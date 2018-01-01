@@ -104,9 +104,9 @@ RpcServer::HandlerFunction jsonMethod(bool (RpcServer::*handler)(typename Comman
 
 
 }
-  
+
 std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction>> RpcServer::s_handlers = {
-  
+
   // binary handlers
   { "/getblocks.bin", { binMethod<COMMAND_RPC_GET_BLOCKS_FAST>(&RpcServer::on_get_blocks), false } },
   { "/queryblocks.bin", { binMethod<COMMAND_RPC_QUERY_BLOCKS>(&RpcServer::on_query_blocks), false } },
@@ -496,7 +496,7 @@ bool RpcServer::on_send_raw_tx(const COMMAND_RPC_SEND_RAW_TX::request& req, COMM
   logger(DEBUGGING) << "transaction " << transactionHash << " came in on_send_raw_tx";
 
   if (!m_core.addTransactionToPool(transactions.back())) {
-    logger(INFO) << "[on_send_raw_tx]: tx verification failed";
+    logger(DEBUGGING) << "[on_send_raw_tx]: tx verification failed";
     res.status = "Failed";
     return true;
   }
@@ -523,16 +523,21 @@ bool RpcServer::on_stop_daemon(const COMMAND_RPC_STOP_DAEMON::request& req, COMM
 // JSON RPC methods
 //------------------------------------------------------------------------------------------------------------------------------
 bool RpcServer::f_on_blocks_list_json(const F_COMMAND_RPC_GET_BLOCKS_LIST::request& req, F_COMMAND_RPC_GET_BLOCKS_LIST::response& res) {
+  // check if blockchain explorer RPC is enabled
+  if (m_core.getCurrency().isBlockexplorer() == false) {
+    return false;
+  }
+
   if (m_core.getTopBlockIndex() + 1 <= req.height) {
     throw JsonRpc::JsonRpcError{ CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
-      std::string("To big height: ") + std::to_string(req.height) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex() + 1) };
+      std::string("To big height: ") + std::to_string(req.height) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex()) };
   }
 
   uint32_t print_blocks_count = 30;
   uint32_t last_height = req.height - print_blocks_count;
   if (req.height <= print_blocks_count)  {
     last_height = 0;
-  } 
+  }
 
   for (uint32_t i = req.height; i >= last_height; i--) {
     Hash block_hash = m_core.getBlockHashByIndex(static_cast<uint32_t>(i));
@@ -562,6 +567,11 @@ bool RpcServer::f_on_blocks_list_json(const F_COMMAND_RPC_GET_BLOCKS_LIST::reque
 }
 
 bool RpcServer::f_on_block_json(const F_COMMAND_RPC_GET_BLOCK_DETAILS::request& req, F_COMMAND_RPC_GET_BLOCK_DETAILS::response& res) {
+  // check if blockchain explorer RPC is enabled
+  if (m_core.getCurrency().isBlockexplorer() == false) {
+    return false;
+  }
+
   Hash hash;
 
   try {
@@ -655,6 +665,11 @@ bool RpcServer::f_on_block_json(const F_COMMAND_RPC_GET_BLOCK_DETAILS::request& 
 }
 
 bool RpcServer::f_on_transaction_json(const F_COMMAND_RPC_GET_TRANSACTION_DETAILS::request& req, F_COMMAND_RPC_GET_TRANSACTION_DETAILS::response& res) {
+  // check if blockchain explorer RPC is enabled
+  if (m_core.getCurrency().isBlockexplorer() == false) {
+    return false;
+  }
+
   Hash hash;
 
   if (!parse_hash256(req.hash, hash)) {
@@ -734,6 +749,11 @@ bool RpcServer::f_on_transaction_json(const F_COMMAND_RPC_GET_TRANSACTION_DETAIL
 
 
 bool RpcServer::f_on_transactions_pool_json(const F_COMMAND_RPC_GET_POOL::request& req, F_COMMAND_RPC_GET_POOL::response& res) {
+  // check if blockchain explorer RPC is enabled
+  if (m_core.getCurrency().isBlockexplorer() == false) {
+    return false;
+  }
+
   auto pool = m_core.getPoolTransactions();
   for (const Transaction tx : pool) {
     f_transaction_short_response transaction_short;
@@ -778,7 +798,7 @@ bool RpcServer::on_getblockhash(const COMMAND_RPC_GETBLOCKHASH::request& req, CO
   uint32_t h = static_cast<uint32_t>(req[0]);
   Crypto::Hash blockId = m_core.getBlockHashByIndex(h - 1);
   if (blockId == NULL_HASH) {
-    throw JsonRpc::JsonRpcError{ 
+    throw JsonRpc::JsonRpcError{
       CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
       std::string("Too big height: ") + std::to_string(h) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex() + 1)
     };
@@ -937,7 +957,7 @@ void RpcServer::fill_block_header_response(const BlockTemplate& blk, bool orphan
 }
 
 bool RpcServer::on_get_last_block_header(const COMMAND_RPC_GET_LAST_BLOCK_HEADER::request& req, COMMAND_RPC_GET_LAST_BLOCK_HEADER::response& res) {
-  auto topBlock = m_core.getBlockByHash(m_core.getTopBlockHash());  
+  auto topBlock = m_core.getBlockByHash(m_core.getTopBlockHash());
   fill_block_header_response(topBlock, false, m_core.getTopBlockIndex(), m_core.getTopBlockHash(), res.block_header);
   res.status = CORE_RPC_STATUS_OK;
   return true;
@@ -967,15 +987,15 @@ bool RpcServer::on_get_block_header_by_hash(const COMMAND_RPC_GET_BLOCK_HEADER_B
 }
 
 bool RpcServer::on_get_block_header_by_height(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::request& req, COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::response& res) {
-  if (m_core.getTopBlockIndex() + 1 < req.height) {
+  if (m_core.getTopBlockIndex() < req.height) {
     throw JsonRpc::JsonRpcError{ CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
-      std::string("To big height: ") + std::to_string(req.height) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex() + 1) };
+      std::string("To big height: ") + std::to_string(req.height) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex()) };
   }
 
-  uint32_t index = static_cast<uint32_t>(req.height) - 1;
+uint32_t index = static_cast<uint32_t>(req.height);
   auto block = m_core.getBlockByIndex(index);
   CachedBlock cachedBlock(block);
-  assert(cachedBlock.getBlockIndex() == req.height - 1);
+assert(cachedBlock.getBlockIndex() == req.height);
   fill_block_header_response(block, false, index, cachedBlock.getBlockHash(), res.block_header);
   res.status = CORE_RPC_STATUS_OK;
   return true;

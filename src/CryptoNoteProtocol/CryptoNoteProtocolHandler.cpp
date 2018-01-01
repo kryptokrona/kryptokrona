@@ -136,7 +136,7 @@ CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, S
   m_observedHeight(0),
   m_peersCount(0),
   logger(log, "protocol") {
-  
+
   if (!m_p2p) {
     m_p2p = &m_p2p_stub;
   }
@@ -181,7 +181,7 @@ void CryptoNoteProtocolHandler::onConnectionClosed(CryptoNoteConnectionContext& 
 void CryptoNoteProtocolHandler::stop() {
   m_stop = true;
 }
-    
+
 bool CryptoNoteProtocolHandler::start_sync(CryptoNoteConnectionContext& context) {
   logger(Logging::TRACE) << context << "Starting synchronization";
 
@@ -356,7 +356,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_transactions(int command, NOTIF
 
   for (auto tx_blob_it = arg.txs.begin(); tx_blob_it != arg.txs.end();) {
     if (!m_core.addTransactionToPool(*tx_blob_it)) {
-      logger(Logging::INFO) << context << "Tx verification failed";
+      logger(Logging::DEBUGGING) << context << "Tx verification failed";
       tx_blob_it = arg.txs.erase(tx_blob_it);
     } else {
       ++tx_blob_it;
@@ -564,7 +564,7 @@ bool CryptoNoteProtocolHandler::request_missing_objects(CryptoNoteConnectionCont
         << "\r\nm_last_response_height=" << context.m_last_response_height
         << "\r\nm_remote_blockchain_height=" << context.m_remote_blockchain_height
         << "\r\nm_needed_objects.size()=" << context.m_needed_objects.size()
-        << "\r\nm_requested_objects.size()=" << context.m_requested_objects.size() 
+        << "\r\nm_requested_objects.size()=" << context.m_requested_objects.size()
         << "\r\non connection [" << context << "]";
       return false;
     }
@@ -689,7 +689,12 @@ void CryptoNoteProtocolHandler::updateObservedHeight(uint32_t peerHeight, const 
     std::lock_guard<std::mutex> lock(m_observedHeightMutex);
 
     uint32_t height = m_observedHeight;
-    if (peerHeight > context.m_remote_blockchain_height) {
+    if (context.m_remote_blockchain_height != 0 && context.m_last_response_height <= context.m_remote_blockchain_height - 1) {
+      m_observedHeight = context.m_remote_blockchain_height - 1;
+      if (m_observedHeight != height) {
+        updated = true;
+      }
+    } else if (peerHeight > context.m_remote_blockchain_height) {
       m_observedHeight = std::max(m_observedHeight, peerHeight);
       if (m_observedHeight != height) {
         updated = true;
@@ -719,6 +724,9 @@ void CryptoNoteProtocolHandler::recalculateMaxObservedHeight(const CryptoNoteCon
   });
 
   m_observedHeight = std::max(peerHeight, m_core.getTopBlockIndex() + 1);
+    if (context.m_state == CryptoNoteConnectionContext::state_normal) {
+      m_observedHeight = m_core.getTopBlockIndex();
+    }
 }
 
 uint32_t CryptoNoteProtocolHandler::getObservedHeight() const {
