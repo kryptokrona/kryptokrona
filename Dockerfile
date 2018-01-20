@@ -65,7 +65,8 @@ RUN useradd -r -s /usr/sbin/nologin -m -d /var/lib/turtlecoind turtlecoind && \
     chmod +x /etc/services.d/turtlecoind/run && \
     chown nobody:nogroup /var/log/turtlecoind && \
     echo "#!/usr/bin/execlineb" > /etc/services.d/turtlecoind/log/run && \
-    echo "logutil-service /var/log/turtlecoind" >> /etc/services.d/turtlecoind/log/run && \
+    echo "s6-setuidgid nobody" >> /etc/services.d/turtlecoind/log/run && \
+    echo "s6-log -bp -- n20 s1000000 /var/log/turtlecoind" >> /etc/services.d/turtlecoind/log/run && \
     chmod +x /etc/services.d/turtlecoind/log/run && \
     echo "/var/lib/turtlecoind true turtlecoind 0644 0755" > /etc/fix-attrs.d/turtlecoind-home && \
     echo "/home/turtlecoin true turtlecoin 0644 0755" > /etc/fix-attrs.d/turtlecoin-home && \
