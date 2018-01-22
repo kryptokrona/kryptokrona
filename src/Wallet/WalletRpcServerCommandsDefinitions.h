@@ -182,5 +182,21 @@ using CryptoNote::ISerializer;
     typedef CryptoNote::EMPTY_STRUCT request;
     typedef CryptoNote::EMPTY_STRUCT response;
   };
+
+  struct COMMAND_RPC_RESET_FROM {
+
+    struct request
+    {
+    uint64_t height;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(height)
+      }
+    };
+
+    typedef CryptoNote::EMPTY_STRUCT response;
+
+  };
+
 }
 }

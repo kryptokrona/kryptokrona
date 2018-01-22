@@ -203,8 +203,12 @@ void WalletLegacy::initSync() {
   sub.transactionSpendableAge = 1;
   sub.syncStart.height = 0;
   sub.syncStart.timestamp = m_account.get_createtime() - ACCOUN_CREATE_TIME_ACCURACY;
-  if (m_syncAll == 1)
+  if (m_syncAll == 1) {
     sub.syncStart.timestamp = 0;
+    if (m_syncStartHeight) {
+      sub.syncStart.height = m_syncStartHeight;
+    }
+  }
   std::cout << "Sync from timestamp: " << sub.syncStart.timestamp << std::endl;
   
   auto& subObject = m_transfersSync.addSubscription(sub);
@@ -309,6 +313,12 @@ void WalletLegacy::reset() {
   } catch (std::exception& e) {
     std::cout << "exception in reset: " << e.what() << std::endl;
   }
+}
+
+void WalletLegacy::reset(uint64_t height) {
+  m_syncAll = 1;
+  m_syncStartHeight = height;
+  reset();
 }
 
 void WalletLegacy::save(std::ostream& destination, bool saveDetailed, bool saveCache) {
@@ -598,8 +608,13 @@ void WalletLegacy::notifyIfBalanceChanged() {
 
 }
 
-void WalletLegacy::syncAll(bool syncWalletFromZero) {
+void WalletLegacy::syncAll(bool syncWalletFromZero, uint64_t height) {
   m_syncAll = syncWalletFromZero;
+  if (height) {
+    m_syncStartHeight = height;
+  } else {
+    m_syncStartHeight = 0;
+  }
 }
 void WalletLegacy::getAccountKeys(AccountKeys& keys) {
   if (m_state == NOT_INITIALIZED) {

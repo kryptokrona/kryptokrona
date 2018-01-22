@@ -43,19 +43,19 @@ void wallet_rpc_server::init_options(boost::program_options::options_description
 }
 //------------------------------------------------------------------------------------------------------------------------------
 wallet_rpc_server::wallet_rpc_server(
-  System::Dispatcher& dispatcher, 
-  Logging::ILogger& log, 
+  System::Dispatcher& dispatcher,
+  Logging::ILogger& log,
   CryptoNote::IWalletLegacy&w,
-  CryptoNote::INode& n, 
-  CryptoNote::Currency& currency, 
+  CryptoNote::INode& n,
+  CryptoNote::Currency& currency,
   const std::string& walletFile)
-  : 
-  HttpServer(dispatcher, log), 
-  logger(log, "WalletRpc"), 
-  m_dispatcher(dispatcher), 
-  m_stopComplete(dispatcher), 
+  :
+  HttpServer(dispatcher, log),
+  logger(log, "WalletRpc"),
+  m_dispatcher(dispatcher),
+  m_stopComplete(dispatcher),
   m_wallet(w),
-  m_node(n), 
+  m_node(n),
   m_currency(currency),
   m_walletFilename(walletFile) {
 }
@@ -108,7 +108,11 @@ void wallet_rpc_server::processRequest(const CryptoNote::HttpRequest& request, C
       { "get_payments", makeMemberMethod(&wallet_rpc_server::on_get_payments) },
       { "get_transfers", makeMemberMethod(&wallet_rpc_server::on_get_transfers) },
       { "get_height", makeMemberMethod(&wallet_rpc_server::on_get_height) },
-      { "reset", makeMemberMethod(&wallet_rpc_server::on_reset) }
+      { "reset", makeMemberMethod(&wallet_rpc_server::on_reset) },
+      { "reset_from", makeMemberMethod(&wallet_rpc_server::on_reset_from) }
+      //{ "stop_wallet", makeMemberMethod(&wallet_rpc_server::on_stop_wallet) },
+      //{ "get_address", makeMemberMethod(&wallet_rpc_server::on_get_address) },
+      //{ "view_keys", makeMemberMethod(&wallet_rpc_server::on_view_keys) }
     };
 
     auto it = s_methods.find(jsonRequest.getMethod());
@@ -149,7 +153,7 @@ bool wallet_rpc_server::on_transfer(const wallet_rpc::COMMAND_RPC_TRANSFER::requ
 
     Crypto::Hash payment_id;
     if (!CryptoNote::parsePaymentId(payment_id_str, payment_id)) {
-      throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_CODE_WRONG_PAYMENT_ID, 
+      throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_CODE_WRONG_PAYMENT_ID,
         "Payment id has invalid format: \"" + payment_id_str + "\", expected 64-character string");
     }
 
@@ -288,6 +292,11 @@ bool wallet_rpc_server::on_get_height(const wallet_rpc::COMMAND_RPC_GET_HEIGHT::
 }
 
 bool wallet_rpc_server::on_reset(const wallet_rpc::COMMAND_RPC_RESET::request& req, wallet_rpc::COMMAND_RPC_RESET::response& res) {
+  m_wallet.reset();
+  return true;
+}
+
+bool wallet_rpc_server::on_reset_from(const wallet_rpc::COMMAND_RPC_RESET_FROM::request& req, wallet_rpc::COMMAND_RPC_RESET_FROM::response& res) {
   m_wallet.reset();
   return true;
 }
