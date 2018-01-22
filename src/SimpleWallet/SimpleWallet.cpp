@@ -559,6 +559,9 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
 
   std::string walletFileName;
   sync_from_zero = command_line::get_arg(vm, arg_SYNC_FROM_ZERO);
+  if (sync_from_zero) {
+    sync_from_height = 0;
+  }
     if (!m_generate_new.empty() || !m_import_new.empty()) {
     std::string ignoredString;
     if (!m_generate_new.empty()) {
@@ -611,6 +614,9 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   }
 
   sync_from_zero = command_line::get_arg(vm, arg_SYNC_FROM_ZERO);
+  if (sync_from_zero) {
+    sync_from_height = 0;
+  }
   if (!m_generate_new.empty()) {
     std::string walletAddressFile = prepareWalletAddressFilename(m_generate_new);
     boost::system::error_code ignore;
@@ -672,7 +678,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     m_wallet.reset(new WalletLegacy(m_currency, *m_node));
 
 
-    m_wallet->syncAll(sync_from_zero);
+    m_wallet->syncAll(sync_from_zero, 0);
 
     try {
       m_wallet_file = tryToOpenWalletOrLoadKeysOrThrow(logger, m_wallet, m_wallet_file_arg, pwd_container.password());
@@ -723,7 +729,7 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
   try {
     m_initResultPromise.reset(new std::promise<std::error_code>());
     std::future<std::error_code> f_initError = m_initResultPromise->get_future();
-    m_wallet->syncAll(sync_from_zero);
+    m_wallet->syncAll(sync_from_zero, 0);
     m_wallet->initAndGenerate(password);
     auto initError = f_initError.get();
     m_initResultPromise.reset(nullptr);
@@ -849,7 +855,21 @@ bool simple_wallet::reset(const std::vector<std::string> &args) {
     m_walletSynchronized = false;
   }
 
-  m_wallet->reset();
+  if(0 == args.size()) {
+    success_msg_writer(true) << "Resetting wallet from block height 0";
+    m_wallet->syncAll(true, 0);
+    m_wallet->reset();
+  } else {
+    uint64_t height = 0;
+    bool ok = Common::fromString(args[0], height);
+    if (ok) {
+      success_msg_writer(true) << "Resetting wallet from block height " << height;
+      m_wallet->syncAll(true, height);
+      m_wallet->reset(height);
+    }
+  }
+
+  
   success_msg_writer(true) << "Reset completed successfully.";
 
   std::unique_lock<std::mutex> lock(m_walletSynchronizedMutex);

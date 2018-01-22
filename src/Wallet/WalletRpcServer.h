@@ -37,17 +37,17 @@ namespace Tools
   public:
 
     wallet_rpc_server(
-      System::Dispatcher& dispatcher, 
+      System::Dispatcher& dispatcher,
       Logging::ILogger& log,
-      CryptoNote::IWalletLegacy &w, 
-      CryptoNote::INode &n, 
+      CryptoNote::IWalletLegacy &w,
+      CryptoNote::INode &n,
       CryptoNote::Currency& currency,
       const std::string& walletFilename);
 
 
     static void init_options(boost::program_options::options_description& desc);
     bool init(const boost::program_options::variables_map& vm);
-    
+
     bool run();
     void send_stop_signal();
 
@@ -66,6 +66,7 @@ namespace Tools
     bool on_get_transfers(const wallet_rpc::COMMAND_RPC_GET_TRANSFERS::request& req, wallet_rpc::COMMAND_RPC_GET_TRANSFERS::response& res);
     bool on_get_height(const wallet_rpc::COMMAND_RPC_GET_HEIGHT::request& req, wallet_rpc::COMMAND_RPC_GET_HEIGHT::response& res);
     bool on_reset(const wallet_rpc::COMMAND_RPC_RESET::request& req, wallet_rpc::COMMAND_RPC_RESET::response& res);
+    bool on_reset_from(const wallet_rpc::COMMAND_RPC_RESET_FROM::request& req, wallet_rpc::COMMAND_RPC_RESET_FROM::response& res);
 
     bool handle_command_line(const boost::program_options::variables_map& vm);
 
