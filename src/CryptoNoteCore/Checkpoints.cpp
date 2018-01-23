@@ -53,7 +53,7 @@ bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h,
     return true;
 
   if (it->second == h) {
-    logger(Logging::INFO, Logging::GREEN) 
+    logger(Logging::INFO, BRIGHT_YELLOW) 
       << "CHECKPOINT PASSED FOR INDEX " << index << " " << h;
     return true;
   } else {
