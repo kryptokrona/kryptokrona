@@ -27,6 +27,10 @@
 #include "BlockingQueue.h"
 #include "ConsoleTools.h"
 
+#ifndef _WIN32
+#include <sys/select.h>
+#endif
+
 namespace Common {
 
 class AsyncConsoleReader {
