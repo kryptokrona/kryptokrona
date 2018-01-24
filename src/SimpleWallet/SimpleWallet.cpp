@@ -77,7 +77,8 @@ const command_line::arg_descriptor<bool>      arg_SYNC_FROM_ZERO  = {"SYNC_FROM_
 const command_line::arg_descriptor<bool>      arg_exit_after_generate  = {"exit-after-generate", "Exit immediately after generating a wallet, do not try to sync with the daemon", false};
 const command_line::arg_descriptor<bool> arg_testnet = { "testnet", "Used to deploy test nets. The daemon must be launched with --testnet flag", false };
 const command_line::arg_descriptor< std::vector<std::string> > arg_command = { "command", "" };
-
+const command_line::arg_descriptor<std::string> arg_restore_view = { "restore-view-key", "Specify the View Key to re-generate an existing wallet", ""};
+const command_line::arg_descriptor<std::string> arg_restore_spend = { "restore-spend-key", "Specify the Spend Key to re-generate an existing wallet", ""};
 
 bool parseUrlAddress(const std::string& url, std::string& address, uint16_t& port) {
   auto pos = url.find("://");
@@ -519,9 +520,13 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     return false;
   }
 
+  bool restore_cmd = (!m_restore_view.empty() && !m_restore_spend.empty());
+  
   if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
-    std::cout << "Nor 'generate-new-wallet' neither 'wallet-file' argument was specified.\nWhat do you want to do?\n[O]pen existing wallet, [G]enerate new wallet file, [I]mport wallet or [E]xit.\n";
+
     char c;
+    std::cout << "Nor 'generate-new-wallet' neither 'wallet-file' argument was specified.\nWhat do you want to do?\n[O]pen existing wallet, [G]enerate new wallet file, [I]mport wallet or [E]xit.\n";
+    
     do {
       std::string answer;
       std::getline(std::cin, answer);
@@ -552,6 +557,11 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     } else {
       m_wallet_file_arg = userInput;
     }
+  }
+
+  if (restore_cmd && !m_wallet_file_arg.empty()) {
+    // we are restoring a wallet from the view/spend keys
+    m_import_new = m_wallet_file_arg;
   }
 
   if (!m_generate_new.empty() && !m_wallet_file_arg.empty() && !m_import_new.empty()) {
@@ -645,16 +655,31 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
 
     std::string private_spend_key_string;
     std::string private_view_key_string;
-    do {
-      std::cout << "Private Spend Key: ";
-      std::getline(std::cin, private_spend_key_string);
-      boost::algorithm::trim(private_spend_key_string);
-    } while (private_spend_key_string.empty());
-    do {
-      std::cout << "Private View Key: ";
-      std::getline(std::cin, private_view_key_string);
+
+    if (m_restore_view.empty() || m_restore_spend.empty()) {
+
+      do {
+        std::cout << "Private Spend Key: ";
+        std::getline(std::cin, private_spend_key_string);
+        boost::algorithm::trim(private_spend_key_string);
+      } while (private_spend_key_string.empty());
+      do {
+        std::cout << "Private View Key: ";
+        std::getline(std::cin, private_view_key_string);
+        boost::algorithm::trim(private_view_key_string);
+      } while (private_view_key_string.empty());
+
+    } else {
+      
+      // the view/spend keys have been specified
+
+      private_view_key_string = m_restore_view;
+      private_spend_key_string = m_restore_spend;
+
       boost::algorithm::trim(private_view_key_string);
-    } while (private_view_key_string.empty());
+      boost::algorithm::trim(private_spend_key_string);
+
+    }
 
     Crypto::Hash private_spend_key_hash;
     Crypto::Hash private_view_key_hash;
@@ -727,6 +752,8 @@ void simple_wallet::handle_command_line(const boost::program_options::variables_
   m_daemon_host = command_line::get_arg(vm, arg_daemon_host);
   m_daemon_port = command_line::get_arg(vm, arg_daemon_port);
   exit_after_generate = command_line::get_arg(vm, arg_exit_after_generate);
+  m_restore_view = command_line::get_arg(vm, arg_restore_view);
+  m_restore_spend = command_line::get_arg(vm, arg_restore_spend);
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string& password) {
@@ -1237,6 +1264,8 @@ int main(int argc, char* argv[]) {
   command_line::add_arg(desc_params, arg_wallet_file);
   command_line::add_arg(desc_params, arg_generate_new_wallet);
   command_line::add_arg(desc_params, arg_password);
+  command_line::add_arg(desc_params, arg_restore_spend);
+  command_line::add_arg(desc_params, arg_restore_view);
   command_line::add_arg(desc_params, arg_daemon_address);
   command_line::add_arg(desc_params, arg_daemon_host);
   command_line::add_arg(desc_params, arg_daemon_port);
