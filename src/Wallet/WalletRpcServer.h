@@ -76,6 +76,7 @@ namespace Tools
     CryptoNote::IWalletLegacy& m_wallet;
     CryptoNote::INode& m_node;
     uint16_t m_port;
+    bool m_allow_extended_rpc;
     std::string m_bind_ip;
     CryptoNote::Currency& m_currency;
     const std::string m_walletFilename;
