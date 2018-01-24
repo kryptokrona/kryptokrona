@@ -204,5 +204,36 @@ using CryptoNote::ISerializer;
 
   };
 
+  struct COMMAND_RPC_GET_ADDRESS
+  {
+    typedef CryptoNote::EMPTY_STRUCT request;
+
+    struct response
+    {
+      std::string address;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(address)
+      }
+    };
+  };
+
+  struct COMMAND_RPC_VIEW_KEYS
+  {
+    typedef CryptoNote::EMPTY_STRUCT request;
+
+    struct response
+    {
+      std::string view_key;
+      std::string spend_key;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(view_key)
+        KV_MEMBER(spend_key)
+      }
+
+    };
+  };
+
 }
 }
