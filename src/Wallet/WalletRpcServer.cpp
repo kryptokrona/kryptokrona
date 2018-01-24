@@ -36,26 +36,28 @@ namespace Tools {
 
 const command_line::arg_descriptor<uint16_t> wallet_rpc_server::arg_rpc_bind_port = { "rpc-bind-port", "Starts wallet as rpc server for wallet operations, sets bind port for server", 0, true };
 const command_line::arg_descriptor<std::string> wallet_rpc_server::arg_rpc_bind_ip = { "rpc-bind-ip", "Specify ip to bind rpc server", "127.0.0.1" };
+const command_line::arg_descriptor<bool>      arg_allow_extended_rpc  = {"allow-extended-rpc", "Allow RPC access to the wallet address and view/spend keys", false};
 
 void wallet_rpc_server::init_options(boost::program_options::options_description& desc) {
   command_line::add_arg(desc, arg_rpc_bind_ip);
   command_line::add_arg(desc, arg_rpc_bind_port);
+  command_line::add_arg(desc, arg_allow_extended_rpc);
 }
 //------------------------------------------------------------------------------------------------------------------------------
 wallet_rpc_server::wallet_rpc_server(
-  System::Dispatcher& dispatcher, 
-  Logging::ILogger& log, 
+  System::Dispatcher& dispatcher,
+  Logging::ILogger& log,
   CryptoNote::IWalletLegacy&w,
-  CryptoNote::INode& n, 
-  CryptoNote::Currency& currency, 
+  CryptoNote::INode& n,
+  CryptoNote::Currency& currency,
   const std::string& walletFile)
-  : 
-  HttpServer(dispatcher, log), 
-  logger(log, "WalletRpc"), 
-  m_dispatcher(dispatcher), 
-  m_stopComplete(dispatcher), 
+  :
+  HttpServer(dispatcher, log),
+  logger(log, "WalletRpc"),
+  m_dispatcher(dispatcher),
+  m_stopComplete(dispatcher),
   m_wallet(w),
-  m_node(n), 
+  m_node(n),
   m_currency(currency),
   m_walletFilename(walletFile) {
 }
@@ -78,6 +80,7 @@ void wallet_rpc_server::send_stop_signal() {
 bool wallet_rpc_server::handle_command_line(const boost::program_options::variables_map& vm) {
   m_bind_ip = command_line::get_arg(vm, arg_rpc_bind_ip);
   m_port = command_line::get_arg(vm, arg_rpc_bind_port);
+  m_allow_extended_rpc = command_line::get_arg(vm, arg_allow_extended_rpc);
   return true;
 }
 //------------------------------------------------------------------------------------------------------------------------------
@@ -108,7 +111,11 @@ void wallet_rpc_server::processRequest(const CryptoNote::HttpRequest& request, C
       { "get_payments", makeMemberMethod(&wallet_rpc_server::on_get_payments) },
       { "get_transfers", makeMemberMethod(&wallet_rpc_server::on_get_transfers) },
       { "get_height", makeMemberMethod(&wallet_rpc_server::on_get_height) },
-      { "reset", makeMemberMethod(&wallet_rpc_server::on_reset) }
+      // below are the restricted methods, use --enable-extended-rpc
+      { "reset", makeMemberMethod(&wallet_rpc_server::on_reset) },
+      { "stop_wallet", makeMemberMethod(&wallet_rpc_server::on_stop_wallet) },
+      { "get_address", makeMemberMethod(&wallet_rpc_server::on_get_address) },
+      { "view_keys", makeMemberMethod(&wallet_rpc_server::on_view_keys) }
     };
 
     auto it = s_methods.find(jsonRequest.getMethod());
@@ -149,7 +156,7 @@ bool wallet_rpc_server::on_transfer(const wallet_rpc::COMMAND_RPC_TRANSFER::requ
 
     Crypto::Hash payment_id;
     if (!CryptoNote::parsePaymentId(payment_id_str, payment_id)) {
-      throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_CODE_WRONG_PAYMENT_ID, 
+      throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_CODE_WRONG_PAYMENT_ID,
         "Payment id has invalid format: \"" + payment_id_str + "\", expected 64-character string");
     }
 
@@ -290,6 +297,43 @@ bool wallet_rpc_server::on_get_height(const wallet_rpc::COMMAND_RPC_GET_HEIGHT::
 bool wallet_rpc_server::on_reset(const wallet_rpc::COMMAND_RPC_RESET::request& req, wallet_rpc::COMMAND_RPC_RESET::response& res) {
   m_wallet.reset();
   return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------
+bool wallet_rpc_server::on_stop_wallet(const wallet_rpc::COMMAND_RPC_STOP::request& req, wallet_rpc::COMMAND_RPC_STOP::response& res) {
+  
+  if(m_allow_extended_rpc) {
+    try {
+      WalletHelper::storeWallet(m_wallet, m_walletFilename);
+    } catch (std::exception& e) {
+      throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR, std::string("Couldn't save wallet: ") + e.what());
+    }
+
+    wallet_rpc_server::send_stop_signal();
+  }
+  return true;
+  
+}
+
+bool wallet_rpc_server::on_get_address(const wallet_rpc::COMMAND_RPC_GET_ADDRESS::request& req, wallet_rpc::COMMAND_RPC_GET_ADDRESS::response& res) {
+  
+  if(m_allow_extended_rpc) {
+    res.address = m_wallet.getAddress();
+  }
+  return true;
+
+}
+
+bool wallet_rpc_server::on_view_keys(const wallet_rpc::COMMAND_RPC_VIEW_KEYS::request& req, wallet_rpc::COMMAND_RPC_VIEW_KEYS::response& res) {
+  
+  if(m_allow_extended_rpc) {
+    AccountKeys keys;
+    m_wallet.getAccountKeys(keys);
+    res.view_key = Common::podToHex(keys.viewSecretKey);
+    res.spend_key = Common::podToHex(keys.spendSecretKey);
+  }
+  return true;
+
 }
 
 }

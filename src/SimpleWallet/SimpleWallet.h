@@ -164,7 +164,11 @@ std::string m_import_new;
     uint16_t m_daemon_port;
 
     std::string m_wallet_file;
+    std::string m_restore_view;
+    std::string m_restore_spend;
     bool sync_from_zero;
+    bool exit_after_generate;
+    uint64_t sync_from_height; 
 
     std::unique_ptr<std::promise<std::error_code>> m_initResultPromise;
 

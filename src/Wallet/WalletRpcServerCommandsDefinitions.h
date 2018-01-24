@@ -94,6 +94,12 @@ using CryptoNote::ISerializer;
     typedef CryptoNote::EMPTY_STRUCT response;
   };
 
+  struct COMMAND_RPC_STOP
+  {
+    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef CryptoNote::EMPTY_STRUCT response;
+  };
+
   struct payment_details
   {
     std::string tx_hash;
@@ -182,5 +188,52 @@ using CryptoNote::ISerializer;
     typedef CryptoNote::EMPTY_STRUCT request;
     typedef CryptoNote::EMPTY_STRUCT response;
   };
+
+  struct COMMAND_RPC_RESET_FROM {
+
+    struct request
+    {
+    uint64_t height;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(height)
+      }
+    };
+
+    typedef CryptoNote::EMPTY_STRUCT response;
+
+  };
+
+  struct COMMAND_RPC_GET_ADDRESS
+  {
+    typedef CryptoNote::EMPTY_STRUCT request;
+
+    struct response
+    {
+      std::string address;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(address)
+      }
+    };
+  };
+
+  struct COMMAND_RPC_VIEW_KEYS
+  {
+    typedef CryptoNote::EMPTY_STRUCT request;
+
+    struct response
+    {
+      std::string view_key;
+      std::string spend_key;
+
+      void serialize(ISerializer& s) {
+        KV_MEMBER(view_key)
+        KV_MEMBER(spend_key)
+      }
+
+    };
+  };
+
 }
 }

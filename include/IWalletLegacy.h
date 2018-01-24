@@ -88,6 +88,7 @@ public:
   virtual void initWithKeys(const AccountKeys& accountKeys, const std::string& password) = 0;
   virtual void shutdown() = 0;
   virtual void reset() = 0;
+  virtual void reset(uint64_t height) = 0;
 
   virtual void save(std::ostream& destination, bool saveDetailed = true, bool saveCache = true) = 0;
 
@@ -111,7 +112,7 @@ public:
   virtual std::error_code cancelTransaction(size_t transferId) = 0;
 
   virtual void getAccountKeys(AccountKeys& keys) = 0;
-  virtual void syncAll(bool syncWalletFromZero = 0) = 0;
+  virtual void syncAll(bool syncWalletFromZero = 0, uint64_t height = 0) = 0;
 };
 
 }
