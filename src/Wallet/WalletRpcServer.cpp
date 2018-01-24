@@ -109,9 +109,9 @@ void wallet_rpc_server::processRequest(const CryptoNote::HttpRequest& request, C
       { "get_transfers", makeMemberMethod(&wallet_rpc_server::on_get_transfers) },
       { "get_height", makeMemberMethod(&wallet_rpc_server::on_get_height) },
       { "reset", makeMemberMethod(&wallet_rpc_server::on_reset) },
-      { "stop_wallet", makeMemberMethod(&wallet_rpc_server::on_stop_wallet) }
-      //{ "get_address", makeMemberMethod(&wallet_rpc_server::on_get_address) },
-      //{ "view_keys", makeMemberMethod(&wallet_rpc_server::on_view_keys) }
+      { "stop_wallet", makeMemberMethod(&wallet_rpc_server::on_stop_wallet) },
+      { "get_address", makeMemberMethod(&wallet_rpc_server::on_get_address) },
+      { "view_keys", makeMemberMethod(&wallet_rpc_server::on_view_keys) }
     };
 
     auto it = s_methods.find(jsonRequest.getMethod());
@@ -296,7 +296,7 @@ bool wallet_rpc_server::on_reset(const wallet_rpc::COMMAND_RPC_RESET::request& r
 }
 
 //------------------------------------------------------------------------------------------------------------------------------
-bool wallet_rpc_server::on_stop_wallet(const wallet_rpc::COMMAND_RPC_STOP::request& req, wallet_rpc::COMMAND_RPC_STORE::response& res) {
+bool wallet_rpc_server::on_stop_wallet(const wallet_rpc::COMMAND_RPC_STOP::request& req, wallet_rpc::COMMAND_RPC_STOP::response& res) {
   try {
     WalletHelper::storeWallet(m_wallet, m_walletFilename);
   } catch (std::exception& e) {
@@ -307,4 +307,23 @@ bool wallet_rpc_server::on_stop_wallet(const wallet_rpc::COMMAND_RPC_STOP::reque
 
   return true;
 }
+
+bool wallet_rpc_server::on_get_address(const wallet_rpc::COMMAND_RPC_GET_ADDRESS::request& req, wallet_rpc::COMMAND_RPC_GET_ADDRESS::response& res) {
+  
+  res.address = m_wallet.getAddress();
+  return true;
+
+}
+
+bool wallet_rpc_server::on_view_keys(const wallet_rpc::COMMAND_RPC_VIEW_KEYS::request& req, wallet_rpc::COMMAND_RPC_VIEW_KEYS::response& res) {
+  
+  AccountKeys keys;
+  m_wallet.getAccountKeys(keys);
+  res.view_key = Common::podToHex(keys.viewSecretKey);
+  res.spend_key = Common::podToHex(keys.spendSecretKey);
+
+  return true;
+
+}
+
 }

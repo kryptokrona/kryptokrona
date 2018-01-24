@@ -68,8 +68,9 @@ namespace Tools
     bool on_get_height(const wallet_rpc::COMMAND_RPC_GET_HEIGHT::request& req, wallet_rpc::COMMAND_RPC_GET_HEIGHT::response& res);
     bool on_reset(const wallet_rpc::COMMAND_RPC_RESET::request& req, wallet_rpc::COMMAND_RPC_RESET::response& res);
     bool on_reset_from(const wallet_rpc::COMMAND_RPC_RESET_FROM::request& req, wallet_rpc::COMMAND_RPC_RESET_FROM::response& res);
-
     bool handle_command_line(const boost::program_options::variables_map& vm);
+    bool on_get_address(const wallet_rpc::COMMAND_RPC_GET_ADDRESS::request& req, wallet_rpc::COMMAND_RPC_GET_ADDRESS::response& res);
+    bool on_view_keys(const wallet_rpc::COMMAND_RPC_VIEW_KEYS::request& req, wallet_rpc::COMMAND_RPC_VIEW_KEYS::response& res);
 
     Logging::LoggerRef logger;
     CryptoNote::IWalletLegacy& m_wallet;
