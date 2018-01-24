@@ -94,6 +94,12 @@ using CryptoNote::ISerializer;
     typedef CryptoNote::EMPTY_STRUCT response;
   };
 
+  struct COMMAND_RPC_STOP
+  {
+    typedef CryptoNote::EMPTY_STRUCT request;
+    typedef CryptoNote::EMPTY_STRUCT response;
+  };
+
   struct payment_details
   {
     std::string tx_hash;

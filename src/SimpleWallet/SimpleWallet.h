@@ -165,6 +165,7 @@ std::string m_import_new;
 
     std::string m_wallet_file;
     bool sync_from_zero;
+    bool exit_after_generate;
     uint64_t sync_from_height; 
 
     std::unique_ptr<std::promise<std::error_code>> m_initResultPromise;

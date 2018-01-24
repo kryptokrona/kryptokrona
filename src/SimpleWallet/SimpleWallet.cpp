@@ -73,7 +73,8 @@ const command_line::arg_descriptor<std::string> arg_daemon_host = { "daemon-host
 const command_line::arg_descriptor<std::string> arg_password = { "password", "Wallet password", "", true };
 const command_line::arg_descriptor<uint16_t> arg_daemon_port = { "daemon-port", "Use daemon instance at port <arg> instead of 11898", 0 };
 const command_line::arg_descriptor<uint32_t> arg_log_level = { "set_log", "", INFO, true };
-  const command_line::arg_descriptor<bool>      arg_SYNC_FROM_ZERO  = {"SYNC_FROM_ZERO", "Sync from block 0. Use for premine wallet or brainwallet", false};
+const command_line::arg_descriptor<bool>      arg_SYNC_FROM_ZERO  = {"SYNC_FROM_ZERO", "Sync from block 0. Use for premine wallet or brainwallet", false};
+const command_line::arg_descriptor<bool>      arg_exit_after_generate  = {"exit-after-generate", "Exit immediately after generating a wallet, do not try to sync with the daemon", false};
 const command_line::arg_descriptor<bool> arg_testnet = { "testnet", "Used to deploy test nets. The daemon must be launched with --testnet flag", false };
 const command_line::arg_descriptor< std::vector<std::string> > arg_command = { "command", "" };
 
@@ -99,6 +100,7 @@ bool parseUrlAddress(const std::string& url, std::string& address, uint16_t& por
 
   address = url.substr(addrStart, addrEnd - addrStart);
   return true;
+
 }
 
 
@@ -675,11 +677,11 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       logger(WARNING, BRIGHT_RED) << "Couldn't write wallet address file: " + walletAddressFile;
     }
   } else {
-    m_wallet.reset(new WalletLegacy(m_currency, *m_node));
 
-
-    m_wallet->syncAll(sync_from_zero, 0);
-
+    if(!exit_after_generate) {
+      m_wallet.reset(new WalletLegacy(m_currency, *m_node));
+      m_wallet->syncAll(sync_from_zero, 0);
+    }
     try {
       m_wallet_file = tryToOpenWalletOrLoadKeysOrThrow(logger, m_wallet, m_wallet_file_arg, pwd_container.password());
     } catch (const std::exception& e) {
@@ -696,6 +698,12 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       "**********************************************************************\n" <<
       "Use \"help\" command to see the list of available commands.\n" <<
       "**********************************************************************";
+
+    if(exit_after_generate) {
+      m_consoleHandler.requestStop();
+      std::exit(0);
+    }
+
   }
 
   return true;
@@ -718,6 +726,7 @@ void simple_wallet::handle_command_line(const boost::program_options::variables_
   m_daemon_address = command_line::get_arg(vm, arg_daemon_address);
   m_daemon_host = command_line::get_arg(vm, arg_daemon_host);
   m_daemon_port = command_line::get_arg(vm, arg_daemon_port);
+  exit_after_generate = command_line::get_arg(vm, arg_exit_after_generate);
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string& password) {
@@ -765,6 +774,12 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     "current session's state. Otherwise, you will possibly need to synchronize \n" <<
     "your wallet again. Your wallet key is NOT under risk anyway.\n" <<
     "**********************************************************************";
+
+    if(exit_after_generate) {
+      m_consoleHandler.requestStop();
+      std::exit(0);
+    }
+
   return true;
 }
 //----------------------------------------------------------------------------------------------------
@@ -818,6 +833,12 @@ bool simple_wallet::new_wallet(Crypto::SecretKey &secret_key, Crypto::SecretKey 
     "current session's state. Otherwise, you will possibly need to synchronize \n" <<
     "your wallet again. Your wallet key is NOT under risk anyway.\n" <<
     "**********************************************************************";
+
+    if(exit_after_generate) {
+      m_consoleHandler.requestStop();
+      std::exit(0);
+    } 
+
   return true;
 }
 //----------------------------------------------------------------------------------------------------
@@ -1224,6 +1245,7 @@ int main(int argc, char* argv[]) {
   command_line::add_arg(desc_params, arg_testnet);
   Tools::wallet_rpc_server::init_options(desc_params);
   command_line::add_arg(desc_params, arg_SYNC_FROM_ZERO);
+  command_line::add_arg(desc_params, arg_exit_after_generate);
 
   po::positional_options_description positional_options;
   positional_options.add(arg_command.name, -1);
