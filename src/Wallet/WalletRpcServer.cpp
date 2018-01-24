@@ -109,8 +109,7 @@ void wallet_rpc_server::processRequest(const CryptoNote::HttpRequest& request, C
       { "get_transfers", makeMemberMethod(&wallet_rpc_server::on_get_transfers) },
       { "get_height", makeMemberMethod(&wallet_rpc_server::on_get_height) },
       { "reset", makeMemberMethod(&wallet_rpc_server::on_reset) },
-      { "reset_from", makeMemberMethod(&wallet_rpc_server::on_reset_from) }
-      //{ "stop_wallet", makeMemberMethod(&wallet_rpc_server::on_stop_wallet) },
+      { "stop_wallet", makeMemberMethod(&wallet_rpc_server::on_stop_wallet) }
       //{ "get_address", makeMemberMethod(&wallet_rpc_server::on_get_address) },
       //{ "view_keys", makeMemberMethod(&wallet_rpc_server::on_view_keys) }
     };
@@ -296,9 +295,16 @@ bool wallet_rpc_server::on_reset(const wallet_rpc::COMMAND_RPC_RESET::request& r
   return true;
 }
 
-bool wallet_rpc_server::on_reset_from(const wallet_rpc::COMMAND_RPC_RESET_FROM::request& req, wallet_rpc::COMMAND_RPC_RESET_FROM::response& res) {
-  m_wallet.reset();
+//------------------------------------------------------------------------------------------------------------------------------
+bool wallet_rpc_server::on_stop_wallet(const wallet_rpc::COMMAND_RPC_STOP::request& req, wallet_rpc::COMMAND_RPC_STORE::response& res) {
+  try {
+    WalletHelper::storeWallet(m_wallet, m_walletFilename);
+  } catch (std::exception& e) {
+    throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR, std::string("Couldn't save wallet: ") + e.what());
+  }
+
+  wallet_rpc_server::send_stop_signal();
+
   return true;
 }
-
 }
