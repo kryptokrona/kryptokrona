@@ -109,7 +109,9 @@ WalletConfiguration PaymentGateService::getWalletConfig() const {
   return WalletConfiguration{
     config.gateConfiguration.containerFile,
     config.gateConfiguration.containerPassword,
-    config.gateConfiguration.syncFromZero
+    config.gateConfiguration.syncFromZero,
+	config.gateConfiguration.secretViewKey,
+	config.gateConfiguration.secretSpendKey
   };
 }
 
