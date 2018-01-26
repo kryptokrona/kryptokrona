@@ -320,18 +320,50 @@ void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfigu
   CryptoNote::IWallet* wallet = new CryptoNote::WalletGreen(dispatcher, currency, *nodeStub, logger);
   std::unique_ptr<CryptoNote::IWallet> walletGuard(wallet);
 
-  log(Logging::INFO, Logging::BRIGHT_WHITE) << "Generating new wallet";
+  
 
-  wallet->initialize(conf.walletFile, conf.walletPassword);
   std::string address;
-  if (conf.syncFromZero) {
-    CryptoNote::KeyPair spendKey;
-    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
-    address = wallet->createAddress(spendKey.secretKey);
+  if (conf.secretSpendKey.empty() && conf.secretViewKey.empty())
+  {
+	log(Logging::INFO, Logging::BRIGHT_WHITE) << "Generating new wallet";
+	wallet->initialize(conf.walletFile, conf.walletPassword);
+	if (conf.syncFromZero) {
+		CryptoNote::KeyPair spendKey;
+		Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+		address = wallet->createAddress(spendKey.secretKey);
+	}
+	else {
+		address = wallet->createAddress();
+	}
+	log(Logging::INFO, Logging::BRIGHT_WHITE) << "New wallet is generated. Address: " << address;
   } else
-    address = wallet->createAddress();
+  {
+	  if (conf.secretSpendKey.empty() || conf.secretViewKey.empty())
+	  {
+		  log(Logging::ERROR, Logging::BRIGHT_RED) << "Need both secret spend key and secret view key.";
+		  return;
+	  } else
+	  {
+		  log(Logging::INFO, Logging::BRIGHT_WHITE) << "Attemping to import wallet from keys";
+		  Crypto::Hash private_spend_key_hash;
+		  Crypto::Hash private_view_key_hash;
+		  size_t size;
+		  if (!Common::fromHex(conf.secretSpendKey, &private_spend_key_hash, sizeof(private_spend_key_hash), size) || size != sizeof(private_spend_key_hash)) {
+			  log(Logging::ERROR, Logging::BRIGHT_RED) << "Invalid spend key";
+			  return;
+		  }
+		  if (!Common::fromHex(conf.secretViewKey, &private_view_key_hash, sizeof(private_view_key_hash), size) || size != sizeof(private_spend_key_hash)) {
+			  log(Logging::ERROR, Logging::BRIGHT_RED) << "Invalid view key";
+			  return;
+		  }
+		  Crypto::SecretKey private_spend_key = *(struct Crypto::SecretKey *) &private_spend_key_hash;
+		  Crypto::SecretKey private_view_key = *(struct Crypto::SecretKey *) &private_view_key_hash;
 
-  log(Logging::INFO, Logging::BRIGHT_WHITE) << "New wallet is generated. Address: " << address;
+		  wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key);
+		  address = wallet->createAddress(private_spend_key);
+		  log(Logging::INFO, Logging::BRIGHT_WHITE) << "Imported wallet successfully.";
+	  }
+  }
 
   wallet->save(CryptoNote::WalletSaveLevel::SAVE_KEYS_ONLY);
   log(Logging::INFO, Logging::BRIGHT_WHITE) << "Wallet is saved";
