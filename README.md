@@ -22,8 +22,8 @@
 - Install [cmake](https://cmake.org/). See
   [here](https://stackoverflow.com/questions/23849962/cmake-installer-for-mac-fails-to-create-usr-bin-symlinks)
   if you are unable call `cmake` from the terminal after installing.
-- Install the boost libraries. Either compile boost manually or run
-  `brew install boost`.
+- Install the [boost](http://www.boost.org/) libraries. Either compile boost
+  manually or run `brew install boost`.
 - Install XCode and Developer Tools.
 
 ##### Building
