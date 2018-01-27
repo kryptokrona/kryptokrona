@@ -16,7 +16,26 @@
 - `TODO: Windows 10 fuckery and magic`
 
 #### Apple
-- `TODO: Apple current version and install instructions`
+
+##### Prerequisites
+
+- Install [cmake](https://cmake.org/). See
+  [here](https://stackoverflow.com/questions/23849962/cmake-installer-for-mac-fails-to-create-usr-bin-symlinks)
+  if you are unable call `cmake` from the terminal after installing.
+- Install the boost libraries. Either compile boost manually or run
+  `brew install boost`.
+- Install XCode and Developer Tools.
+
+##### Building
+
+- `git clone https://github.com/turtlecoin/turtlecoin`
+- `cd turtlecoin`
+- `mkdir build && cd $_`
+- `cmake ..` or `cmake -DBOOST_ROOT=<path_to_boost_install> ..` when building
+  from a specific boost install
+- `make`
+
+The binaries should be in `./src` after compilation is complete.
 
 #### Thanks
 Cryptonote Developers, Bytecoin Developers, Forknote Project, TurtleCoin Community
