@@ -102,7 +102,7 @@ static inline void serialize(NOTIFY_NEW_BLOCK_request& request, ISerializer& s) 
 }
 
 // unpack to strings to maintain protocol compatibility with older versions
-static inline void serialize(NOTIFINFOY_NEW_TRANSACTIONS_request& request, ISerializer& s) {
+static inline void serialize(NOTIFY_NEW_TRANSACTIONS_request& request, ISerializer& s) {
   std::vector<std::string> transactions;
   if (s.type() == ISerializer::INPUT) {
     s(transactions, "txs");
