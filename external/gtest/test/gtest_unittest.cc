@@ -3790,7 +3790,7 @@ TEST(AssertionTest, NamedEnum) {
   EXPECT_NONFATAL_FAILURE(EXPECT_EQ(kE1, kE2), "Actual: 1");
 }
 
-// The version of gcc used in XCode 2.2 has a bug and doesn't allow
+// The version of gcc used in Xcode 2.2 has a bug and doesn't allow
 // anonymous enums in assertions.  Therefore the following test is not
 // done on Mac.
 // Sun Studio and HP aCC also reject this code.
