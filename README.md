@@ -24,7 +24,7 @@
   if you are unable call `cmake` from the terminal after installing.
 - Install the [boost](http://www.boost.org/) libraries. Either compile boost
   manually or run `brew install boost`.
-- Install XCode and Developer Tools.
+- Install Xcode and Developer Tools.
 
 ##### Building
 
