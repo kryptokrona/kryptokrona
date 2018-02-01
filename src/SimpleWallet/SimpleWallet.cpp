@@ -1329,6 +1329,18 @@ int main(int argc, char* argv[]) {
 
   if (command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_bind_port)) {
     //runs wallet with rpc interface
+	  
+	/* 
+	  If the rpc interface is run, ensure that either legacy mode or an RPC
+	  password is set.
+	*/
+	  
+	if (!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_password) &&
+		!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_legacy_security)) {
+	  logger(ERROR, BRIGHT_RED) << "Required RPC password is not set.";
+	  return 1;
+	}
+	  
     if (!command_line::has_arg(vm, arg_wallet_file)) {
       logger(ERROR, BRIGHT_RED) << "Wallet file not set.";
       return 1;
