@@ -106,12 +106,12 @@ void wallet_rpc_server::processRequest(const CryptoNote::HttpRequest& request, C
 
     static std::unordered_map<std::string, JsonMemberMethod> s_methods = {
       { "getbalance", makeMemberMethod(&wallet_rpc_server::on_getbalance) },
-      { "transfer", makeMemberMethod(&wallet_rpc_server::on_transfer) },
       { "store", makeMemberMethod(&wallet_rpc_server::on_store) },
       { "get_payments", makeMemberMethod(&wallet_rpc_server::on_get_payments) },
       { "get_transfers", makeMemberMethod(&wallet_rpc_server::on_get_transfers) },
       { "get_height", makeMemberMethod(&wallet_rpc_server::on_get_height) },
       // below are the restricted methods, use --enable-extended-rpc
+      { "transfer", makeMemberMethod(&wallet_rpc_server::on_transfer) },
       { "reset", makeMemberMethod(&wallet_rpc_server::on_reset) },
       { "stop_wallet", makeMemberMethod(&wallet_rpc_server::on_stop_wallet) },
       { "get_address", makeMemberMethod(&wallet_rpc_server::on_get_address) },
@@ -142,6 +142,11 @@ bool wallet_rpc_server::on_getbalance(const wallet_rpc::COMMAND_RPC_GET_BALANCE:
 }
 //------------------------------------------------------------------------------------------------------------------------------
 bool wallet_rpc_server::on_transfer(const wallet_rpc::COMMAND_RPC_TRANSFER::request& req, wallet_rpc::COMMAND_RPC_TRANSFER::response& res) {
+  
+  if(!m_allow_extended_rpc) {
+    throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_METHOD_RESTRICTED, "Unable to invoke extended RPC method without explicit --allow-extended-rpc flag.");
+  }
+  
   std::vector<CryptoNote::WalletLegacyTransfer> transfers;
   for (auto it = req.destinations.begin(); it != req.destinations.end(); it++) {
     CryptoNote::WalletLegacyTransfer transfer;
@@ -311,6 +316,9 @@ bool wallet_rpc_server::on_stop_wallet(const wallet_rpc::COMMAND_RPC_STOP::reque
 
     wallet_rpc_server::send_stop_signal();
   }
+  else {
+    throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_METHOD_RESTRICTED, "Unable to invoke extended RPC method without explicit --allow-extended-rpc flag.");
+  }
   return true;
   
 }
@@ -319,6 +327,9 @@ bool wallet_rpc_server::on_get_address(const wallet_rpc::COMMAND_RPC_GET_ADDRESS
   
   if(m_allow_extended_rpc) {
     res.address = m_wallet.getAddress();
+  }
+  else {
+    throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_METHOD_RESTRICTED, "Unable to invoke extended RPC method without explicit --allow-extended-rpc flag.");
   }
   return true;
 
@@ -331,6 +342,9 @@ bool wallet_rpc_server::on_view_keys(const wallet_rpc::COMMAND_RPC_VIEW_KEYS::re
     m_wallet.getAccountKeys(keys);
     res.view_key = Common::podToHex(keys.viewSecretKey);
     res.spend_key = Common::podToHex(keys.spendSecretKey);
+  }
+  else {
+    throw JsonRpc::JsonRpcError(WALLET_RPC_ERROR_METHOD_RESTRICTED, "Unable to invoke extended RPC method without explicit --allow-extended-rpc flag.");
   }
   return true;
 
