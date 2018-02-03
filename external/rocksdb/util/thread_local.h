@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <functional>
 #include <atomic>
 #include <memory>
 #include <unordered_map>

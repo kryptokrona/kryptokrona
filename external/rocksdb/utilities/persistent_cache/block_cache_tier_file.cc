@@ -6,6 +6,7 @@
 
 #include "utilities/persistent_cache/block_cache_tier_file.h"
 
+#include <functional>
 #include <unistd.h>
 #include <memory>
 #include <vector>

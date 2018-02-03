@@ -21,6 +21,7 @@ int main() {
 #include <memory>
 #include <thread>
 #include <vector>
+#include <functional>
 #include <gflags/gflags.h>
 
 #include "dynamic_bloom.h"

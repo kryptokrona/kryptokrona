@@ -4,6 +4,7 @@
 //  of patent rights can be found in the PATENTS file in the same directory.
 #pragma once
 
+#include <functional>
 #include <cstdlib>
 #include <string>
 
