@@ -9,6 +9,7 @@
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <functional>
 #include <memory>
 #include <string>
 #include <tuple>

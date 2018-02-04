@@ -7,6 +7,7 @@
 
 #include "utilities/persistent_cache/volatile_tier_impl.h"
 
+#include <functional>
 #include <string>
 
 namespace rocksdb {

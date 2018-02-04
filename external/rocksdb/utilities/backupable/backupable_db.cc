@@ -26,6 +26,7 @@
 #define __STDC_FORMAT_MACROS
 #endif  // __STDC_FORMAT_MACROS
 
+#include <functional>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <algorithm>

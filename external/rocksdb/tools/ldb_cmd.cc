@@ -40,6 +40,7 @@
 #include <stdexcept>
 #include <string>
 #include <fstream>
+#include <functional>
 
 namespace rocksdb {
 
