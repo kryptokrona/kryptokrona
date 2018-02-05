@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Turtlecoin Multi-installer 
+# Turtlecoin Multi-installer
 # a one line clone-and-compile for turtlecoin:
 #
-#     ` $ curl -sL "https://raw.githubusercontent.com/turtlecoin/turtlecoin/master/multi_installer.sh" | bash 
+#     ` $ curl -sL "https://raw.githubusercontent.com/turtlecoin/turtlecoin/master/multi_installer.sh" | bash
 #
 # Supports Ubuntu 16.04 LTS, OSX 10.10+
 # Supports building project from current directory (automatic detection)
@@ -44,7 +44,7 @@ _set_wd() {
         if [ -d "$PWD"/turtlecoin ]; then
             read -r -p "${1:-turtlecoin directory already exists. Overwrite? [y/N]} " response
             case "$response" in
-                [yY][eE][sS|[yY]) 
+                [yY][eE][sS|[yY])
                     _colorize red "Overwriting old turtlecoin directory" && echo
                     rm -rf "$PWD"/turtlecoin
                     ;;
@@ -68,7 +68,7 @@ _build_turtlecoin() {
 
     local _threads=`python -c 'import multiprocessing as mp; print(mp.cpu_count())'`
     echo "Using ${_threads} threads"
-    
+
     mkdir build && cd $_
     cmake --silent .. >>build.log 2>&1 || _fail "Unable to run cmake. Please see build.log for more information"
     make --silent -j"$_threads"  >>build.log 2>&1 || _fail "Unable to run make. Please see build.log for more information"
@@ -89,12 +89,28 @@ _configure_ubuntu() {
     export CXXFLAGS="-std=gnu++11"
 }
 
+_configure_debian() {
+    [ "`lsb_release -r -s | cut -d'.' -f1 `" -ge 9 ] || _fail "Your Debian GNU/Linux version `lsb_release -r -s` is below the requirements to run this installer. Please consider upgrading to a later release"
+    _note "The installer will now update your package manager and install required packages (this might take a while)..."
+    _sudo=""
+    if (( $EUID != 0 )); then
+        _sudo="sudo"
+        _note "Sudo privileges required for package installation"
+    fi
+    $_sudo apt-get update -qq
+    $_sudo apt-get install -qq -y git build-essential python-dev gcc g++ git cmake libboost-all-dev librocksdb-dev  >>build.log 2>&1 || _fail "Unable to install build dependencies. Please see build.log for more information"
+
+    export CXXFLAGS="-std=gnu++11"
+}
+
 _configure_linux() {
     if [ "$(awk -F= '/^NAME/{print $2}' /etc/os-release)" = "\"Ubuntu\"" ]; then
         _configure_ubuntu
+    elif [ "$(awk -F= '/^NAME/{print $2}' /etc/os-release)" = "\"Debian GNU/Linux\"" ]; then
+        _configure_debian
     else
         _fail "Your OS version isn't supported by this installer. Please consider adding support for your OS to the project ('https://github.com/turtlecoin')"
-    fi    
+    fi
 }
 
 _configure_osx() {
@@ -121,8 +137,8 @@ _configure_os() {
         Darwin*)
             _configure_osx
             ;;
-        *)          
-            _fail "This installer only runs on OSX 10.10+ and Ubuntu 16.04+. Please consider adding support for your OS to the project ('https://github.com/turtlecoin')" 
+        *)
+            _fail "This installer only runs on OSX 10.10+ and Ubuntu 16.04+. Please consider adding support for your OS to the project ('https://github.com/turtlecoin')"
             ;;
     esac
     _note "Operating system configuration completed. You're halfway there!"
@@ -136,5 +152,5 @@ _configure_os
 _set_wd
 _build_turtlecoin
 
-_note "Installation complete!" 
+_note "Installation complete!"
 _note "Look in 'turtlecoin/build/src/' for the executible binaries. See 'https://github.com/turtlecoin/turtlecoin' for more project support. Cowabunga!"
