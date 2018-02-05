@@ -21,6 +21,7 @@
 #include <cstdarg>
 #include <limits>
 #include <memory>
+#include <functional>
 #include <string>
 #include <vector>
 #include "rocksdb/status.h"

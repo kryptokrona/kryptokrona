@@ -5,6 +5,7 @@
 
 #include "util/sync_point.h"
 #include <thread>
+#include <functional>
 #include "port/port.h"
 #include "util/random.h"
 

@@ -13,6 +13,7 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
+#include <functional>
 #include <inttypes.h>
 #include <algorithm>
 #include <atomic>

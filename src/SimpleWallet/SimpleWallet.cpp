@@ -473,7 +473,7 @@ simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::C
   //m_consoleHandler.setHandler("start_mining", boost::bind(&simple_wallet::start_mining, this, _1), "start_mining [<number_of_threads>] - Start mining in daemon");
   //m_consoleHandler.setHandler("stop_mining", boost::bind(&simple_wallet::stop_mining, this, _1), "Stop mining in daemon");
   //m_consoleHandler.setHandler("refresh", boost::bind(&simple_wallet::refresh, this, _1), "Resynchronize transactions and balance");
-  m_consoleHandler.setHandler("export_keys", boost::bind(&simple_wallet::export_keys, this, _1), "Show the secret keys of the openned wallet");
+  m_consoleHandler.setHandler("export_keys", boost::bind(&simple_wallet::export_keys, this, _1), "Show the secret keys of the opened wallet");
   m_consoleHandler.setHandler("balance", boost::bind(&simple_wallet::show_balance, this, _1), "Show current wallet balance");
   m_consoleHandler.setHandler("incoming_transfers", boost::bind(&simple_wallet::show_incoming_transfers, this, _1), "Show incoming transfers");
   m_consoleHandler.setHandler("list_transfers", boost::bind(&simple_wallet::listTransfers, this, _1), "Show all known transfers");
@@ -1329,6 +1329,18 @@ int main(int argc, char* argv[]) {
 
   if (command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_bind_port)) {
     //runs wallet with rpc interface
+	  
+	/* 
+	  If the rpc interface is run, ensure that either legacy mode or an RPC
+	  password is set.
+	*/
+	  
+	if (!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_password) &&
+		!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_legacy_security)) {
+	  logger(ERROR, BRIGHT_RED) << "Required RPC password is not set.";
+	  return 1;
+	}
+	  
     if (!command_line::has_arg(vm, arg_wallet_file)) {
       logger(ERROR, BRIGHT_RED) << "Wallet file not set.";
       return 1;

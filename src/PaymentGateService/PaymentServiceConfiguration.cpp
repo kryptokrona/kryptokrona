@@ -40,15 +40,23 @@ Configuration::Configuration() {
   logLevel = Logging::INFO;
   bindAddress = "";
   bindPort = 0;
+  secretViewKey = "";
+  secretSpendKey = "";
+  rpcPassword = "";
+  legacySecurity = false;
 }
 
 void Configuration::initOptions(boost::program_options::options_description& desc) {
   desc.add_options()
-      ("bind-address", po::value<std::string>()->default_value("0.0.0.0"), "payment service bind address")
+      ("bind-address", po::value<std::string>()->default_value("127.0.0.1"), "payment service bind address")
       ("bind-port", po::value<uint16_t>()->default_value(8070), "payment service bind port")
+      ("rpc-password", po::value<std::string>(), "Specify the password to access the rpc server.")
+      ("rpc-legacy-security", "Enable legacy mode (no password for RPC). WARNING: INSECURE. USE ONLY AS A LAST RESORT.")
       ("container-file,w", po::value<std::string>(), "container file")
       ("container-password,p", po::value<std::string>(), "container password")
       ("generate-container,g", "generate new container file with one wallet and exit")
+	  ("view-key", po::value<std::string>(), "generate a container with this secret key view")
+	  ("spend-key", po::value<std::string>(), "generate a container with this secret spend key")
       ("daemon,d", "run as daemon in Unix or as service in Windows")
 #ifdef _WIN32
       ("register-service", "register service and exit (Windows only)")
@@ -118,6 +126,24 @@ void Configuration::init(const boost::program_options::variables_map& options) {
     generateNewContainer = true;
   }
 
+  if (options.count("view-key") != 0)
+  {
+	if (!generateNewContainer)
+	{
+	  throw ConfigurationError("generate-container parameter is required");
+	}
+	secretViewKey = options["view-key"].as<std::string>();
+  }
+
+  if (options.count("spend-key") != 0)
+  {
+	if (!generateNewContainer)
+	{
+	  throw ConfigurationError("generate-container parameter is required");
+	}
+	secretSpendKey = options["spend-key"].as<std::string>();
+  }
+
   if (options.count("address") != 0) {
     printAddresses = true;
   }
@@ -130,6 +156,24 @@ void Configuration::init(const boost::program_options::variables_map& options) {
       throw ConfigurationError("container-file parameter are required");
     }
   }
+  
+  // If generating a container skip the authentication parameters.
+  if (generateNewContainer) {
+    return;
+  }
+  
+  // Check for the authentication parameters
+  if ((options.count("rpc-password") == 0) && (options.count("rpc-legacy-security") == 0)) {
+    throw ConfigurationError("Please specify an RPC password or use the --rpc-legacy-security flag.");
+  }
+  
+  if (options.count("rpc-legacy-security") != 0) {
+    legacySecurity = true;
+  }
+  else {
+    rpcPassword = options["rpc-password"].as<std::string>();
+  }
+  
 }
 
 } //namespace PaymentService

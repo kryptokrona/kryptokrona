@@ -43,6 +43,8 @@ struct WalletConfiguration {
   std::string walletFile;
   std::string walletPassword;
   bool syncFromZero;
+  std::string secretViewKey;
+  std::string secretSpendKey;
 };
 
 void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfiguration& conf, Logging::ILogger& logger, System::Dispatcher& dispatcher);

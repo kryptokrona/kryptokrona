@@ -77,7 +77,7 @@ your make commands, like this: `PORTABLE=1 make static_lib`
 
 * **OS X**:
     * Install latest C++ compiler that supports C++ 11:
-        * Update XCode:  run `xcode-select --install` (or install it from XCode App's settting).
+        * Update Xcode:  run `xcode-select --install` (or install it from Xcode settings).
         * Install via [homebrew](http://brew.sh/).
             * If you're first time developer in MacOS, you still need to run: `xcode-select --install` in your command line.
             * run `brew tap homebrew/versions; brew install gcc47 --use-llvm` to install gcc 4.7 (or higher).
