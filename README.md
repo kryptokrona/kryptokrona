@@ -18,20 +18,20 @@ See the script for more installation details and please consider extending it fo
 #### Windows 10
 
 ##### Prerequisites
-- Install [Visual Studios 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall)
-- When installing Visual Studios, it is absolutely important you install C++ capabilities, and the vc++ v140 toolchain when selecting features. You will need this for cmake, MSBuild and other commands.
-- Install [Boost 1.59.0](https://sourceforge.net/projects/boost/files/boost-binaries/1.59.0/), ensure to download the installer for  MSVC 14.
+- Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall)
+- When installing Visual Studio, it is **required** that you install **Desktop development with C++** and the **VC++ v140 toolchain** when selecting features. The option to install the v140 toolchain can be found by expanding the "Desktop development with C++" node on the right. You will need this for the project to build correctly.
+- Install [Boost 1.59.0](https://sourceforge.net/projects/boost/files/boost-binaries/1.59.0/), ensuring you download the installer for MSVC 14.
 
 ##### Building
 
-- Use the start menu or similar to open 'x64 Native Tools Command Prompt for vs2017' command prompt.
+- From the start menu, open 'x64 Native Tools Command Prompt for vs2017'.
 - `cd <your_turtlecoin_directory>`
 - `mkdir build`
 - `cd build`
 - `cmake -G "Visual Studio 14 Win64" .. -DBOOST_ROOT=D:/Boost/boost_1_59_0` (Or your boost installed dir.)
-- `MSBuild ByteCoin.sln /p:Configuration=Release`
-- At this point, this will create a .sln file in the 'build' directory. Open this .sln in Visual Studios 2017 and click 'Build Solution' under the 'Build' Menu Item.
-- If all went well, it will complete successfully, and you will find all your binaries in the '..\build\src\Debug' directory, or the '..\build\src\Release' directory if you built with release enabled.
+- `MSBuild ByteCoin.sln /p:Configuration=Release /m`
+- If all went well, it will complete successfully, and you will find all your binaries in the '..\build\src\Release' directory.
+- Additionally, a `.sln` file will have been created in the `build` directory. If you wish to open the project in Visual Studio with this, you can.
 
 
 #### Apple
