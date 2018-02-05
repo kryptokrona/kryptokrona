@@ -2,7 +2,8 @@
 # run something like tail /var/log/turtlecoind/current to see the status
 # be sure to run with volumes, ie:
 # docker run -v $(pwd)/turtlecoind:/var/lib/turtlecoind -v $(pwd)/wallet:/home/turtlecoin --rm -ti turtlecoin:0.2.2
-FROM ubuntu:16.04
+ARG base_image_version=0.10.0
+FROM phusion/baseimage:$base_image_version
 
 ADD https://github.com/just-containers/s6-overlay/releases/download/v1.21.2.2/s6-overlay-amd64.tar.gz /tmp/
 RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
@@ -10,7 +11,8 @@ RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
 ADD https://github.com/just-containers/socklog-overlay/releases/download/v2.1.0-0/socklog-overlay-amd64.tar.gz /tmp/
 RUN tar xzf /tmp/socklog-overlay-amd64.tar.gz -C /
 
-ARG TURTLECOIN_VERSION=v0.3.1
+ARG TURTLECOIN_VERSION=v0.3.0
+ENV TURTLECOIN_VERSION=${TURTLECOIN_VERSION}
 
 # install build dependencies
 # checkout the latest tag
