@@ -46,7 +46,7 @@ void AccountBase::generate() {
 void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret, Crypto::PublicKey &viewPublic) {
   Crypto::SecretKey viewKeySeed;
 
-  keccak((uint8_t *)&spend, sizeof(viewKeySeed), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
+  keccak((uint8_t *)&spend, sizeof(spend), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
 
   Crypto::generate_keys_from_seed(viewPublic, viewSecret, viewKeySeed);
 }
