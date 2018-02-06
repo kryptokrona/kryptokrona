@@ -783,16 +783,19 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     AccountKeys keys;
     m_wallet->getAccountKeys(keys);
 
+    std::cout << "\nWelcome to your new wallet, here is your payment address:\n";
+    Common::Console::setTextColor(Common::Console::Color::BrightGreen);
+    std::cout << m_wallet->getAddress();
+    Common::Console::setTextColor(Common::Console::Color::Default);
+    std::cout << "\n\nPlease copy your secret keys and store them in a secure location:";
+    Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout <<
-      "\nWelcome to your new wallet, here is your payment address:\n" <<
-      "\033[1;32m" << m_wallet->getAddress() << "\033[0m\n\n" <<
-      "Please copy your secret keys and store them in a secure location:\n" <<
-      "\033[1;32m" <<
-      "view key: " << Common::podToHex(keys.viewSecretKey) <<
-      "\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
-      "\n\n\033[1;31mIf you lose these your wallet cannot be recreated!" <<
-      "\033[0m\n\n" <<
-
+	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
+	"\nspend key: " << Common::podToHex(keys.spendSecretKey);
+    Common::Console::setTextColor(Common::Console::Color::BrightRed);
+    std::cout << "\n\nIf you lose these your wallet cannot be recreated!\n\n";
+    Common::Console::setTextColor(Common::Console::Color::Default);
+    std::cout <<
       "**********************************************************************\n" <<
       "Use \"help\" command to see the list of available commands.\n" <<
       "Always use \"exit\" command when closing simplewallet to save\n" <<
