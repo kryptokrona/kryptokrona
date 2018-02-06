@@ -685,18 +685,36 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
         std::string mnemonic_phrase;
         std::string language {"English"};
 
+        std::vector<std::string> words;
+
+        bool valid_input = true;
+
         do {
           std::cout << "Mnemonic Phrase (25 words): ";
+
           std::getline(std::cin, mnemonic_phrase);
           boost::algorithm::trim(mnemonic_phrase);
-        } while (mnemonic_phrase.empty());
+          boost::algorithm::to_lower(mnemonic_phrase);
+          words = boost::split(words, mnemonic_phrase, ::isspace);
 
-        if (!crypto::ElectrumWords::words_to_bytes(mnemonic_phrase, private_spend_key, language)) {
-          logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase";
-          std::vector<std::string> words;
-          logIncorrectWords(boost::split(words, mnemonic_phrase, ::isspace));
-          return false;
-        }
+          if (words.size() != 25 || !crypto::ElectrumWords::words_to_bytes(mnemonic_phrase, private_spend_key, language)) {
+            logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
+
+            logIncorrectWords(words);
+
+            if (words.size() != 25) {
+              logger(ERROR, BRIGHT_RED) << "Seed phrase is not 25 words! Please try again.";
+            }
+
+            valid_input = false;
+
+            continue;
+          }
+
+          valid_input = true;
+
+        } while (!valid_input);
+
 
         /* This is not used, but is needed to be passed to the function, not sure how we can avoid this */
         Crypto::PublicKey unused_dummy_variable;
@@ -773,6 +791,21 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   return true;
 }
 //----------------------------------------------------------------------------------------------------
+/* This function is currently not used. It does generate a mnemonic seed
+perfectly well from a private spend key, however, simplewallet previously
+generated a random spend and view key, which were unrelated. With this set of
+commits, this has been changed, to make the view key derived from the spend
+key. This is done by running keccak-256 on the input, and then using that as
+a seed to create a set of private and public keys, the spend private and public
+keys.
+
+With this implemented, users only need to save a private spend key, or the
+mnemonic seed, which is a nice way of representing the spend key. However,
+we don't want users with the old way of generating keys thinking they only need
+to keep their mnemonic seed, because this will only generate their private
+spend key, and NOT their private view key - and they won't be able to restore
+their funds.
+*/
 bool simple_wallet::generate_mnemonic() {
   std::string private_spend_key_string;
 
@@ -813,6 +846,93 @@ void simple_wallet::logIncorrectWords(std::vector<std::string> words) {
       logger(ERROR, BRIGHT_RED) << i << " is not in the english word list!";
     }
   }
+}
+//----------------------------------------------------------------------------------------------------
+std::string simple_wallet::getline_tab_completion() {
+
+  /* Some very broken code which will for sure not work. Currently, it doesn't
+  work because terminals or OS's buffer input, and so we can't interactively
+  react when a user hits the tab character. If a library like ncurses is
+  used we could probably implement this in a semi decent way. Regardless, this
+  code is crap. */
+  Language::Base *language = Language::Singleton<Language::English>::instance();
+  const std::vector<std::string> &dictionary = language->get_word_list();
+
+  std::vector<std::string> words;
+  std::string buffer = "";
+
+  char c;
+
+  while(std::cin.get(c)) {
+
+    c = tolower(c);
+
+    if (c == '\n' || c == '\r') {
+      break;
+    /* space, check that word is not empty and add to word list */
+    } else if (c == ' ') {
+      if (buffer != "") {
+        words.push_back(buffer);
+        buffer = "";
+      }
+    /* only a-z is allowed in english dictionary */
+    } else if (c >= 'a' && c <= 'z') {
+      buffer += c;
+    /* now for the *fun* part */
+    } else if (c == '\t') {
+      if (buffer != "") {
+        std::vector<std::string> valid_words;
+
+        for (auto i : dictionary) {
+          /* check if the buffer is a prefix of the dictionary word */
+          auto res = std::mismatch(buffer.begin(), buffer.end(), i.begin());
+          if (res.first == buffer.end()) {
+            /* is a valid word to tab complete */
+            valid_words.push_back(i);
+          }
+        }
+        // only one word left, fill it in
+        if (valid_words.size() == 1) {
+          std::string valid_word = valid_words[0];
+          buffer = "";
+          words.push_back(valid_word);
+
+          /* remove prefix of filled in part of auto complete */
+          valid_word.erase(0, buffer.length()-1);
+
+          if (valid_word.length() != 0) {
+            /* print out the rest of the word so the user knows it worked,
+            also print out a space so they can start on next word instantly */
+            std::cout << valid_word << " ";
+          }
+        } else if (valid_words.size() >= 1) {
+          /* ok there is no way this won't fuck everything up */
+          std::cout << std::endl;
+
+          for (auto i : valid_words) {
+            std::cout << i << " ";
+          }
+
+          std::cout << std::endl;
+
+          /* now reprint out what the user was typing */
+          for (auto i : words) {
+            std::cout << i << " ";
+          }
+        }
+      }
+    } else {
+      logger(ERROR, BRIGHT_RED) << "Unexpected character " << c << ", all characters must be a-z, lowercase";
+    }
+  }
+
+  std::string mnemonic_phrase = "";
+
+  for (auto i : words) {
+    mnemonic_phrase += i;
+  }
+
+  return mnemonic_phrase;
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::deinit() {

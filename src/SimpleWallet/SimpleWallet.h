@@ -51,6 +51,7 @@ namespace CryptoNote
     bool init(const boost::program_options::variables_map& vm);
     bool generate_mnemonic();
     void logIncorrectWords(std::vector<std::string>);
+    std::string getline_tab_completion();
     bool deinit();
     bool run();
     void stop();
