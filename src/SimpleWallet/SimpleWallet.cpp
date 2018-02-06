@@ -574,7 +574,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   if (sync_from_zero) {
     sync_from_height = 0;
   }
-    if (!m_generate_new.empty() || !m_import_new.empty()) {
+  if (!m_generate_new.empty() || !m_import_new.empty()) {
     std::string ignoredString;
     if (!m_generate_new.empty()) {
       WalletHelper::prepareFileNames(m_generate_new, ignoredString, walletFileName);
@@ -586,7 +586,6 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       fail_msg_writer() << walletFileName << " already exists";
       return false;
     }
-
   }
 
   if (m_daemon_host.empty())
@@ -784,29 +783,32 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     AccountKeys keys;
     m_wallet->getAccountKeys(keys);
 
-    logger(INFO, BRIGHT_WHITE) <<
-      "Generated new wallet: " << m_wallet->getAddress() << std::endl;
-      // removed for security reasons, needs to be put back once logger has a security model.
-      //"view key: " << Common::podToHex(keys.viewSecretKey);
-  }
-  catch (const std::exception& e) {
+    std::cout <<
+      "\nWelcome to your new wallet, here is your payment address:\n" <<
+      "\033[1;32m" << m_wallet->getAddress() << "\033[0m\n\n" <<
+      "Please copy your secret keys and store them in a secure location:\n" <<
+      "\033[1;32m" <<
+      "view key: " << Common::podToHex(keys.viewSecretKey) <<
+      "\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
+      "\n\n\033[1;31mIf you lose these your wallet cannot be recreated!" <<
+      "\033[0m\n\n" <<
+
+      "**********************************************************************\n" <<
+      "Use \"help\" command to see the list of available commands.\n" <<
+      "Always use \"exit\" command when closing simplewallet to save\n" <<
+      "current session's state. Otherwise, you will possibly need to synchronize \n" <<
+      "your wallet again. Your wallet key is NOT under risk anyway.\n" <<
+      "**********************************************************************\n";
+
+  } catch (const std::exception& e) {
     fail_msg_writer() << "failed to generate new wallet: " << e.what();
     return false;
   }
 
-  success_msg_writer() <<
-    "**********************************************************************\n" <<
-    "Your wallet has been generated.\n" <<
-    "Use \"help\" command to see the list of available commands.\n" <<
-    "Always use \"exit\" command when closing simplewallet to save\n" <<
-    "current session's state. Otherwise, you will possibly need to synchronize \n" <<
-    "your wallet again. Your wallet key is NOT under risk anyway.\n" <<
-    "**********************************************************************";
-
-    if(exit_after_generate) {
-      m_consoleHandler.requestStop();
-      std::exit(0);
-    }
+  if(exit_after_generate) {
+    m_consoleHandler.requestStop();
+    std::exit(0);
+  }
 
   return true;
 }
