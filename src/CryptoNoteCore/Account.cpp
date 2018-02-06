@@ -17,6 +17,11 @@
 
 #include "Account.h"
 #include "CryptoNoteSerialization.h"
+#include "crypto/keccak.c"
+#include "crypto/crypto-ops.c"
+// remember to delete this later
+#include <iostream>
+#include "Common/StringTools.h"
 
 namespace CryptoNote {
 //-----------------------------------------------------------------
@@ -29,9 +34,21 @@ void AccountBase::setNull() {
 }
 //-----------------------------------------------------------------
 void AccountBase::generate() {
+
   Crypto::generate_keys(m_keys.address.spendPublicKey, m_keys.spendSecretKey);
-  Crypto::generate_keys(m_keys.address.viewPublicKey, m_keys.viewSecretKey);
+
+  /* We derive the view secret key by taking our spend secret key, hashing
+     with keccak-256, and then using this as the seed to generate a new set
+     of keys - the public and private view keys. See generate_keys_from_seed */
+
+  Crypto::SecretKey viewKeySeed;
+
+  keccak((uint8_t *)&m_keys.spendSecretKey, sizeof(viewKeySeed), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
+
+  Crypto::generate_keys_from_seed(m_keys.address.viewPublicKey, m_keys.viewSecretKey, viewKeySeed);
+
   m_creation_timestamp = time(NULL);
+
 }
 //-----------------------------------------------------------------
 const AccountKeys &AccountBase::getAccountKeys() const {
