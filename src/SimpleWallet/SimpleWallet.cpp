@@ -693,13 +693,15 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
 
         if (!crypto::ElectrumWords::words_to_bytes(mnemonic_phrase, private_spend_key, language)) {
           logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase";
+          std::vector<std::string> words;
+          logIncorrectWords(boost::split(words, mnemonic_phrase, ::isspace));
           return false;
         }
 
         /* This is not used, but is needed to be passed to the function, not sure how we can avoid this */
-        Crypto::PublicKey public_view_key;
+        Crypto::PublicKey unused_dummy_variable;
 
-        AccountBase::generateViewFromSpend(private_spend_key, private_view_key, public_view_key);
+        AccountBase::generateViewFromSpend(private_spend_key, private_view_key, unused_dummy_variable);
       }
 
     } else {
@@ -771,7 +773,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   return true;
 }
 //----------------------------------------------------------------------------------------------------
-bool simple_wallet::generate_mnemonic(Logging::LoggerRef logger) {
+bool simple_wallet::generate_mnemonic() {
   std::string private_spend_key_string;
 
   do {
@@ -800,6 +802,17 @@ bool simple_wallet::generate_mnemonic(Logging::LoggerRef logger) {
 
   logger(INFO, BRIGHT_WHITE) << "Mnemonic seed: " << mnemonic_str << std::endl;
   return true;
+}
+//----------------------------------------------------------------------------------------------------
+void simple_wallet::logIncorrectWords(std::vector<std::string> words) {
+  Language::Base *language = Language::Singleton<Language::English>::instance();
+  const std::vector<std::string> &dictionary = language->get_word_list();
+
+  for (auto i : words) {
+    if (std::find(dictionary.begin(), dictionary.end(), i) == dictionary.end()) {
+      logger(ERROR, BRIGHT_RED) << i << " is not in the english word list!";
+    }
+  }
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::deinit() {
