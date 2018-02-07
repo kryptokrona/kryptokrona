@@ -791,7 +791,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   return true;
 }
 //----------------------------------------------------------------------------------------------------
-/* This function is currently not used. It does generate a mnemonic seed
+/* Be careful using this function. It does generate a mnemonic seed
 perfectly well from a private spend key, however, simplewallet previously
 generated a random spend and view key, which were unrelated. With this set of
 commits, this has been changed, to make the view key derived from the spend
@@ -806,35 +806,16 @@ to keep their mnemonic seed, because this will only generate their private
 spend key, and NOT their private view key - and they won't be able to restore
 their funds.
 */
-bool simple_wallet::generate_mnemonic() {
-  std::string private_spend_key_string;
-
-  do {
-    std::cout << "Private Spend Key: ";
-    std::getline(std::cin, private_spend_key_string);
-    boost::algorithm::trim(private_spend_key_string);
-  } while (private_spend_key_string.empty());
-
-  Crypto::Hash private_spend_key_hash;
-
-  size_t size;
-
-  if (!Common::fromHex(private_spend_key_string, &private_spend_key_hash, sizeof(private_spend_key_hash), size) || size != sizeof(private_spend_key_hash)) {
-    return false;
-  }
-
-  Crypto::SecretKey private_spend_key = *(struct Crypto::SecretKey *) &private_spend_key_hash;
+std::string simple_wallet::generate_mnemonic(Crypto::SecretKey &private_spend_key) {
 
   std::string mnemonic_str;
 
   if (!crypto::ElectrumWords::bytes_to_words(private_spend_key, mnemonic_str, "English")) {
       logger(ERROR, BRIGHT_RED) << "\nCant create the mnemonic for the private spend key: "
            << private_spend_key << std::endl;
-      return false;
   }
 
-  logger(INFO, BRIGHT_WHITE) << "Mnemonic seed: " << mnemonic_str << std::endl;
-  return true;
+  return mnemonic_str;
 }
 //----------------------------------------------------------------------------------------------------
 void simple_wallet::logIncorrectWords(std::vector<std::string> words) {
@@ -993,7 +974,8 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout <<
 	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
-	"\nspend key: " << Common::podToHex(keys.spendSecretKey);
+	"\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
+  "\nmnemonic seed: " << generate_mnemonic(keys.spendSecretKey);
     Common::Console::setTextColor(Common::Console::Color::BrightRed);
     std::cout << "\n\nIf you lose these your wallet cannot be recreated!\n\n";
     Common::Console::setTextColor(Common::Console::Color::Default);

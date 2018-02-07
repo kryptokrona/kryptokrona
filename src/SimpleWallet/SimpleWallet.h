@@ -49,7 +49,7 @@ namespace CryptoNote
     simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::Currency& currency, Logging::LoggerManager& log);
 
     bool init(const boost::program_options::variables_map& vm);
-    bool generate_mnemonic();
+    std::string generate_mnemonic(Crypto::SecretKey &);
     void logIncorrectWords(std::vector<std::string>);
     std::string getline_tab_completion();
     bool deinit();
