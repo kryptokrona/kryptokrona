@@ -50,7 +50,8 @@ namespace CryptoNote
 
     bool init(const boost::program_options::variables_map& vm);
     std::string generate_mnemonic(Crypto::SecretKey &);
-    void logIncorrectWords(std::vector<std::string>);
+    void log_incorrect_words(std::vector<std::string>);
+    bool is_valid_mnemonic(std::string &, Crypto::SecretKey &);
     std::string getline_tab_completion();
     bool deinit();
     bool run();

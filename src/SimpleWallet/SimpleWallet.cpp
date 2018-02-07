@@ -683,11 +683,6 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       else
       {
         std::string mnemonic_phrase;
-        std::string language {"English"};
-
-        std::vector<std::string> words;
-
-        bool valid_input = true;
 
         do {
           std::cout << "Mnemonic Phrase (25 words): ";
@@ -695,26 +690,8 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
           std::getline(std::cin, mnemonic_phrase);
           boost::algorithm::trim(mnemonic_phrase);
           boost::algorithm::to_lower(mnemonic_phrase);
-          words = boost::split(words, mnemonic_phrase, ::isspace);
 
-          if (words.size() != 25 || !crypto::ElectrumWords::words_to_bytes(mnemonic_phrase, private_spend_key, language)) {
-            logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
-
-            logIncorrectWords(words);
-
-            if (words.size() != 25) {
-              logger(ERROR, BRIGHT_RED) << "Seed phrase is not 25 words! Please try again.";
-            }
-
-            valid_input = false;
-
-            continue;
-          }
-
-          valid_input = true;
-
-        } while (!valid_input);
-
+        } while (!is_valid_mnemonic(mnemonic_phrase, private_spend_key));
 
         /* This is not used, but is needed to be passed to the function, not sure how we can avoid this */
         Crypto::PublicKey unused_dummy_variable;
@@ -817,7 +794,7 @@ std::string simple_wallet::generate_mnemonic(Crypto::SecretKey &private_spend_ke
   return mnemonic_str;
 }
 //----------------------------------------------------------------------------------------------------
-void simple_wallet::logIncorrectWords(std::vector<std::string> words) {
+void simple_wallet::log_incorrect_words(std::vector<std::string> words) {
   Language::Base *language = Language::Singleton<Language::English>::instance();
   const std::vector<std::string> &dictionary = language->get_word_list();
 
@@ -826,6 +803,41 @@ void simple_wallet::logIncorrectWords(std::vector<std::string> words) {
       logger(ERROR, BRIGHT_RED) << i << " is not in the english word list!";
     }
   }
+}
+//----------------------------------------------------------------------------------------------------
+bool simple_wallet::is_valid_mnemonic(std::string &mnemonic_phrase, Crypto::SecretKey &private_spend_key) {
+  static std::string languages[] = {"English", "Nederlands", "Français", "Português", "Italiano", "Deutsch", "русский язык", "简体中文 (中国)", "Esperanto", "Lojban"};
+
+  static const int mnemonic_phrase_length = 25;
+  static const int num_of_languages = 10;
+
+  std::vector<std::string> words;
+
+  words = boost::split(words, mnemonic_phrase, ::isspace);
+
+  if (words.size() != mnemonic_phrase_length) {
+    logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
+    logger(ERROR, BRIGHT_RED) << "Seed phrase is not 25 words! Please try again.";
+    log_incorrect_words(words);
+    return false;
+  }
+
+  /* Check every language for our phrase so the user doesn't have to specify
+     it, this should be an issue as long as one language doesn't have enough
+     of another languages words, might need some testing */
+  for (int i = 0; i < num_of_languages; i++) {
+    if (crypto::ElectrumWords::words_to_bytes(mnemonic_phrase, private_spend_key, languages[i])) {
+      return true;
+    }
+  }
+
+  /* The issue with this is if we try and automagically determine what language
+     the seed phrase is in, then we can't log words which aren't in the x
+     dictionary, we will have to take an argument to know what language they
+     are in, but this is less user friendly. */
+  logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
+  log_incorrect_words(words);
+  return false;
 }
 //----------------------------------------------------------------------------------------------------
 std::string simple_wallet::getline_tab_completion() {
