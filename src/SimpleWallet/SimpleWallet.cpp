@@ -811,8 +811,7 @@ std::string simple_wallet::generate_mnemonic(Crypto::SecretKey &private_spend_ke
   std::string mnemonic_str;
 
   if (!crypto::ElectrumWords::bytes_to_words(private_spend_key, mnemonic_str, "English")) {
-      logger(ERROR, BRIGHT_RED) << "\nCant create the mnemonic for the private spend key: "
-           << private_spend_key << std::endl;
+      logger(ERROR, BRIGHT_RED) << "\nCant create the mnemonic for the private spend key!";
   }
 
   return mnemonic_str;
@@ -970,7 +969,7 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout << m_wallet->getAddress();
     Common::Console::setTextColor(Common::Console::Color::Default);
-    std::cout << "\n\nPlease copy your secret keys and store them in a secure location:";
+    std::cout << "\n\nPlease copy your secret keys and mnemonic seed and store them in a secure location:";
     Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout <<
 	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
@@ -1252,6 +1251,20 @@ bool simple_wallet::export_keys(const std::vector<std::string>& args/* = std::ve
 
   std::cout << "Spend secret key: " << Common::podToHex(keys.spendSecretKey) << std::endl;
   std::cout << "View secret key: " <<  Common::podToHex(keys.viewSecretKey) << std::endl;
+
+  Crypto::PublicKey unused_dummy_variable;
+  Crypto::SecretKey deterministic_private_view_key;
+
+  AccountBase::generateViewFromSpend(keys.spendSecretKey, deterministic_private_view_key, unused_dummy_variable);
+
+  bool deterministic_private_keys = deterministic_private_view_key == keys.viewSecretKey;
+
+  /* Only output the mnemonic seed if it's valid for this wallet - the old
+    wallet code generated random spend and view keys so we can't create a 
+    mnemonic key */
+  if (deterministic_private_keys) {
+    std::cout << "Mnemonic seed: " << generate_mnemonic(keys.spendSecretKey) << std::endl;
+  }
 
   return true;
 }
