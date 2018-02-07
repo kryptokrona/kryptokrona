@@ -806,10 +806,25 @@ void simple_wallet::log_incorrect_words(std::vector<std::string> words) {
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::is_valid_mnemonic(std::string &mnemonic_phrase, Crypto::SecretKey &private_spend_key) {
-  static std::string languages[] = {"English", "Nederlands", "Français", "Português", "Italiano", "Deutsch", "русский язык", "简体中文 (中国)", "Esperanto", "Lojban"};
+
+  /* Uncommenting these will allow importing of different languages, exporting
+     in different languages however has not been added, as it will require
+     changing the export_keys command to take an argument to specify what
+     language the seed should be exported in. For now, multilanguage support
+     has been disabled as there are a couple of issues - we can't print out
+     what words aren't present in the dictionary if we don't know what
+     dictionary they are using, and it's a lot more friendly to work that
+     out automatically rather than asking, and secondly, it is possible that
+     dictionaries of other words can overlap enough to allow an esperanto
+     seed for example to be imported as an english seed */
+
+  //static std::string languages[] = {"English", "Nederlands", "Français", "Português", "Italiano", "Deutsch", "русский язык", "简体中文 (中国)", "Esperanto", "Lojban"};
+  static std::string languages[] = {"English"};
+  
+  //static const int num_of_languages = 10;
+  static const int num_of_languages = 1;
 
   static const int mnemonic_phrase_length = 25;
-  static const int num_of_languages = 10;
 
   std::vector<std::string> words;
 
@@ -823,7 +838,7 @@ bool simple_wallet::is_valid_mnemonic(std::string &mnemonic_phrase, Crypto::Secr
   }
 
   /* Check every language for our phrase so the user doesn't have to specify
-     it, this should be an issue as long as one language doesn't have enough
+     it, this shouldn't be an issue as long as one language doesn't have enough
      of another languages words, might need some testing */
   for (int i = 0; i < num_of_languages; i++) {
     if (crypto::ElectrumWords::words_to_bytes(mnemonic_phrase, private_spend_key, languages[i])) {
