@@ -52,7 +52,6 @@ namespace CryptoNote
     std::string generate_mnemonic(Crypto::SecretKey &);
     void log_incorrect_words(std::vector<std::string>);
     bool is_valid_mnemonic(std::string &, Crypto::SecretKey &);
-    std::string getline_tab_completion();
     bool deinit();
     bool run();
     void stop();
