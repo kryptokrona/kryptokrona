@@ -450,8 +450,8 @@ bool Core::queryBlocksLite(const std::vector<Crypto::Hash>& knownBlockHashes, ui
     fillQueryBlockShortInfo(fullOffset, currentIndex, BLOCKS_SYNCHRONIZING_DEFAULT_COUNT, entries);
 
     return true;
-  } catch (std::exception&) {
-    // TODO log
+  } catch (std::exception& e) {
+	logger(Logging::ERROR) << "Failed to query blocks: " << e.what();
     return false;
   }
 }
