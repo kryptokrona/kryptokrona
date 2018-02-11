@@ -1264,7 +1264,7 @@ bool simple_wallet::print_outputs_from_transaction(const std::vector<std::string
   
   if (!Common::fromHex(transactionHashString, &transactionHash, sizeof(transactionHash), size))
   {
-    std::cout << "Failed to parse - please ensure you entered the hash correctly." << std::endl;
+    logger(ERROR, BRIGHT_RED) << "Failed to parse - please ensure you entered the hash correctly.";
     return false;
   }
 
