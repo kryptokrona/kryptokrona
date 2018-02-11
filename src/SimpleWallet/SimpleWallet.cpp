@@ -1323,25 +1323,8 @@ bool simple_wallet::print_outputs_from_transaction(const std::vector<std::string
     if (targetPubKey.key == outputPublicKey)
     {
       uint64_t amount = ourTransaction.outputs[i].output.amount; 
-      short shells = amount % 100;
 
-      std::string trtl = std::to_string(amount / 100) + ".";
-
-      if (shells == 0)
-      {
-        /* Add an extra zero, to make it amount.00 e.g. 123.00 TRTL */
-        trtl += "00";
-      }
-      else if (shells < 10)
-      {
-        /* Add the zero on the front, to make it amount.0shells e.g. 123.02 TRTL */
-        trtl += "0" + std::to_string(shells);
-      }
-      else
-      {
-        /* Add the shells, to make it amount.shells e.g. 123.12 TRTL */
-        trtl += std::to_string(shells);
-      }
+      std::string trtl = m_currency.formatAmount(amount);
 
       sum += amount;
 
@@ -1357,25 +1340,7 @@ bool simple_wallet::print_outputs_from_transaction(const std::vector<std::string
   }
   else
   {
-    short shells = sum % 100;
-    
-    std::string trtl = std::to_string(sum / 100) += ".";
-
-    if (shells == 0)
-    {
-      /* Add an extra zero, to make it amount.00 e.g. 123.00 TRTL */
-      trtl += "00";
-    }
-    else if (shells < 10)
-    {
-      /* Add the zero on the front, to make it amount.0shells e.g. 123.02 TRTL */
-      trtl += "0" + std::to_string(shells);
-    }
-    else
-    {
-      /* Add the shells, to make it amount.shells e.g. 123.12 TRTL */
-      trtl += std::to_string(shells);
-    }
+    std::string trtl = m_currency.formatAmount(sum);
 
     logger(INFO, GREEN) << "Outputs totalling " << trtl << " TRTL were sent to your wallet!";
   }
