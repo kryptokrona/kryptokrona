@@ -386,7 +386,7 @@ void printListTransfersHeader(LoggerRef& logger) {
   logger(INFO) << std::string(header.size(), '-');
 }
 
-void printListTransfersItem(LoggerRef& logger, const WalletLegacyTransaction& txInfo, IWalletLegacy& wallet, const Currency& currency) {
+void printListTransfersItem(LoggerRef& logger, const WalletLegacyTransaction& txInfo, IWalletLegacy& wallet, const Currency& currency, uint64_t currentHeight) {
   std::vector<uint8_t> extraVec = Common::asBinaryArray(txInfo.extra);
 
   Crypto::Hash paymentId;
@@ -397,6 +397,7 @@ void printListTransfersItem(LoggerRef& logger, const WalletLegacyTransaction& tx
   if (std::strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", std::gmtime(&timestamp)) == 0) {
     throw std::runtime_error("time buffer is too small");
   }
+  uint64_t confirmations = currentHeight - txInfo.blockHeight;
 
   std::string rowColor = txInfo.totalAmount < 0 ? MAGENTA : GREEN;
   logger(INFO, rowColor)
@@ -405,8 +406,8 @@ void printListTransfersItem(LoggerRef& logger, const WalletLegacyTransaction& tx
     << "  " << std::setw(TOTAL_AMOUNT_MAX_WIDTH) << currency.formatAmount(txInfo.totalAmount)
     << "  " << std::setw(FEE_MAX_WIDTH) << currency.formatAmount(txInfo.fee)
     << "  " << std::setw(BLOCK_MAX_WIDTH) << txInfo.blockHeight
-    << "  " << std::setw(UNLOCK_TIME_MAX_WIDTH) << txInfo.unlockTime;
-    << "  " << std::setw(BLOCK_MAX_WIDTH) << m_node->getLastLocalBlockHeight() - txInfo.blockHeight;
+    << "  " << std::setw(UNLOCK_TIME_MAX_WIDTH) << txInfo.unlockTime
+    << "  " << std::setw(BLOCK_MAX_WIDTH) << confirmations;
 
   if (!paymentIdStr.empty()) {
     logger(INFO, rowColor) << "payment ID: " << paymentIdStr;
@@ -1113,8 +1114,7 @@ bool simple_wallet::listTransfers(const std::vector<std::string>& args) {
       printListTransfersHeader(logger);
       haveTransfers = true;
     }
-
-    printListTransfersItem(logger, txInfo, *m_wallet, m_currency);
+    printListTransfersItem(logger, txInfo, *m_wallet, m_currency, m_node->getLastLocalBlockHeight());
   }
 
   if (!haveTransfers) {
