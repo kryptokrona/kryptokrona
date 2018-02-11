@@ -49,10 +49,7 @@ namespace CryptoNote
     simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::Currency& currency, Logging::LoggerManager& log);
 
     bool init(const boost::program_options::variables_map& vm);
-    std::string generate_mnemonic(Crypto::SecretKey &);
-    void log_incorrect_words(std::vector<std::string>);
-    bool is_valid_mnemonic(std::string &, Crypto::SecretKey &);
-    bool deinit();
+        bool deinit();
     bool run();
     void stop();
 
@@ -99,6 +96,9 @@ bool new_wallet(Crypto::SecretKey &secret_key, Crypto::SecretKey &view_key, cons
     bool set_log(const std::vector<std::string> &args);
 
     bool ask_wallet_create_if_needed();
+    std::string generate_mnemonic(Crypto::SecretKey &);
+    void log_incorrect_words(std::vector<std::string>);
+    bool is_valid_mnemonic(std::string &, Crypto::SecretKey &);
 
     void printConnectionError() const;
 
