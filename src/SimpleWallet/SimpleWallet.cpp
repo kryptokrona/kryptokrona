@@ -488,6 +488,7 @@ simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::C
     "<mixin_count> is the number of transactions yours is indistinguishable from (from 0 to maximum available)");
   m_consoleHandler.setHandler("set_log", boost::bind(&simple_wallet::set_log, this, _1), "set_log <level> - Change current log level, <level> is a number 0-4");
   m_consoleHandler.setHandler("address", boost::bind(&simple_wallet::print_address, this, _1), "Show current wallet public address");
+  m_consoleHandler.setHandler("view_tx_outputs", boost::bind(&simple_wallet::print_outputs_from_transaction, this, _1), "view_tx_outputs <transaction_hash> - Find outputs that belong to you in a transaction");
   m_consoleHandler.setHandler("save", boost::bind(&simple_wallet::save, this, _1), "Save wallet synchronized data");
   m_consoleHandler.setHandler("reset", boost::bind(&simple_wallet::reset, this, _1), "Discard cache data and start synchronizing from the start");
   m_consoleHandler.setHandler("help", boost::bind(&simple_wallet::help, this, _1), "Show this help");
@@ -1246,6 +1247,99 @@ bool simple_wallet::run() {
 //----------------------------------------------------------------------------------------------------
 void simple_wallet::stop() {
   m_consoleHandler.requestStop();
+}
+//----------------------------------------------------------------------------------------------------
+bool simple_wallet::print_outputs_from_transaction(const std::vector<std::string>& args)
+{
+  if (args.size() == 0)
+  {
+    logger(ERROR, BRIGHT_RED) << "Must supply transaction hash as argument!";
+    return false;
+  }
+
+  Crypto::Hash transactionHash;
+  std::string transactionHashString = args[0];
+  boost::algorithm::trim(transactionHashString);
+  size_t size;
+  
+  if (!Common::fromHex(transactionHashString, &transactionHash, sizeof(transactionHash), size))
+  {
+    std::cout << "Failed to parse - please ensure you entered the hash correctly." << std::endl;
+    return false;
+  }
+
+  std::vector<TransactionDetails> transactions;
+  std::vector<Crypto::Hash> transactionHashes;
+  transactionHashes.push_back(transactionHash);
+
+  std::promise<std::error_code> errorPromise;
+  std::future<std::error_code> f_error = errorPromise.get_future();
+  auto callback = [&errorPromise](std::error_code e) {errorPromise.set_value(e); };
+
+  m_node->addObserver(static_cast<INodeRpcProxyObserver*>(this));
+  m_node->getTransactions(transactionHashes, transactions, callback);
+  auto error = f_error.get();
+
+  if (error)
+  {
+    logger(ERROR, BRIGHT_RED) << "Failed to find transaction hash! Ensure you entered it correctly and your daemon is fully synced.";
+    return false;
+  }
+
+  TransactionDetails ourTransaction = transactions[0];
+
+  AccountKeys keys;
+  m_wallet->getAccountKeys(keys);
+
+  Crypto::SecretKey privateViewKey = keys.viewSecretKey;
+  Crypto::SecretKey privateSpendKey = keys.spendSecretKey;
+
+  /* The transaction public key */
+  Crypto::PublicKey publicTransactionKey = ourTransaction.extra.publicKey;
+
+  /* The users public spend key */
+  Crypto::PublicKey publicSpendKey;
+  Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
+
+  /* Derived key is created from the users private view key and the public
+     transaction key */
+  Crypto::KeyDerivation derivation;
+  Crypto::generate_key_derivation(publicTransactionKey, privateViewKey, derivation);
+
+  Crypto::PublicKey outputPublicKey;
+
+  bool found = false;
+  uint64_t sum = 0;
+
+  /* Loop through each output in the transaction */
+  for (size_t i = 0; i < ourTransaction.outputs.size(); ++i)
+  {
+    Crypto::derive_public_key(derivation, i, publicSpendKey, outputPublicKey);
+
+    TransactionOutputTarget target = ourTransaction.outputs[i].output.target;
+
+    KeyOutput targetPubKey = boost::get<CryptoNote::KeyOutput>(target);
+
+    if (targetPubKey.key == outputPublicKey)
+    {
+      uint64_t amount = ourTransaction.outputs[i].output.amount; 
+      logger(INFO, GREEN) << "The transaction output of " << amount / 100 << " TRTL belongs to you!";
+
+      sum += amount;
+      found = true;
+    }
+  }
+
+  if (!found)
+  {
+    logger(ERROR, BRIGHT_RED) << "No outputs were found that belong to you, searched " << ourTransaction.outputs.size() << " outputs.";
+  }
+  else
+  {
+    logger(INFO, GREEN) << "Outputs totalling " << sum / 100 << " TRTL were sent to your wallet!";
+  }
+
+  return true;
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::print_address(const std::vector<std::string> &args/* = std::vector<std::string>()*/) {
