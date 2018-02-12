@@ -1,4 +1,4 @@
-![TurtleCoin](https://user-images.githubusercontent.com/34389545/34746835-428ac812-f55b-11e7-8e78-d342ac45d904.png)
+![image](https://user-images.githubusercontent.com/34389545/35821974-62e0e25c-0a70-11e8-87dd-2cfffeb6ed47.png)
 
 ### How To Compile
 
