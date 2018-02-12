@@ -55,7 +55,3 @@ The binaries will be in `./src` after compilation is complete.
 
 #### Thanks
 Cryptonote Developers, Bytecoin Developers, Forknote Project, TurtleCoin Community
-
-
-### Thanks
-Cryptonote Developers, Bytecoin Developers, Forknote Project, TurtleCoin Community
