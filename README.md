@@ -54,4 +54,4 @@ See the script for more installation details and please consider extending it fo
 The binaries will be in `./src` after compilation is complete.
 
 #### Thanks
-Cryptonote Developers, Bytecoin Developers, Forknote Project, TurtleCoin Community
+Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community
