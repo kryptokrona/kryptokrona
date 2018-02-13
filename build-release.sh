@@ -116,8 +116,6 @@ then
     mkdir -p "$BUILD_DIRECTORY"
 fi
 
-exit 0
-
 # -- Config
 GITHUB_REPO="https://github.com/turtlecoin/turtlecoin.git"
 CLONE_DIR="$BUILD_DIRECTORY/turtlecoin-buildall"
