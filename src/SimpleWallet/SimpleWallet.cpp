@@ -796,6 +796,23 @@ std::string simple_wallet::generate_mnemonic(Crypto::SecretKey &private_spend_ke
 
   return mnemonic_str;
 }
+std::string simple_wallet::format_mnemonic(std::string mnemonic_str) {
+  std::string spacer ("\n\t\t");
+  std::string formatted_str;
+
+  std::vector<std::string> results;
+  boost::split(results, mnemonic_str, [](char c){return c == ' ';});
+  for (int i=0; i< (int)results.size(); i++) {
+    formatted_str += (i==0 ? spacer : "") + results[i];
+    if ((i+1) % 5 == 0) {
+      formatted_str += spacer;
+    } else {
+      formatted_str += " ";
+    }
+  }
+
+  return formatted_str;
+}
 //----------------------------------------------------------------------------------------------------
 void simple_wallet::log_incorrect_words(std::vector<std::string> words) {
   Language::Base *language = Language::Singleton<Language::English>::instance();
@@ -915,11 +932,11 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     std::cout << "\n\nPlease copy your secret keys and mnemonic seed and store them in a secure location:";
     Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout <<
-	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
 	"\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
-  "\nmnemonic seed: " << generate_mnemonic(keys.spendSecretKey);
+	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
+        "\nmnemonic seed:" << format_mnemonic(generate_mnemonic(keys.spendSecretKey));
     Common::Console::setTextColor(Common::Console::Color::BrightRed);
-    std::cout << "\n\nIf you lose these your wallet cannot be recreated!\n\n";
+    std::cout << "\nIf you lose these your wallet cannot be recreated!\n\n";
     Common::Console::setTextColor(Common::Console::Color::Default);
     std::cout <<
       "**********************************************************************\n" <<
@@ -1206,7 +1223,7 @@ bool simple_wallet::export_keys(const std::vector<std::string>& args/* = std::ve
     wallet code generated random spend and view keys so we can't create a 
     mnemonic key */
   if (deterministic_private_keys) {
-    std::cout << "Mnemonic seed: " << generate_mnemonic(keys.spendSecretKey) << std::endl;
+    std::cout << "Mnemonic seed: " << format_mnemonic(generate_mnemonic(keys.spendSecretKey)) << std::endl;
   }
 
   return true;
