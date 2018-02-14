@@ -126,6 +126,23 @@ JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   return loggerConfiguration;
 }
 
+/* Wait for input so users can read errors before the window closes is they
+   launch from a GUI rather than a terminal */
+void pause_for_input(int argc) {
+  /* if they passed arguments they're probably in a terminal so the errors will
+     stay visible */
+  if (argc == 1) {
+    #if defined(WIN32)
+    if (_isatty(_fileno(stdout)) && _isatty(_fileno(stdin))) {
+    #else
+    if(isatty(fileno(stdout)) && isatty(fileno(stdin))) {
+    #endif
+      std::cout << "Press any key to close the program: ";
+      getchar();
+    }
+  }
+}
+
 int main(int argc, char* argv[])
 {
 
@@ -238,6 +255,7 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
       currencyBuilder.currency();
     } catch (std::exception&) {
       std::cout << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: " << CryptoNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.name;
+      pause_for_input(argc);
       return 1;
     }
     CryptoNote::Currency currency = currencyBuilder.currency();
@@ -261,6 +279,7 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
 
     if (dbConfig.isConfigFolderDefaulted()) {
       if (!Tools::create_directories_if_necessary(dbConfig.getDataDir())) {
+        pause_for_input(argc);
         throw std::runtime_error("Can't create directory: " + dbConfig.getDataDir());
       }
     } else {
@@ -306,6 +325,7 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
     logger(INFO) << "Initializing p2p server...";
     if (!p2psrv.init(netNodeConfig)) {
       logger(ERROR, BRIGHT_RED) << "Failed to initialize p2p server.";
+      pause_for_input(argc);
       return 1;
     }
 
@@ -344,6 +364,7 @@ rpcServer.enableCors(command_line::get_arg(vm, arg_enable_cors));
 
   } catch (const std::exception& e) {
     logger(ERROR, BRIGHT_RED) << "Exception: " << e.what();
+    pause_for_input(argc);
     return 1;
   }
 
