@@ -96,7 +96,7 @@ namespace Tools
             } else {
               std::cout << "Passwords do not match, try again." << std::endl;
               clear();
-	      return false;
+	      return read_password(true);
             }
           }
 	}
