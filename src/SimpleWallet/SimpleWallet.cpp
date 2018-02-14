@@ -616,7 +616,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   Tools::PasswordContainer pwd_container;
   if (command_line::has_arg(vm, arg_password)) {
     pwd_container.password(command_line::get_arg(vm, arg_password));
-  } else if (!pwd_container.read_password()) {
+  } else if (!pwd_container.read_password(!m_generate_new.empty() || !m_import_new.empty())) {
     fail_msg_writer() << "failed to read wallet password";
     return false;
   }
