@@ -98,7 +98,6 @@ bool new_wallet(Crypto::SecretKey &secret_key, Crypto::SecretKey &view_key, cons
 
     bool ask_wallet_create_if_needed();
     std::string generate_mnemonic(Crypto::SecretKey &);
-    std::string format_mnemonic(std::string mnemonic_str);
     void log_incorrect_words(std::vector<std::string>);
     bool is_valid_mnemonic(std::string &, Crypto::SecretKey &);
 
