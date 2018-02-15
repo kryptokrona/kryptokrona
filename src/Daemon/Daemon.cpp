@@ -258,7 +258,6 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
       currencyBuilder.currency();
     } catch (std::exception&) {
       std::cout << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: " << CryptoNote::CRYPTONOTE_NAME << "d --" << arg_print_genesis_tx.name;
-      pause_for_input(argc);
       return 1;
     }
     CryptoNote::Currency currency = currencyBuilder.currency();
@@ -282,7 +281,6 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
 
     if (dbConfig.isConfigFolderDefaulted()) {
       if (!Tools::create_directories_if_necessary(dbConfig.getDataDir())) {
-        pause_for_input(argc);
         throw std::runtime_error("Can't create directory: " + dbConfig.getDataDir());
       }
     } else {
@@ -328,7 +326,6 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
     logger(INFO) << "Initializing p2p server...";
     if (!p2psrv.init(netNodeConfig)) {
       logger(ERROR, BRIGHT_RED) << "Failed to initialize p2p server.";
-      pause_for_input(argc);
       return 1;
     }
 
@@ -367,7 +364,6 @@ rpcServer.enableCors(command_line::get_arg(vm, arg_enable_cors));
 
   } catch (const std::exception& e) {
     logger(ERROR, BRIGHT_RED) << "Exception: " << e.what();
-    pause_for_input(argc);
     return 1;
   }
 

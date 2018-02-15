@@ -54,9 +54,6 @@
 
 #if defined(WIN32)
 #include <crtdbg.h>
-#include <io.h>
-#else
-#include <unistd.h>
 #endif
 
 using namespace CryptoNote;
@@ -638,7 +635,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   Tools::PasswordContainer pwd_container;
   if (command_line::has_arg(vm, arg_password)) {
     pwd_container.password(command_line::get_arg(vm, arg_password));
-  } else if (!pwd_container.read_password()) {
+  } else if (!pwd_container.read_password(!m_generate_new.empty() || !m_import_new.empty())) {
     fail_msg_writer() << "failed to read wallet password";
     return false;
   }
@@ -937,9 +934,9 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     std::cout << "\n\nPlease copy your secret keys and mnemonic seed and store them in a secure location:";
     Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout <<
-	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
 	"\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
-  "\nmnemonic seed: " << generate_mnemonic(keys.spendSecretKey);
+	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
+        "\nmnemonic seed:" << generate_mnemonic(keys.spendSecretKey);
     Common::Console::setTextColor(Common::Console::Color::BrightRed);
     std::cout << "\n\nIf you lose these your wallet cannot be recreated!\n\n";
     Common::Console::setTextColor(Common::Console::Color::Default);
@@ -1608,25 +1605,21 @@ int main(int argc, char* argv[]) {
 	if (!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_password) &&
 		!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_legacy_security)) {
 	  logger(ERROR, BRIGHT_RED) << "Required RPC password is not set.";
-    pause_for_input(argc);
 	  return 1;
 	}
 
     if (!command_line::has_arg(vm, arg_wallet_file)) {
       logger(ERROR, BRIGHT_RED) << "Wallet file not set.";
-      pause_for_input(argc);
       return 1;
     }
 
     if (!command_line::has_arg(vm, arg_daemon_address)) {
       logger(ERROR, BRIGHT_RED) << "Daemon address not set.";
-      pause_for_input(argc);
       return 1;
     }
 
     if (!command_line::has_arg(vm, arg_password)) {
       logger(ERROR, BRIGHT_RED) << "Wallet password not set.";
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1643,7 +1636,6 @@ int main(int argc, char* argv[]) {
     if (!daemon_address.empty()) {
       if (!parseUrlAddress(daemon_address, daemon_host, daemon_port)) {
         logger(ERROR, BRIGHT_RED) << "failed to parse daemon address: " << daemon_address;
-        pause_for_input(argc);
         return 1;
       }
     }
@@ -1656,7 +1648,6 @@ int main(int argc, char* argv[]) {
     node->init(callback);
     if (error.get()) {
       logger(ERROR, BRIGHT_RED) << ("failed to init NodeRPCProxy");
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1672,7 +1663,6 @@ int main(int argc, char* argv[]) {
       logger(INFO, BRIGHT_GREEN) << "Loaded ok";
     } catch (const std::exception& e)  {
       logger(ERROR, BRIGHT_RED) << "Wallet initialize failed: " << e.what();
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1680,7 +1670,6 @@ int main(int argc, char* argv[]) {
 
     if (!wrpc.init(vm)) {
       logger(ERROR, BRIGHT_RED) << "Failed to initialize wallet rpc server";
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1698,7 +1687,6 @@ int main(int argc, char* argv[]) {
       logger(INFO, BRIGHT_GREEN) << "Stored ok";
     } catch (const std::exception& e) {
       logger(ERROR, BRIGHT_RED) << "Failed to store wallet: " << e.what();
-      pause_for_input(argc);
       return 1;
     }
   } else {
@@ -1707,7 +1695,6 @@ int main(int argc, char* argv[]) {
 
     if (!wal.init(vm)) {
       logger(ERROR, BRIGHT_RED) << "Failed to initialize wallet";
-      pause_for_input(argc);
       return 1;
     }
 
