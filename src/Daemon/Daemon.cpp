@@ -129,7 +129,7 @@ JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   return loggerConfiguration;
 }
 
-/* Wait for input so users can read errors before the window closes is they
+/* Wait for input so users can read errors before the window closes if they
    launch from a GUI rather than a terminal */
 void pause_for_input(int argc) {
   /* if they passed arguments they're probably in a terminal so the errors will

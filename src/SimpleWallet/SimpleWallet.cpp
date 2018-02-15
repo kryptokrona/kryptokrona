@@ -468,7 +468,7 @@ bool simple_wallet::exit(const std::vector<std::string> &args) {
   return true;
 }
 
-/* Wait for input so users can read errors before the window closes is they
+/* Wait for input so users can read errors before the window closes if they
    launch from a GUI rather than a terminal */
 /* Not a member of simple wallet because has to be called from main, could
    make static I suppose */
