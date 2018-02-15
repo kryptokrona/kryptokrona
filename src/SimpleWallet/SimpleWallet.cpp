@@ -54,9 +54,6 @@
 
 #if defined(WIN32)
 #include <crtdbg.h>
-#include <io.h>
-#else
-#include <unistd.h>
 #endif
 
 using namespace CryptoNote;
@@ -466,25 +463,6 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
 bool simple_wallet::exit(const std::vector<std::string> &args) {
   m_consoleHandler.requestStop();
   return true;
-}
-
-/* Wait for input so users can read errors before the window closes is they
-   launch from a GUI rather than a terminal */
-/* Not a member of simple wallet because has to be called from main, could
-   make static I suppose */
-void pause_for_input(int argc) {
-  /* if they passed arguments they're probably in a terminal so the errors will
-     stay visible */
-  if (argc == 1) {
-    #if defined(WIN32)
-    if (_isatty(_fileno(stdout)) && _isatty(_fileno(stdin))) {
-    #else
-    if(isatty(fileno(stdout)) && isatty(fileno(stdin))) {
-    #endif
-      std::cout << "Press any key to close the program: ";
-      getchar();
-    }
-  }
 }
 
 simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::Currency& currency, Logging::LoggerManager& log) :
@@ -1608,25 +1586,21 @@ int main(int argc, char* argv[]) {
 	if (!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_password) &&
 		!command_line::has_arg(vm, Tools::wallet_rpc_server::arg_rpc_legacy_security)) {
 	  logger(ERROR, BRIGHT_RED) << "Required RPC password is not set.";
-    pause_for_input(argc);
 	  return 1;
 	}
 
     if (!command_line::has_arg(vm, arg_wallet_file)) {
       logger(ERROR, BRIGHT_RED) << "Wallet file not set.";
-      pause_for_input(argc);
       return 1;
     }
 
     if (!command_line::has_arg(vm, arg_daemon_address)) {
       logger(ERROR, BRIGHT_RED) << "Daemon address not set.";
-      pause_for_input(argc);
       return 1;
     }
 
     if (!command_line::has_arg(vm, arg_password)) {
       logger(ERROR, BRIGHT_RED) << "Wallet password not set.";
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1643,7 +1617,6 @@ int main(int argc, char* argv[]) {
     if (!daemon_address.empty()) {
       if (!parseUrlAddress(daemon_address, daemon_host, daemon_port)) {
         logger(ERROR, BRIGHT_RED) << "failed to parse daemon address: " << daemon_address;
-        pause_for_input(argc);
         return 1;
       }
     }
@@ -1656,7 +1629,6 @@ int main(int argc, char* argv[]) {
     node->init(callback);
     if (error.get()) {
       logger(ERROR, BRIGHT_RED) << ("failed to init NodeRPCProxy");
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1672,7 +1644,6 @@ int main(int argc, char* argv[]) {
       logger(INFO, BRIGHT_GREEN) << "Loaded ok";
     } catch (const std::exception& e)  {
       logger(ERROR, BRIGHT_RED) << "Wallet initialize failed: " << e.what();
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1680,7 +1651,6 @@ int main(int argc, char* argv[]) {
 
     if (!wrpc.init(vm)) {
       logger(ERROR, BRIGHT_RED) << "Failed to initialize wallet rpc server";
-      pause_for_input(argc);
       return 1;
     }
 
@@ -1698,7 +1668,6 @@ int main(int argc, char* argv[]) {
       logger(INFO, BRIGHT_GREEN) << "Stored ok";
     } catch (const std::exception& e) {
       logger(ERROR, BRIGHT_RED) << "Failed to store wallet: " << e.what();
-      pause_for_input(argc);
       return 1;
     }
   } else {
@@ -1707,7 +1676,6 @@ int main(int argc, char* argv[]) {
 
     if (!wal.init(vm)) {
       logger(ERROR, BRIGHT_RED) << "Failed to initialize wallet";
-      pause_for_input(argc);
       return 1;
     }
 

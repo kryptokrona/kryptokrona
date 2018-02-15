@@ -102,7 +102,6 @@ bool new_wallet(Crypto::SecretKey &secret_key, Crypto::SecretKey &view_key, cons
     bool is_valid_mnemonic(std::string &, Crypto::SecretKey &);
 
     void printConnectionError() const;
-    void pause_for_input(int argc);
 
     //---------------- IWalletLegacyObserver -------------------------
     virtual void initCompleted(std::error_code result) override;
