@@ -616,7 +616,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   Tools::PasswordContainer pwd_container;
   if (command_line::has_arg(vm, arg_password)) {
     pwd_container.password(command_line::get_arg(vm, arg_password));
-  } else if (!pwd_container.read_password()) {
+  } else if (!pwd_container.read_password(!m_generate_new.empty() || !m_import_new.empty())) {
     fail_msg_writer() << "failed to read wallet password";
     return false;
   }
@@ -915,9 +915,9 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     std::cout << "\n\nPlease copy your secret keys and mnemonic seed and store them in a secure location:";
     Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout <<
-	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
 	"\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
-  "\nmnemonic seed: " << generate_mnemonic(keys.spendSecretKey);
+	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
+        "\nmnemonic seed:" << generate_mnemonic(keys.spendSecretKey);
     Common::Console::setTextColor(Common::Console::Color::BrightRed);
     std::cout << "\n\nIf you lose these your wallet cannot be recreated!\n\n";
     Common::Console::setTextColor(Common::Console::Color::Default);
