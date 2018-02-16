@@ -1,6 +1,11 @@
 ![image](https://user-images.githubusercontent.com/34389545/35821974-62e0e25c-0a70-11e8-87dd-2cfffeb6ed47.png)
 
-### How To Compile
+### Build Status
+
+Linux + OSX - https://travis-ci.org/ZedPea/turtlecoin.svg?branch=master
+Windows - https://ci.appveyor.com/api/projects/status/a1efx1ynae1qpxe4?svg=true
+
+### How To Compile 
 
 #### Ubuntu 16.04+ and MacOS 10.10+
 
