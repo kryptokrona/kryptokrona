@@ -480,6 +480,7 @@ simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::C
   m_consoleHandler.setHandler("export_keys", boost::bind(&simple_wallet::export_keys, this, _1), "Show the secret keys of the opened wallet");
   m_consoleHandler.setHandler("balance", boost::bind(&simple_wallet::show_balance, this, _1), "Show current wallet balance");
   m_consoleHandler.setHandler("incoming_transfers", boost::bind(&simple_wallet::show_incoming_transfers, this, _1), "Show incoming transfers");
+  m_consoleHandler.setHandler("outgoing_transfers", boost::bind(&simple_wallet::show_outgoing_transfers, this, _1), "Show outgoing transfers");
   m_consoleHandler.setHandler("list_transfers", boost::bind(&simple_wallet::listTransfers, this, _1), "Show all known transfers");
   m_consoleHandler.setHandler("payments", boost::bind(&simple_wallet::show_payments, this, _1), "payments <payment_id_1> [<payment_id_2> ... <payment_id_N>] - Show payments <payment_id_1>, ... <payment_id_N>");
   m_consoleHandler.setHandler("bc_height", boost::bind(&simple_wallet::show_blockchain_height, this, _1), "Show blockchain height");
@@ -1234,6 +1235,23 @@ bool simple_wallet::show_incoming_transfers(const std::vector<std::string>& args
   }
 
   if (!hasTransfers) success_msg_writer() << "No incoming transfers";
+  return true;
+}
+//----------------------------------------------------------------------------------------------------
+bool simple_wallet::show_outgoing_transfers(const std::vector<std::string>& args) {
+  bool hasTransfers = false;
+  size_t transactionsCount = m_wallet->getTransactionCount();
+  for (size_t trantransactionNumber = 0; trantransactionNumber < transactionsCount; ++trantransactionNumber) {
+    WalletLegacyTransaction txInfo;
+    m_wallet->getTransaction(trantransactionNumber, txInfo);
+    if (txInfo.totalAmount > 0) continue;
+    hasTransfers = true;
+    logger(INFO) << "        amount       \t                              tx id";
+    logger(INFO, MAGENTA) <<
+      std::setw(21) << m_currency.formatAmount(txInfo.totalAmount) << '\t' << Common::podToHex(txInfo.hash);
+  }
+
+  if (!hasTransfers) success_msg_writer() << "No outgoing transfers";
   return true;
 }
 
