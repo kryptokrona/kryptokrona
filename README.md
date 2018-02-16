@@ -2,8 +2,8 @@
 
 ### Build Status
 
-Linux + OSX - [![Build Status](https://travis-ci.org/ZedPea/turtlecoin.svg?branch=master)](https://travis-ci.org/ZedPea/turtlecoin)
-Windows - [![Build status](https://ci.appveyor.com/api/projects/status/a1efx1ynae1qpxe4?svg=true)](https://ci.appveyor.com/project/ZedPea/turtlecoin)
+[![Build Status](https://travis-ci.org/ZedPea/turtlecoin.svg?branch=master)](https://travis-ci.org/ZedPea/turtlecoin)
+[![Build status](https://ci.appveyor.com/api/projects/status/a1efx1ynae1qpxe4?svg=true)](https://ci.appveyor.com/project/ZedPea/turtlecoin)
 
 ### How To Compile 
 
