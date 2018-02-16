@@ -54,6 +54,9 @@
 
 #if defined(WIN32)
 #include <crtdbg.h>
+#include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 using namespace CryptoNote;
