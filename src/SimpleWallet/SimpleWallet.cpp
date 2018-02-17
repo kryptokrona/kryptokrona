@@ -54,6 +54,9 @@
 
 #if defined(WIN32)
 #include <crtdbg.h>
+#include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 using namespace CryptoNote;
@@ -463,6 +466,25 @@ bool simple_wallet::help(const std::vector<std::string> &args/* = std::vector<st
 bool simple_wallet::exit(const std::vector<std::string> &args) {
   m_consoleHandler.requestStop();
   return true;
+}
+
+/* Wait for input so users can read errors before the window closes if they
+   launch from a GUI rather than a terminal */
+/* Not a member of simple wallet because has to be called from main, could
+   make static I suppose */
+void pause_for_input(int argc) {
+  /* if they passed arguments they're probably in a terminal so the errors will
+     stay visible */
+  if (argc == 1) {
+    #if defined(WIN32)
+    if (_isatty(_fileno(stdout)) && _isatty(_fileno(stdin))) {
+    #else
+    if(isatty(fileno(stdout)) && isatty(fileno(stdin))) {
+    #endif
+      std::cout << "Press any key to close the program: ";
+      getchar();
+    }
+  }
 }
 
 simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::Currency& currency, Logging::LoggerManager& log) :

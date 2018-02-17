@@ -1,11 +1,10 @@
 ![image](https://user-images.githubusercontent.com/34389545/35821974-62e0e25c-0a70-11e8-87dd-2cfffeb6ed47.png)
 
-### Build Status
 
-[![Build Status](https://travis-ci.org/ZedPea/turtlecoin.svg?branch=master)](https://travis-ci.org/ZedPea/turtlecoin)
-[![Build status](https://ci.appveyor.com/api/projects/status/a1efx1ynae1qpxe4?svg=true)](https://ci.appveyor.com/project/ZedPea/turtlecoin)
-
-### How To Compile 
+=======
+[![Build Status](https://travis-ci.org/turtlecoin/turtlecoin.svg?branch=master)](https://travis-ci.org/turtlecoin/turtlecoin)
+[![Build status](https://ci.appveyor.com/api/projects/status/an6je6l48eawteyg?svg=true)](https://ci.appveyor.com/project/RocksteadyTC/turtlecoin)
+### How To Compile
 
 #### Ubuntu 16.04+ and MacOS 10.10+
 
@@ -33,6 +32,7 @@ See the script for more installation details and please consider extending it fo
 - `cd <your_turtlecoin_directory>`
 - `mkdir build`
 - `cd build`
+- Set the PATH variable for cmake: ie. `set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";%PATH%`
 - `cmake -G "Visual Studio 14 Win64" .. -DBOOST_ROOT=D:/Boost/boost_1_59_0` (Or your boost installed dir.)
 - `MSBuild ByteCoin.sln /p:Configuration=Release /m`
 - If all went well, it will complete successfully, and you will find all your binaries in the '..\build\src\Release' directory.
