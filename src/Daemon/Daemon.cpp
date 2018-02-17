@@ -50,6 +50,9 @@
 
 #if defined(WIN32)
 #include <crtdbg.h>
+#include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 using Common::JsonValue;
@@ -124,6 +127,23 @@ JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   consoleLogger.insert("pattern", "%D %T %L ");
 
   return loggerConfiguration;
+}
+
+/* Wait for input so users can read errors before the window closes if they
+   launch from a GUI rather than a terminal */
+void pause_for_input(int argc) {
+  /* if they passed arguments they're probably in a terminal so the errors will
+     stay visible */
+  if (argc == 1) {
+    #if defined(WIN32)
+    if (_isatty(_fileno(stdout)) && _isatty(_fileno(stdin))) {
+    #else
+    if(isatty(fileno(stdout)) && isatty(fileno(stdin))) {
+    #endif
+      std::cout << "Press any key to close the program: ";
+      getchar();
+    }
+  }
 }
 
 int main(int argc, char* argv[])
