@@ -206,13 +206,13 @@ void CryptoNoteProtocolHandler::log_connections() {
   std::stringstream ss;
 
   ss << std::setw(25) << std::left << "Remote Host"
-    << std::setw(20) << "Peer id"
+    << std::setw(20) << "Peer ID"
     << std::setw(25) << "Recv/Sent (inactive,sec)"
     << std::setw(25) << "State"
     << std::setw(20) << "Lifetime(seconds)" << ENDL;
 
   m_p2p->for_each_connection([&](const CryptoNoteConnectionContext& cntxt, PeerIdType peer_id) {
-    ss << std::setw(25) << std::left << std::string(cntxt.m_is_income ? "[INC]" : "[OUT]") +
+    ss << std::setw(25) << std::left << std::string(cntxt.m_is_income ? "[INCOMING]" : "[OUTGOING]") +
       Common::ipAddressToString(cntxt.m_remote_ip) + ":" + std::to_string(cntxt.m_remote_port)
       << std::setw(20) << std::hex << peer_id
       // << std::setw(25) << std::to_string(cntxt.m_recv_cnt) + "(" + std::to_string(time(NULL) - cntxt.m_last_recv) + ")" + "/" + std::to_string(cntxt.m_send_cnt) + "(" + std::to_string(time(NULL) - cntxt.m_last_send) + ")"
@@ -241,10 +241,11 @@ bool CryptoNoteProtocolHandler::process_payload_sync_data(const CORE_SYNC_DATA& 
   } else {
     int64_t diff = static_cast<int64_t>(hshd.current_height) - static_cast<int64_t>(get_current_blockchain_height());
 
-    logger(diff >= 0 ? (is_inital ? Logging::INFO : Logging::DEBUGGING) : Logging::TRACE, Logging::BRIGHT_YELLOW) << context <<
-      "Sync data returned unknown top block: " << get_current_blockchain_height() << " -> " << hshd.current_height
-      << " [" << std::abs(diff) << " blocks (" << std::abs(diff) / (24 * 60 * 60 / m_currency.difficultyTarget()) << " days) "
-      << (diff >= 0 ? std::string("behind") : std::string("ahead")) << "] " << std::endl << "SYNCHRONIZATION started";
+    logger(diff >= 0 ? (is_inital ? Logging::INFO : Logging::DEBUGGING) : Logging::TRACE, Logging::BRIGHT_GREEN) << context <<
+      "Your TurtleCoin node is syncing with the network. You are "
+      // << get_current_blockchain_height() << " -> " << hshd.current_height
+      << std::abs(diff) << " blocks (" << std::abs(diff) / (24 * 60 * 60 / m_currency.difficultyTarget()) << " days) "
+      << (diff >= 0 ? std::string("behind") : std::string("ahead of")) << " the Hare. Slow and steady wins the race! " << std::endl << "TurtleCoin is now syncing with the network";
 
     logger(Logging::DEBUGGING) << "Remote top block height: " << hshd.current_height << ", id: " << hshd.top_id;
     //let the socket to send response to handshake, but request callback, to let send request data after response
@@ -572,7 +573,7 @@ bool CryptoNoteProtocolHandler::request_missing_objects(CryptoNoteConnectionCont
     requestMissingPoolTransactions(context);
 
     context.m_state = CryptoNoteConnectionContext::state_normal;
-    logger(Logging::INFO, Logging::BRIGHT_GREEN) << context << "SUCCESSFULLY SYNCHRONIZED WITH THE TURTLECOIN NETWORK.";
+    logger(Logging::INFO, Logging::BRIGHT_GREEN) << context << "Successfully synchronized with the TurtleCoin Network.";
     on_connection_synchronized();
   }
   return true;
@@ -581,13 +582,14 @@ bool CryptoNoteProtocolHandler::request_missing_objects(CryptoNoteConnectionCont
 bool CryptoNoteProtocolHandler::on_connection_synchronized() {
   bool val_expected = false;
   if (m_synchronized.compare_exchange_strong(val_expected, true)) {
-    logger(Logging::INFO) << ENDL
-      << ENDL
-      << "Always exit TurtleCoind and Simplewallet with the \"exit\" command." << ENDL
-      << "If you do not exit properly, you may lose your blockchain and wallet data." << ENDL
-      << ENDL
-      << "Use \"help\" command to see the list of available commands." << ENDL
-      << "Use \"export_keys\" command to display your keys for restoring a corrupted wallet.";
+    logger(Logging::INFO)
+      << ENDL ;
+      logger(INFO, BRIGHT_MAGENTA) << "===[ TurtleCoin Tip! ]=============================" << ENDL ;
+      logger(INFO, WHITE) << " Always exit TurtleCoind and Simplewallet with the \"exit\" command to preserve your chain and wallet data." << ENDL ;
+      logger(INFO, WHITE) << " Use the \"help\" command to see a list of available commands." << ENDL ;
+      logger(INFO, WHITE) << " Use the \"export_keys\" command in Simplewallet to display your keys for restoring a corrupted wallet." << ENDL ;
+      logger(INFO, WHITE) << " If you need more assistance, visit the #HELP channel in the TurtleCoin Discord Chat - https://chat.turtlecoin.lol" << ENDL ;
+      logger(INFO, BRIGHT_MAGENTA) << "===================================================" << ENDL << ENDL ;
 
     m_observerManager.notify(&ICryptoNoteProtocolObserver::blockchainSynchronized, m_core.getTopBlockIndex());
   }

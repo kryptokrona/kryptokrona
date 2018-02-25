@@ -219,7 +219,7 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
 
     if (!r)
       return 1;
-  
+
     auto modulePath = Common::NativePathToGeneric(argv[0]);
     auto cfgLogFile = Common::NativePathToGeneric(command_line::get_arg(vm, arg_log_file));
 
@@ -236,7 +236,7 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
     // configure logging
     logManager.configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile));
 
-    logger(INFO) << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG;
+    logger(INFO, BRIGHT_GREEN) << "Welcome to " << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG;
 
     if (command_line_preprocessor(vm, logger)) {
       return 0;
@@ -268,7 +268,7 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
         checkpoints.addCheckpoint(cp.index, cp.blockId);
       }
     }
-    
+
     NetNodeConfig netNodeConfig;
     netNodeConfig.init(vm);
     netNodeConfig.setTestnet(testnet_mode);

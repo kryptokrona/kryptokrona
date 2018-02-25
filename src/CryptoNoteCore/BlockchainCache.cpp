@@ -541,12 +541,8 @@ uint32_t BlockchainCache::getTimestampLowerBoundBlockIndex(uint64_t timestamp) c
     return 0;
   }
 
-  try {
-    return parent->getTimestampLowerBoundBlockIndex(timestamp);
-  } catch (std::runtime_error&) {
-    // parent didn't have the block, so index.front() must be the block we're looking for
-    return startIndex;
-  }
+  uint32_t blockIndex = parent->getTimestampLowerBoundBlockIndex(timestamp);
+  return blockIndex == INVALID_BLOCK_INDEX ? blockIndex : startIndex;
 }
 
 bool BlockchainCache::getTransactionGlobalIndexes(const Crypto::Hash& transactionHash,

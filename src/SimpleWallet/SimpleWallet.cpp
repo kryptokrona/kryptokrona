@@ -556,7 +556,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
 
     char c;
     std::cout << "Nor 'generate-new-wallet' neither 'wallet-file' argument was specified.\nWhat do you want to do?\n[O]pen existing wallet, [G]enerate new wallet file, [I]mport wallet, [M]nemonic import or [E]xit.\n";
-    
+
     do {
       std::string answer;
       std::getline(std::cin, answer);
@@ -657,7 +657,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     fail_msg_writer() << "failed to init NodeRPCProxy: " << error.message();
     return false;
   }
-  
+
   sync_from_zero = command_line::get_arg(vm, arg_SYNC_FROM_ZERO);
   if (sync_from_zero) {
     sync_from_height = 0;
@@ -752,7 +752,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       private_spend_key = *(struct Crypto::SecretKey *) &private_spend_key_hash;
       private_view_key = *(struct Crypto::SecretKey *) &private_view_key_hash;
     }
-    
+
     if (!new_wallet(private_spend_key, private_view_key, walletFileName, pwd_container.password())) {
       logger(ERROR, BRIGHT_RED) << "account creation failed";
       return false;
@@ -846,7 +846,7 @@ bool simple_wallet::is_valid_mnemonic(std::string &mnemonic_phrase, Crypto::Secr
 
   //static std::string languages[] = {"English", "Nederlands", "Français", "Português", "Italiano", "Deutsch", "русский язык", "简体中文 (中国)", "Esperanto", "Lojban"};
   static std::string languages[] = {"English"};
-  
+
   //static const int num_of_languages = 10;
   static const int num_of_languages = 1;
 
@@ -942,15 +942,15 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
 	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
         "\nmnemonic seed:" << generate_mnemonic(keys.spendSecretKey);
     Common::Console::setTextColor(Common::Console::Color::BrightRed);
-    std::cout << "\n\nIf you lose these your wallet cannot be recreated!\n\n";
+    std::cout << "\n\nIf you lose these keys, your wallet cannot be recreated!\n\n";
     Common::Console::setTextColor(Common::Console::Color::Default);
     std::cout <<
-      "**********************************************************************\n" <<
-      "Use \"help\" command to see the list of available commands.\n" <<
-      "Always use \"exit\" command when closing simplewallet to save\n" <<
+      "===[ TurtleCoin Tip! ]=============================\n" <<
+      "Use the \"help\" command to see the list of available commands.\n" <<
+      "Always use the \"exit\" command when closing simplewallet to save\n" <<
       "current session's state. Otherwise, you will possibly need to synchronize \n" <<
-      "your wallet again. Your wallet key is NOT under risk anyway.\n" <<
-      "**********************************************************************\n";
+      "your wallet again. Your wallet keys are not at risk.\n" <<
+      "===================================================\n";
 
   } catch (const std::exception& e) {
     fail_msg_writer() << "failed to generate new wallet: " << e.what();
@@ -1226,7 +1226,7 @@ bool simple_wallet::export_keys(const std::vector<std::string>& args/* = std::ve
   bool deterministic_private_keys = deterministic_private_view_key == keys.viewSecretKey;
 
   /* Only output the mnemonic seed if it's valid for this wallet - the old
-    wallet code generated random spend and view keys so we can't create a 
+    wallet code generated random spend and view keys so we can't create a
     mnemonic key */
   if (deterministic_private_keys) {
     std::cout << "Mnemonic seed: " << generate_mnemonic(keys.spendSecretKey) << std::endl;
@@ -1438,7 +1438,7 @@ bool simple_wallet::print_outputs_from_transaction(const std::vector<std::string
   std::string transactionHashString = args[0];
   boost::algorithm::trim(transactionHashString);
   size_t size;
-  
+
   if (!Common::fromHex(transactionHashString, &transactionHash, sizeof(transactionHash), size))
   {
     logger(ERROR, BRIGHT_RED) << "Failed to parse - please ensure you entered the hash correctly.";
@@ -1499,7 +1499,7 @@ bool simple_wallet::print_outputs_from_transaction(const std::vector<std::string
 
     if (targetPubKey.key == outputPublicKey)
     {
-      uint64_t amount = ourTransaction.outputs[i].output.amount; 
+      uint64_t amount = ourTransaction.outputs[i].output.amount;
 
       std::string trtl = m_currency.formatAmount(amount);
 
@@ -1738,5 +1738,3 @@ int main(int argc, char* argv[]) {
   return 1;
   //CATCH_ENTRY_L0("main", 1);
 }
-
-
