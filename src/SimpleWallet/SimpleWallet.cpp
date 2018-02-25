@@ -123,124 +123,6 @@ inline std::string interpret_rpc_response(bool ok, const std::string& status) {
   return err;
 }
 
-template <typename IterT, typename ValueT = typename IterT::value_type>
-class ArgumentReader {
-public:
-
-  ArgumentReader(IterT begin, IterT end) :
-    m_begin(begin), m_end(end), m_cur(begin) {
-  }
-
-  bool eof() const {
-    return m_cur == m_end;
-  }
-
-  ValueT next() {
-    if (eof()) {
-      throw std::runtime_error("unexpected end of arguments");
-    }
-
-    return *m_cur++;
-  }
-
-private:
-
-  IterT m_cur;
-  IterT m_begin;
-  IterT m_end;
-};
-
-struct TransferCommand {
-  const CryptoNote::Currency& m_currency;
-  size_t fake_outs_count;
-  std::vector<CryptoNote::WalletLegacyTransfer> dsts;
-  std::vector<uint8_t> extra;
-  uint64_t fee;
-
-  TransferCommand(const CryptoNote::Currency& currency) :
-    m_currency(currency), fake_outs_count(0), fee(currency.minimumFee()) {
-  }
-
-  bool parseArguments(LoggerRef& logger, const std::vector<std::string> &args) {
-
-    ArgumentReader<std::vector<std::string>::const_iterator> ar(args.begin(), args.end());
-
-    try {
-
-      auto mixin_str = ar.next();
-
-      if (!Common::fromString(mixin_str, fake_outs_count)) {
-        logger(ERROR, BRIGHT_RED) << "mixin_count should be non-negative integer, got " << mixin_str;
-        return false;
-      }
-
-      while (!ar.eof()) {
-
-        auto arg = ar.next();
-
-        if (arg.size() && arg[0] == '-') {
-
-          const auto& value = ar.next();
-
-          if (arg == "-p") {
-            if (!createTxExtraWithPaymentId(value, extra)) {
-              logger(ERROR, BRIGHT_RED) << "payment ID has invalid format: \"" << value << "\", expected 64-character string";
-              return false;
-            }
-          } else if (arg == "-f") {
-            bool ok = m_currency.parseAmount(value, fee);
-            if (!ok) {
-              logger(ERROR, BRIGHT_RED) << "Fee value is invalid: " << value;
-              return false;
-            }
-
-            if (fee < m_currency.minimumFee()) {
-              logger(ERROR, BRIGHT_RED) << "Fee value is less than minimum: " << m_currency.minimumFee();
-              return false;
-            }
-          }
-        } else {
-          WalletLegacyTransfer destination;
-          CryptoNote::TransactionDestinationEntry de;
-
-          if (!m_currency.parseAccountAddressString(arg, de.addr)) {
-            Crypto::Hash paymentId;
-            if (CryptoNote::parsePaymentId(arg, paymentId)) {
-              logger(ERROR, BRIGHT_RED) << "Invalid payment ID usage. Please, use -p <payment_id>. See help for details.";
-            } else {
-              logger(ERROR, BRIGHT_RED) << "Wrong address: " << arg;
-            }
-
-            return false;
-          }
-
-          auto value = ar.next();
-          bool ok = m_currency.parseAmount(value, de.amount);
-          if (!ok || 0 == de.amount) {
-            logger(ERROR, BRIGHT_RED) << "amount is wrong: " << arg << ' ' << value <<
-              ", expected number from 0 to " << m_currency.formatAmount(std::numeric_limits<uint64_t>::max());
-            return false;
-          }
-          destination.address = arg;
-          destination.amount = de.amount;
-
-          dsts.push_back(destination);
-        }
-      }
-
-      if (dsts.empty()) {
-        logger(ERROR, BRIGHT_RED) << "At least one destination address is required";
-        return false;
-      }
-    } catch (const std::exception& e) {
-      logger(ERROR, BRIGHT_RED) << e.what();
-      return false;
-    }
-
-    return true;
-  }
-};
-
 JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   JsonValue loggerConfiguration(JsonValue::OBJECT);
   loggerConfiguration.insert("globalLevel", static_cast<int64_t>(level));
@@ -554,39 +436,54 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
 
   if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
 
+    std::cout << std::endl << "Welcome, please choose an option below:"
+              << std::endl 
+              << std::endl << "\t[G] - Generate a new wallet address"
+              << std::endl << "\t[O] - Open a wallet already on your system"
+              << std::endl << "\t[S] - Regenerate your wallet using a seed phrase of words"
+              << std::endl << "\t[I] - Import your wallet using a View Key and Spend Key"
+            /*<< std::endl << "\t[V] - Import a View Key and create a view-only wallet"*/
+              << std::endl << std::endl << "or, press CTRL_C to exit: "
+              << std::flush;
+
     char c;
-    std::cout << "Nor 'generate-new-wallet' neither 'wallet-file' argument was specified.\nWhat do you want to do?\n[O]pen existing wallet, [G]enerate new wallet file, [I]mport wallet, [M]nemonic import or [E]xit.\n";
     
     do {
       std::string answer;
       std::getline(std::cin, answer);
       c = answer[0];
-      if (!(c == 'O' || c == 'G' || c == 'E' || c == 'I' || c == 'M' || c == 'o' || c == 'g' || c == 'e' || c == 'i' || c == 'm')) {
-        std::cout << "Unknown command: " << c <<std::endl;
+      c = std::tolower(c);
+      if (!(c == 'o' || c == 'g' || c == 'i' || c == 's')) {
+        std::cout << "Unknown command: " << answer << std::endl;
       } else {
         break;
       }
     } while (true);
 
-    if (c == 'E' || c == 'e') {
+    if (c == 'e') {
       return false;
     }
 
     std::cout << "Specify wallet file name (e.g., wallet.bin).\n";
     std::string userInput;
+
     do {
-      std::cout << "Wallet file name: ";
+      if (c == 'o') {
+        std::cout << "Enter the name of the wallet you wish to open: ";
+      } else {
+        std::cout << "What do you want to call your new wallet?: ";
+      }
       std::getline(std::cin, userInput);
       boost::algorithm::trim(userInput);
     } while (userInput.empty());
 
-    if (c == 'i' || c == 'I') {
+    if (c == 'i') {
       key_import = true;
       m_import_new = userInput;
-    } else if (c == 'm' || c == 'M') {
+    } else if (c == 's') {
       key_import = false;
       m_import_new = userInput;
-    } else if (c == 'g' || c == 'G') {
+    } else if (c == 'g') {
       m_generate_new = userInput;
     } else {
       m_wallet_file_arg = userInput;
@@ -636,10 +533,9 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     m_daemon_address = std::string("http://") + m_daemon_host + ":" + std::to_string(m_daemon_port);
   }
 
-  Tools::PasswordContainer pwd_container;
   if (command_line::has_arg(vm, arg_password)) {
-    pwd_container.password(command_line::get_arg(vm, arg_password));
-  } else if (!pwd_container.read_password(!m_generate_new.empty() || !m_import_new.empty())) {
+    m_pwd_container.password(command_line::get_arg(vm, arg_password));
+  } else if (!m_pwd_container.read_password(!m_generate_new.empty() || !m_import_new.empty())) {
     fail_msg_writer() << "failed to read wallet password";
     return false;
   }
@@ -670,7 +566,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       return false;
     }
 
-    if (!new_wallet(walletFileName, pwd_container.password())) {
+    if (!new_wallet(walletFileName, m_pwd_container.password())) {
       logger(ERROR, BRIGHT_RED) << "account creation failed";
       return false;
     }
@@ -753,7 +649,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       private_view_key = *(struct Crypto::SecretKey *) &private_view_key_hash;
     }
     
-    if (!new_wallet(private_spend_key, private_view_key, walletFileName, pwd_container.password())) {
+    if (!new_wallet(private_spend_key, private_view_key, walletFileName, m_pwd_container.password())) {
       logger(ERROR, BRIGHT_RED) << "account creation failed";
       return false;
     }
@@ -768,7 +664,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       m_wallet->syncAll(sync_from_zero, 0);
     }
     try {
-      m_wallet_file = tryToOpenWalletOrLoadKeysOrThrow(logger, m_wallet, m_wallet_file_arg, pwd_container.password());
+      m_wallet_file = tryToOpenWalletOrLoadKeysOrThrow(logger, m_wallet, m_wallet_file_arg, m_pwd_container.password());
     } catch (const std::exception& e) {
       fail_msg_writer() << "failed to load wallet: " << e.what();
       return false;
@@ -1358,6 +1254,68 @@ bool simple_wallet::show_blockchain_height(const std::vector<std::string>& args)
 
   return true;
 }
+
+bool simple_wallet::confirmTransaction(TransferCommand cmd, bool multiAddress) {
+  std::string feeString;
+
+  /* 10 shells = 0.1 TRTL */
+  if (cmd.fee == 10) {
+    feeString = "0.1 TRTL (minimum)";
+  } else {
+    feeString = m_currency.formatAmount(cmd.fee) + " TRTL";
+  }
+
+  std::string walletName = boost::filesystem::change_extension(m_wallet_file, "").string();
+
+  std::cout << std::endl << "Confirm Transaction?" << std::endl;
+
+  if (!multiAddress) {
+    std::cout << "You are sending " << m_currency.formatAmount(cmd.dsts[0].amount)
+              << " TRTL, with a fee of " << feeString << std::endl
+              << "FROM: " << walletName << std::endl
+              << "TO: " << std::endl << cmd.dsts[0].address << std::endl
+              << std::endl;
+  } else {
+    std::cout << "You are sending a transaction to "
+              << std::to_string(cmd.dsts.size())
+              << " addresses, with a combined fee of " << feeString
+              << " TRTL" << std::endl << std::endl;
+
+    for (auto destination : cmd.dsts) {
+      std::cout << "You are sending " << m_currency.formatAmount(destination.amount)
+                << " TRTL" << std::endl << "FROM: " << walletName << std::endl
+                << "TO: " << std::endl << destination.address << std::endl
+                << std::endl;
+    }
+  }
+
+  while (true) {
+    std::cout << "Is this correct? (Y/N): ";
+
+    char c;
+
+    std::cin >> c;
+
+    c = std::tolower(c);
+
+    if (c == 'y') {
+      if (!m_pwd_container.read_and_validate()) {
+        std::cout << "Incorrect password!" << std::endl;
+        continue;
+      }
+
+      return true;
+
+    } else if (c == 'n') {
+      return false;
+    } else {
+      std::cout << "Bad input, please enter either Y or N." << std::endl;
+    }
+  }
+
+  /* Because the compiler is dumb */
+  return false;
+}
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::transfer(const std::vector<std::string> &args) {
   try {
@@ -1371,6 +1329,13 @@ bool simple_wallet::transfer(const std::vector<std::string> &args) {
     std::copy(cmd.extra.begin(), cmd.extra.end(), std::back_inserter(extraString));
 
     WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
+
+    bool proceed = confirmTransaction(cmd, cmd.dsts.size() > 1);
+
+    if (!proceed) {
+      std::cout << "Cancelling transaction." << std::endl;
+      return true;
+    }
 
     CryptoNote::TransactionId tx = m_wallet->sendTransaction(cmd.dsts, cmd.fee, extraString, cmd.fake_outs_count, 0);
     if (tx == WALLET_LEGACY_INVALID_TRANSACTION_ID) {
@@ -1388,7 +1353,8 @@ bool simple_wallet::transfer(const std::vector<std::string> &args) {
 
     CryptoNote::WalletLegacyTransaction txInfo;
     m_wallet->getTransaction(tx, txInfo);
-    success_msg_writer(true) << "Money successfully sent, transaction " << Common::podToHex(txInfo.hash);
+    std::cout << "Transaction has been sent! ID:" << std::endl
+              << Common::podToHex(txInfo.hash) << std::endl;
 
     try {
       CryptoNote::WalletHelper::storeWallet(*m_wallet, m_wallet_file);
@@ -1610,7 +1576,7 @@ int main(int argc, char* argv[]) {
 
   logManager.configure(buildLoggerConfiguration(logLevel, Common::ReplaceExtenstion(argv[0], ".log")));
 
-  logger(INFO, BRIGHT_WHITE) << CRYPTONOTE_NAME << " wallet v" << PROJECT_VERSION_LONG;
+  std::cout << "TurtleCoin v" << PROJECT_VERSION << " Simplewallet" << std::endl;
 
   CryptoNote::Currency currency = CryptoNote::CurrencyBuilder(logManager).
     testnet(command_line::get_arg(vm, arg_testnet)).currency();
