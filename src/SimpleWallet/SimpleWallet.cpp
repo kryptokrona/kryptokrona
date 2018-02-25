@@ -1105,12 +1105,23 @@ void simple_wallet::synchronizationProgressUpdated(uint32_t current, uint32_t to
   }
 }
 
-bool simple_wallet::export_keys(const std::vector<std::string>& args/* = std::vector<std::string>()*/) {
+bool simple_wallet::export_keys(const std::vector<std::string>& args) {
   AccountKeys keys;
   m_wallet->getAccountKeys(keys);
 
-  // output the keys directly to the console to avoid them being output to the logfile.
+  /* The console handler fucks up input, so lets pause it whilst we're
+    getting input then unpause afterwards */
+  m_consoleHandler.pause();
 
+  if (!m_pwd_container.read_and_validate()) {
+    std::cout << "Incorrect password!" << std::endl;
+    m_consoleHandler.unpause();
+    return false;
+  }
+
+  m_consoleHandler.unpause();
+
+  // output the keys directly to the console to avoid them being output to the logfile.
   std::cout << "Spend secret key: " << Common::podToHex(keys.spendSecretKey) << std::endl;
   std::cout << "View secret key: " <<  Common::podToHex(keys.viewSecretKey) << std::endl;
 
@@ -1279,7 +1290,7 @@ bool simple_wallet::confirmTransaction(TransferCommand cmd, bool multiAddress) {
     std::cout << "You are sending a transaction to "
               << std::to_string(cmd.dsts.size())
               << " addresses, with a combined fee of " << feeString
-              << " TRTL" << std::endl << std::endl;
+              << std::endl << std::endl;
 
     for (auto destination : cmd.dsts) {
       std::cout << "You are sending " << m_currency.formatAmount(destination.amount)
@@ -1290,13 +1301,16 @@ bool simple_wallet::confirmTransaction(TransferCommand cmd, bool multiAddress) {
   }
 
   while (true) {
-    std::cout << "Is this correct? (Y/N): ";
+    std::cout << "Is this correct? (Y/N): " << std::flush;
 
-    char c;
+    /* The console handler fucks up input, so lets pause it whilst we're
+       getting input then unpause afterwards */
+    m_consoleHandler.pause();
 
-    std::cin >> c;
+    std::string answer;
+    std::getline(std::cin, answer);
 
-    c = std::tolower(c);
+    char c = std::tolower(answer[0]);
 
     if (c == 'y') {
       if (!m_pwd_container.read_and_validate()) {
@@ -1308,8 +1322,11 @@ bool simple_wallet::confirmTransaction(TransferCommand cmd, bool multiAddress) {
 
     } else if (c == 'n') {
       return false;
+    /* Don't loop forever on EOF */
+    } else if (c == std::ifstream::traits_type::eof()) {
+      return false;
     } else {
-      std::cout << "Bad input, please enter either Y or N." << std::endl;
+      std::cout << "Bad input: " << answer << " - please enter either Y or N.";
     }
   }
 
@@ -1331,6 +1348,9 @@ bool simple_wallet::transfer(const std::vector<std::string> &args) {
     WalletHelper::IWalletRemoveObserverGuard removeGuard(*m_wallet, sent);
 
     bool proceed = confirmTransaction(cmd, cmd.dsts.size() > 1);
+
+    /* Restore prompt and input handling */
+    m_consoleHandler.unpause();
 
     if (!proceed) {
       std::cout << "Cancelling transaction." << std::endl;
