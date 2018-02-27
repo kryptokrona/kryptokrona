@@ -467,15 +467,34 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     std::cout << "Specify wallet file name (e.g., wallet.bin).\n";
     std::string userInput;
 
+    bool validInput = true;
+
     do {
       if (c == 'o') {
         std::cout << "Enter the name of the wallet you wish to open: ";
       } else {
         std::cout << "What do you want to call your new wallet?: ";
       }
+
       std::getline(std::cin, userInput);
       boost::algorithm::trim(userInput);
-    } while (userInput.empty());
+      
+      if (c != 'o') {
+        std::string ignoredString;
+        std::string walletFileName;
+
+        WalletHelper::prepareFileNames(userInput, ignoredString, walletFileName);
+
+        boost::system::error_code ignore;
+
+        if (boost::filesystem::exists(walletFileName, ignore)) {
+          std::cout << walletFileName << " already exists! Try a different name." << std::endl;
+          validInput = false;
+        } else {
+          validInput = true;
+        }
+      }
+    } while (!validInput);
 
     if (c == 'i') {
       key_import = true;
