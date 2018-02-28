@@ -75,33 +75,52 @@ namespace Tools
     return read_password(false);
   }
 
+  bool PasswordContainer::read_and_validate() {
+    std::string tmpPassword = m_password;
+
+    if (!read_password()) {
+      std::cout << "Failed to read password!";
+      return false;
+    }
+
+    bool validPass = m_password == tmpPassword;
+
+    m_password = tmpPassword;
+
+    return validPass;
+  }
+
   bool PasswordContainer::read_password(bool verify) {
     clear();
 
     bool r;
     if (is_cin_tty()) {
-      std::cout << "password: ";
+      if (verify) {
+        std::cout << "Give your new wallet a password: ";
+      } else {
+        std::cout << "Enter password: ";
+      }
       if (verify) {
         std::string password1;
         std::string password2;
         r = read_from_tty(password1);
         if (r) {
-          std::cout << "confirm password: ";
+          std::cout << "Confirm your new password: ";
           r = read_from_tty(password2);
           if (r) {
             if (password1 == password2) {
               m_password = std::move(password2);
               m_empty = false;
-	      return true;
+	            return true;
             } else {
               std::cout << "Passwords do not match, try again." << std::endl;
               clear();
-	      return read_password(true);
+	            return read_password(true);
             }
           }
-	}
+	      }
       } else {
-	r = read_from_tty(m_password);
+	      r = read_from_tty(m_password);
       }
     } else {
       r = read_from_file();
