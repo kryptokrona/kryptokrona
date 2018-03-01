@@ -30,7 +30,7 @@ If you are using Arch Linux, there is an AUR precompiled package, `turtlecoin-bi
 ```
 sudo add-apt-repository ppa:ethcore/ethcore -y
 sudo apt-get update
-suto apt-get install librocksdb-dev
+sudo apt-get install librocksdb-dev
 ```
 
 ##### Building
