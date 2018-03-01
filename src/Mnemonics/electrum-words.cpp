@@ -51,22 +51,6 @@
 #include <boost/crc.hpp>
 #include <boost/algorithm/string/join.hpp>
 
-#include "chinese_simplified.h"
-#include "english.h"
-#include "dutch.h"
-#include "french.h"
-#include "italian.h"
-#include "german.h"
-#include "spanish.h"
-#include "portuguese.h"
-#include "japanese.h"
-#include "russian.h"
-#include "esperanto.h"
-#include "lojban.h"
-#include "english_old.h"
-#include "language_base.h"
-#include "singleton.h"
-
 namespace
 {
   uint32_t create_checksum_index(const std::vector<std::string> &word_list,
