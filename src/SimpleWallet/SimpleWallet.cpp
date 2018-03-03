@@ -632,12 +632,9 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
           boost::algorithm::trim(mnemonic_phrase);
           boost::algorithm::to_lower(mnemonic_phrase);
 
-        } while (!is_valid_mnemonic(mnemonic_phrase, private_spend_key));
+        } while (!crypto::ElectrumWords::is_valid_mnemonic(mnemonic_phrase, private_spend_key, logger));
 
-        /* This is not used, but is needed to be passed to the function, not sure how we can avoid this */
-        Crypto::PublicKey unused_dummy_variable;
-
-        AccountBase::generateViewFromSpend(private_spend_key, private_view_key, unused_dummy_variable);
+        AccountBase::generateViewFromSpend(private_spend_key, private_view_key);
       }
 
     } else {
@@ -735,67 +732,6 @@ std::string simple_wallet::generate_mnemonic(Crypto::SecretKey &private_spend_ke
   return mnemonic_str;
 }
 //----------------------------------------------------------------------------------------------------
-void simple_wallet::log_incorrect_words(std::vector<std::string> words) {
-  Language::Base *language = Language::Singleton<Language::English>::instance();
-  const std::vector<std::string> &dictionary = language->get_word_list();
-
-  for (auto i : words) {
-    if (std::find(dictionary.begin(), dictionary.end(), i) == dictionary.end()) {
-      logger(ERROR, BRIGHT_RED) << i << " is not in the english word list!";
-    }
-  }
-}
-//----------------------------------------------------------------------------------------------------
-bool simple_wallet::is_valid_mnemonic(std::string &mnemonic_phrase, Crypto::SecretKey &private_spend_key) {
-
-  /* Uncommenting these will allow importing of different languages, exporting
-     in different languages however has not been added, as it will require
-     changing the export_keys command to take an argument to specify what
-     language the seed should be exported in. For now, multilanguage support
-     has been disabled as there are a couple of issues - we can't print out
-     what words aren't present in the dictionary if we don't know what
-     dictionary they are using, and it's a lot more friendly to work that
-     out automatically rather than asking, and secondly, it is possible that
-     dictionaries of other words can overlap enough to allow an esperanto
-     seed for example to be imported as an english seed */
-
-  //static std::string languages[] = {"English", "Nederlands", "Français", "Português", "Italiano", "Deutsch", "русский язык", "简体中文 (中国)", "Esperanto", "Lojban"};
-  static std::string languages[] = {"English"};
-  
-  //static const int num_of_languages = 10;
-  static const int num_of_languages = 1;
-
-  static const int mnemonic_phrase_length = 25;
-
-  std::vector<std::string> words;
-
-  words = boost::split(words, mnemonic_phrase, ::isspace);
-
-  if (words.size() != mnemonic_phrase_length) {
-    logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
-    logger(ERROR, BRIGHT_RED) << "Seed phrase is not 25 words! Please try again.";
-    log_incorrect_words(words);
-    return false;
-  }
-
-  /* Check every language for our phrase so the user doesn't have to specify
-     it, this shouldn't be an issue as long as one language doesn't have enough
-     of another languages words, might need some testing */
-  for (int i = 0; i < num_of_languages; i++) {
-    if (crypto::ElectrumWords::words_to_bytes(mnemonic_phrase, private_spend_key, languages[i])) {
-      return true;
-    }
-  }
-
-  /* The issue with this is if we try and automagically determine what language
-     the seed phrase is in, then we can't log words which aren't in the x
-     dictionary, we will have to take an argument to know what language they
-     are in, but this is less user friendly. */
-  logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
-  log_incorrect_words(words);
-  return false;
-}
-//----------------------------------------------------------------------------------------------------
 bool simple_wallet::deinit() {
   m_wallet->removeObserver(this);
   m_node->removeObserver(static_cast<INodeObserver*>(this));
@@ -853,9 +789,9 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     std::cout << "\n\nPlease copy your secret keys and mnemonic seed and store them in a secure location:";
     Common::Console::setTextColor(Common::Console::Color::BrightGreen);
     std::cout <<
-	"\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
-	"\nview key: " << Common::podToHex(keys.viewSecretKey) <<
-        "\nmnemonic seed:" << generate_mnemonic(keys.spendSecretKey);
+	    "\nspend key: " << Common::podToHex(keys.spendSecretKey) <<
+	    "\nview key: " << Common::podToHex(keys.viewSecretKey) <<
+      "\nmnemonic seed: " << generate_mnemonic(keys.spendSecretKey);
     Common::Console::setTextColor(Common::Console::Color::BrightRed);
     std::cout << "\n\nIf you lose these your wallet cannot be recreated!\n\n";
     Common::Console::setTextColor(Common::Console::Color::Default);
@@ -1144,10 +1080,9 @@ bool simple_wallet::export_keys(const std::vector<std::string>& args) {
   std::cout << "Spend secret key: " << Common::podToHex(keys.spendSecretKey) << std::endl;
   std::cout << "View secret key: " <<  Common::podToHex(keys.viewSecretKey) << std::endl;
 
-  Crypto::PublicKey unused_dummy_variable;
   Crypto::SecretKey deterministic_private_view_key;
 
-  AccountBase::generateViewFromSpend(keys.spendSecretKey, deterministic_private_view_key, unused_dummy_variable);
+  AccountBase::generateViewFromSpend(keys.spendSecretKey, deterministic_private_view_key);
 
   bool deterministic_private_keys = deterministic_private_view_key == keys.viewSecretKey;
 
@@ -1743,5 +1678,3 @@ int main(int argc, char* argv[]) {
   return 1;
   //CATCH_ENTRY_L0("main", 1);
 }
-
-

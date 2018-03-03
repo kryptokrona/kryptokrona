@@ -48,6 +48,12 @@ void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::Secret
 
   Crypto::generate_keys_from_seed(viewPublic, viewSecret, viewKeySeed);
 }
+
+void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret) {
+  /* If we don't need the pub key */
+  Crypto::PublicKey unused_dummy_variable;
+  generateViewFromSpend(spend, viewSecret, unused_dummy_variable);
+}
 //-----------------------------------------------------------------
 const AccountKeys &AccountBase::getAccountKeys() const {
   return m_keys;
