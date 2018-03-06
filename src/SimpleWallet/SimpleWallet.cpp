@@ -606,6 +606,12 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
         std::string command;
         std::getline(std::cin, command);
 
+        /* Split into args to support legacy transfer command, for example
+           transfer 5 TRTLxyz... 100, sends 100 TRTL to TRTLxyz... with a mixin
+           of 5 */
+        std::vector<std::string> words;
+        words = boost::split(words, command, ::isspace);
+        
         if (command == "")
         {
             // no-op
@@ -641,6 +647,13 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
         else if (command == "transfer")
         {
             transfer(walletInfo);
+        }
+        else if (words[0] == "transfer")
+        {
+            /* remove the first item from words - this is the "transfer"
+               command, leaving us just the transfer arguments. */
+            words.erase(words.begin());
+            transfer(walletInfo, words);
         }
         else if (command == "exit")
         {
@@ -1075,8 +1088,13 @@ void findNewTransactions(CryptoNote::INode &node,
             {
                 CryptoNote::WalletTransaction t = wallet.getTransaction(i);
 
-                std::cout << std::endl << YellowMsg("New transaction found!")
-                          << std::endl << std::endl;
+                /* Don't print out fusion transactions */
+                if (t.totalAmount != 0)
+                {
+                    std::cout << std::endl
+                              << YellowMsg("New transaction found!")
+                              << std::endl << std::endl;
+                }
 
                 if (t.totalAmount < 0)
                 {

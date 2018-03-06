@@ -1,3 +1,5 @@
+#include <cctype>
+
 #include "INode.h"
 #include "version.h"
 

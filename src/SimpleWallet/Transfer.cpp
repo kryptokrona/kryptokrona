@@ -503,9 +503,156 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
     }
 }
 
+void transfer(std::shared_ptr<WalletInfo> walletInfo,
+              std::vector<std::string> args)
+{
+    uint16_t mixin;
+    std::string address;
+    uint64_t amount;
+    uint64_t fee = CryptoNote::parameters::MINIMUM_FEE;
+    std::string extra;
+
+    /* Check we have enough args for the default required parameters */
+    if (args.size() >= 3)
+    {
+        if (parseMixin(args[0]) && parseAddress(args[1]) && parseAmount(args[2]))
+        {
+            mixin = std::stoi(args[0]);
+            address = args[1];
+            parseAmount(args[2], amount);
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        std::cout << RedMsg("Not enough arguments given!") << std::endl
+                  << "Try running just " << YellowMsg("transfer") << " for "
+                  << "a walk through guide to transferring." << std::endl;
+        return;
+    }
+
+    for (size_t i = 0; i < args.size(); i++)
+    {
+        if (args[i] == "-f")
+        {
+            if (i+1 < args.size())
+            {
+                if (parseFee(args[i+1]))
+                {
+                    parseAmount(args[i+1], fee);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                std::cout << RedMsg("Fee flag given but no fee follows!")
+                          << std::endl;
+                return;
+            }
+        }
+        else if (args[i] == "-p")
+        {
+            if (i+1 < args.size())
+            {
+                std::vector<uint8_t> extraVec;
+                std::string extraString;
+
+                /* Convert the payment ID into an "extra" */
+                if (!CryptoNote::createTxExtraWithPaymentId(args[i+1],
+                                                            extraVec))
+                {
+                    std::cout << RedMsg("Failed to parse payment ID! "
+                                        "Payment ID's are 64 character "
+                                        "hexadecimal strings.")
+                              << std::endl;
+                    return;
+                }
+                else
+                {
+                    /* Then convert the "extra" back into a string so we
+                       can pass the argument that walletgreen expects. 
+                       Note this string is not the same as the original
+                       paymentID string! */
+                    for (auto i : extraVec)
+                    {
+                        extraString += static_cast<char>(i);
+                    }
+                }
+
+                extra = extraString;
+            }
+            else
+            {
+                std::cout << RedMsg("Payment ID flag given but not payment ID "
+                                    "follows!") << std::endl;
+                return;
+            }
+        }
+    }
+
+    doTransfer(mixin, address, amount, fee, extra, walletInfo);
+}
+
 void transfer(std::shared_ptr<WalletInfo> walletInfo)
 {
     uint64_t balance = walletInfo->wallet.getActualBalance();
+
+    std::string address = getDestinationAddress();
+    uint64_t amount = getTransferAmount();
+
+    if (balance < amount)
+    {
+        std::cout << RedMsg("You don't have enough funds to cover this "
+                            "transaction!") << std::endl
+                  << YellowMsg("Funds needed: " + formatAmount(amount))
+                  << std::endl
+                  << GreenMsg("Funds available: " + formatAmount(balance))
+                  << std::endl;
+        return;
+    }
+
+    uint64_t fee = getFee();
+
+    if (balance < amount + fee)
+    {
+        std::cout << RedMsg("You don't have enough funds to cover this "
+                            "transaction!") << std::endl
+                  << YellowMsg("Funds needed: " + formatAmount(amount + fee))
+                  << std::endl
+                  << GreenMsg("Funds available: " + formatAmount(balance))
+                  << std::endl;
+        return;
+    }
+
+    uint16_t mixin = getMixin();
+
+    std::string extra = getPaymentID();
+
+    doTransfer(mixin, address, amount, fee, extra, walletInfo);
+}
+
+void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
+                uint64_t fee, std::string extra,
+                std::shared_ptr<WalletInfo> walletInfo)
+{
+    uint64_t balance = walletInfo->wallet.getActualBalance();
+
+    if (balance < amount + fee)
+    {
+        std::cout << RedMsg("You don't have enough funds to cover this "
+                            "transaction!") << std::endl
+                  << YellowMsg("Funds needed: " + formatAmount(amount + fee))
+                  << std::endl
+                  << GreenMsg("Funds available: " + formatAmount(balance))
+                  << std::endl;
+        return;
+    }
 
     std::vector<CryptoNote::WalletOrder> transfers;
 
@@ -514,38 +661,15 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
     d.address = "";
 
     CryptoNote::WalletOrder w;
-    w.address = getDestinationAddress();
-    w.amount = getTransferAmount();
+    w.address = address;
+    w.amount = amount;
     transfers.push_back(w);
-
-    if (balance < w.amount)
-    {
-        std::cout << RedMsg("You don't have enough funds to cover this "
-                            "transaction!") << std::endl
-                  << YellowMsg("Funds needed: " + formatAmount(w.amount))
-                  << std::endl
-                  << GreenMsg("Funds available: " + formatAmount(balance))
-                  << std::endl;
-        return;
-    }
 
     CryptoNote::TransactionParameters p;
     p.destinations = transfers;
-    p.fee = getFee();
-
-    if (balance < w.amount + p.fee)
-    {
-        std::cout << RedMsg("You don't have enough funds to cover this "
-                            "transaction!") << std::endl
-                  << YellowMsg("Funds needed: " + formatAmount(w.amount+p.fee))
-                  << std::endl
-                  << GreenMsg("Funds available: " + formatAmount(balance))
-                  << std::endl;
-        return;
-    }
-
-    p.mixIn = getMixin();
-    p.extra = getPaymentID();
+    p.fee = fee;
+    p.mixIn = mixin;
+    p.extra = extra;
     p.changeDestination = walletInfo->walletAddress;
 
     if (!confirmTransaction(p, walletInfo))
@@ -619,8 +743,6 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
                       << std::endl << "Error message: " << errMsg
                       << std::endl;
         }
-
-        return;
     }
 }
 
@@ -690,18 +812,9 @@ uint64_t getFee()
 
         uint64_t amount;
 
-        if (!parseAmount(stringAmount, amount))
+        if (parseFee(stringAmount))
         {
-            std::cout << RedMsg("Failed to parse! Ensure you entered the "
-                                "value correctly.") << std::endl;
-        }
-        else if (amount < CryptoNote::parameters::MINIMUM_FEE)
-        {
-            std::cout << RedMsg("Fee must be at least 0.1 TRTL!") << std::endl;
-        }
-        else
-        {
-            return amount;
+            return parseAmount(stringAmount, amount);
         }
     }
 }
@@ -723,20 +836,9 @@ uint16_t getMixin()
         {
             return CryptoNote::parameters::DEFAULT_MIXIN;
         }
-
-        uint16_t mixin;
-
-        try
+        else if (parseMixin(stringMixin))
         {
-            /* We shouldn't need to check this is >0 because it should fail
-               to parse as it's a uint16_t? */
-            mixin = std::stoi(stringMixin);
-            return mixin;
-        }
-        catch (const std::invalid_argument &e)
-        {
-            std::cout << RedMsg("Failed to parse! Ensure you entered the "
-                                "value correctly.") << std::endl;
+            return std::stoi(stringMixin);
         }
     }
 }
@@ -754,16 +856,9 @@ uint64_t getTransferAmount()
 
         uint64_t amount;
 
-        if (!parseAmount(stringAmount, amount))
+        if (parseAmount(stringAmount))
         {
-            std::cout << RedMsg("Failed to parse! Ensure you entered the "
-                                "value correctly.") << std::endl
-                      << "Please note, the minimum you can send is 0.01 TRTL."
-                      << std::endl;
-        }
-        else
-        {
-            return amount;
+            return parseAmount(stringAmount, amount);
         }
     }
 }
@@ -779,20 +874,85 @@ std::string getDestinationAddress()
         std::getline(std::cin, transferAddr);
         boost::algorithm::trim(transferAddr);
 
-        if (transferAddr.length() != 99)
-        {
-            std::cout << "Address is wrong length! It should be 99 characters "
-                      << "long, but it is " << transferAddr.length()
-                      << " characters long!" << std::endl;
-        }
-        else if (transferAddr.substr(0, 4) != "TRTL")
-        {
-            std::cout << RedMsg("Invalid address! It should start with "
-                                "\"TRTL\"!") << std::endl;
-        }
-        else
+        if (parseAddress(transferAddr))
         {
             return transferAddr;
         }
     }
+}
+
+bool parseFee(std::string feeString)
+{
+    uint64_t fee;
+
+    if (!parseAmount(feeString, fee))
+    {
+        std::cout << RedMsg("Failed to parse fee! Ensure you entered the "
+                            "value correctly.") << std::endl;
+        return false;
+    }
+    else if (fee < CryptoNote::parameters::MINIMUM_FEE)
+    {
+        std::cout << RedMsg("Fee must be at least 0.1 TRTL!") << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+
+bool parseAddress(std::string address)
+{
+    if (address.length() != 99)
+    {
+        std::cout << RedMsg("Address is wrong length!") << std::endl
+                  << "It should be 99 characters long, but it is "
+                  << address.length() << " characters long!" << std::endl;
+
+        return false;
+    }
+    else if (address.substr(0, 4) != "TRTL")
+    {
+        std::cout << RedMsg("Invalid address! It should start with "
+                            "\"TRTL\"!") << std::endl;
+
+        return false;
+    }
+
+    return true;
+}
+
+bool parseMixin(std::string mixinString)
+{
+
+    try
+    {
+        /* We shouldn't need to check this is >0 because it should fail
+           to parse as it's a uint16_t? */
+        std::stoi(mixinString);
+        return true;
+    }
+    catch (const std::invalid_argument &e)
+    {
+        std::cout << RedMsg("Failed to parse mixin! Ensure you entered the "
+                            "value correctly.") << std::endl;
+        return false;
+    }
+}
+
+bool parseAmount(std::string amountString)
+{
+    uint64_t amount;
+
+    if (!parseAmount(amountString, amount))
+    {
+        std::cout << RedMsg("Failed to parse amount! Ensure you entered the "
+                            "value correctly.") << std::endl
+                  << "Please note, the minimum you can send is 0.01 TRTL, "
+                  << "and you can only use 2 decimal places."
+                  << std::endl;
+        return false;
+    }
+
+    return true;
 }
