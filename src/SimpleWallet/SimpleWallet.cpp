@@ -467,7 +467,7 @@ bool isValidMnemonic(std::string &mnemonic_phrase,
      dictionary they are using, and it's a lot more friendly to work that
      out automatically rather than asking, and secondly, it is possible that
      dictionaries of other words can overlap enough to allow an esperanto
-     seed for example to be imported as an english seed */
+     seed for example to be imported as an English seed */
 
     /*
     static std::string languages[] = {"English", "Nederlands", "Français", 
@@ -532,7 +532,7 @@ void logIncorrectMnemonicWords(std::vector<std::string> words)
         if (std::find(dictionary.begin(), dictionary.end(), i) 
                    == dictionary.end())
         {
-            std::cout << PurpleMsg(i) << RedMsg(" is not in the english word "
+            std::cout << PurpleMsg(i) << RedMsg(" is not in the English word "
                                                 "list!") << std::endl;
         }
     }
