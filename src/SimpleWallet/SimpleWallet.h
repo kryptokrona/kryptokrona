@@ -104,3 +104,5 @@ std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
                                          Action action);
 
 Crypto::SecretKey getPrivateKey(std::string outputMsg);
+
+ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo);
