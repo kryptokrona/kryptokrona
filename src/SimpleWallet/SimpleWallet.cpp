@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
 void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 {
-    std::cout << YellowMsg("TurtleCoin v" + std::string(PROJECT_VERSION)
+    std::cout << PurpleMsg("TurtleCoin v" + std::string(PROJECT_VERSION)
                          + " Simplewallet") << std::endl;
 
     /* Open/import/generate the wallet */
@@ -91,7 +91,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
                   << RedMsg("The wallet can't function until it can "
                             "communicate with the network.")
                   << std::endl
-                  << YellowMsg("Hit any key to exit: ");
+                  << PurpleMsg("Hit any key to exit: ");
 
         std::cin.get();
 
@@ -200,7 +200,7 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
 
     std::string walletAddress = wallet.createAddress(privateSpendKey);
 
-    std::cout << YellowMsg("\nYour wallet " + walletAddress 
+    std::cout << PurpleMsg("\nYour wallet " + walletAddress 
                          + " has been successfully imported!")
               << std::endl << std::endl;
 
@@ -258,7 +258,7 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet)
             std::string walletAddress = wallet.getAddress(0);
 
             std::cout << std::endl
-                      << YellowMsg("Your wallet " + walletAddress
+                      << PurpleMsg("Your wallet " + walletAddress
                                  + " has been successfully opened!\n\n");
 
             return std::make_shared<WalletInfo>(walletFileName, walletPass, 
@@ -415,12 +415,12 @@ Action getAction()
     while (true)
     {
         std::cout << std::endl << "Welcome, please choose an option below:"
-                  << std::endl << std::endl << "\t[" << YellowMsg("G")
+                  << std::endl << std::endl << "\t[" << PurpleMsg("G")
                   << "] - Generate a new wallet address" << std::endl 
-                  << "\t[" << YellowMsg("O") << "] - Open a wallet already "
-                  << "on your system" << std::endl << "\t[" << YellowMsg("S")
+                  << "\t[" << PurpleMsg("O") << "] - Open a wallet already "
+                  << "on your system" << std::endl << "\t[" << PurpleMsg("S")
                   << "] - Regenerate your wallet using a seed phrase of words"
-                  << std::endl << "\t[" << YellowMsg("I") << "] - Import "
+                  << std::endl << "\t[" << PurpleMsg("I") << "] - Import "
                   << "your wallet using a View Key and Spend Key"
                   << std::endl << std::endl
                   << "or, press CTRL_C to exit: ";
@@ -532,7 +532,7 @@ void logIncorrectMnemonicWords(std::vector<std::string> words)
         if (std::find(dictionary.begin(), dictionary.end(), i) 
                    == dictionary.end())
         {
-            std::cout << YellowMsg(i) << RedMsg(" is not in the english word "
+            std::cout << PurpleMsg(i) << RedMsg(" is not in the english word "
                                                 "list!") << std::endl;
         }
     }
@@ -541,7 +541,7 @@ void logIncorrectMnemonicWords(std::vector<std::string> words)
 void promptSaveKeys(CryptoNote::WalletGreen &wallet)
 {
     std::cout << "Welcome to your new wallet, here is your payment address:"
-              << std::endl << YellowMsg(wallet.getAddress(0))
+              << std::endl << PurpleMsg(wallet.getAddress(0))
               << std::endl << std::endl 
               << "Please copy your secret keys and mnemonic seed and store "
               << "them in a secure location: " << std::endl;
@@ -588,9 +588,9 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet)
 
 void welcomeMsg()
 {
-    std::cout << "Use the " << YellowMsg("help") << " command to see the list "
+    std::cout << "Use the " << PurpleMsg("help") << " command to see the list "
               << "of available commands." << std::endl << "Use "
-              << YellowMsg("exit") << " when closing to ensure your wallet "
+              << PurpleMsg("exit") << " when closing to ensure your wallet "
               << "file doesn't get corrupted." << std::endl << std::endl;
 }
 
@@ -601,7 +601,7 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
 
     while (true)
     {
-        std::cout << YellowMsg("[TurtleWallet " + shortAddress + "]: ");
+        std::cout << PurpleMsg("[TurtleWallet " + shortAddress + "]: ");
 
         std::string command;
         std::getline(std::cin, command);
@@ -678,7 +678,7 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
         else
         {
             std::cout << "Unknown command: " << RedMsg(command) 
-                      << ", use " << YellowMsg("help") << " command to list "
+                      << ", use " << PurpleMsg("help") << " command to list "
                       << "all possible commands." << std::endl;
         }
     }
@@ -747,7 +747,7 @@ void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
               << "Locked (unconfirmed) balance: "
               << RedMsg(formatAmount(unconfirmedBalance))
               << std::endl << "Total balance: "
-              << YellowMsg(formatAmount(totalBalance)) << std::endl;
+              << PurpleMsg(formatAmount(totalBalance)) << std::endl;
 }
 
 void blockchainHeight(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
@@ -813,7 +813,7 @@ void shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     }
     else
     {
-        std::cout << YellowMsg("Saving wallet and shutting down, please "
+        std::cout << PurpleMsg("Saving wallet and shutting down, please "
                                "wait...") << std::endl;
     }
 
@@ -935,14 +935,14 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
                 if (t.totalAmount > 0)
                 {
                     std::cout << std::endl
-                              << YellowMsg("New transaction found!")
+                              << PurpleMsg("New transaction found!")
                               << std::endl
                               << GreenMsg("Incoming transfer: " 
                                         + Common::podToHex(t.hash) +
                                           "\nAmount: " 
                                         + formatAmount(t.totalAmount))
                               << std::endl
-                              << YellowMsg("[TurtleWallet " 
+                              << PurpleMsg("[TurtleWallet " 
                                          + shortAddress + "]: ")
                               << std::flush;
                 }
@@ -960,7 +960,7 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
 void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo,
            ThreadHandler &threadHandler)
 {
-    std::cout << YellowMsg("Resetting wallet...") << std::endl;
+    std::cout << PurpleMsg("Resetting wallet...") << std::endl;
 
     /* Pause the transaction watcher whilst we reset. It could potentially
        fuck up, and if it doesn't, it still will be printing stuff when we
@@ -1079,7 +1079,7 @@ void findNewTransactions(CryptoNote::INode &node,
         remoteHeight = node.getLastKnownBlockHeight();
 
         std::cout << GreenMsg(std::to_string(walletHeight))
-                  << " of " << YellowMsg(std::to_string(localHeight))
+                  << " of " << PurpleMsg(std::to_string(localHeight))
                   << std::endl;
 
         if (tmpTransactionCount != transactionCount)
@@ -1092,7 +1092,7 @@ void findNewTransactions(CryptoNote::INode &node,
                 if (t.totalAmount != 0)
                 {
                     std::cout << std::endl
-                              << YellowMsg("New transaction found!")
+                              << PurpleMsg("New transaction found!")
                               << std::endl << std::endl;
                 }
 

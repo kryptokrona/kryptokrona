@@ -3,8 +3,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <Common/ConsoleHandler.h>
-#include <Common/StringTools.h>
+#include <Common/ConsoleTools.h>
 #include <SimpleWallet/PasswordContainer.h>
 
 void confirmPassword(std::string walletPass);
@@ -60,6 +59,9 @@ class ColouredMsg
         bool pad = false;
 };
 
+/* These are pretty general rules and are sometimes broken. */
+
+/* Something good happened */
 class GreenMsg : public ColouredMsg
 {
     public:
@@ -70,17 +72,19 @@ class GreenMsg : public ColouredMsg
                : ColouredMsg(msg, padding, Common::Console::Color::Green) {}
 };
 
-class YellowMsg : public ColouredMsg
+/* Notification / Warning / Alert */
+class PurpleMsg : public ColouredMsg
 {
     public:
-        explicit YellowMsg(std::string msg) 
-               : ColouredMsg(msg, Common::Console::Color::BrightYellow) {}
+        explicit PurpleMsg(std::string msg) 
+               : ColouredMsg(msg, Common::Console::Color::BrightMagenta) {}
 
-        explicit YellowMsg(std::string msg, int padding)
+        explicit PurpleMsg(std::string msg, int padding)
                : ColouredMsg(msg, padding, 
-                             Common::Console::Color::BrightYellow) {}
+                             Common::Console::Color::BrightMagenta) {}
 };
 
+/* Something bad happened */
 class RedMsg : public ColouredMsg
 {
     public:

@@ -52,16 +52,16 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
 bool confirmTransaction(CryptoNote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo)
 {
-    std::cout << std::endl << YellowMsg("Confirm Transaction?") << std::endl;
+    std::cout << std::endl << PurpleMsg("Confirm Transaction?") << std::endl;
 
     std::cout << "You are sending " 
               << GreenMsg(formatAmount(t.destinations[0].amount))
               << ", with a fee of " << GreenMsg(formatAmount(t.fee))
               << std::endl
-              << "FROM: " << YellowMsg(walletInfo->walletFileName) 
+              << "FROM: " << PurpleMsg(walletInfo->walletFileName) 
               << std::endl
               << "TO: " << std::endl
-              << YellowMsg(t.destinations[0].address)
+              << PurpleMsg(t.destinations[0].address)
               << std::endl << std::endl;
 
     if (confirm("Is this correct?"))
@@ -93,8 +93,8 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
         while (true)
         {
             std::cout << "Attempting to send transaction "
-                      << YellowMsg(std::to_string(currentTx))
-                      << " of " << YellowMsg(std::to_string(numTxs))
+                      << PurpleMsg(std::to_string(currentTx))
+                      << " of " << PurpleMsg(std::to_string(numTxs))
                       << std::endl;
 
             uint64_t neededBalance = tx.destinations[0].amount + tx.fee;
@@ -284,7 +284,7 @@ void quickOptimize(CryptoNote::WalletGreen &wallet)
         std::cout << GreenMsg("Optimization completed!") << std::endl
                   << "Your wallet can still be optimized more if you run "
                   << "this command again." << std::endl << "Consider using "
-                  << "the " << YellowMsg("full_optimize") << " command to "
+                  << "the " << PurpleMsg("full_optimize") << " command to "
                   << "automate the process." << std::endl;
     }
 }
@@ -303,7 +303,7 @@ void fullOptimize(CryptoNote::WalletGreen &wallet)
 
     for (int i = 1;;i++)
     {
-        std::cout << YellowMsg("Running optimization round "
+        std::cout << PurpleMsg("Running optimization round "
                               + std::to_string(i) + "...")
                   << std::endl;
 
@@ -529,7 +529,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
     else
     {
         std::cout << RedMsg("Not enough arguments given!") << std::endl
-                  << "Try running just " << YellowMsg("transfer") << " for "
+                  << "Try running just " << PurpleMsg("transfer") << " for "
                   << "a walk through guide to transferring." << std::endl;
         return;
     }
@@ -610,7 +610,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
     {
         std::cout << RedMsg("You don't have enough funds to cover this "
                             "transaction!") << std::endl
-                  << YellowMsg("Funds needed: " + formatAmount(amount))
+                  << PurpleMsg("Funds needed: " + formatAmount(amount))
                   << std::endl
                   << GreenMsg("Funds available: " + formatAmount(balance))
                   << std::endl;
@@ -623,7 +623,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
     {
         std::cout << RedMsg("You don't have enough funds to cover this "
                             "transaction!") << std::endl
-                  << YellowMsg("Funds needed: " + formatAmount(amount + fee))
+                  << PurpleMsg("Funds needed: " + formatAmount(amount + fee))
                   << std::endl
                   << GreenMsg("Funds available: " + formatAmount(balance))
                   << std::endl;
@@ -647,7 +647,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
     {
         std::cout << RedMsg("You don't have enough funds to cover this "
                             "transaction!") << std::endl
-                  << YellowMsg("Funds needed: " + formatAmount(amount + fee))
+                  << PurpleMsg("Funds needed: " + formatAmount(amount + fee))
                   << std::endl
                   << GreenMsg("Funds available: " + formatAmount(balance))
                   << std::endl;
@@ -753,7 +753,7 @@ std::string getPaymentID()
         std::string paymentID;
 
         std::cout << std::endl
-                  << YellowMsg("What payment ID do you want to use?")
+                  << PurpleMsg("What payment ID do you want to use?")
                   << std::endl 
                   << "These are usually used for sending to exchanges."
                   << std::endl
@@ -800,7 +800,7 @@ uint64_t getFee()
     while (true)
     {
         std::string stringAmount;
-        std::cout << std::endl << YellowMsg("What fee do you want to use?")
+        std::cout << std::endl << PurpleMsg("What fee do you want to use?")
                   << std::endl << "Hit enter for the default fee of 0.1 TRTL: ";
 
         std::getline(std::cin, stringAmount);
@@ -824,7 +824,7 @@ uint16_t getMixin()
     while (true)
     {
         std::string stringMixin;
-        std::cout << std::endl << YellowMsg("What mixin do you want to use?")
+        std::cout << std::endl << PurpleMsg("What mixin do you want to use?")
                   << std::endl
                   << "Mixin is how many times your transaction is mixed "
                   << "with others for privacy." << std::endl
@@ -850,7 +850,7 @@ uint64_t getTransferAmount()
         std::string stringAmount;
 
         std::cout << std::endl
-                  << YellowMsg("How much TRTL do you want to send?: ");
+                  << PurpleMsg("How much TRTL do you want to send?: ");
 
         std::getline(std::cin, stringAmount);
 
@@ -869,7 +869,7 @@ std::string getDestinationAddress()
     {
         std::string transferAddr;
 
-        std::cout << YellowMsg("What address do you want to transfer to?: ");
+        std::cout << PurpleMsg("What address do you want to transfer to?: ");
 
         std::getline(std::cin, transferAddr);
         boost::algorithm::trim(transferAddr);

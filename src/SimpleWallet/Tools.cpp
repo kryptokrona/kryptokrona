@@ -35,7 +35,7 @@ bool confirm(std::string msg)
 {
     while (true)
     {
-        std::cout << YellowMsg(msg + " (Y/n): ");
+        std::cout << PurpleMsg(msg + " (Y/n): ");
 
         std::string answer;
         std::getline(std::cin, answer);
@@ -58,7 +58,7 @@ bool confirm(std::string msg)
         } 
         else
         {
-            std::cout << RedMsg("Bad input: ") << YellowMsg(answer)
+            std::cout << RedMsg("Bad input: ") << PurpleMsg(answer)
                       << RedMsg(" - please enter either Y or N.") << std::endl;
         }
     }
