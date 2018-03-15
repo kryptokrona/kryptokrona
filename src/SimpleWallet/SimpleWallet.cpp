@@ -597,8 +597,6 @@ void welcomeMsg()
 void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
                ThreadHandler &threadHandler)
 { 
-    std::string shortAddress = walletInfo->walletAddress.substr(0, 6);
-
     while (true)
     {
         std::cout << getPrompt(walletInfo);
@@ -901,7 +899,6 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
                         ThreadHandler &threadHandler)
 {
     size_t transactionCount = walletInfo->wallet.getTransactionCount();
-    std::string shortAddress = walletInfo->walletAddress.substr(0, 6);
 
     while(true)
     {
