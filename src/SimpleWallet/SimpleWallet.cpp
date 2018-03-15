@@ -601,7 +601,7 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
 
     while (true)
     {
-        std::cout << PurpleMsg("[TurtleWallet " + shortAddress + "]: ");
+        std::cout << getPrompt(walletInfo);
 
         std::string command;
         std::getline(std::cin, command);
@@ -942,8 +942,7 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
                                           "\nAmount: " 
                                         + formatAmount(t.totalAmount))
                               << std::endl
-                              << PurpleMsg("[TurtleWallet " 
-                                         + shortAddress + "]: ")
+                              << getPrompt(walletInfo)
                               << std::flush;
                 }
             }
@@ -1115,4 +1114,9 @@ void findNewTransactions(CryptoNote::INode &node,
 
     std::cout << GreenMsg("Finished scanning blockchain!") << std::endl
               << std::endl;
+}
+
+ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo)
+{
+    return PurpleMsg("[TRTL " + walletInfo->walletFileName.substr(0, walletInfo->walletFileName.find('.')) + "]: ");
 }
