@@ -284,7 +284,7 @@ void quickOptimize(CryptoNote::WalletGreen &wallet)
         std::cout << GreenMsg("Optimization completed!") << std::endl
                   << "Your wallet can still be optimized more if you run "
                   << "this command again." << std::endl << "Consider using "
-                  << "the " << PurpleMsg("full_optimize") << " command to "
+                  << "the " << YellowMsg("full_optimize") << " command to "
                   << "automate the process." << std::endl;
     }
 }
@@ -529,7 +529,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
     else
     {
         std::cout << RedMsg("Not enough arguments given!") << std::endl
-                  << "Try running just " << PurpleMsg("transfer") << " for "
+                  << "Try running just " << YellowMsg("transfer") << " for "
                   << "a walk through guide to transferring." << std::endl;
         return;
     }

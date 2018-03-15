@@ -72,7 +72,7 @@ class GreenMsg : public ColouredMsg
                : ColouredMsg(msg, padding, Common::Console::Color::Green) {}
 };
 
-/* Notification / Warning / Alert */
+/* Notification */
 class PurpleMsg : public ColouredMsg
 {
     public:
@@ -82,6 +82,19 @@ class PurpleMsg : public ColouredMsg
         explicit PurpleMsg(std::string msg, int padding)
                : ColouredMsg(msg, padding, 
                              Common::Console::Color::BrightMagenta) {}
+};
+
+/* Suggestion / Warning */
+/* This is a bit harsh on the eyes, use sparingly, e.g. for single words */
+class YellowMsg : public ColouredMsg
+{
+    public:
+        explicit YellowMsg(std::string msg) 
+               : ColouredMsg(msg, Common::Console::Color::BrightYellow) {}
+
+        explicit YellowMsg(std::string msg, int padding)
+               : ColouredMsg(msg, padding, 
+                             Common::Console::Color::BrightYellow) {}
 };
 
 /* Something bad happened */

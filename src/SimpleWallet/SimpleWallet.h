@@ -2,11 +2,13 @@
 
 #include "INode.h"
 #include "version.h"
+#include "CryptoNote.h"
 
 #include <Common/ConsoleHandler.h>
 #include <Common/SignalHandler.h>
 
 #include <CryptoNoteCore/Account.h>
+#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/Currency.h>
 
 #include <Logging/FileLogger.h>
@@ -77,6 +79,8 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
                         ThreadHandler &threadHandler);
 
 void confirmPassword(std::string);
+
+void connectingMsg();
 
 bool isValidMnemonic(std::string &mnemonic_phrase, 
                      Crypto::SecretKey &private_spend_key);

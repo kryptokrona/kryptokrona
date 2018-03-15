@@ -191,10 +191,7 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
     std::string walletFileName = getNewWalletFileName();
     std::string walletPass = getWalletPassword(true);
 
-    std::cout << std::endl << "Making initial contact with TurtleCoind."
-              << std::endl << "Please note, this sometimes can take a long "
-              << "time." << std::endl << "Please wait..." << std::endl
-              << std::endl;
+    connectingMsg();
 
     wallet.initializeWithViewKey(walletFileName, walletPass, privateViewKey);
 
@@ -213,11 +210,7 @@ std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
     std::string walletFileName = getNewWalletFileName();
     std::string walletPass = getWalletPassword(true);
 
-    std::cout << std::endl << "Making initial contact with TurtleCoind."
-              << std::endl << "Please note, this sometimes can take a long "
-              << "time." << std::endl << "Please wait..." << std::endl
-              << std::endl;
-
+    
     CryptoNote::KeyPair spendKey;
     Crypto::SecretKey privateViewKey;
 
@@ -246,10 +239,7 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet)
     {
         std::string walletPass = getWalletPassword(false);
 
-        std::cout << std::endl << "Making initial contact with TurtleCoind."
-                  << std::endl << "Please note, this sometimes can take a "
-                  << "long time." << std::endl << "Please wait..."
-                  << std::endl << std::endl;
+        connectingMsg();
 
         try
         {
@@ -415,12 +405,12 @@ Action getAction()
     while (true)
     {
         std::cout << std::endl << "Welcome, please choose an option below:"
-                  << std::endl << std::endl << "\t[" << PurpleMsg("G")
+                  << std::endl << std::endl << "\t[" << YellowMsg("G")
                   << "] - Generate a new wallet address" << std::endl 
-                  << "\t[" << PurpleMsg("O") << "] - Open a wallet already "
-                  << "on your system" << std::endl << "\t[" << PurpleMsg("S")
+                  << "\t[" << YellowMsg("O") << "] - Open a wallet already "
+                  << "on your system" << std::endl << "\t[" << YellowMsg("S")
                   << "] - Regenerate your wallet using a seed phrase of words"
-                  << std::endl << "\t[" << PurpleMsg("I") << "] - Import "
+                  << std::endl << "\t[" << YellowMsg("I") << "] - Import "
                   << "your wallet using a View Key and Spend Key"
                   << std::endl << std::endl
                   << "or, press CTRL_C to exit: ";
@@ -588,9 +578,9 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet)
 
 void welcomeMsg()
 {
-    std::cout << "Use the " << PurpleMsg("help") << " command to see the list "
+    std::cout << "Use the " << YellowMsg("help") << " command to see the list "
               << "of available commands." << std::endl << "Use "
-              << PurpleMsg("exit") << " when closing to ensure your wallet "
+              << YellowMsg("exit") << " when closing to ensure your wallet "
               << "file doesn't get corrupted." << std::endl << std::endl;
 }
 
@@ -676,7 +666,7 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
         else
         {
             std::cout << "Unknown command: " << RedMsg(command) 
-                      << ", use " << PurpleMsg("help") << " command to list "
+                      << ", use " << YellowMsg("help") << " command to list "
                       << "all possible commands." << std::endl;
         }
     }
@@ -1024,15 +1014,17 @@ void findNewTransactions(CryptoNote::INode &node,
     if (walletHeight == 1)
     {
         std::cout << "Scanning through the blockchain to find transactions "
-                     "that belong to you." << std::endl << "Please wait, this "
-                     "will take some time." << std::endl << std::endl;
+                     "that belong to you." << std::endl
+                     << "Please wait, this will take some time."
+                     << std::endl << std::endl;
     }
     else
     {
         std::cout << "Scanning through the blockchain to find any new "
                      "transactions you received whilst your wallet wasn't "
-                     "open." << std::endl << "Please wait, this may take some "
-                     "time." << std::endl << std::endl;
+                     "open." << std::endl
+                     << "Please wait, this may take some time."
+                     << std::endl << std::endl;
     }
 
     while (walletHeight < localHeight)
@@ -1115,5 +1107,18 @@ void findNewTransactions(CryptoNote::INode &node,
 
 ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo)
 {
-    return PurpleMsg("[TRTL " + walletInfo->walletFileName.substr(0, walletInfo->walletFileName.find('.')) + "]: ");
+    int extPos = walletInfo->walletFileName.find('.');
+
+    std::string walletName = walletInfo->walletFileName.substr(0, extPos);
+
+    return PurpleMsg("[TRTL " + walletName + "]: ");
+}
+
+void connectingMsg()
+{
+    std::cout << std::endl << "Making initial contact with TurtleCoind."
+              << std::endl
+              << "Please note, this sometimes can take a long time."
+              << std::endl << "Please wait..." << std::endl
+              << std::endl;
 }
