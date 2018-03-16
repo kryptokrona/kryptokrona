@@ -443,22 +443,27 @@ std::string getExistingWalletFileName()
 
         std::string walletFileName = walletName + ".wallet";
 
-        if (!boost::filesystem::exists(walletFileName))
+        if (walletName == "")
+        {
+            std::cout << WarningMsg("Wallet name can't be blank! Try again.")
+                      << std::endl;
+        }
+        /* Allow people to enter wallet name with or without file extension */
+        else if (boost::filesystem::exists(walletName))
+        {
+            return walletName;
+        }
+        else if (boost::filesystem::exists(walletFileName))
+        {
+            return walletFileName;
+        }
+        else
         {
             std::cout << WarningMsg("A wallet with the filename " 
                                   + walletFileName + " doesn't exist!")
                       << std::endl
                       << "Ensure you entered your wallet name correctly."
                       << std::endl;
-        }
-        else if (walletName == "")
-        {
-            std::cout << WarningMsg("Wallet name can't be blank! Try again.")
-                      << std::endl;
-        }
-        else
-        {
-            return walletFileName;
         }
     }
 }
@@ -1282,11 +1287,23 @@ void findNewTransactions(CryptoNote::INode &node,
 
 ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo)
 {
-    int extPos = walletInfo->walletFileName.find('.');
+    const int promptLength = 20;
+    const std::string extension = ".wallet";
 
-    std::string walletName = walletInfo->walletFileName.substr(0, extPos);
+    std::string walletName = walletInfo->walletFileName;
 
-    return InformationMsg("[TRTL " + walletName + "]: ");
+    /* Filename ends in .wallet, remove extension */
+    if (std::equal(extension.rbegin(), extension.rend(), 
+                   walletInfo->walletFileName.rbegin()))
+    {
+        int extPos = walletInfo->walletFileName.find_last_of('.');
+
+        walletName = walletInfo->walletFileName.substr(0, extPos);
+    }
+
+    std::string shortName = walletName.substr(0, promptLength);
+
+    return InformationMsg("[TRTL " + shortName + "]: ");
 }
 
 void connectingMsg()
