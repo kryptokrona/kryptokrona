@@ -59,52 +59,45 @@ class ColouredMsg
         bool pad = false;
 };
 
-/* These are pretty general rules and are sometimes broken. */
-
-/* Something good happened */
-class GreenMsg : public ColouredMsg
+class SuccessMsg : public ColouredMsg
 {
     public:
-        explicit GreenMsg(std::string msg) 
+        explicit SuccessMsg(std::string msg) 
                : ColouredMsg(msg, Common::Console::Color::Green) {}
 
-        explicit GreenMsg(std::string msg, int padding)
+        explicit SuccessMsg(std::string msg, int padding)
                : ColouredMsg(msg, padding, Common::Console::Color::Green) {}
 };
 
-/* Notification */
-class PurpleMsg : public ColouredMsg
+class InformationMsg : public ColouredMsg
 {
     public:
-        explicit PurpleMsg(std::string msg) 
-               : ColouredMsg(msg, Common::Console::Color::BrightMagenta) {}
-
-        explicit PurpleMsg(std::string msg, int padding)
-               : ColouredMsg(msg, padding, 
-                             Common::Console::Color::BrightMagenta) {}
-};
-
-/* Suggestion / Warning */
-/* This is a bit harsh on the eyes, use sparingly, e.g. for single words */
-class YellowMsg : public ColouredMsg
-{
-    public:
-        explicit YellowMsg(std::string msg) 
+        explicit InformationMsg(std::string msg) 
                : ColouredMsg(msg, Common::Console::Color::BrightYellow) {}
 
-        explicit YellowMsg(std::string msg, int padding)
+        explicit InformationMsg(std::string msg, int padding)
                : ColouredMsg(msg, padding, 
                              Common::Console::Color::BrightYellow) {}
 };
 
-/* Something bad happened */
-class RedMsg : public ColouredMsg
+class SuggestionMsg : public ColouredMsg
 {
     public:
-        explicit RedMsg(std::string msg) 
+        explicit SuggestionMsg(std::string msg) 
+               : ColouredMsg(msg, Common::Console::Color::BrightYellow) {}
+
+        explicit SuggestionMsg(std::string msg, int padding)
+               : ColouredMsg(msg, padding, 
+                             Common::Console::Color::BrightYellow) {}
+};
+
+class WarningMsg : public ColouredMsg
+{
+    public:
+        explicit WarningMsg(std::string msg) 
                : ColouredMsg(msg, Common::Console::Color::BrightRed) {}
 
-        explicit RedMsg(std::string msg, int padding)
+        explicit WarningMsg(std::string msg, int padding)
                : ColouredMsg(msg, padding, 
                              Common::Console::Color::BrightRed) {}
 };

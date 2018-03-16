@@ -91,6 +91,9 @@ public:
   void updateInternalCache();
   void clearCaches(bool clearTransactions, bool clearCachedData);
   void clearCacheAndShutdown();
+  void createViewWallet(const std::string &path, const std::string &password,
+                        const std::string address, 
+                        const Crypto::SecretKey &viewSecretKey);
 
   virtual void start() override;
   virtual void stop() override;

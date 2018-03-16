@@ -158,6 +158,23 @@ WalletGreen::~WalletGreen() {
   m_dispatcher.yield(); //let remote spawns finish
 }
 
+void WalletGreen::createViewWallet(const std::string &path,
+                                   const std::string &password,
+                                   const std::string address,
+                                   const Crypto::SecretKey &viewSecretKey)
+{
+    CryptoNote::AccountPublicAddress publicKeys;
+    uint64_t prefix;
+
+    if (!CryptoNote::parseAccountAddressString(prefix, publicKeys, address))
+    {
+        throw std::runtime_error("Failed to parse address!");
+    }
+
+    initializeWithViewKey(path, password, viewSecretKey);
+    createAddress(publicKeys.spendPublicKey);
+}
+
 void WalletGreen::initialize(const std::string& path, const std::string& password) {
   Crypto::PublicKey viewPublicKey;
   Crypto::SecretKey viewSecretKey;

@@ -52,16 +52,16 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
 bool confirmTransaction(CryptoNote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo)
 {
-    std::cout << std::endl << PurpleMsg("Confirm Transaction?") << std::endl;
+    std::cout << std::endl << InformationMsg("Confirm Transaction?") << std::endl;
 
     std::cout << "You are sending " 
-              << GreenMsg(formatAmount(t.destinations[0].amount))
-              << ", with a fee of " << GreenMsg(formatAmount(t.fee))
+              << SuccessMsg(formatAmount(t.destinations[0].amount))
+              << ", with a fee of " << SuccessMsg(formatAmount(t.fee))
               << std::endl
-              << "FROM: " << PurpleMsg(walletInfo->walletFileName) 
+              << "FROM: " << InformationMsg(walletInfo->walletFileName) 
               << std::endl
               << "TO: " << std::endl
-              << PurpleMsg(t.destinations[0].address)
+              << InformationMsg(t.destinations[0].address)
               << std::endl << std::endl;
 
     if (confirm("Is this correct?"))
@@ -93,8 +93,8 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
         while (true)
         {
             std::cout << "Attempting to send transaction "
-                      << PurpleMsg(std::to_string(currentTx))
-                      << " of " << PurpleMsg(std::to_string(numTxs))
+                      << InformationMsg(std::to_string(currentTx))
+                      << " of " << InformationMsg(std::to_string(numTxs))
                       << std::endl;
 
             uint64_t neededBalance = tx.destinations[0].amount + tx.fee;
@@ -106,7 +106,7 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
                 CryptoNote::WalletTransaction sentTx 
                     = wallet.getTransaction(id);
 
-                std::cout << GreenMsg("Transaction has been sent! ID:\n" + 
+                std::cout << SuccessMsg("Transaction has been sent! ID:\n" + 
                                       Common::podToHex(sentTx.hash))
                           << std::endl << std::endl;
 
@@ -132,7 +132,7 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
         currentTx++;
     }
 
-    std::cout << GreenMsg("All transactions sent!") << std::endl;
+    std::cout << SuccessMsg("All transactions sent!") << std::endl;
 }
 
 void splitTx(CryptoNote::WalletGreen &wallet, 
@@ -148,7 +148,7 @@ void splitTx(CryptoNote::WalletGreen &wallet,
 
     if (!confirm("Is this OK?"))
     {
-        std::cout << RedMsg("Cancelling transaction.") << std::endl;
+        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
         return;
     }
 
@@ -267,24 +267,24 @@ void quickOptimize(CryptoNote::WalletGreen &wallet)
               << "You can run this command as many times as you like."
               << std::endl << "You will be informed when your wallet is fully "
               << "optimized." << std::endl
-              << RedMsg("This may take a long time!") << std::endl;
+              << WarningMsg("This may take a long time!") << std::endl;
 
     if (!confirm("Do you want to proceed?"))
     {
-        std::cout << RedMsg("Cancelling optimization.") << std::endl;
+        std::cout << WarningMsg("Cancelling optimization.") << std::endl;
         return;
     }
 
     if (!optimize(wallet, wallet.getActualBalance()))
     {
-        std::cout << GreenMsg("Wallet fully optimized!") << std::endl;
+        std::cout << SuccessMsg("Wallet fully optimized!") << std::endl;
     }
     else
     {
-        std::cout << GreenMsg("Optimization completed!") << std::endl
+        std::cout << SuccessMsg("Optimization completed!") << std::endl
                   << "Your wallet can still be optimized more if you run "
                   << "this command again." << std::endl << "Consider using "
-                  << "the " << YellowMsg("full_optimize") << " command to "
+                  << "the " << SuggestionMsg("full_optimize") << " command to "
                   << "automate the process." << std::endl;
     }
 }
@@ -293,17 +293,17 @@ void fullOptimize(CryptoNote::WalletGreen &wallet)
 {
     std::cout << "Attempting to fully optimize your wallet to allow you to "
               << "send large amounts at once. " << std::endl
-              << RedMsg("This may take a very long time!") << std::endl;
+              << WarningMsg("This may take a very long time!") << std::endl;
 
     if (!confirm("Do you want to proceed?"))
     {
-        std::cout << RedMsg("Cancelling optimization.") << std::endl;
+        std::cout << WarningMsg("Cancelling optimization.") << std::endl;
         return;
     }
 
     for (int i = 1;;i++)
     {
-        std::cout << PurpleMsg("Running optimization round "
+        std::cout << InformationMsg("Running optimization round "
                               + std::to_string(i) + "...")
                   << std::endl;
 
@@ -315,7 +315,7 @@ void fullOptimize(CryptoNote::WalletGreen &wallet)
         }
     }
 
-    std::cout << GreenMsg("Full optimization completed!") << std::endl;
+    std::cout << SuccessMsg("Full optimization completed!") << std::endl;
 }
 
 bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
@@ -349,13 +349,13 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
     /* Hurr durr grammar */
     if (fusionTransactionHashes.size() == 1)
     {
-        std::cout << GreenMsg("1 fusion transaction has been sent, waiting "
+        std::cout << SuccessMsg("1 fusion transaction has been sent, waiting "
                               "for balance to return and unlock...")
                   << std::endl << std::endl;
     }
     else
     {
-        std::cout << GreenMsg(std::to_string(fusionTransactionHashes.size()) +
+        std::cout << SuccessMsg(std::to_string(fusionTransactionHashes.size()) +
                               " fusion transactions have been sent, waiting "
                               "for balance to return and unlock...")
               << std::endl << std::endl;
@@ -407,30 +407,30 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
 
         if (!fusionCompleted)
         {
-            std::cout << RedMsg("Balance is still locked, "
+            std::cout << WarningMsg("Balance is still locked, "
                               + std::to_string(fusionTransactionHashes.size()));
 
             /* More grammar... */
             if (fusionTransactionHashes.size() == 1)
             {
-                std::cout << RedMsg(" fusion transaction still to be "
+                std::cout << WarningMsg(" fusion transaction still to be "
                                     "confirmed.");
             }
             else
             {
-                std::cout << RedMsg(" fusion transactions still to be "
+                std::cout << WarningMsg(" fusion transactions still to be "
                                     "confirmed.");
             }
             
             std::cout << std::endl
-                      << GreenMsg("Will try again in 5 seconds...")
+                      << SuccessMsg("Will try again in 5 seconds...")
                       << std::endl;
 
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
         else
         {
-            std::cout << GreenMsg("All fusion transactions confirmed!")
+            std::cout << SuccessMsg("All fusion transactions confirmed!")
                       << std::endl;
             break;
         }
@@ -442,7 +442,7 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
 void fusionTX(CryptoNote::WalletGreen &wallet, 
               CryptoNote::TransactionParameters p)
 {
-    std::cout << RedMsg("Your transaction is too large to be accepted by the "
+    std::cout << WarningMsg("Your transaction is too large to be accepted by the "
                         "network!")
               << std::endl << "We're attempting to optimize your "
               << "wallet, which hopefully will make the transaction small "
@@ -466,7 +466,7 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
             size_t id = wallet.transfer(p);
             CryptoNote::WalletTransaction tx = wallet.getTransaction(id);
 
-            std::cout << GreenMsg("Transaction has been sent! ID:\n" 
+            std::cout << SuccessMsg("Transaction has been sent! ID:\n" 
                                 + Common::podToHex(tx.hash))
                       << std::endl;
         }
@@ -487,7 +487,7 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
         if (errMsg == "MixIn count is too big"
          || errMsg == "Internal node error")
         {
-            std::cout << RedMsg("Failed to send transaction!") << std::endl
+            std::cout << WarningMsg("Failed to send transaction!") << std::endl
                       << "Unable to find enough outputs to mix with."
                       << std::endl << "Try lowering the amount you are "
                       << "sending in one transaction." << std::endl
@@ -496,7 +496,7 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
         }
         else
         {
-            std::cout << RedMsg("Failed to send transaction!")
+            std::cout << WarningMsg("Failed to send transaction!")
                       << std::endl << "Error message: " << errMsg
                       << std::endl;
         }
@@ -528,8 +528,8 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
     }
     else
     {
-        std::cout << RedMsg("Not enough arguments given!") << std::endl
-                  << "Try running just " << YellowMsg("transfer") << " for "
+        std::cout << WarningMsg("Not enough arguments given!") << std::endl
+                  << "Try running just " << SuggestionMsg("transfer") << " for "
                   << "a walk through guide to transferring." << std::endl;
         return;
     }
@@ -551,7 +551,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
             }
             else
             {
-                std::cout << RedMsg("Fee flag given but no fee follows!")
+                std::cout << WarningMsg("Fee flag given but no fee follows!")
                           << std::endl;
                 return;
             }
@@ -567,7 +567,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
                 if (!CryptoNote::createTxExtraWithPaymentId(args[i+1],
                                                             extraVec))
                 {
-                    std::cout << RedMsg("Failed to parse payment ID! "
+                    std::cout << WarningMsg("Failed to parse payment ID! "
                                         "Payment ID's are 64 character "
                                         "hexadecimal strings.")
                               << std::endl;
@@ -589,7 +589,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
             }
             else
             {
-                std::cout << RedMsg("Payment ID flag given but not payment ID "
+                std::cout << WarningMsg("Payment ID flag given but not payment ID "
                                     "follows!") << std::endl;
                 return;
             }
@@ -608,11 +608,11 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
 
     if (balance < amount)
     {
-        std::cout << RedMsg("You don't have enough funds to cover this "
+        std::cout << WarningMsg("You don't have enough funds to cover this "
                             "transaction!") << std::endl
-                  << PurpleMsg("Funds needed: " + formatAmount(amount))
+                  << InformationMsg("Funds needed: " + formatAmount(amount))
                   << std::endl
-                  << GreenMsg("Funds available: " + formatAmount(balance))
+                  << SuccessMsg("Funds available: " + formatAmount(balance))
                   << std::endl;
         return;
     }
@@ -621,11 +621,11 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
 
     if (balance < amount + fee)
     {
-        std::cout << RedMsg("You don't have enough funds to cover this "
+        std::cout << WarningMsg("You don't have enough funds to cover this "
                             "transaction!") << std::endl
-                  << PurpleMsg("Funds needed: " + formatAmount(amount + fee))
+                  << InformationMsg("Funds needed: " + formatAmount(amount + fee))
                   << std::endl
-                  << GreenMsg("Funds available: " + formatAmount(balance))
+                  << SuccessMsg("Funds available: " + formatAmount(balance))
                   << std::endl;
         return;
     }
@@ -645,11 +645,11 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
 
     if (balance < amount + fee)
     {
-        std::cout << RedMsg("You don't have enough funds to cover this "
+        std::cout << WarningMsg("You don't have enough funds to cover this "
                             "transaction!") << std::endl
-                  << PurpleMsg("Funds needed: " + formatAmount(amount + fee))
+                  << InformationMsg("Funds needed: " + formatAmount(amount + fee))
                   << std::endl
-                  << GreenMsg("Funds available: " + formatAmount(balance))
+                  << SuccessMsg("Funds available: " + formatAmount(balance))
                   << std::endl;
         return;
     }
@@ -674,7 +674,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
 
     if (!confirmTransaction(p, walletInfo))
     {
-        std::cout << RedMsg("Cancelling transaction.") << std::endl;
+        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
         return;
     }
 
@@ -695,7 +695,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
             CryptoNote::WalletTransaction tx 
                 = walletInfo->wallet.getTransaction(id);
 
-            std::cout << GreenMsg("Transaction has been sent! ID:\n" 
+            std::cout << SuccessMsg("Transaction has been sent! ID:\n" 
                                 + Common::podToHex(tx.hash))
                       << std::endl;
         }
@@ -710,7 +710,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
            selectTransfers() */
         if (errMsg == "Not enough money: Wrong amount")
         {
-            std::cout << RedMsg("Failed to send transaction - not enough "
+            std::cout << WarningMsg("Failed to send transaction - not enough "
                                 "funds!") << std::endl
                       << "You sometimes need to send a small amount less "
                       << "than your full balance to get the transfer to "
@@ -730,7 +730,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
         else if (errMsg == "MixIn count is too big"
               || errMsg == "Internal node error")
         {
-            std::cout << RedMsg("Failed to send transaction!") << std::endl
+            std::cout << WarningMsg("Failed to send transaction!") << std::endl
                       << "Unable to find enough outputs to mix with."
                       << std::endl << "Try lowering the amount you are "
                       << "sending in one transaction." << std::endl
@@ -739,7 +739,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
         }
         else
         {
-            std::cout << RedMsg("Failed to send transaction!")
+            std::cout << WarningMsg("Failed to send transaction!")
                       << std::endl << "Error message: " << errMsg
                       << std::endl;
         }
@@ -753,11 +753,11 @@ std::string getPaymentID()
         std::string paymentID;
 
         std::cout << std::endl
-                  << PurpleMsg("What payment ID do you want to use?")
+                  << InformationMsg("What payment ID do you want to use?")
                   << std::endl 
                   << "These are usually used for sending to exchanges."
                   << std::endl
-                  << RedMsg("Warning: if you were given a payment ID, you "
+                  << WarningMsg("Warning: if you were given a payment ID, you "
                             "MUST use it, or your funds may be lost!")
                   << std::endl
                   << "Hit enter for the default of no payment ID: ";
@@ -774,7 +774,7 @@ std::string getPaymentID()
         /* Convert the payment ID into an "extra" */
         if (!CryptoNote::createTxExtraWithPaymentId(paymentID, extra))
         {
-            std::cout << RedMsg("Failed to parse! Payment ID's are 64 "
+            std::cout << WarningMsg("Failed to parse! Payment ID's are 64 "
                                 "character hexadecimal strings.")
                       << std::endl;
         }
@@ -800,7 +800,7 @@ uint64_t getFee()
     while (true)
     {
         std::string stringAmount;
-        std::cout << std::endl << PurpleMsg("What fee do you want to use?")
+        std::cout << std::endl << InformationMsg("What fee do you want to use?")
                   << std::endl << "Hit enter for the default fee of 0.1 TRTL: ";
 
         std::getline(std::cin, stringAmount);
@@ -824,7 +824,7 @@ uint16_t getMixin()
     while (true)
     {
         std::string stringMixin;
-        std::cout << std::endl << PurpleMsg("What mixin do you want to use?")
+        std::cout << std::endl << InformationMsg("What mixin do you want to use?")
                   << std::endl
                   << "Mixin is how many times your transaction is mixed "
                   << "with others for privacy." << std::endl
@@ -850,7 +850,7 @@ uint64_t getTransferAmount()
         std::string stringAmount;
 
         std::cout << std::endl
-                  << PurpleMsg("How much TRTL do you want to send?: ");
+                  << InformationMsg("How much TRTL do you want to send?: ");
 
         std::getline(std::cin, stringAmount);
 
@@ -869,7 +869,7 @@ std::string getDestinationAddress()
     {
         std::string transferAddr;
 
-        std::cout << PurpleMsg("What address do you want to transfer to?: ");
+        std::cout << InformationMsg("What address do you want to transfer to?: ");
 
         std::getline(std::cin, transferAddr);
         boost::algorithm::trim(transferAddr);
@@ -887,13 +887,13 @@ bool parseFee(std::string feeString)
 
     if (!parseAmount(feeString, fee))
     {
-        std::cout << RedMsg("Failed to parse fee! Ensure you entered the "
+        std::cout << WarningMsg("Failed to parse fee! Ensure you entered the "
                             "value correctly.") << std::endl;
         return false;
     }
     else if (fee < CryptoNote::parameters::MINIMUM_FEE)
     {
-        std::cout << RedMsg("Fee must be at least 0.1 TRTL!") << std::endl;
+        std::cout << WarningMsg("Fee must be at least 0.1 TRTL!") << std::endl;
         return false;
     }
 
@@ -905,7 +905,7 @@ bool parseAddress(std::string address)
 {
     if (address.length() != 99)
     {
-        std::cout << RedMsg("Address is wrong length!") << std::endl
+        std::cout << WarningMsg("Address is wrong length!") << std::endl
                   << "It should be 99 characters long, but it is "
                   << address.length() << " characters long!" << std::endl;
 
@@ -913,7 +913,7 @@ bool parseAddress(std::string address)
     }
     else if (address.substr(0, 4) != "TRTL")
     {
-        std::cout << RedMsg("Invalid address! It should start with "
+        std::cout << WarningMsg("Invalid address! It should start with "
                             "\"TRTL\"!") << std::endl;
 
         return false;
@@ -934,7 +934,7 @@ bool parseMixin(std::string mixinString)
     }
     catch (const std::invalid_argument &e)
     {
-        std::cout << RedMsg("Failed to parse mixin! Ensure you entered the "
+        std::cout << WarningMsg("Failed to parse mixin! Ensure you entered the "
                             "value correctly.") << std::endl;
         return false;
     }
@@ -946,7 +946,7 @@ bool parseAmount(std::string amountString)
 
     if (!parseAmount(amountString, amount))
     {
-        std::cout << RedMsg("Failed to parse amount! Ensure you entered the "
+        std::cout << WarningMsg("Failed to parse amount! Ensure you entered the "
                             "value correctly.") << std::endl
                   << "Please note, the minimum you can send is 0.01 TRTL, "
                   << "and you can only use 2 decimal places."

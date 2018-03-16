@@ -34,7 +34,7 @@ struct ThreadHandler {
     bool havePaused = false;
 };
 
-enum Action {Open, Generate, Import, SeedImport};
+enum Action {Open, Generate, Import, SeedImport, ViewWallet};
 
 Action getAction();
 
@@ -42,13 +42,14 @@ void logIncorrectMnemonicWords(std::vector<std::string> words);
 
 void promptSaveKeys(CryptoNote::WalletGreen &wallet);
 
-void printPrivateKeys(CryptoNote::WalletGreen &wallet);
+void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet);
 
-void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet);
+void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
+             bool viewWallet);
 
 void welcomeMsg();
 
-void help();
+void help(bool viewWallet);
 
 void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
                ThreadHandler &threadHandler);
@@ -82,6 +83,8 @@ void confirmPassword(std::string);
 
 void connectingMsg();
 
+void viewWalletMsg();
+
 bool isValidMnemonic(std::string &mnemonic_phrase, 
                      Crypto::SecretKey &private_spend_key);
 
@@ -98,6 +101,8 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
 std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet);
 
 std::shared_ptr<WalletInfo> importWallet(CryptoNote::WalletGreen &wallet);
+
+std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet);
 
 std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen 
                                                  &wallet);

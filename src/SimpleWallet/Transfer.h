@@ -17,15 +17,18 @@ struct WalletInfo {
     WalletInfo(std::string walletFileName, 
                std::string walletPass, 
                std::string walletAddress,
+               bool viewWallet,
                CryptoNote::WalletGreen &wallet) : 
                walletFileName(walletFileName), 
                walletPass(walletPass), 
                walletAddress(walletAddress),
+               viewWallet(viewWallet),
                wallet(wallet) {}
 
     std::string walletFileName;
     std::string walletPass;
     std::string walletAddress;
+    bool viewWallet;
     CryptoNote::WalletGreen &wallet;
 };
 
