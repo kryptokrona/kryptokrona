@@ -833,11 +833,11 @@ void help(bool viewWallet)
               << "Export your private keys" << std::endl
               << SuccessMsg("address", 25)
               << "Displays your payment address" << std::endl
-              << SuccessMsg("incoming_transfers", 25)
-              << "Show incoming transfers" << std::endl
               << SuccessMsg("exit", 25)
-              << "Exit and save your wallet" << std::endl;
-    
+              << "Exit and save your wallet" << std::endl
+              << SuccessMsg("incoming_transfers", 25)
+              << "Show incoming transfers" << std::endl;
+                  
     if (viewWallet)
     {
         std::cout << InformationMsg("Please note you are using a view only "
@@ -846,16 +846,16 @@ void help(bool viewWallet)
     }
     else
     {
-        std::cout << SuccessMsg("quick_optimize", 25)
+        std::cout << SuccessMsg("outgoing_transfers", 25)
+                  << "Show outgoing transfers" << std::endl
+                  << SuccessMsg("list_transfers", 25)
+                  << "Show all transfers" << std::endl
+                  << SuccessMsg("quick_optimize", 25)
                   << "Quickly optimize your wallet to send large amounts"
                   << std::endl
                   << SuccessMsg("full_optimize", 25)
                   << "Fully optimize your wallet to send large amounts"
                   << std::endl
-                  << SuccessMsg("outgoing_transfers", 25)
-                  << "Show outgoing transfers" << std::endl
-                  << SuccessMsg("list_transfers", 25)
-                  << "Show all transfers" << std::endl
                   << SuccessMsg("transfer", 25)
                   << "Send TRTL to someone" << std::endl;
     }
