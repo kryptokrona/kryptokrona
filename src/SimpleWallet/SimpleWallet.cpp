@@ -1283,6 +1283,10 @@ void findNewTransactions(CryptoNote::INode &node,
 
     std::cout << SuccessMsg("Finished scanning blockchain!") << std::endl
               << std::endl;
+
+    /* In case the user force closes, we don't want them to have to rescan
+       the whole chain. */
+    wallet.save();
 }
 
 ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo)
