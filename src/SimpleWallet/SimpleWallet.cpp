@@ -1149,7 +1149,7 @@ void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo,
     findNewTransactions(node, walletInfo->wallet);
 
     /* Then we save the wallet again, with the hopefully fixed balance. This
-       step is not strictly neccessary, but it's nice to do in case the user
+       step is not strictly necessary, but it's nice to do in case the user
        doesn't shut down cleanly. */
     walletInfo->wallet.save();
 
@@ -1262,16 +1262,15 @@ void findNewTransactions(CryptoNote::INode &node,
                     std::cout << std::endl
                               << InformationMsg("New transaction found!")
                               << std::endl << std::endl;
-                }
 
-                if (t.totalAmount < 0)
-                {
-                    printOutgoingTransfer(t);
-                }
-                /* Don't display fusion transactions */
-                else if (t.totalAmount > 0)
-                {
-                    printIncomingTransfer(t);
+                    if (t.totalAmount < 0)
+                    {
+                        printOutgoingTransfer(t);
+                    }
+                    else
+                    {
+                        printIncomingTransfer(t);
+                    }
                 }
             }
 
@@ -1314,14 +1313,13 @@ void connectingMsg()
 {
     std::cout << std::endl << "Making initial contact with TurtleCoind."
               << std::endl
-              << "Please note, this sometimes can take a long time."
-              << std::endl << "Please wait..." << std::endl
-              << std::endl;
+              << "Please wait, this sometimes can take a long time..."
+              << std::endl << std::endl;
 }
 
 void viewWalletMsg()
 {
-    std::cout << InformationMsg("Please note that when using a view wallet "
+    std::cout << InformationMsg("Please remember that when using a view wallet "
                                 "you can only view incoming transactions!")
               << std::endl << "This means if you received 100 TRTL and then "
               << "sent 50 TRTL, your balance would appear to still be 100 "

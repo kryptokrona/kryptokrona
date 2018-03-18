@@ -177,8 +177,8 @@ void splitTx(CryptoNote::WalletGreen &wallet,
 
         /* Split the requested fee over each transaction, i.e. if a fee of 200
            TRTL was requested and we split it into 4 transactions each one will
-           have a fee of 5TRTL. If the fee per transaction is less than the min
-           fee, use the min fee. */
+           have a fee of 5 TRTL. If the fee per transaction is less than the
+           min fee, use the min fee. */
         uint64_t feePerTx = std::max (p.fee / numTransactions, minFee);
 
         uint64_t totalFee = feePerTx * numTransactions;
@@ -483,9 +483,9 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
            the mixin error. Rocksteady explained this as not enough traffic
            having occured on the network to allow your to mixin with.
            Hopefully, this will only occur on the testnet and not the main
-           network. It seems sending multiple smaller transactiosn will
+           network. It seems sending multiple smaller transactions will
            provide the network with more change to allow tx's to go through.
-           However, in some wallets that have only recieved one big single
+           However, in some wallets that have only received one big single
            transaction, they may be unable to send at all without lowering
            their mixin count to 0 */
         if (errMsg == "MixIn count is too big"
