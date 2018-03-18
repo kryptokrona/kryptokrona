@@ -326,7 +326,7 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet)
                 std::cout << std::endl
                           << InformationMsg("Your view only wallet "
                                           + walletAddress
-                                          + "has been successfully opened!")
+                                          + " has been successfully opened!")
                           << std::endl << std::endl;
 
                 viewWalletMsg();
@@ -340,7 +340,7 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet)
                 std::cout << std::endl
                           << InformationMsg("Your wallet "
                                           + walletAddress
-                                          + "has been successfully opened!")
+                                          + " has been successfully opened!")
                           << std::endl << std::endl;
 
                 return std::make_shared<WalletInfo>(walletFileName, walletPass, 
