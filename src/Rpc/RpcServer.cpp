@@ -97,6 +97,10 @@ RpcServer::HandlerFunction jsonMethod(bool (RpcServer::*handler)(typename Comman
     }
 
     bool result = (obj->*handler)(req, res);
+    for (const auto& cors_domain: obj->getCorsDomains()) {
+      response.addHeader("Access-Control-Allow-Origin", cors_domain);
+    }
+    response.addHeader("Content-Type", "application/json");
     response.setBody(storeToJson(res.data()));
     return result;
   };
@@ -215,6 +219,10 @@ bool RpcServer::processJsonRpcRequest(const HttpRequest& request, HttpResponse& 
 bool RpcServer::enableCors(const std::vector<std::string> domains) {
   m_cors_domains = domains;
   return true;
+}
+
+std::vector<std::string> RpcServer::getCorsDomains() {
+  return m_cors_domains;
 }
 
 bool RpcServer::isCoreReady() {
