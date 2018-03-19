@@ -837,7 +837,8 @@ uint64_t getFee()
 
         if (parseFee(stringAmount))
         {
-            return parseAmount(stringAmount, amount);
+            parseAmount(stringAmount, amount);
+            return amount;
         }
     }
 }
@@ -882,7 +883,8 @@ uint64_t getTransferAmount()
 
         if (parseAmount(stringAmount))
         {
-            return parseAmount(stringAmount, amount);
+            parseAmount(stringAmount, amount);
+            return amount;
         }
     }
 }

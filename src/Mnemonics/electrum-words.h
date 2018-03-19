@@ -42,6 +42,8 @@
 #include <string>
 #include <cstdint>
 #include <map>
+#include <iostream>
+#include <Common/ConsoleTools.h>
 #include "crypto/crypto.h"  // for declaration of crypto::secret_key
 
 #include "chinese_simplified.h"
@@ -131,6 +133,20 @@ namespace crypto
      * \return      true if the seed passed is a old style seed false if not.
      */
     bool get_is_old_style_seed(std::string seed);
+
+    /*!
+     * \brief Parses a seed into a private spend key if possible.
+     * \param mnemonic_phrase   The mnemonic string to parse (a space delimited concatenated word list)
+     * \param private_spend_key The secret key to parse the mnemonic seed into
+     * \return                  true if the mnemonic could be parsed
+     */
+    bool is_valid_mnemonic(std::string mnemonic_phrase, Crypto::SecretKey &private_spend_key);
+
+    /*!
+     * \brief Logs words not present in the english word list.
+     * \param words   The words to check if they are present in the dictionary
+     */
+    void log_incorrect_words(std::vector<std::string> words);
   }
 }
 
