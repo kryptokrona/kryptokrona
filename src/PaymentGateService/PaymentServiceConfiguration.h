@@ -44,6 +44,7 @@ struct Configuration {
   std::string containerPassword;
   std::string secretViewKey;
   std::string secretSpendKey;
+  std::string mnemonicSeed;
   std::string logFile;
   std::string serverRoot;
 

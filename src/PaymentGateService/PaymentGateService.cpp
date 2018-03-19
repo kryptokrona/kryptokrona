@@ -110,8 +110,9 @@ WalletConfiguration PaymentGateService::getWalletConfig() const {
     config.gateConfiguration.containerFile,
     config.gateConfiguration.containerPassword,
     config.gateConfiguration.syncFromZero,
-	config.gateConfiguration.secretViewKey,
-	config.gateConfiguration.secretSpendKey
+    config.gateConfiguration.secretViewKey,
+    config.gateConfiguration.secretSpendKey,
+    config.gateConfiguration.mnemonicSeed
   };
 }
 

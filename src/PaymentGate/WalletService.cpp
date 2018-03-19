@@ -34,6 +34,7 @@
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/TransactionExtra.h"
+#include "CryptoNoteCore/Account.h"
 
 #include <System/EventLock.h>
 #include <System/RemoteContext.h>
@@ -46,6 +47,8 @@
 #include "Wallet/WalletErrors.h"
 #include "Wallet/WalletUtils.h"
 #include "WalletServiceErrorCategory.h"
+
+#include "Mnemonics/electrum-words.cpp"
 
 namespace PaymentService {
 
@@ -320,29 +323,47 @@ void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfigu
   CryptoNote::IWallet* wallet = new CryptoNote::WalletGreen(dispatcher, currency, *nodeStub, logger);
   std::unique_ptr<CryptoNote::IWallet> walletGuard(wallet);
 
-  
-
   std::string address;
-  if (conf.secretSpendKey.empty() && conf.secretViewKey.empty())
+  if (conf.secretSpendKey.empty() && conf.secretViewKey.empty() && conf.mnemonicSeed.empty())
   {
-	log(Logging::INFO, Logging::BRIGHT_WHITE) << "Generating new wallet";
-	wallet->initialize(conf.walletFile, conf.walletPassword);
-	if (conf.syncFromZero) {
-		CryptoNote::KeyPair spendKey;
-		Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
-		address = wallet->createAddress(spendKey.secretKey);
-	}
-	else {
-		address = wallet->createAddress();
-	}
-	log(Logging::INFO, Logging::BRIGHT_WHITE) << "New wallet is generated. Address: " << address;
-  } else
+    log(Logging::INFO, Logging::BRIGHT_WHITE) << "Generating new wallet";
+
+    Crypto::SecretKey private_view_key;
+    CryptoNote::KeyPair spendKey;
+
+    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+    CryptoNote::AccountBase::generateViewFromSpend(spendKey.secretKey, private_view_key);
+
+    wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key);
+    address = wallet->createAddress(spendKey.secretKey);
+
+	  log(Logging::INFO, Logging::BRIGHT_WHITE) << "New wallet is generated. Address: " << address;
+  }
+  else if (!conf.mnemonicSeed.empty())
+  {
+    log(Logging::INFO, Logging::BRIGHT_WHITE) << "Attempting to import wallet from mnemonic seed";
+
+    Crypto::SecretKey private_spend_key;
+    Crypto::SecretKey private_view_key;
+
+    if (!crypto::ElectrumWords::is_valid_mnemonic(conf.mnemonicSeed, private_spend_key, log))
+    {
+      return;
+    }
+
+    CryptoNote::AccountBase::generateViewFromSpend(private_spend_key, private_view_key);
+    wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key);
+    address = wallet->createAddress(private_spend_key);
+    log(Logging::INFO, Logging::BRIGHT_WHITE) << "Imported wallet successfully.";
+  }
+  else
   {
 	  if (conf.secretSpendKey.empty() || conf.secretViewKey.empty())
 	  {
 		  log(Logging::ERROR, Logging::BRIGHT_RED) << "Need both secret spend key and secret view key.";
 		  return;
-	  } else
+	  }
+    else
 	  {
 		  log(Logging::INFO, Logging::BRIGHT_WHITE) << "Attemping to import wallet from keys";
 		  Crypto::Hash private_spend_key_hash;
@@ -709,6 +730,35 @@ std::error_code WalletService::getViewKey(std::string& viewSecretKey) {
     viewSecretKey = Common::podToHex(viewKey.secretKey);
   } catch (std::system_error& x) {
     logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while getting view key: " << x.what();
+    return x.code();
+  }
+
+  return std::error_code();
+}
+
+std::error_code WalletService::getMnemonicSeed(const std::string& address, std::string& mnemonicSeed) {
+  try {
+    System::EventLock lk(readyEvent);
+    CryptoNote::KeyPair key = wallet.getAddressSpendKey(address);
+    CryptoNote::KeyPair viewKey = wallet.getViewKey();
+
+    Crypto::SecretKey deterministic_private_view_key;
+
+    CryptoNote::AccountBase::generateViewFromSpend(key.secretKey, deterministic_private_view_key);
+
+    bool deterministic_private_keys = deterministic_private_view_key == viewKey.secretKey;
+
+    if (deterministic_private_keys) {
+      crypto::ElectrumWords::bytes_to_words(key.secretKey, mnemonicSeed, "English");
+    } else {
+      /* Have to be able to derive view key from spend key to create a mnemonic
+         seed, due to being able to generate multiple addresses we can't do
+         this in walletd as the default */
+      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Your private keys are not deterministic and so a mnemonic seed cannot be generated!";
+      return make_error_code(CryptoNote::error::WalletServiceErrorCode::KEYS_NOT_DETERMINISTIC);
+    }
+  } catch (std::system_error& x) {
+    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while getting mnemonic seed: " << x.what();
     return x.code();
   }
 
