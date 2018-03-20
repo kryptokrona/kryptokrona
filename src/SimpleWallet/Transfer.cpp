@@ -756,7 +756,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                       << std::endl << "Try lowering the amount you are "
                       << "sending in one transaction." << std::endl
                       << "Alternatively, you can try lowering the mixin count "
-                      << "to 0, but this will compromise privacy." << std::endl
+                      << "to 0, but this will compromise privacy." << std::endl;
         }
         else
         {
