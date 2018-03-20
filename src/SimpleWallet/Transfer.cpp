@@ -512,7 +512,7 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
                       << std::endl << "Try lowering the amount you are "
                       << "sending in one transaction." << std::endl
                       << "Alternatively, you can try lowering the mixin count "
-                      << "to 0, but this will compromise privacy.";
+                      << "to 0, but this will compromise privacy." << std::endl
         }
         else
         {
