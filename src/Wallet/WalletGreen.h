@@ -86,6 +86,14 @@ public:
   virtual size_t makeTransaction(const TransactionParameters& sendingTransaction) override;
   virtual void commitTransaction(size_t) override;
   virtual void rollbackUncommitedTransaction(size_t) override;
+  bool txIsTooLarge(const TransactionParameters& sendingTransaction);
+  size_t getTxSize(const TransactionParameters &sendingTransaction);
+  void updateInternalCache();
+  void clearCaches(bool clearTransactions, bool clearCachedData);
+  void clearCacheAndShutdown();
+  void createViewWallet(const std::string &path, const std::string &password,
+                        const std::string address, 
+                        const Crypto::SecretKey &viewSecretKey);
 
   virtual void start() override;
   virtual void stop() override;
@@ -107,7 +115,6 @@ protected:
   void throwIfStopped() const;
   void throwIfTrackingMode() const;
   void doShutdown();
-  void clearCaches(bool clearTransactions, bool clearCachedData);
   void convertAndLoadWalletFile(const std::string& path, std::ifstream&& walletFileStream);
   static void decryptKeyPair(const EncryptedWalletRecord& cipher, Crypto::PublicKey& publicKey, Crypto::SecretKey& secretKey,
     uint64_t& creationTimestamp, const Crypto::chacha8_key& key);
@@ -121,6 +128,7 @@ protected:
   void initWithKeys(const std::string& path, const std::string& password, const Crypto::PublicKey& viewPublicKey, const Crypto::SecretKey& viewSecretKey);
   std::string doCreateAddress(const Crypto::PublicKey& spendPublicKey, const Crypto::SecretKey& spendSecretKey, uint64_t creationTimestamp);
   std::vector<std::string> doCreateAddressList(const std::vector<NewAddressData>& addressDataList);
+
 
   struct InputInfo {
     TransactionTypes::InputKeyInfo keyInfo;

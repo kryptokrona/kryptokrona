@@ -51,24 +51,6 @@
 #include <boost/crc.hpp>
 #include <boost/algorithm/string/join.hpp>
 
-#include "chinese_simplified.h"
-#include "english.h"
-#include "dutch.h"
-#include "french.h"
-#include "italian.h"
-#include "german.h"
-#include "spanish.h"
-#include "portuguese.h"
-#include "japanese.h"
-#include "russian.h"
-#include "esperanto.h"
-#include "lojban.h"
-#include "english_old.h"
-#include "language_base.h"
-#include "singleton.h"
-
-using namespace Logging;
-
 namespace
 {
   uint32_t create_checksum_index(const std::vector<std::string> &word_list,
@@ -487,7 +469,7 @@ namespace crypto
       return word_list.size() != (seed_length + 1);
     }
 
-    bool is_valid_mnemonic(std::string mnemonic_phrase, Crypto::SecretKey &private_spend_key, LoggerRef &logger)
+    bool is_valid_mnemonic(std::string mnemonic_phrase, Crypto::SecretKey &private_spend_key)
     {
       /* Uncommenting these will allow importing of different languages, exporting
          in different languages however has not been added, as it will require
@@ -500,10 +482,17 @@ namespace crypto
          dictionaries of other words can overlap enough to allow an esperanto
          seed for example to be imported as an english seed */
 
-      //static std::string languages[] = {"English", "Nederlands", "Français", "Português", "Italiano", "Deutsch", "русский язык", "简体中文 (中国)", "Esperanto", "Lojban"};
+      /*
+      static std::string languages[] = {"English", "Nederlands", "Français",
+                                        "Português", "Italiano", "Deutsch",
+                                        "русский язык", "简体中文 (中国)",
+                                        "Esperanto", "Lojban"};
+
+      static const int num_of_languages = 10;
+      */
+
       static std::string languages[] = {"English"};
-      
-      //static const int num_of_languages = 10;
+
       static const int num_of_languages = 1;
 
       static const int mnemonic_phrase_length = 25;
@@ -514,9 +503,14 @@ namespace crypto
 
       if (words.size() != mnemonic_phrase_length)
       {
-        logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
-        logger(ERROR, BRIGHT_RED) << "Seed phrase is not 25 words! Please try again.";
-        log_incorrect_words(words, logger);
+        Common::Console::setTextColor(Common::Console::Color::BrightRed);
+        std::cout << "Invalid mnemonic phrase! Seed phrase is not 25 words! "
+                     "Please try again." << std::endl;
+
+        log_incorrect_words(words);
+
+        Common::Console::setTextColor(Common::Console::Color::Default);
+
         return false;
       }
 
@@ -535,24 +529,33 @@ namespace crypto
          the seed phrase is in, then we can't log words which aren't in the x
          dictionary, we will have to take an argument to know what language they
          are in, but this is less user friendly. */
-      logger(ERROR, BRIGHT_RED) << "Invalid mnemonic phrase!";
-      log_incorrect_words(words, logger);
+      Common::Console::setTextColor(Common::Console::Color::BrightRed);
+
+      std::cout << "Invalid mnemonic phrase!" << std::endl;
+      
+      Common::Console::setTextColor(Common::Console::Color::Default);
+
+      log_incorrect_words(words);
 
       return false;
     }
 
-    void log_incorrect_words(std::vector<std::string> words, LoggerRef &logger)
+    void log_incorrect_words(std::vector<std::string> words)
     {
       Language::Base *language = Language::Singleton<Language::English>::instance();
       const std::vector<std::string> &dictionary = language->get_word_list();
+
+      Common::Console::setTextColor(Common::Console::Color::BrightRed);
 
       for (auto i : words)
       {
         if (std::find(dictionary.begin(), dictionary.end(), i) == dictionary.end())
         {
-          logger(ERROR, BRIGHT_RED) << i << " is not in the english word list!";
+          std::cout << i << " is not in the english word list!" << std::endl;
         }
       }
+
+      Common::Console::setTextColor(Common::Console::Color::Default);
     }
   }
 }

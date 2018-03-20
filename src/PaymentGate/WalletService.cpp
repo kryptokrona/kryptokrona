@@ -48,7 +48,7 @@
 #include "Wallet/WalletUtils.h"
 #include "WalletServiceErrorCategory.h"
 
-#include "Mnemonics/electrum-words.cpp"
+#include "Mnemonics/electrum-words.h"
 
 namespace PaymentService {
 
@@ -346,7 +346,7 @@ void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfigu
     Crypto::SecretKey private_spend_key;
     Crypto::SecretKey private_view_key;
 
-    if (!crypto::ElectrumWords::is_valid_mnemonic(conf.mnemonicSeed, private_spend_key, log))
+    if (!crypto::ElectrumWords::is_valid_mnemonic(conf.mnemonicSeed, private_spend_key))
     {
       return;
     }
