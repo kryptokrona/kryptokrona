@@ -338,7 +338,17 @@ void WalletSerializerV1::loadWalletV1(Common::IInputStream& source, const Crypto
   CryptoNote::BinaryInputStreamSerializer serializer(decryptedStream);
 
   loadWalletV1Keys(serializer);
-  checkKeys();
+
+  try
+  {
+    checkKeys();
+  }
+  /* Remove the partially (incorrectly) parsed wallet, pass is wrong */
+  catch (const std::system_error &e)
+  {
+    m_walletsContainer.clear();
+    throw(e);
+  }
 
   subscribeWallets();
 
