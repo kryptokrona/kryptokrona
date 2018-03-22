@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <cctype>
+#include <future>
 
 #include "INode.h"
 #include "version.h"
@@ -49,6 +50,7 @@ struct ThreadHandler {
     bool shouldDie = false;
     bool shouldPause = false;
     bool havePaused = false;
+    bool doWorkOnMainThread = false;
 };
 
 enum Action {Open, Generate, Import, SeedImport, ViewWallet};
@@ -104,6 +106,9 @@ void viewWalletMsg();
 
 bool isValidMnemonic(std::string &mnemonic_phrase, 
                      Crypto::SecretKey &private_spend_key);
+
+std::string getInput(ThreadHandler &threadHandler,
+                     CryptoNote::WalletGreen &wallet);
 
 std::string getNewWalletFileName();
 

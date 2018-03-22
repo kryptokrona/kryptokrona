@@ -114,6 +114,8 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
                       << " of " << InformationMsg(std::to_string(numTxs))
                       << std::endl;
 
+            wallet.updateInternalCache();
+
             uint64_t neededBalance = tx.destinations[0].amount + tx.fee;
 
             if (neededBalance < wallet.getActualBalance())
@@ -381,6 +383,8 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
               << std::endl << std::endl;
     }
 
+    wallet.updateInternalCache();
+
     /* Short sleep to ensure it's in the transaction pool when we poll it */
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -447,6 +451,8 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
                       << std::endl;
 
             std::this_thread::sleep_for(std::chrono::seconds(5));
+
+            wallet.updateInternalCache();
         }
         else
         {

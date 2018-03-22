@@ -206,8 +206,8 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
         if (address.length() != 99)
         {
             std::cout << WarningMsg("Address is wrong length!") << std::endl
-                  << "It should be 99 characters long, but it is "
-                  << address.length() << " characters long!" << std::endl;
+                      << "It should be 99 characters long, but it is "
+                      << address.length() << " characters long!" << std::endl;
         }
         else if (address.substr(0, 4) != "TRTL")
         {
@@ -650,6 +650,40 @@ void welcomeMsg()
               << "file doesn't get corrupted." << std::endl << std::endl;
 }
 
+std::string getInput(ThreadHandler &threadHandler,
+                     CryptoNote::WalletGreen &wallet)
+{
+    std::future<std::string> inputGetter = std::async(std::launch::async, [] {
+            std::string command;
+            std::getline(std::cin, command);
+            return command;
+    });
+
+    while (true)
+    {
+        /* Check if the user has inputted something yet (Wait for zero seconds
+           to instantly return) */
+        std::future_status status = inputGetter.wait_for(std::chrono::seconds(0));
+
+        /* User has inputted, get what they inputted and return it */
+        if (status == std::future_status::ready)
+        {
+            return inputGetter.get();
+        }
+
+        /* Otherwise check if we need to update the wallet cache */
+        if (threadHandler.doWorkOnMainThread)
+        {
+            wallet.updateInternalCache();
+            threadHandler.doWorkOnMainThread = false;
+        }
+
+        /* Sleep for enough for it to not be noticeable when the user enters
+           something, but enough that we're not starving the CPU */
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+}
+
 void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
                ThreadHandler &threadHandler)
 { 
@@ -657,15 +691,14 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
     {
         std::cout << getPrompt(walletInfo);
 
-        std::string command;
-        std::getline(std::cin, command);
+        std::string command = getInput(threadHandler, walletInfo->wallet);
 
         /* Split into args to support legacy transfer command, for example
            transfer 5 TRTLxyz... 100, sends 100 TRTL to TRTLxyz... with a mixin
            of 5 */
         std::vector<std::string> words;
         words = boost::split(words, command, ::isspace);
-        
+
         if (command == "")
         {
             // no-op
@@ -1049,7 +1082,20 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
             transactionCount = tmpTransactionCount;
         }
 
-        walletInfo->wallet.updateInternalCache();
+        /* Schedule a wallet.updateInternalCache() on the main thread. This
+           has to be done on the main thread because it needs to make the
+           dispatcher yield, however on windows the dispatcher can only be
+           ran on the thread it was created on, in this case the main thread.
+
+           So, on the main thread we'll check to see if this flag is set
+           periodically, and do the update for us */
+        threadHandler.doWorkOnMainThread = true;
+
+        /* Sleep until the work is done */
+        while (threadHandler.doWorkOnMainThread)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
 
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
@@ -1080,11 +1126,6 @@ void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo,
 
     /* Now we rescan the chain to re-discover our balance and transactions */
     findNewTransactions(node, walletInfo->wallet);
-
-    /* Then we save the wallet again, with the hopefully fixed balance. This
-       step is not strictly necessary, but it's nice to do in case the user
-       doesn't shut down cleanly. */
-    walletInfo->wallet.save();
 
     threadHandler.shouldPause = false;
     threadHandler.shouldDie = false;
@@ -1141,6 +1182,7 @@ void findNewTransactions(CryptoNote::INode &node,
 
     while (walletHeight < localHeight)
     {
+        /* This MUST be called on the main thread! */
         wallet.updateInternalCache();
 
         size_t tmpTransactionCount = wallet.getTransactionCount();
