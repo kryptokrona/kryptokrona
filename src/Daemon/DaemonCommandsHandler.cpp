@@ -21,8 +21,12 @@
 #include "CryptoNoteCore/Miner.h"
 #include "CryptoNoteCore/Core.h"
 #include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
+#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "Serialization/SerializationTools.h"
 #include "version.h"
+
+#include "Rpc/JsonRpc.h"
+#include "CryptoNoteCore/Currency.h"
 
 namespace {
 template <typename T>
@@ -51,8 +55,8 @@ std::string printTransactionFullInfo(const CryptoNote::CachedTransaction& transa
 
 }
 
-DaemonCommandsHandler::DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log) :
-  m_core(core), m_srv(srv), logger(log, "daemon"), m_logManager(log) {
+DaemonCommandsHandler::DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, CryptoNote::RpcServer* prpc_server) :
+  m_core(core), m_srv(srv), logger(log, "daemon"), m_logManager(log), m_prpc_server(prpc_server) {
   m_consoleHandler.setHandler("exit", boost::bind(&DaemonCommandsHandler::exit, this, _1), "Shutdown the daemon");
   m_consoleHandler.setHandler("help", boost::bind(&DaemonCommandsHandler::help, this, _1), "Show this help");
   m_consoleHandler.setHandler("print_pl", boost::bind(&DaemonCommandsHandler::print_pl, this, _1), "Print peer list");
@@ -124,6 +128,7 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args) {
   uint32_t start_index = 0;
   uint32_t end_index = 0;
   uint32_t end_block_parametr = m_core.getTopBlockIndex() + 1;
+
   if (!Common::fromString(args[0], start_index)) {
     std::cout << "wrong starter block index parameter" << ENDL;
     return false;
@@ -148,7 +153,39 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args) {
     return false;
   }
 
-  //TODO m_core.print_blockchain(start_index, end_index);
+  CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request req;
+  CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response res;
+  using namespace CryptoNote::JsonRpc;
+  JsonRpcError error_resp;
+
+  req.start_height = start_index;
+  req.end_height = end_index;
+
+  // TODO: implement m_is_rpc handling like in monero?
+  if (!m_prpc_server->on_get_block_headers_range(req, res, error_resp) || res.status != CORE_RPC_STATUS_OK) {
+	  // TODO res.status handling
+	  std::cout << "Response status not CORE_RPC_STATUS_OK" << ENDL; 
+	  return false;
+  }
+
+  const CryptoNote::Currency& currency = m_core.getCurrency();
+
+  bool first = true;
+  for (CryptoNote::block_header_response& header : res.headers) {
+	  if (!first) {
+		  std::cout << ENDL;
+		  first = false;
+	  }
+	  
+	  std::cout
+		  << "height: " << header.height << ", timestamp: " << header.timestamp << ", difficulty: " << header.difficulty
+		  << ", size: " << header.block_size << ", transactions: " << header.num_txes << ENDL
+		  << "major version: " << header.major_version << ", minor version: " << header.minor_version << ENDL
+		  << "block id: " << header.hash << ", previous block id: " << header.prev_hash << ENDL
+		  << "difficulty: " << header.difficulty << ", nonce " << header.nonce << ", reward " << currency.formatAmount(header.reward) << ENDL;
+		  //<< "difficulty: " << header.difficulty << ", nonce " << header.nonce << ", reward " << CryptoNote::print_money(header.reward) << ENDL;
+  }
+
   return true;
 }
 //--------------------------------------------------------------------------------

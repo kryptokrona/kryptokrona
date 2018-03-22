@@ -31,6 +31,8 @@ class ILogger;
 
 namespace CryptoNote {
 
+//std::string print_money(uint64_t amount, unsigned int decimal_point = -1);
+
 bool parseAndValidateTransactionFromBinaryArray(const BinaryArray& transactionBinaryArray, Transaction& transaction, Crypto::Hash& transactionHash, Crypto::Hash& transactionPrefixHash);
 
 struct TransactionSourceEntry {

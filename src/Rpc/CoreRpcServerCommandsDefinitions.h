@@ -381,6 +381,8 @@ struct block_header_response {
   std::string hash;
   Difficulty difficulty;
   uint64_t reward;
+  uint32_t num_txes;
+  uint64_t block_size;
 
   void serialize(ISerializer &s) {
     KV_MEMBER(major_version)
@@ -394,6 +396,8 @@ struct block_header_response {
     KV_MEMBER(hash)
     KV_MEMBER(difficulty)
     KV_MEMBER(reward)
+	KV_MEMBER(num_txes)
+	KV_MEMBER(block_size)
   }
 };
 
@@ -407,6 +411,42 @@ struct BLOCK_HEADER_RESPONSE {
   }
 };
 
+
+struct COMMAND_RPC_GET_BLOCK_HEADERS_RANGE
+{
+	struct request
+	{
+		uint64_t start_height;
+		uint64_t end_height;
+
+		void serialize(ISerializer &s) {
+			KV_MEMBER(start_height)
+			KV_MEMBER(end_height)
+		}
+		/*BEGIN_KV_SERIALIZE_MAP()
+		KV_SERIALIZE(start_height)
+		KV_SERIALIZE(end_height)
+		END_KV_SERIALIZE_MAP()*/
+	};
+
+	struct response
+	{
+		std::string status;
+		std::vector<block_header_response> headers;
+		bool untrusted;
+
+		void serialize(ISerializer &s) {
+			KV_MEMBER(status)
+			KV_MEMBER(headers)
+			KV_MEMBER(untrusted)
+		}
+		/*BEGIN_KV_SERIALIZE_MAP()
+		KV_SERIALIZE(status)
+		KV_SERIALIZE(headers)
+		KV_SERIALIZE(untrusted)
+		END_KV_SERIALIZE_MAP()*/
+	};
+};
 
 struct f_transaction_short_response {
   std::string hash;

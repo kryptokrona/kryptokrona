@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
+#pragma once
+
 #include "HttpServer.h"
 
 #include <functional>
@@ -23,6 +25,7 @@
 #include <Logging/LoggerRef.h>
 #include "Common/Math.h"
 #include "CoreRpcServerCommandsDefinitions.h"
+#include "JsonRpc.h"
 
 namespace CryptoNote {
 
@@ -37,6 +40,8 @@ public:
   typedef std::function<bool(RpcServer*, const HttpRequest& request, HttpResponse& response)> HandlerFunction;
   bool enableCors(const std::vector<std::string>  domains);
   std::vector<std::string> getCorsDomains();
+
+  bool on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request& req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response& res, JsonRpc::JsonRpcError& error_resp);
 
 private:
 

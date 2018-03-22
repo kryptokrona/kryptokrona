@@ -21,6 +21,9 @@
 
 #include <Logging/LoggerRef.h>
 #include <Logging/LoggerManager.h>
+#include "Rpc/RpcServer.h"
+#include "Rpc/CoreRpcServerCommandsDefinitions.h"
+#include "Rpc/JsonRpc.h"
 
 namespace CryptoNote {
 class Core;
@@ -30,7 +33,7 @@ class NodeServer;
 class DaemonCommandsHandler
 {
 public:
-  DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log);
+  DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, CryptoNote::RpcServer* prpc_server);
 
   bool start_handling() {
     m_consoleHandler.start();
@@ -48,6 +51,7 @@ private:
   CryptoNote::NodeServer& m_srv;
   Logging::LoggerRef logger;
   Logging::LoggerManager& m_logManager;
+  CryptoNote::RpcServer* m_prpc_server;
 
   std::string get_commands_str();
   bool print_block_by_height(uint32_t height);
