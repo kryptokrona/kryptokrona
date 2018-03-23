@@ -75,7 +75,7 @@ void listTransfers(bool incoming, bool outgoing,
                    CryptoNote::WalletGreen &wallet);
 
 void findNewTransactions(CryptoNote::INode &node, 
-                         CryptoNote::WalletGreen &wallet);
+                         std::shared_ptr<WalletInfo> &walletInfo);
 
 void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo);
 

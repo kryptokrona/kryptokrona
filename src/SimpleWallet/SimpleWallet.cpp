@@ -81,8 +81,6 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
     Action action = getAction();
     std::shared_ptr<WalletInfo> walletInfo = handleAction(wallet, action);
 
-    walletInfo->knownTransactionCount = wallet.getTransactionCount();
-
     bool alreadyShuttingDown = false;
 
     /* This will call shutdown when ctrl+c is hit. This is a lambda function,
@@ -127,7 +125,8 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
            received any money yet. */
         if (action != Generate)
         {
-            findNewTransactions(node, walletInfo->wallet);
+            findNewTransactions(node, walletInfo);
+
         }
         else
         {
@@ -1074,6 +1073,8 @@ void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo)
 {
     std::cout << InformationMsg("Resetting wallet...") << std::endl;
 
+    walletInfo->knownTransactionCount = 0;
+
     /* Wallet is now unitialized. You must reinit with load, initWithKeys,
        or whatever. This function wipes the cache, then saves the wallet. */
     walletInfo->wallet.clearCacheAndShutdown();
@@ -1083,17 +1084,17 @@ void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo)
                             walletInfo->walletPass);
 
     /* Now we rescan the chain to re-discover our balance and transactions */
-    findNewTransactions(node, walletInfo->wallet);
+    findNewTransactions(node, walletInfo);
 }
 
 void findNewTransactions(CryptoNote::INode &node, 
-                         CryptoNote::WalletGreen &wallet)
+                         std::shared_ptr<WalletInfo> &walletInfo)
 {
     uint32_t localHeight = node.getLastLocalBlockHeight();
-    uint32_t walletHeight = wallet.getBlockCount();
+    uint32_t walletHeight = walletInfo->wallet.getBlockCount();
     uint32_t remoteHeight = node.getLastKnownBlockHeight();
 
-    size_t transactionCount = wallet.getTransactionCount();
+    size_t transactionCount = walletInfo->wallet.getTransactionCount();
 
     int stuckCounter = 0;
 
@@ -1115,7 +1116,7 @@ void findNewTransactions(CryptoNote::INode &node,
                   << "to rescan the chain to find your transactions."
                   << std::endl;
         transactionCount = 0;
-        wallet.clearCaches(true, false);
+        walletInfo->wallet.clearCaches(true, false);
     }
 
     if (walletHeight == 1)
@@ -1137,11 +1138,11 @@ void findNewTransactions(CryptoNote::INode &node,
     while (walletHeight < localHeight)
     {
         /* This MUST be called on the main thread! */
-        wallet.updateInternalCache();
+        walletInfo->wallet.updateInternalCache();
 
-        size_t tmpTransactionCount = wallet.getTransactionCount();
+        size_t tmpTransactionCount = walletInfo->wallet.getTransactionCount();
 
-        uint32_t tmpWalletHeight = wallet.getBlockCount();
+        uint32_t tmpWalletHeight = walletInfo->wallet.getBlockCount();
 
         if (tmpWalletHeight == walletHeight)
         {
@@ -1183,7 +1184,8 @@ void findNewTransactions(CryptoNote::INode &node,
         {
             for (size_t i = transactionCount; i < tmpTransactionCount; i++)
             {
-                CryptoNote::WalletTransaction t = wallet.getTransaction(i);
+                CryptoNote::WalletTransaction t 
+                    = walletInfo->wallet.getTransaction(i);
 
                 /* Don't print out fusion transactions */
                 if (t.totalAmount != 0)
@@ -1214,7 +1216,9 @@ void findNewTransactions(CryptoNote::INode &node,
 
     /* In case the user force closes, we don't want them to have to rescan
        the whole chain. */
-    wallet.save();
+    walletInfo->wallet.save();
+
+    walletInfo->knownTransactionCount = transactionCount;
 }
 
 ColouredMsg getPrompt(std::shared_ptr<WalletInfo> &walletInfo)

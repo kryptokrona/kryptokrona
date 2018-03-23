@@ -490,6 +490,17 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
         }
         else
         {
+            while (wallet.getActualBalance() < p.destinations[0].amount + p.fee)
+            {
+                std::cout << WarningMsg("Optimization completed, but balance "
+                                        "is not fully unlocked yet!")
+                          << std::endl
+                          << SuccessMsg("Will try again in 5 seconds...")
+                          << std::endl;
+
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            }
+
             size_t id = wallet.transfer(p);
             CryptoNote::WalletTransaction tx = wallet.getTransaction(id);
 
