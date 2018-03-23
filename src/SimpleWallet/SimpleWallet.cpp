@@ -640,7 +640,7 @@ void welcomeMsg()
               << "file doesn't get corrupted." << std::endl << std::endl;
 }
 
-std::string getInput(std::shared_ptr<WalletInfo> &walletInfo)
+std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
 {
     auto lastUpdated = std::chrono::system_clock::now();
 
@@ -665,7 +665,7 @@ std::string getInput(std::shared_ptr<WalletInfo> &walletInfo)
         auto currentTime = std::chrono::system_clock::now();
 
         /* Otherwise check if we need to update the wallet cache */
-        if ((lastUpdated - currentTime) > std::chrono::seconds(5))
+        if ((currentTime - lastUpdated) > std::chrono::seconds(5))
         {
             lastUpdated = currentTime;
             checkForNewTransactions(walletInfo);
@@ -683,7 +683,7 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
     {
         std::cout << getPrompt(walletInfo);
 
-        std::string command = getInput(walletInfo);
+        std::string command = getInputAndDoWorkWhileIdle(walletInfo);
 
         /* Split into args to support legacy transfer command, for example
            transfer 5 TRTLxyz... 100, sends 100 TRTL to TRTLxyz... with a mixin

@@ -97,7 +97,7 @@ bool isValidMnemonic(std::string &mnemonic_phrase,
 bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
               bool &alreadyShuttingDown);
 
-std::string getInput(std::shared_ptr<WalletInfo> &walletInfo);
+std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo);
 
 std::string getNewWalletFileName();
 
