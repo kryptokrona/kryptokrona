@@ -847,7 +847,8 @@ void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
 
     if (viewWallet)
     {
-        std::cout << InformationMsg("Please note that view only wallets "
+        std::cout << std::endl 
+                  << InformationMsg("Please note that view only wallets "
                                     "can only track incoming transactions, "
                                     "and so your wallet balance may appear "
                                     "inflated.") << std::endl;
@@ -855,16 +856,18 @@ void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
 
     if (localHeight < remoteHeight)
     {
-        std::cout << InformationMsg("Your daemon is not fully synced with "
+        std::cout << std::endl
+                  << InformationMsg("Your daemon is not fully synced with "
                                     "the network!")
                   << std::endl << "Your balance may be incorrect until you "
-                  << "are fully synced!" << std::endl << std::endl;
+                  << "are fully synced!" << std::endl;
     }
     /* Small buffer because wallet height doesn't update instantly like node
        height does */
     else if (walletHeight + 1000 < remoteHeight)
     {
-        std::cout << InformationMsg("The blockchain is still being scanned for "
+        std::cout << std::endl
+                  << InformationMsg("The blockchain is still being scanned for "
                                     "your transactions.")
                   << std::endl
                   << "Balances might be incorrect whilst this is ongoing."
@@ -1037,21 +1040,37 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
 
     while(true)
     {
-        if (threadHandler.shouldDie)
-        {
-            return;
-        }
+        /* Schedule a wallet.updateInternalCache() on the main thread. This
+           has to be done on the main thread because it needs to make the
+           dispatcher yield, however on windows the dispatcher can only be
+           ran on the thread it was created on, in this case the main thread.
 
-        /* Pause watching until we get the signal to unpause. Will fuck up
-           reset. */
-        if (threadHandler.shouldPause)
-        {
-            threadHandler.havePaused = true;
+           So, on the main thread we'll check to see if this flag is set
+           periodically, and do the update for us */
+        threadHandler.doWorkOnMainThread = true;
 
-            while (threadHandler.shouldPause)
+        /* Sleep until the work is done */
+        while (threadHandler.doWorkOnMainThread)
+        {
+
+            if (threadHandler.shouldDie)
             {
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                return;
             }
+
+            /* Pause watching until we get the signal to unpause. Will fuck up
+               reset. */
+            if (threadHandler.shouldPause)
+            {
+                threadHandler.havePaused = true;
+
+                while (threadHandler.shouldPause)
+                {
+                    std::this_thread::sleep_for(std::chrono::seconds(5));
+                }
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
 
         size_t tmpTransactionCount = walletInfo->wallet.getTransactionCount();
@@ -1081,22 +1100,7 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
 
             transactionCount = tmpTransactionCount;
         }
-
-        /* Schedule a wallet.updateInternalCache() on the main thread. This
-           has to be done on the main thread because it needs to make the
-           dispatcher yield, however on windows the dispatcher can only be
-           ran on the thread it was created on, in this case the main thread.
-
-           So, on the main thread we'll check to see if this flag is set
-           periodically, and do the update for us */
-        threadHandler.doWorkOnMainThread = true;
-
-        /* Sleep until the work is done */
-        while (threadHandler.doWorkOnMainThread)
-        {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
-
+        
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 }
