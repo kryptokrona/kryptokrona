@@ -114,6 +114,8 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
                       << " of " << InformationMsg(std::to_string(numTxs))
                       << std::endl;
 
+            wallet.updateInternalCache();
+
             uint64_t neededBalance = tx.destinations[0].amount + tx.fee;
 
             if (neededBalance < wallet.getActualBalance())
@@ -188,8 +190,9 @@ void splitTx(CryptoNote::WalletGreen &wallet,
            We then check at the end that each transaction is small enough, and
            if not, we up the numTxMultiplier and try again with more
            transactions. */
-        int numTransactions = numTxMultiplier * 
-                              (std::ceil(double(txSize) / double(maxSize)));
+        int numTransactions 
+            = int(numTxMultiplier * 
+                 (std::ceil(double(txSize) / double(maxSize))));
 
         /* Split the requested fee over each transaction, i.e. if a fee of 200
            TRTL was requested and we split it into 4 transactions each one will
@@ -274,7 +277,7 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
                                               CryptoNote::parameters
                                                         ::DEFAULT_MIXIN);
     }
-    catch (const std::runtime_error &e)
+    catch (const std::runtime_error)
     {
         return CryptoNote::WALLET_INVALID_TRANSACTION_ID;
     }
@@ -381,6 +384,8 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
               << std::endl << std::endl;
     }
 
+    wallet.updateInternalCache();
+
     /* Short sleep to ensure it's in the transaction pool when we poll it */
     std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -447,6 +452,8 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
                       << std::endl;
 
             std::this_thread::sleep_for(std::chrono::seconds(5));
+
+            wallet.updateInternalCache();
         }
         else
         {
@@ -483,6 +490,34 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
         }
         else
         {
+            auto startTime = std::chrono::system_clock::now();
+
+            while (wallet.getActualBalance() < p.destinations[0].amount + p.fee)
+            {
+                /* Break after a minute just in case something has gone wrong */
+                if ((std::chrono::system_clock::now() - startTime) > 
+                     std::chrono::minutes(1))
+                {
+                    std::cout << WarningMsg("Fusion transactions have "
+                                            "completed, however available "
+                                            "balance is less than transfer "
+                                            "amount specified.") << std::endl
+                              << WarningMsg("Transfer aborted, please review "
+                                            "and start a new transfer.")
+                              << std::endl;
+
+                    return;
+                }
+
+                std::cout << WarningMsg("Optimization completed, but balance "
+                                        "is not fully unlocked yet!")
+                          << std::endl
+                          << SuccessMsg("Will try again in 5 seconds...")
+                          << std::endl;
+
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            }
+
             size_t id = wallet.transfer(p);
             CryptoNote::WalletTransaction tx = wallet.getTransaction(id);
 
@@ -756,7 +791,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                       << std::endl << "Try lowering the amount you are "
                       << "sending in one transaction." << std::endl
                       << "Alternatively, you can try lowering the mixin count "
-                      << "to 0, but this will compromise privacy.";
+                      << "to 0, but this will compromise privacy." << std::endl;
         }
         else
         {
@@ -959,7 +994,7 @@ bool parseMixin(std::string mixinString)
         std::stoi(mixinString);
         return true;
     }
-    catch (const std::invalid_argument &e)
+    catch (const std::invalid_argument)
     {
         std::cout << WarningMsg("Failed to parse mixin! Ensure you entered the "
                                 "value correctly.") << std::endl;

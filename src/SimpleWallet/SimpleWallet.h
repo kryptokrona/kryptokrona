@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <cctype>
+#include <future>
 
 #include "INode.h"
 #include "version.h"
@@ -45,12 +46,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/thread/thread.hpp>
 
-struct ThreadHandler {
-    bool shouldDie = false;
-    bool shouldPause = false;
-    bool havePaused = false;
-};
-
 enum Action {Open, Generate, Import, SeedImport, ViewWallet};
 
 Action getAction();
@@ -68,13 +63,9 @@ void welcomeMsg();
 
 void help(bool viewWallet);
 
-void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
-               ThreadHandler &threadHandler);
+void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node);
 
-void exportKeys(std::shared_ptr<WalletInfo> walletInfo);
-
-void shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
-              ThreadHandler &threadHandler);
+void exportKeys(std::shared_ptr<WalletInfo> &walletInfo);
 
 void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node);
 
@@ -84,17 +75,15 @@ void listTransfers(bool incoming, bool outgoing,
                    CryptoNote::WalletGreen &wallet);
 
 void findNewTransactions(CryptoNote::INode &node, 
-                         CryptoNote::WalletGreen &wallet);
+                         std::shared_ptr<WalletInfo> &walletInfo);
 
-void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo,
-           ThreadHandler &threadHandler);
+void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo);
 
 void printOutgoingTransfer(CryptoNote::WalletTransaction t);
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t);
 
-void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
-                        ThreadHandler &threadHandler);
+void checkForNewTransactions(std::shared_ptr<WalletInfo> &walletInfo);
 
 void confirmPassword(std::string);
 
@@ -105,6 +94,11 @@ void viewWalletMsg();
 bool isValidMnemonic(std::string &mnemonic_phrase, 
                      Crypto::SecretKey &private_spend_key);
 
+bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+              bool &alreadyShuttingDown);
+
+std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo);
+
 std::string getNewWalletFileName();
 
 std::string getExistingWalletFileName();
@@ -112,8 +106,8 @@ std::string getExistingWalletFileName();
 std::string getWalletPassword(bool verifyPwd);
 
 std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet, 
-                           Crypto::SecretKey privateSpendKey,
-                           Crypto::SecretKey privateViewKey);
+                                           Crypto::SecretKey privateSpendKey,
+                                           Crypto::SecretKey privateViewKey);
 
 std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet);
 
@@ -131,4 +125,4 @@ std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
 
 Crypto::SecretKey getPrivateKey(std::string outputMsg);
 
-ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo);
+ColouredMsg getPrompt(std::shared_ptr<WalletInfo> &walletInfo);

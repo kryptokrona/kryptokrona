@@ -81,15 +81,16 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
     Action action = getAction();
     std::shared_ptr<WalletInfo> walletInfo = handleAction(wallet, action);
 
-    ThreadHandler threadHandler;
+    bool alreadyShuttingDown = false;
 
-    /* This will call shutdown when ctrl+c is hit. This is a lambda function.
-       We use &variable to capture a variable, allowing us to use it in the
-       lambda. */
-    Tools::SignalHandler::install([&threadHandler, &walletInfo, &node] {
-        shutdown(walletInfo->wallet, node, threadHandler);
-        /* You shouldn't really do this. I'm lazy and stupid. */
-        exit(0);
+    /* This will call shutdown when ctrl+c is hit. This is a lambda function,
+       & means capture all variables by reference */
+    Tools::SignalHandler::install([&] {
+        /* If we're already shutting down let control flow continue as normal */
+        if (shutdown(walletInfo->wallet, node, alreadyShuttingDown))
+        {
+            exit(0);
+        }
     });
 
     if (node.getLastKnownBlockHeight() == 0)
@@ -112,7 +113,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 
         std::cin.get();
 
-        shutdown(walletInfo->wallet, node, threadHandler);
+        shutdown(walletInfo->wallet, node, alreadyShuttingDown);
     }
     else
     {
@@ -124,7 +125,8 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
            received any money yet. */
         if (action != Generate)
         {
-            findNewTransactions(node, walletInfo->wallet);
+            findNewTransactions(node, walletInfo);
+
         }
         else
         {
@@ -138,23 +140,11 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
                       << std::endl << std::endl;
         }
 
-        /* Look for transactions in the background */
-        /* We need to use std::ref here, because when you pass a variable to
-           a boost::thread, or a std::thread as well, they get copied by
-           value, and then passed as reference to the function, so whilst it
-           appears to have been passed by reference, it hasn't really. Using
-           a std::ref wrapper fixes this. */
-        boost::thread txWatcher(&transactionWatcher, walletInfo,
-                                std::ref(threadHandler));
-
         welcomeMsg();
 
-        inputLoop(walletInfo, node, threadHandler);
+        inputLoop(walletInfo, node);
 
-        shutdown(walletInfo->wallet, node, threadHandler);
-
-        /* Wait for the tx watcher to terminate */
-        txWatcher.join();
+        shutdown(walletInfo->wallet, node, alreadyShuttingDown);
     }
 }
 
@@ -206,8 +196,8 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
         if (address.length() != 99)
         {
             std::cout << WarningMsg("Address is wrong length!") << std::endl
-                  << "It should be 99 characters long, but it is "
-                  << address.length() << " characters long!" << std::endl;
+                      << "It should be 99 characters long, but it is "
+                      << address.length() << " characters long!" << std::endl;
         }
         else if (address.substr(0, 4) != "TRTL")
         {
@@ -364,7 +354,6 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet)
                 return std::make_shared<WalletInfo>(walletFileName, walletPass, 
                                                     walletAddress, false, 
                                                     wallet);
-
             }
 
             return std::make_shared<WalletInfo>(walletFileName, walletPass, 
@@ -598,7 +587,7 @@ void promptSaveKeys(CryptoNote::WalletGreen &wallet)
     std::cout << std::endl;
 }
 
-void exportKeys(std::shared_ptr<WalletInfo> walletInfo)
+void exportKeys(std::shared_ptr<WalletInfo> &walletInfo)
 {
     confirmPassword(walletInfo->walletPass);
     printPrivateKeys(walletInfo->wallet, walletInfo->viewWallet);
@@ -650,22 +639,57 @@ void welcomeMsg()
               << "file doesn't get corrupted." << std::endl << std::endl;
 }
 
-void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
-               ThreadHandler &threadHandler)
+std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
+{
+    auto lastUpdated = std::chrono::system_clock::now();
+
+    std::future<std::string> inputGetter = std::async(std::launch::async, [] {
+            std::string command;
+            std::getline(std::cin, command);
+            return command;
+    });
+
+    while (true)
+    {
+        /* Check if the user has inputted something yet (Wait for zero seconds
+           to instantly return) */
+        std::future_status status = inputGetter.wait_for(std::chrono::seconds(0));
+
+        /* User has inputted, get what they inputted and return it */
+        if (status == std::future_status::ready)
+        {
+            return inputGetter.get();
+        }
+
+        auto currentTime = std::chrono::system_clock::now();
+
+        /* Otherwise check if we need to update the wallet cache */
+        if ((currentTime - lastUpdated) > std::chrono::seconds(5))
+        {
+            lastUpdated = currentTime;
+            checkForNewTransactions(walletInfo);
+        }
+
+        /* Sleep for enough for it to not be noticeable when the user enters
+           something, but enough that we're not starving the CPU */
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+}
+
+void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
 { 
     while (true)
     {
         std::cout << getPrompt(walletInfo);
 
-        std::string command;
-        std::getline(std::cin, command);
+        std::string command = getInputAndDoWorkWhileIdle(walletInfo);
 
         /* Split into args to support legacy transfer command, for example
            transfer 5 TRTLxyz... 100, sends 100 TRTL to TRTLxyz... with a mixin
            of 5 */
         std::vector<std::string> words;
         words = boost::split(words, command, ::isspace);
-        
+
         if (command == "")
         {
             // no-op
@@ -700,7 +724,7 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
         }
         else if (command == "reset")
         {
-            reset(node, walletInfo, threadHandler);
+            reset(node, walletInfo);
         }
         else if (!walletInfo->viewWallet)
         {
@@ -814,7 +838,8 @@ void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
 
     if (viewWallet)
     {
-        std::cout << InformationMsg("Please note that view only wallets "
+        std::cout << std::endl 
+                  << InformationMsg("Please note that view only wallets "
                                     "can only track incoming transactions, "
                                     "and so your wallet balance may appear "
                                     "inflated.") << std::endl;
@@ -822,16 +847,18 @@ void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
 
     if (localHeight < remoteHeight)
     {
-        std::cout << InformationMsg("Your daemon is not fully synced with "
+        std::cout << std::endl
+                  << InformationMsg("Your daemon is not fully synced with "
                                     "the network!")
                   << std::endl << "Your balance may be incorrect until you "
-                  << "are fully synced!" << std::endl << std::endl;
+                  << "are fully synced!" << std::endl;
     }
     /* Small buffer because wallet height doesn't update instantly like node
        height does */
     else if (walletHeight + 1000 < remoteHeight)
     {
-        std::cout << InformationMsg("The blockchain is still being scanned for "
+        std::cout << std::endl
+                  << InformationMsg("The blockchain is still being scanned for "
                                     "your transactions.")
                   << std::endl
                   << "Balances might be incorrect whilst this is ongoing."
@@ -901,47 +928,58 @@ void blockchainHeight(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
     }
 }
 
-void shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
-              ThreadHandler &threadHandler)
+bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+              bool &alreadyShuttingDown)
 {
-    if (threadHandler.shouldDie)
+    if (alreadyShuttingDown)
     {
         std::cout << "Patience little turtle, we're already shutting down!" 
                   << std::endl;
-        return;
+        return false;
     }
     else
     {
+        alreadyShuttingDown = true;
         std::cout << InformationMsg("Saving wallet and shutting down, please "
                                     "wait...") << std::endl;
     }
 
-    threadHandler.shouldDie = true;
+    bool finishedShutdown = false;
 
-    /* This is a lambda function. We have to "capture" wallet and node so they
-       can be used inside our lambda. */
-    boost::thread shutdownThread([&wallet, &node]()
+    boost::thread timelyShutdown([&finishedShutdown]
     {
-            wallet.save();
-            wallet.shutdown();
-            node.shutdown();
+        auto startTime = std::chrono::system_clock::now();
+
+        /* Has shutdown finished? */
+        while (!finishedShutdown)
+        {
+            auto currentTime = std::chrono::system_clock::now();
+
+            /* If not, wait for a max of 20 seconds then force exit. */
+            if ((currentTime - startTime) > std::chrono::seconds(20))
+            {
+                std::cout << WarningMsg("Wallet took too long to save! "
+                                        "Force closing.") << std::endl
+                          << "Bye." << std::endl;
+                exit(0);
+            }
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     });
 
-    bool shutdownSuccess 
-       = shutdownThread.try_join_for(boost::chrono::seconds(20));
+    wallet.save();
+    wallet.shutdown();
+    node.shutdown();
 
-    /* If we fail to shutdown correctly, then force close. Otherwise when
-       we go out of main scope we'll get an ugly error message when terminate
-       is called on the node/wallet thread */
-    if (!shutdownSuccess)
-    {
-        std::cout << WarningMsg("Wallet took too long to save! Force closing.") 
-                  << std::endl;
-        std::cout << "Bye." << std::endl;
-        exit(0);
-    }
+    finishedShutdown = true;
+
+    /* Wait for shutdown watcher to finish */
+    timelyShutdown.join();
 
     std::cout << "Bye." << std::endl;
+
+    return true;
 }
 
 void printOutgoingTransfer(CryptoNote::WalletTransaction t)
@@ -997,78 +1035,45 @@ void listTransfers(bool incoming, bool outgoing,
     }
 }
 
-void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
-                        ThreadHandler &threadHandler)
+void checkForNewTransactions(std::shared_ptr<WalletInfo> &walletInfo)
 {
-    size_t transactionCount = walletInfo->wallet.getTransactionCount();
+    walletInfo->wallet.updateInternalCache();
 
-    while(true)
+    size_t newTransactionCount = walletInfo->wallet.getTransactionCount();
+
+    if (newTransactionCount != walletInfo->knownTransactionCount)
     {
-        if (threadHandler.shouldDie)
+        for (size_t i = walletInfo->knownTransactionCount; 
+                    i < newTransactionCount; i++)
         {
-            return;
-        }
+            CryptoNote::WalletTransaction t 
+                = walletInfo->wallet.getTransaction(i);
 
-        /* Pause watching until we get the signal to unpause. Will fuck up
-           reset. */
-        if (threadHandler.shouldPause)
-        {
-            threadHandler.havePaused = true;
-
-            while (threadHandler.shouldPause)
+            /* Don't print outgoing or fusion transfers */
+            if (t.totalAmount > 0)
             {
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                std::cout << std::endl
+                          << InformationMsg("New transaction found!")
+                          << std::endl
+                          << SuccessMsg("Incoming transfer: " 
+                                    + Common::podToHex(t.hash) +
+                                      "\nAmount: " 
+                                    + formatAmount(t.totalAmount))
+                          << std::endl
+                          << getPrompt(walletInfo)
+                          << std::flush;
             }
         }
 
-        size_t tmpTransactionCount = walletInfo->wallet.getTransactionCount();
-
-        if (tmpTransactionCount != transactionCount)
-        {
-            for (size_t i = transactionCount; i < tmpTransactionCount; i++)
-            {
-                CryptoNote::WalletTransaction t 
-                    = walletInfo->wallet.getTransaction(i);
-
-                /* Don't print outgoing or fusion transfers */
-                if (t.totalAmount > 0)
-                {
-                    std::cout << std::endl
-                              << InformationMsg("New transaction found!")
-                              << std::endl
-                              << SuccessMsg("Incoming transfer: " 
-                                        + Common::podToHex(t.hash) +
-                                          "\nAmount: " 
-                                        + formatAmount(t.totalAmount))
-                              << std::endl
-                              << getPrompt(walletInfo)
-                              << std::flush;
-                }
-            }
-
-            transactionCount = tmpTransactionCount;
-        }
-
-        walletInfo->wallet.updateInternalCache();
-
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        walletInfo->knownTransactionCount = newTransactionCount;
     }
 }
 
-void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo,
-           ThreadHandler &threadHandler)
+void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo)
 {
     std::cout << InformationMsg("Resetting wallet...") << std::endl;
 
-    /* Pause the transaction watcher whilst we reset. It could potentially
-       fuck up, and if it doesn't, it still will be printing stuff when we
-       only want findNewTransactions to be printing */
-    threadHandler.shouldPause = true;
-
-    while (!threadHandler.havePaused)
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
+    walletInfo->knownTransactionCount = 0;
 
     /* Wallet is now unitialized. You must reinit with load, initWithKeys,
        or whatever. This function wipes the cache, then saves the wallet. */
@@ -1079,26 +1084,17 @@ void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo,
                             walletInfo->walletPass);
 
     /* Now we rescan the chain to re-discover our balance and transactions */
-    findNewTransactions(node, walletInfo->wallet);
-
-    /* Then we save the wallet again, with the hopefully fixed balance. This
-       step is not strictly necessary, but it's nice to do in case the user
-       doesn't shut down cleanly. */
-    walletInfo->wallet.save();
-
-    threadHandler.shouldPause = false;
-    threadHandler.shouldDie = false;
-    threadHandler.havePaused = false;
+    findNewTransactions(node, walletInfo);
 }
 
 void findNewTransactions(CryptoNote::INode &node, 
-                         CryptoNote::WalletGreen &wallet)
+                         std::shared_ptr<WalletInfo> &walletInfo)
 {
     uint32_t localHeight = node.getLastLocalBlockHeight();
-    uint32_t walletHeight = wallet.getBlockCount();
+    uint32_t walletHeight = walletInfo->wallet.getBlockCount();
     uint32_t remoteHeight = node.getLastKnownBlockHeight();
 
-    size_t transactionCount = wallet.getTransactionCount();
+    size_t transactionCount = walletInfo->wallet.getTransactionCount();
 
     int stuckCounter = 0;
 
@@ -1120,7 +1116,7 @@ void findNewTransactions(CryptoNote::INode &node,
                   << "to rescan the chain to find your transactions."
                   << std::endl;
         transactionCount = 0;
-        wallet.clearCaches(true, false);
+        walletInfo->wallet.clearCaches(true, false);
     }
 
     if (walletHeight == 1)
@@ -1141,11 +1137,12 @@ void findNewTransactions(CryptoNote::INode &node,
 
     while (walletHeight < localHeight)
     {
-        wallet.updateInternalCache();
+        /* This MUST be called on the main thread! */
+        walletInfo->wallet.updateInternalCache();
 
-        size_t tmpTransactionCount = wallet.getTransactionCount();
+        size_t tmpTransactionCount = walletInfo->wallet.getTransactionCount();
 
-        uint32_t tmpWalletHeight = wallet.getBlockCount();
+        uint32_t tmpWalletHeight = walletInfo->wallet.getBlockCount();
 
         if (tmpWalletHeight == walletHeight)
         {
@@ -1157,7 +1154,7 @@ void findNewTransactions(CryptoNote::INode &node,
         }
 
         /* Should be around a minute */
-        if (stuckCounter > 60)
+        if (stuckCounter > 20)
         {
             std::cout << WarningMsg("It looks like syncing might have got "
                                     "stuck...") << std::endl
@@ -1187,7 +1184,8 @@ void findNewTransactions(CryptoNote::INode &node,
         {
             for (size_t i = transactionCount; i < tmpTransactionCount; i++)
             {
-                CryptoNote::WalletTransaction t = wallet.getTransaction(i);
+                CryptoNote::WalletTransaction t 
+                    = walletInfo->wallet.getTransaction(i);
 
                 /* Don't print out fusion transactions */
                 if (t.totalAmount != 0)
@@ -1210,7 +1208,7 @@ void findNewTransactions(CryptoNote::INode &node,
             transactionCount = tmpTransactionCount;
         }
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
     std::cout << SuccessMsg("Finished scanning blockchain!") << std::endl
@@ -1218,10 +1216,12 @@ void findNewTransactions(CryptoNote::INode &node,
 
     /* In case the user force closes, we don't want them to have to rescan
        the whole chain. */
-    wallet.save();
+    walletInfo->wallet.save();
+
+    walletInfo->knownTransactionCount = transactionCount;
 }
 
-ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo)
+ColouredMsg getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
 {
     const int promptLength = 20;
     const std::string extension = ".wallet";
@@ -1232,7 +1232,7 @@ ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo)
     if (std::equal(extension.rbegin(), extension.rend(), 
                    walletInfo->walletFileName.rbegin()))
     {
-        int extPos = walletInfo->walletFileName.find_last_of('.');
+        size_t extPos = walletInfo->walletFileName.find_last_of('.');
 
         walletName = walletInfo->walletFileName.substr(0, extPos);
     }
