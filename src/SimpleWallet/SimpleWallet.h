@@ -51,6 +51,7 @@ struct ThreadHandler {
     bool shouldPause = false;
     bool havePaused = false;
     bool doWorkOnMainThread = false;
+    bool isTxWatcherAlive = false;
 };
 
 enum Action {Open, Generate, Import, SeedImport, ViewWallet};
@@ -74,9 +75,6 @@ void inputLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
                ThreadHandler &threadHandler);
 
 void exportKeys(std::shared_ptr<WalletInfo> walletInfo);
-
-void shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
-              ThreadHandler &threadHandler);
 
 void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node);
 
@@ -106,6 +104,9 @@ void viewWalletMsg();
 
 bool isValidMnemonic(std::string &mnemonic_phrase, 
                      Crypto::SecretKey &private_spend_key);
+
+bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+              ThreadHandler &threadHandler);
 
 std::string getInput(ThreadHandler &threadHandler,
                      CryptoNote::WalletGreen &wallet);

@@ -190,8 +190,9 @@ void splitTx(CryptoNote::WalletGreen &wallet,
            We then check at the end that each transaction is small enough, and
            if not, we up the numTxMultiplier and try again with more
            transactions. */
-        int numTransactions = numTxMultiplier * 
-                              (std::ceil(double(txSize) / double(maxSize)));
+        int numTransactions 
+            = int(numTxMultiplier * 
+                 (std::ceil(double(txSize) / double(maxSize))));
 
         /* Split the requested fee over each transaction, i.e. if a fee of 200
            TRTL was requested and we split it into 4 transactions each one will
@@ -276,7 +277,7 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
                                               CryptoNote::parameters
                                                         ::DEFAULT_MIXIN);
     }
-    catch (const std::runtime_error &e)
+    catch (const std::runtime_error)
     {
         return CryptoNote::WALLET_INVALID_TRANSACTION_ID;
     }
@@ -965,7 +966,7 @@ bool parseMixin(std::string mixinString)
         std::stoi(mixinString);
         return true;
     }
-    catch (const std::invalid_argument &e)
+    catch (const std::invalid_argument)
     {
         std::cout << WarningMsg("Failed to parse mixin! Ensure you entered the "
                                 "value correctly.") << std::endl;

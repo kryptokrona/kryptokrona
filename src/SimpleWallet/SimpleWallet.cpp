@@ -87,9 +87,11 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
        We use &variable to capture a variable, allowing us to use it in the
        lambda. */
     Tools::SignalHandler::install([&threadHandler, &walletInfo, &node] {
-        shutdown(walletInfo->wallet, node, threadHandler);
-        /* You shouldn't really do this. I'm lazy and stupid. */
-        exit(0);
+        /* If we're already shutting down let control flow continue as normal */
+        if (shutdown(walletInfo->wallet, node, threadHandler))
+        {
+            exit(0);
+        }
     });
 
     if (node.getLastKnownBlockHeight() == 0)
@@ -111,8 +113,6 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
                   << InformationMsg("Hit any key to exit: ");
 
         std::cin.get();
-
-        shutdown(walletInfo->wallet, node, threadHandler);
     }
     else
     {
@@ -937,14 +937,14 @@ void blockchainHeight(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
     }
 }
 
-void shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
               ThreadHandler &threadHandler)
 {
     if (threadHandler.shouldDie)
     {
         std::cout << "Patience little turtle, we're already shutting down!" 
                   << std::endl;
-        return;
+        return false;
     }
     else
     {
@@ -954,13 +954,21 @@ void shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     threadHandler.shouldDie = true;
 
+    /* Wait for the transaction watcher to die, otherwise we move onto
+       shutting down the node and the txwatcher can call it in the mean time,
+       throwing an error */
+    while (threadHandler.isTxWatcherAlive)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
     /* This is a lambda function. We have to "capture" wallet and node so they
        can be used inside our lambda. */
     boost::thread shutdownThread([&wallet, &node]()
     {
-            wallet.save();
-            wallet.shutdown();
-            node.shutdown();
+        wallet.save();
+        wallet.shutdown();
+        node.shutdown();
     });
 
     bool shutdownSuccess 
@@ -978,6 +986,8 @@ void shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     }
 
     std::cout << "Bye." << std::endl;
+
+    return true;
 }
 
 void printOutgoingTransfer(CryptoNote::WalletTransaction t)
@@ -1036,6 +1046,8 @@ void listTransfers(bool incoming, bool outgoing,
 void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
                         ThreadHandler &threadHandler)
 {
+    threadHandler.isTxWatcherAlive = true;
+
     size_t transactionCount = walletInfo->wallet.getTransactionCount();
 
     while(true)
@@ -1055,6 +1067,7 @@ void transactionWatcher(std::shared_ptr<WalletInfo> walletInfo,
 
             if (threadHandler.shouldDie)
             {
+                threadHandler.isTxWatcherAlive = false;
                 return;
             }
 
@@ -1278,7 +1291,7 @@ ColouredMsg getPrompt(std::shared_ptr<WalletInfo> walletInfo)
     if (std::equal(extension.rbegin(), extension.rend(), 
                    walletInfo->walletFileName.rbegin()))
     {
-        int extPos = walletInfo->walletFileName.find_last_of('.');
+        size_t extPos = walletInfo->walletFileName.find_last_of('.');
 
         walletName = walletInfo->walletFileName.substr(0, extPos);
     }
