@@ -42,10 +42,14 @@ struct WalletInfo {
                viewWallet(viewWallet),
                wallet(wallet) {}
 
+    size_t knownTransactionCount = 0;
+
     std::string walletFileName;
     std::string walletPass;
     std::string walletAddress;
+
     bool viewWallet;
+
     CryptoNote::WalletGreen &wallet;
 };
 
