@@ -113,6 +113,8 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
                   << InformationMsg("Hit any key to exit: ");
 
         std::cin.get();
+
+        shutdown(walletInfo->wallet, node, threadHandler);
     }
     else
     {
