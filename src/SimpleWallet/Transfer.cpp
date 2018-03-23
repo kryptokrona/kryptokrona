@@ -490,8 +490,25 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
         }
         else
         {
+            auto startTime = std::chrono::system_clock::now();
+
             while (wallet.getActualBalance() < p.destinations[0].amount + p.fee)
             {
+                /* Break after a minute just in case something has gone wrong */
+                if ((std::chrono::system_clock::now() - startTime) > 
+                     std::chrono::minutes(1))
+                {
+                    std::cout << WarningMsg("Fusion transactions have "
+                                            "completed, however available "
+                                            "balance is less than transfer "
+                                            "amount specified.") << std::endl
+                              << WarningMsg("Transfer aborted, please review "
+                                            "and start a new transfer.")
+                              << std::endl;
+
+                    return;
+                }
+
                 std::cout << WarningMsg("Optimization completed, but balance "
                                         "is not fully unlocked yet!")
                           << std::endl
