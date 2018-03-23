@@ -973,6 +973,8 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     wallet.shutdown();
     node.shutdown();
 
+    finishedShutdown = true;
+
     /* Wait for shutdown watcher to finish */
     timelyShutdown.join();
 
@@ -1151,7 +1153,7 @@ void findNewTransactions(CryptoNote::INode &node,
         }
 
         /* Should be around a minute */
-        if (stuckCounter > 60)
+        if (stuckCounter > 20)
         {
             std::cout << WarningMsg("It looks like syncing might have got "
                                     "stuck...") << std::endl
@@ -1204,7 +1206,7 @@ void findNewTransactions(CryptoNote::INode &node,
             transactionCount = tmpTransactionCount;
         }
 
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
     std::cout << SuccessMsg("Finished scanning blockchain!") << std::endl
