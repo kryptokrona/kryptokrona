@@ -482,6 +482,34 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
        potentially become valid because another payment came in. */
     optimize(wallet, p.destinations[0].amount + p.fee);
 
+    auto startTime = std::chrono::system_clock::now();
+
+    while (wallet.getActualBalance() < p.destinations[0].amount + p.fee)
+    {
+        /* Break after a minute just in case something has gone wrong */
+        if ((std::chrono::system_clock::now() - startTime) > 
+             std::chrono::minutes(1))
+        {
+            std::cout << WarningMsg("Fusion transactions have "
+                                    "completed, however available "
+                                    "balance is less than transfer "
+                                    "amount specified.") << std::endl
+                      << WarningMsg("Transfer aborted, please review "
+                                    "and start a new transfer.")
+                      << std::endl;
+
+            return;
+        }
+
+        std::cout << WarningMsg("Optimization completed, but balance "
+                                "is not fully unlocked yet!")
+                  << std::endl
+                  << SuccessMsg("Will try again in 5 seconds...")
+                  << std::endl;
+
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+
     try
     {
         if (wallet.txIsTooLarge(p))
@@ -490,34 +518,7 @@ void fusionTX(CryptoNote::WalletGreen &wallet,
         }
         else
         {
-            auto startTime = std::chrono::system_clock::now();
-
-            while (wallet.getActualBalance() < p.destinations[0].amount + p.fee)
-            {
-                /* Break after a minute just in case something has gone wrong */
-                if ((std::chrono::system_clock::now() - startTime) > 
-                     std::chrono::minutes(1))
-                {
-                    std::cout << WarningMsg("Fusion transactions have "
-                                            "completed, however available "
-                                            "balance is less than transfer "
-                                            "amount specified.") << std::endl
-                              << WarningMsg("Transfer aborted, please review "
-                                            "and start a new transfer.")
-                              << std::endl;
-
-                    return;
-                }
-
-                std::cout << WarningMsg("Optimization completed, but balance "
-                                        "is not fully unlocked yet!")
-                          << std::endl
-                          << SuccessMsg("Will try again in 5 seconds...")
-                          << std::endl;
-
-                std::this_thread::sleep_for(std::chrono::seconds(5));
-            }
-
+            
             size_t id = wallet.transfer(p);
             CryptoNote::WalletTransaction tx = wallet.getTransaction(id);
 
