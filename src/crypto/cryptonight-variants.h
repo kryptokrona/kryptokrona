@@ -1,4 +1,5 @@
 // Copyright (c) 2017-2018, The Turtlecoin Developers
+// Copyright (c) 2018, The Monero Project
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 //
 // This file is part of Bytecoin.
