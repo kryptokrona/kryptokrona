@@ -20,7 +20,6 @@
 /* The following was adapted from the Monero Cryptonight variant change of April 2018. */
 
 #include <stdio.h>
-#include <unistd.h>
 
 #pragma once
 
@@ -47,8 +46,8 @@ static inline void xor64(uint64_t *a, const uint64_t b)
 #define VARIANT1_CHECK() \
   do if (length < 43) \
   { \
-    fprintf(stderr, "Cryptonight variants need at least 43 bytes of data. Exiting."); \
-    _exit(1); \
+    fprintf(stderr, "Cryptonight variants need at least 43 bytes of data. Aborting."); \
+    abort(); \
   } while(0);
 
 #define NONCE_POINTER (((const uint8_t*)data)+35)
