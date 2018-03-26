@@ -110,7 +110,6 @@ RpcServer::HandlerFunction jsonMethod(bool (RpcServer::*handler)(typename Comman
 }
 
 std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction>> RpcServer::s_handlers = {
-
   // binary handlers
   { "/getblocks.bin", { binMethod<COMMAND_RPC_GET_BLOCKS_FAST>(&RpcServer::on_get_blocks), false } },
   { "/queryblocks.bin", { binMethod<COMMAND_RPC_QUERY_BLOCKS>(&RpcServer::on_query_blocks), false } },
@@ -953,20 +952,20 @@ uint64_t get_block_reward(const BlockTemplate& blk) {
 }
 
 void RpcServer::fill_block_header_response(const BlockTemplate& blk, bool orphan_status, uint32_t index, const Hash& hash, block_header_response& response) {
-  response.major_version = blk.majorVersion;
-  response.minor_version = blk.minorVersion;
-  response.timestamp = blk.timestamp;
-  response.prev_hash = Common::podToHex(blk.previousBlockHash);
-  response.nonce = blk.nonce;
-  response.orphan_status = orphan_status;
-  response.height = index;
-  response.depth = m_core.getTopBlockIndex() - index;
-  response.hash = Common::podToHex(hash);
-  response.difficulty = m_core.getBlockDifficulty(index);
-  response.reward = get_block_reward(blk);
-  BlockDetails blkDetails = m_core.getBlockDetails(hash);
-  response.num_txes = blkDetails.transactions.size();
-  response.block_size = blkDetails.blockSize;
+	response.major_version = blk.majorVersion;
+	response.minor_version = blk.minorVersion;
+	response.timestamp = blk.timestamp;
+	response.prev_hash = Common::podToHex(blk.previousBlockHash);
+	response.nonce = blk.nonce;
+	response.orphan_status = orphan_status;
+	response.height = index;
+	response.depth = m_core.getTopBlockIndex() - index;
+	response.hash = Common::podToHex(hash);
+	response.difficulty = m_core.getBlockDifficulty(index);
+	response.reward = get_block_reward(blk);
+	BlockDetails blkDetails = m_core.getBlockDetails(hash);
+	response.num_txes = blkDetails.transactions.size();
+	response.block_size = blkDetails.blockSize;
 }
 
 bool RpcServer::on_get_last_block_header(const COMMAND_RPC_GET_LAST_BLOCK_HEADER::request& req, COMMAND_RPC_GET_LAST_BLOCK_HEADER::response& res) {
@@ -1018,16 +1017,15 @@ assert(cachedBlock.getBlockIndex() == req.height);
 bool RpcServer::on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request& req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response& res, JsonRpc::JsonRpcError& error_resp) {
 	// TODO: change usage to jsonRpcHandlers?
 	const uint64_t bc_height = m_core.get_current_blockchain_height();
-	if (req.start_height >= bc_height || req.end_height >= bc_height || req.start_height > req.end_height)
+	if (req.start_height > bc_height || req.end_height >= bc_height || req.start_height > req.end_height)
 	{
 		error_resp.code = CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT;
 		error_resp.message = "Invalid start/end heights.";
 		return false;
 	}
-	for (uint64_t h = req.start_height; h <= req.end_height; ++h) {
 
+	for (uint64_t h = req.start_height; h <= req.end_height; ++h) {
 		Crypto::Hash block_hash = m_core.getBlockHashByIndex(h);
-		//crypto::hash block_hash = m_core.get_block_id_by_height(h);
 		CryptoNote::BlockTemplate blk = m_core.getBlockByHash(block_hash);
 		
 		res.headers.push_back(block_header_response());
@@ -1064,6 +1062,7 @@ bool RpcServer::on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_R
 			return false;
 		}*/
 	}
+
 	res.status = CORE_RPC_STATUS_OK;
 	return true;
 }

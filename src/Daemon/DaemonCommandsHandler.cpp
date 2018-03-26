@@ -120,73 +120,70 @@ bool DaemonCommandsHandler::print_cn(const std::vector<std::string>& args)
 }
 //--------------------------------------------------------------------------------
 bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args) {
-  if (!args.size()) {
-    std::cout << "need block index parameter" << ENDL;
-    return false;
-  }
+	if (!args.size()) {
+		std::cout << "need block index parameter" << ENDL;
+		return false;
+	}
 
-  uint32_t start_index = 0;
-  uint32_t end_index = 0;
-  uint32_t end_block_parametr = m_core.getTopBlockIndex() + 1;
+	uint32_t start_index = 0;
+	uint32_t end_index = 0;
+	uint32_t end_block_parametr = m_core.getTopBlockIndex();
 
-  if (!Common::fromString(args[0], start_index)) {
-    std::cout << "wrong starter block index parameter" << ENDL;
-    return false;
-  }
+	if (!Common::fromString(args[0], start_index)) {
+		std::cout << "wrong starter block index parameter" << ENDL;
+		return false;
+	}
 
-  if (args.size() > 1 && !Common::fromString(args[1], end_index)) {
-    std::cout << "wrong end block index parameter" << ENDL;
-    return false;
-  }
+	if (args.size() > 1 && !Common::fromString(args[1], end_index)) {
+		std::cout << "wrong end block index parameter" << ENDL;
+		return false;
+	}
 
-  if (end_index == 0) {
-    end_index = end_block_parametr;
-  }
+	if (end_index == 0)
+		end_index = start_index;
 
-  if (end_index > end_block_parametr) {
-    std::cout << "end block index parameter shouldn't be greater than " << end_block_parametr << ENDL;
-    return false;
-  }
+	if (end_index > end_block_parametr) {
+		std::cout << "end block index parameter shouldn't be greater than " << end_block_parametr << ENDL;
+		return false;
+	}
 
-  if (end_index <= start_index) {
-    std::cout << "end block index should be greater than starter block index" << ENDL;
-    return false;
-  }
+	if (end_index < start_index) {
+		std::cout << "end block index should be greater than or equal to starter block index" << ENDL;
+		return false;
+	}
 
-  CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request req;
-  CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response res;
-  using namespace CryptoNote::JsonRpc;
-  JsonRpcError error_resp;
+	CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request req;
+	CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response res;
+	CryptoNote::JsonRpc::JsonRpcError error_resp;
 
-  req.start_height = start_index;
-  req.end_height = end_index;
+	req.start_height = start_index;
+	req.end_height = end_index;
 
-  // TODO: implement m_is_rpc handling like in monero?
-  if (!m_prpc_server->on_get_block_headers_range(req, res, error_resp) || res.status != CORE_RPC_STATUS_OK) {
-	  // TODO res.status handling
-	  std::cout << "Response status not CORE_RPC_STATUS_OK" << ENDL; 
-	  return false;
-  }
+	// TODO: implement m_is_rpc handling like in monero?
+	if (!m_prpc_server->on_get_block_headers_range(req, res, error_resp) || res.status != CORE_RPC_STATUS_OK) {
+		// TODO res.status handling
+		std::cout << "Response status not CORE_RPC_STATUS_OK" << ENDL;
+		return false;
+	}
 
-  const CryptoNote::Currency& currency = m_core.getCurrency();
+	const CryptoNote::Currency& currency = m_core.getCurrency();
 
-  bool first = true;
-  for (CryptoNote::block_header_response& header : res.headers) {
-	  if (!first) {
-		  std::cout << ENDL;
-		  first = false;
-	  }
-	  
-	  std::cout
-		  << "height: " << header.height << ", timestamp: " << header.timestamp << ", difficulty: " << header.difficulty
-		  << ", size: " << header.block_size << ", transactions: " << header.num_txes << ENDL
-		  << "major version: " << unsigned(header.major_version) << ", minor version: " << unsigned(header.minor_version) << ENDL
-		  << "block id: " << header.hash << ", previous block id: " << header.prev_hash << ENDL
-		  << "difficulty: " << header.difficulty << ", nonce " << header.nonce << ", reward " << currency.formatAmount(header.reward) << ENDL;
-		  //<< "difficulty: " << header.difficulty << ", nonce " << header.nonce << ", reward " << CryptoNote::print_money(header.reward) << ENDL;
-  }
+	bool first = true;
+	for (CryptoNote::block_header_response& header : res.headers) {
+		if (!first) {
+			std::cout << ENDL;
+			first = false;
+		}
 
-  return true;
+		std::cout
+			<< "height: " << header.height << ", timestamp: " << header.timestamp << ", difficulty: " << header.difficulty
+			<< ", size: " << header.block_size << ", transactions: " << header.num_txes << ENDL
+			<< "major version: " << unsigned(header.major_version) << ", minor version: " << unsigned(header.minor_version) << ENDL
+			<< "block id: " << header.hash << ", previous block id: " << header.prev_hash << ENDL
+			<< "difficulty: " << header.difficulty << ", nonce: " << header.nonce << ", reward: " << currency.formatAmount(header.reward) << ENDL;
+	}
+
+	return true;
 }
 //--------------------------------------------------------------------------------
 bool DaemonCommandsHandler::print_bci(const std::vector<std::string>& args)
