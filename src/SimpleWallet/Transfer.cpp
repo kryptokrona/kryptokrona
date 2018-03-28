@@ -968,15 +968,41 @@ bool parseFee(std::string feeString)
 
 bool parseAddress(std::string address)
 {
-    if (address.length() != 99)
+    uint64_t expectedPrefix
+        = CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX;
+
+    uint64_t prefix;
+
+    CryptoNote::AccountPublicAddress addr;
+
+    CryptoNote::parseAccountAddressString(prefix, addr, address);
+
+    /* Generate a dummy address and grab its length to check that the inputted
+       address is correct */
+    CryptoNote::KeyPair spendKey;
+    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+    
+    CryptoNote::KeyPair viewKey;
+    Crypto::generate_keys(viewKey.publicKey, viewKey.secretKey);
+
+    CryptoNote::AccountPublicAddress expectedAddr
+        {spendKey.publicKey, viewKey.publicKey};
+
+    size_t expectedLen = CryptoNote::getAccountAddressAsStr(expectedPrefix, 
+                         expectedAddr).length();
+
+    if (address.length() != expectedLen)
     {
         std::cout << WarningMsg("Address is wrong length!") << std::endl
-                  << "It should be 99 characters long, but it is "
-                  << address.length() << " characters long!" << std::endl;
+                  << "It should be " << expectedLen
+                  << " characters long, but it is " << address.length()
+                  << " characters long!" << std::endl;
 
         return false;
     }
-    else if (address.substr(0, 4) != "TRTL")
+    /* Can't see an easy way to go from prefix num -> prefix string, so for
+       now just hard code "TRTL" - it will let testers send stuff at least */
+    else if (prefix != expectedPrefix)
     {
         std::cout << WarningMsg("Invalid address! It should start with "
                                 "\"TRTL\"!") << std::endl;
