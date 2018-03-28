@@ -20,6 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 bool parseAmount(std::string strAmount, uint64_t &amount)
 {
     boost::algorithm::trim(strAmount);
+    /* If the user entered thousand separators, remove them */
+    boost::erase_all(strAmount, ",");
 
     size_t pointIndex = strAmount.find_first_of('.');
     size_t fractionSize;
