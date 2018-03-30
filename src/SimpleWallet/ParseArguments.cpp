@@ -38,7 +38,7 @@ Config parseArguments(int argc, char **argv)
 {
     Config config;
     config.exit = false;
-    config.host = "0.0.0.0";
+    config.host = "127.0.0.1";
     config.port = CryptoNote::RPC_DEFAULT_PORT;
 
     if (cmdOptionExists(argv, argv+argc, "-h")

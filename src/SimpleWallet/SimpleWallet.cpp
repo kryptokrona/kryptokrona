@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
     if (error.get())
     {
-        throw("Failed to initialize node!");
+        throw std::runtime_error("Failed to initialize node!");
     }
 
     /* Create the wallet instance */
