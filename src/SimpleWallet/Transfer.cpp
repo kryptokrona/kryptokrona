@@ -739,69 +739,119 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
     }
 
     bool txIsTooLarge;
+    bool retried = false;
 
-    try
+    while (true)
     {
-        txIsTooLarge = walletInfo->wallet.txIsTooLarge(p);
+        try
+        {
+            txIsTooLarge = walletInfo->wallet.txIsTooLarge(p);
 
-        if (txIsTooLarge)
-        {
-            fusionTX(walletInfo->wallet, p);
-        }
-        else
-        {
-            size_t id = walletInfo->wallet.transfer(p);
-            
-            CryptoNote::WalletTransaction tx 
-                = walletInfo->wallet.getTransaction(id);
+            if (txIsTooLarge)
+            {
+                fusionTX(walletInfo->wallet, p);
+            }
+            else
+            {
+                size_t id = walletInfo->wallet.transfer(p);
+                
+                CryptoNote::WalletTransaction tx 
+                    = walletInfo->wallet.getTransaction(id);
 
-            std::cout << SuccessMsg("Transaction has been sent! ID:\n" 
-                                  + Common::podToHex(tx.hash)) << std::endl;
+                std::cout << SuccessMsg("Transaction has been sent! ID:\n" 
+                                      + Common::podToHex(tx.hash)) << std::endl;
+            }
         }
-    }
-    catch (const std::system_error &e)
-    {
-        std::string errMsg = e.what();
-        /* For some reason we are unable to send our full balance when
-           I have tested. It looks possible it is due to dust amounts,
-           possibly these can't be sent? The relevant code can be found
-           in src/Wallet/WalletGreen.cpp in the function
-           selectTransfers() */
-        if (errMsg == "Not enough money: Wrong amount")
+        catch (const std::system_error &e)
         {
-            std::cout << WarningMsg("Failed to send transaction - not enough "
-                                "funds!") << std::endl
-                      << "You sometimes need to send a small amount less "
-                      << "than your full balance to get the transfer to "
-                      << "succeed." << std::endl << "This is possibly due to "
-                      << "dust in your wallet that is unable to be sent."
-                      << std::endl;
+            std::string errMsg = e.what();
+            /* For some reason we are unable to send our full balance when
+               I have tested. It looks possible it is due to dust amounts,
+               possibly these can't be sent? The relevant code can be found
+               in src/Wallet/WalletGreen.cpp in the function
+               selectTransfers() */
+            if (errMsg == "Not enough money: Wrong amount" && !retried)
+            {
+                std::cout << WarningMsg("Failed to send transaction - not "
+                                        "enough funds!") << std::endl
+                          << "You sometimes need to send a small amount less "
+                          << "than your full balance to get the transfer to "
+                          << "succeed." << std::endl << "This is possibly due "
+                          << "to dust in your wallet that is unable to be "
+                          << "sent without a mixin of 0." << std::endl;
+
+                /* We can try and resend with a mixin of zero, but only retry
+                   once */
+                if(confirm("Retry transaction with mixin of 0? "
+                           "This will compromise privacy."))
+                {
+                    p.mixIn = 0;
+                    retried = true;
+                    continue;
+                }
+                else
+                {
+                    std::cout << WarningMsg("Cancelling transaction.")
+                              << std::endl;
+                }
+            }
+            /* The internal node error I believe is caused by the same issue as
+               the mixin error. Rocksteady explained this as not enough traffic
+               having occured on the network to allow your to mixin with.
+               Hopefully, this will only occur on the testnet and not the main
+               network. It seems sending multiple smaller transactiosn will
+               provide the network with more change to allow tx's to go through.
+               However, in some wallets that have only recieved one big single
+               transaction, they may be unable to send at all without lowering
+               their mixin count to 0 */
+            else if ((errMsg == "MixIn count is too big"
+                   || errMsg == "Internal node error") && !retried)
+            {
+                std::cout << WarningMsg("Failed to send transaction!")
+                          << std::endl
+                          << "Unable to find enough outputs to mix with."
+                          << std::endl << "Try lowering the amount you are "
+                          << "sending in one transaction." << std::endl
+                          << "Alternatively, you can try lowering the mixin "
+                          << "count to 0, but this will compromise privacy."
+                          << std::endl;
+
+                if(confirm("Retry transaction with mixin of 0? "
+                           "This will compromise privacy."))
+                {
+                    p.mixIn = 0;
+                    retried = true;
+                    continue;
+                }
+                else
+                {
+                    std::cout << WarningMsg("Cancelling transaction.")
+                              << std::endl;
+                }
+
+            }
+            else if (errMsg == "Network error")
+            {
+                std::cout << WarningMsg("Couldn't connect to the network to "
+                                        "send the transaction!") << std::endl
+                          << "Ensure turtlecoind or the remote node you are "
+                          << "using is open and functioning." << std::endl;
+            }
+            else if (retried)
+            {
+                std::cout << WarningMsg("Failed to send transaction with zero "
+                                        "mixin! Try lowering the amount you "
+                                        "are sending.") << std::endl;
+            }
+            else
+            {
+                std::cout << WarningMsg("Failed to send transaction!")
+                          << std::endl << "Error message: " << errMsg
+                          << std::endl;
+            }
         }
-        /* The internal node error I believe is caused by the same issue as
-           the mixin error. Rocksteady explained this as not enough traffic
-           having occured on the network to allow your to mixin with.
-           Hopefully, this will only occur on the testnet and not the main
-           network. It seems sending multiple smaller transactiosn will
-           provide the network with more change to allow tx's to go through.
-           However, in some wallets that have only recieved one big single
-           transaction, they may be unable to send at all without lowering
-           their mixin count to 0 */
-        else if (errMsg == "MixIn count is too big"
-              || errMsg == "Internal node error")
-        {
-            std::cout << WarningMsg("Failed to send transaction!") << std::endl
-                      << "Unable to find enough outputs to mix with."
-                      << std::endl << "Try lowering the amount you are "
-                      << "sending in one transaction." << std::endl
-                      << "Alternatively, you can try lowering the mixin count "
-                      << "to 0, but this will compromise privacy." << std::endl;
-        }
-        else
-        {
-            std::cout << WarningMsg("Failed to send transaction!")
-                      << std::endl << "Error message: " << errMsg
-                      << std::endl;
-        }
+
+        break;
     }
 }
 
@@ -1015,12 +1065,24 @@ bool parseAddress(std::string address)
 
 bool parseMixin(std::string mixinString)
 {
-
     try
     {
         /* We shouldn't need to check this is >0 because it should fail
            to parse as it's a uint16_t? */
-        std::stoi(mixinString);
+        uint16_t mixin = std::stoi(mixinString);
+
+        uint16_t minMixin = CryptoNote::parameters::MINIMUM_MIXIN;
+
+        if (mixin < minMixin)
+        {
+            std::cout << WarningMsg("Mixin count is too small! "
+                                    "Minimum allowed is " + 
+                                    std::to_string(minMixin)) << "." 
+                                    << std::endl;
+
+            return false;
+        }
+
         return true;
     }
     catch (const std::invalid_argument)
