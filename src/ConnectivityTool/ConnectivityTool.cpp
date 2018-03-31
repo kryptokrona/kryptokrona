@@ -54,11 +54,14 @@ namespace {
   const command_line::arg_descriptor<std::string> arg_priv_key           = {"private_key", "private key to subscribe debug command", "", true};
   const command_line::arg_descriptor<uint64_t>    arg_peer_id            = {"peer_id", "peer_id if known(if not - will be requested)", 0};
   const command_line::arg_descriptor<bool>        arg_generate_keys      = {"generate_keys_pair", "generate private and public keys pair"};
+#ifdef ALLOW_DEBUG_COMMANDS
   const command_line::arg_descriptor<bool>        arg_request_stat_info  = {"request_stat_info", "request statistics information"};
   const command_line::arg_descriptor<bool>        arg_request_net_state  = {"request_net_state", "request network state information (peer list, connections count)"};
+#endif
   const command_line::arg_descriptor<bool>        arg_get_daemon_info    = {"rpc_get_daemon_info", "request daemon state info vie rpc (--rpc_port option should be set ).", "", true};
 }
 
+#ifdef ALLOW_DEBUG_COMMANDS
 struct response_schema {
   std::string status;
   std::string COMMAND_REQUEST_STAT_INFO_status;
@@ -66,6 +69,7 @@ struct response_schema {
   boost::optional<COMMAND_REQUEST_STAT_INFO::response> si_rsp;
   boost::optional<COMMAND_REQUEST_NETWORK_STATE::response> ns_rsp;
 };
+#endif
 
 void withTimeout(System::Dispatcher& dispatcher, unsigned timeout, std::function<void()> f) {
   std::string result;
@@ -89,7 +93,7 @@ void withTimeout(System::Dispatcher& dispatcher, unsigned timeout, std::function
   }
 }
 
-
+#ifdef ALLOW_DEBUG_COMMANDS
 std::ostream& get_response_schema_as_json(std::ostream& ss, response_schema &rs) {
   
   ss << "{" << ENDL
@@ -185,6 +189,8 @@ bool print_COMMAND_REQUEST_NETWORK_STATE(const COMMAND_REQUEST_NETWORK_STATE::re
   return true;
 }
 //---------------------------------------------------------------------------------------------------------------
+#endif
+
 bool handle_get_daemon_info(po::variables_map& vm) {
   if(!command_line::has_arg(vm, arg_rpc_port)) {
     std::cout << "ERROR: rpc port not set" << ENDL;
@@ -219,6 +225,8 @@ bool handle_get_daemon_info(po::variables_map& vm) {
   return true;
 }
 //---------------------------------------------------------------------------------------------------------------
+
+#ifdef ALLOW_DEBUG_COMMANDS
 bool handle_request_stat(po::variables_map& vm, PeerIdType peer_id) {
   if(!command_line::has_arg(vm, arg_priv_key)) {
     std::cout << "{" << ENDL << "  \"status\": \"ERROR: " << "secret key not set \"" << ENDL << "}";
@@ -320,6 +328,7 @@ bool handle_request_stat(po::variables_map& vm, PeerIdType peer_id) {
   get_response_schema_as_json(std::cout, rs) << std::endl;
   return true;
 }
+#endif
 
 //---------------------------------------------------------------------------------------------------------------
 bool generate_and_print_keys() {
@@ -341,8 +350,10 @@ int main(int argc, char *argv[]) {
   command_line::add_arg(desc_params, arg_port);
   command_line::add_arg(desc_params, arg_rpc_port);
   command_line::add_arg(desc_params, arg_timeout);
+#ifdef ALLOW_DEBUG_COMMANDS
   command_line::add_arg(desc_params, arg_request_stat_info);
   command_line::add_arg(desc_params, arg_request_net_state);
+#endif
   command_line::add_arg(desc_params, arg_generate_keys);
   command_line::add_arg(desc_params, arg_peer_id);
   command_line::add_arg(desc_params, arg_priv_key);
@@ -369,9 +380,11 @@ int main(int argc, char *argv[]) {
   if (!r)
     return 1;
 
+#ifdef ALLOW_DEBUG_COMMANDS
   if (command_line::has_arg(vm, arg_request_stat_info) || command_line::has_arg(vm, arg_request_net_state)) {
     return handle_request_stat(vm, command_line::get_arg(vm, arg_peer_id)) ? 0 : 1;
   }
+#endif
   
   if (command_line::has_arg(vm, arg_get_daemon_info)) {
     return handle_get_daemon_info(vm) ? 0 : 1;
