@@ -53,6 +53,7 @@ const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE        = 600;
 const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 2;
 const uint64_t MINIMUM_FEE                                   = UINT64_C(10);
 const uint16_t DEFAULT_MIXIN                                 = 5;
+const uint16_t MINIMUM_MIXIN                                 = 3;
 const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(10);
 
 const uint64_t DIFFICULTY_TARGET                             = 30; // seconds

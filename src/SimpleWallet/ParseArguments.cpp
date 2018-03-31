@@ -38,7 +38,7 @@ Config parseArguments(int argc, char **argv)
 {
     Config config;
     config.exit = false;
-    config.host = "0.0.0.0";
+    config.host = "127.0.0.1";
     config.port = CryptoNote::RPC_DEFAULT_PORT;
 
     if (cmdOptionExists(argv, argv+argc, "-h")
@@ -115,5 +115,5 @@ void helpMessage()
               << "--version" << "Display the version information and exit"
               << std::endl << "      " << std::left << std::setw(25)
               << "--remote-daemon <url>" << "Connect to the remote daemon at "
-              << "<url> instead of the default: 0.0.0.0:11898" << std::endl;
+              << "<url> instead of the default: 127.0.0.1:11898" << std::endl;
 }

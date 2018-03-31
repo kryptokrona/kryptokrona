@@ -19,6 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 int main(int argc, char **argv)
 {
+    /* On ctrl+c the program seems to throw "simplewallet.exe has stopped
+       working" when calling exit(0)... I'm not sure why, this is a bit of
+       a hack, it disables that */
+    #ifdef _WIN32
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+    #endif
+
     Config config = parseArguments(argc, argv);
 
     /* User requested --help or --version */
@@ -61,7 +68,7 @@ int main(int argc, char **argv)
 
     if (error.get())
     {
-        throw("Failed to initialize node!");
+        throw std::runtime_error("Failed to initialize node!");
     }
 
     /* Create the wallet instance */

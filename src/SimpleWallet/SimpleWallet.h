@@ -15,6 +15,12 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef _WIN32
+/* Prevents windows.h redefining min/max which breaks compilation */
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 #include <cctype>
 #include <future>
 
