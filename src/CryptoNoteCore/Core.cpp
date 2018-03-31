@@ -2265,4 +2265,11 @@ void Core::updateBlockMedianSize() {
   blockMedianSize = std::max(Common::medianValue(lastBlockSizes), static_cast<uint64_t>(nextBlockGrantedFullRewardZone));
 }
 
+uint64_t Core::get_current_blockchain_height() const
+{
+	// TODO: remove when GetCoreStatistics is implemented
+	return mainChainStorage->getBlockCount();
 }
+
+}
+

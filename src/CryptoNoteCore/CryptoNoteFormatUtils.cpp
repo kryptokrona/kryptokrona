@@ -38,6 +38,21 @@ using namespace Common;
 
 namespace CryptoNote {
 
+//std::string print_money(uint64_t amount, unsigned int decimal_point)
+//{
+//	/*if (decimal_point == (unsigned int)-1)
+//		decimal_point = default_decimal_point;*/
+//	if (decimal_point == (unsigned int)-1)
+//		decimal_point = 2;
+//	std::string s = std::to_string(amount);
+//	if (s.size() < decimal_point + 1)
+//	{
+//		s.insert(0, decimal_point + 1 - s.size(), '0');
+//	}
+//	if (decimal_point > 0)
+//		s.insert(s.size() - decimal_point, ".");
+//	return s;
+//}
 bool parseAndValidateTransactionFromBinaryArray(const BinaryArray& tx_blob, Transaction& tx, Hash& tx_hash, Hash& tx_prefix_hash) {
   if (!fromBinaryArray(tx, tx_blob)) {
     return false;
