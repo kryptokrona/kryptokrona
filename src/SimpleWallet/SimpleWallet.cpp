@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
     Config config = parseArguments(argc, argv);
 
-    /* User requested --help or --version */
+    /* User requested --help or --version, or invalid arguments */
     if (config.exit)
     {
         return 0;
@@ -76,17 +76,19 @@ int main(int argc, char **argv)
                                    logger.getLogger());
 
     /* Run the interactive wallet interface */
-    run(wallet, *node);
+    run(wallet, *node, config);
 }
 
-void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
+void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+         Config &config)
 {
     std::cout << InformationMsg("TurtleCoin v" + std::string(PROJECT_VERSION)
                               + " Simplewallet") << std::endl;
 
     /* Open/import/generate the wallet */
-    Action action = getAction();
-    std::shared_ptr<WalletInfo> walletInfo = handleAction(wallet, action);
+    Action action = getAction(config);
+    std::shared_ptr<WalletInfo> walletInfo = handleAction(wallet, action, 
+                                                          config);
 
     bool alreadyShuttingDown = false;
 
@@ -100,7 +102,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
         }
     });
 
-    if (node.getLastKnownBlockHeight() == 0)
+    while (node.getLastKnownBlockHeight() == 0)
     {
         std::cout << WarningMsg("It looks like TurtleCoind isn't open!")
                   << std::endl << std::endl
@@ -115,48 +117,49 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
                   << std::endl << std::endl
                   << WarningMsg("The wallet can't function until it can "
                                 "communicate with the network.")
-                  << std::endl
-                  << InformationMsg("Hit any key to exit: ");
+                  << std::endl << std::endl;
 
-        std::cin.get();
+        if (!confirm("Try again?"))
+        {
+            shutdown(walletInfo->wallet, node, alreadyShuttingDown);
+            return;
+        }
 
-        shutdown(walletInfo->wallet, node, alreadyShuttingDown);
+        std::cout << std::endl;
+    }
+
+    /* Scan the chain for new transactions. In the case of an imported 
+       wallet, we need to scan the whole chain to find any transactions. 
+       If we opened the wallet however, we just need to scan from when we 
+       last had it open. If we are generating a wallet, there is no need
+       to check for transactions as there is no way the wallet can have
+       received any money yet. */
+    if (action != Generate)
+    {
+        findNewTransactions(node, walletInfo);
+
     }
     else
     {
-        /* Scan the chain for new transactions. In the case of an imported 
-           wallet, we need to scan the whole chain to find any transactions. 
-           If we opened the wallet however, we just need to scan from when we 
-           last had it open. If we are generating a wallet, there is no need
-           to check for transactions as there is no way the wallet can have
-           received any money yet. */
-        if (action != Generate)
-        {
-            findNewTransactions(node, walletInfo);
-
-        }
-        else
-        {
-            std::cout << InformationMsg("Your wallet is syncing with the "
-                                        "network in the background.")
-                      << std::endl
-                      << InformationMsg("Until this is completed new "
-                                        "transactions might not show up.")
-                      << std::endl
-                      << InformationMsg("Use bc_height to check the progress.")
-                      << std::endl << std::endl;
-        }
-
-        welcomeMsg();
-
-        inputLoop(walletInfo, node);
-
-        shutdown(walletInfo->wallet, node, alreadyShuttingDown);
+        std::cout << InformationMsg("Your wallet is syncing with the "
+                                    "network in the background.")
+                  << std::endl
+                  << InformationMsg("Until this is completed new "
+                                    "transactions might not show up.")
+                  << std::endl
+                  << InformationMsg("Use bc_height to check the progress.")
+                  << std::endl << std::endl;
     }
+
+    welcomeMsg();
+
+    inputLoop(walletInfo, node);
+
+    shutdown(walletInfo->wallet, node, alreadyShuttingDown);
 }
 
 std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
-                                         Action action)
+                                         Action action, Config &config)
 {
     if (action == Generate)
     {
@@ -164,7 +167,7 @@ std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
     }
     else if (action == Open)
     {
-        return openWallet(wallet);
+        return openWallet(wallet, config);
     }
     else if (action == Import)
     {
@@ -317,13 +320,29 @@ std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
                                         walletAddress, false, wallet);
 }
 
-std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet)
+std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
+                                       Config &config)
 {
-    std::string walletFileName = getExistingWalletFileName();
+    std::string walletFileName = getExistingWalletFileName(config);
+
+    bool initial = true;
 
     while (true)
     {
-        std::string walletPass = getWalletPassword(false);
+        std::string walletPass;
+
+        /* Only use the command line pass once, otherwise we will infinite
+           loop if it is incorrect */
+        if (initial && config.passGiven)
+        {
+            walletPass = config.walletPass;
+        }
+        else
+        {
+            walletPass = getWalletPassword(false);
+        }
+
+        initial = false;
 
         connectingMsg();
 
@@ -446,14 +465,26 @@ Crypto::SecretKey getPrivateKey(std::string msg)
     }
 }
 
-std::string getExistingWalletFileName()
+std::string getExistingWalletFileName(Config &config)
 {
+    bool initial = true;
+
     std::string walletName;
 
     while (true)
     {
-        std::cout << "What is the name of the wallet you want to open?: ";
-        std::getline(std::cin, walletName);
+        /* Only use wallet file once in case it is incorrect */
+        if (config.walletGiven && initial)
+        {
+            walletName = config.walletFile;
+        }
+        else
+        {
+            std::cout << "What is the name of the wallet you want to open?: ";
+            std::getline(std::cin, walletName);
+        }
+
+        initial = false;
 
         std::string walletFileName = walletName + ".wallet";
 
@@ -519,8 +550,13 @@ std::string getWalletPassword(bool verifyPwd)
     return pwdContainer.password();
 }
 
-Action getAction()
+Action getAction(Config &config)
 {
+    if (config.walletGiven || config.passGiven)
+    {
+        return Open;
+    }
+
     while (true)
     {
         std::cout << std::endl << "Welcome, please choose an option below:"

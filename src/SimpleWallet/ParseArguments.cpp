@@ -37,23 +37,70 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 Config parseArguments(int argc, char **argv)
 {
     Config config;
+
     config.exit = false;
+    config.walletGiven = false;
+    config.passGiven = false;
+
     config.host = "127.0.0.1";
     config.port = CryptoNote::RPC_DEFAULT_PORT;
+
+    config.walletFile = "";
+    config.walletPass = "";
 
     if (cmdOptionExists(argv, argv+argc, "-h")
      || cmdOptionExists(argv, argv+argc, "--help"))
     {
         helpMessage();
         config.exit = true;
+        return config;
     }
-    else if (cmdOptionExists(argv, argv+argc, "-v")
-          || cmdOptionExists(argv, argv+argc, "--version"))
+
+    if (cmdOptionExists(argv, argv+argc, "-v")
+     || cmdOptionExists(argv, argv+argc, "--version"))
     {
         versionMessage();
         config.exit = true;
+        return config;
     }
-    else if (cmdOptionExists(argv, argv+argc, "--remote-daemon"))
+
+    if (cmdOptionExists(argv, argv+argc, "--wallet-file"))
+    {
+        char *wallet = getCmdOption(argv, argv+argc, "--wallet-file");
+
+        if (!wallet)
+        {
+            std::cout << "--wallet-file was specified, but no wallet file "
+                      << "was given!" << std::endl;
+
+            helpMessage();
+            config.exit = true;
+            return config;
+        }
+
+        config.walletFile = std::string(wallet);
+        config.walletGiven = true;
+    }
+
+    if (cmdOptionExists(argv, argv+argc, "--password"))
+    {
+        char *password = getCmdOption(argv, argv+argc, "--password");
+
+        if (!password)
+        {
+            std::cout << "--password was specified, but no password was "
+                      << "given!" << std::endl;
+
+            helpMessage();
+            config.exit = true;
+            return config;
+        }
+
+        config.walletPass = std::string(password);
+        config.passGiven = true;
+    }
+
+    if (cmdOptionExists(argv, argv+argc, "--remote-daemon"))
     {
         char *url = getCmdOption(argv, argv + argc, "--remote-daemon");
 
@@ -107,7 +154,9 @@ void helpMessage()
     versionMessage();
 
     std::cout << std::endl << "simplewallet [--version] [--help] "
-              << "[--remote-daemon <url>]" << std::endl << std::endl
+              << "[--remote-daemon <url>] [--wallet-file <file>] "
+              << "[--password <pass>]"
+              << std::endl << std::endl
               << "Commands:" << std::endl << "  -h, " << std::left
               << std::setw(25) << "--help"
               << "Display this help message and exit"
@@ -115,5 +164,10 @@ void helpMessage()
               << "--version" << "Display the version information and exit"
               << std::endl << "      " << std::left << std::setw(25)
               << "--remote-daemon <url>" << "Connect to the remote daemon at "
-              << "<url> instead of the default: 127.0.0.1:11898" << std::endl;
+              << "<url>"
+              << std::endl << "      " << std::left << std::setw(25)
+              << "--wallet-file <file>" << "Open the wallet <file>"
+              << std::endl << "      " << std::left << std::setw(25)
+              << "--password <pass>" << "Use the password <pass> to open the "
+              << "wallet" << std::endl;
 }
