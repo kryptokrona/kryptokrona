@@ -468,7 +468,10 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     //only in case if we really sure that we have external visible ip
     m_have_address = true;
     m_ip_address = 0;
+
+#ifdef ALLOW_DEBUG_COMMANDS
     m_last_stat_request_time = 0;
+#endif
 
     //configure self
     // m_net_server.get_config_object().m_pcommands_handler = this;
@@ -1284,7 +1287,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
   }
 
   void NodeServer::acceptLoop() {
-    for (;;) {
+    while (!m_stop) {
       try {
         P2pConnectionContext ctx(m_dispatcher, logger.getLogger(), m_listener.accept());
         ctx.m_connection_id = boost::uuids::random_generator()();
@@ -1338,7 +1341,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
         for (auto& kv : m_connections) {
           auto& ctx = kv.second;
           if (ctx.writeDuration(now) > P2P_DEFAULT_INVOKE_TIMEOUT) {
-            logger(WARNING) << ctx << "write operation timed out, stopping connection";
+            logger(DEBUGGING) << ctx << "write operation timed out, stopping connection";
             safeInterrupt(ctx);
           }
         }

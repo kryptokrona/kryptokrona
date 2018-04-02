@@ -53,6 +53,7 @@ const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE        = 600;
 const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 2;
 const uint64_t MINIMUM_FEE                                   = UINT64_C(10);
 const uint16_t DEFAULT_MIXIN                                 = 5;
+const uint16_t MINIMUM_MIXIN                                 = 3;
 const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(10);
 
 const uint64_t DIFFICULTY_TARGET                             = 30; // seconds
@@ -86,6 +87,7 @@ const size_t   FUSION_TX_MIN_IN_OUT_COUNT_RATIO              = 4;
 const uint32_t KEY_IMAGE_CHECKING_BLOCK_INDEX                = 0;
 const uint32_t UPGRADE_HEIGHT_V2                             = 1;
 const uint32_t UPGRADE_HEIGHT_V3                             = 2;
+const uint32_t UPGRADE_HEIGHT_V4                             = 350000; // Upgrade height for CN-Lite Variant 1 switch.
 const unsigned UPGRADE_VOTING_THRESHOLD                      = 90;               // percent
 const uint32_t UPGRADE_VOTING_WINDOW                         = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
 const uint32_t UPGRADE_WINDOW                                = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;  // blocks
@@ -107,6 +109,7 @@ const uint8_t  CURRENT_TRANSACTION_VERSION                   =  TRANSACTION_VERS
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_2                         =  2;
 const uint8_t  BLOCK_MAJOR_VERSION_3                         =  3;
+const uint8_t  BLOCK_MAJOR_VERSION_4                         =  4;
 const uint8_t  BLOCK_MINOR_VERSION_0                         =  0;
 const uint8_t  BLOCK_MINOR_VERSION_1                         =  1;
 
@@ -132,7 +135,7 @@ const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT                    = 60 * 2 * 1000; //
 const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000;          // 5 seconds
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
 
-const char* const SEED_NODES[] = { "104.236.227.176:11897", "46.101.132.184:11897", "163.172.147.52:11897", "51.15.138.214:11897", "51.15.137.77:11897", "174.138.68.141:11897" };
+const char* const SEED_NODES[] = { "104.236.227.176:11897", "46.101.132.184:11897", "163.172.147.52:11897", "51.15.138.214:11897", "51.15.137.77:11897", "174.138.68.141:11897", "145.239.88.119:11999", "142.44.242.106:11897", "165.227.252.132:11897" };
 
 
 struct CheckpointData {
@@ -144,4 +147,3 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {  };
 
 } // CryptoNote
 
-#define ALLOW_DEBUG_COMMANDS

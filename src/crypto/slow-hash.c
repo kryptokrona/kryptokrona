@@ -33,11 +33,13 @@
 #include "Common/int-util.h"
 #include "hash-ops.h"
 #include "oaes_lib.h"
+#include "cryptonight.h"
+#include "cryptonight-variants.h"
 
-void (*cn_slow_hash_fp)(void *, const void *, size_t, void *);
+void (*cn_slow_hash_fp)(void *, const void *, size_t, void *, int lite, int variant);
 
-void cn_slow_hash_f(void * a, const void * b, size_t c, void * d){
-(*cn_slow_hash_fp)(a, b, c, d);
+void cn_slow_hash_f(void * a, const void * b, size_t c, void * d, int lite, int variant) {
+    (*cn_slow_hash_fp)(a, b, c, d, lite, variant);
 }
 
 #if defined(__GNUC__)
@@ -52,13 +54,6 @@ void cn_slow_hash_f(void * a, const void * b, size_t c, void * d){
 #if defined(_MSC_VER)
 #define restrict
 #endif
-
-#define MEMORY         (1 << 21) /* 2 MiB */
-#define ITER           (1 << 20)
-#define AES_BLOCK_SIZE  16
-#define AES_KEY_SIZE    32 /*16*/
-#define INIT_SIZE_BLK   8
-#define INIT_SIZE_BYTE (INIT_SIZE_BLK * AES_BLOCK_SIZE)	// 128
 
 #pragma pack(push, 1)
 union cn_slow_hash_state {
@@ -78,6 +73,10 @@ union cn_slow_hash_state {
 #define ALIGNED_DECL(t, x) t ALIGNED_DATA(x)
 #endif
 
+// Suml: This is not an ideal situation. What's happening right now is that a
+// flat blob of data is allocated as a flat blob of data in slow-hash.cpp and
+// then re-casted to this structure in slow-hash.inl.
+
 struct cn_ctx {
   ALIGNED_DECL(uint8_t long_state[MEMORY], 16);
   ALIGNED_DECL(union cn_slow_hash_state state, 16);
@@ -88,7 +87,20 @@ struct cn_ctx {
   oaes_ctx* aes_ctx;
 };
 
+// Suml: Unused now because of how oddly the cn_context is allocated.
+
+struct cn_ctx_lite {
+  ALIGNED_DECL(uint8_t long_state[LITE_MEMORY], 16);
+  ALIGNED_DECL(union cn_slow_hash_state state, 16);
+  ALIGNED_DECL(uint8_t text[INIT_SIZE_BYTE], 16);
+  ALIGNED_DECL(uint64_t a[AES_BLOCK_SIZE >> 3], 16);
+  ALIGNED_DECL(uint64_t b[AES_BLOCK_SIZE >> 3], 16);
+  ALIGNED_DECL(uint8_t c[AES_BLOCK_SIZE], 16);
+  oaes_ctx* aes_ctx;
+};
+
 static_assert(sizeof(struct cn_ctx) == SLOW_HASH_CONTEXT_SIZE, "Invalid structure size");
+static_assert(sizeof(struct cn_ctx_lite) == SLOW_HASH_CONTEXT_LITE_SIZE, "Invalid structure size");
 
 static inline void ExpandAESKey256_sub1(__m128i *tmp1, __m128i *tmp2)
 {

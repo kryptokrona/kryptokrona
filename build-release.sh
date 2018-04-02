@@ -30,7 +30,6 @@ function build_dynamic_linked_version()
     echo "starting dynamic build .."
 
     cd $CLONE_DIR
-    make clean
     mkdir -p build/release
     cd build/release
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-fassociative-math" -DCMAKE_CXX_FLAGS="-fassociative-math" ../..

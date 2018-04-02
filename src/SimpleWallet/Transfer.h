@@ -23,6 +23,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <Common/StringTools.h>
 
 #include <CryptoNoteCore/TransactionExtra.h>
+#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 
 #include <SimpleWallet/Tools.h>
 
@@ -42,10 +43,14 @@ struct WalletInfo {
                viewWallet(viewWallet),
                wallet(wallet) {}
 
+    size_t knownTransactionCount = 0;
+
     std::string walletFileName;
     std::string walletPass;
     std::string walletAddress;
+
     bool viewWallet;
+
     CryptoNote::WalletGreen &wallet;
 };
 

@@ -1,3 +1,4 @@
+// Copyright (c) 2017-2018, The Turtlecoin developers
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 //
 // This file is part of Bytecoin.
@@ -55,11 +56,26 @@ namespace Crypto {
   private:
 
     void *data;
-    friend inline void cn_slow_hash(cn_context &, const void *, size_t, Hash &);
+    friend inline void cn_slow_hash_v6(cn_context &, const void *, size_t, Hash &);
+    friend inline void cn_slow_hash_v7(cn_context &, const void *, size_t, Hash &);
+    friend inline void cn_lite_slow_hash_v0(cn_context &, const void *, size_t, Hash &);
+    friend inline void cn_lite_slow_hash_v1(cn_context &, const void *, size_t, Hash &);
   };
 
-  inline void cn_slow_hash(cn_context &context, const void *data, size_t length, Hash &hash) {
-    (*cn_slow_hash_f)(context.data, data, length, reinterpret_cast<void *>(&hash));
+  inline void cn_slow_hash_v6(cn_context &context, const void *data, size_t length, Hash &hash) {
+    (*cn_slow_hash_f)(context.data, data, length, reinterpret_cast<void *>(&hash), 0, 0);
+  }
+
+  inline void cn_slow_hash_v7(cn_context &context, const void *data, size_t length, Hash &hash) {
+    (*cn_slow_hash_f)(context.data, data, length, reinterpret_cast<void *>(&hash), 0, 1);
+  }
+
+  inline void cn_lite_slow_hash_v0(cn_context &context, const void *data, size_t length, Hash &hash) {
+    (*cn_slow_hash_f)(context.data, data, length, reinterpret_cast<void *>(&hash), 1, 0);
+  }
+
+  inline void cn_lite_slow_hash_v1(cn_context &context, const void *data, size_t length, Hash &hash) {
+    (*cn_slow_hash_f)(context.data, data, length, reinterpret_cast<void *>(&hash), 1, 1);
   }
 
   inline void tree_hash(const Hash *hashes, size_t count, Hash &root_hash) {

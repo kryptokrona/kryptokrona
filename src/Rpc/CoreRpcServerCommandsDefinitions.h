@@ -789,4 +789,19 @@ struct COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASHES {
   };
 };
 
+struct COMMAND_RPC_GET_PEERS {
+  //TODO useful to add option to get gray peers ?
+  typedef EMPTY_STRUCT request;
+
+  struct response {
+    std::string status;
+    std::vector<std::string> peers;
+
+    void serialize(ISerializer &s) {
+      KV_MEMBER(status)
+      KV_MEMBER(peers)
+    }
+  };
+};
+
 }

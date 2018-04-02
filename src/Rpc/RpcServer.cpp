@@ -129,6 +129,7 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/gettransactions", { jsonMethod<COMMAND_RPC_GET_TRANSACTIONS>(&RpcServer::on_get_transactions), false } },
   { "/sendrawtransaction", { jsonMethod<COMMAND_RPC_SEND_RAW_TX>(&RpcServer::on_send_raw_tx), false } },
   { "/stop_daemon", { jsonMethod<COMMAND_RPC_STOP_DAEMON>(&RpcServer::on_stop_daemon), true } },
+  { "/getpeers", { jsonMethod<COMMAND_RPC_GET_PEERS>(&RpcServer::on_get_peers), true } },
 
   // json rpc
   { "/json_rpc", { std::bind(&RpcServer::processJsonRpcRequest, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), true } }
@@ -523,6 +524,21 @@ bool RpcServer::on_stop_daemon(const COMMAND_RPC_STOP_DAEMON::request& req, COMM
     return false;
   }
 
+  return true;
+}
+
+bool RpcServer::on_get_peers(const COMMAND_RPC_GET_PEERS::request& req, COMMAND_RPC_GET_PEERS::response& res) {
+  std::list<PeerlistEntry> peers_white;
+  std::list<PeerlistEntry> peers_gray;
+
+  m_p2p.getPeerlistManager().get_peerlist_full(peers_gray, peers_white);
+
+  for (const auto& peer : peers_white) {
+    std::stringstream stream;
+    stream << peer.adr;
+    res.peers.push_back(stream.str());
+  }
+  res.status = CORE_RPC_STATUS_OK;
   return true;
 }
 

@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 #include <Common/ConsoleTools.h>
 #include <SimpleWallet/PasswordContainer.h>
@@ -28,6 +29,8 @@ void confirmPassword(std::string walletPass);
 bool confirm(std::string msg);
 
 std::string formatAmount(uint64_t amount);
+std::string formatDollars(uint64_t amount);
+std::string formatCents(uint64_t amount);
 
 class ColouredMsg
 {
