@@ -121,21 +121,31 @@ Config parseArguments(int argc, char **argv)
             /* Get the index of the ":" */
             size_t splitter = urlString.find_first_of(":");
 
-            /* Host is everything before ":" */
-            config.host = urlString.substr(0, splitter);
-
-            /* Port is everything after ":" */
-            std::string port = urlString.substr(splitter + 1,   
-                                                std::string::npos);
-
-            try
+            /* No ":" present */
+            if (splitter == std::string::npos)
             {
-                config.port = std::stoi(port);
+                config.host = urlString;
+                std::cout << "No port given, using default of "
+                          << CryptoNote::RPC_DEFAULT_PORT << std::endl;
             }
-            catch (const std::invalid_argument)
+            else
             {
-                std::cout << "Failed to parse daemon port!" << std::endl;
-                config.exit = true;
+                /* Host is everything before ":" */
+                config.host = urlString.substr(0, splitter);
+
+                /* Port is everything after ":" */
+                std::string port = urlString.substr(splitter + 1,   
+                                                    std::string::npos);
+
+                try
+                {
+                    config.port = std::stoi(port);
+                }
+                catch (const std::invalid_argument)
+                {
+                    std::cout << "Failed to parse daemon port!" << std::endl;
+                    config.exit = true;
+                }
             }
         }
     }
