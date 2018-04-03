@@ -31,6 +31,7 @@ public:
   virtual bool addObserver(CryptoNote::ICryptoNoteProtocolObserver* observer) override;
   virtual bool removeObserver(CryptoNote::ICryptoNoteProtocolObserver* observer) override;
   virtual uint32_t getObservedHeight() const override;
+  virtual uint32_t getBlockchainHeight() const override;
   virtual size_t getPeerCount() const override;
   virtual bool isSynchronized() const override;
 
@@ -45,6 +46,7 @@ public:
 private:
   size_t peers;
   uint32_t observedHeight;
+  uint32_t blockchainHeight;
 
   bool synchronized;
 };
