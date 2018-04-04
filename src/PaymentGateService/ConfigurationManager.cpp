@@ -54,7 +54,6 @@ bool ConfigurationManager::init(int argc, char** argv) {
 
   Configuration::initOptions(cmdGeneralOptions);
   Configuration::initOptions(confGeneralOptions);
-
   po::options_description netNodeOptions("Local Node Options");
   CryptoNote::NetNodeConfig::initOptions(netNodeOptions);
   
@@ -81,37 +80,26 @@ bool ConfigurationManager::init(int argc, char** argv) {
     return false;
   }
 
+  po::variables_map allOptions;
   if (cmdOptions.count("config")) {
     std::ifstream confStream(cmdOptions["config"].as<std::string>(), std::ifstream::in);
     if (!confStream.good()) {
       throw ConfigurationError("Cannot open configuration file");
     }
-
-    po::variables_map confOptions;
-    po::store(po::parse_config_file(confStream, confOptionsDesc), confOptions);
-    po::notify(confOptions);
-
-    gateConfiguration.init(confOptions);
-    netNodeConfig.init(confOptions);
-    remoteNodeConfig.init(confOptions);
-
-    netNodeConfig.setTestnet(confOptions["testnet"].as<bool>());
-    startInprocess = confOptions["local"].as<bool>();
+    po::store(po::parse_config_file(confStream, confOptionsDesc), allOptions);
+    po::notify(allOptions);
   }
 
-  //command line options should override options from config file
-  gateConfiguration.init(cmdOptions);
-  netNodeConfig.init(cmdOptions);
-  remoteNodeConfig.init(cmdOptions);
-  dataDir = command_line::get_arg(cmdOptions, command_line::arg_data_dir);
+  po::store(po::parse_command_line(argc, argv, cmdOptionsDesc), allOptions);
+  po::notify(allOptions);
 
-  if (cmdOptions["testnet"].as<bool>()) {
-    netNodeConfig.setTestnet(true);
-  }
+  gateConfiguration.init(allOptions);
+  netNodeConfig.init(allOptions);
+  remoteNodeConfig.init(allOptions);
+  dataDir = command_line::get_arg(allOptions, command_line::arg_data_dir);
 
-  if (cmdOptions["local"].as<bool>()) {
-    startInprocess = true;
-  }
+  netNodeConfig.setTestnet(allOptions["testnet"].as<bool>());
+  startInprocess = allOptions["local"].as<bool>();
 
   return true;
 }
