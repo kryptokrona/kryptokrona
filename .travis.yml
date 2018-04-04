@@ -26,7 +26,7 @@ install:
   -y            ; fi
 script:
 - mkdir build && cd build
-- cmake .. && make
+- cmake -DCMAKE_BUILD_TYPE=Release -DSTATIC=true .. && make
 before_deploy:
 - cd src
 - mkdir turtlecoin-${TRAVIS_TAG}
