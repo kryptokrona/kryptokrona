@@ -164,17 +164,17 @@ int main(int argc, char* argv[])
     command_line::add_arg(desc_cmd_only, command_line::arg_version);
     command_line::add_arg(desc_cmd_only, arg_os_version);
     // tools::get_default_data_dir() can't be called during static initialization
-    command_line::add_arg(desc_cmd_only, command_line::arg_data_dir, Tools::getDefaultDataDirectory());
+    command_line::add_arg(desc_cmd_sett, command_line::arg_data_dir, Tools::getDefaultDataDirectory());
     command_line::add_arg(desc_cmd_only, arg_config_file);
 
     command_line::add_arg(desc_cmd_sett, arg_log_file);
     command_line::add_arg(desc_cmd_sett, arg_log_level);
     command_line::add_arg(desc_cmd_sett, arg_console);
     command_line::add_arg(desc_cmd_sett, arg_testnet_on);
-command_line::add_arg(desc_cmd_sett, arg_enable_cors);
+    command_line::add_arg(desc_cmd_sett, arg_enable_cors);
     command_line::add_arg(desc_cmd_sett, arg_blockexplorer_on);
-command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
-  command_line::add_arg(desc_cmd_sett, arg_genesis_block_reward_address);
+    command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
+    command_line::add_arg(desc_cmd_sett, arg_genesis_block_reward_address);
 
     RpcServerConfig::initOptions(desc_cmd_sett);
     NetNodeConfig::initOptions(desc_cmd_sett);
@@ -196,20 +196,17 @@ command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
         return false;
       }
 
-      std::string data_dir = command_line::get_arg(vm, command_line::arg_data_dir);
       std::string config = command_line::get_arg(vm, arg_config_file);
-
-      data_dir_path = data_dir;
       boost::filesystem::path config_path(config);
-      if (!config_path.has_parent_path()) {
-        config_path = data_dir_path / config_path;
-      }
 
       boost::system::error_code ec;
       if (boost::filesystem::exists(config_path, ec)) {
         po::store(po::parse_config_file<char>(config_path.string<std::string>().c_str(), desc_cmd_sett), vm);
       }
       po::notify(vm);
+
+      data_dir_path = command_line::get_arg(vm, command_line::arg_data_dir);
+
       if (command_line::get_arg(vm, arg_print_genesis_tx)) {
         print_genesis_tx_hex(vm, logManager);
         return false;
