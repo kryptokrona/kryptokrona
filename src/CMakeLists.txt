@@ -25,6 +25,7 @@ file(GLOB_RECURSE WalletLegacy WalletLegacy/*)
 file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 file(GLOB_RECURSE PaymentGate PaymentGate/*)
 file(GLOB_RECURSE PaymentGateService PaymentGateService/*)
+file(GLOB_RECURSE PoolWallet PoolWallet/*)
 
 if(MSVC)
 file(GLOB_RECURSE System System/* Platform/Windows/System/*)
@@ -37,7 +38,7 @@ endif()
 # This appears to be an IDE thing, to group files together.
 # https://cmake.org/cmake/help/v3.0/command/source_group.html
 # Probably not what you need to be looking at if something isn't building
-source_group("" FILES $${Common} ${ConnectivityTool} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${Daemon} ${JsonRpcServer} ${Http} ${Logging} ${Miner} ${Mnemonics} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${SimpleWallet} ${System} ${Transfers} ${Wallet} ${WalletLegacy})
+source_group("" FILES $${Common} ${ConnectivityTool} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${Daemon} ${JsonRpcServer} ${Http} ${Logging} ${Miner} ${Mnemonics} ${NodeRpcProxy} ${PoolWallet} ${P2p} ${Rpc} ${Serialization} ${SimpleWallet} ${System} ${Transfers} ${Wallet} ${WalletLegacy})
 
 add_library(BlockchainExplorer ${BlockchainExplorer})
 add_library(Common ${Common})
@@ -60,6 +61,7 @@ add_library(JsonRpcServer ${JsonRpcServer})
 add_executable(Daemon ${Daemon})
 add_executable(SimpleWallet ${SimpleWallet})
 add_executable(PaymentGateService ${PaymentGateService})
+add_executable(PoolWallet ${PoolWallet})
 add_executable(Miner ${Miner})
 
 if (MSVC)
@@ -77,6 +79,7 @@ target_link_libraries(Daemon P2P Rpc Serialization System Http Logging CryptoNot
 target_link_libraries(SimpleWallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES})
 target_link_libraries(PaymentGate Mnemonics)
 target_link_libraries(PaymentGateService PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common InProcessNode rocksdblib ${Boost_LIBRARIES})
+target_link_libraries(PoolWallet Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(Miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
 
 # Add dependencies means we have to build the latter before we build the former
@@ -86,10 +89,12 @@ add_dependencies(Rpc version)
 add_dependencies(Daemon version)
 add_dependencies(SimpleWallet version)
 add_dependencies(PaymentGateService version)
+add_dependencies(PoolWallet version)
 add_dependencies(P2P version)
 
 # Finally build the binaries
 set_property(TARGET Daemon PROPERTY OUTPUT_NAME "TurtleCoind")
 set_property(TARGET SimpleWallet PROPERTY OUTPUT_NAME "simplewallet")
 set_property(TARGET PaymentGateService PROPERTY OUTPUT_NAME "walletd")
+set_property(TARGET PoolWallet PROPERTY OUTPUT_NAME "poolwallet")
 set_property(TARGET Miner PROPERTY OUTPUT_NAME "miner")

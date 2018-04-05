@@ -363,6 +363,18 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
             CryptoNote::WalletTransaction w
                 = wallet.getTransaction(tmpFusionTxID);
             fusionTransactionHashes.push_back(w.hash);
+
+            if (fusionTransactionHashes.size() == 1)
+            {
+                std::cout << SuccessMsg("Created 1 fusion transaction!")
+                          << std::endl;
+            }
+            else
+            {
+                std::cout << SuccessMsg("Created " 
+                            + std::to_string(fusionTransactionHashes.size())
+                                    + " fusion transactions!") << std::endl;
+            }
         }
     }
 
