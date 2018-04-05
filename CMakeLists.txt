@@ -11,7 +11,10 @@ set(CMAKE_SUPPRESS_REGENERATION ON)
 SET(DO_TESTS ON CACHE STRING "Spend time making tests? Defaults to ON")
 
 if(DO_TESTS)
+  message(STATUS "BUILD TESTS: enabled")
   enable_testing()
+else()
+  message(STATUS "BUILD TESTS: disabled")
 endif()
 
 # copy CTestCustom.cmake to build dir to disable long running tests in 'make test'
