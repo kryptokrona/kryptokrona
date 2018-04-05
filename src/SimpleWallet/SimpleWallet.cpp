@@ -119,10 +119,45 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
                                 "communicate with the network.")
                   << std::endl << std::endl;
 
-        if (!confirm("Try again?"))
+        bool proceed = false;
+
+        while (true)
         {
-            shutdown(walletInfo->wallet, node, alreadyShuttingDown);
-            return;
+            std::cout << "[" << InformationMsg("T") << "]ry again, "
+                      << "[" << InformationMsg("E") << "]xit, or "
+                      << "[" << InformationMsg("C") << "]ontinue anyway?: ";
+
+            std::string answer;
+            std::getline(std::cin, answer);
+
+            char c = std::tolower(answer[0]);
+
+            /* Lets people spam enter in the transaction screen */
+            if (c == 't' || c == '\0')
+            {
+                break;
+            }
+            else if (c == 'e' || c == std::ifstream::traits_type::eof())
+            {
+                shutdown(walletInfo->wallet, node, alreadyShuttingDown);
+                return;
+            }
+            else if (c == 'c')
+            {
+                proceed = true;
+                break;
+            }
+            else
+            {
+                std::cout << WarningMsg("Bad input: ") << InformationMsg(answer)
+                          << WarningMsg(" - please enter either T, E, or C.")
+                          << std::endl;
+            }
+        }
+
+        if (proceed)
+        {
+            break;
         }
 
         std::cout << std::endl;
