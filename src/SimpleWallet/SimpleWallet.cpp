@@ -796,6 +796,12 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
         {
             return;
         }
+        else if (command == "save")
+        {
+            std::cout << InformationMsg("Saving.") << std::endl;
+            walletInfo->wallet.save();
+            std::cout << InformationMsg("Saved.") << std::endl;
+        }
         else if (command == "bc_height")
         {
             blockchainHeight(node, walletInfo->wallet);
@@ -870,6 +876,8 @@ void help(bool viewWallet)
               << "Displays your payment address" << std::endl
               << SuccessMsg("exit", 25)
               << "Exit and save your wallet" << std::endl
+              << SuccessMsg("save", 25)
+              << "Save your wallet state" << std::endl
               << SuccessMsg("incoming_transfers", 25)
               << "Show incoming transfers" << std::endl;
                   
