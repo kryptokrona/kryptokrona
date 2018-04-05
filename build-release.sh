@@ -32,7 +32,7 @@ function build_dynamic_linked_version()
     cd $CLONE_DIR
     mkdir -p build/release
     cd build/release
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-fassociative-math" -DCMAKE_CXX_FLAGS="-fassociative-math" ../..
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-fassociative-math" -DCMAKE_CXX_FLAGS="-fassociative-math" -DDO_TESTS=OFF ../..
     make
     cd ../..
 
@@ -48,7 +48,7 @@ function build_static_linked_version()
     make clean
     mkdir -p build/release
     cd build/release
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-fassociative-math" -DCMAKE_CXX_FLAGS="-fassociative-math" -DSTATIC=true ../..
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-fassociative-math" -DCMAKE_CXX_FLAGS="-fassociative-math" -DSTATIC=true -DDO_TESTS=OFF ../..
     make
     cd ../..
 
@@ -72,8 +72,7 @@ function generate_tarball()
         miner \
         simplewallet \
         TurtleCoind \
-        walletd \
-        connectivity_tool
+        walletd
 
     generate_checksums $TARBALL
 }
