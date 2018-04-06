@@ -1,12 +1,13 @@
 // Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-// This source code is licensed under the BSD-style license found in the
-// LICENSE file in the root directory of this source tree. An additional grant
-// of patent rights can be found in the PATENTS file in the same directory.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 
 #pragma once
 
 #include <string>
+#include "rocksdb/comparator.h"
 #include "rocksdb/iterator.h"
 #include "rocksdb/status.h"
 
@@ -36,6 +37,11 @@ class InternalIterator : public Cleanable {
   // an entry that comes at or past target.
   virtual void Seek(const Slice& target) = 0;
 
+  // Position at the first key in the source that at or before target
+  // The iterator is Valid() after this call iff the source contains
+  // an entry that comes at or before target.
+  virtual void SeekForPrev(const Slice& target) = 0;
+
   // Moves to the next entry in the source.  After this call, Valid() is
   // true iff the iterator was not positioned at the last entry in the source.
   // REQUIRES: Valid()
@@ -63,6 +69,10 @@ class InternalIterator : public Cleanable {
   // satisfied without doing some IO, then this returns Status::Incomplete().
   virtual Status status() const = 0;
 
+  // True if the iterator is invalidated because it is out of the iterator
+  // upper bound
+  virtual bool IsOutOfBound() { return false; }
+
   // Pass the PinnedIteratorsManager to the Iterator, most Iterators dont
   // communicate with PinnedIteratorsManager so default implementation is no-op
   // but for Iterators that need to communicate with PinnedIteratorsManager
@@ -71,7 +81,7 @@ class InternalIterator : public Cleanable {
   virtual void SetPinnedItersMgr(PinnedIteratorsManager* pinned_iters_mgr) {}
 
   // If true, this means that the Slice returned by key() is valid as long as
-  // PinnedIteratorsManager::ReleasePinnedIterators is not called and the
+  // PinnedIteratorsManager::ReleasePinnedData is not called and the
   // Iterator is not deleted.
   //
   // IsKeyPinned() is guaranteed to always return true if
@@ -81,12 +91,23 @@ class InternalIterator : public Cleanable {
   virtual bool IsKeyPinned() const { return false; }
 
   // If true, this means that the Slice returned by value() is valid as long as
-  // PinnedIteratorsManager::ReleasePinnedIterators is not called and the
+  // PinnedIteratorsManager::ReleasePinnedData is not called and the
   // Iterator is not deleted.
   virtual bool IsValuePinned() const { return false; }
 
   virtual Status GetProperty(std::string prop_name, std::string* prop) {
     return Status::NotSupported("");
+  }
+
+ protected:
+  void SeekForPrevImpl(const Slice& target, const Comparator* cmp) {
+    Seek(target);
+    if (!Valid()) {
+      SeekToLast();
+    }
+    while (Valid() && cmp->Compare(target, key()) < 0) {
+      Prev();
+    }
   }
 
  private:
