@@ -25,8 +25,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 struct Config {
     bool exit;
+
+    bool walletGiven;
+    bool passGiven;
+
     std::string host;
     int port;
+
+    std::string walletFile;
+    std::string walletPass;
 };
 
 char* getCmdOption(char ** begin, char ** end, const std::string & option);

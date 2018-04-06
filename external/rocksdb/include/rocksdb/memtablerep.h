@@ -1,7 +1,7 @@
 // Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-// This source code is licensed under the BSD-style license found in the
-// LICENSE file in the root directory of this source tree. An additional grant
-// of patent rights can be found in the PATENTS file in the same directory.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // This file contains the interface that must be implemented by any collection
 // to be used as the backing store for a MemTable. Such a collection must
@@ -43,7 +43,7 @@
 namespace rocksdb {
 
 class Arena;
-class MemTableAllocator;
+class Allocator;
 class LookupKey;
 class Slice;
 class SliceTransform;
@@ -68,7 +68,7 @@ class MemTableRep {
     virtual ~KeyComparator() { }
   };
 
-  explicit MemTableRep(MemTableAllocator* allocator) : allocator_(allocator) {}
+  explicit MemTableRep(Allocator* allocator) : allocator_(allocator) {}
 
   // Allocate a buf of len size for storing key. The idea is that a
   // specific memtable representation knows its underlying data structure
@@ -83,14 +83,46 @@ class MemTableRep {
   // collection, and no concurrent modifications to the table in progress
   virtual void Insert(KeyHandle handle) = 0;
 
+  // Same as ::Insert
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual bool InsertKey(KeyHandle handle) {
+    Insert(handle);
+    return true;
+  }
+
+  // Same as Insert(), but in additional pass a hint to insert location for
+  // the key. If hint points to nullptr, a new hint will be populated.
+  // otherwise the hint will be updated to reflect the last insert location.
+  //
+  // Currently only skip-list based memtable implement the interface. Other
+  // implementations will fallback to Insert() by default.
+  virtual void InsertWithHint(KeyHandle handle, void** hint) {
+    // Ignore the hint by default.
+    Insert(handle);
+  }
+
+  // Same as ::InsertWithHint
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual bool InsertKeyWithHint(KeyHandle handle, void** hint) {
+    InsertWithHint(handle, hint);
+    return true;
+  }
+
   // Like Insert(handle), but may be called concurrent with other calls
-  // to InsertConcurrently for other handles
-  virtual void InsertConcurrently(KeyHandle handle) {
-#ifndef ROCKSDB_LITE
-    throw std::runtime_error("concurrent insert not supported");
-#else
-    abort();
-#endif
+  // to InsertConcurrently for other handles.
+  //
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual void InsertConcurrently(KeyHandle handle);
+
+  // Same as ::InsertConcurrently
+  // Returns false if MemTableRepFactory::CanHandleDuplicatedKey() is true and
+  // the <key, seq> already exists.
+  virtual bool InsertKeyConcurrently(KeyHandle handle) {
+    InsertConcurrently(handle);
+    return true;
   }
 
   // Returns true iff an entry that compares equal to key is in the collection.
@@ -154,6 +186,10 @@ class MemTableRep {
     // Advance to the first entry with a key >= target
     virtual void Seek(const Slice& internal_key, const char* memtable_key) = 0;
 
+    // retreat to the first entry with a key <= target
+    virtual void SeekForPrev(const Slice& internal_key,
+                             const char* memtable_key) = 0;
+
     // Position at the first entry in collection.
     // Final state of iterator is Valid() iff collection is not empty.
     virtual void SeekToFirst() = 0;
@@ -193,7 +229,7 @@ class MemTableRep {
   // user key.
   virtual Slice UserKey(const char* key) const;
 
-  MemTableAllocator* allocator_;
+  Allocator* allocator_;
 };
 
 // This is the base class for all factories that are used by RocksDB to create
@@ -201,15 +237,28 @@ class MemTableRep {
 class MemTableRepFactory {
  public:
   virtual ~MemTableRepFactory() {}
+
   virtual MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&,
-                                         MemTableAllocator*,
-                                         const SliceTransform*,
+                                         Allocator*, const SliceTransform*,
                                          Logger* logger) = 0;
+  virtual MemTableRep* CreateMemTableRep(
+      const MemTableRep::KeyComparator& key_cmp, Allocator* allocator,
+      const SliceTransform* slice_transform, Logger* logger,
+      uint32_t /* column_family_id */) {
+    return CreateMemTableRep(key_cmp, allocator, slice_transform, logger);
+  }
+
   virtual const char* Name() const = 0;
 
   // Return true if the current MemTableRep supports concurrent inserts
   // Default: false
   virtual bool IsInsertConcurrentlySupported() const { return false; }
+
+  // Return true if the current MemTableRep supports detecting duplicate
+  // <key,seq> at insertion time. If true, then MemTableRep::Insert* returns
+  // false when if the <key,seq> already exists.
+  // Default: false
+  virtual bool CanHandleDuplicatedKey() const { return false; }
 };
 
 // This uses a skip list to store keys. It is the default.
@@ -223,13 +272,15 @@ class SkipListFactory : public MemTableRepFactory {
  public:
   explicit SkipListFactory(size_t lookahead = 0) : lookahead_(lookahead) {}
 
+  using MemTableRepFactory::CreateMemTableRep;
   virtual MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&,
-                                         MemTableAllocator*,
-                                         const SliceTransform*,
+                                         Allocator*, const SliceTransform*,
                                          Logger* logger) override;
   virtual const char* Name() const override { return "SkipListFactory"; }
 
   bool IsInsertConcurrentlySupported() const override { return true; }
+
+  bool CanHandleDuplicatedKey() const override { return true; }
 
  private:
   const size_t lookahead_;
@@ -249,10 +300,12 @@ class VectorRepFactory : public MemTableRepFactory {
 
  public:
   explicit VectorRepFactory(size_t count = 0) : count_(count) { }
+
+  using MemTableRepFactory::CreateMemTableRep;
   virtual MemTableRep* CreateMemTableRep(const MemTableRep::KeyComparator&,
-                                         MemTableAllocator*,
-                                         const SliceTransform*,
+                                         Allocator*, const SliceTransform*,
                                          Logger* logger) override;
+
   virtual const char* Name() const override {
     return "VectorRepFactory";
   }

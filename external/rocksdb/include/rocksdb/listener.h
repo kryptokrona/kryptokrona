@@ -18,6 +18,7 @@ typedef std::unordered_map<std::string, std::shared_ptr<const TableProperties>>
     TablePropertiesCollection;
 
 class DB;
+class ColumnFamilyHandle;
 class Status;
 struct CompactionJobStats;
 enum CompressionType : unsigned char;
@@ -68,10 +69,52 @@ enum class CompactionReason {
   kUniversalSortedRunNum,
   // [FIFO] total size > max_table_files_size
   kFIFOMaxSize,
+  // [FIFO] reduce number of files.
+  kFIFOReduceNumFiles,
+  // [FIFO] files with creation time < (current_time - interval)
+  kFIFOTtl,
   // Manual compaction
   kManualCompaction,
   // DB::SuggestCompactRange() marked files for compaction
   kFilesMarkedForCompaction,
+  // [Level] Automatic compaction within bottommost level to cleanup duplicate
+  // versions of same user key, usually due to a released snapshot.
+  kBottommostFiles,
+};
+
+enum class FlushReason : int {
+  kUnknown = 0x00,
+  kGetLiveFiles = 0x01,
+  kShutDown = 0x02,
+  kExternalFileIngestion = 0x03,
+  kManualCompaction = 0x04,
+  kWriteBufferManager = 0x05,
+  kWriteBufferFull = 0x06,
+  kTest = 0x07,
+  kSuperVersionChange = 0x08,
+};
+
+enum class BackgroundErrorReason {
+  kFlush,
+  kCompaction,
+  kWriteCallback,
+  kMemTable,
+};
+
+enum class WriteStallCondition {
+  kNormal,
+  kDelayed,
+  kStopped,
+};
+
+struct WriteStallInfo {
+  // the name of the column family
+  std::string cf_name;
+  // state of the write controller
+  struct {
+    WriteStallCondition cur;
+    WriteStallCondition prev;
+  } condition;
 };
 
 #ifndef ROCKSDB_LITE
@@ -112,6 +155,8 @@ struct FlushJobInfo {
   SequenceNumber largest_seqno;
   // Table properties of the table being flushed
   TableProperties table_properties;
+
+  FlushReason flush_reason;
 };
 
 struct CompactionJobInfo {
@@ -169,6 +214,43 @@ struct MemTableInfo {
 
 };
 
+struct ExternalFileIngestionInfo {
+  // the name of the column family
+  std::string cf_name;
+  // Path of the file outside the DB
+  std::string external_file_path;
+  // Path of the file inside the DB
+  std::string internal_file_path;
+  // The global sequence number assigned to keys in this file
+  SequenceNumber global_seqno;
+  // Table properties of the table being flushed
+  TableProperties table_properties;
+};
+
+// A call-back function to RocksDB which will be called when the compaction
+// iterator is compacting values. It is meant to be returned from
+// EventListner::GetCompactionEventListner() at the beginning of compaction
+// job.
+class CompactionEventListener {
+ public:
+  enum CompactionListenerValueType {
+    kValue,
+    kMergeOperand,
+    kDelete,
+    kSingleDelete,
+    kRangeDelete,
+    kBlobIndex,
+    kInvalid,
+  };
+
+  virtual void OnCompaction(int level, const Slice& key,
+                            CompactionListenerValueType value_type,
+                            const Slice& existing_value,
+                            const SequenceNumber& sn, bool is_new) = 0;
+
+  virtual ~CompactionEventListener() = default;
+};
+
 // EventListener class contains a set of call-back functions that will
 // be called when specific RocksDB event happens such as flush.  It can
 // be used as a building block for developing custom features such as
@@ -209,6 +291,16 @@ class EventListener {
   // returns.  Otherwise, RocksDB may be blocked.
   virtual void OnFlushCompleted(DB* /*db*/,
                                 const FlushJobInfo& /*flush_job_info*/) {}
+
+  // A call-back function to RocksDB which will be called before a
+  // RocksDB starts to flush memtables.  The default implementation is
+  // no-op.
+  //
+  // Note that the this function must be implemented in a way such that
+  // it should not run for an extended period of time before the function
+  // returns.  Otherwise, RocksDB may be blocked.
+  virtual void OnFlushBegin(DB* /*db*/,
+                            const FlushJobInfo& /*flush_job_info*/) {}
 
   // A call-back function for RocksDB which will be called whenever
   // a SST file is deleted.  Different from OnCompactionCompleted and
@@ -265,7 +357,7 @@ class EventListener {
   // returned value.
   virtual void OnTableFileCreationStarted(
       const TableFileCreationBriefInfo& /*info*/) {}
- 
+
   // A call-back function for RocksDB which will be called before
   // a memtable is made immutable.
   //
@@ -278,6 +370,54 @@ class EventListener {
   // returned value.
   virtual void OnMemTableSealed(
     const MemTableInfo& /*info*/) {}
+
+  // A call-back function for RocksDB which will be called before
+  // a column family handle is deleted.
+  //
+  // Note that the this function must be implemented in a way such that
+  // it should not run for an extended period of time before the function
+  // returns.  Otherwise, RocksDB may be blocked.
+  // @param handle is a pointer to the column family handle to be deleted
+  // which will become a dangling pointer after the deletion.
+  virtual void OnColumnFamilyHandleDeletionStarted(ColumnFamilyHandle* handle) {
+  }
+
+  // A call-back function for RocksDB which will be called after an external
+  // file is ingested using IngestExternalFile.
+  //
+  // Note that the this function will run on the same thread as
+  // IngestExternalFile(), if this function is blocked, IngestExternalFile()
+  // will be blocked from finishing.
+  virtual void OnExternalFileIngested(
+      DB* /*db*/, const ExternalFileIngestionInfo& /*info*/) {}
+
+  // A call-back function for RocksDB which will be called before setting the
+  // background error status to a non-OK value. The new background error status
+  // is provided in `bg_error` and can be modified by the callback. E.g., a
+  // callback can suppress errors by resetting it to Status::OK(), thus
+  // preventing the database from entering read-only mode. We do not provide any
+  // guarantee when failed flushes/compactions will be rescheduled if the user
+  // suppresses an error.
+  //
+  // Note that this function can run on the same threads as flush, compaction,
+  // and user writes. So, it is extremely important not to perform heavy
+  // computations or blocking calls in this function.
+  virtual void OnBackgroundError(BackgroundErrorReason /* reason */,
+                                 Status* /* bg_error */) {}
+
+  // A call-back function for RocksDB which will be called whenever a change
+  // of superversion triggers a change of the stall conditions.
+  //
+  // Note that the this function must be implemented in a way such that
+  // it should not run for an extended period of time before the function
+  // returns.  Otherwise, RocksDB may be blocked.
+  virtual void OnStallConditionsChanged(const WriteStallInfo& /*info*/) {}
+
+  // Factory method to return CompactionEventListener. If multiple listeners
+  // provides CompactionEventListner, only the first one will be used.
+  virtual CompactionEventListener* GetCompactionEventListener() {
+    return nullptr;
+  }
 
   virtual ~EventListener() {}
 };

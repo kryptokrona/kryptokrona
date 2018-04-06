@@ -67,6 +67,7 @@ namespace CryptoNote
     int handleCommand(bool is_notify, int command, const BinaryArray& in_buff, BinaryArray& buff_out, CryptoNoteConnectionContext& context, bool& handled);
     virtual size_t getPeerCount() const override;
     virtual uint32_t getObservedHeight() const override;
+    virtual uint32_t getBlockchainHeight() const override;
     void requestMissingPoolTransactions(const CryptoNoteConnectionContext& context);
 
   private:
@@ -105,6 +106,9 @@ namespace CryptoNote
 
     mutable std::mutex m_observedHeightMutex;
     uint32_t m_observedHeight;
+    
+    mutable std::mutex m_blockchainHeightMutex;
+    uint32_t m_blockchainHeight;
 
     std::atomic<size_t> m_peersCount;
     Tools::ObserverManager<ICryptoNoteProtocolObserver> m_observerManager;

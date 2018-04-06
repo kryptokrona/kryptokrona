@@ -5,10 +5,18 @@ set(VERSION "0.1")
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release CACHE TYPE INTERNAL)
-set(CMAKE_SKIP_INSTALL_RULES ON)
+set(CMAKE_SKIP_INSTALL_RULES OFF)
 set(CMAKE_SKIP_PACKAGE_ALL_DEPENDENCY ON)
 set(CMAKE_SUPPRESS_REGENERATION ON)
-enable_testing()
+SET(DO_TESTS ON CACHE STRING "Spend time making tests? Defaults to ON")
+
+if(DO_TESTS)
+  message(STATUS "BUILD TESTS: enabled")
+  enable_testing()
+else()
+  message(STATUS "BUILD TESTS: disabled")
+endif()
+
 # copy CTestCustom.cmake to build dir to disable long running tests in 'make test'
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.cmake ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -153,4 +161,7 @@ endif()
 
 add_subdirectory(external)
 add_subdirectory(src)
-add_subdirectory(tests)
+
+if(DO_TESTS)
+  add_subdirectory(tests)
+endif()
