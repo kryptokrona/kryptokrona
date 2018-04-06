@@ -1,15 +1,17 @@
 //  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 //
 // Copyright (c) 2011 The LevelDB Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
+#include "port/win/env_win.h"
+#include "port/win/win_thread.h"
 #include <algorithm>
-#include <thread>
 #include <ctime>
+#include <thread>
 
 #include <errno.h>
 #include <process.h> // _getpid
@@ -25,15 +27,14 @@
 #include "port/dirent.h"
 #include "port/win/win_logger.h"
 #include "port/win/io_win.h"
-#include "port/win/env_win.h"
 
-#include "util/iostats_context_imp.h"
+#include "monitoring/iostats_context_imp.h"
 
-#include "util/thread_status_updater.h"
-#include "util/thread_status_util.h"
+#include "monitoring/thread_status_updater.h"
+#include "monitoring/thread_status_util.h"
 
-#include <Rpc.h>  // For UUID generation
-#include <Windows.h>
+#include <rpc.h>  // for uuid generation
+#include <windows.h>
 
 namespace rocksdb {
 
@@ -73,7 +74,8 @@ WinEnvIO::WinEnvIO(Env* hosted_env)
 
   {
     LARGE_INTEGER qpf;
-    BOOL ret = QueryPerformanceFrequency(&qpf);
+    BOOL ret __attribute__((__unused__));
+    ret = QueryPerformanceFrequency(&qpf);
     assert(ret == TRUE);
     perf_counter_frequency_ = qpf.QuadPart;
   }
@@ -119,13 +121,20 @@ Status WinEnvIO::NewSequentialFile(const std::string& fname,
   // while they are still open with another handle. For that reason we
   // allow share_write and delete(allows rename).
   HANDLE hFile = INVALID_HANDLE_VALUE;
+
+  DWORD fileFlags = FILE_ATTRIBUTE_READONLY;
+
+  if (options.use_direct_reads && !options.use_mmap_reads) {
+    fileFlags |= FILE_FLAG_NO_BUFFERING;
+  }
+
   {
     IOSTATS_TIMER_GUARD(open_nanos);
     hFile = CreateFileA(
       fname.c_str(), GENERIC_READ,
       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL,
       OPEN_EXISTING,  // Original fopen mode is "rb"
-      FILE_ATTRIBUTE_NORMAL, NULL);
+      fileFlags, NULL);
   }
 
   if (INVALID_HANDLE_VALUE == hFile) {
@@ -148,7 +157,7 @@ Status WinEnvIO::NewRandomAccessFile(const std::string& fname,
   // Random access is to disable read-ahead as the system reads too much data
   DWORD fileFlags = FILE_ATTRIBUTE_READONLY;
 
-  if (!options.use_os_buffer && !options.use_mmap_reads) {
+  if (options.use_direct_reads && !options.use_mmap_reads) {
     fileFlags |= FILE_FLAG_NO_BUFFERING;
   } else {
     fileFlags |= FILE_FLAG_RANDOM_ACCESS;
@@ -228,9 +237,11 @@ Status WinEnvIO::NewRandomAccessFile(const std::string& fname,
   return s;
 }
 
-Status WinEnvIO::NewWritableFile(const std::string& fname,
+Status WinEnvIO::OpenWritableFile(const std::string& fname,
   std::unique_ptr<WritableFile>* result,
-  const EnvOptions& options) {
+  const EnvOptions& options,
+  bool reopen) {
+
   const size_t c_BufferCapacity = 64 * 1024;
 
   EnvOptions local_options(options);
@@ -240,8 +251,8 @@ Status WinEnvIO::NewWritableFile(const std::string& fname,
 
   DWORD fileFlags = FILE_ATTRIBUTE_NORMAL;
 
-  if (!local_options.use_os_buffer && !local_options.use_mmap_writes) {
-    fileFlags = FILE_FLAG_NO_BUFFERING;
+  if (local_options.use_direct_writes && !local_options.use_mmap_writes) {
+    fileFlags = FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH;
   }
 
   // Desired access. We are want to write only here but if we want to memory
@@ -254,10 +265,17 @@ Status WinEnvIO::NewWritableFile(const std::string& fname,
 
   if (local_options.use_mmap_writes) {
     desired_access |= GENERIC_READ;
-  } else {
+  }
+  else {
     // Adding this solely for tests to pass (fault_injection_test,
     // wal_manager_test).
     shared_mode |= (FILE_SHARE_WRITE | FILE_SHARE_DELETE);
+  }
+
+  // This will always truncate the file
+  DWORD creation_disposition = CREATE_ALWAYS;
+  if (reopen) {
+    creation_disposition = OPEN_ALWAYS;
   }
 
   HANDLE hFile = 0;
@@ -268,7 +286,7 @@ Status WinEnvIO::NewWritableFile(const std::string& fname,
       desired_access,  // Access desired
       shared_mode,
       NULL,           // Security attributes
-      CREATE_ALWAYS,  // Posix env says O_CREAT | O_RDWR | O_TRUNC
+      creation_disposition,  // Posix env says (reopen) ? (O_CREATE | O_APPEND) : O_CREAT | O_TRUNC
       fileFlags,      // Flags
       NULL);          // Template File
   }
@@ -277,6 +295,18 @@ Status WinEnvIO::NewWritableFile(const std::string& fname,
     auto lastError = GetLastError();
     return IOErrorFromWindowsError(
       "Failed to create a NewWriteableFile: " + fname, lastError);
+  }
+
+  // We will start writing at the end, appending
+  if (reopen) {
+    LARGE_INTEGER zero_move;
+    zero_move.QuadPart = 0;
+    BOOL ret = SetFilePointerEx(hFile, zero_move, NULL, FILE_END);
+    if (!ret) {
+      auto lastError = GetLastError();
+      return IOErrorFromWindowsError(
+        "Failed to create a ReopenWritableFile move to the end: " + fname, lastError);
+    }
   }
 
   if (options.use_mmap_writes) {
@@ -290,6 +320,50 @@ Status WinEnvIO::NewWritableFile(const std::string& fname,
     result->reset(new WinWritableFile(fname, hFile, page_size_,
       c_BufferCapacity, local_options));
   }
+  return s;
+}
+
+Status WinEnvIO::NewRandomRWFile(const std::string & fname,
+  std::unique_ptr<RandomRWFile>* result, const EnvOptions & options) {
+
+  Status s;
+
+  // Open the file for read-only random access
+  // Random access is to disable read-ahead as the system reads too much data
+  DWORD desired_access = GENERIC_READ | GENERIC_WRITE;
+  DWORD shared_mode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+  DWORD creation_disposition = OPEN_ALWAYS; // Create if necessary or open existing
+  DWORD file_flags = FILE_FLAG_RANDOM_ACCESS;
+
+  if (options.use_direct_reads && options.use_direct_writes) {
+    file_flags |= FILE_FLAG_NO_BUFFERING;
+  }
+
+  /// Shared access is necessary for corruption test to pass
+  // almost all tests would work with a possible exception of fault_injection
+  HANDLE hFile = 0;
+  {
+    IOSTATS_TIMER_GUARD(open_nanos);
+    hFile =
+      CreateFileA(fname.c_str(),
+        desired_access,
+        shared_mode,
+        NULL, // Security attributes
+        creation_disposition,
+        file_flags,
+        NULL);
+  }
+
+  if (INVALID_HANDLE_VALUE == hFile) {
+    auto lastError = GetLastError();
+    return IOErrorFromWindowsError(
+      "NewRandomRWFile failed to Create/Open: " + fname, lastError);
+  }
+
+  UniqueCloseHandlePtr fileGuard(hFile, CloseHandleFunc);
+  result->reset(new WinRandomRWFile(fname, hFile, page_size_, options));
+  fileGuard.release();
+
   return s;
 }
 
@@ -317,6 +391,8 @@ Status WinEnvIO::FileExists(const std::string& fname) {
 
 Status WinEnvIO::GetChildren(const std::string& dir,
   std::vector<std::string>* result) {
+
+  result->clear();
   std::vector<std::string> output;
 
   Status status;
@@ -326,7 +402,14 @@ Status WinEnvIO::GetChildren(const std::string& dir,
     CloseDir);
 
   if (!dirp) {
-    status = IOError(dir, errno);
+    switch (errno) {
+      case EACCES:
+      case ENOENT:
+      case ENOTDIR:
+        return Status::NotFound();
+      default:
+        return IOError(dir, errno);
+    }
   } else {
     if (result->capacity() > 0) {
       output.reserve(result->capacity());
@@ -581,13 +664,12 @@ Status WinEnvIO::NewLogger(const std::string& fname,
   return s;
 }
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
 uint64_t WinEnvIO::NowMicros() {
 
   if (GetSystemTimePreciseAsFileTime_ != NULL) {
     // all std::chrono clocks on windows proved to return
     // values that may repeat that is not good enough for some uses.
-    const int64_t c_UnixEpochStartTicks = 116444736000000000i64;
+    const int64_t c_UnixEpochStartTicks = 116444736000000000LL;
     const int64_t c_FtToMicroSec = 10;
 
     // This interface needs to return system time and not
@@ -608,18 +690,6 @@ uint64_t WinEnvIO::NowMicros() {
   using namespace std::chrono;
   return duration_cast<microseconds>(system_clock::now().time_since_epoch()).count();
 }
-#else
-uint64_t WinEnvIO::NowMicros() {
-  // On Windows 7 and below, where GetSystemTimePreciseAsFileTime is not
-  // available, use QueryPerformanceCounter. Note that this may cause some
-  // of the tests to fail.
-  LARGE_INTEGER li;
-  QueryPerformanceCounter(&li);
-  li.QuadPart *= std::micro::den;
-  li.QuadPart /= perf_counter_frequency_;
-  return li.QuadPart;
-}
-#endif // (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
 
 uint64_t WinEnvIO::NowNanos() {
   // all std::chrono clocks on windows have the same resolution that is only
@@ -706,15 +776,17 @@ std::string WinEnvIO::TimeToString(uint64_t secondsSince1970) {
 EnvOptions WinEnvIO::OptimizeForLogWrite(const EnvOptions& env_options,
   const DBOptions& db_options) const {
   EnvOptions optimized = env_options;
-  optimized.use_mmap_writes = false;
   optimized.bytes_per_sync = db_options.wal_bytes_per_sync;
-  optimized.use_os_buffer =
-    true;  // This is because we flush only whole pages on unbuffered io and
+  optimized.use_mmap_writes = false;
+  // This is because we flush only whole pages on unbuffered io and
   // the last records are not guaranteed to be flushed.
+  optimized.use_direct_writes = false;
   // TODO(icanadi) it's faster if fallocate_with_keep_size is false, but it
   // breaks TransactionLogIteratorStallAtLastRecord unit test. Fix the unit
   // test and make this false
   optimized.fallocate_with_keep_size = true;
+  optimized.writable_file_max_buffer_size =
+      db_options.writable_file_max_buffer_size;
   return optimized;
 }
 
@@ -722,7 +794,7 @@ EnvOptions WinEnvIO::OptimizeForManifestWrite(
   const EnvOptions& env_options) const {
   EnvOptions optimized = env_options;
   optimized.use_mmap_writes = false;
-  optimized.use_os_buffer = true;
+  optimized.use_direct_writes = false;
   optimized.fallocate_with_keep_size = true;
   return optimized;
 }
@@ -760,7 +832,7 @@ WinEnvThreads::~WinEnvThreads() {
 
 void WinEnvThreads::Schedule(void(*function)(void*), void* arg, Env::Priority pri,
   void* tag, void(*unschedFunction)(void* arg)) {
-  assert(pri >= Env::Priority::LOW && pri <= Env::Priority::HIGH);
+  assert(pri >= Env::Priority::BOTTOM && pri <= Env::Priority::HIGH);
   thread_pools_[pri].Schedule(function, arg, tag, unschedFunction);
 }
 
@@ -790,7 +862,7 @@ void WinEnvThreads::StartThread(void(*function)(void* arg), void* arg) {
   state->arg = arg;
   try {
 
-    std::thread th(&StartThreadWrapper, state.get());
+    rocksdb::port::WindowsThread th(&StartThreadWrapper, state.get());
     state.release();
 
     std::lock_guard<std::mutex> lg(mu_);
@@ -809,7 +881,7 @@ void WinEnvThreads::WaitForJoin() {
 }
 
 unsigned int WinEnvThreads::GetThreadPoolQueueLen(Env::Priority pri) const {
-  assert(pri >= Env::Priority::LOW && pri <= Env::Priority::HIGH);
+  assert(pri >= Env::Priority::BOTTOM && pri <= Env::Priority::HIGH);
   return thread_pools_[pri].GetQueueLen();
 }
 
@@ -825,12 +897,17 @@ void  WinEnvThreads::SleepForMicroseconds(int micros) {
 }
 
 void WinEnvThreads::SetBackgroundThreads(int num, Env::Priority pri) {
-  assert(pri >= Env::Priority::LOW && pri <= Env::Priority::HIGH);
+  assert(pri >= Env::Priority::BOTTOM && pri <= Env::Priority::HIGH);
   thread_pools_[pri].SetBackgroundThreads(num);
 }
 
+int WinEnvThreads::GetBackgroundThreads(Env::Priority pri) {
+  assert(pri >= Env::Priority::BOTTOM && pri <= Env::Priority::HIGH);
+  return thread_pools_[pri].GetBackgroundThreads();
+}
+
 void WinEnvThreads::IncBackgroundThreadsIfNeeded(int num, Env::Priority pri) {
-  assert(pri >= Env::Priority::LOW && pri <= Env::Priority::HIGH);
+  assert(pri >= Env::Priority::BOTTOM && pri <= Env::Priority::HIGH);
   thread_pools_[pri].IncBackgroundThreadsIfNeeded(num);
 }
 
@@ -876,9 +953,19 @@ Status WinEnv::NewRandomAccessFile(const std::string& fname,
 }
 
 Status WinEnv::NewWritableFile(const std::string& fname,
-  std::unique_ptr<WritableFile>* result,
-  const EnvOptions& options) {
-  return winenv_io_.NewWritableFile(fname, result, options);
+                               std::unique_ptr<WritableFile>* result,
+                               const EnvOptions& options) {
+  return winenv_io_.OpenWritableFile(fname, result, options, false);
+}
+
+Status WinEnv::ReopenWritableFile(const std::string& fname,
+    std::unique_ptr<WritableFile>* result, const EnvOptions& options) {
+  return winenv_io_.OpenWritableFile(fname, result, options, true);
+}
+
+Status WinEnv::NewRandomRWFile(const std::string & fname,
+  unique_ptr<RandomRWFile>* result, const EnvOptions & options) {
+  return winenv_io_.NewRandomRWFile(fname, result, options);
 }
 
 Status WinEnv::NewDirectory(const std::string& name,
@@ -1001,6 +1088,10 @@ void  WinEnv::SetBackgroundThreads(int num, Env::Priority pri) {
   return winenv_threads_.SetBackgroundThreads(num, pri);
 }
 
+int WinEnv::GetBackgroundThreads(Env::Priority pri) {
+  return winenv_threads_.GetBackgroundThreads(pri);
+}
+
 void  WinEnv::IncBackgroundThreadsIfNeeded(int num, Env::Priority pri) {
   return winenv_threads_.IncBackgroundThreadsIfNeeded(num, pri);
 }
@@ -1025,6 +1116,7 @@ std::string Env::GenerateUniqueId() {
 
   RPC_CSTR rpc_str;
   auto status = UuidToStringA(&uuid, &rpc_str);
+  (void)status;
   assert(status == RPC_S_OK);
 
   result = reinterpret_cast<char*>(rpc_str);

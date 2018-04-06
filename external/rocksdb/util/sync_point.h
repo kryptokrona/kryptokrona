@@ -1,11 +1,12 @@
 //  Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
-//  This source code is licensed under the BSD-style license found in the
-//  LICENSE file in the root directory of this source tree. An additional grant
-//  of patent rights can be found in the PATENTS file in the same directory.
+//  This source code is licensed under both the GPLv2 (found in the
+//  COPYING file in the root directory) and Apache 2.0 License
+//  (found in the LICENSE.Apache file in the root directory).
 #pragma once
 
 #include <assert.h>
 #include <condition_variable>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -45,6 +46,7 @@ extern void TestKillRandom(std::string kill_point, int odds,
 
 #ifdef NDEBUG
 #define TEST_SYNC_POINT(x)
+#define TEST_IDX_SYNC_POINT(x, index)
 #define TEST_SYNC_POINT_CALLBACK(x, y)
 #else
 
@@ -80,8 +82,15 @@ class SyncPoint {
                                 const std::vector<SyncPointPair>& markers);
 
   // Set up a call back function in sync point.
+  // The argument to the callback is passed through from
+  // TEST_SYNC_POINT_CALLBACK(); nullptr if TEST_SYNC_POINT or
+  // TEST_IDX_SYNC_POINT was used.
   void SetCallBack(const std::string point,
                    std::function<void(void*)> callback);
+
+  // Clear callback function by point
+  void ClearCallBack(const std::string point);
+
   // Clear all call back functions.
   void ClearAllCallBacks();
 
@@ -130,6 +139,8 @@ class SyncPoint {
 // See TransactionLogIteratorRace in db_test.cc for an example use case.
 // TEST_SYNC_POINT is no op in release build.
 #define TEST_SYNC_POINT(x) rocksdb::SyncPoint::GetInstance()->Process(x)
+#define TEST_IDX_SYNC_POINT(x, index) \
+  rocksdb::SyncPoint::GetInstance()->Process(x + std::to_string(index))
 #define TEST_SYNC_POINT_CALLBACK(x, y) \
   rocksdb::SyncPoint::GetInstance()->Process(x, y)
 #endif  // NDEBUG
