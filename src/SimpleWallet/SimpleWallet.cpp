@@ -433,6 +433,10 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
             std::string walletLegacyBadPwdMsg =
                 ": The password is wrong";
 
+            std::string alreadyOpenMsg =
+                "MemoryMappedFile::open: The process cannot access the file "
+                "because it is being used by another process.";
+
             std::string errorMsg = e.what();
                 
             /* There are three different error messages depending upon if we're
@@ -444,8 +448,31 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                 std::cout << WarningMsg("Incorrect password! Try again.")
                           << std::endl;
             }
+            /* The message actually has a \r\n on the end but i'd prefer to
+               keep just the raw string in the source so check the it starts
+               with instead */
+            else if (boost::starts_with(errorMsg, alreadyOpenMsg))
+            {
+                std::cout << WarningMsg("Could not open wallet! It is already "
+                                        "open in another process.")
+                          << std::endl
+                          << WarningMsg("Check with a task manager that you "
+                                        "don't have simplewallet open twice.")
+                          << std::endl
+                          << WarningMsg("Also check you don't have another "
+                                        "wallet program open, such as a GUI "
+                                        "wallet or walletd.")
+                          << std::endl;
+
+                std::cout << "Hit any key to exit: ";
+                std::cin.get();
+                exit(0);
+            }
             else
             {
+                std::cout << "Unexpected error: " << errorMsg << std::endl;
+                std::cout << "Hit any key to exit: ";
+                std::cin.get();
                 throw(e);
             }
         }
@@ -796,6 +823,12 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
         {
             return;
         }
+        else if (command == "save")
+        {
+            std::cout << InformationMsg("Saving.") << std::endl;
+            walletInfo->wallet.save();
+            std::cout << InformationMsg("Saved.") << std::endl;
+        }
         else if (command == "bc_height")
         {
             blockchainHeight(node, walletInfo->wallet);
@@ -870,6 +903,8 @@ void help(bool viewWallet)
               << "Displays your payment address" << std::endl
               << SuccessMsg("exit", 25)
               << "Exit and save your wallet" << std::endl
+              << SuccessMsg("save", 25)
+              << "Save your wallet state" << std::endl
               << SuccessMsg("incoming_transfers", 25)
               << "Show incoming transfers" << std::endl;
                   
