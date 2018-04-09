@@ -17,11 +17,11 @@ elseif(NOT MSVC)
     set_property(TARGET upnpc-static PROPERTY FOLDER "external")
     add_custom_target(
        rocksdb
-       COMMAND cmake . && make rocksdb
-       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/rocksdb/
+       COMMAND make rocksdb
+       WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/rocksdb
     )
     add_library(rocksdblib STATIC IMPORTED GLOBAL)
-    set_target_properties(rocksdblib PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/rocksdb/librocksdb.a)
+    set_target_properties(rocksdblib PROPERTIES IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/rocksdb/librocksdb.a)
     add_dependencies(rocksdblib rocksdb)
 endif()
 

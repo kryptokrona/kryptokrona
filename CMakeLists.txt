@@ -165,3 +165,11 @@ add_subdirectory(src)
 if(DO_TESTS)
   add_subdirectory(tests)
 endif()
+
+## We need to setup the RocksDB build environment to match our system
+if(NOT MSVC)
+  execute_process(
+    COMMAND cmake ${CMAKE_CURRENT_SOURCE_DIR}/external/rocksdb -DWITH_GFLAGS=0 -B${PROJECT_BINARY_DIR}/rocksdb
+  )
+  set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_BINARY_DIR}/rocksdb/librocksdb.a")
+endif()
