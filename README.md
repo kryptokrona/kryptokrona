@@ -60,7 +60,7 @@ sudo apt-get install librocksdb-dev
 
 The binaries will be in `./src` after compilation is complete.
 
-Run `./src/TurtleCoin` to connect to the network and let it sync (it may take a while).
+Run `./src/TurtleCoind` to connect to the network and let it sync (it may take a while).
 
 #### Windows 10
 
