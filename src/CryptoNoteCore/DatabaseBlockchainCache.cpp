@@ -121,6 +121,7 @@ bool requestCachedTransactionInfos(const std::vector<Crypto::Hash>& transactionH
 }
 
 //returns CachedTransactionInfos in the same or as packedOuts are
+/*
 bool requestCachedTransactionInfos(const std::vector<PackedOutIndex>& packedOuts, IDataBase& database, std::vector<CachedTransactionInfo>& result) {
   std::vector<Crypto::Hash> transactionHashes;
   if (!requestTransactionHashesForGlobalOutputIndexes(packedOuts, database, transactionHashes)) {
@@ -129,6 +130,7 @@ bool requestCachedTransactionInfos(const std::vector<PackedOutIndex>& packedOuts
 
   return requestCachedTransactionInfos(transactionHashes, database, result);
 }
+*/
 
 bool requestExtendedTransactionInfos(const std::vector<Crypto::Hash>& transactionHashes, IDataBase& database, std::vector<ExtendedTransactionInfo>& result) {
   result.reserve(result.size() + transactionHashes.size());
@@ -216,6 +218,7 @@ Transaction extractTransaction(const RawBlock& block, uint32_t transactionIndex)
   if (transactionIndex != 0) {
     Transaction transaction;
     bool r = fromBinaryArray(transaction, block.transactions[transactionIndex - 1]);
+    if (r) {}
     assert(r);
 
     return transaction;
@@ -223,6 +226,7 @@ Transaction extractTransaction(const RawBlock& block, uint32_t transactionIndex)
 
   BlockTemplate blockTemplate;
   bool r = fromBinaryArray(blockTemplate, block.block);
+  if (r) {}
   assert(r);
 
   return blockTemplate.baseTransaction;
@@ -595,10 +599,12 @@ std::unique_ptr<IBlockchainCache> DatabaseBlockchainCache::split(uint32_t splitB
 Crypto::Hash DatabaseBlockchainCache::pushBlockToAnotherCache(IBlockchainCache& segment, PushedBlockInfo&& pushedBlockInfo) {
   BlockTemplate block;
   bool br = fromBinaryArray(block, pushedBlockInfo.rawBlock.block);
+  if (br) {}
   assert(br);
 
   std::vector<CachedTransaction> transactions;
   bool tr = Utils::restoreCachedTransactions(pushedBlockInfo.rawBlock.transactions, transactions);
+  if (tr) {}
   assert(tr);
 
   CachedBlock cachedBlock(block);

@@ -648,6 +648,11 @@ bool RpcServer::f_on_block_json(const F_COMMAND_RPC_GET_BLOCK_DETAILS::request& 
   uint64_t maxReward = 0;
   uint64_t currentReward = 0;
   int64_t emissionChange = 0;
+  
+  if (maxReward) {}
+  if (currentReward) {}
+  if (emissionChange) {}
+  
   size_t blockGrantedFullRewardZone = m_core.getCurrency().blockGrantedFullRewardZoneByBlockVersion(block_header.major_version);
   res.block.effectiveSizeMedian = std::max(res.block.sizeMedian, blockGrantedFullRewardZone);
 
@@ -938,6 +943,7 @@ bool RpcServer::on_submitblock(const COMMAND_RPC_SUBMITBLOCK::request& req, COMM
 RawBlockLegacy RpcServer::prepareRawBlockLegacy(BinaryArray&& blockBlob) {
   BlockTemplate blockTemplate;
   bool result = fromBinaryArray(blockTemplate, blockBlob);
+  if (result) {}
   assert(result);
 
   RawBlockLegacy rawBlock;

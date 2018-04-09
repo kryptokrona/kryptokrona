@@ -50,6 +50,7 @@ TcpConnection::~TcpConnection() {
     assert(readContext == nullptr);
     assert(writeContext == nullptr);
     int result = close(connection);
+    if (result) {}
     assert(result != -1);
   }
 }
