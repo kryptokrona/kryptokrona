@@ -77,7 +77,7 @@ Run `./src/TurtleCoind` to connect to the network and let it sync (it may take a
 - `cd build`
 - Set the PATH variable for cmake: ie. `set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";%PATH%`
 - `cmake -G "Visual Studio 14 Win64" .. -DBOOST_ROOT=C:/local/boost_1_59_0` (Or your boost installed dir.)
-- `MSBuild ByteCoin.sln /p:Configuration=Release /m`
+- `MSBuild TurtleCoin.sln /p:Configuration=Release /m`
 - If all went well, it will complete successfully, and you will find all your binaries in the '..\build\src\Release' directory.
 - Additionally, a `.sln` file will have been created in the `build` directory. If you wish to open the project in Visual Studio with this, you can.
 
