@@ -79,16 +79,18 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 void blockchainHeight(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet);
 
 void listTransfers(bool incoming, bool outgoing, 
-                   CryptoNote::WalletGreen &wallet);
+                   CryptoNote::WalletGreen &wallet, CryptoNote::INode &node);
 
 void findNewTransactions(CryptoNote::INode &node, 
                          std::shared_ptr<WalletInfo> &walletInfo);
 
 void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo);
 
-void printOutgoingTransfer(CryptoNote::WalletTransaction t);
+void printOutgoingTransfer(CryptoNote::WalletTransaction t,
+                           CryptoNote::INode &node);
 
-void printIncomingTransfer(CryptoNote::WalletTransaction t);
+void printIncomingTransfer(CryptoNote::WalletTransaction t,
+                           CryptoNote::INode &node);
 
 void checkForNewTransactions(std::shared_ptr<WalletInfo> &walletInfo);
 
@@ -112,6 +114,8 @@ std::string getExistingWalletFileName(Config &config);
 
 std::string getWalletPassword(bool verifyPwd);
 
+std::string getBlockTime(CryptoNote::BlockDetails b);
+
 std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet, 
                                            Crypto::SecretKey privateSpendKey,
                                            Crypto::SecretKey privateViewKey);
@@ -134,3 +138,6 @@ std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
 Crypto::SecretKey getPrivateKey(std::string outputMsg);
 
 ColouredMsg getPrompt(std::shared_ptr<WalletInfo> &walletInfo);
+
+CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
+                                  CryptoNote::INode &node);

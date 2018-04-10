@@ -753,6 +753,27 @@ std::error_code InProcessNode::doGetPoolSymmetricDifference(std::vector<Crypto::
   return ec;
 }
 
+void InProcessNode::getBlock(const uint32_t blockHeight, BlockDetails& block,
+                             const Callback& callback) {
+  const std::vector<uint32_t> blockHeights(blockHeight);
+  std::vector<std::vector<BlockDetails>> blocks;
+
+  std::unique_lock<std::mutex> lock(mutex);
+  if (state != INITIALIZED) {
+    lock.unlock();
+    callback(make_error_code(CryptoNote::error::NOT_INITIALIZED));
+    return;
+  }
+
+  executeInDispatcherThread([=, &blocks, &block] () {
+    auto ec = doGetBlocks(blockHeights, blocks);
+    executeInRemoteThread([callback, ec, &block, &blocks] () { 
+        block = blocks[0][0];
+        callback(ec);
+    });
+  });
+}
+
 void InProcessNode::getBlocks(const std::vector<uint32_t>& blockHeights, std::vector<std::vector<BlockDetails>>& blocks,
                               const Callback& callback) {
   std::unique_lock<std::mutex> lock(mutex);
