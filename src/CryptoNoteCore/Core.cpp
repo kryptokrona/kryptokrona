@@ -1589,6 +1589,20 @@ IBlockchainCache* Core::findSegmentContainingBlock(const Crypto::Hash& blockHash
   return findAlternativeSegmentContainingBlock(blockHash);
 }
 
+IBlockchainCache* Core::findSegmentContainingBlock(uint32_t blockHeight) const {
+  assert(chainsLeaves.size() > 0);
+
+  // first search in main chain
+  auto blockSegment = findMainChainSegmentContainingBlock(blockHeight);
+  if (blockSegment != nullptr) {
+    return blockSegment;
+  }
+
+  // than search in alternative chains
+  return findAlternativeSegmentContainingBlock(blockHeight);
+}
+
+
 IBlockchainCache* Core::findAlternativeSegmentContainingBlock(const Crypto::Hash& blockHash) const {
   IBlockchainCache* cache = nullptr;
   std::find_if(++chainsLeaves.begin(), chainsLeaves.end(),
@@ -1928,6 +1942,17 @@ void Core::mergeSegments(IBlockchainCache* acceptingSegment, IBlockchainCache* s
     acceptingSegment->pushBlock(CachedBlock(block), transactions, info.validatorState, info.blockSize,
                                 info.generatedCoins, info.blockDifficulty, std::move(info.rawBlock));
   }
+}
+
+BlockDetails Core::getBlockDetails(const uint32_t blockHeight) const {
+  throwIfNotInitialized();
+
+  IBlockchainCache* segment = findSegmentContainingBlock(blockHeight);
+  if (segment == nullptr) {
+    throw std::runtime_error("Requested block height wasn't found in blockchain.");
+  }
+
+  return getBlockDetails(segment->getBlockHash(blockHeight));
 }
 
 BlockDetails Core::getBlockDetails(const Crypto::Hash& blockHash) const {
