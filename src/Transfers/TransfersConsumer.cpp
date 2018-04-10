@@ -315,7 +315,7 @@ uint32_t TransfersConsumer::onNewBlocks(const CompleteBlock* blocks, uint32_t st
     return std::tie(a.blockInfo.height, a.blockInfo.transactionIndex) < std::tie(b.blockInfo.height, b.blockInfo.transactionIndex);
   });
 
-  uint32_t processedBlockCount = emptyBlockCount;
+  uint32_t processedBlockCount = static_cast<uint32_t>(emptyBlockCount);
   try {
     for (const auto& tx : preprocessedTransactions) {
       processTransaction(tx.blockInfo, *tx.tx, tx);
