@@ -445,7 +445,7 @@ void INodeTrivialRefreshStub::doGetBlocks(const std::vector<uint32_t>& blockHeig
 void INodeTrivialRefreshStub::getBlock(const uint32_t blockHeight, BlockDetails &block, const Callback& callback) {
   m_asyncCounter.addAsyncContext();
 
-  std::thread task([=, &blocks]() mutable { doGetBlock(blockHeight, block, callback); });
+  std::thread task([=, &block]() mutable { doGetBlock(blockHeight, block, callback); });
   task.detach();
 }
 
@@ -461,10 +461,10 @@ void INodeTrivialRefreshStub::doGetBlock(const uint32_t blockHeight, BlockDetail
   BlockDetails b = BlockDetails();
   b.index = blockHeight;
   b.isAlternative = false;
-  auto cached = CachedBlock(m_blockchainGenerator.getBlockchain()[height]);
+  auto cached = CachedBlock(m_blockchainGenerator.getBlockchain()[blockHeight]);
   b.hash = cached.getBlockHash();
   b.timestamp = cached.getBlock().timestamp;
-  b.alreadyGeneratedTransactions = m_blockchainGenerator.getGeneratedTransactionsNumber(height);
+  b.alreadyGeneratedTransactions = m_blockchainGenerator.getGeneratedTransactionsNumber(blockHeight);
 
   std::transform(cached.getBlock().transactionHashes.begin(), cached.getBlock().transactionHashes.end(),
                  std::back_inserter(b.transactions), [&](const Crypto::Hash& hash) {
