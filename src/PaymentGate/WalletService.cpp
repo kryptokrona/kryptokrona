@@ -83,6 +83,7 @@ Crypto::Hash parsePaymentId(const std::string& paymentIdStr) {
 
   Crypto::Hash paymentId;
   bool r = Common::podFromHex(paymentIdStr, paymentId);
+  if (r) {}
   assert(r);
 
   return paymentId;

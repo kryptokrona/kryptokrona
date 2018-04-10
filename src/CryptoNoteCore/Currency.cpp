@@ -821,6 +821,7 @@ Transaction CurrencyBuilder::generateGenesisTransaction() {
       Crypto::KeyDerivation derivation = boost::value_initialized<Crypto::KeyDerivation>();
       Crypto::PublicKey outEphemeralPubKey = boost::value_initialized<Crypto::PublicKey>();
       bool r = Crypto::generate_key_derivation(targets[i].viewPublicKey, txkey.secretKey, derivation);
+      if (r) {}
       assert(r == true);
 //      CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to generate_key_derivation(" << targets[i].viewPublicKey << ", " << txkey.sec << ")");
       r = Crypto::derive_public_key(derivation, i, targets[i].spendPublicKey, outEphemeralPubKey);

@@ -96,6 +96,7 @@ void SynchronizationState::detach(uint32_t height) {
 void SynchronizationState::addBlocks(const Crypto::Hash* blockHashes, uint32_t height, uint32_t count) {
   assert(blockHashes);
   auto size = m_blockchain.size();
+  if (size) {}
   // Dummy fix for simplewallet or walletd when sync
   if (height == 0)
     height = 1;

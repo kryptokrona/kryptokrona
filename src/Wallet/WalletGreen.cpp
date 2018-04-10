@@ -801,6 +801,7 @@ void WalletGreen::subscribeWallets() {
 
       auto& subscription = m_synchronizer.addSubscription(sub);
       bool r = index.modify(it, [&subscription](WalletRecord& rec) { rec.container = &subscription.getContainer(); });
+      if (r) {}
       assert(r);
 
       subscription.addObserver(this);
@@ -1837,6 +1838,7 @@ bool WalletGreen::updateWalletTransactionInfo(size_t transactionId, const Crypto
     }
   });
 
+  if (r) {}
   assert(r);
 
   if (updated) {
@@ -2663,6 +2665,7 @@ void WalletGreen::onTransactionUpdated(const Crypto::PublicKey&, const Crypto::H
     // Don't move this code to the following remote spawn, because it guarantees that the container has the transaction
     uint64_t outputsAmount;
     bool found = container->getTransactionInformation(transactionHash, info, &inputsAmount, &outputsAmount);
+    if (found) {}
     assert(found);
 
     ContainerAmounts containerAmounts;
@@ -3050,7 +3053,8 @@ size_t WalletGreen::createFusionTransaction(uint64_t threshold, uint16_t mixin,
   std::unique_ptr<ITransaction> fusionTransaction;
   size_t transactionSize;
   int round = 0;
-  uint64_t transactionAmount;
+  uint64_t transactionAmount = 0;
+  if (transactionAmount) {}
   do {
     if (round != 0) {
       fusionInputs.pop_back();
