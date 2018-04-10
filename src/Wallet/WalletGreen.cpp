@@ -3053,7 +3053,7 @@ size_t WalletGreen::createFusionTransaction(uint64_t threshold, uint16_t mixin,
   std::unique_ptr<ITransaction> fusionTransaction;
   size_t transactionSize;
   int round = 0;
-  uint64_t transactionAmount;
+  uint64_t transactionAmount = 0;
   if (transactionAmount) {}
   do {
     if (round != 0) {
