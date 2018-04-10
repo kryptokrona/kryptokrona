@@ -1100,8 +1100,15 @@ CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
 {
     CryptoNote::BlockDetails block;
 
+    /* No connection to turtlecoind */
+    if (node.getLastKnownBlockHeight() == 0)
+    {
+        return block;
+    }
+
     std::promise<std::error_code> errorPromise;
-    auto f_error = errorPromise.get_future();
+
+    auto e = errorPromise.get_future();
 
     auto callback = [&errorPromise](std::error_code e)
     {
@@ -1110,12 +1117,10 @@ CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
 
     node.getBlock(blockHeight, block, callback);
 
-    auto error = f_error.get();
-
-    if (error)
+    if (e.get())
     {
-        std::cout << "Failed to retrieve block from node, is TurtleCoind open?"
-                  << std::endl;
+        std::cout << "Failed to retrieve block from node, is TurtleCoind "
+                  << "open?" << std::endl;
     }
 
     return block;
