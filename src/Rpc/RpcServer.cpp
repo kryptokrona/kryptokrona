@@ -120,6 +120,7 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/getrandom_outs.bin", { binMethod<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS>(&RpcServer::on_get_random_outs), false } },
   { "/get_pool_changes.bin", { binMethod<COMMAND_RPC_GET_POOL_CHANGES>(&RpcServer::onGetPoolChanges), false } },
   { "/get_pool_changes_lite.bin", { binMethod<COMMAND_RPC_GET_POOL_CHANGES_LITE>(&RpcServer::onGetPoolChangesLite), false } },
+  { "/get_block_details_by_height.bin", { binMethod<COMMAND_RPC_GET_BLOCK_DETAILS_BY_HEIGHT>(&RpcServer::onGetBlockDetailsByHeight), false } },
   { "/get_blocks_details_by_hashes.bin", { binMethod<COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HASHES>(&RpcServer::onGetBlocksDetailsByHashes), false } },
   { "/get_blocks_hashes_by_timestamps.bin", { binMethod<COMMAND_RPC_GET_BLOCKS_HASHES_BY_TIMESTAMPS>(&RpcServer::onGetBlocksHashesByTimestamps), false } },
   { "/get_transaction_details_by_hashes.bin", { binMethod<COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASHES>(&RpcServer::onGetTransactionDetailsByHashes), false } },
@@ -383,6 +384,22 @@ bool RpcServer::onGetBlocksDetailsByHashes(const COMMAND_RPC_GET_BLOCKS_DETAILS_
   return true;
 }
 
+bool RpcServer::onGetBlockDetailsByHeight(const COMMAND_RPC_GET_BLOCK_DETAILS_BY_HEIGHT::request& req, COMMAND_RPC_GET_BLOCK_DETAILS_BY_HEIGHT::response& rsp) {
+  try {
+    BlockDetails blockDetails = m_core.getBlockDetails(req.blockHeight);
+    rsp.block = blockDetails;
+  } catch (std::system_error& e) {
+    rsp.status = e.what();
+    return false;
+  } catch (std::exception& e) {
+    rsp.status = "Error: " + std::string(e.what());
+    return false;
+  }
+
+  rsp.status = CORE_RPC_STATUS_OK;
+  return true;
+}
+
 bool RpcServer::onGetBlocksHashesByTimestamps(const COMMAND_RPC_GET_BLOCKS_HASHES_BY_TIMESTAMPS::request& req, COMMAND_RPC_GET_BLOCKS_HASHES_BY_TIMESTAMPS::response& rsp) {
   try {
     auto blockHashes = m_core.getBlockHashesByTimestamps(req.timestampBegin, req.secondsCount);
@@ -563,12 +580,12 @@ bool RpcServer::f_on_blocks_list_json(const F_COMMAND_RPC_GET_BLOCKS_LIST::reque
   }
 
   uint32_t print_blocks_count = 30;
-  uint32_t last_height = req.height - print_blocks_count;
+  uint32_t last_height = static_cast<uint32_t>(req.height - print_blocks_count);
   if (req.height <= print_blocks_count)  {
     last_height = 0;
   }
 
-  for (uint32_t i = req.height; i >= last_height; i--) {
+  for (uint32_t i = static_cast<uint32_t>(req.height); i >= last_height; i--) {
     Hash block_hash = m_core.getBlockHashByIndex(static_cast<uint32_t>(i));
     if (!m_core.hasBlock(block_hash)) {
       throw JsonRpc::JsonRpcError{
@@ -653,6 +670,11 @@ bool RpcServer::f_on_block_json(const F_COMMAND_RPC_GET_BLOCK_DETAILS::request& 
   uint64_t maxReward = 0;
   uint64_t currentReward = 0;
   int64_t emissionChange = 0;
+  
+  if (maxReward) {}
+  if (currentReward) {}
+  if (emissionChange) {}
+  
   size_t blockGrantedFullRewardZone = m_core.getCurrency().blockGrantedFullRewardZoneByBlockVersion(block_header.major_version);
   res.block.effectiveSizeMedian = std::max(res.block.sizeMedian, blockGrantedFullRewardZone);
 
@@ -943,6 +965,7 @@ bool RpcServer::on_submitblock(const COMMAND_RPC_SUBMITBLOCK::request& req, COMM
 RawBlockLegacy RpcServer::prepareRawBlockLegacy(BinaryArray&& blockBlob) {
   BlockTemplate blockTemplate;
   bool result = fromBinaryArray(blockTemplate, blockBlob);
+  if (result) {}
   assert(result);
 
   RawBlockLegacy rawBlock;
@@ -986,7 +1009,7 @@ void RpcServer::fill_block_header_response(const BlockTemplate& blk, bool orphan
 	response.difficulty = m_core.getBlockDifficulty(index);
 	response.reward = get_block_reward(blk);
 	BlockDetails blkDetails = m_core.getBlockDetails(hash);
-	response.num_txes = blkDetails.transactions.size();
+	response.num_txes = static_cast<uint32_t>(blkDetails.transactions.size());
 	response.block_size = blkDetails.blockSize;
 }
 
@@ -1046,7 +1069,7 @@ bool RpcServer::on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_R
 		return false;
 	}
 
-	for (uint64_t h = req.start_height; h <= req.end_height; ++h) {
+	for (uint32_t h = static_cast<uint32_t>(req.start_height); h <= static_cast<uint32_t>(req.end_height); ++h) {
 		Crypto::Hash block_hash = m_core.getBlockHashByIndex(h);
 		CryptoNote::BlockTemplate blk = m_core.getBlockByHash(block_hash);
 		

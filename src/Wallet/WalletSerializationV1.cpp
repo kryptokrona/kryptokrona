@@ -495,6 +495,7 @@ void WalletSerializerV1::subscribeWallets() {
 
     auto& subscription = m_synchronizer.addSubscription(sub);
     bool r = index.modify(it, [&subscription] (WalletRecord& rec) { rec.container = &subscription.getContainer(); });
+    if (r) {}
     assert(r);
 
     subscription.addObserver(&m_transfersObserver);
@@ -536,6 +537,7 @@ void WalletSerializerV1::loadUnlockTransactionsJobs(Common::IInputStream& source
   auto& index = m_unlockTransactions.get<TransactionHashIndex>();
   auto& walletsIndex = m_walletsContainer.get<RandomAccessIndex>();
   const uint64_t walletsSize = walletsIndex.size();
+  if (walletsSize) {}
 
   uint64_t jobsCount = 0;
   deserializeEncrypted(jobsCount, "unlock_transactions_jobs_count", cryptoContext, source);

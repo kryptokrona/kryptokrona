@@ -180,7 +180,10 @@ void serialize(BlockDetails& block, ISerializer& serializer) {
   serializer(block.alreadyGeneratedCoins, "alreadyGeneratedCoins");
   serializer(block.alreadyGeneratedTransactions, "alreadyGeneratedTransactions");
   serializer(block.sizeMedian, "sizeMedian");
+  /* Some serializers don't support doubles, which causes this to fail and
+     not serialize the whole object
   serializer(block.penalty, "penalty");
+  */
   serializer(block.totalFeeAmount, "totalFeeAmount");
   serializer(block.transactions, "transactions");
 }
