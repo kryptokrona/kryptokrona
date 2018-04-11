@@ -99,8 +99,10 @@ bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h,
     return true;
 
   if (it->second == h) {
-    logger(Logging::INFO, BRIGHT_YELLOW) 
-      << "CHECKPOINT PASSED FOR INDEX " << index << " " << h;
+    if (index % 100 == 0) {
+      logger(Logging::INFO, BRIGHT_YELLOW)
+        << "CHECKPOINT PASSED FOR INDEX " << index << " " << h;
+    }
     return true;
   } else {
     logger(Logging::WARNING, BRIGHT_YELLOW) << "CHECKPOINT FAILED FOR HEIGHT " << index
