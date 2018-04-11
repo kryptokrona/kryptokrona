@@ -146,13 +146,5 @@ const char* const SEED_NODES[] = {
   "142.44.242.106:11897", //tom
   "165.227.252.132:11897" //iburnmycd
 };
-
-struct CheckpointData {
-  uint32_t index;
-  const char* blockId;
-};
-
-const std::initializer_list<CheckpointData> CHECKPOINTS = {  };
-
 } // CryptoNote
 

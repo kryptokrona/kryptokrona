@@ -17,6 +17,7 @@
 
 #include "Checkpoints.h"
 #include "Common/StringTools.h"
+#include <boost/regex.hpp>
 
 using namespace Logging;
 
@@ -28,16 +29,61 @@ bool Checkpoints::addCheckpoint(uint32_t index, const std::string &hash_str) {
   Crypto::Hash h = NULL_HASH;
 
   if (!Common::podFromHex(hash_str, h)) {
-    logger(ERROR, BRIGHT_RED) << "WRONG HASH IN CHECKPOINTS!!!";
+    logger(ERROR, BRIGHT_RED) << "INVALID HASH IN CHECKPOINTS!";
     return false;
   }
 
   if (!(0 == points.count(index))) {
-    logger(ERROR, BRIGHT_RED) << "WRONG HASH IN CHECKPOINTS!!!";
+    logger(ERROR, BRIGHT_RED) << "CHECKPOINT ALREADY EXISTS!";
     return false;
   }
 
   points[index] = h;
+  return true;
+}
+//---------------------------------------------------------------------------
+const boost::regex linesregx("\\r\\n|\\n\\r|\\n|\\r");
+const boost::regex fieldsregx(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
+bool Checkpoints::loadCheckpointsFromFile(const std::string& fileName) {
+  std::string buff;
+  if (!Common::loadFileToString(fileName, buff)) {
+    logger(ERROR, BRIGHT_RED) << "Could not load checkpoints file: " << fileName;
+    return false;
+  }
+  const char* data = buff.c_str();
+  unsigned int length = strlen(data);
+
+  boost::cregex_token_iterator li(data, data + length, linesregx, -1);
+  boost::cregex_token_iterator end;
+
+  int count = 0;
+  while (li != end) {
+    std::string line = li->str();
+    ++li;
+ 
+    boost::sregex_token_iterator ti(line.begin(), line.end(), fieldsregx, -1);
+    boost::sregex_token_iterator end2;
+ 
+    std::vector<std::string> row;
+    while (ti != end2) {
+      std::string token = ti->str();
+      ++ti;
+      row.push_back(token);
+    }
+    if (row.size() != 2) {
+      logger(ERROR, BRIGHT_RED) << "Invalid checkpoint file format";
+      return false;
+    } else {
+      uint32_t height = stoi(row[0]);
+      bool r = addCheckpoint(height, row[1]);
+      if (!r) {
+        return false;
+      }
+      count += 1;
+    }
+  }
+
+  logger(INFO) << "Loaded " << count << " checkpoints from " << fileName;
   return true;
 }
 //---------------------------------------------------------------------------
@@ -53,8 +99,10 @@ bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h,
     return true;
 
   if (it->second == h) {
-    logger(Logging::INFO, BRIGHT_YELLOW) 
-      << "CHECKPOINT PASSED FOR INDEX " << index << " " << h;
+    if (index % 100 == 0) {
+      logger(Logging::INFO, BRIGHT_YELLOW)
+        << "CHECKPOINT PASSED FOR INDEX " << index << " " << h;
+    }
     return true;
   } else {
     logger(Logging::WARNING, BRIGHT_YELLOW) << "CHECKPOINT FAILED FOR HEIGHT " << index
