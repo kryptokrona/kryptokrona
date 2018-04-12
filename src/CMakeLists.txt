@@ -85,7 +85,7 @@ add_executable(Miner ${Miner} ${MINER_SOURCES_OS})
 if(MSVC)
   target_link_libraries(System ws2_32)
   target_link_libraries(Daemon Rpcrt4)
-  target_link_libraries(PaymentGateService)
+  target_link_libraries(PaymentGateService Rpcrt4)
 endif ()
 
 # Add the dependencies we need
