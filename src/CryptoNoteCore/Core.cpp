@@ -953,7 +953,7 @@ bool Core::isTransactionValidForPool(const CachedTransaction& cachedTransaction,
   uint64_t fee;
 
   if (auto validationResult = validateTransaction(cachedTransaction, validatorState, chainsLeaves[0], fee, getTopBlockIndex())) {
-    logger(Logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
+    logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
       << " is not valid. Reason: " << validationResult.message();
     return false;
   }
