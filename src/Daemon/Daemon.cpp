@@ -29,6 +29,7 @@
 #include "Common/PathTools.h"
 #include "Common/Util.h"
 #include "crypto/hash.h"
+#include "CryptoNoteCheckpoints.h"
 #include "CryptoNoteCore/CryptoNoteTools.h"
 #include "CryptoNoteCore/Core.h"
 #include "CryptoNoteCore/Currency.h"
@@ -74,6 +75,7 @@ namespace
   const command_line::arg_descriptor<std::vector<std::string>>        arg_enable_cors = { "enable-cors", "Adds header 'Access-Control-Allow-Origin' to the daemon's RPC responses. Uses the value as domain. Use * for all" };
   const command_line::arg_descriptor<bool>        arg_testnet_on  = {"testnet", "Used to deploy test nets. Checkpoints and hardcoded seeds are ignored, "
     "network id is changed. Use it with --data-dir flag. The wallet must be launched with --testnet flag.", false};
+  const command_line::arg_descriptor<std::string> arg_load_checkpoints   = {"load-checkpoints", "<default|filename> Use builtin default checkpoints or checkpoint csv file for faster initial blockchain sync", ""};
 }
 
 bool command_line_preprocessor(const boost::program_options::variables_map& vm, LoggerRef& logger);
@@ -175,6 +177,7 @@ int main(int argc, char* argv[])
     command_line::add_arg(desc_cmd_sett, arg_blockexplorer_on);
     command_line::add_arg(desc_cmd_sett, arg_print_genesis_tx);
     command_line::add_arg(desc_cmd_sett, arg_genesis_block_reward_address);
+    command_line::add_arg(desc_cmd_sett, arg_load_checkpoints);
 
     RpcServerConfig::initOptions(desc_cmd_sett);
     NetNodeConfig::initOptions(desc_cmd_sett);
@@ -248,8 +251,8 @@ int main(int argc, char* argv[])
 
     //create objects and link them
     CryptoNote::CurrencyBuilder currencyBuilder(logManager);
-bool blockexplorer_mode = command_line::get_arg(vm, arg_blockexplorer_on);
-currencyBuilder.isBlockexplorer(blockexplorer_mode);
+    bool blockexplorer_mode = command_line::get_arg(vm, arg_blockexplorer_on);
+    currencyBuilder.isBlockexplorer(blockexplorer_mode);
     currencyBuilder.testnet(testnet_mode);
     try {
       currencyBuilder.currency();
@@ -259,10 +262,22 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
     }
     CryptoNote::Currency currency = currencyBuilder.currency();
 
+    bool use_checkpoints = !command_line::get_arg(vm, arg_load_checkpoints).empty();
+
     CryptoNote::Checkpoints checkpoints(logManager);
-    if (!testnet_mode) {
-      for (const auto& cp : CryptoNote::CHECKPOINTS) {
-        checkpoints.addCheckpoint(cp.index, cp.blockId);
+    if (use_checkpoints && !testnet_mode) {
+      logger(INFO) << "Loading Checkpoints for faster initial sync...";
+      std::string checkpoints_file = command_line::get_arg(vm, arg_load_checkpoints);
+      if (checkpoints_file == "default") {
+        for (const auto& cp : CryptoNote::CHECKPOINTS) {
+          checkpoints.addCheckpoint(cp.index, cp.blockId);
+        }
+        logger(INFO) << "Loaded " << CryptoNote::CHECKPOINTS.size() << " default checkpoints";
+      } else {
+        bool results = checkpoints.loadCheckpointsFromFile(checkpoints_file);
+        if (!results) {
+          throw std::runtime_error("Failed to load checkpoints");
+        }
       }
     }
 

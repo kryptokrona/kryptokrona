@@ -433,6 +433,10 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
             std::string walletLegacyBadPwdMsg =
                 ": The password is wrong";
 
+            std::string alreadyOpenMsg =
+                "MemoryMappedFile::open: The process cannot access the file "
+                "because it is being used by another process.";
+
             std::string errorMsg = e.what();
                 
             /* There are three different error messages depending upon if we're
@@ -444,8 +448,31 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                 std::cout << WarningMsg("Incorrect password! Try again.")
                           << std::endl;
             }
+            /* The message actually has a \r\n on the end but i'd prefer to
+               keep just the raw string in the source so check the it starts
+               with instead */
+            else if (boost::starts_with(errorMsg, alreadyOpenMsg))
+            {
+                std::cout << WarningMsg("Could not open wallet! It is already "
+                                        "open in another process.")
+                          << std::endl
+                          << WarningMsg("Check with a task manager that you "
+                                        "don't have simplewallet open twice.")
+                          << std::endl
+                          << WarningMsg("Also check you don't have another "
+                                        "wallet program open, such as a GUI "
+                                        "wallet or walletd.")
+                          << std::endl;
+
+                std::cout << "Hit any key to exit: ";
+                std::cin.get();
+                exit(0);
+            }
             else
             {
+                std::cout << "Unexpected error: " << errorMsg << std::endl;
+                std::cout << "Hit any key to exit: ";
+                std::cin.get();
                 throw(e);
             }
         }
@@ -790,7 +817,7 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
         }
         else if (command == "incoming_transfers")
         {
-            listTransfers(true, false, walletInfo->wallet);
+            listTransfers(true, false, walletInfo->wallet, node);
         }
         else if (command == "exit")
         {
@@ -814,11 +841,11 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
         {
             if (command == "outgoing_transfers")
             {
-                listTransfers(false, true, walletInfo->wallet);
+                listTransfers(false, true, walletInfo->wallet, node);
             }
             else if (command == "list_transfers")
             {
-                listTransfers(true, true, walletInfo->wallet);
+                listTransfers(true, true, walletInfo->wallet, node);
             }
             else if (command == "transfer")
             {
@@ -1068,24 +1095,76 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     return true;
 }
 
-void printOutgoingTransfer(CryptoNote::WalletTransaction t)
+CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
+                                  CryptoNote::INode &node)
 {
+    CryptoNote::BlockDetails block;
+
+    /* No connection to turtlecoind */
+    if (node.getLastKnownBlockHeight() == 0)
+    {
+        return block;
+    }
+
+    std::promise<std::error_code> errorPromise;
+
+    auto e = errorPromise.get_future();
+
+    auto callback = [&errorPromise](std::error_code e)
+    {
+        errorPromise.set_value(e);
+    };
+
+    node.getBlock(blockHeight, block, callback);
+
+    if (e.get())
+    {
+        std::cout << "Failed to retrieve block from node, is TurtleCoind "
+                  << "open?" << std::endl;
+    }
+
+    return block;
+}
+
+std::string getBlockTime(CryptoNote::BlockDetails b)
+{
+    if (b.timestamp == 0)
+    {
+        return "Failed to get timestamp, is TurtleCoind open?";
+    }
+
+    std::time_t time = b.timestamp;
+    char buffer[100];
+    std::strftime(buffer, sizeof(buffer), "%F %R", std::localtime(&time));
+    return std::string(buffer);
+}
+
+void printOutgoingTransfer(CryptoNote::WalletTransaction t,
+                           CryptoNote::INode &node)
+{
+    std::string blockTime = getBlockTime(getBlock(t.blockHeight, node));
+
     std::cout << WarningMsg("Outgoing transfer: " + Common::podToHex(t.hash) +
                             "\nSpent: " + formatAmount(-t.totalAmount - t.fee) + 
                             "\nFee: " + formatAmount(t.fee) +
-                            "\nTotal Spent: " + formatAmount(-t.totalAmount)) 
+                            "\nTotal Spent: " + formatAmount(-t.totalAmount) +
+                            "\nTimestamp: " + blockTime)
               << std::endl << std::endl;
 }
 
-void printIncomingTransfer(CryptoNote::WalletTransaction t)
+void printIncomingTransfer(CryptoNote::WalletTransaction t,
+                           CryptoNote::INode &node)
 {
+    std::string blockTime = getBlockTime(getBlock(t.blockHeight, node));
+
     std::cout << SuccessMsg("Incoming transfer: " + Common::podToHex(t.hash) +
-                            "\nAmount: " + formatAmount(t.totalAmount))
+                            "\nAmount: " + formatAmount(t.totalAmount) +
+                            "\nTimestamp: " + blockTime)
               << std::endl << std::endl;
 }
 
 void listTransfers(bool incoming, bool outgoing, 
-                   CryptoNote::WalletGreen &wallet)
+                   CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 {
     size_t numTransactions = wallet.getTransactionCount();
     int64_t totalSpent = 0;
@@ -1097,12 +1176,12 @@ void listTransfers(bool incoming, bool outgoing,
 
         if (t.totalAmount < 0 && outgoing)
         {
-            printOutgoingTransfer(t);
+            printOutgoingTransfer(t, node);
             totalSpent += -t.totalAmount;
         }
         else if (t.totalAmount > 0 && incoming)
         {
-            printIncomingTransfer(t);
+            printIncomingTransfer(t, node);
             totalReceived += t.totalAmount;
         }
     }
@@ -1283,11 +1362,11 @@ void findNewTransactions(CryptoNote::INode &node,
 
                         if (t.totalAmount < 0)
                         {
-                            printOutgoingTransfer(t);
+                            printOutgoingTransfer(t, node);
                         }
                         else
                         {
-                            printIncomingTransfer(t);
+                            printIncomingTransfer(t, node);
                         }
                     }
                 }

@@ -58,13 +58,31 @@ add_library(Wallet ${Wallet} ${WalletLegacy})
 add_library(PaymentGate ${PaymentGate})
 add_library(JsonRpcServer ${JsonRpcServer})
 
-add_executable(Daemon ${Daemon})
-add_executable(SimpleWallet ${SimpleWallet})
-add_executable(PaymentGateService ${PaymentGateService})
-add_executable(PoolWallet ${PoolWallet})
-add_executable(Miner ${Miner})
+if(MSVC)
+  set(DAEMON_SOURCES_OS
+    BinaryInfo/daemon.rc
+  )
+  set(SIMPLE_WALLET_SOURCES_OS
+    BinaryInfo/simplewallet.rc
+  )
+  set(POOLWALLET_SOURCES_OS
+    BinaryInfo/poolwallet.rc
+  )
+  set(MINER_SOURCES_OS
+    BinaryInfo/miner.rc
+  )
+  set(PG_SOURCES_OS
+    BinaryInfo/walletd.rc
+  )
+endif()
 
-if (MSVC)
+add_executable(Daemon ${Daemon} ${DAEMON_SOURCES_OS})
+add_executable(SimpleWallet ${SimpleWallet} ${SIMPLE_WALLET_SOURCES_OS})
+add_executable(PaymentGateService ${PaymentGateService} ${PG_SOURCES_OS})
+add_executable(PoolWallet ${PoolWallet} ${POOLWALLET_SOURCES_OS})
+add_executable(Miner ${Miner} ${MINER_SOURCES_OS})
+
+if(MSVC)
   target_link_libraries(System ws2_32)
   target_link_libraries(Daemon Rpcrt4)
   target_link_libraries(PaymentGateService Rpcrt4)

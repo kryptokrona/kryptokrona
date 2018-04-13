@@ -18,5 +18,7 @@
 #include "BlockingQueue.h"
 
 namespace {
+#ifdef MSVC
 char suppressMSVCWarningLNK4221;
+#endif
 }

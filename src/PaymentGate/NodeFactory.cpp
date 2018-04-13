@@ -77,6 +77,9 @@ public:
   virtual void getBlocks(const std::vector<Crypto::Hash>& blockHashes, std::vector<CryptoNote::BlockDetails>& blocks,
     const Callback& callback) override { }
 
+  virtual void getBlock(const uint32_t blockHeight, CryptoNote::BlockDetails &block,
+    const Callback& callback) override { }
+
   virtual void getTransactions(const std::vector<Crypto::Hash>& transactionHashes, std::vector<CryptoNote::TransactionDetails>& transactions,
     const Callback& callback) override { }
 

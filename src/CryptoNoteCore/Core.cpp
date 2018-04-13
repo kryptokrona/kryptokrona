@@ -130,6 +130,7 @@ TransactionValidatorState extractSpentOutputs(const CachedTransaction& transacti
     if (input.type() == typeid(KeyInput)) {
       const KeyInput& in = boost::get<KeyInput>(input);
       bool r = spentOutputs.spentKeyImages.insert(in.keyImage).second;
+      if (r) {}
       assert(r);
     } else {
       assert(false);
@@ -952,7 +953,7 @@ bool Core::isTransactionValidForPool(const CachedTransaction& cachedTransaction,
   uint64_t fee;
 
   if (auto validationResult = validateTransaction(cachedTransaction, validatorState, chainsLeaves[0], fee, getTopBlockIndex())) {
-    logger(Logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
+    logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
       << " is not valid. Reason: " << validationResult.message();
     return false;
   }
@@ -1308,6 +1309,7 @@ std::error_code Core::validateSemantic(const Transaction& transaction, uint64_t&
 
     // parameters used for the additional key_image check
     static const Crypto::KeyImage Z = { {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
+    if (Z == Z) {}
     static const Crypto::KeyImage I = { {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
     static const Crypto::KeyImage L = { {0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 } };
 
@@ -1589,6 +1591,20 @@ IBlockchainCache* Core::findSegmentContainingBlock(const Crypto::Hash& blockHash
   return findAlternativeSegmentContainingBlock(blockHash);
 }
 
+IBlockchainCache* Core::findSegmentContainingBlock(uint32_t blockHeight) const {
+  assert(chainsLeaves.size() > 0);
+
+  // first search in main chain
+  auto blockSegment = findMainChainSegmentContainingBlock(blockHeight);
+  if (blockSegment != nullptr) {
+    return blockSegment;
+  }
+
+  // than search in alternative chains
+  return findAlternativeSegmentContainingBlock(blockHeight);
+}
+
+
 IBlockchainCache* Core::findAlternativeSegmentContainingBlock(const Crypto::Hash& blockHash) const {
   IBlockchainCache* cache = nullptr;
   std::find_if(++chainsLeaves.begin(), chainsLeaves.end(),
@@ -1848,6 +1864,7 @@ void Core::deleteLeaf(size_t leafIndex) {
   IBlockchainCache* parent = leaf->getParent();
   if (parent != nullptr) {
     bool r = parent->deleteChild(leaf);
+    if (r) {}
     assert(r);
   }
 
@@ -1930,6 +1947,17 @@ void Core::mergeSegments(IBlockchainCache* acceptingSegment, IBlockchainCache* s
   }
 }
 
+BlockDetails Core::getBlockDetails(const uint32_t blockHeight) const {
+  throwIfNotInitialized();
+
+  IBlockchainCache* segment = findSegmentContainingBlock(blockHeight);
+  if (segment == nullptr) {
+    throw std::runtime_error("Requested block height wasn't found in blockchain.");
+  }
+
+  return getBlockDetails(segment->getBlockHash(blockHeight));
+}
+
 BlockDetails Core::getBlockDetails(const Crypto::Hash& blockHash) const {
   throwIfNotInitialized();
 
@@ -1980,6 +2008,7 @@ BlockDetails Core::getBlockDetails(const Crypto::Hash& blockHash) const {
 
   int64_t emissionChange = 0;
   bool result = currency.getBlockReward(blockDetails.majorVersion, blockDetails.sizeMedian, 0, prevBlockGeneratedCoins, 0, blockDetails.baseReward, emissionChange);
+  if (result) {}
   assert(result);
 
   uint64_t currentReward = 0;
@@ -2111,6 +2140,7 @@ TransactionDetails Core::getTransactionDetails(const Crypto::Hash& transactionHa
       outputReferences.reserve(txInToKeyDetails.input.outputIndexes.size());
       std::vector<uint32_t> globalIndexes = relativeOutputOffsetsToAbsolute(txInToKeyDetails.input.outputIndexes);
       ExtractOutputKeysResult result = segment->extractKeyOtputReferences(txInToKeyDetails.input.amount, { globalIndexes.data(), globalIndexes.size() }, outputReferences);
+      if (result == result) {}
       assert(result == ExtractOutputKeysResult::SUCCESS);
       assert(txInToKeyDetails.input.outputIndexes.size() == outputReferences.size());
 

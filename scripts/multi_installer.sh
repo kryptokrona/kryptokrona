@@ -70,7 +70,7 @@ _build_turtlecoin() {
     echo "Using ${_threads} threads"
 
     mkdir build && cd $_
-    cmake --silent .. >>build.log 2>&1 || _fail "Unable to run cmake. Please see build.log for more information"
+    cmake --silent -DDO_TESTS=OFF .. >>build.log 2>&1 || _fail "Unable to run cmake. Please see build.log for more information"
     make --silent -j"$_threads"  >>build.log 2>&1 || _fail "Unable to run make. Please see build.log for more information"
     _note "Compilation completed!"
 }
@@ -84,7 +84,7 @@ _configure_ubuntu() {
         _note "Sudo privileges required for package installation"
     fi
     $_sudo apt-get update -qq
-    $_sudo apt-get install -qq -y git build-essential python-dev gcc-4.9 g++-4.9 git cmake libboost1.58-all-dev librocksdb-dev  >>build.log 2>&1 || _fail "Unable to install build dependencies. Please see build.log for more information"
+    $_sudo apt-get install -qq -y git build-essential python-dev gcc g++ git cmake libboost-all-dev librocksdb-dev  >>build.log 2>&1 || _fail "Unable to install build dependencies. Please see build.log for more information"
 
     export CXXFLAGS="-std=gnu++11"
 }
