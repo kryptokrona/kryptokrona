@@ -561,14 +561,14 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
 
   auto cache = findSegmentContainingBlock(previousBlockHash);
   if (cache == nullptr) {
-    logger(Logging::WARNING) << "Block " << blockStr << " rejected as orphaned";
+    logger(Logging::DEBUGGING) << "Block " << blockStr << " rejected as orphaned";
     return error::AddBlockErrorCode::REJECTED_AS_ORPHANED;
   }
 
   std::vector<CachedTransaction> transactions;
   uint64_t cumulativeSize = 0;
   if (!extractTransactions(rawBlock.transactions, transactions, cumulativeSize)) {
-    logger(Logging::WARNING) << "Couldn't deserialize raw block transactions in block " << blockStr;
+    logger(Logging::DEBUGGING) << "Couldn't deserialize raw block transactions in block " << blockStr;
     return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
   }
 
@@ -582,14 +582,14 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
   bool addOnTop = cache->getTopBlockIndex() == previousBlockIndex;
   auto maxBlockCumulativeSize = currency.maxBlockCumulativeSize(previousBlockIndex + 1);
   if (cumulativeBlockSize > maxBlockCumulativeSize) {
-    logger(Logging::WARNING) << "Block " << blockStr << " has too big cumulative size";
+    logger(Logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
     return error::BlockValidationError::CUMULATIVE_BLOCK_SIZE_TOO_BIG;
   }
 
   uint64_t minerReward = 0;
   auto blockValidationResult = validateBlock(cachedBlock, cache, minerReward);
   if (blockValidationResult) {
-    logger(Logging::WARNING) << "Failed to validate block " << blockStr << ": " << blockValidationResult.message();
+    logger(Logging::DEBUGGING) << "Failed to validate block " << blockStr << ": " << blockValidationResult.message();
     return blockValidationResult;
   }
 
@@ -619,12 +619,12 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
 
   if (!currency.getBlockReward(cachedBlock.getBlock().majorVersion, blocksSizeMedian,
                                cumulativeBlockSize, alreadyGeneratedCoins, cumulativeFee, reward, emissionChange)) {
-    logger(Logging::WARNING) << "Block " << blockStr << " has too big cumulative size";
+    logger(Logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
     return error::BlockValidationError::CUMULATIVE_BLOCK_SIZE_TOO_BIG;
   }
 
   if (minerReward != reward) {
-    logger(Logging::WARNING) << "Block reward mismatch for block " << blockStr
+    logger(Logging::DEBUGGING) << "Block reward mismatch for block " << blockStr
                              << ". Expected reward: " << reward << ", got reward: " << minerReward;
     return error::BlockValidationError::BLOCK_REWARD_MISMATCH;
   }
@@ -664,7 +664,7 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
         notifyObservers(makeDelTransactionMessage(std::move(hashes), Messages::DeleteTransaction::Reason::InBlock));
       } else {
         cache->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange, currentDifficulty, std::move(rawBlock));
-        logger(Logging::WARNING) << "Block " << blockStr << " added to alternative chain.";
+        logger(Logging::DEBUGGING) << "Block " << blockStr << " added to alternative chain.";
 
         auto mainChainCache = chainsLeaves[0];
         if (cache->getCurrentCumulativeDifficulty() > mainChainCache->getCurrentCumulativeDifficulty()) {
