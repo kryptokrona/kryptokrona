@@ -30,6 +30,7 @@
 #include <System/Ipv4Address.h>
 #include "HTTP/HttpParser.h"
 #include "HTTP/HttpResponse.h"
+#include "Rpc/JsonRpc.h"
 
 #include "Common/JsonValue.h"
 #include "Serialization/JsonInputValueSerializer.h"
@@ -106,7 +107,7 @@ void JsonRpcServer::makeErrorResponse(const std::error_code& ec, Common::JsonVal
   JsonValue error(JsonValue::OBJECT);
 
   JsonValue code;
-  code = static_cast<int64_t>(-32000); //Application specific error code
+  code = static_cast<int64_t>(CryptoNote::JsonRpc::errParseError); //Application specific error code
 
   JsonValue message;
   message = ec.message();
@@ -154,7 +155,7 @@ void JsonRpcServer::makeMethodNotFoundResponse(Common::JsonValue& resp) {
   JsonValue error(JsonValue::OBJECT);
 
   JsonValue code;
-  code = static_cast<int64_t>(-32601); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
+  code = static_cast<int64_t>(CryptoNote::JsonRpc::errMethodNotFound); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
 
   JsonValue message;
   message = "Method not found";
@@ -171,7 +172,7 @@ void JsonRpcServer::makeInvalidPasswordResponse(Common::JsonValue& resp) {
   JsonValue error(JsonValue::OBJECT);
 
   JsonValue code;
-  code = static_cast<int64_t>(-32604);
+  code = static_cast<int64_t>(CryptoNote::JsonRpc::errInvalidPassword);
 
   JsonValue message;
   message = "Invalid or no rpc password";
@@ -195,7 +196,7 @@ void JsonRpcServer::makeJsonParsingErrorResponse(Common::JsonValue& resp) {
 
   JsonValue error(JsonValue::OBJECT);
   JsonValue code;
-  code = static_cast<int64_t>(-32700); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
+  code = static_cast<int64_t>(CryptoNote::JsonRpc::errParseError); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
 
   JsonValue message = "Parse error";
 
