@@ -437,6 +437,9 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                 "MemoryMappedFile::open: The process cannot access the file "
                 "because it is being used by another process.";
 
+            std::string notAWalletMsg =
+                "Unsupported wallet version: Wrong version";
+
             std::string errorMsg = e.what();
                 
             /* There are three different error messages depending upon if we're
@@ -462,8 +465,25 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                           << WarningMsg("Also check you don't have another "
                                         "wallet program open, such as a GUI "
                                         "wallet or walletd.")
-                          << std::endl;
+                          << std::endl << std::endl;
 
+                std::cout << "Hit any key to exit: ";
+                std::cin.get();
+                exit(0);
+            }
+            else if (errorMsg == notAWalletMsg)
+            {
+                std::cout << WarningMsg("Could not open wallet file! It "
+                                        "doesn't appear to be a valid wallet!")
+                          << std::endl
+                          << WarningMsg("Ensure you are opening a wallet "
+                                        "file, and the file has not gotten "
+                                        "corrupted.")
+                          << std::endl
+                          << WarningMsg("Try reimporting via keys, and always "
+                                        "close simplewallet with the exit "
+                                        "command to prevent corruption.")
+                          << std::endl << std::endl;
                 std::cout << "Hit any key to exit: ";
                 std::cin.get();
                 exit(0);
