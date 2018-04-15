@@ -71,7 +71,7 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
 						std::shared_ptr<WalletInfo> walletInfo)
 {
 	std::cout << std::endl
-		<< InformationMsg("Confirm Transaction?") << std::endl;
+			  << InformationMsg("Confirm Transaction?") << std::endl;
 
 	std::string paymentId = "";
 
