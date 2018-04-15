@@ -68,19 +68,35 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
 }
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
-                        std::shared_ptr<WalletInfo> walletInfo)
+						std::shared_ptr<WalletInfo> walletInfo)
 {
-    std::cout << std::endl 
-              << InformationMsg("Confirm Transaction?") << std::endl;
+	std::cout << std::endl
+			  << InformationMsg("Confirm Transaction?") << std::endl;
 
-    std::cout << "You are sending " 
-              << SuccessMsg(formatAmount(t.destinations[0].amount))
-              << ", with a fee of " << SuccessMsg(formatAmount(t.fee))
-              << std::endl
-              << "FROM: " << InformationMsg(walletInfo->walletFileName) 
-              << std::endl
-              << "TO: " << std::endl
-              << InformationMsg(t.destinations[0].address)
+	std::string paymentId = "";
+
+	if (t.extra.length() > 0)
+	{
+		std::vector<uint8_t> vecExtra;
+
+		for (auto it : t.extra)
+			vecExtra.push_back(static_cast<uint8_t>(it));
+
+		Crypto::Hash paymentIdHash;
+		CryptoNote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash);
+		paymentId = Common::podToHex(paymentIdHash);
+	}
+
+	std::cout << "You are sending "
+			  << SuccessMsg(formatAmount(t.destinations[0].amount))
+		  	  << ", with a fee of " << SuccessMsg(formatAmount(t.fee))
+			  << std::endl
+			  << "FROM: " << InformationMsg(walletInfo->walletFileName)
+			  << std::endl
+			  << "TO: " << std::endl
+			  << InformationMsg(t.destinations[0].address) << std::endl
+			  << "Payment ID: " << InformationMsg(paymentId) << std::endl
+			  << "MixIn: " << (unsigned)t.mixIn
               << std::endl << std::endl;
 
     if (confirm("Is this correct?"))
