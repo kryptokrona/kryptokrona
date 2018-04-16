@@ -68,7 +68,7 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
 }
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
-						            std::shared_ptr<WalletInfo> walletInfo)
+                        std::shared_ptr<WalletInfo> walletInfo)
 {
     std::cout << std::endl
               << InformationMsg("Confirm Transaction?") << std::endl;
