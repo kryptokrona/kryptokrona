@@ -69,7 +69,8 @@ void welcomeMsg();
 
 void help(bool viewWallet);
 
-void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node);
+void inputLoop(std::shared_ptr<WalletInfo> &walletInfo,
+               CryptoNote::INode &node);
 
 void exportKeys(std::shared_ptr<WalletInfo> &walletInfo);
 
@@ -120,8 +121,8 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
                                            Crypto::SecretKey privateSpendKey,
                                            Crypto::SecretKey privateViewKey);
 
-std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
-                                       Config &config);
+Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
+                                              Config &config);
 
 std::shared_ptr<WalletInfo> importWallet(CryptoNote::WalletGreen &wallet);
 
@@ -132,8 +133,8 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
 
 std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet);
 
-std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
-                                         Action action, Config &config);
+Maybe<std::shared_ptr<WalletInfo>> handleAction(CryptoNote::WalletGreen &wallet,
+                                                Action action, Config &config);
 
 Crypto::SecretKey getPrivateKey(std::string outputMsg);
 

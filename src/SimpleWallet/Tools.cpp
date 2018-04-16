@@ -122,7 +122,8 @@ bool confirm(std::string msg)
         else
         {
             std::cout << WarningMsg("Bad input: ") << InformationMsg(answer)
-                      << WarningMsg(" - please enter either Y or N.") << std::endl;
+                      << WarningMsg(" - please enter either Y or N.")
+                      << std::endl;
         }
     }
 }

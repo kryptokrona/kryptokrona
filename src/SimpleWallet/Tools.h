@@ -121,3 +121,77 @@ class WarningMsg : public ColouredMsg
                : ColouredMsg(msg, padding, 
                              Common::Console::Color::BrightRed) {}
 };
+
+/* This borrows from haskell, and is a nicer boost::optional class. We either
+   have Just a value, or Nothing.
+
+   Example usage follows.
+   The below code will print:
+
+   ```
+   100
+   Nothing
+   ```
+
+   Maybe<int> parseAmount(std::string input)
+   {
+        if (input.length() == 0)
+        {
+            return Nothing<int>();
+        }
+
+        try
+        {
+            return Just<int>(std::stoi(input)
+        }
+        catch (const std::invalid_argument)
+        {
+            return Nothing<int>();
+        }
+   }
+
+   int main()
+   {
+       auto foo = parseAmount("100");
+
+       if (foo.isJust)
+       {
+           std::cout << foo.x << std::endl;
+       }
+       else
+       {
+           std::cout << "Nothing" << std::endl;
+       }
+
+       auto bar = parseAmount("garbage");
+
+       if (bar.isJust)
+       {
+           std::cout << bar.x << std::endl;
+       }
+       else
+       {
+           std::cout << "Nothing" << std::endl;
+       }
+   }
+
+*/
+
+template <class X> struct Maybe
+{
+    X x;
+    bool isJust;
+
+    Maybe(const X &x) : x (x), isJust(true) {}
+    Maybe() : isJust(false) {}
+};
+
+template <class X> Maybe<X> Just(const X&x)
+{
+    return Maybe<X>(x);
+}
+
+template <class X> Maybe<X> Nothing()
+{
+    return Maybe<X>();
+}

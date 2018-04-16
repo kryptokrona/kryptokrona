@@ -82,13 +82,23 @@ int main(int argc, char **argv)
 void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
          Config &config)
 {
-    std::cout << InformationMsg("TurtleCoin v" + std::string(PROJECT_VERSION)
-                              + " Simplewallet") << std::endl;
+    auto maybeWalletInfo = Nothing<std::shared_ptr<WalletInfo>>();
+    Action action;
 
-    /* Open/import/generate the wallet */
-    Action action = getAction(config);
-    std::shared_ptr<WalletInfo> walletInfo = handleAction(wallet, action, 
-                                                          config);
+    do
+    {
+        std::cout << InformationMsg("TurtleCoin v"
+                                  + std::string(PROJECT_VERSION)
+                                  + " Simplewallet") << std::endl;
+
+        /* Open/import/generate the wallet */
+        action = getAction(config);
+        maybeWalletInfo = handleAction(wallet, action, config);
+
+    /* Didn't manage to get the wallet info, returning to selection screen */
+    } while (!maybeWalletInfo.isJust);
+
+    auto walletInfo = maybeWalletInfo.x;
 
     bool alreadyShuttingDown = false;
 
@@ -193,12 +203,12 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     shutdown(walletInfo->wallet, node, alreadyShuttingDown);
 }
 
-std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
-                                         Action action, Config &config)
+Maybe<std::shared_ptr<WalletInfo>> handleAction(CryptoNote::WalletGreen &wallet,
+                                                Action action, Config &config)
 {
     if (action == Generate)
     {
-        return generateWallet(wallet);
+        return Just<std::shared_ptr<WalletInfo>>(generateWallet(wallet));
     }
     else if (action == Open)
     {
@@ -206,15 +216,15 @@ std::shared_ptr<WalletInfo> handleAction(CryptoNote::WalletGreen &wallet,
     }
     else if (action == Import)
     {
-        return importWallet(wallet);
+        return Just<std::shared_ptr<WalletInfo>>(importWallet(wallet));
     }
     else if (action == SeedImport)
     {
-        return mnemonicImportWallet(wallet);
+        return Just<std::shared_ptr<WalletInfo>>(mnemonicImportWallet(wallet));
     }
     else if (action == ViewWallet)
     {
-        return createViewWallet(wallet);
+        return Just<std::shared_ptr<WalletInfo>>(createViewWallet(wallet));
     }
     else
     {
@@ -355,8 +365,8 @@ std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
                                         walletAddress, false, wallet);
 }
 
-std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
-                                       Config &config)
+Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
+                                              Config &config)
 {
     std::string walletFileName = getExistingWalletFileName(config);
 
@@ -400,9 +410,12 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
 
                 viewWalletMsg();
 
-                return std::make_shared<WalletInfo>(walletFileName, walletPass, 
-                                                    walletAddress, true, 
-                                                    wallet);
+                return Just<std::shared_ptr<WalletInfo>>
+                           (std::make_shared<WalletInfo>(walletFileName,
+                                                         walletPass, 
+                                                         walletAddress,
+                                                         true, 
+                                                         wallet));
             }
             else
             {
@@ -412,13 +425,20 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                                           + " has been successfully opened!")
                           << std::endl << std::endl;
 
-                return std::make_shared<WalletInfo>(walletFileName, walletPass, 
-                                                    walletAddress, false, 
-                                                    wallet);
+                return Just<std::shared_ptr<WalletInfo>>
+                           (std::make_shared<WalletInfo>(walletFileName,
+                                                         walletPass, 
+                                                         walletAddress,
+                                                         false, 
+                                                         wallet));
             }
-
-            return std::make_shared<WalletInfo>(walletFileName, walletPass, 
-                                                walletAddress, false, wallet);
+ 
+            return Just<std::shared_ptr<WalletInfo>>
+                       (std::make_shared<WalletInfo>(walletFileName,
+                                                     walletPass, 
+                                                     walletAddress,
+                                                     false,
+                                                     wallet));
         }
         catch (const std::system_error& e)
         {
@@ -467,9 +487,10 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                                         "wallet or walletd.")
                           << std::endl << std::endl;
 
-                std::cout << "Hit any key to exit: ";
-                std::cin.get();
-                exit(0);
+                std::cout << "Returning to selection screen..." << std::endl
+                          << std::endl;
+
+                return Nothing<std::shared_ptr<WalletInfo>>();
             }
             else if (errorMsg == notAWalletMsg)
             {
@@ -484,16 +505,22 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                                         "close simplewallet with the exit "
                                         "command to prevent corruption.")
                           << std::endl << std::endl;
-                std::cout << "Hit any key to exit: ";
-                std::cin.get();
-                exit(0);
+
+                std::cout << "Returning to selection screen..." << std::endl
+                          << std::endl;
+
+                return Nothing<std::shared_ptr<WalletInfo>>();
             }
             else
             {
                 std::cout << "Unexpected error: " << errorMsg << std::endl;
-                std::cout << "Hit any key to exit: ";
-                std::cin.get();
-                throw(e);
+                std::cout << "Please report this error message and what "
+                          << "you did to cause it." << std::endl << std::endl;
+
+                std::cout << "Returning to selection screen..." << std::endl
+                          << std::endl;
+
+                return Nothing<std::shared_ptr<WalletInfo>>();
             }
         }
     }
@@ -1139,8 +1166,8 @@ CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
 
     if (e.get())
     {
-        std::cout << "Failed to retrieve block from node, is TurtleCoind "
-                  << "open?" << std::endl;
+        /* Prevent the compiler optimizing it out... */
+        std::cout << "";
     }
 
     return block;
@@ -1150,7 +1177,7 @@ std::string getBlockTime(CryptoNote::BlockDetails b)
 {
     if (b.timestamp == 0)
     {
-        return "Failed to get timestamp, is TurtleCoind open?";
+        return "";
     }
 
     std::time_t time = b.timestamp;
@@ -1164,12 +1191,20 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
 {
     std::string blockTime = getBlockTime(getBlock(t.blockHeight, node));
 
-    std::cout << WarningMsg("Outgoing transfer: " + Common::podToHex(t.hash) +
-                            "\nSpent: " + formatAmount(-t.totalAmount - t.fee) + 
-                            "\nFee: " + formatAmount(t.fee) +
-                            "\nTotal Spent: " + formatAmount(-t.totalAmount) +
-                            "\nTimestamp: " + blockTime)
+    std::cout << WarningMsg("Outgoing transfer: " + Common::podToHex(t.hash))
+              << std::endl
+              << WarningMsg("Spent: " + formatAmount(-t.totalAmount - t.fee))
+              << std::endl
+              << WarningMsg("Fee: " + formatAmount(t.fee))
+              << std::endl
+              << WarningMsg("Total Spent: " + formatAmount(-t.totalAmount))
               << std::endl << std::endl;
+
+    /* Couldn't get timestamp, maybe old node or turtlecoind closed */
+    if (blockTime != "")
+    {
+        std::cout << WarningMsg("Timestamp: " + blockTime) << std::endl;
+    }
 }
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t,
@@ -1177,10 +1212,16 @@ void printIncomingTransfer(CryptoNote::WalletTransaction t,
 {
     std::string blockTime = getBlockTime(getBlock(t.blockHeight, node));
 
-    std::cout << SuccessMsg("Incoming transfer: " + Common::podToHex(t.hash) +
-                            "\nAmount: " + formatAmount(t.totalAmount) +
-                            "\nTimestamp: " + blockTime)
+    std::cout << SuccessMsg("Incoming transfer: " + Common::podToHex(t.hash))
+              << std::endl
+              << SuccessMsg("Amount: " + formatAmount(t.totalAmount))
               << std::endl << std::endl;
+
+    /* Couldn't get timestamp, maybe old node or turtlecoind closed */
+    if (blockTime != "")
+    {
+        std::cout << SuccessMsg("Timestamp: " + blockTime) << std::endl;
+    }
 }
 
 void listTransfers(bool incoming, bool outgoing, 
@@ -1241,9 +1282,10 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> &walletInfo)
                           << InformationMsg("New transaction found!")
                           << std::endl
                           << SuccessMsg("Incoming transfer: " 
-                                    + Common::podToHex(t.hash) +
-                                      "\nAmount: " 
-                                    + formatAmount(t.totalAmount))
+                                      + Common::podToHex(t.hash))
+                          << std::endl
+                          << SuccessMsg("Amount: "
+                                      + formatAmount(t.totalAmount))
                           << std::endl
                           << getPrompt(walletInfo)
                           << std::flush;
@@ -1365,7 +1407,9 @@ void findNewTransactions(CryptoNote::INode &node,
             stuckCounter = 0;
             walletHeight = tmpWalletHeight;
 
-            size_t tmpTransactionCount = walletInfo->wallet.getTransactionCount();
+            size_t tmpTransactionCount = walletInfo
+                                       ->wallet.getTransactionCount();
+
             if (tmpTransactionCount != transactionCount)
             {
                 for (size_t i = transactionCount; i < tmpTransactionCount; i++)

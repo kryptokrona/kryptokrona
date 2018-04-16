@@ -68,35 +68,46 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
 }
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
-						std::shared_ptr<WalletInfo> walletInfo)
+						            std::shared_ptr<WalletInfo> walletInfo)
 {
-	std::cout << std::endl
-			  << InformationMsg("Confirm Transaction?") << std::endl;
+    std::cout << std::endl
+              << InformationMsg("Confirm Transaction?") << std::endl;
 
-	std::string paymentId = "";
+    std::string paymentId = "";
 
-	if (t.extra.length() > 0)
-	{
-		std::vector<uint8_t> vecExtra;
+    if (t.extra.length() > 0)
+    {
+        std::vector<uint8_t> vecExtra;
 
-		for (auto it : t.extra)
-			vecExtra.push_back(static_cast<uint8_t>(it));
+        for (auto it : t.extra)
+        {
+            vecExtra.push_back(static_cast<uint8_t>(it));
+        }
 
-		Crypto::Hash paymentIdHash;
-		CryptoNote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash);
-		paymentId = Common::podToHex(paymentIdHash);
-	}
+        Crypto::Hash paymentIdHash;
+        CryptoNote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash);
+        paymentId = Common::podToHex(paymentIdHash);
+    }
 
-	std::cout << "You are sending "
-			  << SuccessMsg(formatAmount(t.destinations[0].amount))
-		  	  << ", with a fee of " << SuccessMsg(formatAmount(t.fee))
-			  << std::endl
-			  << "FROM: " << InformationMsg(walletInfo->walletFileName)
-			  << std::endl
-			  << "TO: " << std::endl
-			  << InformationMsg(t.destinations[0].address) << std::endl
-			  << "Payment ID: " << InformationMsg(paymentId) << std::endl
-			  << "MixIn: " << (unsigned)t.mixIn
+    std::cout << "You are sending "
+              << SuccessMsg(formatAmount(t.destinations[0].amount))
+              << ", with a fee of " << SuccessMsg(formatAmount(t.fee))
+              << ", " << std::endl;
+
+    if (paymentId != "")
+    {
+        std::cout << "A mixin of " << SuccessMsg(std::to_string(t.mixIn))
+                  << " and a Payment ID of " << SuccessMsg(paymentId);
+    }
+    else
+    {
+        std::cout << "And a mixin of " << SuccessMsg(std::to_string(t.mixIn));
+    }
+    
+    std::cout << std::endl << std::endl
+              << "FROM: " << InformationMsg(walletInfo->walletFileName)
+              << std::endl
+              << "TO: " << InformationMsg(t.destinations[0].address)
               << std::endl << std::endl;
 
     if (confirm("Is this correct?"))
@@ -1127,11 +1138,13 @@ bool parseAmount(std::string amountString)
 
     if (!parseAmount(amountString, amount))
     {
-        std::cout << WarningMsg("Failed to parse amount! Ensure you entered the "
-                                "value correctly.") << std::endl
+        std::cout << WarningMsg("Failed to parse amount! Ensure you entered "
+                                "the value correctly.")
+                  << std::endl
                   << "Please note, the minimum you can send is 0.01 TRTL, "
                   << "and you can only use 2 decimal places."
                   << std::endl;
+
         return false;
     }
 
