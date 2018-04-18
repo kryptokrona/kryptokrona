@@ -102,6 +102,15 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
         }
     });
 
+    /* If all the arguments are specified, and we're using a remote node, it
+       seems like we don't have time to get a response from the node instantly,
+       and so about 50% of the time it will report that turtlecoind is not
+       open. We can simply add a small sleep to mitigate this */
+    if (config.host != "127.0.0.1" && config.walletGiven && config.passGiven)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+
     while (node.getLastKnownBlockHeight() == 0)
     {
         std::cout << WarningMsg("It looks like TurtleCoind isn't open!")
@@ -1302,6 +1311,8 @@ void findNewTransactions(CryptoNote::INode &node,
 
     while (walletHeight < localHeight)
     {
+        int counter = 1;
+
         /* This MUST be called on the main thread! */
         walletInfo->wallet.updateInternalCache();
 
@@ -1314,6 +1325,14 @@ void findNewTransactions(CryptoNote::INode &node,
         uint32_t tmpWalletHeight = walletInfo->wallet.getBlockCount();
 
         int waitSeconds = 1;
+
+        /* Save periodically so if someone closes before completion they don't
+           lose all their progress */
+        if (counter % 60 == 0)
+        {
+            walletInfo->wallet.save();
+        }
+
         if (tmpWalletHeight == walletHeight)
         {
             stuckCounter++;
@@ -1374,6 +1393,9 @@ void findNewTransactions(CryptoNote::INode &node,
                 transactionCount = tmpTransactionCount;
             }
         }
+
+        counter++;
+
         std::this_thread::sleep_for(std::chrono::seconds(waitSeconds));
     }
 
