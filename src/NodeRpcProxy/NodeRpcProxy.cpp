@@ -160,6 +160,8 @@ void NodeRpcProxy::workerThread(const INode::Callback& initialized_callback) {
       m_cv_initialized.notify_all();
     }
 
+    updateNodeStatus();
+
     initialized_callback(std::error_code());
 
     contextGroup.spawn([this]() {

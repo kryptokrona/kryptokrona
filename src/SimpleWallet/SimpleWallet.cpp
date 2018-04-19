@@ -1364,6 +1364,8 @@ void findNewTransactions(CryptoNote::INode &node,
 
     while (walletHeight < localHeight)
     {
+        int counter = 1;
+
         /* This MUST be called on the main thread! */
         walletInfo->wallet.updateInternalCache();
 
@@ -1376,6 +1378,14 @@ void findNewTransactions(CryptoNote::INode &node,
         uint32_t tmpWalletHeight = walletInfo->wallet.getBlockCount();
 
         int waitSeconds = 1;
+
+        /* Save periodically so if someone closes before completion they don't
+           lose all their progress */
+        if (counter % 60 == 0)
+        {
+            walletInfo->wallet.save();
+        }
+
         if (tmpWalletHeight == walletHeight)
         {
             stuckCounter++;
@@ -1438,6 +1448,9 @@ void findNewTransactions(CryptoNote::INode &node,
                 transactionCount = tmpTransactionCount;
             }
         }
+
+        counter++;
+
         std::this_thread::sleep_for(std::chrono::seconds(waitSeconds));
     }
 
