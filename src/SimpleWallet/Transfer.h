@@ -90,15 +90,15 @@ bool parseAddress(std::string address);
 
 bool parseFee(std::string feeString);
 
-std::string getPaymentID();
+Maybe<std::string> getPaymentID();
 
-std::string getDestinationAddress();
+Maybe<std::string> getDestinationAddress();
 
-uint64_t getFee();
+Maybe<uint64_t> getFee();
 
-uint64_t getTransferAmount();
+Maybe<uint64_t> getTransferAmount();
 
-uint16_t getMixin();
+Maybe<uint16_t> getMixin();
 
 size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet, 
                              uint64_t threshold);

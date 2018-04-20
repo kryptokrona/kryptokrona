@@ -699,10 +699,32 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
 
 void transfer(std::shared_ptr<WalletInfo> walletInfo)
 {
+    std::cout << InformationMsg("Note: You can type cancel at any time to "
+                                "cancel the transaction")
+              << std::endl << std::endl;
+
+
     uint64_t balance = walletInfo->wallet.getActualBalance();
 
-    std::string address = getDestinationAddress();
-    uint64_t amount = getTransferAmount();
+    auto maybeAddress = getDestinationAddress();
+
+    if (!maybeAddress.isJust)
+    {
+        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
+        return;
+    }
+
+    std::string address = maybeAddress.x;
+
+    auto maybeAmount = getTransferAmount();
+
+    if (!maybeAmount.isJust)
+    {
+        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
+        return;
+    }
+
+    uint64_t amount = maybeAmount.x;
 
     if (balance < amount)
     {
@@ -715,7 +737,15 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
         return;
     }
 
-    uint64_t fee = getFee();
+    auto maybeFee = getFee();
+
+    if (!maybeFee.isJust)
+    {
+        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
+        return;
+    }
+
+    uint64_t fee = maybeFee.x;
 
     if (balance < amount + fee)
     {
@@ -729,9 +759,25 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
         return;
     }
 
-    uint16_t mixin = getMixin();
+    auto maybeMixin = getMixin();
 
-    std::string extra = getPaymentID();
+    if (!maybeMixin.isJust)
+    {
+        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
+        return;
+    }
+
+    uint16_t mixin = maybeMixin.x;
+
+    auto maybeExtra = getPaymentID();
+
+    if (!maybeExtra.isJust)
+    {
+        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
+        return;
+    }
+
+    std::string extra = maybeExtra.x;
 
     doTransfer(mixin, address, amount, fee, extra, walletInfo);
 }
@@ -894,7 +940,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
     }
 }
 
-std::string getPaymentID()
+Maybe<std::string> getPaymentID()
 {
     while (true)
     {
@@ -914,7 +960,12 @@ std::string getPaymentID()
 
         if (paymentID == "")
         {
-            return paymentID;
+            return Just<std::string>(paymentID);
+        }
+
+        if (paymentID == "cancel")
+        {
+            return Nothing<std::string>();
         }
 
         std::vector<uint8_t> extra;
@@ -938,12 +989,12 @@ std::string getPaymentID()
                 extraString += static_cast<char>(i);
             }
 
-            return extraString;
+            return Just<std::string>(extraString);
         }
     }
 }
 
-uint64_t getFee()
+Maybe<uint64_t> getFee()
 {
     while (true)
     {
@@ -957,7 +1008,12 @@ uint64_t getFee()
 
         if (stringAmount == "")
         {
-            return CryptoNote::parameters::MINIMUM_FEE;
+            return Just<uint64_t>(CryptoNote::parameters::MINIMUM_FEE);
+        }
+
+        if (stringAmount == "cancel")
+        {
+            return Nothing<uint64_t>();
         }
 
         uint64_t amount;
@@ -965,16 +1021,17 @@ uint64_t getFee()
         if (parseFee(stringAmount))
         {
             parseAmount(stringAmount, amount);
-            return amount;
+            return Just<uint64_t>(amount);
         }
     }
 }
 
-uint16_t getMixin()
+Maybe<uint16_t> getMixin()
 {
     while (true)
     {
         std::string stringMixin;
+
         std::cout << std::endl
                   << InformationMsg("What mixin do you want to use?")
                   << std::endl
@@ -986,16 +1043,20 @@ uint16_t getMixin()
 
         if (stringMixin == "")
         {
-            return CryptoNote::parameters::DEFAULT_MIXIN;
+            return Just<uint16_t>(CryptoNote::parameters::DEFAULT_MIXIN);
+        }
+        else if (stringMixin == "cancel")
+        {
+            return Nothing<uint16_t>();
         }
         else if (parseMixin(stringMixin))
         {
-            return std::stoi(stringMixin);
+            return Just<uint16_t>(std::stoi(stringMixin));
         }
     }
 }
 
-uint64_t getTransferAmount()
+Maybe<uint64_t> getTransferAmount()
 {
     while (true)
     {
@@ -1006,17 +1067,22 @@ uint64_t getTransferAmount()
 
         std::getline(std::cin, stringAmount);
 
+        if (stringAmount == "cancel")
+        {
+            return Nothing<uint64_t>();
+        }
+
         uint64_t amount;
 
         if (parseAmount(stringAmount))
         {
             parseAmount(stringAmount, amount);
-            return amount;
+            return Just<uint64_t>(amount);
         }
     }
 }
 
-std::string getDestinationAddress()
+Maybe<std::string> getDestinationAddress()
 {
     while (true)
     {
@@ -1028,9 +1094,14 @@ std::string getDestinationAddress()
         std::getline(std::cin, transferAddr);
         boost::algorithm::trim(transferAddr);
 
+        if (transferAddr == "cancel")
+        {
+            return Nothing<std::string>();
+        }
+
         if (parseAddress(transferAddr))
         {
-            return transferAddr;
+            return Just<std::string>(transferAddr);
         }
     }
 }
