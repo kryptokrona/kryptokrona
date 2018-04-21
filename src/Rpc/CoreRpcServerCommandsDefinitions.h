@@ -279,6 +279,7 @@ struct COMMAND_RPC_GET_INFO {
     uint32_t last_known_block_index;
     uint32_t network_height;
     uint32_t hashrate;
+    std::string version;
     bool synced;
 
     void serialize(ISerializer &s) {
@@ -296,6 +297,7 @@ struct COMMAND_RPC_GET_INFO {
       KV_MEMBER(network_height)
       KV_MEMBER(hashrate)
       KV_MEMBER(synced)
+      KV_MEMBER(version)
     }
   };
 };

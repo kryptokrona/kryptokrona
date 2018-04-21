@@ -16,7 +16,6 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "RpcServer.h"
-
 #include <future>
 #include <unordered_map>
 #include "math.h"
@@ -28,13 +27,11 @@
 #include "CryptoNoteCore/Miner.h"
 #include "CryptoNoteCore/TransactionExtra.h"
 #include "CryptoNoteConfig.h"
-
 #include "CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h"
-
 #include "P2p/NetNode.h"
-
 #include "CoreRpcServerErrorCodes.h"
 #include "JsonRpc.h"
+#include "version.h"
 
 #undef ERROR
 
@@ -472,6 +469,7 @@ bool RpcServer::on_get_info(const COMMAND_RPC_GET_INFO::request& req, COMMAND_RP
   res.network_height = std::max(static_cast<uint32_t>(1), m_protocol.getBlockchainHeight());
   res.hashrate = (uint32_t)round(res.difficulty / CryptoNote::parameters::DIFFICULTY_TARGET);
   res.synced = ((uint32_t)res.height == (uint32_t)res.network_height);
+  res.version = PROJECT_VERSION;
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }
