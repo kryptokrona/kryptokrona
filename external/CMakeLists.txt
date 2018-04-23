@@ -17,7 +17,7 @@ elseif(NOT MSVC)
     set_property(TARGET upnpc-static PROPERTY FOLDER "external")
     add_custom_target(
        rocksdb
-       COMMAND make rocksdb
+       COMMAND $(MAKE) rocksdb
        WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/rocksdb
     )
     add_library(rocksdblib STATIC IMPORTED GLOBAL)
