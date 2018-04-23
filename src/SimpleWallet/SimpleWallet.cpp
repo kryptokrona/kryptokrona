@@ -798,6 +798,7 @@ std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
     std::future<std::string> inputGetter = std::async(std::launch::async, [] {
             std::string command;
             std::getline(std::cin, command);
+            boost::algorithm::trim(command);
             return command;
     });
 

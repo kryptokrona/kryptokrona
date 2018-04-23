@@ -125,8 +125,6 @@ Config parseArguments(int argc, char **argv)
             if (splitter == std::string::npos)
             {
                 config.host = urlString;
-                std::cout << "No port given, using default of "
-                          << CryptoNote::RPC_DEFAULT_PORT << std::endl;
             }
             else
             {
