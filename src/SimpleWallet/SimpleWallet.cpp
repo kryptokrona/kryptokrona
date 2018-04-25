@@ -751,8 +751,10 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
 
     if (viewWallet)
     {
-        std::cout << SuccessMsg("Private view key: " 
-                              + Common::podToHex(privateViewKey)) << std::endl;
+        std::cout << SuccessMsg("Private view key:")
+                  << std::endl
+                  << SuccessMsg(Common::podToHex(privateViewKey))
+                  << std::endl;
         return;
     }
 
@@ -765,10 +767,15 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
 
     bool deterministicPrivateKeys = derivedPrivateViewKey == privateViewKey;
 
-    std::cout << SuccessMsg("Private spend key: " 
-                          + Common::podToHex(privateSpendKey)) << std::endl
-              << SuccessMsg("Private view key: " 
-                          + Common::podToHex(privateViewKey)) << std::endl;
+    std::cout << SuccessMsg("Private spend key:")
+              << std::endl
+              << SuccessMsg(Common::podToHex(privateSpendKey))
+              << std::endl
+              << std::endl
+              << SuccessMsg("Private view key:")
+              << std::endl
+              << SuccessMsg(Common::podToHex(privateViewKey))
+              << std::endl;
 
     if (deterministicPrivateKeys)
     {
@@ -778,17 +785,25 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
                                               mnemonicSeed,
                                               "English");
 
-        std::cout << SuccessMsg("Mnemonic seed: " + mnemonicSeed) << std::endl;
+        std::cout << std::endl
+                  << SuccessMsg("Mnemonic seed:")
+                  << std::endl
+                  << SuccessMsg(mnemonicSeed)
+                  << std::endl;
     }
 }
 
 void welcomeMsg()
 {
-    std::cout << "Use the " << SuggestionMsg("help") 
-              << " command to see the list "
-              << "of available commands." << std::endl << "Use "
-              << SuggestionMsg("exit") << " when closing to ensure your wallet "
-              << "file doesn't get corrupted." << std::endl << std::endl;
+    std::cout << "Use the "
+              << SuggestionMsg("help") 
+              << " command to see the list of available commands."
+              << std::endl
+              << "Use "
+              << SuggestionMsg("exit")
+              << " when closing to ensure your wallet file doesn't get "
+              << "corrupted."
+              << std::endl << std::endl;
 }
 
 std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
@@ -1192,20 +1207,24 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
 {
     std::string blockTime = getBlockTime(getBlock(t.blockHeight, node));
 
-    std::cout << WarningMsg("Outgoing transfer: " + Common::podToHex(t.hash))
+    std::cout << WarningMsg("Outgoing transfer:")
+              << std::endl
+              << WarningMsg("Hash: " + Common::podToHex(t.hash))
               << std::endl
               << WarningMsg("Spent: " + formatAmount(-t.totalAmount - t.fee))
               << std::endl
               << WarningMsg("Fee: " + formatAmount(t.fee))
               << std::endl
               << WarningMsg("Total Spent: " + formatAmount(-t.totalAmount))
-              << std::endl << std::endl;
+              << std::endl;
 
     /* Couldn't get timestamp, maybe old node or turtlecoind closed */
     if (blockTime != "")
     {
         std::cout << WarningMsg("Timestamp: " + blockTime) << std::endl;
     }
+
+    std::cout << std::endl;
 }
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t,
@@ -1213,16 +1232,20 @@ void printIncomingTransfer(CryptoNote::WalletTransaction t,
 {
     std::string blockTime = getBlockTime(getBlock(t.blockHeight, node));
 
-    std::cout << SuccessMsg("Incoming transfer: " + Common::podToHex(t.hash))
+    std::cout << SuccessMsg("Incoming transfer:")
+              << std::endl
+              << SuccessMsg("Hash: " + Common::podToHex(t.hash))
               << std::endl
               << SuccessMsg("Amount: " + formatAmount(t.totalAmount))
-              << std::endl << std::endl;
+              << std::endl;
 
     /* Couldn't get timestamp, maybe old node or turtlecoind closed */
     if (blockTime != "")
     {
         std::cout << SuccessMsg("Timestamp: " + blockTime) << std::endl;
     }
+
+    std::cout << std::endl;
 }
 
 void listTransfers(bool incoming, bool outgoing, 
@@ -1282,8 +1305,9 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> &walletInfo)
                 std::cout << std::endl
                           << InformationMsg("New transaction found!")
                           << std::endl
-                          << SuccessMsg("Incoming transfer: " 
-                                      + Common::podToHex(t.hash))
+                          << SuccessMsg("Incoming transfer:")
+                          << std::endl
+                          << SuccessMsg("Hash: " + Common::podToHex(t.hash))
                           << std::endl
                           << SuccessMsg("Amount: "
                                       + formatAmount(t.totalAmount))
@@ -1350,17 +1374,19 @@ void findNewTransactions(CryptoNote::INode &node,
     if (walletHeight == 1)
     {
         std::cout << "Scanning through the blockchain to find transactions "
-                     "that belong to you." << std::endl
-                     << "Please wait, this will take some time."
-                     << std::endl << std::endl;
+                  << "that belong to you." << std::endl
+                  << "Please wait, this will take some time."
+                  << std::endl << std::endl;
     }
     else
     {
         std::cout << "Scanning through the blockchain to find any new "
-                     "transactions you received whilst your wallet wasn't "
-                     "open." << std::endl
-                     << "Please wait, this may take some time."
-                     << std::endl << std::endl;
+                  << "transactions you received"
+                  << std::endl
+                  << "whilst your wallet wasn't open."
+                  << std::endl
+                  << "Please wait, this may take some time."
+                  << std::endl << std::endl;
     }
 
     while (walletHeight < localHeight)
