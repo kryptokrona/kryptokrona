@@ -1354,7 +1354,9 @@ void findNewTransactions(CryptoNote::INode &node,
     {
         std::cout << "Your TurtleCoind isn't fully synced yet!" << std::endl
                   << "Until you are fully synced, you won't be able to send "
-                  << "transactions, and your balance may be missing or "
+                  << "transactions,"
+                  << std::endl
+                  << "and your balance may be missing or "
                   << "incorrect!" << std::endl << std::endl;
     }
 
@@ -1481,7 +1483,8 @@ void findNewTransactions(CryptoNote::INode &node,
         std::this_thread::sleep_for(std::chrono::seconds(waitSeconds));
     }
 
-    std::cout << SuccessMsg("Finished scanning blockchain!") << std::endl
+    std::cout << std::endl
+              << SuccessMsg("Finished scanning blockchain!") << std::endl
               << std::endl;
 
     /* In case the user force closes, we don't want them to have to rescan
