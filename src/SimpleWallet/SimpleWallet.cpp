@@ -66,9 +66,35 @@ int main(int argc, char **argv)
 
     node->init(callback);
 
-    if (error.get())
+    std::future<void> initNode = std::async(std::launch::async, [&] {
+            if (error.get())
+            {
+                throw std::runtime_error("Failed to initialize node!");
+            }
+    });
+
+    std::future_status status = initNode.wait_for(std::chrono::seconds(20));
+
+    /* Connection took to long to remote node, let program continue regardless
+       as they could perform functions like export_keys without being
+       connected */
+    if (status != std::future_status::ready)
     {
-        throw std::runtime_error("Failed to initialize node!");
+        if (config.host != "127.0.0.1")
+        {
+            std::cout << WarningMsg("Unable to connect to remote node, "
+                                    "connection timed out.")
+                      << std::endl
+                      << WarningMsg("Confirm the remote node is functioning, "
+                                    "or try a different remote node.")
+                      << std::endl << std::endl;
+        }
+        else
+        {
+            std::cout << WarningMsg("Unable to connect to node, "
+                                    "connection timed out.")
+                      << std::endl << std::endl;
+        }
     }
 
     /* Create the wallet instance */
