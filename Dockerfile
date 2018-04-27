@@ -38,12 +38,10 @@ RUN apt-get update && \
     cp src/walletd /usr/local/bin/walletd && \
     cp src/simplewallet /usr/local/bin/simplewallet && \
     cp src/miner /usr/local/bin/miner && \
-    cp src/connectivity_tool /usr/local/bin/connectivity_tool && \
     strip /usr/local/bin/TurtleCoind && \
     strip /usr/local/bin/walletd && \
     strip /usr/local/bin/simplewallet && \
     strip /usr/local/bin/miner && \
-    strip /usr/local/bin/connectivity_tool && \
     cd / && \
     rm -rf /src/turtlecoin && \
     apt-get remove -y build-essential python-dev gcc-4.9 g++-4.9 git cmake libboost1.58-all-dev librocksdb-dev && \
