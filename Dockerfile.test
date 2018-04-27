@@ -1,3 +1,7 @@
+# WHAT IS THIS FOR?
+# This is a copy of Dockerfile, but prior to compiling, will set difficult to 500. Useless for mainnet, but used
+# to setup a testnet with bootstrapped blockchain, and not have to spend days mining to get to the next block!
+#
 # daemon runs in the background
 # run something like tail /var/log/turtlecoind/current to see the status
 # be sure to run with volumes, ie:
