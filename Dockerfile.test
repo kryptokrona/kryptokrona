@@ -29,7 +29,7 @@ RUN apt-get update && \
     git clone https://github.com/turtlecoin/turtlecoin.git /src/turtlecoin && \
     cd /src/turtlecoin && \
     git checkout $TURTLECOIN_VERSION && \
-    sed -i '/std::vector<uint64_t> timestamps_o(timestamps);/i \\/*\n   Lower difficulty to static 500 for testnet\n   The rest of this function is ignored\n*\/\nreturn 500;\n\n' src/CryptoNoteCore/Currency.cpp
+    sed -i '/std::vector<uint64_t> timestamps_o(timestamps);/i \\/*\n   Lower difficulty to static 500 for testnet\n   The rest of this function is ignored\n*\/\nreturn 500;\n\n' src/CryptoNoteCore/Currency.cpp && \
     mkdir build && \
     cd build && \
     cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++11" .. && \
