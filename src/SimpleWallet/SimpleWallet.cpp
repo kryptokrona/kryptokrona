@@ -1244,6 +1244,13 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
               << WarningMsg("Total Spent: " + formatAmount(-t.totalAmount))
               << std::endl;
 
+    std::string paymentID = getPaymentID(t.extra);
+
+    if (paymentID != "")
+    {
+        std::cout << WarningMsg("Payment ID: " + paymentID) << std::endl;
+    }
+
     /* Couldn't get timestamp, maybe old node or turtlecoind closed */
     if (blockTime != "")
     {
@@ -1264,6 +1271,13 @@ void printIncomingTransfer(CryptoNote::WalletTransaction t,
               << std::endl
               << SuccessMsg("Amount: " + formatAmount(t.totalAmount))
               << std::endl;
+
+    std::string paymentID = getPaymentID(t.extra);
+
+    if (paymentID != "")
+    {
+        std::cout << SuccessMsg("Payment ID: " + paymentID) << std::endl;
+    }
 
     /* Couldn't get timestamp, maybe old node or turtlecoind closed */
     if (blockTime != "")

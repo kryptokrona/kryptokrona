@@ -127,3 +127,27 @@ bool confirm(std::string msg)
         }
     }
 }
+
+std::string getPaymentID(std::string extra)
+{
+    std::string paymentID;
+
+    if (extra.length() > 0)
+    {
+        std::vector<uint8_t> vecExtra;
+
+        for (auto it : extra)
+        {
+            vecExtra.push_back(static_cast<uint8_t>(it));
+        }
+
+        Crypto::Hash paymentIdHash;
+
+        if (CryptoNote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash))
+        {
+            return Common::podToHex(paymentIdHash);
+        }
+    }
+
+    return paymentID;
+}

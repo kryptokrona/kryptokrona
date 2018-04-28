@@ -15,14 +15,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string>
-
 #include "CryptoNoteConfig.h"
 #include "IWallet.h"
 
 #include <Common/StringTools.h>
 
-#include <CryptoNoteCore/TransactionExtra.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 
 #include <SimpleWallet/Tools.h>
@@ -31,7 +28,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <boost/algorithm/string.hpp>
 
-struct WalletInfo {
+struct WalletInfo
+{
     WalletInfo(std::string walletFileName, 
                std::string walletPass, 
                std::string walletAddress,
