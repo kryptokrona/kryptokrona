@@ -73,31 +73,17 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
     std::cout << std::endl
               << InformationMsg("Confirm Transaction?") << std::endl;
 
-    std::string paymentId = "";
-
-    if (t.extra.length() > 0)
-    {
-        std::vector<uint8_t> vecExtra;
-
-        for (auto it : t.extra)
-        {
-            vecExtra.push_back(static_cast<uint8_t>(it));
-        }
-
-        Crypto::Hash paymentIdHash;
-        CryptoNote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash);
-        paymentId = Common::podToHex(paymentIdHash);
-    }
-
     std::cout << "You are sending "
               << SuccessMsg(formatAmount(t.destinations[0].amount))
               << ", with a fee of " << SuccessMsg(formatAmount(t.fee))
               << ", " << std::endl;
 
-    if (paymentId != "")
+    std::string paymentID = getPaymentID(t.extra);
+
+    if (paymentID != "")
     {
         std::cout << "A mixin of " << SuccessMsg(std::to_string(t.mixIn))
-                  << " and a Payment ID of " << SuccessMsg(paymentId);
+                  << " and a Payment ID of " << SuccessMsg(paymentID);
     }
     else
     {
@@ -847,6 +833,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                     = walletInfo->wallet.getTransaction(id);
 
                 std::cout << SuccessMsg("Transaction has been sent!")
+                          << std::endl
                           << SuccessMsg("Hash: " + 
                                         Common::podToHex(tx.hash))
                           << std::endl;

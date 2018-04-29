@@ -23,7 +23,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <iomanip>
 #include <string>
 
-struct Config {
+struct Config
+{
     bool exit;
 
     bool walletGiven;

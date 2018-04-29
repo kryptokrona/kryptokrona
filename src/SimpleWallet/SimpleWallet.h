@@ -21,18 +21,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <windows.h>
 #endif
 
-#include <cctype>
-#include <future>
-
-#include "INode.h"
-#include "version.h"
-#include "CryptoNote.h"
-
-#include <Common/ConsoleHandler.h>
 #include <Common/SignalHandler.h>
 
 #include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/Currency.h>
 
 #include <Logging/FileLogger.h>
@@ -42,13 +33,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <NodeRpcProxy/NodeRpcProxy.h>
 
-#include <SimpleWallet/PasswordContainer.h>
 #include <SimpleWallet/Transfer.h>
 #include <SimpleWallet/ParseArguments.h>
-
-#include <System/Dispatcher.h>
-
-#include <Wallet/WalletGreen.h>
 
 #include <boost/thread/thread.hpp>
 
