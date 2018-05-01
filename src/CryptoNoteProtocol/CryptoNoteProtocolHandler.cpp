@@ -599,7 +599,7 @@ bool CryptoNoteProtocolHandler::on_connection_synchronized() {
         "   | |_   _ _ __| |_| | ___| |     ___  _ _ __  \n"
         "   | | | | | '__| __| |/ _ \\ |    / _ \\| | '_ \\ \n"
         "   | | |_| | |  | |_| |  __/ |___| (_) | | | | |\n"
-        "   |_|\\__,_|_|   \\__|_|\\___|\\_____\\___/|_|_| |_|\n" << ENDL;
+        "   |_|\\__ _|_|   \\__|_|\\___|\\_____\\___/|_|_| |_|\n" << ENDL;
 
     m_observerManager.notify(&ICryptoNoteProtocolObserver::blockchainSynchronized, m_core.getTopBlockIndex());
   }

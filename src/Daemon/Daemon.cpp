@@ -243,7 +243,7 @@ int main(int argc, char* argv[])
         "   | |_   _ _ __| |_| | ___| |     ___  _ _ __  \n"
         "   | | | | | '__| __| |/ _ \\ |    / _ \\| | '_ \\ \n"
         "   | | |_| | |  | |_| |  __/ |___| (_) | | | | |\n"
-        "   |_|\\__,_|_|   \\__|_|\\___|\\_____\\___/|_|_| |_|\n" << ENDL;
+        "   |_|\\__ _|_|   \\__|_|\\___|\\_____\\___/|_|_| |_|\n" << ENDL;
 
     logger(INFO, BRIGHT_GREEN) << "Welcome to " << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG;
 
