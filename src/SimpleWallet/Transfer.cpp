@@ -286,18 +286,15 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
         threshold /= 2;
     }
 
-    /* Can throw if it can't create - lol what are error codes - just catch
-       it and assume we can't fusion anymore */
-    try
-    {
-        return wallet.createFusionTransaction(bestThreshold, 
-                                              CryptoNote::parameters
-                                                        ::DEFAULT_MIXIN);
-    }
-    catch (const std::runtime_error)
+    /* Can't optimize */
+    if (optimizable == 0)
     {
         return CryptoNote::WALLET_INVALID_TRANSACTION_ID;
     }
+
+    return wallet.createFusionTransaction(bestThreshold, 
+                                          CryptoNote::parameters
+                                                    ::DEFAULT_MIXIN);
 }
 
 void quickOptimize(CryptoNote::WalletGreen &wallet)
@@ -872,15 +869,6 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                               << std::endl;
                 }
             }
-            /* The internal node error I believe is caused by the same issue as
-               the mixin error. Rocksteady explained this as not enough traffic
-               having occured on the network to allow your to mixin with.
-               Hopefully, this will only occur on the testnet and not the main
-               network. It seems sending multiple smaller transactiosn will
-               provide the network with more change to allow tx's to go through.
-               However, in some wallets that have only recieved one big single
-               transaction, they may be unable to send at all without lowering
-               their mixin count to 0 */
             else if ((errMsg == "MixIn count is too big"
                    || errMsg == "Internal node error") && !retried)
             {
@@ -1132,7 +1120,7 @@ bool parseAddress(std::string address)
 
     CryptoNote::AccountPublicAddress addr;
 
-    CryptoNote::parseAccountAddressString(prefix, addr, address);
+    bool valid = CryptoNote::parseAccountAddressString(prefix, addr, address);
 
     /* Generate a dummy address and grab its length to check that the inputted
        address is correct */
@@ -1157,13 +1145,23 @@ bool parseAddress(std::string address)
 
         return false;
     }
-    /* Can't see an easy way to go from prefix num -> prefix string, so for
-       now just hard code "TRTL" - it will let testers send stuff at least */
-    else if (prefix != expectedPrefix)
+    /* We can't get the actual prefix if the address is invalid for other
+       reasons. To work around this, we can just check that the address starts
+       with TRTL, aslong as the prefix is the TRTL prefix. This keeps it
+       working on testnets with different prefixes. */
+    else if (expectedPrefix == 3914525 && address.substr(0, 4) != "TRTL")
     {
-        std::cout << WarningMsg("Invalid address! It should start with "
-                                "\"TRTL\"!") << std::endl << std::endl;
-
+        std::cout << WarningMsg("Invalid address! It should start with TRTL!")
+                  << std::endl << std::endl;
+        return false;
+    }
+    /* We can return earlier by checking the value of valid, but then we don't
+       get to give more detailed error messages about the address */
+    else if (!valid)
+    {
+        std::cout << WarningMsg("Failed to parse address, address is not a "
+                                "valid TRTL address!") << std::endl
+                  << std::endl;
         return false;
     }
 
