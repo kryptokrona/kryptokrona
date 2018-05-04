@@ -639,8 +639,11 @@ std::string getExistingWalletFileName(Config &config)
         }
         else
         {
-            std::cout << WarningMsg("A wallet with the filename " 
-                                  + walletFileName + " doesn't exist!")
+            std::cout << WarningMsg("A wallet with the filename ")
+                      << InformationMsg(walletName)
+                      << WarningMsg(" or ")
+                      << InformationMsg(walletFileName)
+                      << WarningMsg(" doesn't exist!")
                       << std::endl
                       << "Ensure you entered your wallet name correctly."
                       << std::endl;
