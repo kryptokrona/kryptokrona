@@ -146,7 +146,6 @@ WalletGreen::WalletGreen(System::Dispatcher& dispatcher, const Currency& currenc
   m_pendingBalance(0),
   m_transactionSoftLockTime(transactionSoftLockTime)
 {
-  m_upperTransactionSizeLimit = parameters::CRYPTONOTE_MAX_SAFE_TX_SIZE;
   m_readyEvent.set();
 }
 
@@ -1617,7 +1616,7 @@ size_t WalletGreen::getTxSize(const TransactionParameters &sendingTransaction)
 
 bool WalletGreen::txIsTooLarge(const TransactionParameters& sendingTransaction)
 {
-  return getTxSize(sendingTransaction) > m_upperTransactionSizeLimit;
+  return getTxSize(sendingTransaction) > getMaxTxSize();
 }
 
 size_t WalletGreen::makeTransaction(const TransactionParameters& sendingTransaction) {
@@ -2144,9 +2143,11 @@ void WalletGreen::sendTransaction(const CryptoNote::Transaction& cryptoNoteTrans
 size_t WalletGreen::validateSaveAndSendTransaction(const ITransactionReader& transaction, const std::vector<WalletTransfer>& destinations, bool isFusion, bool send) {
   BinaryArray transactionData = transaction.getTransactionData();
 
-  if (transactionData.size() > m_upperTransactionSizeLimit) {
+  size_t maxTxSize = getMaxTxSize();
+
+  if (transactionData.size() > maxTxSize) {
     m_logger(ERROR, BRIGHT_RED) << "Transaction is too big. Transaction hash " << transaction.getTransactionHash() <<
-      ", size " << transactionData.size() << ", size limit " << m_upperTransactionSizeLimit;
+      ", size " << transactionData.size() << ", size limit " << maxTxSize;
     throw std::system_error(make_error_code(error::TRANSACTION_SIZE_TOO_BIG));
   }
 
@@ -3470,6 +3471,44 @@ void WalletGreen::deleteFromUncommitedTransactions(const std::vector<size_t>& de
   for (auto transactionId: deletedTransactions) {
     m_uncommitedTransactions.erase(transactionId);
   }
+}
+
+/* We get the current block size, then we take off the reserved size
+   for the miner transaction.
+       
+   The block size slowly grows over time.
+   The block can grow up to two times because of elastic blocks, but this
+   doesn't always happen so it's better to have a transaction that will always
+   fit in the block of now, rather than tommorrow.
+
+   For more info, see CryptoNoteCore/Core.cpp/getMaximumTransactionAllowedSize
+   and CryptoNoteCore/Core.cpp/maxBlockCumulativeSize */
+size_t WalletGreen::getMaxTxSize()
+{
+    uint32_t currentHeight = m_node.getLastKnownBlockHeight();
+
+    size_t growth = (currentHeight * CryptoNote
+                                   ::parameters
+                                   ::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR) /
+
+                    CryptoNote
+                  ::parameters
+                  ::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
+
+    size_t maxSize = CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
+
+    if (maxSize < CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL)
+    {
+        std::cout << "Failed to calculate correct max transaction size..."
+                  << std::endl;
+
+        return CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL -
+               CryptoNote::parameters::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+    }
+
+    return maxSize - CryptoNote
+                   ::parameters
+                   ::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
 }
 
 } //namespace CryptoNote

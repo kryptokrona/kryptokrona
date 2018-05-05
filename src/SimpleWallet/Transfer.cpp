@@ -190,7 +190,7 @@ void splitTx(CryptoNote::WalletGreen &wallet,
 
     CryptoNote::TransactionParameters restoreInitialTx = p;
 
-    uint64_t maxSize = CryptoNote::parameters::CRYPTONOTE_MAX_SAFE_TX_SIZE;
+    uint64_t maxSize = wallet.getMaxTxSize();
     size_t txSize = wallet.getTxSize(p);
     uint64_t minFee = CryptoNote::parameters::MINIMUM_FEE;
 
