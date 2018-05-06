@@ -933,13 +933,22 @@ bool Core::addTransactionToPool(const BinaryArray& transactionBinaryArray) {
 }
 
 bool Core::addTransactionToPool(CachedTransaction&& cachedTransaction) {
+  auto transactionHash = cachedTransaction.getTransactionHash();
+
+  /* 2000 mixin transaction hash crashes daemons... */
+  if (Common::podToHex(transactionHash) == "f0e956833c62e6d5047c25998a34b75938af035b8011a5ffb39c55924833ca2a")
+  {
+      logger(Logging::DEBUGGING) << "Ignoring bad transaction hash";
+      return false;
+  }
+
   TransactionValidatorState validatorState;
 
   if (!isTransactionValidForPool(cachedTransaction, validatorState)) {
     return false;
   }
 
-  auto transactionHash = cachedTransaction.getTransactionHash();
+
   if (!transactionPool->pushTransaction(std::move(cachedTransaction), std::move(validatorState))) {
     logger(Logging::DEBUGGING) << "Failed to push transaction " << transactionHash << " to pool, already exists";
     return false;
