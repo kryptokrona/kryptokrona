@@ -34,17 +34,8 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    /* Only log to file so we don't have crap filling up the terminal */
+    /* Logging to a black hole... */
     Logging::LoggerManager logManager;
-    /* Should we maybe change this to INFO? On the one hand, DEBUGGING really
-       spams the file, on the other hand, it exposes a lot of information
-       that might help more devs debug a users issues. */
-    logManager.setMaxLevel(Logging::DEBUGGING);
-
-    Logging::FileLogger fileLogger;
-    fileLogger.init("simplewallet.log");
-    logManager.addLogger(fileLogger);
-
     Logging::LoggerRef logger(logManager, "simplewallet");
 
     /* Currency contains our coin parameters, such as decimal places, supply */
