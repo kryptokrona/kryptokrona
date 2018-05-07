@@ -1176,13 +1176,28 @@ bool parseMixin(std::string mixinString)
            to parse as it's a uint16_t? */
         uint16_t mixin = std::stoi(mixinString);
 
-        uint16_t minMixin = CryptoNote::parameters::MINIMUM_MIXIN;
+        /* Force them to use a set mixin, if we detect dust later, then we
+           will allow them to use 0 mixin. */
+        uint16_t minMixin = std::max(CryptoNote::parameters
+                                               ::MINIMUM_MIXIN_NO_DUST,
+                                     CryptoNote::parameters::MINIMUM_MIXIN);
+
+        uint16_t maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN;
 
         if (mixin < minMixin)
         {
             std::cout << WarningMsg("Mixin count is too small! "
                                     "Minimum allowed is " + 
-                                    std::to_string(minMixin)) << "." 
+                                    std::to_string(minMixin) + ".")
+                                    << std::endl;
+
+            return false;
+        }
+        else if (mixin > maxMixin)
+        {
+            std::cout << WarningMsg("Mixin count is too large! "
+                                    "Maximum allowed is " +
+                                    std::to_string(maxMixin) + ".")
                                     << std::endl;
 
             return false;
