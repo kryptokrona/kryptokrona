@@ -3473,16 +3473,32 @@ void WalletGreen::deleteFromUncommitedTransactions(const std::vector<size_t>& de
   }
 }
 
-/* We get the current block size, then we take off the reserved size
-   for the miner transaction.
-       
-   The block size slowly grows over time.
-   The block can grow up to two times because of elastic blocks, but this
-   doesn't always happen so it's better to have a transaction that will always
-   fit in the block of now, rather than tommorrow.
+/* The formula for the block size is as follows. Calculate the
+   maxBlockCumulativeSize. This is equal to:
+   100,000 + ((height * 102,400) / 1,051,200)
+   At a block height of 400k, this gives us a size of 138,964.
+   The constants this calculation arise from can be seen below, or in
+   src/CryptoNoteCore/Currency.cpp::maxBlockCumulativeSize(). Call this value
+   x.
 
-   For more info, see CryptoNoteCore/Core.cpp/getMaximumTransactionAllowedSize
-   and CryptoNoteCore/Core.cpp/maxBlockCumulativeSize */
+   Next, calculate the median size of the last 100 blocks. Take the max of
+   this value, and 100,000. Multiply this value by 1.25. Call this value y.
+
+   Finally, return the minimum of x and y.
+
+   Or, in short: min(140k (slowly rising), max(125k, median(last 100 blocks size)))
+   Block size will always be 125k or greater (Assuming non testnet)
+
+   To get the max transaction size, remove 600 from this value, for the
+   reserved miner transaction.
+
+   We are going to ignore the median(last 100 blocks size), as it is possible
+   for a transaction to be valid for inclusion in a block when it is submitted,
+   but not when it actually comes to be mined, for example if the median
+   block size suddenly decreases. This gives a bit of a lower cap of max
+   tx sizes, but prevents anything getting stuck in the pool.
+
+*/
 size_t WalletGreen::getMaxTxSize()
 {
     uint32_t currentHeight = m_node.getLastKnownBlockHeight();
@@ -3495,20 +3511,12 @@ size_t WalletGreen::getMaxTxSize()
                   ::parameters
                   ::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
 
-    size_t maxSize = CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
+    size_t x = CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
 
-    if (maxSize < CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL)
-    {
-        std::cout << "Failed to calculate correct max transaction size..."
-                  << std::endl;
+    size_t y = 125000;
 
-        return CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL -
-               CryptoNote::parameters::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
-    }
-
-    return maxSize - CryptoNote
-                   ::parameters
-                   ::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+    return std::min(x, y) - CryptoNote::parameters
+                                      ::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
 }
 
 } //namespace CryptoNote
