@@ -58,7 +58,7 @@ const uint16_t DEFAULT_MIXIN                                 = 5;
 const uint16_t MINIMUM_MIXIN_NO_DUST                         = 3;
 const uint16_t MINIMUM_MIXIN_V1                              = 0;
 const uint16_t MAXIMUM_MIXIN_V1                              = 100;
-const uint32_t MIXIN_LIMITS_V1_HEIGHT                        = 450000;
+const uint32_t MIXIN_LIMITS_V1_HEIGHT                        = 440000;
 const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(10);
 
 const uint64_t DIFFICULTY_TARGET                             = 30; // seconds
