@@ -65,7 +65,8 @@ void parseDaemonAddress(const std::string& daemonAddress, std::string& daemonHos
 
 MiningConfig::MiningConfig(): help(false) {
   cmdOptions.add_options()
-      ("help,h", "produce this help message and exit")
+      ("help,h", "Produce this help message and exit")
+      ("version", "Print the version number and exit")
       ("address", po::value<std::string>(), "Valid cryptonote miner's address")
       ("daemon-host", po::value<std::string>()->default_value(DEFAULT_DAEMON_HOST), "Daemon host")
       ("daemon-rpc-port", po::value<uint16_t>()->default_value(static_cast<uint16_t>(RPC_DEFAULT_PORT)), "Daemon's RPC port")
@@ -86,6 +87,11 @@ void MiningConfig::parse(int argc, char** argv) {
 
   if (options.count("help") != 0) {
     help = true;
+    return;
+  }
+
+  if (options.count("version") != 0) {
+    version = true;
     return;
   }
 
@@ -133,6 +139,10 @@ void MiningConfig::parse(int argc, char** argv) {
 
 void MiningConfig::printHelp() {
   std::cout << cmdOptions << std::endl;
+}
+
+void MiningConfig::printVersion() {
+  std::cout << "TurtleCoin v" << PROJECT_VERSION << " Miner" << std::endl;
 }
 
 }

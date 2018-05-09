@@ -35,6 +35,11 @@ int main(int argc, char** argv) {
       return 0;
     }
 
+    if (config.version) {
+      config.printVersion();
+      return 0;
+    }
+
     Logging::LoggerGroup loggerGroup;
     Logging::ConsoleLogger consoleLogger(static_cast<Logging::Level>(config.logLevel));
     loggerGroup.addLogger(consoleLogger);
