@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers, The TurtleCoin developers
 //
 // This file is part of Bytecoin.
 //
@@ -704,8 +704,8 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
 
           ret = error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED;
 
-          logger(Logging::INFO) << "Switching to alt chain! New top block: " << blockStr
-                                << ", previous top block: " << chainsLeaves[endpointIndex]->getTopBlockIndex() << " (" 
+          logger(Logging::INFO) << "Resolved: " << blockStr
+                                << ", Previous: " << chainsLeaves[endpointIndex]->getTopBlockIndex() << " (" 
                                 << chainsLeaves[endpointIndex]->getTopBlockHash() << ")";
         }
       }
@@ -718,7 +718,7 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
       chainsStorage.emplace_back(std::move(newCache));
       chainsLeaves.push_back(newlyForkedChainPtr);
 
-      logger(Logging::DEBUGGING) << "Adding alternative block: " << blockStr;
+      logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
 
       newlyForkedChainPtr->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange,
                                      currentDifficulty, std::move(rawBlock));
@@ -727,7 +727,7 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
       updateBlockMedianSize();
     }
   } else {
-    logger(Logging::DEBUGGING) << "Adding alternative block: " << blockStr;
+    logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
 
     auto upperSegment = cache->split(previousBlockIndex + 1);
     //[cache] is lower segment now
