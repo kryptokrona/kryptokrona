@@ -474,8 +474,13 @@ Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
                 "MemoryMappedFile::open: The process cannot access the file "
                 "because it is being used by another process.";
 
+            /* Wallet version from file not == 6 */
             std::string notAWalletMsg =
                 "Unsupported wallet version: Wrong version";
+            
+            /* Got EOF before reading wallet version */
+            std::string notAWalletMsg2 =
+                "Failed to read wallet version: Wrong version";
 
             std::string errorMsg = e.what();
                 
@@ -509,7 +514,7 @@ Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
 
                 return Nothing<std::shared_ptr<WalletInfo>>();
             }
-            else if (errorMsg == notAWalletMsg)
+            else if (errorMsg == notAWalletMsg || errorMsg == notAWalletMsg2)
             {
                 std::cout << WarningMsg("Could not open wallet file! It "
                                         "doesn't appear to be a valid wallet!")
