@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers, The TurtleCoin developers
 //
 // This file is part of Bytecoin.
 //
@@ -600,6 +600,27 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
   }
 
   uint64_t cumulativeFee = 0;
+
+  /* We now limit the mixin allowed in a transaction. However, there have been
+     some transactions outside these limits in the past, so we need to only
+     enforce this on new blocks, otherwise wouldn't be able to sync the chain */
+
+  /* We also need to ensure that the mixin enforced is for the limit that
+     was correct when the block was formed - i.e. if 0 mixin was allowed at
+     block 100, but is no longer allowed - we should still validate block 100 */
+
+  /* In the future, change this to && <= MIXIN_LIMITS_V2_HEIGHT, then add a
+     new section with the new mixin limits */
+  if (blockIndex >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT) {
+      for (const auto& transaction : transactions) {
+          if (!validateMixin(transaction,
+                             CryptoNote::parameters::MINIMUM_MIXIN_V1,
+                             CryptoNote::parameters::MAXIMUM_MIXIN_V1)) {
+              return error::TransactionValidationError::INVALID_MIXIN;
+          }
+      }
+  }
+
   for (const auto& transaction : transactions) {
     uint64_t fee = 0;
     auto transactionValidationResult = validateTransaction(transaction, validatorState, cache, fee, previousBlockIndex);
@@ -683,8 +704,8 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
 
           ret = error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED;
 
-          logger(Logging::INFO) << "Switching to alt chain! New top block: " << blockStr
-                                << ", previous top block: " << chainsLeaves[endpointIndex]->getTopBlockIndex() << " (" 
+          logger(Logging::INFO) << "Resolved: " << blockStr
+                                << ", Previous: " << chainsLeaves[endpointIndex]->getTopBlockIndex() << " (" 
                                 << chainsLeaves[endpointIndex]->getTopBlockHash() << ")";
         }
       }
@@ -697,7 +718,7 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
       chainsStorage.emplace_back(std::move(newCache));
       chainsLeaves.push_back(newlyForkedChainPtr);
 
-      logger(Logging::DEBUGGING) << "Adding alternative block: " << blockStr;
+      logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
 
       newlyForkedChainPtr->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange,
                                      currentDifficulty, std::move(rawBlock));
@@ -706,7 +727,7 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
       updateBlockMedianSize();
     }
   } else {
-    logger(Logging::DEBUGGING) << "Adding alternative block: " << blockStr;
+    logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
 
     auto upperSegment = cache->split(previousBlockIndex + 1);
     //[cache] is lower segment now
@@ -933,21 +954,13 @@ bool Core::addTransactionToPool(const BinaryArray& transactionBinaryArray) {
 }
 
 bool Core::addTransactionToPool(CachedTransaction&& cachedTransaction) {
-  auto transactionHash = cachedTransaction.getTransactionHash();
-
-  /* 2000 mixin transaction hash crashes daemons... */
-  if (Common::podToHex(transactionHash) == "f0e956833c62e6d5047c25998a34b75938af035b8011a5ffb39c55924833ca2a")
-  {
-      logger(Logging::DEBUGGING) << "Ignoring bad transaction hash";
-      return false;
-  }
-
   TransactionValidatorState validatorState;
 
   if (!isTransactionValidForPool(cachedTransaction, validatorState)) {
     return false;
   }
 
+  auto transactionHash = cachedTransaction.getTransactionHash();
 
   if (!transactionPool->pushTransaction(std::move(cachedTransaction), std::move(validatorState))) {
     logger(Logging::DEBUGGING) << "Failed to push transaction " << transactionHash << " to pool, already exists";
@@ -958,7 +971,57 @@ bool Core::addTransactionToPool(CachedTransaction&& cachedTransaction) {
   return true;
 }
 
+bool Core::validateMixin(const CachedTransaction& cachedTransaction,
+                         uint16_t minMixin, uint16_t maxMixin) {
+
+  /* Note that the mixin calculated here is one more than the mixin you input
+     in your transaction. This is checking the number of outputs, for example,
+     5, where yours is one of them. Mixin 4 = mix my output with 4 others,
+     so 5 outputs. So, we add one here. */
+  minMixin++;
+  maxMixin++;
+
+  uint64_t mixin = 0;
+
+  auto tx = createTransaction(cachedTransaction.getTransaction());
+
+  for (size_t i = 0; i < tx->getInputCount(); ++i) {
+    if (tx->getInputType(i) != TransactionTypes::InputType::Key) {
+      continue;
+    }
+
+    KeyInput input;
+    tx->getInput(i, input);
+    uint64_t currentMixin = input.outputIndexes.size();
+    if (currentMixin > mixin) {
+        mixin = currentMixin;
+    }
+  }
+
+  if (mixin > maxMixin) {
+    logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
+      << " is not valid. Reason: transaction mixin is too large (" << mixin
+      << "). Maximum mixin allowed is " << maxMixin;
+
+    return false;
+  } else if (mixin < minMixin) {
+    logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
+      << " is not valid. Reason: transaction mixin is too small (" << mixin
+      << "). Minimum mixin allowed is " << minMixin;
+
+    return false;
+  }
+
+  return true;
+}
+
 bool Core::isTransactionValidForPool(const CachedTransaction& cachedTransaction, TransactionValidatorState& validatorState) {
+  if (!validateMixin(cachedTransaction,
+                     CryptoNote::parameters::MINIMUM_MIXIN_V1,
+                     CryptoNote::parameters::MAXIMUM_MIXIN_V1)) {
+    return false;
+  }
+  
   uint64_t fee;
 
   if (auto validationResult = validateTransaction(cachedTransaction, validatorState, chainsLeaves[0], fee, getTopBlockIndex())) {

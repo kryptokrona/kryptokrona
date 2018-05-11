@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers, The TurtleCoin developers
 //
 // This file is part of Bytecoin.
 //
@@ -1307,7 +1307,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
         logger(DEBUGGING) << "acceptLoop() is interrupted";
         break;
       } catch (const std::exception& e) {
-        logger(WARNING) << "Exception in acceptLoop: " << e.what();
+        logger(DEBUGGING) << "Exception in acceptLoop: " << e.what();
       }
     }
 
@@ -1472,7 +1472,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
       // connection stopped
       logger(DEBUGGING) << ctx << "writeHandler() is interrupted";
     } catch (std::exception& e) {
-      logger(WARNING) << ctx << "error during write: " << e.what();
+      logger(DEBUGGING) << ctx << "error during write: " << e.what();
       safeInterrupt(ctx); // stop connection on write error
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers, The TurtleCoin developers
 //
 // This file is part of Bytecoin.
 //
@@ -209,7 +209,7 @@ void P2pNode::acceptLoop() {
     } catch (InterruptedException&) {
       break;
     } catch (const std::exception& e) {
-      logger(WARNING) << "Exception in acceptLoop: " << e.what();
+      logger(DEBUGGING) << "Exception in acceptLoop: " << e.what();
     }
   }
 
