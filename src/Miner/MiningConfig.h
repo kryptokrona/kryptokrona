@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "version.h"
+
 #include <cstdint>
 #include <string>
 
@@ -27,6 +29,7 @@ struct MiningConfig {
 
   void parse(int argc, char** argv);
   void printHelp();
+  void printVersion();
 
   std::string miningAddress;
   std::string daemonHost;
@@ -38,6 +41,7 @@ struct MiningConfig {
   uint64_t firstBlockTimestamp;
   int64_t blockTimestampInterval;
   bool help;
+  bool version;
 };
 
 } //namespace CryptoNote
