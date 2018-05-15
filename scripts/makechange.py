@@ -41,7 +41,7 @@ def make_request(method, **kwargs):
         'params': kwargs
     }
 
-    url = f'http://{walletdAddress}:{walletdPort}/json_rpc'
+    url = 'http://' + walletdAddress + ':' + walletdPort + '/json_rpc'
 
     response = requests.post(url, data=json.dumps(payload),
                              headers={'content-type': 'application/json'}).json()
