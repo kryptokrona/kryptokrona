@@ -68,7 +68,8 @@ while True:
 
         params = {'transfers': [{'address': address, 'amount': amount}],
                   'fee': 10,
-                  'anonymity': 5}
+                  'anonymity': 5,
+                  'changeAddress': address}
 
         if not make_request("sendTransaction", **params):
             time.sleep(sleepAmount)
