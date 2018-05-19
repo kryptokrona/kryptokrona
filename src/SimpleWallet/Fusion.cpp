@@ -1,4 +1,30 @@
+/*
+Copyright (C) 2018, The TurtleCoin developers
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+////////////////////////////////
 #include <SimpleWallet/Fusion.h>
+////////////////////////////////
+
+#include "CryptoNoteConfig.h"
+
+#include <SimpleWallet/ColouredMsg.h>
+#include <SimpleWallet/Tools.h>
+
+#include <Wallet/WalletGreen.h>
 
 size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet, 
                              uint64_t threshold)
@@ -35,7 +61,7 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
                                               CryptoNote::parameters
                                                         ::DEFAULT_MIXIN);
     }
-    catch (const std::runtime_error e)
+    catch (const std::runtime_error &e)
     {
         std::cout << WarningMsg("Failed to send fusion transaction: ")
                   << WarningMsg(e.what()) << std::endl;
