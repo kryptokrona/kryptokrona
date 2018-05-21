@@ -261,7 +261,7 @@ bool fusionTX(CryptoNote::WalletGreen &wallet,
     {
         /* Break after a minute just in case something has gone wrong */
         if ((std::chrono::system_clock::now() - startTime) > 
-             std::chrono::minutes(1))
+             std::chrono::minutes(5))
         {
             std::cout << WarningMsg("Fusion transactions have "
                                     "completed, however available "
