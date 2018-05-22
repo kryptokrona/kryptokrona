@@ -63,7 +63,7 @@ void parseDaemonAddress(const std::string& daemonAddress, std::string& daemonHos
 
 }
 
-MiningConfig::MiningConfig(): help(false) {
+MiningConfig::MiningConfig(): help(false), version(false) {
   cmdOptions.add_options()
       ("help,h", "Produce this help message and exit")
       ("version", "Print the version number and exit")
