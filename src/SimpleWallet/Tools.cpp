@@ -15,7 +15,22 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+///////////////////////////////
 #include <SimpleWallet/Tools.h>
+///////////////////////////////
+
+#include <cctype>
+
+#include <Common/StringTools.h>
+
+#include <CryptoNoteCore/TransactionExtra.h>
+
+#include <fstream>
+
+#include <iostream>
+
+#include <SimpleWallet/ColouredMsg.h>
+#include <SimpleWallet/PasswordContainer.h>
 
 void confirmPassword(std::string walletPass)
 {

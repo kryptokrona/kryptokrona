@@ -15,42 +15,11 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "CryptoNoteConfig.h"
-#include "IWallet.h"
+#pragma once
 
-#include <Common/StringTools.h>
+#include <memory>
 
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-
-#include <SimpleWallet/Fusion.h>
-
-#include <Wallet/WalletGreen.h>
-
-#include <boost/algorithm/string.hpp>
-
-struct WalletInfo
-{
-    WalletInfo(std::string walletFileName, 
-               std::string walletPass, 
-               std::string walletAddress,
-               bool viewWallet,
-               CryptoNote::WalletGreen &wallet) : 
-               walletFileName(walletFileName), 
-               walletPass(walletPass), 
-               walletAddress(walletAddress),
-               viewWallet(viewWallet),
-               wallet(wallet) {}
-
-    size_t knownTransactionCount = 0;
-
-    std::string walletFileName;
-    std::string walletPass;
-    std::string walletAddress;
-
-    bool viewWallet;
-
-    CryptoNote::WalletGreen &wallet;
-};
+#include <SimpleWallet/Types.h>
 
 void transfer(std::shared_ptr<WalletInfo> walletInfo);
 

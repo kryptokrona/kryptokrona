@@ -17,14 +17,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <string>
+#include <SimpleWallet/ColouredMsg.h>
+#include <SimpleWallet/Types.h>
 
-void confirmPassword(std::string walletPass);
+#include <Wallet/WalletGreen.h>
 
-bool confirm(std::string msg);
+void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet);
 
-std::string formatAmount(uint64_t amount);
-std::string formatDollars(uint64_t amount);
-std::string formatCents(uint64_t amount);
+void help(bool viewWallet);
 
-std::string getPaymentID(std::string extra);
+void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo);
+
+void blockchainHeight(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet);
+
+void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
+             bool viewWallet);
+
+void exportKeys(std::shared_ptr<WalletInfo> &walletInfo);

@@ -15,7 +15,21 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ParseArguments.h"
+////////////////////////////////////////
+#include <SimpleWallet/ParseArguments.h>
+////////////////////////////////////////
+
+#include <algorithm>
+
+#include "CryptoNoteConfig.h"
+
+#include <iostream>
+
+#include <iomanip>
+
+#include <string>
+
+#include "version.h"
 
 /* Thanks to https://stackoverflow.com/users/85381/iain for this small command
    line parsing snippet! https://stackoverflow.com/a/868894/8737306 */
@@ -139,7 +153,7 @@ Config parseArguments(int argc, char **argv)
                 {
                     config.port = std::stoi(port);
                 }
-                catch (const std::invalid_argument)
+                catch (const std::invalid_argument &)
                 {
                     std::cout << "Failed to parse daemon port!" << std::endl;
                     config.exit = true;
