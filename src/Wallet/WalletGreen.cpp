@@ -3268,6 +3268,11 @@ std::vector<TransactionsInBlockInfo> WalletGreen::getTransactionsInBlocks(uint32
     m_logger(ERROR, BRIGHT_RED) << "Bad argument: block count must be greater than zero";
     throw std::system_error(make_error_code(error::WRONG_PARAMETERS), "blocks count must be greater than zero");
   }
+  
+  if (blockIndex == 0) {
+    m_logger(ERROR, BRIGHT_RED) << "Bad argument: blockIndex must be greater than zero";
+    throw std::system_error(make_error_code(error::WRONG_PARAMETERS), "blockIndex must be greater than zero");
+  }
 
   std::vector<TransactionsInBlockInfo> result;
 
