@@ -45,7 +45,6 @@ BlockchainWriteBatch& BlockchainWriteBatch::insertCachedTransaction(const Extend
 }
 
 BlockchainWriteBatch& BlockchainWriteBatch::insertPaymentId(const Crypto::Hash& transactionHash, const Crypto::Hash paymentId, uint32_t totalTxsCountForPaymentId) {
-  assert(totalTxsCountForPaymentId > 0);
   rawDataToInsert.emplace_back(DB::serialize(DB::PAYMENT_ID_TO_TX_HASH_PREFIX, paymentId, totalTxsCountForPaymentId));
   rawDataToInsert.emplace_back(DB::serialize(DB::PAYMENT_ID_TO_TX_HASH_PREFIX, std::make_pair(paymentId, totalTxsCountForPaymentId - 1), transactionHash));
   return *this;
