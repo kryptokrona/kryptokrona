@@ -54,6 +54,8 @@ private:
   CryptoNote::RpcServer* m_prpc_server;
 
   std::string get_commands_str();
+  std::string get_mining_speed(uint32_t hr);
+  float get_sync_percentage(uint64_t height, uint64_t target_height);
   bool print_block_by_height(uint32_t height);
   bool print_block_by_hash(const std::string& arg);
 
@@ -73,4 +75,5 @@ private:
   bool print_pool_sh(const std::vector<std::string>& args);
   bool start_mining(const std::vector<std::string>& args);
   bool stop_mining(const std::vector<std::string>& args);
+  bool status(const std::vector<std::string>& args);
 };
