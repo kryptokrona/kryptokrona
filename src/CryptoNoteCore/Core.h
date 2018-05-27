@@ -16,6 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
+#include <ctime>
 #include <vector>
 #include <unordered_map>
 #include "BlockchainCache.h"
@@ -98,6 +99,8 @@ public:
 
   virtual CoreStatistics getCoreStatistics() const override;
 
+  virtual std::time_t getStartTime() const;
+
   //ICoreInformation
   virtual size_t getPoolTransactionCount() const override;
   virtual size_t getBlockchainTransactionCount() const override;
@@ -139,6 +142,8 @@ private:
   std::unique_ptr<IBlockchainCacheFactory> blockchainCacheFactory;
   std::unique_ptr<IMainChainStorage> mainChainStorage;
   bool initialized;
+
+  time_t start_time;
 
   size_t blockMedianSize;
 

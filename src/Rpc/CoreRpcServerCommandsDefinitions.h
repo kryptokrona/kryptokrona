@@ -280,6 +280,7 @@ struct COMMAND_RPC_GET_INFO {
     uint32_t network_height;
     uint32_t hashrate;
     std::string version;
+    uint64_t start_time;
     bool synced;
 
     void serialize(ISerializer &s) {

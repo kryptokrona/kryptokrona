@@ -14,9 +14,13 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+//
+// Portions copyright (c) 2014-2018, The Monero Project
+// Portions copyright (c) 2018, The TurtleCoin developers
 
 #include "DaemonCommandsHandler.h"
 
+#include <ctime>
 #include "P2p/NetNode.h"
 #include "CryptoNoteCore/Miner.h"
 #include "CryptoNoteCore/Core.h"
@@ -89,7 +93,6 @@ std::string DaemonCommandsHandler::get_commands_str()
 //--------------------------------------------------------------------------------
 std::string DaemonCommandsHandler::get_mining_speed(uint32_t hr)
 {
-  // Code snippet from Monero Project
   if (hr>1e9) return (boost::format("%.2f GH/s") % (hr/1e9)).str();
   if (hr>1e6) return (boost::format("%.2f MH/s") % (hr/1e6)).str();
   if (hr>1e3) return (boost::format("%.2f kH/s") % (hr/1e3)).str();
@@ -99,7 +102,6 @@ std::string DaemonCommandsHandler::get_mining_speed(uint32_t hr)
 //--------------------------------------------------------------------------------
 float DaemonCommandsHandler::get_sync_percentage(uint64_t height, uint64_t target_height)
 {
-  // Code snippet from Monero Project
   target_height = target_height ? target_height < height ? height : target_height : height;
   float pc = 100.0f * height / target_height;
   if (height < target_height && pc > 99.9f)
@@ -348,18 +350,25 @@ bool DaemonCommandsHandler::print_pool_sh(const std::vector<std::string>& args)
 //--------------------------------------------------------------------------------
 bool DaemonCommandsHandler::status(const std::vector<std::string>& args)
 {
-  CryptoNote::COMMAND_RPC_GET_INFO::request req;
-  CryptoNote::COMMAND_RPC_GET_INFO::response resp;
+  CryptoNote::COMMAND_RPC_GET_INFO::request ireq;
+  CryptoNote::COMMAND_RPC_GET_INFO::response iresp;
 
-  if (!m_prpc_server->on_get_info(req, resp)) {
+  if (!m_prpc_server->on_get_info(ireq, iresp) || iresp.status != CORE_RPC_STATUS_OK) {
+    std::cout << "Problem retreiving information from RPC server." << std::endl;
     return false;
   } 
 
+  // CryptoNote::BlockDetails block_details = m_core.getBlockDetails(m_core.getTopBlockHash());
+
+  std::time_t uptime = std::time(nullptr) - iresp.start_time;
+
   std::cout 
-    << "Height: " << resp.height << "/" << resp.network_height << " (" << get_sync_percentage(resp.height, resp.network_height) << "%), "
-    << (resp.synced ? "synced, " : "syncing, ") << "on " << (m_core.getCurrency().isTestnet() ? "testnet, " : "mainnet, ")
-    << "net hash " << get_mining_speed(resp.hashrate) << ", " 
-    << resp.outgoing_connections_count << "(out)+" << resp.incoming_connections_count << "(in) connections"
+    << "Height: " << iresp.height << "/" << iresp.network_height << " (" << get_sync_percentage(iresp.height, iresp.network_height) << "%), "
+    << (iresp.synced ? "synced, " : "syncing, ") << "on " << (m_core.getCurrency().isTestnet() ? "testnet, " : "mainnet, ")
+    << "net hash " << get_mining_speed(iresp.hashrate) << ", " // << "v" << (uint8_t)block_details.majorVersion << ", "
+    << iresp.outgoing_connections_count << "(out)+" << iresp.incoming_connections_count << "(in) connections, "
+    << "uptime " << (unsigned int)floor(uptime / 60.0 / 60.0 / 24.0) << "d " << (unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0)) << "h "
+    << (unsigned int)floor(fmod((uptime / 60.0), 60.0)) << "m " << (unsigned int)fmod(uptime, 60.0) << "s"
     << std::endl;
   
   return true;

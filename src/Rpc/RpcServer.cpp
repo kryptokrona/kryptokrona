@@ -492,6 +492,7 @@ bool RpcServer::on_get_info(const COMMAND_RPC_GET_INFO::request& req, COMMAND_RP
   res.synced = ((uint32_t)res.height == (uint32_t)res.network_height);
   res.version = PROJECT_VERSION;
   res.status = CORE_RPC_STATUS_OK;
+  res.start_time = m_core.getStartTime();
   return true;
 }
 
