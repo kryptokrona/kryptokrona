@@ -358,14 +358,13 @@ bool DaemonCommandsHandler::status(const std::vector<std::string>& args)
     return false;
   } 
 
-  // CryptoNote::BlockDetails block_details = m_core.getBlockDetails(m_core.getTopBlockHash());
-
+  CryptoNote::BlockDetails block_details = m_core.getBlockDetails(m_core.getTopBlockIndex());
   std::time_t uptime = std::time(nullptr) - iresp.start_time;
 
   std::cout 
-    << "Height: " << iresp.height << "/" << iresp.network_height << " (" << get_sync_percentage(iresp.height, iresp.network_height) << "%), "
-    << (iresp.synced ? "synced, " : "syncing, ") << "on " << (m_core.getCurrency().isTestnet() ? "testnet, " : "mainnet, ")
-    << "net hash " << get_mining_speed(iresp.hashrate) << ", " // << "v" << (uint8_t)block_details.majorVersion << ", "
+    << "Height: " << iresp.height << "/" << iresp.network_height << " (" << get_sync_percentage(iresp.height, iresp.network_height) << "%) "
+    << "on " << (m_core.getCurrency().isTestnet() ? "testnet, " : "mainnet, ") << (iresp.synced ? "synced, " : "syncing, ") 
+    << "net hash " << get_mining_speed(iresp.hashrate) << ", " << "v" << +block_details.majorVersion << ", "
     << iresp.outgoing_connections_count << "(out)+" << iresp.incoming_connections_count << "(in) connections, "
     << "uptime " << (unsigned int)floor(uptime / 60.0 / 60.0 / 24.0) << "d " << (unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0)) << "h "
     << (unsigned int)floor(fmod((uptime / 60.0), 60.0)) << "m " << (unsigned int)fmod(uptime, 60.0) << "s"
