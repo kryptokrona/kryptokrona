@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 '''
 Usage: python makechange.py
 This is python3, so you might need to launch it with python3 makechange.py
@@ -22,6 +24,9 @@ import random
 import time
 
 address = "Fill me in!"
+
+# If you are sending to someone else, change this to your own address
+makeChangeAddress = address
 
 if len(address) != 99:
     print("Please fill in your address and re-run the script.")
@@ -69,7 +74,7 @@ while True:
         params = {'transfers': [{'address': address, 'amount': amount}],
                   'fee': 10,
                   'anonymity': 5,
-                  'changeAddress': address}
+                  'changeAddress': makeChangeAddress}
 
         if not make_request("sendTransaction", **params):
             time.sleep(sleepAmount)
