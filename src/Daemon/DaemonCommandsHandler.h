@@ -55,7 +55,8 @@ private:
 
   std::string get_commands_str();
   std::string get_mining_speed(uint32_t hr);
-  float get_sync_percentage(uint64_t height, uint64_t target_height);
+  std::string get_sync_percentage(uint64_t height, uint64_t target_height);
+  std::string get_upgrade_time(uint64_t height, uint64_t upgrade_height);
   bool print_block_by_height(uint32_t height);
   bool print_block_by_hash(const std::string& arg);
 
