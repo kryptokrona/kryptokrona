@@ -3491,7 +3491,7 @@ void WalletGreen::deleteFromUncommitedTransactions(const std::vector<size_t>& de
 
    Finally, return the minimum of x and y.
 
-   Or, in short: min(140k (slowly rising), max(125k, median(last 100 blocks size)))
+   Or, in short: min(140k (slowly rising), 1.25 * max(100k, median(last 100 blocks size)))
    Block size will always be 125k or greater (Assuming non testnet)
 
    To get the max transaction size, remove 600 from this value, for the
