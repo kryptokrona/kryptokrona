@@ -100,13 +100,29 @@ std::string DaemonCommandsHandler::get_mining_speed(uint32_t hr)
 }
 
 //--------------------------------------------------------------------------------
-float DaemonCommandsHandler::get_sync_percentage(uint64_t height, uint64_t target_height)
+std::string DaemonCommandsHandler::get_sync_percentage(uint64_t height, uint64_t target_height)
 {
   target_height = target_height ? target_height < height ? height : target_height : height;
   float pc = 100.0f * height / target_height;
-  if (height < target_height && pc > 99.9f)
-    return 99.9f; // to avoid 100% when not fully synced
-  return pc;
+
+  if (height < target_height && pc > 99.99f) {
+    pc = 99.99f; // to avoid 100% when not fully synced
+  }
+
+  return (boost::format("%.2f") % pc).str();
+}
+
+//--------------------------------------------------------------------------------
+std::string DaemonCommandsHandler::get_upgrade_time(uint64_t height, uint64_t upgrade_height) {
+  if (height >= upgrade_height) {
+    return std::string();
+  }
+
+  float days = (upgrade_height - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+  
+  if (days < 1) return std::string(" (next fork in <1 day)");
+
+  return (boost::format(" (next fork in %.1f days)") % days).str();
 }
 
 //--------------------------------------------------------------------------------
@@ -364,7 +380,7 @@ bool DaemonCommandsHandler::status(const std::vector<std::string>& args)
   std::cout 
     << "Height: " << iresp.height << "/" << iresp.network_height << " (" << get_sync_percentage(iresp.height, iresp.network_height) << "%) "
     << "on " << (m_core.getCurrency().isTestnet() ? "testnet, " : "mainnet, ") << (iresp.synced ? "synced, " : "syncing, ") 
-    << "net hash " << get_mining_speed(iresp.hashrate) << ", " << "v" << +block_details.majorVersion << ", "
+    << "net hash " << get_mining_speed(iresp.hashrate) << ", " << "v" << +block_details.majorVersion << get_upgrade_time(iresp.network_height, iresp.upgrade_height) << ", "
     << iresp.outgoing_connections_count << "(out)+" << iresp.incoming_connections_count << "(in) connections, "
     << "uptime " << (unsigned int)floor(uptime / 60.0 / 60.0 / 24.0) << "d " << (unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0)) << "h "
     << (unsigned int)floor(fmod((uptime / 60.0), 60.0)) << "m " << (unsigned int)fmod(uptime, 60.0) << "s"
