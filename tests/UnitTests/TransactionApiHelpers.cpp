@@ -217,7 +217,7 @@ void FusionTransactionBuilder::setInputCount(size_t val) {
 std::unique_ptr<ITransactionReader> FusionTransactionBuilder::buildReader() const {
   assert(m_inputCount > 0);
   assert(m_firstInput <= m_amount);
-  assert(m_amount > m_currency.defaultDustThreshold());
+  assert(m_amount > m_currency.defaultDustThreshold(0));
 
   TestTransactionBuilder builder;
 
@@ -230,16 +230,16 @@ std::unique_ptr<ITransactionReader> FusionTransactionBuilder::buildReader() cons
   }
 
   if (m_amount > m_firstInput) {
-    builder.addTestInput(m_amount - m_firstInput - (m_inputCount - 1) * m_currency.defaultDustThreshold());
+    builder.addTestInput(m_amount - m_firstInput - (m_inputCount - 1) * m_currency.defaultDustThreshold(0));
     for (size_t i = 0; i < m_inputCount - 1; ++i) {
-      builder.addTestInput(m_currency.defaultDustThreshold());
+      builder.addTestInput(m_currency.defaultDustThreshold(0));
     }
   }
 
   AccountPublicAddress address = generateAddress();
   std::vector<uint64_t> outputAmounts;
   assert(m_amount >= m_firstOutput + m_fee);
-  decomposeAmount(m_amount - m_firstOutput - m_fee, m_currency.defaultDustThreshold(), outputAmounts);
+  decomposeAmount(m_amount - m_firstOutput - m_fee, m_currency.defaultDustThreshold(0), outputAmounts);
   std::sort(outputAmounts.begin(), outputAmounts.end());
 
   if (m_firstOutput != 0) {
