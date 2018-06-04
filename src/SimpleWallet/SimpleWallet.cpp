@@ -519,20 +519,20 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
             }
             else if (command == "transfer")
             {
-                transfer(walletInfo);
+                transfer(walletInfo, node.getLastKnownBlockHeight());
             }
             else if (words[0] == "transfer")
             {
                 /* remove the first item from words - this is the "transfer"
                    command, leaving us just the transfer arguments. */
                 words.erase(words.begin());
-                transfer(walletInfo, words);
+                transfer(walletInfo, words, node.getLastKnownBlockHeight());
             }
             else if (command == "quick_optimize")
             {
                 quickOptimize(walletInfo->wallet);
             }
-            else if (command == "full_optimize")
+            else if (command == "full_optimize" || command == "optimize")
             {
                 fullOptimize(walletInfo->wallet);
             }

@@ -282,16 +282,33 @@ void validateAddresses(const std::vector<std::string>& addresses, const CryptoNo
   }
 }
 
-void validateMixin(const uint32_t mixin, Logging::LoggerRef logger) {
-  if (mixin < CryptoNote::parameters::MINIMUM_MIXIN_V1) {
-    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin " << mixin
-      << " under minimum threshold " << CryptoNote::parameters::MINIMUM_MIXIN_V1;
-    throw std::system_error(make_error_code(CryptoNote::error::MIXIN_BELOW_THRESHOLD));
-  } else if (mixin > CryptoNote::parameters::MAXIMUM_MIXIN_V1) {
-    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin " << mixin
-      << " above maximum threshold " << CryptoNote::parameters::MAXIMUM_MIXIN_V1;
-    throw std::system_error(make_error_code(CryptoNote::error::MIXIN_ABOVE_THRESHOLD));
-  }
+void validateMixin(const uint32_t mixin, const uint32_t height, Logging::LoggerRef logger) {
+    uint64_t minMixin = 0;
+    uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
+
+    if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
+    {
+        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
+        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V2;
+    }
+    else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT)
+    {
+        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V1;
+        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V1;
+    }
+
+    if (mixin < minMixin)
+    {
+        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin " << mixin
+            << " under minimum threshold " << CryptoNote::parameters::MINIMUM_MIXIN_V1;
+        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_BELOW_THRESHOLD));
+    }
+    else if (mixin > maxMixin)
+    {
+        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin " << mixin
+          << " under minimum threshold " << CryptoNote::parameters::MINIMUM_MIXIN_V1;
+        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_BELOW_THRESHOLD));
+    }
 }
 
 std::string getValidatedTransactionExtraString(const std::string& extraString) {
@@ -929,7 +946,7 @@ std::error_code WalletService::sendTransaction(const SendTransaction::Request& r
       validateAddresses({ request.changeAddress }, currency, logger);
     }
 
-    validateMixin(request.anonymity, logger);
+    validateMixin(request.anonymity, node.getLastKnownBlockHeight(), logger);
 
     CryptoNote::TransactionParameters sendParams;
     if (!request.paymentId.empty()) {

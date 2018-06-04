@@ -21,14 +21,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <SimpleWallet/Types.h>
 
-void transfer(std::shared_ptr<WalletInfo> walletInfo);
+void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height);
 
 void transfer(std::shared_ptr<WalletInfo> walletInfo,
-              std::vector<std::string> args);
+              std::vector<std::string> args, uint32_t height);
 
 void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                 uint64_t fee, std::string extra,
-                std::shared_ptr<WalletInfo> walletInfo);
+                std::shared_ptr<WalletInfo> walletInfo, uint32_t height);
 
 void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
                               std::vector<CryptoNote::TransactionParameters>

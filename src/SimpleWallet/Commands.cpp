@@ -102,7 +102,7 @@ void help(bool viewWallet)
               << SuccessMsg("export_keys", 25)
               << "Export your private keys" << std::endl
               << SuccessMsg("address", 25)
-              << "Displays your payment address" << std::endl
+              << "Display your payment address" << std::endl
               << SuccessMsg("exit", 25)
               << "Exit and save your wallet" << std::endl
               << SuccessMsg("save", 25)
@@ -122,11 +122,8 @@ void help(bool viewWallet)
                   << "Show outgoing transfers" << std::endl
                   << SuccessMsg("list_transfers", 25)
                   << "Show all transfers" << std::endl
-                  << SuccessMsg("quick_optimize", 25)
-                  << "Quickly optimize your wallet to send large amounts"
-                  << std::endl
-                  << SuccessMsg("full_optimize", 25)
-                  << "Fully optimize your wallet to send large amounts"
+                  << SuccessMsg("optimize", 25)
+                  << "Optimize your wallet to send large amounts"
                   << std::endl
                   << SuccessMsg("transfer", 25)
                   << "Send TRTL to someone" << std::endl;

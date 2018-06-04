@@ -599,27 +599,12 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
     return error::BlockValidationError::DIFFICULTY_OVERHEAD;
   }
 
-  uint64_t cumulativeFee = 0;
-
-  /* We now limit the mixin allowed in a transaction. However, there have been
-     some transactions outside these limits in the past, so we need to only
-     enforce this on new blocks, otherwise wouldn't be able to sync the chain */
-
-  /* We also need to ensure that the mixin enforced is for the limit that
-     was correct when the block was formed - i.e. if 0 mixin was allowed at
-     block 100, but is no longer allowed - we should still validate block 100 */
-
-  /* In the future, change this to && <= MIXIN_LIMITS_V2_HEIGHT, then add a
-     new section with the new mixin limits */
-  if (blockIndex >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT) {
-      for (const auto& transaction : transactions) {
-          if (!validateMixin(transaction,
-                             CryptoNote::parameters::MINIMUM_MIXIN_V1,
-                             CryptoNote::parameters::MAXIMUM_MIXIN_V1)) {
-              return error::TransactionValidationError::INVALID_MIXIN;
-          }
-      }
+  if (!validateMixin(transactions, blockIndex))
+  {
+      return error::TransactionValidationError::INVALID_MIXIN;
   }
+
+  uint64_t cumulativeFee = 0;
 
   for (const auto& transaction : transactions) {
     uint64_t fee = 0;
@@ -971,8 +956,41 @@ bool Core::addTransactionToPool(CachedTransaction&& cachedTransaction) {
   return true;
 }
 
+bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
+                         uint32_t height)
+{
+    uint64_t minMixin = 0;
+    uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
+
+    /* We now limit the mixin allowed in a transaction. However, there have been
+     some transactions outside these limits in the past, so we need to only
+     enforce this on new blocks, otherwise wouldn't be able to sync the chain */
+
+    /* We also need to ensure that the mixin enforced is for the limit that
+     was correct when the block was formed - i.e. if 0 mixin was allowed at
+     block 100, but is no longer allowed - we should still validate block 100 */
+    if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
+    {
+        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
+        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V2;
+    }
+    else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT)
+    {
+        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V1;
+        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V1;
+    }
+
+    for (const auto& transaction : transactions)
+    {
+        if (!validateMixin(transaction, minMixin, maxMixin))
+        {
+            return false;
+        }
+    }
+}
+
 bool Core::validateMixin(const CachedTransaction& cachedTransaction,
-                         uint16_t minMixin, uint16_t maxMixin) {
+                         uint64_t minMixin, uint64_t maxMixin) {
 
   /* Note that the mixin calculated here is one more than the mixin you input
      in your transaction. This is checking the number of outputs, for example,
@@ -1016,10 +1034,9 @@ bool Core::validateMixin(const CachedTransaction& cachedTransaction,
 }
 
 bool Core::isTransactionValidForPool(const CachedTransaction& cachedTransaction, TransactionValidatorState& validatorState) {
-  if (!validateMixin(cachedTransaction,
-                     CryptoNote::parameters::MINIMUM_MIXIN_V1,
-                     CryptoNote::parameters::MAXIMUM_MIXIN_V1)) {
-    return false;
+  if (!validateMixin({cachedTransaction}, getTopBlockIndex()))
+  {
+      return false;
   }
   
   uint64_t fee;
