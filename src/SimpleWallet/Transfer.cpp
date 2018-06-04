@@ -146,8 +146,10 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
     std::cout << "Your transaction has been split up into " << numTxs
               << " separate transactions of " 
               << formatAmount(transfers[0].destinations[0].amount)
-              << ". It may take some time to send all the transactions, "
-              << "please be patient." << std::endl << std::endl;
+              << ". "
+              << std::endl
+              << "It may take some time to send all the transactions."
+              << std::endl << std::endl;
 
     for (auto tx : transfers)
     {
@@ -177,18 +179,11 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
 
                 break;
             }
-
-            std::cout << "Not enough balance available to send transaction, "
-                      << "this is because some of your balance is used when "
-                      << "sending another transaction to help hide the size "
-                      << "of your transaction, and is locked for a short "
-                      << "time. It will return shortly." << std::endl
-                      << "Needed balance: " << formatAmount(neededBalance) 
-                      << std::endl << "Available balance: " 
-                      << formatAmount(wallet.getActualBalance())
-                      << std::endl << "Locked balance: "
-                      << formatAmount(wallet.getPendingBalance())
-                      << std::endl << "Will try again in 5 seconds..."
+           
+            std::cout << "Waiting for balance to unlock to send next "
+                      << "transaction."
+                      << std::endl
+                      << "Will try again in 5 seconds..."
                       << std::endl << std::endl;
 
             std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -203,12 +198,15 @@ void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
 void splitTx(CryptoNote::WalletGreen &wallet, 
              CryptoNote::TransactionParameters p)
 {
-    std::cout << "Wallet optimization failed, transactions are still too "
-              << "large to send in one chunk, splitting into multiple chunks." 
-              << std::endl << "This may take a long time as portions of your "
-              << "balance get locked whilst sending a transaction."
-              << std::endl << "It may also slightly raise the fee you have "
-              << "to pay, and hence reduce the total amount you can send if "
+    std::cout << "Transaction is still too large to send, splitting into "
+              << "multiple chunks." 
+              << std::endl
+              << "This may take a long time."
+              << std::endl
+              << "It may also slightly raise the fee you have to pay,"
+              << std::endl
+              << "and hence reduce the total amount you can send if"
+              << std::endl
               << "your balance cannot cover it." << std::endl;
 
     if (!confirm("Is this OK?"))
@@ -281,8 +279,6 @@ void splitTx(CryptoNote::WalletGreen &wallet,
                transactions into smaller pieces */
             if (wallet.txIsTooLarge(tx))
             {
-                std::cout << "Split up transactions are still too large! "
-                          << "Splitting up into smaller chunks." << std::endl;
                 continue;
             }
         }
