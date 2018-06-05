@@ -1,24 +1,14 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
+
 
 #include "NodeRpcProxy.h"
 #include "NodeErrors.h"
 
 #include <atomic>
+#include <ctime>
 #include <system_error>
 #include <thread>
 
@@ -32,6 +22,7 @@
 #include <CryptoNoteCore/TransactionApi.h>
 
 #include "Common/StringTools.h"
+#include "Common/FormatTools.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteTools.h"
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
@@ -293,6 +284,19 @@ void NodeRpcProxy::updatePoolState(const std::vector<std::unique_ptr<ITransactio
     Hash hash = tx->getTransactionHash();
     m_knownTxs.emplace(std::move(hash));
   }
+}
+
+std::string NodeRpcProxy::getInfo() {
+  CryptoNote::COMMAND_RPC_GET_INFO::request ireq;
+  CryptoNote::COMMAND_RPC_GET_INFO::response iresp;
+
+  std::error_code ec = jsonCommand("/getinfo", ireq, iresp);
+
+  if (ec || iresp.status != CORE_RPC_STATUS_OK) {
+    return std::string("Problem retrieving information from RPC server.");
+  } 
+    
+  return Common::get_status_string(iresp);
 }
 
 std::vector<Crypto::Hash> NodeRpcProxy::getKnownTxsVector() const {

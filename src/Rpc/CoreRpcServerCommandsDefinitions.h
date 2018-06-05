@@ -1,19 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
@@ -280,9 +268,12 @@ struct COMMAND_RPC_GET_INFO {
     uint32_t network_height;
     uint64_t upgrade_height;
     uint32_t hashrate;
+    uint8_t major_version;
+    uint8_t minor_version;
     std::string version;
     uint64_t start_time;
     bool synced;
+    bool testnet;
 
     void serialize(ISerializer &s) {
       KV_MEMBER(status)
@@ -297,8 +288,13 @@ struct COMMAND_RPC_GET_INFO {
       KV_MEMBER(grey_peerlist_size)
       KV_MEMBER(last_known_block_index)
       KV_MEMBER(network_height)
+      KV_MEMBER(upgrade_height)
       KV_MEMBER(hashrate)
+      KV_MEMBER(major_version)
+      KV_MEMBER(minor_version)
+      KV_MEMBER(start_time)
       KV_MEMBER(synced)
+      KV_MEMBER(testnet)
       KV_MEMBER(version)
     }
   };
