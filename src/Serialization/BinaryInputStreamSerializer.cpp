@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <Common/StreamTools.h>
 #include "SerializationOverloads.h"
+#include "CryptoNoteConfig.h"
 
 using namespace Common;
 
@@ -100,7 +101,7 @@ bool BinaryInputStreamSerializer::operator()(std::string& value, Common::StringV
   readVarint(stream, size);
 
   /* This should probably match block size... */
-  if (size > 200000)
+  if (size > CryptoNote::parameters::MAX_EXTRA_SIZE)
   {
     std::vector<char> temp;
     temp.resize(1);
