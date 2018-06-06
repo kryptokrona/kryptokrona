@@ -37,17 +37,13 @@ std::string get_sync_percentage(uint64_t height, uint64_t target_height) {
 
 //--------------------------------------------------------------------------------
 std::string get_upgrade_time(uint64_t height, uint64_t upgrade_height) {
-  if (height >= upgrade_height) {
-    return std::string();
-  }
-
   float days = (upgrade_height - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
 
-  if (upgrade_height == height) return std::string(" (forking now)");
+  if (height > upgrade_height) return std::string();
+  if (height == upgrade_height) return std::string(" (forking now)");
   if (days < 1) return (boost::format(" (next fork in %.1f hours)") % (days * 24)).str();
   
   return (boost::format(" (next fork in %.1f days)") % days).str();
-  }
 }
 
 //--------------------------------------------------------------------------------
