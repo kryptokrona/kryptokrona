@@ -987,6 +987,8 @@ bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
             return false;
         }
     }
+	
+    return true;
 }
 
 bool Core::validateMixin(const CachedTransaction& cachedTransaction,
