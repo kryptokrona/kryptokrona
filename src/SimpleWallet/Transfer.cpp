@@ -602,7 +602,7 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                     if (height < CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
                     {
                         std::cout << "Alternatively, you can sent the mixin "
-                                  << "count to 0.";
+                                  << "count to 0." << std::endl;
 
                         if(confirm("Retry transaction with mixin of 0? "
                                    "This will compromise privacy."))
