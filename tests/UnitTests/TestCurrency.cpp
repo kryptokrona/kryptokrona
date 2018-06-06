@@ -52,21 +52,21 @@ protected:
 
 TEST_F(Currency_isFusionTransactionTest, succeedsOnFusionTransaction) {
   auto tx = FusionTransactionBuilder(m_currency, TEST_AMOUNT).buildTx();
-  ASSERT_TRUE(m_currency.isFusionTransaction(tx));
+  ASSERT_TRUE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, succeedsIfFusionTransactionSizeEqMaxSize) {
   FusionTransactionBuilder builder(m_currency, TEST_AMOUNT);
   auto tx = builder.createFusionTransactionBySize(m_currency.fusionTxMaxSize());
   ASSERT_EQ(m_currency.fusionTxMaxSize(), getObjectBinarySize(tx));
-  ASSERT_TRUE(m_currency.isFusionTransaction(tx));
+  ASSERT_TRUE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, failsIfFusionTransactionSizeGreaterThanMaxSize) {
   FusionTransactionBuilder builder(m_currency, TEST_AMOUNT);
   auto tx = builder.createFusionTransactionBySize(m_currency.fusionTxMaxSize() + 1);
   ASSERT_EQ(m_currency.fusionTxMaxSize() + 1, getObjectBinarySize(tx));
-  ASSERT_FALSE(m_currency.isFusionTransaction(tx));
+  ASSERT_FALSE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, failsIfTransactionInputsCountIsNotEnought) {
@@ -74,15 +74,15 @@ TEST_F(Currency_isFusionTransactionTest, failsIfTransactionInputsCountIsNotEnoug
   builder.setInputCount(m_currency.fusionTxMinInputCount() - 1);
   auto tx = builder.buildTx();
   ASSERT_EQ(m_currency.fusionTxMinInputCount() - 1, tx.inputs.size());
-  ASSERT_FALSE(m_currency.isFusionTransaction(tx));
+  ASSERT_FALSE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, failsIfTransactionInputOutputCountRatioIsLessThenNecessary) {
-  FusionTransactionBuilder builder(m_currency, 3710 * m_currency.defaultDustThreshold());
+  FusionTransactionBuilder builder(m_currency, 3710 * m_currency.defaultDustThreshold(0));
   auto tx = builder.buildTx();
   ASSERT_EQ(3, tx.outputs.size());
   ASSERT_GT(tx.outputs.size() * m_currency.fusionTxMinInOutCountRatio(), tx.inputs.size());
-  ASSERT_FALSE(m_currency.isFusionTransaction(tx));
+  ASSERT_FALSE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, failsIfTransactionHasNotExponentialOutput) {
@@ -90,42 +90,42 @@ TEST_F(Currency_isFusionTransactionTest, failsIfTransactionHasNotExponentialOutp
   builder.setFirstOutput(TEST_AMOUNT);
   auto tx = builder.buildTx();
   ASSERT_EQ(1, tx.outputs.size());
-  ASSERT_FALSE(m_currency.isFusionTransaction(tx));
+  ASSERT_FALSE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, failsIfTransactionHasOutputsWithTheSameExponent) {
-  FusionTransactionBuilder builder(m_currency, 130 * m_currency.defaultDustThreshold());
-  builder.setFirstOutput(70 * m_currency.defaultDustThreshold());
+  FusionTransactionBuilder builder(m_currency, 130 * m_currency.defaultDustThreshold(0));
+  builder.setFirstOutput(70 * m_currency.defaultDustThreshold(0));
   auto tx = builder.buildTx();
   ASSERT_EQ(2, tx.outputs.size());
-  ASSERT_FALSE(m_currency.isFusionTransaction(tx));
+  ASSERT_FALSE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, succeedsIfTransactionHasDustOutput) {
-  FusionTransactionBuilder builder(m_currency, 11 * m_currency.defaultDustThreshold());
+  FusionTransactionBuilder builder(m_currency, 11 * m_currency.defaultDustThreshold(0));
   auto tx = builder.buildTx();
   ASSERT_EQ(2, tx.outputs.size());
-  ASSERT_EQ(m_currency.defaultDustThreshold(), tx.outputs[0].amount);
-  ASSERT_TRUE(m_currency.isFusionTransaction(tx));
+  ASSERT_EQ(m_currency.defaultDustThreshold(0), tx.outputs[0].amount);
+  ASSERT_TRUE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, failsIfTransactionFeeIsNotZero) {
-  FusionTransactionBuilder builder(m_currency, 370 * m_currency.defaultDustThreshold());
-  builder.setFee(70 * m_currency.defaultDustThreshold());
+  FusionTransactionBuilder builder(m_currency, 370 * m_currency.defaultDustThreshold(0));
+  builder.setFee(70 * m_currency.defaultDustThreshold(0));
   auto tx = builder.buildTx();
-  ASSERT_FALSE(m_currency.isFusionTransaction(tx));
+  ASSERT_FALSE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, succedsIfTransactionHasInputEqualsDustThreshold) {
   FusionTransactionBuilder builder(m_currency, TEST_AMOUNT);
-  builder.setFirstInput(m_currency.defaultDustThreshold());
+  builder.setFirstInput(m_currency.defaultDustThreshold(0));
   auto tx = builder.buildTx();
-  ASSERT_TRUE(m_currency.isFusionTransaction(tx));
+  ASSERT_TRUE(m_currency.isFusionTransaction(tx, 0));
 }
 
 TEST_F(Currency_isFusionTransactionTest, failsIfTransactionHasInputLessThanDustThreshold) {
   FusionTransactionBuilder builder(m_currency, TEST_AMOUNT);
-  builder.setFirstInput(m_currency.defaultDustThreshold() - 1);
+  builder.setFirstInput(m_currency.defaultDustThreshold(0) - 1);
   auto tx = builder.buildTx();
-  ASSERT_FALSE(m_currency.isFusionTransaction(tx));
+  ASSERT_FALSE(m_currency.isFusionTransaction(tx, 0));
 }

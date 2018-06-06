@@ -40,15 +40,21 @@ const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_CURRENT = CRYPTONOTE_BL
 const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE        = 600;
 const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 2;
 const uint64_t MINIMUM_FEE                                   = UINT64_C(10);
-const uint16_t DEFAULT_MIXIN                                 = 5;
-/* minimum_mixin = enforced for deamon
-   minimum_mixin_no_dust = enforced for simplewallet, when dust is not present
-   if dust is present, 0 mixin allowed. Possibly later disabled, or relegated to sweep_unmixable */
-const uint16_t MINIMUM_MIXIN_NO_DUST                         = 3;
-const uint16_t MINIMUM_MIXIN_V1                              = 0;
-const uint16_t MAXIMUM_MIXIN_V1                              = 100;
+
+const uint64_t MINIMUM_MIXIN_V1                              = 0;
+const uint64_t MAXIMUM_MIXIN_V1                              = 100;
+const uint64_t MINIMUM_MIXIN_V2                              = 7;
+const uint64_t MAXIMUM_MIXIN_V2                              = 100;
+
+const uint64_t DEFAULT_MIXIN                                 = MINIMUM_MIXIN_V2 + 2;
+
 const uint32_t MIXIN_LIMITS_V1_HEIGHT                        = 440000;
+const uint32_t MIXIN_LIMITS_V2_HEIGHT                        = 600000;
+
 const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(10);
+const uint64_t DEFAULT_DUST_THRESHOLD_V2                     = UINT64_C(0);
+
+const uint32_t DUST_THRESHOLD_V2_HEIGHT                      = MIXIN_LIMITS_V2_HEIGHT;
 
 const uint64_t DIFFICULTY_TARGET                             = 30; // seconds
 const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DIFFICULTY_TARGET;

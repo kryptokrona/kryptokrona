@@ -145,7 +145,7 @@ public:
     node(generator),
     alice(dispatcher, currency, node, logger),
     FEE(currency.minimumFee()),
-    FUSION_THRESHOLD(currency.defaultDustThreshold() * 10)
+    FUSION_THRESHOLD(currency.defaultDustThreshold(0) * 10)
   {
     CryptoNote::AccountBase randomAccount;
     randomAccount.generate();
@@ -297,7 +297,7 @@ void WalletApi::generateBlockReward(const std::string& address) {
 void WalletApi::generateFusionOutputsAndUnlock(WalletGreen& wallet, INodeTrivialRefreshStub& node,
   const CryptoNote::Currency& walletCurrency, uint64_t threshold, size_t addressIndex) {
 
-  uint64_t digit = walletCurrency.defaultDustThreshold();
+  uint64_t digit = walletCurrency.defaultDustThreshold(0);
   uint64_t mul = 1;
 
   while (digit > 9) {
@@ -2175,7 +2175,7 @@ TEST_F(WalletApi, createFusionTransactionCreatesValidFusionTransactionWithoutMix
 
   ASSERT_NE(WALLET_INVALID_TRANSACTION_ID, wallet.createFusionTransaction(FUSION_THRESHOLD, 0));
   ASSERT_TRUE(catchNode.caught);
-  ASSERT_TRUE(currency.isFusionTransaction(catchNode.transaction));
+  ASSERT_TRUE(currency.isFusionTransaction(catchNode.transaction, 0));
 
   wallet.shutdown();
 }
@@ -2190,7 +2190,7 @@ TEST_F(WalletApi, createFusionTransactionCreatesValidFusionTransactionWithMixin)
 
   ASSERT_NE(WALLET_INVALID_TRANSACTION_ID, wallet.createFusionTransaction(FUSION_THRESHOLD, 2));
   ASSERT_TRUE(catchNode.caught);
-  ASSERT_TRUE(currency.isFusionTransaction(catchNode.transaction));
+  ASSERT_TRUE(currency.isFusionTransaction(catchNode.transaction, 0));
 
   wallet.shutdown();
 }
@@ -2226,7 +2226,7 @@ TEST_F(WalletApi, createFusionTransactionThrowsIfStopped) {
 }
 
 TEST_F(WalletApi, createFusionTransactionThrowsIfThresholdTooSmall) {
-  ASSERT_ANY_THROW(alice.createFusionTransaction(currency.defaultDustThreshold() - 1, 0));
+  ASSERT_ANY_THROW(alice.createFusionTransaction(currency.defaultDustThreshold(0) - 1, 0));
 }
 
 TEST_F(WalletApi, createFusionTransactionThrowsIfNoAddresses) {
@@ -2569,7 +2569,7 @@ TEST_F(WalletApi, DISABLED_fusionManagerEstimate) {
       maxOutputIndex = i;
     }
 
-    if (currency.isAmountApplicableInFusionTransactionInput(tx.outputs[i].amount, tx.outputs[i].amount + 1)) {
+    if (currency.isAmountApplicableInFusionTransactionInput(tx.outputs[i].amount, tx.outputs[i].amount + 1, 0)) {
       ++expectedResult.fusionReadyCount;
     }
   }

@@ -289,7 +289,7 @@ void splitTx(CryptoNote::WalletGreen &wallet,
 }
 
 void transfer(std::shared_ptr<WalletInfo> walletInfo,
-              std::vector<std::string> args)
+              std::vector<std::string> args, uint32_t height)
 {
     uint16_t mixin;
     std::string address;
@@ -382,10 +382,10 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo,
         }
     }
 
-    doTransfer(mixin, address, amount, fee, extra, walletInfo);
+    doTransfer(mixin, address, amount, fee, extra, walletInfo, height);
 }
 
-void transfer(std::shared_ptr<WalletInfo> walletInfo)
+void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height)
 {
     std::cout << InformationMsg("Note: You can type cancel at any time to "
                                 "cancel the transaction")
@@ -467,12 +467,13 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo)
 
     std::string extra = maybeExtra.x;
 
-    doTransfer(mixin, address, amount, fee, extra, walletInfo);
+    doTransfer(mixin, address, amount, fee, extra, walletInfo, height);
 }
 
 void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                 uint64_t fee, std::string extra,
-                std::shared_ptr<WalletInfo> walletInfo)
+                std::shared_ptr<WalletInfo> walletInfo,
+                uint32_t height)
 {
     uint64_t balance = walletInfo->wallet.getActualBalance();
 
@@ -590,25 +591,26 @@ void doTransfer(uint16_t mixin, std::string address, uint64_t amount,
                                   << std::endl;
                     }
 
-                    std::cout << "Try lowering the amount you are "
-                              << "sending in one transaction."
-                              << std::endl
-                              << "Alternatively, you can set the mixin "
-                              << "count to 0."
-                              << std::endl;
+                    std::cout << "Try lowering the amount you are sending "
+                              << "in one transaction." << std::endl;
 
-                    if(confirm("Retry transaction with mixin of 0? "
-                               "This will compromise privacy."))
+                    /* Mixin 0 not allowed after MIXIN_LIMITS_V2 */
+                    if (height < CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
                     {
-                        p.mixIn = 0;
-                        retried = true;
-                        continue;
+                        std::cout << "Alternatively, you can sent the mixin "
+                                  << "count to 0." << std::endl;
+
+                        if(confirm("Retry transaction with mixin of 0? "
+                                   "This will compromise privacy."))
+                        {
+                            p.mixIn = 0;
+                            retried = true;
+                            continue;
+                        }
                     }
-                    else
-                    {
-                        std::cout << WarningMsg("Cancelling transaction.")
-                                  << std::endl;
-                    }
+
+                    std::cout << WarningMsg("Cancelling transaction.")
+                              << std::endl;
 
                     break;
                 }
@@ -913,11 +915,8 @@ bool parseMixin(std::string mixinString)
 
         /* Force them to use a set mixin, if we detect dust later, then we
            will allow them to use 0 mixin. */
-        uint16_t minMixin = std::max(CryptoNote::parameters
-                                               ::MINIMUM_MIXIN_NO_DUST,
-                                     CryptoNote::parameters::MINIMUM_MIXIN_V1);
-
-        uint16_t maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V1;
+        uint16_t minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
+        uint16_t maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V2;
 
         if (mixin < minMixin)
         {

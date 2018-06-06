@@ -152,7 +152,8 @@ private:
 
   std::error_code validateSemantic(const Transaction& transaction, uint64_t& fee, uint32_t blockIndex);
   std::error_code validateTransaction(const CachedTransaction& transaction, TransactionValidatorState& state, IBlockchainCache* cache, uint64_t& fee, uint32_t blockIndex);
-  bool validateMixin(const CachedTransaction& transaction, uint16_t minMixin, uint16_t maxMixin);
+  bool validateMixin(const CachedTransaction& transaction, uint64_t minMixin, uint64_t maxMixin);
+  bool validateMixin(std::vector<CachedTransaction> transactions, uint32_t height);
   
   uint32_t findBlockchainSupplement(const std::vector<Crypto::Hash>& remoteBlockIds) const;
   std::vector<Crypto::Hash> getBlockHashes(uint32_t startBlockIndex, uint32_t maxCount) const;
