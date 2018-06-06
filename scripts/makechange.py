@@ -4,17 +4,20 @@
 Usage: python makechange.py
 This is python3, so you might need to launch it with python3 makechange.py
 
-Make a wallet and fill it with some funds, or start mining to it.
-Open the wallet with walletd like so:
+Make two wallets and fill one or both with some funds, or start mining to it.
+Open the wallets with walletd like so:
 
-walletd -w yourwalletfilename -p yourwalletpassword --rpc-password test
+./walletd -w walletA.wallet -p yourpass --rpc-password test --daemon-port 11898 --bind-port 8070
+./walletd -w walletB.wallet -p yourpass --rpc-password test --daemon-port 11898 --bind-port 8071
 
-Fill in the address variable, and change the walletd port and address if needed.
+Feel free to change these parameters if needed of course.
 
-Make sure the address variable is correct, because if it isn't, you will
+Next, fill in the address variables with your two address, and change the walletd ports and hosts if needed.
+
+Make sure the address variables are correct, because if it isn't, you will
 rapidly be sending your funds to this address.
 
-This script rapidly sends random amount of funds from your wallet back to you,
+This script rapidly sends random amount of funds from two wallets to each other,
 hopefully generating change on a new network.
 '''
 
@@ -23,30 +26,35 @@ import json
 import random
 import time
 
-address = "Fill me in!"
+# The address of your first wallet
+addressA = "Fill me in!"
 
-# If you are sending to someone else, change this to your own address
-makeChangeAddress = address
+# The address of your second wallet
+addressB = "Fill me in!"
 
-if len(address) != 99:
-    print("Please fill in your address and re-run the script.")
+if len(addressA) != 99 or len(addressB) != 99:
+    print("Please fill in your addresses and re-run the script.")
     quit()
 
-walletdPort = "8070"
-walletdAddress = "127.0.0.1"
+walletdPortA = "8070"
+walletdAddressA = "127.0.0.1"
 
-rpcPassword = "test"
+walletdPortB = "8071"
+walletdAddressB = "127.0.0.1"
 
-def make_request(method, **kwargs):
+rpcPasswordA = "test"
+rpcPasswordB = "test"
+
+def sendTransaction(host, port, rpcPassword, **kwargs):
     payload = {
         'jsonrpc': '2.0',
-        'method': method,
+        'method': "sendTransaction",
         'password': rpcPassword,
         'id': 'test',
         'params': kwargs
     }
 
-    url = 'http://' + walletdAddress + ':' + walletdPort + '/json_rpc'
+    url = 'http://' + host + ':' + port + '/json_rpc'
 
     response = requests.post(url, data=json.dumps(payload),
                              headers={'content-type': 'application/json'}).json()
@@ -58,28 +66,33 @@ def make_request(method, **kwargs):
         print(response['result'])
         return True
 
-def loop():
-    n = 1000
-    while(n < 100000000000):
-        yield n
-        n *= 10
+def sendTXs(host, port, rpcPassword, sender, receiver):
+    def loop():
+        n = 1000
+        while(n < 100000000000):
+            yield n
+            n *= 10
 
-sleepAmount = 0.001
+    sleepAmount = 0.001
+
+    while True:
+        for i in loop():
+            # give it a bit more randomness, maybe this helps
+            amount = random.randint(i, i+10000)
+
+            params = {'transfers': [{'address': receiver, 'amount': amount}],
+                      'fee': 10,
+                      'anonymity': 5,
+                      'changeAddress': sender}
+
+            if not sendTransaction(host, port, rpcPassword, **params):
+                time.sleep(sleepAmount)
+                print("Sleeping for " + str(sleepAmount) + " seconds...")
+                sleepAmount *= 2
+                break
+            else:
+                sleepAmount = 0.001
 
 while True:
-    for i in loop():
-        # give it a bit more randomness, maybe this helps
-        amount = random.randint(i, i+10000)
-
-        params = {'transfers': [{'address': address, 'amount': amount}],
-                  'fee': 10,
-                  'anonymity': 5,
-                  'changeAddress': makeChangeAddress}
-
-        if not make_request("sendTransaction", **params):
-            time.sleep(sleepAmount)
-            print("Sleeping for " + str(sleepAmount) + " seconds...")
-            sleepAmount *= 2
-            break
-        else:
-            sleepAmount = 0.001
+    sendTXs(walletdAddressA, walletdPortA, rpcPasswordA, sender=addressA, receiver=addressB)
+    sendTXs(walletdAddressB, walletdPortB, rpcPasswordB, sender=addressB, receiver=addressA)
