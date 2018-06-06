@@ -27,12 +27,10 @@ import random
 import time
 
 # The address of your first wallet
-#addressA = "Fill me in!"
-addressA = "TRTLuyTvsJZjAsbtgbYmZeV1pb43dXqcv1jNdYNwokv8GUa1ZbYzivzg2gEgXeAfUqJF12APf3Rq89UneaQKiZ1nGW1vYqkGb8Y"
+addressA = "Fill me in!"
 
 # The address of your second wallet
-#addressB = "Fill me in!"
-addressB = "TRTLv1XqnNvAHYVMcp1FCQf9qdAyzAkD577Ltg7dA6x2YgMRdUdnNHE9WRgezC7jbiMTbMNuaWrvG8eTYucRVZnERNrf2QpCSS9"
+addressB = "Fill me in!"
 
 if len(addressA) != 99 or len(addressB) != 99:
     print("Please fill in your addresses and re-run the script.")
