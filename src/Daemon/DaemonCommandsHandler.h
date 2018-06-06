@@ -1,19 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
@@ -54,9 +42,6 @@ private:
   CryptoNote::RpcServer* m_prpc_server;
 
   std::string get_commands_str();
-  std::string get_mining_speed(uint32_t hr);
-  std::string get_sync_percentage(uint64_t height, uint64_t target_height);
-  std::string get_upgrade_time(uint64_t height, uint64_t upgrade_height);
   bool print_block_by_height(uint32_t height);
   bool print_block_by_hash(const std::string& arg);
 

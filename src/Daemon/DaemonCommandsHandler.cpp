@@ -1,22 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
-//
-// Portions copyright (c) 2014-2018, The Monero Project
-// Portions copyright (c) 2018, The TurtleCoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #include "DaemonCommandsHandler.h"
 
@@ -32,6 +17,7 @@
 #include "Rpc/JsonRpc.h"
 #include "CryptoNoteCore/Currency.h"
 #include <boost/format.hpp>
+#include "Common/FormatTools.h"
 
 namespace {
 template <typename T>
@@ -88,41 +74,6 @@ std::string DaemonCommandsHandler::get_commands_str()
   usage.insert(0, "  ");
   ss << usage << ENDL;
   return ss.str();
-}
-
-//--------------------------------------------------------------------------------
-std::string DaemonCommandsHandler::get_mining_speed(uint32_t hr)
-{
-  if (hr>1e9) return (boost::format("%.2f GH/s") % (hr/1e9)).str();
-  if (hr>1e6) return (boost::format("%.2f MH/s") % (hr/1e6)).str();
-  if (hr>1e3) return (boost::format("%.2f kH/s") % (hr/1e3)).str();
-  return (boost::format("%.0f H/s") % hr).str();
-}
-
-//--------------------------------------------------------------------------------
-std::string DaemonCommandsHandler::get_sync_percentage(uint64_t height, uint64_t target_height)
-{
-  target_height = target_height ? target_height < height ? height : target_height : height;
-  float pc = 100.0f * height / target_height;
-
-  if (height < target_height && pc > 99.99f) {
-    pc = 99.99f; // to avoid 100% when not fully synced
-  }
-
-  return (boost::format("%.2f") % pc).str();
-}
-
-//--------------------------------------------------------------------------------
-std::string DaemonCommandsHandler::get_upgrade_time(uint64_t height, uint64_t upgrade_height) {
-  if (height >= upgrade_height) {
-    return std::string();
-  }
-
-  float days = (upgrade_height - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
-  
-  if (days < 1) return std::string(" (next fork in <1 day)");
-
-  return (boost::format(" (next fork in %.1f days)") % days).str();
 }
 
 //--------------------------------------------------------------------------------
@@ -370,21 +321,11 @@ bool DaemonCommandsHandler::status(const std::vector<std::string>& args)
   CryptoNote::COMMAND_RPC_GET_INFO::response iresp;
 
   if (!m_prpc_server->on_get_info(ireq, iresp) || iresp.status != CORE_RPC_STATUS_OK) {
-    std::cout << "Problem retreiving information from RPC server." << std::endl;
+    std::cout << "Problem retrieving information from RPC server." << std::endl;
     return false;
   } 
 
-  CryptoNote::BlockDetails block_details = m_core.getBlockDetails(m_core.getTopBlockIndex());
-  std::time_t uptime = std::time(nullptr) - iresp.start_time;
-
-  std::cout 
-    << "Height: " << iresp.height << "/" << iresp.network_height << " (" << get_sync_percentage(iresp.height, iresp.network_height) << "%) "
-    << "on " << (m_core.getCurrency().isTestnet() ? "testnet, " : "mainnet, ") << (iresp.synced ? "synced, " : "syncing, ") 
-    << "net hash " << get_mining_speed(iresp.hashrate) << ", " << "v" << +block_details.majorVersion << get_upgrade_time(iresp.network_height, iresp.upgrade_height) << ", "
-    << iresp.outgoing_connections_count << "(out)+" << iresp.incoming_connections_count << "(in) connections, "
-    << "uptime " << (unsigned int)floor(uptime / 60.0 / 60.0 / 24.0) << "d " << (unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0)) << "h "
-    << (unsigned int)floor(fmod((uptime / 60.0), 60.0)) << "m " << (unsigned int)fmod(uptime, 60.0) << "s"
-    << std::endl;
+  std::cout << Common::get_status_string(iresp) << std::endl;
   
   return true;
 }

@@ -1,19 +1,6 @@
-/*
-Copyright (C) 2018, The TurtleCoin developers
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 //////////////////////////////////
 #include <SimpleWallet/Commands.h>
@@ -107,6 +94,8 @@ void help(bool viewWallet)
               << "Exit and save your wallet" << std::endl
               << SuccessMsg("save", 25)
               << "Save your wallet state" << std::endl
+              << SuccessMsg("status", 25)
+              << "Show daemon status" << std::endl
               << SuccessMsg("incoming_transfers", 25)
               << "Show incoming transfers" << std::endl;
                   
@@ -131,6 +120,11 @@ void help(bool viewWallet)
                   << SuccessMsg("transfer", 25)
                   << "Send TRTL to someone" << std::endl;
     }
+}
+
+void status(CryptoNote::INode &node)
+{
+    std::cout << node.getInfo() << std::endl;
 }
 
 void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
