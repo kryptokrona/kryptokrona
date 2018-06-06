@@ -35,6 +35,11 @@ bool parseTransactionExtra(const std::vector<uint8_t> &transactionExtra, std::ve
   if (transactionExtra.empty())
     return true;
 
+  bool seen_tx_extra_tag_padding = false;
+  bool seen_tx_extra_tag_pubkey = false;
+  bool seen_tx_extra_nonce = false;
+  bool seen_tx_extra_merge_mining_tag = false;
+
   try {
     MemoryInputStream iss(transactionExtra.data(), transactionExtra.size());
     BinaryInputStreamSerializer ar(iss);
@@ -45,6 +50,12 @@ bool parseTransactionExtra(const std::vector<uint8_t> &transactionExtra, std::ve
       c = read<uint8_t>(iss);
       switch (c) {
       case TX_EXTRA_TAG_PADDING: {
+        if (seen_tx_extra_tag_padding) {
+            return true;
+        }
+
+        seen_tx_extra_tag_padding = true;
+
         size_t size = 1;
         for (; !iss.endOfStream() && size <= TX_EXTRA_PADDING_MAX_COUNT; ++size) {
           if (read<uint8_t>(iss) != 0) {
@@ -61,6 +72,12 @@ bool parseTransactionExtra(const std::vector<uint8_t> &transactionExtra, std::ve
       }
 
       case TX_EXTRA_TAG_PUBKEY: {
+        if (seen_tx_extra_tag_pubkey) {
+            return true;
+        }
+
+        seen_tx_extra_tag_pubkey = true;
+
         TransactionExtraPublicKey extraPk;
         ar(extraPk.publicKey, "public_key");
         transactionExtraFields.push_back(extraPk);
@@ -68,6 +85,12 @@ bool parseTransactionExtra(const std::vector<uint8_t> &transactionExtra, std::ve
       }
 
       case TX_EXTRA_NONCE: {
+        if (seen_tx_extra_nonce) {
+            return true;
+        }
+
+        seen_tx_extra_nonce = true;
+
         TransactionExtraNonce extraNonce;
         uint8_t size = read<uint8_t>(iss);
         if (size > 0) {
@@ -80,6 +103,12 @@ bool parseTransactionExtra(const std::vector<uint8_t> &transactionExtra, std::ve
       }
 
       case TX_EXTRA_MERGE_MINING_TAG: {
+        if (seen_tx_extra_merge_mining_tag) {
+            break;
+        }
+
+        seen_tx_extra_merge_mining_tag = true;
+
         TransactionExtraMergeMiningTag mmTag;
         ar(mmTag, "mm_tag");
         transactionExtraFields.push_back(mmTag);

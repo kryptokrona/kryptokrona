@@ -99,6 +99,23 @@ bool BinaryInputStreamSerializer::operator()(std::string& value, Common::StringV
   uint64_t size;
   readVarint(stream, size);
 
+  /* This should probably match block size... */
+  if (size > 200000)
+  {
+    std::vector<char> temp;
+    temp.resize(1);
+
+    /* Read to the end of the stream, and throw the data away, otherwise
+       transaction won't validate. There should be a better way to do this? */
+    while (size > 0) {
+        checkedRead(&temp[0], 1);
+        size--;
+    }
+
+    value.clear();
+    return true;
+  }
+
   if (size > 0) {
     std::vector<char> temp;
     temp.resize(size);
