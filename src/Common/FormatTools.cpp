@@ -36,24 +36,43 @@ std::string get_sync_percentage(uint64_t height, uint64_t target_height) {
 }
 
 //--------------------------------------------------------------------------------
-std::string get_upgrade_time(uint64_t height, uint64_t upgrade_height, uint64_t supported_height) {
-  float days = (upgrade_height - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+std::string get_upgrade_time(uint64_t height, std::vector<uint64_t> upgrade_heights, uint64_t supported_height) {
   std::string supported = "(Your version of the software is ready for this fork)";
   std::string ret;
 
-  if (supported_height < upgrade_height)
+  uint64_t next_fork = 0;
+
+  for (auto upgrade : upgrade_heights)
   {
-      supported = "(Your software will need to be upgraded to support this fork)";
+      /* We have hit an upgrade already that the user cannot support */
+      if (height >= upgrade && supported_height < upgrade)
+      {
+          return " (The network forked at height " + std::to_string(upgrade) + ", please update your software: https://turtlecoin.lol/)";
+      }
+
+      /* Get the next fork height */
+      if (upgrade > height)
+      {
+          next_fork = upgrade;
+          break;
+      }
   }
 
-  std::cout << supported_height << ", " << upgrade_height << std::endl;
+  /* Software doesn't support the next fork yet */
+  if (supported_height < next_fork)
+  {
+      supported = " (Your software will need to be upgraded to support this fork)";
+  }
 
-  if (height > upgrade_height)
+  /* No more hardforks on the list, don't print anything */
+  if (height > next_fork)
   {
       return ret;
   }
 
-  if (height == upgrade_height)
+  float days = (next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+
+  if (height == next_fork)
   {
       ret = " (forking now) ";
   }
@@ -74,12 +93,18 @@ std::string get_status_string(CryptoNote::COMMAND_RPC_GET_INFO::response iresp) 
   std::stringstream ss;
   std::time_t uptime = std::time(nullptr) - iresp.start_time;
 
-  ss << "Height: " << iresp.height << "/" << iresp.network_height << " (" << get_sync_percentage(iresp.height, iresp.network_height) << "%) "
-     << "on " << (iresp.testnet ? "testnet, " : "mainnet, ") << (iresp.synced ? "synced, " : "syncing, ") 
-     << "net hash " << get_mining_speed(iresp.hashrate) << ", " << "v" << +iresp.major_version << get_upgrade_time(iresp.network_height, iresp.upgrade_height, iresp.supported_height) << ", "
-     << iresp.outgoing_connections_count << "(out)+" << iresp.incoming_connections_count << "(in) connections, "
-     << "uptime " << (unsigned int)floor(uptime / 60.0 / 60.0 / 24.0) << "d " << (unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0)) << "h "
-     << (unsigned int)floor(fmod((uptime / 60.0), 60.0)) << "m " << (unsigned int)fmod(uptime, 60.0) << "s";
+  ss << "Height: " << iresp.height << "/" << iresp.network_height
+     << " (" << get_sync_percentage(iresp.height, iresp.network_height) << "%) "
+     << "on " << (iresp.testnet ? "testnet, " : "mainnet, ")
+     << (iresp.synced ? "synced, " : "syncing, ") 
+     << "net hash " << get_mining_speed(iresp.hashrate) << ", "
+     << "v" << +iresp.major_version
+     << get_upgrade_time(iresp.network_height, iresp.upgrade_heights, iresp.supported_height)
+     << ", " << iresp.outgoing_connections_count << "(out)+" << iresp.incoming_connections_count << "(in) connections, "
+     << "uptime " << (unsigned int)floor(uptime / 60.0 / 60.0 / 24.0)
+     << "d " << (unsigned int)floor(fmod((uptime / 60.0 / 60.0), 24.0))
+     << "h " << (unsigned int)floor(fmod((uptime / 60.0), 60.0))
+     << "m " << (unsigned int)fmod(uptime, 60.0) << "s";
 
   return ss.str();
 }

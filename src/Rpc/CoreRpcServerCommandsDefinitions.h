@@ -266,7 +266,7 @@ struct COMMAND_RPC_GET_INFO {
     uint64_t grey_peerlist_size;
     uint32_t last_known_block_index;
     uint32_t network_height;
-    uint64_t upgrade_height;
+    std::vector<uint64_t> upgrade_heights;
     uint64_t supported_height;
     uint32_t hashrate;
     uint8_t major_version;
@@ -289,7 +289,7 @@ struct COMMAND_RPC_GET_INFO {
       KV_MEMBER(grey_peerlist_size)
       KV_MEMBER(last_known_block_index)
       KV_MEMBER(network_height)
-      KV_MEMBER(upgrade_height)
+      KV_MEMBER(upgrade_heights)
       KV_MEMBER(supported_height)
       KV_MEMBER(hashrate)
       KV_MEMBER(major_version)
