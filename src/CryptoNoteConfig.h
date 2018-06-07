@@ -96,6 +96,26 @@ const uint32_t UPGRADE_WINDOW                                = EXPECTED_NUMBER_O
 static_assert(0 < UPGRADE_VOTING_THRESHOLD && UPGRADE_VOTING_THRESHOLD <= 100, "Bad UPGRADE_VOTING_THRESHOLD");
 static_assert(UPGRADE_VOTING_WINDOW > 1, "Bad UPGRADE_VOTING_WINDOW");
 
+/* The index in the FORK_HEIGHTS array that this version of the software will
+   support. For example, if CURRENT_FORK_INDEX is 3, this version of the
+   software will support the fork at 600,000 blocks. */
+const uint8_t CURRENT_FORK_INDEX = 3;
+
+/* Block heights we are going to have hard forks at */
+const uint64_t FORK_HEIGHTS[] = {
+    187000,
+    350000,
+    440000,
+    600000,
+    700000,
+    800000,
+    900000,
+    1000000
+};
+
+/* Make sure CURRENT_FORK_INDEX is a valid index */
+static_assert(CURRENT_FORK_INDEX < (sizeof(FORK_HEIGHTS)/sizeof(*FORK_HEIGHTS)));
+
 const char     CRYPTONOTE_BLOCKS_FILENAME[]                  = "blocks.bin";
 const char     CRYPTONOTE_BLOCKINDEXES_FILENAME[]            = "blockindexes.bin";
 const char     CRYPTONOTE_POOLDATA_FILENAME[]                = "poolstate.bin";
@@ -148,4 +168,3 @@ const char* const SEED_NODES[] = {
   "165.227.252.132:11897" //iburnmycd
 };
 } // CryptoNote
-
