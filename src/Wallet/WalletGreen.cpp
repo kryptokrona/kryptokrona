@@ -3178,7 +3178,7 @@ IFusionManager::EstimateResult WalletGreen::estimate(uint64_t threshold, const s
   for (size_t walletIndex = 0; walletIndex < walletOuts.size(); ++walletIndex) {
     for (auto& out : walletOuts[walletIndex].outs) {
       uint8_t powerOfTen = 0;
-      if (m_currency.isAmountApplicableInFusionTransactionInput(out.amount, threshold, powerOfTen)) {
+      if (m_currency.isAmountApplicableInFusionTransactionInput(out.amount, threshold, powerOfTen, m_node.getLastKnownBlockHeight())) {
         assert(powerOfTen < std::numeric_limits<uint64_t>::digits10 + 1);
         bucketSizes[powerOfTen]++;
       }
