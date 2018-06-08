@@ -138,58 +138,6 @@ std::string get_update_status(ForkStatus forkStatus, uint64_t height, std::vecto
 }
 
 //--------------------------------------------------------------------------------
-std::string get_upgrade_time(uint64_t height, std::vector<uint64_t> upgrade_heights, uint64_t supported_height) {
-  std::string supported = "(Your version of the software is ready for this fork)";
-  std::string ret;
-
-  uint64_t next_fork = 0;
-
-  for (auto upgrade : upgrade_heights)
-  {
-      /* We have hit an upgrade already that the user cannot support */
-      if (height >= upgrade && supported_height < upgrade)
-      {
-          return " (The network forked at height " + std::to_string(upgrade) + ", please update your software: https://turtlecoin.lol/)";
-      }
-
-      /* Get the next fork height */
-      if (upgrade > height)
-      {
-          next_fork = upgrade;
-          break;
-      }
-  }
-
-  /* Software doesn't support the next fork yet, and fork is < 25k blocks away */
-  if (supported_height < next_fork && supported_height + 25000 > next_fork)
-  {
-      supported = " (Your software will need to be upgraded to support this fork)";
-  }
-
-  /* No more hardforks on the list, don't print anything */
-  if (height > next_fork)
-  {
-      return ret;
-  }
-
-  float days = (next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
-
-  if (height == next_fork)
-  {
-      ret = " (forking now) ";
-  }
-  else if (days < 1)
-  {
-      ret = (boost::format(" (next fork in %.1f hours) ") % (days * 24)).str();
-  }
-  else
-  {
-      ret = (boost::format(" (next fork in %.1f days) ") % days).str();
-  }
-
-  return ret + supported;
-}
-
 std::string get_upgrade_info(uint64_t supported_height, std::vector<uint64_t> upgrade_heights)
 {
     for (auto upgrade : upgrade_heights)
