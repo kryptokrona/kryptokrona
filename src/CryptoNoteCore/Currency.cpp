@@ -338,7 +338,7 @@ bool Currency::isFusionTransaction(const Transaction& transaction, uint32_t heig
 
 bool Currency::isAmountApplicableInFusionTransactionInput(uint64_t amount, uint64_t threshold, uint32_t height) const {
   uint8_t ignore;
-  return isAmountApplicableInFusionTransactionInput(amount, threshold, ignore);
+  return isAmountApplicableInFusionTransactionInput(amount, threshold, ignore, height);
 }
 
 bool Currency::isAmountApplicableInFusionTransactionInput(uint64_t amount, uint64_t threshold, uint8_t& amountPowerOfTen, uint32_t height) const {
