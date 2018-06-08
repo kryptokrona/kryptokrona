@@ -425,7 +425,7 @@ void serialize(TransactionExtraMergeMiningTag& tag, ISerializer& serializer) {
     serializer(field, "");
   } else {
     std::string field;
-    serializer(field, "");
+    serializer(field, "mm_tag");
     MemoryInputStream stream(field.data(), field.size());
     BinaryInputStreamSerializer input(stream);
     doSerialize(tag, input);
