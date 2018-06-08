@@ -149,7 +149,7 @@ std::string get_upgrade_info(uint64_t supported_height, std::vector<uint64_t> up
     }
 
     /* This shouldnt happen */
-    return "";
+    return std::string();
 }
 
 //--------------------------------------------------------------------------------
