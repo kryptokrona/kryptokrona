@@ -22,7 +22,7 @@ ADD https://raw.githubusercontent.com/turtlecoin/checkpoints/master/checkpoints.
 # In a multi-node testnet, we'll want to have the slave nodes "wait" for the master node to wake up, so let's get ready
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /tmp/
 
-ARG TURTLECOIN_VERSION=v0.4.3
+ARG TURTLECOIN_VERSION=v0.6.0
 ENV TURTLECOIN_VERSION=${TURTLECOIN_VERSION}
 
 # install build dependencies
