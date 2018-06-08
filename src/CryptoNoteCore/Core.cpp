@@ -960,7 +960,12 @@ bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
                          uint32_t height)
 {
     uint64_t minMixin = 0;
-    uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
+	
+    /* See in the next function due to how things are, this will be ++'d.
+       That doesn't work so well when the value is already max for the given
+       type. So go for -1 here to make everything work */
+
+    uint64_t maxMixin = std::numeric_limits<uint64_t>::max()-1;
 
     /* We now limit the mixin allowed in a transaction. However, there have been
      some transactions outside these limits in the past, so we need to only
