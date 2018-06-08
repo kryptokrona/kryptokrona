@@ -107,10 +107,10 @@ const uint64_t FORK_HEIGHTS[] = {
     350000,
     440000,
     600000,
-    700000,
     800000,
-    900000,
-    1000000
+    1000000,
+    1200000,
+    1400000
 };
 
 /* Make sure CURRENT_FORK_INDEX is a valid index */
