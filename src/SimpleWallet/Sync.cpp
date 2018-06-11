@@ -22,7 +22,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <Common/StringTools.h>
 
 #include <memory>
+#ifndef MSVC
 #include <fstream>
+#endif
 
 #include <SimpleWallet/Tools.h>
 #include <SimpleWallet/Types.h>
