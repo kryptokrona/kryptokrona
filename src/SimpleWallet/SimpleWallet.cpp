@@ -520,10 +520,6 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
                           << " command for a walk through guide to "
                           << "transferring." << std::endl;
             }
-            else if (command == "save_csv")
-            {
-                saveCSV(walletInfo->wallet, node);
-            }
             else if (command == "quick_optimize")
             {
                 quickOptimize(walletInfo->wallet);
