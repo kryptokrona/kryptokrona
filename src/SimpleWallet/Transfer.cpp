@@ -117,7 +117,7 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
     }
     else
     {
-        std::cout << "." << std::endl;
+        std::cout << ".";
     }
     
     std::cout << std::endl << std::endl
