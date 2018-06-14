@@ -475,6 +475,10 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
         {
             listTransfers(true, false, walletInfo->wallet, node);
         }
+        else if (command == "save_csv")
+        {
+            saveCSV(walletInfo->wallet, node);
+        }
         else if (command == "exit")
         {
             return;
