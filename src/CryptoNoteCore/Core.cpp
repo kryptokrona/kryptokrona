@@ -959,13 +959,8 @@ bool Core::addTransactionToPool(CachedTransaction&& cachedTransaction) {
 bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
                          uint32_t height)
 {
-    uint64_t minMixin = 0;
-	
-    /* See in the next function due to how things are, this will be ++'d.
-       That doesn't work so well when the value is already max for the given
-       type. So go for -1 here to make everything work */
-
-    uint64_t maxMixin = std::numeric_limits<uint64_t>::max()-1;
+    uint64_t minMixin = std::numeric_limits<uint64_t>::min();
+    uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
 
     /* We now limit the mixin allowed in a transaction. However, there have been
      some transactions outside these limits in the past, so we need to only
@@ -998,17 +993,9 @@ bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
 
 bool Core::validateMixin(const CachedTransaction& cachedTransaction,
                          uint64_t minMixin, uint64_t maxMixin) {
-
-  /* Note that the mixin calculated here is one more than the mixin you input
-     in your transaction. This is checking the number of outputs, for example,
-     5, where yours is one of them. Mixin 4 = mix my output with 4 others,
-     so 5 outputs. So, we add one here. */
-  minMixin++;
-  maxMixin++;
-
-  uint64_t mixin = 0;
-
-  auto tx = createTransaction(cachedTransaction.getTransaction());
+  uint64_t ringSize = 1;
+  
+  const auto tx = createTransaction(cachedTransaction.getTransaction());
 
   for (size_t i = 0; i < tx->getInputCount(); ++i) {
     if (tx->getInputType(i) != TransactionTypes::InputType::Key) {
@@ -1017,11 +1004,14 @@ bool Core::validateMixin(const CachedTransaction& cachedTransaction,
 
     KeyInput input;
     tx->getInput(i, input);
-    uint64_t currentMixin = input.outputIndexes.size();
-    if (currentMixin > mixin) {
-        mixin = currentMixin;
+    const uint64_t currentRingSize = input.outputIndexes.size();
+    if (currentRingSize > ringSize) {
+        ringSize = currentRingSize;
     }
   }
+
+  /* Ring size = mixin + 1 - your transaction plus the others you mix with */
+  const uint64_t mixin = ringSize - 1;
 
   if (mixin > maxMixin) {
     logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
