@@ -959,7 +959,7 @@ bool Core::addTransactionToPool(CachedTransaction&& cachedTransaction) {
 bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
                          uint32_t height)
 {
-    uint64_t minMixin = std::numeric_limits<uint64_t>::min();
+    uint64_t minMixin = 0;
     uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
 
     /* We now limit the mixin allowed in a transaction. However, there have been
