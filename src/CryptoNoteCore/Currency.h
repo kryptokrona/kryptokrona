@@ -1,19 +1,8 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
@@ -42,6 +31,17 @@ public:
 
   size_t timestampCheckWindow() const { return m_timestampCheckWindow; }
   uint64_t blockFutureTimeLimit() const { return m_blockFutureTimeLimit; }
+  uint64_t blockFutureTimeLimit(uint32_t blockHeight) const
+  {
+      if (blockHeight >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+      {
+          return CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3;
+      }
+      else
+      {
+          return m_blockFutureTimeLimit;
+      }
+  }
 
   uint64_t moneySupply() const { return m_moneySupply; }
   unsigned int emissionSpeedFactor() const { return m_emissionSpeedFactor; }
@@ -76,7 +76,7 @@ size_t difficultyLagByBlockVersion(uint8_t blockMajorVersion) const;
   size_t difficultyCut() const { return m_difficultyCut; }
 size_t difficultyCutByBlockVersion(uint8_t blockMajorVersion) const;
   size_t difficultyBlocksCount() const { return m_difficultyWindow + m_difficultyLag; }
-size_t difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion) const;
+size_t difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion, uint32_t height) const;
 
   size_t maxBlockSizeInitial() const { return m_maxBlockSizeInitial; }
   uint64_t maxBlockSizeGrowthSpeedNumerator() const { return m_maxBlockSizeGrowthSpeedNumerator; }
@@ -132,8 +132,10 @@ size_t difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion) const;
   std::string formatAmount(int64_t amount) const;
   bool parseAmount(const std::string& str, uint64_t& amount) const;
 
+  Difficulty getNextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const;
   Difficulty nextDifficulty(std::vector<uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const;
 Difficulty nextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const;
+  Difficulty nextDifficultyV3(std::vector<uint64_t> timestamps, std::vector<Difficulty> cumulative_difficulties) const;
 
   bool checkProofOfWorkV1(Crypto::cn_context& context, const CachedBlock& block, Difficulty currentDifficulty) const;
   bool checkProofOfWorkV2(Crypto::cn_context& context, const CachedBlock& block, Difficulty currentDifficulty) const;
