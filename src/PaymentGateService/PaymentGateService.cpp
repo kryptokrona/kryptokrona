@@ -192,7 +192,7 @@ void PaymentGateService::runInProcess(Logging::LoggerRef& log) {
     dbShutdownOnExit.cancel();
     database.shutdown();
 
-    database.destoy(dbConfig);
+    database.destroy(dbConfig);
 
     database.init(dbConfig);
     dbShutdownOnExit.resume();

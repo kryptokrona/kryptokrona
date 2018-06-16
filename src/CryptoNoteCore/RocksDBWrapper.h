@@ -43,7 +43,7 @@ public:
 
   void init(const DataBaseConfig& config);
   void shutdown();
-  void destoy(const DataBaseConfig& config); //Be careful with this method!
+  void destroy(const DataBaseConfig& config); //Be careful with this method!
 
   std::error_code write(IWriteBatch& batch) override;
   std::error_code writeSync(IWriteBatch& batch) override;
