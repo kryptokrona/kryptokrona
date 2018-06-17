@@ -36,9 +36,6 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
 {
     Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
 
-    CryptoNote::AccountPublicAddress publicKeys;
-    uint64_t prefix;
-
     std::string address;
 
     while (true)
