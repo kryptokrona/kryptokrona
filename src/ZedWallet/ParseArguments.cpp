@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ////////////////////////////////////////
-#include <SimpleWallet/ParseArguments.h>
+#include <ZedWallet/ParseArguments.h>
 ////////////////////////////////////////
 
 #include <algorithm>
@@ -167,7 +167,7 @@ Config parseArguments(int argc, char **argv)
 
 void versionMessage()
 {
-    std::cout << "TurtleCoin v" << PROJECT_VERSION << " Simplewallet"
+    std::cout << "TurtleCoin v" << PROJECT_VERSION << " Zedwallet"
               << std::endl;
 }
 
@@ -175,7 +175,7 @@ void helpMessage()
 {
     versionMessage();
 
-    std::cout << std::endl << "simplewallet [--version] [--help] "
+    std::cout << std::endl << "zedwallet [--version] [--help] "
               << "[--remote-daemon <url>] [--wallet-file <file>] "
               << "[--password <pass>]"
               << std::endl << std::endl

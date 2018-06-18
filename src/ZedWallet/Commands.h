@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Types.h>
 
 #include <Wallet/WalletGreen.h>
 

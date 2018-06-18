@@ -4,7 +4,7 @@
 
 
 //////////////////////////////////////
-#include <SimpleWallet/SimpleWallet.h>
+#include <ZedWallet/ZedWallet.h>
 //////////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
@@ -20,13 +20,13 @@
 
 #include <NodeRpcProxy/NodeRpcProxy.h>
 
-#include <SimpleWallet/Commands.h>
-#include <SimpleWallet/Fusion.h>
-#include <SimpleWallet/Open.h>
-#include <SimpleWallet/ParseArguments.h>
-#include <SimpleWallet/Sync.h>
-#include <SimpleWallet/Transfer.h>
-#include <SimpleWallet/Tools.h>
+#include <ZedWallet/Commands.h>
+#include <ZedWallet/Fusion.h>
+#include <ZedWallet/Open.h>
+#include <ZedWallet/ParseArguments.h>
+#include <ZedWallet/Sync.h>
+#include <ZedWallet/Transfer.h>
+#include <ZedWallet/Tools.h>
 
 #ifdef _WIN32
 /* Prevents windows.h redefining min/max which breaks compilation */
@@ -38,7 +38,7 @@
 
 int main(int argc, char **argv)
 {
-    /* On ctrl+c the program seems to throw "simplewallet.exe has stopped
+    /* On ctrl+c the program seems to throw "zedwallet.exe has stopped
        working" when calling exit(0)... I'm not sure why, this is a bit of
        a hack, it disables that */
     #ifdef _WIN32
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
     /* Logging to a black hole... */
     Logging::LoggerManager logManager;
-    Logging::LoggerRef logger(logManager, "simplewallet");
+    Logging::LoggerRef logger(logManager, "zedwallet");
 
     /* Currency contains our coin parameters, such as decimal places, supply */
     CryptoNote::Currency currency 
@@ -125,7 +125,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     {
         std::cout << InformationMsg("TurtleCoin v"
                                   + std::string(PROJECT_VERSION)
-                                  + " Simplewallet") << std::endl;
+                                  + " Zedwallet") << std::endl;
 
         /* Open/import/generate the wallet */
         action = getAction(config);

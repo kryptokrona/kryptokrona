@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 //////////////////////////////////
-#include <SimpleWallet/Transfer.h>
+#include <ZedWallet/Transfer.h>
 //////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
@@ -37,9 +37,9 @@ namespace NodeErrors
     #include <NodeRpcProxy/NodeErrors.h>
 }
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Fusion.h>
-#include <SimpleWallet/Tools.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Fusion.h>
+#include <ZedWallet/Tools.h>
 
 namespace WalletErrors
 {

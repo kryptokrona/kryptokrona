@@ -17,8 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Types.h>
 
 enum Action {Open, Generate, Import, SeedImport, ViewWallet};
 

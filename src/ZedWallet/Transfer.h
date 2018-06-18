@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <memory>
 
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/Types.h>
 
 void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height);
 

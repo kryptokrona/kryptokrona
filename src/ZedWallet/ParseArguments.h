@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/Types.h>
 
 #include <string>
 
