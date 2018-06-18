@@ -299,15 +299,15 @@ void validateMixin(const uint32_t mixin, const uint32_t height, Logging::LoggerR
 
     if (mixin < minMixin)
     {
-        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin " << mixin
-            << " under minimum threshold " << CryptoNote::parameters::MINIMUM_MIXIN_V1;
+        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin of " << mixin
+            << " under minimum threshold of " << minMixin;
         throw std::system_error(make_error_code(CryptoNote::error::MIXIN_BELOW_THRESHOLD));
     }
     else if (mixin > maxMixin)
     {
-        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin " << mixin
-          << " under minimum threshold " << CryptoNote::parameters::MINIMUM_MIXIN_V1;
-        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_BELOW_THRESHOLD));
+        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin of " << mixin
+          << " above minimum threshold of " << maxMixin;
+        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_ABOVE_THRESHOLD));
     }
 }
 
