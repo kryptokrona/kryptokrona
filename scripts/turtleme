@@ -65,7 +65,7 @@ ls -al
 # to package the daemon, miner, poolwallet, walletd and zedwallet for
 # archival.
 echo -e "\n\n\n== COMPRESSING BINARIES"
-zip turtlecoin-dev-bin-$(date '+%Y-%m-%d-%H-%M')-linux.zip miner poolwallet simplewallet TurtleCoind walletd
+zip turtlecoin-dev-bin-$(date '+%Y-%m-%d-%H-%M')-linux.zip miner poolwallet zedwallet TurtleCoind walletd
 
 # Move the zip archive to ~/Binaries
 mv *.zip ~/Binaries/
