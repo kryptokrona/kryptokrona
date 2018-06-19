@@ -30,7 +30,7 @@ script:
 before_deploy:
 - cd src
 - mkdir turtlecoin-${TRAVIS_TAG}
-- mv TurtleCoind miner simplewallet walletd poolwallet turtlecoin-${TRAVIS_TAG}/
+- mv TurtleCoind miner zedwallet walletd poolwallet turtlecoin-${TRAVIS_TAG}/
 - tar cvfz turtlecoin-${TRAVIS_TAG}-${TRAVIS_OS_NAME}.tar.gz turtlecoin-${TRAVIS_TAG}/
 deploy:
   provider: releases

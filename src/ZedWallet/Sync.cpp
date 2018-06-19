@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 //////////////////////////////
-#include <SimpleWallet/Sync.h>
+#include <ZedWallet/Sync.h>
 //////////////////////////////
 
 #include <Common/StringTools.h>
@@ -26,8 +26,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #endif
 
-#include <SimpleWallet/Tools.h>
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/Tools.h>
+#include <ZedWallet/Types.h>
 
 CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
                                   CryptoNote::INode &node)

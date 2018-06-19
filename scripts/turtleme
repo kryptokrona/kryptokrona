@@ -62,7 +62,7 @@ ls -al
 
 
 # Announce that we are compressing binaries, and then use a zip archiver
-# to package the daemon, miner, poolwallet, walletd and simplewallet for
+# to package the daemon, miner, poolwallet, walletd and zedwallet for
 # archival.
 echo -e "\n\n\n== COMPRESSING BINARIES"
 zip turtlecoin-dev-bin-$(date '+%Y-%m-%d-%H-%M')-linux.zip miner poolwallet zedwallet TurtleCoind walletd

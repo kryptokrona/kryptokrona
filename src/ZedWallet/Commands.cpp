@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////
-#include <SimpleWallet/Commands.h>
+#include <ZedWallet/Commands.h>
 //////////////////////////////////
 
 #include <Common/StringTools.h>
@@ -14,12 +14,12 @@
 
 #include <Mnemonics/electrum-words.h>
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Fusion.h>
-#include <SimpleWallet/Sync.h>
-#include <SimpleWallet/Tools.h>
-#include <SimpleWallet/Transfer.h>
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Fusion.h>
+#include <ZedWallet/Sync.h>
+#include <ZedWallet/Tools.h>
+#include <ZedWallet/Transfer.h>
+#include <ZedWallet/Types.h>
 
 void exportKeys(std::shared_ptr<WalletInfo> &walletInfo)
 {

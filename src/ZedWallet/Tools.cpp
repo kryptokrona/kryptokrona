@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////
-#include <SimpleWallet/Tools.h>
+#include <ZedWallet/Tools.h>
 ///////////////////////////////
 
 #include <cctype>
@@ -29,8 +29,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/PasswordContainer.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/PasswordContainer.h>
 
 void confirmPassword(std::string walletPass)
 {

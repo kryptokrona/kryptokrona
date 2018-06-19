@@ -16,13 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ////////////////////////////////
-#include <SimpleWallet/Fusion.h>
+#include <ZedWallet/Fusion.h>
 ////////////////////////////////
 
 #include "CryptoNoteConfig.h"
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Tools.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Tools.h>
 
 #include <Wallet/WalletGreen.h>
 

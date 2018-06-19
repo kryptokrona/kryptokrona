@@ -33,11 +33,11 @@ RUN apt-get update && \
     mkdir -p /usr/local/bin && \
     cp src/TurtleCoind /usr/local/bin/TurtleCoind && \
     cp src/walletd /usr/local/bin/walletd && \
-    cp src/simplewallet /usr/local/bin/simplewallet && \
+    cp src/zedwallet /usr/local/bin/zedwallet && \
     cp src/miner /usr/local/bin/miner && \
     strip /usr/local/bin/TurtleCoind && \
     strip /usr/local/bin/walletd && \
-    strip /usr/local/bin/simplewallet && \
+    strip /usr/local/bin/zedwallet && \
     strip /usr/local/bin/miner && \
     cd / && \
     rm -rf /src/turtlecoin && \
