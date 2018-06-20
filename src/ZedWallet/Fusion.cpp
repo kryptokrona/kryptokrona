@@ -58,7 +58,8 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
     {
         return wallet.createFusionTransaction(bestThreshold, 
                                               CryptoNote::parameters
-                                                        ::DEFAULT_MIXIN);
+                                                        ::DEFAULT_MIXIN,
+                                              {}, wallet.getAddress(0));
     }
     catch (const std::runtime_error &e)
     {
