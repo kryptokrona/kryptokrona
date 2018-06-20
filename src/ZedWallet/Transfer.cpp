@@ -382,7 +382,8 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
 
     CryptoNote::TransactionParameters p;
 
-    p.destinations = std::vector<CryptoNote::WalletOrder> {
+    p.destinations = std::vector<CryptoNote::WalletOrder>
+    {
         {address, amount}
     };
 
