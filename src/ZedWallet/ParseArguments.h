@@ -17,14 +17,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <ZedWallet/Types.h>
+
 #include <string>
 
-void confirmPassword(std::string walletPass);
+char* getCmdOption(char ** begin, char ** end, const std::string & option);
 
-bool confirm(std::string msg);
+bool cmdOptionExists(char** begin, char** end, const std::string& option);
 
-std::string formatAmount(uint64_t amount);
-std::string formatDollars(uint64_t amount);
-std::string formatCents(uint64_t amount);
+Config parseArguments(int argc, char **argv);
 
-std::string getPaymentID(std::string extra);
+void helpMessage();
+
+void versionMessage();

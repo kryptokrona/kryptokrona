@@ -17,8 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Types.h>
 
 #include <Wallet/WalletGreen.h>
 
@@ -30,6 +30,8 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t,
                            CryptoNote::INode &node);
+
+void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node);
 
 void syncWallet(CryptoNote::INode &node,
                 std::shared_ptr<WalletInfo> &walletInfo);

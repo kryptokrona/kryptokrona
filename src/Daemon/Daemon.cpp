@@ -329,7 +329,7 @@ int main(int argc, char* argv[])
       dbShutdownOnExit.cancel();
       database.shutdown();
 
-      database.destoy(dbConfig);
+      database.destroy(dbConfig);
 
       database.init(dbConfig);
       dbShutdownOnExit.resume();

@@ -4,7 +4,7 @@
 
 
 //////////////////////////////////////
-#include <SimpleWallet/SimpleWallet.h>
+#include <ZedWallet/ZedWallet.h>
 //////////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
@@ -20,13 +20,13 @@
 
 #include <NodeRpcProxy/NodeRpcProxy.h>
 
-#include <SimpleWallet/Commands.h>
-#include <SimpleWallet/Fusion.h>
-#include <SimpleWallet/Open.h>
-#include <SimpleWallet/ParseArguments.h>
-#include <SimpleWallet/Sync.h>
-#include <SimpleWallet/Transfer.h>
-#include <SimpleWallet/Tools.h>
+#include <ZedWallet/Commands.h>
+#include <ZedWallet/Fusion.h>
+#include <ZedWallet/Open.h>
+#include <ZedWallet/ParseArguments.h>
+#include <ZedWallet/Sync.h>
+#include <ZedWallet/Transfer.h>
+#include <ZedWallet/Tools.h>
 
 #ifdef _WIN32
 /* Prevents windows.h redefining min/max which breaks compilation */
@@ -38,7 +38,7 @@
 
 int main(int argc, char **argv)
 {
-    /* On ctrl+c the program seems to throw "simplewallet.exe has stopped
+    /* On ctrl+c the program seems to throw "zedwallet.exe has stopped
        working" when calling exit(0)... I'm not sure why, this is a bit of
        a hack, it disables that */
     #ifdef _WIN32
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 
     /* Logging to a black hole... */
     Logging::LoggerManager logManager;
-    Logging::LoggerRef logger(logManager, "simplewallet");
+    Logging::LoggerRef logger(logManager, "zedwallet");
 
     /* Currency contains our coin parameters, such as decimal places, supply */
     CryptoNote::Currency currency 
@@ -125,7 +125,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     {
         std::cout << InformationMsg("TurtleCoin v"
                                   + std::string(PROJECT_VERSION)
-                                  + " Simplewallet") << std::endl;
+                                  + " Zedwallet") << std::endl;
 
         /* Open/import/generate the wallet */
         action = getAction(config);
@@ -447,12 +447,6 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
 
         std::string command = getInputAndDoWorkWhileIdle(walletInfo);
 
-        /* Split into args to support legacy transfer command, for example
-           transfer 5 TRTLxyz... 100, sends 100 TRTL to TRTLxyz... with a mixin
-           of 5 */
-        std::vector<std::string> words;
-        words = boost::split(words, command, ::isspace);
-
         if (command == "")
         {
             // no-op
@@ -480,6 +474,10 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
         else if (command == "incoming_transfers")
         {
             listTransfers(true, false, walletInfo->wallet, node);
+        }
+        else if (command == "save_csv")
+        {
+            saveCSV(walletInfo->wallet, node);
         }
         else if (command == "exit")
         {
@@ -513,12 +511,14 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
             {
                 transfer(walletInfo, node.getLastKnownBlockHeight());
             }
-            else if (words[0] == "transfer")
+            /* String starts with transfer, old transfer syntax */
+            else if (command.find("transfer") == 0)
             {
-                /* remove the first item from words - this is the "transfer"
-                   command, leaving us just the transfer arguments. */
-                words.erase(words.begin());
-                transfer(walletInfo, words, node.getLastKnownBlockHeight());
+                std::cout << "This transfer syntax has been removed."
+                          << std::endl
+                          << "Run just the " << SuggestionMsg("transfer")
+                          << " command for a walk through guide to "
+                          << "transferring." << std::endl;
             }
             else if (command == "quick_optimize")
             {

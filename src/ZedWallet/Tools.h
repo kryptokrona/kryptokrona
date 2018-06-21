@@ -17,16 +17,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <SimpleWallet/Types.h>
-
 #include <string>
 
-char* getCmdOption(char ** begin, char ** end, const std::string & option);
+void confirmPassword(std::string walletPass);
 
-bool cmdOptionExists(char** begin, char** end, const std::string& option);
+bool confirm(std::string msg);
+bool confirm(std::string msg, bool defaultReturn);
 
-Config parseArguments(int argc, char **argv);
+std::string formatAmount(uint64_t amount);
+std::string formatDollars(uint64_t amount);
+std::string formatCents(uint64_t amount);
 
-void helpMessage();
-
-void versionMessage();
+std::string getPaymentID(std::string extra);

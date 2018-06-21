@@ -16,13 +16,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ////////////////////////////////
-#include <SimpleWallet/Fusion.h>
+#include <ZedWallet/Fusion.h>
 ////////////////////////////////
 
 #include "CryptoNoteConfig.h"
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Tools.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Tools.h>
 
 #include <Wallet/WalletGreen.h>
 
@@ -37,12 +37,11 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
        gave us the most amount of optimizable amounts */
     while (threshold > CryptoNote::parameters::MINIMUM_FEE)
     {
-        CryptoNote::IFusionManager::EstimateResult r 
-            = wallet.estimate(threshold);
+        auto fusionReadyCount = wallet.estimate(threshold).fusionReadyCount;
 
-        if (r.fusionReadyCount > optimizable)
+        if (fusionReadyCount > optimizable)
         {
-            optimizable = r.fusionReadyCount;
+            optimizable = fusionReadyCount;
             bestThreshold = threshold;
         }
 
@@ -59,7 +58,8 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
     {
         return wallet.createFusionTransaction(bestThreshold, 
                                               CryptoNote::parameters
-                                                        ::DEFAULT_MIXIN);
+                                                        ::DEFAULT_MIXIN,
+                                              {}, wallet.getAddress(0));
     }
     catch (const std::runtime_error &e)
     {

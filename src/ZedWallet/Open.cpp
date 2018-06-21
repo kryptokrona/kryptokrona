@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 //////////////////////////////
-#include <SimpleWallet/Open.h>
+#include <ZedWallet/Open.h>
 //////////////////////////////
 
 #include <boost/algorithm/string.hpp>
@@ -26,18 +26,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <Mnemonics/electrum-words.h>
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/Commands.h>
-#include <SimpleWallet/Transfer.h>
-#include <SimpleWallet/Types.h>
-#include <SimpleWallet/PasswordContainer.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/Commands.h>
+#include <ZedWallet/Transfer.h>
+#include <ZedWallet/Types.h>
+#include <ZedWallet/PasswordContainer.h>
 
 std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
 {
     Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
-
-    CryptoNote::AccountPublicAddress publicKeys;
-    uint64_t prefix;
 
     std::string address;
 
@@ -265,7 +262,7 @@ Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
                                         "open in another process.")
                           << std::endl
                           << WarningMsg("Check with a task manager that you "
-                                        "don't have simplewallet open twice.")
+                                        "don't have zedwallet open twice.")
                           << std::endl
                           << WarningMsg("Also check you don't have another "
                                         "wallet program open, such as a GUI "
@@ -287,7 +284,7 @@ Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
                                         "corrupted.")
                           << std::endl
                           << WarningMsg("Try reimporting via keys, and always "
-                                        "close simplewallet with the exit "
+                                        "close zedwallet with the exit "
                                         "command to prevent corruption.")
                           << std::endl << std::endl;
 

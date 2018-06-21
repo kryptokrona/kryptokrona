@@ -18,7 +18,6 @@ file(GLOB_RECURSE NodeRpcProxy NodeRpcProxy/*)
 file(GLOB_RECURSE P2p P2p/*)
 file(GLOB_RECURSE Rpc Rpc/*)
 file(GLOB_RECURSE Serialization Serialization/*)
-file(GLOB_RECURSE SimpleWallet SimpleWallet/*)
 file(GLOB_RECURSE Transfers Transfers/*)
 file(GLOB_RECURSE Wallet Wallet/*)
 file(GLOB_RECURSE WalletLegacy WalletLegacy/*)
@@ -26,6 +25,7 @@ file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 file(GLOB_RECURSE PaymentGate PaymentGate/*)
 file(GLOB_RECURSE PaymentGateService PaymentGateService/*)
 file(GLOB_RECURSE PoolWallet PoolWallet/*)
+file(GLOB_RECURSE ZedWallet ZedWallet/*)
 
 if(MSVC)
 file(GLOB_RECURSE System System/* Platform/Windows/System/*)
@@ -38,7 +38,7 @@ endif()
 # This appears to be an IDE thing, to group files together.
 # https://cmake.org/cmake/help/v3.0/command/source_group.html
 # Probably not what you need to be looking at if something isn't building
-source_group("" FILES $${Common} ${ConnectivityTool} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${Daemon} ${JsonRpcServer} ${Http} ${Logging} ${Miner} ${Mnemonics} ${NodeRpcProxy} ${PoolWallet} ${P2p} ${Rpc} ${Serialization} ${SimpleWallet} ${System} ${Transfers} ${Wallet} ${WalletLegacy})
+source_group("" FILES $${Common} ${ConnectivityTool} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${Daemon} ${JsonRpcServer} ${Http} ${Logging} ${Miner} ${Mnemonics} ${NodeRpcProxy} ${PoolWallet} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletLegacy} ${ZedWallet})
 
 add_library(BlockchainExplorer ${BlockchainExplorer})
 add_library(Common ${Common})
@@ -63,7 +63,7 @@ if(MSVC)
     BinaryInfo/daemon.rc
   )
   set(SIMPLE_WALLET_SOURCES_OS
-    BinaryInfo/simplewallet.rc
+    BinaryInfo/zedwallet.rc
   )
   set(POOLWALLET_SOURCES_OS
     BinaryInfo/poolwallet.rc
@@ -77,7 +77,7 @@ if(MSVC)
 endif()
 
 add_executable(Daemon ${Daemon} ${DAEMON_SOURCES_OS})
-add_executable(SimpleWallet ${SimpleWallet} ${SIMPLE_WALLET_SOURCES_OS})
+add_executable(ZedWallet ${ZedWallet} ${SIMPLE_WALLET_SOURCES_OS})
 add_executable(PaymentGateService ${PaymentGateService} ${PG_SOURCES_OS})
 add_executable(PoolWallet ${PoolWallet} ${POOLWALLET_SOURCES_OS})
 add_executable(Miner ${Miner} ${MINER_SOURCES_OS})
@@ -98,7 +98,7 @@ if(MSVC)
 else()
 	target_link_libraries(Daemon P2P Rpc Serialization System Http Logging CryptoNoteCore Crypto Common rocksdblib ${Boost_LIBRARIES} )
 endif()
-target_link_libraries(SimpleWallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES})
+target_link_libraries(ZedWallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES})
 target_link_libraries(PaymentGate Mnemonics)
 if(MSVC)
 	target_link_libraries(PaymentGateService PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common InProcessNode rocksdb ${Boost_LIBRARIES})
@@ -113,14 +113,14 @@ target_link_libraries(Miner CryptoNoteCore Rpc Serialization System Http Logging
 # than a cached one
 add_dependencies(Rpc version)
 add_dependencies(Daemon version)
-add_dependencies(SimpleWallet version)
+add_dependencies(ZedWallet version)
 add_dependencies(PaymentGateService version)
 add_dependencies(PoolWallet version)
 add_dependencies(P2P version)
 
 # Finally build the binaries
 set_property(TARGET Daemon PROPERTY OUTPUT_NAME "TurtleCoind")
-set_property(TARGET SimpleWallet PROPERTY OUTPUT_NAME "simplewallet")
+set_property(TARGET ZedWallet PROPERTY OUTPUT_NAME "zedwallet")
 set_property(TARGET PaymentGateService PROPERTY OUTPUT_NAME "walletd")
 set_property(TARGET PoolWallet PROPERTY OUTPUT_NAME "poolwallet")
 set_property(TARGET Miner PROPERTY OUTPUT_NAME "miner")

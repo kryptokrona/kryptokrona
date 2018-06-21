@@ -34,6 +34,9 @@
 #include "CryptoNoteCore/RocksDBWrapper.h"
 #include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
 #include "P2p/NetNode.h"
+#include "Rpc/RpcServer.h"
+#include "Rpc/RpcServerConfig.h"
+#include "NodeRpcProxy/NodeRpcProxy.h"
 #include <System/Context.h>
 #include "Wallet/WalletGreen.h"
 
@@ -189,7 +192,7 @@ void PaymentGateService::runInProcess(Logging::LoggerRef& log) {
     dbShutdownOnExit.cancel();
     database.shutdown();
 
-    database.destoy(dbConfig);
+    database.destroy(dbConfig);
 
     database.init(dbConfig);
     dbShutdownOnExit.resume();
@@ -211,7 +214,9 @@ void PaymentGateService::runInProcess(Logging::LoggerRef& log) {
 
   CryptoNote::CryptoNoteProtocolHandler protocol(currency, *dispatcher, core, nullptr, logger);
   CryptoNote::NodeServer p2pNode(*dispatcher, protocol, logger);
-
+  CryptoNote::RpcServerConfig rpcConfig;
+  CryptoNote::RpcServer rpcServer(*dispatcher, logger, core, p2pNode, protocol);
+  
   protocol.set_p2p_endpoint(&p2pNode);
 
   log(Logging::INFO) << "initializing p2pNode";
@@ -219,8 +224,11 @@ void PaymentGateService::runInProcess(Logging::LoggerRef& log) {
     throw std::runtime_error("Failed to init p2pNode");
   }
 
-  std::unique_ptr<CryptoNote::INode> node(new CryptoNote::InProcessNode(core, protocol, *dispatcher));
-
+  log(Logging::INFO) << "Starting node RPC Server address " << rpcConfig.getBindAddress() << " ...";
+  rpcServer.start(rpcConfig.bindIp, rpcConfig.bindPort);
+  
+  log(Logging::INFO) << "Starting local NodeRPCProxy...";
+  std::unique_ptr<CryptoNote::INode> node(new CryptoNote::NodeRpcProxy(rpcConfig.bindIp, rpcConfig.bindPort, logger));
   std::error_code nodeInitStatus;
   node->init([&log, &nodeInitStatus](std::error_code ec) {
     nodeInitStatus = ec;
@@ -232,6 +240,7 @@ void PaymentGateService::runInProcess(Logging::LoggerRef& log) {
   } else {
     log(Logging::INFO) << "node is inited successfully";
   }
+  log(Logging::INFO) << "Local NodeRPCProxy Started...";
 
   log(Logging::INFO) << "Spawning p2p server";
 
@@ -243,13 +252,16 @@ void PaymentGateService::runInProcess(Logging::LoggerRef& log) {
   });
 
   p2pStarted.wait();
-
+  
   runWalletService(currency, *node);
 
+  log(Logging::INFO) << "Stopping node RPC Server...";
+  rpcServer.stop();
   p2pNode.sendStopSignal();
   context.get();
   node->shutdown();
   p2pNode.deinit(); 
+  core.save();
 }
 
 void PaymentGateService::runRpcProxy(Logging::LoggerRef& log) {

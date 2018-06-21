@@ -16,7 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////
-#include <SimpleWallet/Tools.h>
+#include <ZedWallet/Tools.h>
 ///////////////////////////////
 
 #include <cctype>
@@ -29,8 +29,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-#include <SimpleWallet/ColouredMsg.h>
-#include <SimpleWallet/PasswordContainer.h>
+#include <ZedWallet/ColouredMsg.h>
+#include <ZedWallet/PasswordContainer.h>
 
 void confirmPassword(std::string walletPass)
 {
@@ -111,35 +111,49 @@ std::string formatCents(uint64_t amount)
 
 bool confirm(std::string msg)
 {
+    return confirm(msg, true);
+}
+
+/* defaultReturn = what value we return on hitting enter, i.e. the "expected"
+   workflow */
+bool confirm(std::string msg, bool defaultReturn)
+{
+    /* In unix programs, the upper case letter indicates the default, for
+       example when you hit enter */
+    std::string prompt = " (Y/n): ";
+
+    /* Yes, I know I can do !defaultReturn. It doesn't make as much sense
+       though. If someone deletes this comment to make me look stupid I'll be
+       mad >:( */
+    if (defaultReturn == false)
+    {
+        prompt = " (y/N): ";
+    }
+
     while (true)
     {
-        std::cout << InformationMsg(msg + " (Y/n): ");
+        std::cout << InformationMsg(msg + prompt);
 
         std::string answer;
         std::getline(std::cin, answer);
 
         char c = std::tolower(answer[0]);
 
-        /* Lets people spam enter in the transaction screen */
-        if (c == 'y' || c == '\0')
+        switch(std::tolower(answer[0]))
         {
-            return true;
+            /* Lets people spam enter / choose default value */
+            case '\0':
+                return defaultReturn;
+            case 'y':
+                return true;
+            case 'n':
+                return false;
         }
-        else if (c == 'n')
-        {
-            return false;
-        }
-        /* Don't loop forever on EOF */
-        else if (c == std::ifstream::traits_type::eof())
-        {
-            return false;
-        } 
-        else
-        {
-            std::cout << WarningMsg("Bad input: ") << InformationMsg(answer)
-                      << WarningMsg(" - please enter either Y or N.")
-                      << std::endl;
-        }
+
+        std::cout << WarningMsg("Bad input: ") << InformationMsg(answer)
+                  << WarningMsg(" - please enter either Y or N.")
+                  << std::endl;
+
     }
 }
 

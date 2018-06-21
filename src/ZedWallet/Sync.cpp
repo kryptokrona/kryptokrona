@@ -16,15 +16,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 //////////////////////////////
-#include <SimpleWallet/Sync.h>
+#include <ZedWallet/Sync.h>
 //////////////////////////////
 
 #include <Common/StringTools.h>
 
 #include <memory>
+#ifndef MSVC
+#include <fstream>
+#endif
 
-#include <SimpleWallet/Tools.h>
-#include <SimpleWallet/Types.h>
+#include <ZedWallet/Tools.h>
+#include <ZedWallet/Types.h>
 
 CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
                                   CryptoNote::INode &node)
@@ -71,9 +74,10 @@ std::string getBlockTimestamp(CryptoNote::BlockDetails b)
 }
 
 void printOutgoingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node)
+                           CryptoNote::INode &node,
+                           bool fetchTimestamp)
 {
-    std::string blockTime = getBlockTimestamp(getBlock(t.blockHeight, node));
+
 
     std::cout << WarningMsg("Outgoing transfer:")
               << std::endl
@@ -93,20 +97,24 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
         std::cout << WarningMsg("Payment ID: " + paymentID) << std::endl;
     }
 
-    /* Couldn't get timestamp, maybe old node or turtlecoind closed */
-    if (blockTime != "")
+    if (fetchTimestamp)
     {
-        std::cout << WarningMsg("Timestamp: " + blockTime) << std::endl;
+        std::string blockTime = getBlockTimestamp(getBlock(t.blockHeight, node));
+
+        /* Couldn't get timestamp, maybe old node or turtlecoind closed */
+        if (blockTime != "")
+        {
+            std::cout << WarningMsg("Timestamp: " + blockTime) << std::endl;
+        }
     }
 
     std::cout << std::endl;
 }
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node)
+                           CryptoNote::INode &node,
+                           bool fetchTimestamp)
 {
-    std::string blockTime = getBlockTimestamp(getBlock(t.blockHeight, node));
-
     std::cout << SuccessMsg("Incoming transfer:")
               << std::endl
               << SuccessMsg("Hash: " + Common::podToHex(t.hash))
@@ -121,10 +129,15 @@ void printIncomingTransfer(CryptoNote::WalletTransaction t,
         std::cout << SuccessMsg("Payment ID: " + paymentID) << std::endl;
     }
 
-    /* Couldn't get timestamp, maybe old node or turtlecoind closed */
-    if (blockTime != "")
+    if (fetchTimestamp)
     {
-        std::cout << SuccessMsg("Timestamp: " + blockTime) << std::endl;
+        std::string blockTime = getBlockTimestamp(getBlock(t.blockHeight, node));
+
+        /* Couldn't get timestamp, maybe old node or turtlecoind closed */
+        if (blockTime != "")
+        {
+            std::cout << SuccessMsg("Timestamp: " + blockTime) << std::endl;
+        }
     }
 
     std::cout << std::endl;
@@ -133,6 +146,10 @@ void printIncomingTransfer(CryptoNote::WalletTransaction t,
 void listTransfers(bool incoming, bool outgoing, 
                    CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 {
+    bool fetchTimestamp =
+         confirm("Display timestamps? (Takes lots longer to list transactions)",
+                 false);
+
     size_t numTransactions = wallet.getTransactionCount();
     int64_t totalSpent = 0;
     int64_t totalReceived = 0;
@@ -143,12 +160,12 @@ void listTransfers(bool incoming, bool outgoing,
 
         if (t.totalAmount < 0 && outgoing)
         {
-            printOutgoingTransfer(t, node);
+            printOutgoingTransfer(t, node, fetchTimestamp);
             totalSpent += -t.totalAmount;
         }
         else if (t.totalAmount > 0 && incoming)
         {
-            printIncomingTransfer(t, node);
+            printIncomingTransfer(t, node, fetchTimestamp);
             totalReceived += t.totalAmount;
         }
     }
@@ -165,6 +182,55 @@ void listTransfers(bool incoming, bool outgoing,
         std::cout << WarningMsg("Total spent: " + formatAmount(totalSpent))
                   << std::endl;
     }
+}
+
+void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
+{
+    /* oaf: this routine saves transactions to local CSV file */
+    size_t numTransactions = wallet.getTransactionCount();
+
+    std::ofstream myfile;
+    myfile.open("transactions.csv");
+    if (!myfile)
+    {
+        std::cout << WarningMsg("Couldn't open transactions.csv file for saving!")
+                  << std::endl;
+        std::cout << WarningMsg("Ensure it is not open in any other application.")
+                  << std::endl;
+        return;
+    }
+    std::cout << InformationMsg("Saving CSV file...") << std::endl;
+
+    /* Create header line for CSV file */
+    myfile << "Block date/time,Block Height,Hash,Amount,Currency,In/Out\n";
+    /* Loop through transactions */
+    for (size_t i = 0; i < numTransactions; i++)
+    {
+        CryptoNote::WalletTransaction t = wallet.getTransaction(i);
+        /* Ignore fusion transactions */
+        if (t.totalAmount != 0) {
+            std::string blockTime = getBlockTimestamp(getBlock(t.blockHeight, node));
+            myfile << blockTime << "," << t.blockHeight << ","
+                   << Common::podToHex(t.hash) << ",";
+            /* Handle outgoing (negative) or incoming transactions */
+            if (t.totalAmount < 0)
+            {
+                /* Put TRTL in separate field, makes output more usable in spreadsheet */
+                std::string splitAmtTRTL = formatAmount(-t.totalAmount);
+                boost::replace_all(splitAmtTRTL, " ", ",");
+                myfile << "-" << splitAmtTRTL << ",OUT\n";
+            }
+            else
+            {
+                std::string splitAmtTRTL = formatAmount(t.totalAmount);
+                boost::replace_all(splitAmtTRTL, " ", ",");
+                myfile << splitAmtTRTL << ",IN\n";
+            }
+        }
+    }
+    myfile.close();
+    std::cout << SuccessMsg("CSV file saved successfully.")
+              << std::endl;
 }
 
 void checkForNewTransactions(std::shared_ptr<WalletInfo> &walletInfo)
@@ -329,11 +395,11 @@ void syncWallet(CryptoNote::INode &node,
 
                         if (t.totalAmount < 0)
                         {
-                            printOutgoingTransfer(t, node);
+                            printOutgoingTransfer(t, node, false);
                         }
                         else
                         {
-                            printIncomingTransfer(t, node);
+                            printIncomingTransfer(t, node, false);
                         }
                     }
                 }
