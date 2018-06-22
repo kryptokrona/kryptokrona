@@ -467,8 +467,11 @@ Difficulty Currency::nextDifficultyV3(std::vector<std::uint64_t> timestamps, std
         } 
     }
 
-    next_D = ((cumulativeDifficulties[N] - cumulativeDifficulties[0]) * T * (N+1) * 99) / (100 * 2 * L);
+    next_D = (static_cast<int64_t>(cumulativeDifficulties[N] - cumulativeDifficulties[0]) * T * (N+1) * 99) / (100 * 2 * L);
     prev_D = cumulativeDifficulties[N] - cumulativeDifficulties[N-1];
+
+    /* Make sure we don't divide by zero if 50x attacker (thanks fireice) */
+    next_D = std::max((prev_D*70)/100, std::min(next_D, (prev_D*107)/100));
 
     if (sum_3_ST < (8 * T) / 10)
     {  
