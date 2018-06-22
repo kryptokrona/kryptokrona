@@ -22,8 +22,8 @@ ADD https://raw.githubusercontent.com/turtlecoin/checkpoints/master/checkpoints.
 # In a multi-node testnet, we'll want to have the slave nodes "wait" for the master node to wake up, so let's get ready
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /tmp/
 
-ARG TURTLECOIN_VERSION=v0.6.0
-ENV TURTLECOIN_VERSION=${TURTLECOIN_VERSION}
+ARG TURTLECOIN_BRANCH=master
+ENV TURTLECOIN_BRANCH=${TURTLECOIN_BRANCH}
 
 # install build dependencies
 # checkout the latest tag
@@ -39,7 +39,7 @@ RUN apt-get update && \
       librocksdb-dev && \
     git clone https://github.com/turtlecoin/turtlecoin.git /src/turtlecoin && \
     cd /src/turtlecoin && \
-    git checkout $TURTLECOIN_VERSION && \
+    git checkout $TURTLECOIN_BRANCH && \
     sed -i '/std::vector<uint64_t> timestamps_o(timestamps);/i \\/*\n   Lower difficulty to static 500 for testnet\n   The rest of this function is ignored\n*\/\nreturn 500;\n\n' src/CryptoNoteCore/Currency.cpp && \
     sed -i -e 's/"104.236.227.176:11897",/"172.16.76.11:11897",/g' src/CryptoNoteConfig.h && \
     sed -i -e 's/"46.101.132.184:11897",/"172.16.76.12:11897",/g' src/CryptoNoteConfig.h && \
