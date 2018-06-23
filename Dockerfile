@@ -11,8 +11,8 @@ RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
 ADD https://github.com/just-containers/socklog-overlay/releases/download/v2.1.0-0/socklog-overlay-amd64.tar.gz /tmp/
 RUN tar xzf /tmp/socklog-overlay-amd64.tar.gz -C /
 
-ARG TURTLECOIN_VERSION=v0.6.0
-ENV TURTLECOIN_VERSION=${TURTLECOIN_VERSION}
+ARG TURTLECOIN_BRANCH=master
+ENV TURTLECOIN_BRANCH=${TURTLECOIN_BRANCH}
 
 # install build dependencies
 # checkout the latest tag
@@ -28,7 +28,7 @@ RUN apt-get update && \
       librocksdb-dev && \
     git clone https://github.com/turtlecoin/turtlecoin.git /src/turtlecoin && \
     cd /src/turtlecoin && \
-    git checkout $TURTLECOIN_VERSION && \
+    git checkout $TURTLECOIN_BRANCH && \
     mkdir build && \
     cd build && \
     cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++11" .. && \
