@@ -3,6 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 
+
 //////////////////////////////////////
 #include <ZedWallet/ZedWallet.h>
 //////////////////////////////////////
@@ -28,6 +29,12 @@
 #include <ZedWallet/Transfer.h>
 #include <ZedWallet/Tools.h>
 
+
+#ifdef HAVE_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
+
 #ifdef _WIN32
 /* Prevents windows.h redefining min/max which breaks compilation */
 #define NOMINMAX
@@ -35,6 +42,7 @@
 #endif
 
 #include "version.h"
+
 
 int main(int argc, char **argv)
 {
@@ -347,16 +355,103 @@ void welcomeMsg()
               << std::endl << std::endl;
 }
 
+
+
+#ifdef HAVE_READLINE
+
+//functions for completition with tab
+char **command_name_completion(const char *, int, int);
+char *command_name_generator(const char *, int);
+
+char *command_names[] = {
+    (char*)"balance",
+    (char*)"help",
+    (char*)"bc_height",
+    (char*)"balance",
+    (char*)"export_keys",
+    (char*)"address",
+    (char*)"exit",
+    (char*)"save",
+    (char*)"status",
+    (char*)"incoming_transfers",
+    (char*)"outgoing_transfers",
+    (char*)"list_transfers",
+    (char*)"save_csv",
+    (char*)"optimize",
+    (char*)"transfer",
+    NULL
+};
+
+char **
+command_name_completion(const char *text, int start, int end)
+{
+    rl_attempted_completion_over = 1;
+    rl_completion_append_character = '\0';
+    return rl_completion_matches(text, command_name_generator);
+}
+
+char *
+command_name_generator(const char *text, int state)
+{
+    static int list_index, len;
+    char *name;
+
+    if (!state) {
+        list_index = 0;
+        len = strlen(text);
+    }
+
+    while ((name = command_names[list_index++])) {
+        if (strncmp(name, text, len) == 0) {
+            return strdup(name);
+        }
+    }
+
+    return NULL;
+}
+
+#endif
+
+//colors for prompt msg
+#define CYELLOW "\001\e[1m\e[33m\002"
+#define RESET   "\001\e[0m\002"
+
+
 std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
 {
     auto lastUpdated = std::chrono::system_clock::now();
 
-    std::future<std::string> inputGetter = std::async(std::launch::async, [] {
+    std::future<std::string> inputGetter = std::async(std::launch::async, [&walletInfo] {
+            
+            #ifdef HAVE_READLINE
+
+            //disable the signal handlers libreadline installed
+            rl_catch_signals = 0;
+
+            rl_attempted_completion_function = command_name_completion;
+            std::string str = CYELLOW + getPrompt(walletInfo) + "" + RESET;
+            char *cstr = &str[0u];
+            char *command = readline(cstr);
+            while (command != nullptr) {
+                if (strlen(command) > 0) {
+                  add_history(command);
+                }
+                free(command);
+                return std::string(command);
+            }
+            return std::string(command);
+            
+            #else
+            
             std::string command;
             std::getline(std::cin, command);
             boost::algorithm::trim(command);
             return command;
+
+            #endif     
+            
     });
+
 
     while (true)
     {
@@ -436,6 +531,11 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     std::cout << "Bye." << std::endl;
 
+    #ifdef HAVE_READLINE
+    //clean readline to restore usual terminal history after shutdown
+    rl_cleanup_after_signal();
+    #endif  
+
     return true;
 }
 
@@ -443,7 +543,13 @@ void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
 { 
     while (true)
     {
-        std::cout << getPrompt(walletInfo);
+        #ifdef HAVE_READLINE 
+        //do nothing
+        #else
+        //pring yellow prompt
+        std::string str = CYELLOW + getPrompt(walletInfo) + "" + RESET;
+        std::cout << str;
+        #endif
 
         std::string command = getInputAndDoWorkWhileIdle(walletInfo);
 
