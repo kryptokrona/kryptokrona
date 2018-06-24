@@ -47,6 +47,7 @@ struct Configuration {
   std::string mnemonicSeed;
   std::string logFile;
   std::string serverRoot;
+  std::string corsHeader;
 
   bool generateNewContainer;
   bool daemonize;
