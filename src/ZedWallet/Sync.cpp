@@ -215,14 +215,17 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
             /* Handle outgoing (negative) or incoming transactions */
             if (t.totalAmount < 0)
             {
+                /* Remove , amount separators (on thousands, e.g. 10,000 => 10000) */
                 /* Put TRTL in separate field, makes output more usable in spreadsheet */
                 std::string splitAmtTRTL = formatAmount(-t.totalAmount);
+                boost::replace_all(splitAmtTRTL, ",", "");
                 boost::replace_all(splitAmtTRTL, " ", ",");
                 myfile << "-" << splitAmtTRTL << ",OUT\n";
             }
             else
             {
                 std::string splitAmtTRTL = formatAmount(t.totalAmount);
+                boost::replace_all(splitAmtTRTL, ",", "");
                 boost::replace_all(splitAmtTRTL, " ", ",");
                 myfile << splitAmtTRTL << ",IN\n";
             }
