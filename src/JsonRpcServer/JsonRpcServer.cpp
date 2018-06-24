@@ -77,6 +77,10 @@ void JsonRpcServer::processRequest(const CryptoNote::HttpRequest& req, CryptoNot
       std::ostringstream jsonOutputStream;
       jsonOutputStream << jsonRpcResponse;
 
+      if (config.corsHeader != "") {
+        resp.addHeader("Access-Control-Allow-Origin", config.corsHeader);
+      }
+
       resp.setStatus(CryptoNote::HttpResponse::STATUS_200);
       resp.setBody(jsonOutputStream.str());
 

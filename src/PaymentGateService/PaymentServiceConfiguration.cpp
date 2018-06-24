@@ -45,6 +45,7 @@ Configuration::Configuration() {
   mnemonicSeed = "";
   rpcPassword = "";
   legacySecurity = false;
+  corsHeader = "";
 }
 
 void Configuration::initOptions(boost::program_options::options_description& desc) {
@@ -68,7 +69,8 @@ void Configuration::initOptions(boost::program_options::options_description& des
       ("server-root", po::value<std::string>(), "server root. The service will use it as working directory. Don't set it if don't want to change it")
       ("log-level", po::value<size_t>(), "log level")
       ("SYNC_FROM_ZERO", "sync from timestamp 0")
-      ("address", "print wallet addresses and exit");
+      ("address", "print wallet addresses and exit")
+      ("enable-cors", po::value<std::string>(), "Adds header 'Access-Control-Allow-Origin' to walletd's RPC responses. Uses the value as domain. Use * for all.");
 }
 
 void Configuration::init(const boost::program_options::variables_map& options) {
@@ -187,6 +189,12 @@ void Configuration::init(const boost::program_options::variables_map& options) {
   }
   else {
     rpcPassword = options["rpc-password"].as<std::string>();
+  }
+
+  if (options.count("enable-cors") != 0) {
+    corsHeader = options["enable-cors"].as<std::string>();
+    std::cout << corsHeader << std::endl;
+    std::cout << options["enable-cors"].as<std::string>() << std::endl;
   }
   
 }
