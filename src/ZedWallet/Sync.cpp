@@ -424,7 +424,7 @@ void syncWallet(CryptoNote::INode &node,
     walletInfo->knownTransactionCount = transactionCount;
 }
 
-ColouredMsg getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
+std::string getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
 {
     const int promptLength = 20;
     const std::string extension = ".wallet";
@@ -442,5 +442,5 @@ ColouredMsg getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
 
     std::string shortName = walletName.substr(0, promptLength);
 
-    return InformationMsg("[TRTL " + shortName + "]: ");
+    return "[TRTL " + shortName + "]: ";
 }

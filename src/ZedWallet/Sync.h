@@ -43,4 +43,4 @@ std::string getBlockTimestamp(CryptoNote::BlockDetails b);
 CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
                                   CryptoNote::INode &node);
 
-ColouredMsg getPrompt(std::shared_ptr<WalletInfo> &walletInfo);
+std::string getPrompt(std::shared_ptr<WalletInfo> &walletInfo);
