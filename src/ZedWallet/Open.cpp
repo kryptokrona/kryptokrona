@@ -89,7 +89,8 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
         boost::algorithm::trim(mnemonicPhrase);
     }
     while (!crypto::ElectrumWords::is_valid_mnemonic(mnemonicPhrase,
-                                                     privateSpendKey));
+                                                     privateSpendKey,
+                                                     std::cout));
 
     CryptoNote::AccountBase::generateViewFromSpend(privateSpendKey, 
                                                    privateViewKey);

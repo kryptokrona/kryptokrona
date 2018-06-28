@@ -42,7 +42,6 @@
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
-#include <boost/algorithm/string.hpp>
 #include "crypto/crypto.h"  // for declaration of crypto::secret_key
 #include <fstream>
 #include "Mnemonics/electrum-words.h"
@@ -467,95 +466,6 @@ namespace crypto
       boost::algorithm::trim(seed);
       boost::split(word_list, seed, boost::is_any_of(" "), boost::token_compress_on);
       return word_list.size() != (seed_length + 1);
-    }
-
-    bool is_valid_mnemonic(std::string mnemonic_phrase, Crypto::SecretKey &private_spend_key)
-    {
-      /* Uncommenting these will allow importing of different languages, exporting
-         in different languages however has not been added, as it will require
-         changing the export_keys command to take an argument to specify what
-         language the seed should be exported in. For now, multilanguage support
-         has been disabled as there are a couple of issues - we can't print out
-         what words aren't present in the dictionary if we don't know what
-         dictionary they are using, and it's a lot more friendly to work that
-         out automatically rather than asking, and secondly, it is possible that
-         dictionaries of other words can overlap enough to allow an esperanto
-         seed for example to be imported as an english seed */
-
-      /*
-      static std::string languages[] = {"English", "Nederlands", "Français",
-                                        "Português", "Italiano", "Deutsch",
-                                        "русский язык", "简体中文 (中国)",
-                                        "Esperanto", "Lojban"};
-
-      static const int num_of_languages = 10;
-      */
-
-      static std::string languages[] = {"English"};
-
-      static const int num_of_languages = 1;
-
-      static const int mnemonic_phrase_length = 25;
-
-      std::vector<std::string> words;
-
-      words = boost::split(words, mnemonic_phrase, ::isspace);
-
-      if (words.size() != mnemonic_phrase_length)
-      {
-        Common::Console::setTextColor(Common::Console::Color::BrightRed);
-        std::cout << "Invalid mnemonic phrase! Seed phrase is not 25 words! "
-                     "Please try again." << std::endl;
-
-        log_incorrect_words(words);
-
-        Common::Console::setTextColor(Common::Console::Color::Default);
-
-        return false;
-      }
-
-      /* Check every language for our phrase so the user doesn't have to specify
-         it, this shouldn't be an issue as long as one language doesn't have enough
-         of another languages words, might need some testing */
-      for (int i = 0; i < num_of_languages; i++)
-      {
-        if (words_to_bytes(mnemonic_phrase, private_spend_key, languages[i]))
-        {
-          return true;
-        }
-      }
-
-      /* The issue with this is if we try and automagically determine what language
-         the seed phrase is in, then we can't log words which aren't in the x
-         dictionary, we will have to take an argument to know what language they
-         are in, but this is less user friendly. */
-      Common::Console::setTextColor(Common::Console::Color::BrightRed);
-
-      std::cout << "Invalid mnemonic phrase!" << std::endl;
-      
-      Common::Console::setTextColor(Common::Console::Color::Default);
-
-      log_incorrect_words(words);
-
-      return false;
-    }
-
-    void log_incorrect_words(std::vector<std::string> words)
-    {
-      Language::Base *language = Language::Singleton<Language::English>::instance();
-      const std::vector<std::string> &dictionary = language->get_word_list();
-
-      Common::Console::setTextColor(Common::Console::Color::BrightRed);
-
-      for (auto i : words)
-      {
-        if (std::find(dictionary.begin(), dictionary.end(), i) == dictionary.end())
-        {
-          std::cout << i << " is not in the english word list!" << std::endl;
-        }
-      }
-
-      Common::Console::setTextColor(Common::Console::Color::Default);
     }
   }
 }
