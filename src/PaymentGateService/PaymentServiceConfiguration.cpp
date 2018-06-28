@@ -193,8 +193,6 @@ void Configuration::init(const boost::program_options::variables_map& options) {
 
   if (options.count("enable-cors") != 0) {
     corsHeader = options["enable-cors"].as<std::string>();
-    std::cout << corsHeader << std::endl;
-    std::cout << options["enable-cors"].as<std::string>() << std::endl;
   }
   
 }
