@@ -55,7 +55,7 @@ template <typename T>
 Common::JsonValue storeContainerToJsonValue(const T& cont) {
   Common::JsonValue js(Common::JsonValue::ARRAY);
   for (const auto& item : cont) {
-    js.pushBack(item);
+    js.pushBack(storeToJsonValue(item));
   }
   return js;
 }
@@ -77,10 +77,33 @@ void loadFromJsonValue(T& v, const Common::JsonValue& js) {
 
 template <typename T>
 void loadFromJsonValue(std::vector<T>& v, const Common::JsonValue& js) {
+    /*
   for (size_t i = 0; i < js.size(); ++i) {
     v.push_back(Common::getValueAs<T>(js[i]));
   }
+  */
+
+  for (size_t i = 0; i < js.size(); i++) {
+    T type;
+    loadFromJsonValue(type, js[i]);
+    v.push_back(type);
+  }
 }
+
+template <>
+inline void loadFromJsonValue(std::vector<std::string>&v, const Common::JsonValue& js) {
+  for (size_t i = 0; i < js.size(); ++i) {
+    v.push_back(Common::getValueAs<std::string>(js[i]));
+  }
+}
+
+template <>
+inline void loadFromJsonValue(std::vector<long unsigned int>&v, const Common::JsonValue& js) {
+  for (size_t i = 0; i < js.size(); ++i) {
+    v.push_back(Common::getValueAs<long unsigned int>(js[i]));
+  }
+}
+
 
 template <typename T>
 void loadFromJsonValue(std::list<T>& v, const Common::JsonValue& js) {

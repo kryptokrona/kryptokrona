@@ -10,6 +10,13 @@ set(CMAKE_SKIP_INSTALL_RULES OFF)
 set(CMAKE_SKIP_PACKAGE_ALL_DEPENDENCY ON)
 set(CMAKE_SUPPRESS_REGENERATION ON)
 set(DO_TESTS ON CACHE STRING "Spend time making tests? Defaults to ON")
+set(FORCE_READLINE ON CACHE STRING "Make readline support mandatory on Linux and Mac? Defaults to ON")
+
+# GNU Readline isn't easy to get working on Windows :(
+if (MSVC)
+    set(FORCE_READLINE OFF)
+endif()
+
 set(STATIC ON CACHE BOOL "Link libraries statically")
 
 set(ENABLE_AVX OFF CACHE STRING "Enable RocksDB AVX/AVX2 support detection? Defaults to OFF")
@@ -51,17 +58,23 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Linux)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Posix)
 endif()
 
-option(USE_READLINE "Build with readline support." ON)
-if(USE_READLINE)
-  find_package(Readline)
-  if(READLINE_FOUND)
+# Don't bother searching for readline on windows
+if (NOT MSVC)
+    # If we're forcing readline, then exit if it's not found
+    if (FORCE_READLINE)
+        find_package(Readline REQUIRED)
+    else()
+        find_package(Readline)
+    endif()
+endif()
+
+if(READLINE_FOUND)
     add_definitions(-DHAVE_READLINE)
     include_directories(${Readline_INCLUDE_DIR})
     link_libraries(${Readline_LIBRARY})
     message(STATUS "Found readline library at: ${Readline_ROOT_DIR}")
-  else()
+else()
     message(STATUS "Could not find readline library")
-  endif()
 endif()
 
 if(MSVC)

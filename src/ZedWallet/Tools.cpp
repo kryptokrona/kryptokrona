@@ -1,56 +1,45 @@
-/*
-Copyright (C) 2018, The TurtleCoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
-///////////////////////////////
+////////////////////////////
 #include <ZedWallet/Tools.h>
-///////////////////////////////
-
-#include <cctype>
+////////////////////////////
 
 #include <Common/StringTools.h>
 
 #include <CryptoNoteCore/TransactionExtra.h>
 
-#include <fstream>
-
-#include <iostream>
-
 #include <ZedWallet/ColouredMsg.h>
 #include <ZedWallet/PasswordContainer.h>
 
-void confirmPassword(std::string walletPass)
+void confirmPassword(std::string walletPass, std::string msg)
 {
     /* Password container requires an rvalue, we don't want to wipe our current
        pass so copy it into a tmp string and std::move that instead */
     std::string tmpString = walletPass;
     Tools::PasswordContainer pwdContainer(std::move(tmpString));
 
-    while (!pwdContainer.read_and_validate())
+    while (!pwdContainer.read_and_validate(msg))
     {
-        std::cout << "Incorrect password! Try again." << std::endl;
+        std::cout << WarningMsg("Incorrect password! Try again.") << std::endl;
     }
 }
 
 std::string formatAmount(uint64_t amount)
 {
-    uint64_t dollars = amount / 100;
-    uint64_t cents = amount % 100;
+    const uint64_t dollars = amount / 100;
+    const uint64_t cents = amount % 100;
 
     return formatDollars(dollars) + "." + formatCents(cents) + " TRTL";
+}
+
+std::string formatAmountBasic(uint64_t amount)
+{
+    const uint64_t dollars = amount / 100;
+    const uint64_t cents = amount % 100;
+
+    return std::to_string(dollars) + "." + formatCents(cents);
 }
 
 std::string formatDollars(uint64_t amount)
@@ -137,7 +126,7 @@ bool confirm(std::string msg, bool defaultReturn)
         std::string answer;
         std::getline(std::cin, answer);
 
-        char c = std::tolower(answer[0]);
+        const char c = std::tolower(answer[0]);
 
         switch(std::tolower(answer[0]))
         {
@@ -157,7 +146,7 @@ bool confirm(std::string msg, bool defaultReturn)
     }
 }
 
-std::string getPaymentID(std::string extra)
+std::string getPaymentIDFromExtra(std::string extra)
 {
     std::string paymentID;
 
@@ -179,4 +168,34 @@ std::string getPaymentID(std::string extra)
     }
 
     return paymentID;
+}
+
+/* Note: this is not portable, it only works with terminals that support ANSI
+   codes (e.g., not Windows) */
+std::string yellowANSIMsg(std::string msg)
+{
+    const std::string CYELLOW = "\033[1;33m";
+    const std::string RESET = "\033[0m";
+    return CYELLOW + msg + RESET;
+}
+
+std::string getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
+{
+    const int promptLength = 20;
+    const std::string extension = ".wallet";
+
+    std::string walletName = walletInfo->walletFileName;
+
+    /* Filename ends in .wallet, remove extension */
+    if (std::equal(extension.rbegin(), extension.rend(), 
+                   walletInfo->walletFileName.rbegin()))
+    {
+        const size_t extPos = walletInfo->walletFileName.find_last_of('.');
+
+        walletName = walletInfo->walletFileName.substr(0, extPos);
+    }
+
+    const std::string shortName = walletName.substr(0, promptLength);
+
+    return "[TRTL " + shortName + "]: ";
 }

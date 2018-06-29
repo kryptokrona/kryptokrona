@@ -2,24 +2,53 @@
 // 
 // Please see the included LICENSE file for more information.
 
-#pragma once
+#include <string>
 
-#include <ZedWallet/ColouredMsg.h>
+#include <vector>
+
 #include <ZedWallet/Types.h>
 
-#include <Wallet/WalletGreen.h>
+#pragma once
 
-void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet);
+struct Command
+{
+    public:
+        Command() {}
 
-void help(bool viewWallet);
+        Command(std::string name, std::string description, 
+                bool viewWalletSupport, bool advanced) : 
+                name(name), description(description),
+                viewWalletSupport(viewWalletSupport), advanced(advanced) {}
 
-void status(CryptoNote::INode &node);
+        /* The command name */
+        std::string name;
+        /* The command description */
+        std::string description;
 
-void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo);
+        /* Can the command be used with a view wallet */
+        bool viewWalletSupport;
+        /* Is the command 'basic' or 'advanced' */
+        bool advanced;
+};
 
-void blockchainHeight(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet);
+const Maybe<Command> contains(std::string name,
+                                    std::vector<Command> &commands);
 
-void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
-             bool viewWallet);
+const std::vector<Command> filterCommands(std::vector<Command> &commands,
+                                    std::function<bool(Command)> predicate);
 
-void exportKeys(std::shared_ptr<WalletInfo> &walletInfo);
+std::vector<Command> allCommands();
+
+const std::vector<Command> availableCommands(bool viewWallet,
+                                       std::vector<Command> &commands);
+
+void listCommands(std::vector<Command> &commands, bool advanced);
+
+int numBasicCommands(std::vector<Command> &commands);
+
+const Maybe<Command> resolveCommand(std::string command,
+                                    std::vector<Command> &allCommands,
+                                    std::vector<Command> &available);
+
+bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
+                     CryptoNote::INode &node, std::string command);

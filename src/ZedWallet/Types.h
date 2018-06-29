@@ -1,21 +1,12 @@
-/*
-Copyright (C) 2018, The TurtleCoin developers
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #pragma once
+
+#include "CryptoNoteConfig.h"
+
+#include <Serialization/ISerializer.h>
 
 #include <Wallet/WalletGreen.h>
 
@@ -32,30 +23,82 @@ struct WalletInfo
                viewWallet(viewWallet),
                wallet(wallet) {}
 
+    /* How many transactions do we know about */
     size_t knownTransactionCount = 0;
 
+    /* The wallet file name */
     std::string walletFileName;
+    /* The wallet password */
     std::string walletPass;
+    /* The wallet primary TRTL address */
     std::string walletAddress;
 
+    /* Is the wallet a view only wallet */
     bool viewWallet;
 
+    /* The walletgreen wallet container */
     CryptoNote::WalletGreen &wallet;
 };
 
 struct Config
 {
-    bool exit;
+    /* Should we exit after parsing arguments */
+    bool exit = false;
 
-    bool walletGiven;
-    bool passGiven;
+    /* Was the wallet file specified on CLI */
+    bool walletGiven = false;
+    /* Was the wallet pass specified on CLI */
+    bool passGiven = false;
 
-    std::string host;
-    int port;
+    /* Should we log walletd logs to a file */
+    bool debug = false;
 
-    std::string walletFile;
-    std::string walletPass;
+    /* The daemon host */
+    std::string host = "127.0.0.1";
+    /* The daemon port */
+    int port = CryptoNote::RPC_DEFAULT_PORT;
+
+    /* The wallet file path */
+    std::string walletFile = "";
+    /* The wallet password */
+    std::string walletPass = "";
 };
+
+struct AddressBookEntry
+{
+    AddressBookEntry() {}
+
+    /* Used for quick comparison with strings */
+    AddressBookEntry(std::string friendlyName) : friendlyName(friendlyName) {}
+
+    AddressBookEntry(std::string friendlyName, std::string address,
+                std::string paymentID) : friendlyName(friendlyName),
+                                         address(address),
+                                         paymentID(paymentID) {}
+
+    /* Friendly name for this address book entry */
+    std::string friendlyName;
+    /* The wallet address of this entry */
+    std::string address;
+    /* The payment ID associated with this address */
+    std::string paymentID;
+
+    void serialize(CryptoNote::ISerializer &s)
+    {
+        KV_MEMBER(friendlyName)
+        KV_MEMBER(address)
+        KV_MEMBER(paymentID)
+    }
+
+    /* Only compare via name as we don't really care about the contents */
+    bool operator==(const AddressBookEntry &rhs) const
+    {
+        return rhs.friendlyName == friendlyName;
+    }
+};
+
+/* An address book is a vector of address book entries */
+typedef std::vector<AddressBookEntry> AddressBook;
 
 /* This borrows from haskell, and is a nicer boost::optional class. We either
    have Just a value, or Nothing.

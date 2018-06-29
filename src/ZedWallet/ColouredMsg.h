@@ -1,19 +1,6 @@
-/*
-Copyright (C) 2018, The TurtleCoin developers
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
@@ -22,8 +9,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 #include <iomanip>
 
 #include <ostream>
-
-#include <string>
 
 class ColouredMsg
 {
@@ -66,10 +51,10 @@ class ColouredMsg
         }
 
     protected:
-        std::string msg;
-        Common::Console::Color colour;
-        int padding = 0;
-        bool pad = false;
+        const std::string msg;
+        const Common::Console::Color colour;
+        const int padding = 0;
+        const bool pad = false;
 };
 
 class SuccessMsg : public ColouredMsg

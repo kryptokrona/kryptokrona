@@ -1,23 +1,10 @@
-/*
-Copyright (C) 2018, The TurtleCoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
-////////////////////////////////
+/////////////////////////////
 #include <ZedWallet/Fusion.h>
-////////////////////////////////
+/////////////////////////////
 
 #include "CryptoNoteConfig.h"
 
@@ -37,7 +24,8 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
        gave us the most amount of optimizable amounts */
     while (threshold > CryptoNote::parameters::MINIMUM_FEE)
     {
-        auto fusionReadyCount = wallet.estimate(threshold).fusionReadyCount;
+        const auto fusionReadyCount
+            = wallet.estimate(threshold).fusionReadyCount;
 
         if (fusionReadyCount > optimizable)
         {
@@ -67,35 +55,6 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
                   << WarningMsg(e.what()) << std::endl;
 
         return CryptoNote::WALLET_INVALID_TRANSACTION_ID;
-    }
-}
-
-void quickOptimize(CryptoNote::WalletGreen &wallet)
-{
-    std::cout << "Attempting to optimize your wallet to allow you to send "
-              << "large amounts at once. " << std::endl 
-              << "You can run this command as many times as you like."
-              << std::endl << "You will be informed when your wallet is fully "
-              << "optimized." << std::endl
-              << WarningMsg("This may take a long time!") << std::endl;
-
-    if (!confirm("Do you want to proceed?"))
-    {
-        std::cout << WarningMsg("Cancelling optimization.") << std::endl;
-        return;
-    }
-
-    if (!optimize(wallet, wallet.getActualBalance()))
-    {
-        std::cout << SuccessMsg("Wallet fully optimized!") << std::endl;
-    }
-    else
-    {
-        std::cout << SuccessMsg("Optimization completed!") << std::endl
-                  << "Your wallet can still be optimized more if you run "
-                  << "this command again." << std::endl << "Consider using "
-                  << "the " << SuggestionMsg("full_optimize") << " command to "
-                  << "automate the process." << std::endl;
     }
 }
 
@@ -137,7 +96,7 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
         /* Create as many fusion transactions until we can't send anymore,
            either because balance is locked too much or we can no longer
            optimize anymore transactions */
-        size_t tmpFusionTxID = makeFusionTransaction(wallet, threshold);
+        const size_t tmpFusionTxID = makeFusionTransaction(wallet, threshold);
 
         if (tmpFusionTxID == CryptoNote::WALLET_INVALID_TRANSACTION_ID)
         {
@@ -145,8 +104,9 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
         }
         else
         {
-            CryptoNote::WalletTransaction w
+            const CryptoNote::WalletTransaction w
                 = wallet.getTransaction(tmpFusionTxID);
+
             fusionTransactionHashes.push_back(w.hash);
 
             if (fusionTransactionHashes.size() == 1)
@@ -190,12 +150,12 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
 
     while (true)
     {
-        std::vector<CryptoNote::WalletTransactionWithTransfers> 
+        const std::vector<CryptoNote::WalletTransactionWithTransfers> 
             unconfirmedTransactions = wallet.getUnconfirmedTransactions();
 
         std::vector<Crypto::Hash> unconfirmedTxHashes;
 
-        for (auto t : unconfirmedTransactions)
+        for (const auto &t : unconfirmedTransactions)
         {
             unconfirmedTxHashes.push_back(t.transaction.hash);
         }
@@ -205,7 +165,7 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold)
         /* Is our fusion transaction still unconfirmed? We can't gain the
            benefits of fusioning if the balance hasn't unlocked, so we can
            send this new optimized balance */
-        for (auto tx : fusionTransactionHashes)
+        for (const auto &tx : fusionTransactionHashes)
         {
             /* If the fusion transaction hash is present in the unconfirmed
                transactions pool, we need to wait for it to complete. */
@@ -281,7 +241,7 @@ bool fusionTX(CryptoNote::WalletGreen &wallet,
        potentially become valid because another payment came in. */
     optimize(wallet, p.destinations[0].amount + p.fee);
 
-    auto startTime = std::chrono::system_clock::now();
+    const auto startTime = std::chrono::system_clock::now();
 
     while (wallet.getActualBalance() < p.destinations[0].amount + p.fee)
     {

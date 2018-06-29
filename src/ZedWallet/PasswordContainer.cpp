@@ -1,19 +1,8 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 //////////////////////////////
 #include "PasswordContainer.h"
@@ -74,15 +63,22 @@ namespace Tools
   }
 
   bool PasswordContainer::read_password() {
-    return read_password(false);
+    return read_password(false, "Enter password: ");
   }
 
-  bool PasswordContainer::read_and_validate() {
+  bool PasswordContainer::read_and_validate(std::string msg) {
     std::string tmpPassword = m_password;
 
-    if (!read_password()) {
-      std::cout << "Failed to read password!";
-      return false;
+    if (msg == "") {
+        if (!read_password()) {
+            std::cout << "Failed to read password!";
+            return false;
+        }
+    } else {
+        if (!read_password(false, msg)) {
+            std::cout << "Failed to read password!";
+            return false;
+        }
     }
 
     bool validPass = m_password == tmpPassword;
@@ -92,16 +88,13 @@ namespace Tools
     return validPass;
   }
 
-  bool PasswordContainer::read_password(bool verify) {
+  bool PasswordContainer::read_password(bool verify, std::string msg) {
     clear();
 
     bool r;
     if (is_cin_tty()) {
-      if (verify) {
-        std::cout << "Give your new wallet a password: ";
-      } else {
-        std::cout << "Enter password: ";
-      }
+      std::cout << msg;
+
       if (verify) {
         std::string password1;
         std::string password2;
@@ -117,7 +110,7 @@ namespace Tools
             } else {
               std::cout << "Passwords do not match, try again." << std::endl;
               clear();
-	            return read_password(true);
+	            return read_password(true, msg);
             }
           }
 	      }

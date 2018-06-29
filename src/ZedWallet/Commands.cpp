@@ -2,254 +2,328 @@
 // 
 // Please see the included LICENSE file for more information.
 
-//////////////////////////////////
+///////////////////////////////
 #include <ZedWallet/Commands.h>
-//////////////////////////////////
+///////////////////////////////
 
-#include <Common/StringTools.h>
+#ifdef HAVE_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
 
-#include <CryptoNoteCore/Account.h>
-
-#include <memory>
-
-#include <Mnemonics/electrum-words.h>
-
+#include <ZedWallet/AddressBook.h>
 #include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/Fusion.h>
-#include <ZedWallet/Sync.h>
-#include <ZedWallet/Tools.h>
+#include <ZedWallet/CommandImplementations.h>
 #include <ZedWallet/Transfer.h>
-#include <ZedWallet/Types.h>
+#include <ZedWallet/Fusion.h>
+#include <ZedWallet/WalletConfig.h>
 
-void exportKeys(std::shared_ptr<WalletInfo> &walletInfo)
+const Maybe<Command> contains(std::string name,
+                                    std::vector<Command> &commands)
 {
-    confirmPassword(walletInfo->walletPass);
-    printPrivateKeys(walletInfo->wallet, walletInfo->viewWallet);
+    for (auto command : commands)
+    {
+        if (command.name == name)
+        {
+            return Just<Command>(command);
+        }
+    }
+
+    return Nothing<Command>();
 }
 
-void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
+const std::vector<Command> filterCommands(std::vector<Command> &commands,
+                                    std::function<bool(Command)> predicate)
 {
-    Crypto::SecretKey privateViewKey = wallet.getViewKey().secretKey;
+    std::vector<Command> result;
 
-    if (viewWallet)
-    {
-        std::cout << SuccessMsg("Private view key:")
-                  << std::endl
-                  << SuccessMsg(Common::podToHex(privateViewKey))
-                  << std::endl;
-        return;
-    }
+    std::copy_if(commands.begin(), commands.end(),
+                 std::back_inserter(result), predicate);
 
-    Crypto::SecretKey privateSpendKey = wallet.getAddressSpendKey(0).secretKey;
-
-    Crypto::SecretKey derivedPrivateViewKey;
-
-    CryptoNote::AccountBase::generateViewFromSpend(privateSpendKey,
-                                                   derivedPrivateViewKey);
-
-    bool deterministicPrivateKeys = derivedPrivateViewKey == privateViewKey;
-
-    std::cout << SuccessMsg("Private spend key:")
-              << std::endl
-              << SuccessMsg(Common::podToHex(privateSpendKey))
-              << std::endl
-              << std::endl
-              << SuccessMsg("Private view key:")
-              << std::endl
-              << SuccessMsg(Common::podToHex(privateViewKey))
-              << std::endl;
-
-    if (deterministicPrivateKeys)
-    {
-        std::string mnemonicSeed;
-
-        crypto::ElectrumWords::bytes_to_words(privateSpendKey, 
-                                              mnemonicSeed,
-                                              "English");
-
-        std::cout << std::endl
-                  << SuccessMsg("Mnemonic seed:")
-                  << std::endl
-                  << SuccessMsg(mnemonicSeed)
-                  << std::endl;
-    }
+    return result;
 }
 
-void help(bool viewWallet)
+bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
+                     CryptoNote::INode &node, std::string command)
 {
-    std::cout << "Available commands:" << std::endl
-              << SuccessMsg("help", 25)
-              << "List this help message" << std::endl
-              << SuccessMsg("reset", 25)
-              << "Discard cached data and recheck for transactions" << std::endl
-              << SuccessMsg("bc_height", 25)
-              << "Show the blockchain height" << std::endl
-              << SuccessMsg("balance", 25)
-              << "Display how much TRTL you have" << std::endl
-              << SuccessMsg("export_keys", 25)
-              << "Export your private keys" << std::endl
-              << SuccessMsg("address", 25)
-              << "Display your payment address" << std::endl
-              << SuccessMsg("exit", 25)
-              << "Exit and save your wallet" << std::endl
-              << SuccessMsg("save", 25)
-              << "Save your wallet state" << std::endl
-              << SuccessMsg("status", 25)
-              << "Show daemon status" << std::endl
-              << SuccessMsg("incoming_transfers", 25)
-              << "Show incoming transfers" << std::endl;
-                  
-    if (viewWallet)
+    auto commands = allCommands();
+    auto available = availableCommands(walletInfo->viewWallet, commands);
+    auto maybeCommand = resolveCommand(command, commands, available);
+
+    if (!maybeCommand.isJust)
     {
-        std::cout << InformationMsg("Please note you are using a view only "
-                                    "wallet, and so cannot transfer TRTL.")
-                  << std::endl;
+        return false;
     }
+
+    /* If the user inputted a numeric command, convert it back to the actual
+       command name */
+    command = maybeCommand.x.name;
+
+    if (walletInfo->viewWallet && !maybeCommand.x.viewWalletSupport)
+    {
+        /* Command exists, but user has a view wallet and this command cannot
+           be used in a view wallet */
+        std::cout << WarningMsg("This command is not available in a "
+                                "view only wallet...") << std::endl;
+
+        return false;
+    }
+
+    /* Can't use a switch with std::string ;((( */
+    if (command == "export_keys")
+    {
+        exportKeys(walletInfo);
+    }
+    else if (command == "help")
+    {
+        listCommands(available, false);
+    }
+    else if (command == "advanced")
+    {
+        listCommands(available, true);
+    }
+    else if (command == "status")
+    {
+        status(node);
+    }
+    else if (command == "balance")
+    {
+        balance(node, walletInfo->wallet, walletInfo->viewWallet);
+    }
+    else if (command == "address")
+    {
+        std::cout << SuccessMsg(walletInfo->walletAddress) << std::endl;
+    }
+    else if (command == "incoming_transfers")
+    {
+        listTransfers(true, false, walletInfo->wallet, node);
+    }
+    else if (command == "save_csv")
+    {
+        saveCSV(walletInfo->wallet, node);
+    }
+    else if (command == "exit")
+    {
+        return true;
+    }
+    else if (command == "save")
+    {
+        save(walletInfo->wallet);
+    }
+    else if (command == "bc_height")
+    {
+        blockchainHeight(node, walletInfo->wallet);
+    }
+    else if (command == "reset")
+    {
+        reset(node, walletInfo);
+    }
+    else if (command == "outgoing_transfers")
+    {
+        listTransfers(false, true, walletInfo->wallet, node);
+    }
+    else if (command == "list_transfers")
+    {
+        listTransfers(true, true, walletInfo->wallet, node);
+    }
+    else if (command == "transfer")
+    {
+        transfer(walletInfo, node.getLastKnownBlockHeight());
+    }
+    else if (command == "optimize")
+    {
+        fullOptimize(walletInfo->wallet);
+    }
+    else if (command == "ab_add")
+    {
+        addToAddressBook();
+    }
+    else if (command == "ab_delete")
+    {
+        deleteFromAddressBook();
+    }
+    else if (command == "ab_list")
+    {
+        listAddressBook();
+    }
+    else if (command == "ab_send")
+    {
+        sendFromAddressBook(walletInfo, node.getLastKnownBlockHeight());
+    }
+    else if (command == "change_password")
+    {
+        changePassword(walletInfo);
+    }
+    /* This should never happen */
     else
     {
-        std::cout << SuccessMsg("outgoing_transfers", 25)
-                  << "Show outgoing transfers" << std::endl
-                  << SuccessMsg("list_transfers", 25)
-                  << "Show all transfers" << std::endl
-                  << SuccessMsg("save_csv", 25)
-                  << "Save all wallet transactions to CSV file" << std::endl
-                  << SuccessMsg("optimize", 25)
-                  << "Optimize your wallet to send large amounts"
+        std::cout << WarningMsg("Command was defined but not hooked up: ")
+                  << InformationMsg(command)
                   << std::endl
-                  << SuccessMsg("transfer", 25)
-                  << "Send TRTL to someone" << std::endl;
-    }
-}
-
-void status(CryptoNote::INode &node)
-{
-    std::cout << node.getInfo() << std::endl;
-}
-
-void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
-             bool viewWallet)
-{
-    uint64_t unconfirmedBalance = wallet.getPendingBalance();
-    uint64_t confirmedBalance = wallet.getActualBalance();
-    uint64_t totalBalance = unconfirmedBalance + confirmedBalance;
-
-    uint32_t localHeight = node.getLastLocalBlockHeight();
-    uint32_t remoteHeight = node.getLastKnownBlockHeight();
-    uint32_t walletHeight = wallet.getBlockCount();
-
-    std::cout << "Available balance: "
-              << SuccessMsg(formatAmount(confirmedBalance)) << std::endl
-              << "Locked (unconfirmed) balance: "
-              << WarningMsg(formatAmount(unconfirmedBalance))
-              << std::endl << "Total balance: "
-              << InformationMsg(formatAmount(totalBalance)) << std::endl;
-
-    if (viewWallet)
-    {
-        std::cout << std::endl 
-                  << InformationMsg("Please note that view only wallets "
-                                    "can only track incoming transactions, "
-                                    "and so your wallet balance may appear "
-                                    "inflated.") << std::endl;
-    }
-
-    if (localHeight < remoteHeight)
-    {
-        std::cout << std::endl
-                  << InformationMsg("Your daemon is not fully synced with "
-                                    "the network!")
-                  << std::endl << "Your balance may be incorrect until you "
-                  << "are fully synced!" << std::endl;
-    }
-    /* Small buffer because wallet height doesn't update instantly like node
-       height does */
-    else if (walletHeight + 1000 < remoteHeight)
-    {
-        std::cout << std::endl
-                  << InformationMsg("The blockchain is still being scanned for "
-                                    "your transactions.")
-                  << std::endl
-                  << "Balances might be incorrect whilst this is ongoing."
+                  << InformationMsg("Please report this bug!")
                   << std::endl;
     }
+
+    return false;
 }
 
-void blockchainHeight(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
+const Maybe<Command> resolveCommand(std::string command,
+                              std::vector<Command> &allCommands,
+                              std::vector<Command> &available)
 {
-    uint32_t localHeight = node.getLastLocalBlockHeight();
-    uint32_t remoteHeight = node.getLastKnownBlockHeight();
-    uint32_t walletHeight = wallet.getBlockCount();
+    int index;
 
-    /* This is the height that the wallet has been scanned to. The blockchain
-       can be fully updated, but we have to walk the chain to find our
-       transactions, and this number indicates that progress. */
-    std::cout << "Wallet blockchain height: ";
-
-    /* Small buffer because wallet height doesn't update instantly like node
-       height does */
-    if (walletHeight + 1000 > remoteHeight)
+    /* See if the value is a numberic choice rather than a string command */
+    try
     {
-        std::cout << SuccessMsg(std::to_string(walletHeight));
+        /* Standard adding one to inputs to be more user friendly, 1 based
+           indexing */
+        index = std::stoi(command);
+        index--;
+
+        if (index < 0 || index >= static_cast<int>(available.size()))
+        {
+            std::cout << WarningMsg("Bad input: Expected a command name, "
+                                    "or number from ")
+                      << InformationMsg("1")
+                      << WarningMsg(" to ")
+                      << InformationMsg(std::to_string(available.size()))
+                      << std::endl;
+
+            return Nothing<Command>();
+        }
+
+        command = available[index].name;
     }
-    else
+    catch (const std::invalid_argument &)
     {
-        std::cout << WarningMsg(std::to_string(walletHeight));
-    }
-
-    std::cout << std::endl << "Local blockchain height: ";
-
-    if (localHeight == remoteHeight)
-    {
-        std::cout << SuccessMsg(std::to_string(localHeight));
-    }
-    else
-    {
-        std::cout << WarningMsg(std::to_string(localHeight));
+        /* not a number */
     }
 
-    std::cout << std::endl << "Network blockchain height: "
-              << SuccessMsg(std::to_string(remoteHeight)) << std::endl;
+    const auto maybeCommand = contains(command, allCommands);
 
-    if (localHeight == 0 && remoteHeight == 0)
+    if (command == "")
     {
-        std::cout << WarningMsg("Uh oh, it looks like you don't have "
-                                "TurtleCoind open!")
+        return Nothing<Command>();
+    }
+
+    /* Command doesn't exist */
+    if (!maybeCommand.isJust)
+    {
+        std::cout << "Unknown command: " << WarningMsg(command) 
+                  << ", use " << SuggestionMsg("help")
+                  << " command to list all possible commands."
                   << std::endl;
+
+        return Nothing<Command>();
     }
-    else if (walletHeight + 1000 < remoteHeight && localHeight == remoteHeight)
-    {
-        std::cout << InformationMsg("You are synced with the network, but the "
-                                    "blockchain is still being scanned for "
-                                    "your transactions.")
-                  << std::endl
-                  << "Balances might be incorrect whilst this is ongoing."
-                  << std::endl;
-    }
-    else if (localHeight == remoteHeight)
-    {
-        std::cout << SuccessMsg("Yay! You are synced!") << std::endl;
-    }
-    else
-    {
-        std::cout << WarningMsg("Be patient, you are still syncing with the "
-                                "network!") << std::endl;
-    }
+
+    return maybeCommand;
 }
 
-void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo)
+std::vector<Command> allCommands()
 {
-    std::cout << InformationMsg("Resetting wallet...") << std::endl;
+    /* Add things to this in alphabetical order so it's nicer to read please
+       :) */
+    std::vector<Command> commands =
+    {
+        /* Basic commands */
+        {"address", "Display your payment address", true, false},
+        {"advanced", "List available advanced commands", true, false},
 
-    walletInfo->knownTransactionCount = 0;
+        {"balance", "Display how much " + WalletConfig::ticker + 
+                    " you have", true, false},
 
-    /* Wallet is now unitialized. You must reinit with load, initWithKeys,
-       or whatever. This function wipes the cache, then saves the wallet. */
-    walletInfo->wallet.clearCacheAndShutdown();
+        {"exit", "Exit and save your wallet", true, false},
+        {"export_keys", "Export your private keys", true, false},
+        {"help", "List this help message", true, false},
 
-    /* Now, we reopen the wallet. It now has no cached tx's, and balance */
-    walletInfo->wallet.load(walletInfo->walletFileName,
-                            walletInfo->walletPass);
+        {"transfer", "Send " + WalletConfig::ticker +
+                     " to someone", false, false},
 
-    /* Now we rescan the chain to re-discover our balance and transactions */
-    syncWallet(node, walletInfo);
+        /* Advanced commands */
+        {"ab_add", "Add a person to your address book", true, true},
+        {"ab_delete", "Delete a person from your address book", true, true},
+        {"ab_list", "List everyone in your address book", true, true},
+
+        {"ab_send", "Send " + WalletConfig::ticker + 
+                    " to someone in your address book", false, true},
+
+        {"bc_height", "Show the blockchain height", true, true},
+        {"change_password", "Change your wallet password", true, true},
+        {"incoming_transfers", "Show incoming transfers", true, true},
+        {"list_transfers", "Show all transfers", false, true},
+        {"optimize", "Optimize your wallet to send large amounts", false, true},
+        {"outgoing_transfers", "Show outgoing transfers", false, true},
+        {"reset", "Recheck the chain from zero for transactions", true, true},
+        {"save", "Save your wallet state", true, true},
+        {"save_csv", "Save all wallet transactions to a CSV file", false, true},
+        {"status", "Show the daemon status", true, true}
+    };
+
+    /* Pop em in alphabetical order */
+    std::sort(commands.begin(), commands.end(), [](Command &lhs,
+                                                   Command &rhs)
+    {
+        /* If both are the same command type (basic or advanced), compare
+           based on name. */
+        if (lhs.advanced == rhs.advanced)
+        {
+            return lhs.name < rhs.name;
+        }
+
+        return lhs.advanced < rhs.advanced;
+    });
+
+    return commands;
+}
+
+/* The commands which are currently usable */
+const std::vector<Command> availableCommands(bool viewWallet,
+                                                   std::vector<Command>
+                                                   &commands)
+{
+    if (!viewWallet)
+    {
+        return commands;
+    }
+
+    return filterCommands(commands, [](Command c)
+    {
+        return c.viewWalletSupport;
+    });
+}
+
+int numBasicCommands(std::vector<Command> &commands)
+{
+    return std::count_if(commands.begin(), commands.end(), [](Command c)
+    {
+        return !c.advanced;
+    });
+}
+
+void listCommands(std::vector<Command> &commands, bool advanced)
+{
+    const int commandPadding = 25;
+
+    int index = 1;
+
+    if (advanced)
+    {
+        /* We want the basic commands to be the first numbers, then after
+           that, list the advanced commands numbers */
+        index = numBasicCommands(commands) + 1;
+    }
+
+    for (const auto command : commands)
+    {
+        if (command.advanced == advanced)
+        {
+            std::cout << " " << InformationMsg(std::to_string(index)) << "\t"
+                      << SuccessMsg(command.name, commandPadding)
+                      << command.description << std::endl;
+
+            index++;
+        }
+    }
 }
