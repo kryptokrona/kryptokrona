@@ -28,6 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include <ZedWallet/Tools.h>
 #include <ZedWallet/Types.h>
+#include <boost/progress.hpp>
 
 CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
                                   CryptoNote::INode &node)
@@ -201,6 +202,9 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
     }
     std::cout << InformationMsg("Saving CSV file...") << std::endl;
 
+    /* Progress bar as file save can take a while */
+    boost::progress_display progress(numTransactions);
+
     /* Create header line for CSV file */
     myfile << "Block date/time,Block Height,Hash,Amount,Currency,In/Out\n";
     /* Loop through transactions */
@@ -215,21 +219,26 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
             /* Handle outgoing (negative) or incoming transactions */
             if (t.totalAmount < 0)
             {
+                /* Remove , amount separators (on thousands, e.g. 10,000 => 10000). */
                 /* Put TRTL in separate field, makes output more usable in spreadsheet */
                 std::string splitAmtTRTL = formatAmount(-t.totalAmount);
+                boost::replace_all(splitAmtTRTL, ",", "");
                 boost::replace_all(splitAmtTRTL, " ", ",");
                 myfile << "-" << splitAmtTRTL << ",OUT\n";
+                ++progress;
             }
             else
             {
                 std::string splitAmtTRTL = formatAmount(t.totalAmount);
+                boost::replace_all(splitAmtTRTL, ",", "");
                 boost::replace_all(splitAmtTRTL, " ", ",");
                 myfile << splitAmtTRTL << ",IN\n";
+                ++progress;
             }
         }
     }
     myfile.close();
-    std::cout << SuccessMsg("CSV file saved successfully.")
+    std::cout << SuccessMsg("*\nCSV file saved successfully.\n")
               << std::endl;
 }
 
