@@ -51,7 +51,7 @@ class ColouredMsg
         }
 
     protected:
-        const std::string msg;
+        std::string msg;
         const Common::Console::Color colour;
         const int padding = 0;
         const bool pad = false;
