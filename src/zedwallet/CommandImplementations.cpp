@@ -6,6 +6,8 @@
 #include <zedwallet/CommandImplementations.h>
 /////////////////////////////////////////////
 
+#include <boost/thread/thread.hpp>
+
 #include <Common/StringTools.h>
 
 #include <CryptoNoteCore/Account.h>
@@ -101,12 +103,35 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
     }
 }
 
-/* TODO: Add timeout - maybe 3 seconds */
 void status(CryptoNote::INode &node)
 {
-    const std::string result = node.getInfo();
+    bool completed = false;
 
-    if (result == "Problem retrieving information from RPC server.")
+    std::string status;
+
+    boost::thread getStatus([&node, &completed, &status]
+    {
+        status = node.getInfo();
+        completed = true;
+    });
+
+    const auto startTime = std::chrono::system_clock::now();
+
+    while (!completed)
+    {
+        const auto currentTime = std::chrono::system_clock::now();
+
+        if ((currentTime - startTime) > std::chrono::seconds(5))
+        {
+            std::cout << WarningMsg("Unable to get daemon status - has it ")
+                      << WarningMsg("crashed/frozen?")
+                      << std::endl;
+
+            return;
+        }
+    }
+
+    if (status == "Problem retrieving information from RPC server.")
     {
         std::cout << WarningMsg("Unable to get daemon status - has it "
                                 "crashed/frozen?")
@@ -114,7 +139,7 @@ void status(CryptoNote::INode &node)
     }
     else
     {
-        std::cout << InformationMsg(result) << std::endl;
+        std::cout << InformationMsg(status) << std::endl;
     }
 }
 
