@@ -262,8 +262,8 @@ std::vector<Command> allCommands()
     };
 
     /* Pop em in alphabetical order */
-    std::sort(commands.begin(), commands.end(), [](Command &lhs,
-                                                   Command &rhs)
+    std::sort(commands.begin(), commands.end(), [](const Command &lhs,
+                                                   const Command &rhs)
     {
         /* If both are the same command type (basic or advanced), compare
            based on name. */
