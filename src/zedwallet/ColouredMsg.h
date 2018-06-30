@@ -10,6 +10,8 @@
 
 #include <ostream>
 
+#include <string>
+
 class ColouredMsg
 {
     public:
@@ -33,7 +35,7 @@ class ColouredMsg
            GreenMsg("user");
            std::cout << std::endl; */
 
-        friend std::ostream& operator<<(std::ostream& os, ColouredMsg &m)
+        friend std::ostream& operator<<(std::ostream& os, const ColouredMsg &m)
         {
             Common::Console::setTextColor(m.colour);
 
