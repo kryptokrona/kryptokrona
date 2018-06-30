@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <ZedWallet/Types.h>
+#include <zedwallet/Types.h>
 
 void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height);
 

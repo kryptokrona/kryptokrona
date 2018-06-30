@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////
-#include <ZedWallet/Commands.h>
+#include <zedwallet/Commands.h>
 ///////////////////////////////
 
 #ifdef HAVE_READLINE
@@ -11,12 +11,12 @@
 #include <readline/history.h>
 #endif
 
-#include <ZedWallet/AddressBook.h>
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/CommandImplementations.h>
-#include <ZedWallet/Transfer.h>
-#include <ZedWallet/Fusion.h>
-#include <ZedWallet/WalletConfig.h>
+#include <zedwallet/AddressBook.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/CommandImplementations.h>
+#include <zedwallet/Transfer.h>
+#include <zedwallet/Fusion.h>
+#include <zedwallet/WalletConfig.h>
 
 const Maybe<Command> contains(std::string name,
                                     std::vector<Command> &commands)

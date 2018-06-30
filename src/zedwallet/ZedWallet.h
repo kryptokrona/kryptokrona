@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/Types.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/Types.h>
 
 enum Action {Open, Generate, Import, SeedImport, ViewWallet};
 

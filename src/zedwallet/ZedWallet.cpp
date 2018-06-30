@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////
-#include <ZedWallet/ZedWallet.h>
+#include <zedwallet/ZedWallet.h>
 ////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
@@ -19,19 +19,12 @@
 
 #include <NodeRpcProxy/NodeRpcProxy.h>
 
-#include <ZedWallet/Commands.h>
-#include <ZedWallet/CommandImplementations.h>
-#include <ZedWallet/Fusion.h>
-#include <ZedWallet/Open.h>
-#include <ZedWallet/ParseArguments.h>
-#include <ZedWallet/Sync.h>
-#include <ZedWallet/Transfer.h>
-#include <ZedWallet/Tools.h>
-
 #ifdef HAVE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
+
+#include "version.h"
 
 #ifdef _WIN32
 /* Prevents windows.h redefining min/max which breaks compilation */
@@ -39,14 +32,22 @@
 #include <windows.h>
 #endif
 
-#include "version.h"
-
+#include <zedwallet/Commands.h>
+#include <zedwallet/CommandImplementations.h>
+#include <zedwallet/Fusion.h>
+#include <zedwallet/Open.h>
+#include <zedwallet/ParseArguments.h>
+#include <zedwallet/Sync.h>
+#include <zedwallet/Transfer.h>
+#include <zedwallet/Tools.h>
+#include <zedwallet/WalletConfig.h>
 
 int main(int argc, char **argv)
 {
     /* On ctrl+c the program seems to throw "zedwallet.exe has stopped
        working" when calling exit(0)... I'm not sure why, this is a bit of
-       a hack, it disables that */
+       a hack, it disables that - possibly some deconstructers calling
+       terminate() */
     #ifdef _WIN32
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
     #endif
@@ -71,11 +72,11 @@ int main(int argc, char **argv)
 
     if (config.debug)
     {
-        fileLogger.init("zedwallet.log");
+        fileLogger.init(WalletConfig::walletName + ".log");
         logManager.addLogger(fileLogger);
     }
 
-    Logging::LoggerRef logger(logManager, "zedwallet");
+    Logging::LoggerRef logger(logManager, WalletConfig::walletName);
 
     /* Currency contains our coin parameters, such as decimal places, supply */
     const CryptoNote::Currency currency 
@@ -145,9 +146,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     do
     {
-        std::cout << InformationMsg("TurtleCoin v"
-                                  + std::string(PROJECT_VERSION)
-                                  + " Zedwallet") << std::endl;
+        std::cout << InformationMsg(getVersion()) << std::endl;
 
         /* Open/import/generate the wallet */
         action = getAction(config);
@@ -173,20 +172,21 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     while (node.getLastKnownBlockHeight() == 0)
     {
-        std::cout << WarningMsg("It looks like TurtleCoind isn't open!")
-                  << std::endl << std::endl
-                  << WarningMsg("Ensure TurtleCoind is open and has finished "
-                                "initializing.")
-                  << std::endl
-                  << WarningMsg("If it's still not working, try restarting "
-                                "TurtleCoind. The daemon sometimes gets stuck.") 
-                  << std::endl
-                  << WarningMsg("Alternatively, perhaps TurtleCoind can't "
-                                "communicate with any peers.")
-                  << std::endl << std::endl
-                  << WarningMsg("The wallet can't function until it can "
-                                "communicate with the network.")
-                  << std::endl << std::endl;
+        std::stringstream msg;
+
+        msg << "It looks like " << WalletConfig::daemonName << " isn't open!"
+            << std::endl << std::endl
+            << "Ensure " << WalletConfig::daemonName
+            << " is open and has finished initializing." << std::endl
+            << "If it's still not working, try restarting "
+            << WalletConfig::daemonName << ". The daemon sometimes gets stuck."
+            << std::endl << "Alternatively, perhaps "
+            << WalletConfig::daemonName << " can't communicate with any peers."
+            << std::endl << std::endl
+            << "The wallet can't function until it can communicate with "
+            << "the network." << std::endl;
+
+        std::cout << WarningMsg(msg.str()) << std::endl;
 
         bool proceed = false;
 
@@ -474,7 +474,8 @@ std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
     {
         /* Check if the user has inputted something yet (Wait for zero seconds
            to instantly return) */
-        std::future_status status = inputGetter.wait_for(std::chrono::seconds(0));
+        std::future_status status = inputGetter
+                                   .wait_for(std::chrono::seconds(0));
 
         /* User has inputted, get what they inputted and return it */
         if (status == std::future_status::ready)
@@ -504,11 +505,13 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     {
         std::cout << "Patience little turtle, we're already shutting down!" 
                   << std::endl;
+
         return false;
     }
     else
     {
         alreadyShuttingDown = true;
+
         std::cout << InformationMsg("Saving wallet and shutting down, please "
                                     "wait...") << std::endl;
     }

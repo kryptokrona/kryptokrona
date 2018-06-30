@@ -3,13 +3,13 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////
-#include <ZedWallet/Fusion.h>
+#include <zedwallet/Fusion.h>
 /////////////////////////////
 
 #include "CryptoNoteConfig.h"
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/Tools.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/Tools.h>
 
 #include <Wallet/WalletGreen.h>
 

@@ -10,6 +10,54 @@
 
 #include <Wallet/WalletGreen.h>
 
+struct Command
+{
+    public:
+        Command() {}
+
+        Command(std::string name, std::string description, 
+                bool viewWalletSupport, bool advanced) : 
+                name(name), description(description),
+                viewWalletSupport(viewWalletSupport), advanced(advanced) {}
+
+        /* The command name */
+        std::string name;
+
+        /* The command description */
+        std::string description;
+
+        /* Can the command be used with a view wallet */
+        bool viewWalletSupport;
+
+        /* Is the command 'basic' or 'advanced' */
+        bool advanced;
+};
+
+struct CLICommand
+{
+    CLICommand() {}
+
+    CLICommand(std::string name, std::string description,
+               std::string shortName, bool hasShortName, bool hasArgument) :
+               name(name), description(description), shortName(shortName),
+               hasShortName(hasShortName), hasArgument(hasArgument) {}
+
+    /* The command name */
+    std::string name;
+
+    /* The command description */
+    std::string description;
+
+    /* The command shortname, e.g. --help == -h */
+    std::string shortName;
+
+    /* Does the command have a shortname */
+    bool hasShortName;
+
+    /* Does the command take an argument, e.g. --wallet-file yourwalletname */
+    bool hasArgument;
+};
+
 struct WalletInfo
 {
     WalletInfo(std::string walletFileName, 
@@ -28,9 +76,11 @@ struct WalletInfo
 
     /* The wallet file name */
     std::string walletFileName;
+
     /* The wallet password */
     std::string walletPass;
-    /* The wallet primary TRTL address */
+
+    /* The wallets primary address */
     std::string walletAddress;
 
     /* Is the wallet a view only wallet */
@@ -47,6 +97,7 @@ struct Config
 
     /* Was the wallet file specified on CLI */
     bool walletGiven = false;
+
     /* Was the wallet pass specified on CLI */
     bool passGiven = false;
 
@@ -55,11 +106,13 @@ struct Config
 
     /* The daemon host */
     std::string host = "127.0.0.1";
+    
     /* The daemon port */
     int port = CryptoNote::RPC_DEFAULT_PORT;
 
     /* The wallet file path */
     std::string walletFile = "";
+
     /* The wallet password */
     std::string walletPass = "";
 };

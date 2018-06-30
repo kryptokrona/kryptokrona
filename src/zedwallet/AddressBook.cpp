@@ -3,17 +3,17 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////
-#include <ZedWallet/AddressBook.h>
+#include <zedwallet/AddressBook.h>
 //////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
 
 #include <Serialization/SerializationTools.h>
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/Tools.h>
-#include <ZedWallet/Transfer.h>
-#include <ZedWallet/WalletConfig.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/Tools.h>
+#include <zedwallet/Transfer.h>
+#include <zedwallet/WalletConfig.h>
 
 const std::string getAddressBookName(AddressBook addressBook)
 {

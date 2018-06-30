@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////
-#include <ZedWallet/Open.h>
+#include <zedwallet/Open.h>
 ///////////////////////////
 
 #include <boost/algorithm/string.hpp>
@@ -13,11 +13,14 @@
 
 #include <Mnemonics/electrum-words.h>
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/CommandImplementations.h>
-#include <ZedWallet/Transfer.h>
-#include <ZedWallet/Types.h>
-#include <ZedWallet/PasswordContainer.h>
+#include <Wallet/WalletErrors.h>
+
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/CommandImplementations.h>
+#include <zedwallet/Transfer.h>
+#include <zedwallet/Types.h>
+#include <zedwallet/PasswordContainer.h>
+#include <zedwallet/WalletConfig.h>
 
 std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
 {
@@ -27,7 +30,7 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
 
     while (true)
     {
-        std::cout << "Public TRTL address: ";
+        std::cout << "Public " << WalletConfig::ticker << " address: ";
 
         std::getline(std::cin, address);
         boost::algorithm::trim(address);
@@ -46,8 +49,9 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
     wallet.createViewWallet(walletFileName, walletPass, address,
                             privateViewKey);
 
-    std::cout << InformationMsg("\nYour view wallet " + address 
-                              + " has been successfully imported!")
+    std::cout << std::endl << InformationMsg("Your view wallet ")
+              << InformationMsg(address)
+              << InformationMsg(" has been successfully imported!")
               << std::endl << std::endl;
 
     viewWalletMsg();
@@ -105,8 +109,9 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
 
     const std::string walletAddress = wallet.createAddress(privateSpendKey);
 
-    std::cout << InformationMsg("\nYour wallet " + walletAddress 
-                              + " has been successfully imported!")
+    std::cout << std::endl << InformationMsg("Your wallet ")
+              << InformationMsg(walletAddress)
+              << InformationMsg(" has been succesffuly imported!")
               << std::endl << std::endl;
 
     return std::make_shared<WalletInfo>(walletFileName, walletPass, 
@@ -179,9 +184,9 @@ Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
             if (privateSpendKey == CryptoNote::NULL_SECRET_KEY)
             {
                 std::cout << std::endl
-                          << InformationMsg("Your view only wallet "
-                                          + walletAddress
-                                          + " has been successfully opened!")
+                          << InformationMsg("Your view only wallet ")
+                          << InformationMsg(walletAddress)
+                          << InformationMsg(" has been successfully opened!")
                           << std::endl << std::endl;
 
                 viewWalletMsg();
@@ -196,9 +201,9 @@ Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
             else
             {
                 std::cout << std::endl
-                          << InformationMsg("Your wallet "
-                                          + walletAddress
-                                          + " has been successfully opened!")
+                          << InformationMsg("Your wallet ")
+                          << InformationMsg(walletAddress)
+                          << InformationMsg(" has been successfully opened!")
                           << std::endl << std::endl;
 
                 return Just<std::shared_ptr<WalletInfo>>
@@ -216,74 +221,74 @@ Maybe<std::shared_ptr<WalletInfo>> openWallet(CryptoNote::WalletGreen &wallet,
                                                      false,
                                                      wallet));
         }
-        /* TODO: Can we catch these via direct errors like in transfer.cpp? */
         catch (const std::system_error& e)
         {
-            const std::string walletSuccessBadPwdMsg = 
-                "Restored view public key doesn't correspond to secret key: "
-                "The password is wrong";
+            bool handled = false;
 
-            const std::string walletSuccessBadPwdMsg2 =
-                "Restored spend public key doesn't correspond to secret key: "
-                "The password is wrong";
+            switch (e.code().value())
+            {
+                case CryptoNote::error::WRONG_PASSWORD:
+                {
+                    std::cout << WarningMsg("Incorrect password! Try again.")
+                              << std::endl;
 
-            const std::string walletLegacyBadPwdMsg =
-                ": The password is wrong";
+                    handled = true;
+
+                    break;
+                }
+                case CryptoNote::error::WRONG_VERSION:
+                {
+                    std::stringstream msg;
+
+                    msg << "Could not open wallet file! It doesn't appear "
+                        << "to be a valid wallet!" << std::endl
+                        << "Ensure you are opening a wallet file, and the "
+                        << "file has not gotten corrupted." << std::endl
+                        << "Try reimporting via keys, and always close "
+                        << WalletConfig::walletName << " with the exit "
+                        << "command to prevent corruption." << std::endl;
+
+                    std::cout << WarningMsg(msg.str()) << std::endl;
+
+                    std::cout << "Returning to selection screen..."
+                              << std::endl << std::endl;
+
+                    return Nothing<std::shared_ptr<WalletInfo>>();
+
+                    /* You never know... ;) */
+                    break;
+                }
+            }
+
+            if (handled)
+            {
+                continue;
+            }
 
             const std::string alreadyOpenMsg =
                 "MemoryMappedFile::open: The process cannot access the file "
                 "because it is being used by another process.";
 
-            const std::string notAWalletMsg =
-                "Unsupported wallet version: Wrong version";
-
-            const std::string notAWalletMsg2 = 
-                "Failed to read wallet version: Wrong version";
-
             const std::string errorMsg = e.what();
                 
-            /* There are three different error messages depending upon if we're
-               opening a walletgreen or a walletlegacy wallet */
-            if (errorMsg == walletSuccessBadPwdMsg || 
-                errorMsg == walletSuccessBadPwdMsg2 ||
-                errorMsg == walletLegacyBadPwdMsg)
-            {
-                std::cout << WarningMsg("Incorrect password! Try again.")
-                          << std::endl;
-            }
             /* The message actually has a \r\n on the end but i'd prefer to
                keep just the raw string in the source so check the it starts
                with instead */
-            else if (boost::starts_with(errorMsg, alreadyOpenMsg))
+            if (boost::starts_with(errorMsg, alreadyOpenMsg))
             {
                 std::cout << WarningMsg("Could not open wallet! It is already "
                                         "open in another process.")
                           << std::endl
                           << WarningMsg("Check with a task manager that you "
-                                        "don't have zedwallet open twice.")
+                                        "don't have ")
+                          << WalletConfig::walletName
+                          << WarningMsg(" open twice.")
                           << std::endl
                           << WarningMsg("Also check you don't have another "
                                         "wallet program open, such as a GUI "
-                                        "wallet or walletd.")
-                          << std::endl << std::endl;
-
-                std::cout << "Returning to selection screen..." << std::endl
-                          << std::endl;
-
-                return Nothing<std::shared_ptr<WalletInfo>>();
-            }
-            else if (errorMsg == notAWalletMsg || errorMsg == notAWalletMsg2)
-            {
-                std::cout << WarningMsg("Could not open wallet file! It "
-                                        "doesn't appear to be a valid wallet!")
-                          << std::endl
-                          << WarningMsg("Ensure you are opening a wallet "
-                                        "file, and the file has not gotten "
-                                        "corrupted.")
-                          << std::endl
-                          << WarningMsg("Try reimporting via keys, and always "
-                                        "close zedwallet with the exit "
-                                        "command to prevent corruption.")
+                                        "wallet or ")
+                          << WarningMsg(WalletConfig::walletdName)
+                          << WarningMsg(".")
                           << std::endl << std::endl;
 
                 std::cout << "Returning to selection screen..." << std::endl
@@ -446,9 +451,11 @@ void viewWalletMsg()
 {
     std::cout << InformationMsg("Please remember that when using a view wallet "
                                 "you can only view incoming transactions!")
-              << std::endl << "This means if you received 100 TRTL and then "
-              << "sent 50 TRTL, your balance would appear to still be 100 "
-              << "TRTL." << std::endl
+              << std::endl << "This means if you received 100 "
+              << WalletConfig::ticker << " and then "
+              << "sent 50 " << WalletConfig::ticker << ", your balance "
+              << "would appear to still be 100 "
+              << WalletConfig::ticker << "." << std::endl
               << "To effectively use a view wallet, you should only deposit "
               << "to this wallet." << std::endl
               << "If you have since needed to withdraw, send your remaining "
@@ -461,7 +468,9 @@ void viewWalletMsg()
 
 void connectingMsg()
 {
-    std::cout << std::endl << "Making initial contact with TurtleCoind."
+    std::cout << std::endl << "Making initial contact with "
+              << WalletConfig::daemonName
+              << "."
               << std::endl
               << "Please wait, this sometimes can take a long time..."
               << std::endl << std::endl;

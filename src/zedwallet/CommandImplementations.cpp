@@ -3,23 +3,27 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////////////////
-#include <ZedWallet/CommandImplementations.h>
+#include <zedwallet/CommandImplementations.h>
 /////////////////////////////////////////////
 
 #include <Common/StringTools.h>
 
 #include <CryptoNoteCore/Account.h>
 
+#ifndef MSVC
+#include <fstream>
+#endif
+
 #include <Mnemonics/electrum-words.h>
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/Open.h>
-#include <ZedWallet/Fusion.h>
-#include <ZedWallet/Sync.h>
-#include <ZedWallet/Tools.h>
-#include <ZedWallet/Transfer.h>
-#include <ZedWallet/Types.h>
-#include <ZedWallet/WalletConfig.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/Open.h>
+#include <zedwallet/Fusion.h>
+#include <zedwallet/Sync.h>
+#include <zedwallet/Tools.h>
+#include <zedwallet/Transfer.h>
+#include <zedwallet/Types.h>
+#include <zedwallet/WalletConfig.h>
 
 void changePassword(std::shared_ptr<WalletInfo> &walletInfo)
 {
@@ -97,6 +101,7 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
     }
 }
 
+/* TODO: Add timeout - maybe 3 seconds */
 void status(CryptoNote::INode &node)
 {
     const std::string result = node.getInfo();

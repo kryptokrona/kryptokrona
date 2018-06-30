@@ -3,15 +3,16 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////
-#include <ZedWallet/Sync.h>
+#include <zedwallet/Sync.h>
 ///////////////////////////
 
 #include <Common/StringTools.h>
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/CommandImplementations.h>
-#include <ZedWallet/Tools.h>
-#include <ZedWallet/Types.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/CommandImplementations.h>
+#include <zedwallet/Tools.h>
+#include <zedwallet/Types.h>
+#include <zedwallet/WalletConfig.h>
 
 void checkForNewTransactions(std::shared_ptr<WalletInfo> &walletInfo)
 {
@@ -62,7 +63,8 @@ void syncWallet(CryptoNote::INode &node,
 
     if (localHeight != remoteHeight)
     {
-        std::cout << "Your TurtleCoind isn't fully synced yet!" << std::endl
+        std::cout << "Your " << WalletConfig::daemonName << " isn't fully "
+                  << "synced yet!" << std::endl
                   << "Until you are fully synced, you won't be able to send "
                   << "transactions,"
                   << std::endl
@@ -134,11 +136,14 @@ void syncWallet(CryptoNote::INode &node,
 
             if (stuckCounter > 20)
             {
-                std::string warning =
-                    "Syncing may be stuck. Try restarting Turtlecoind.\n"
-                    "If this persists, visit "
-                    "https://turtlecoin.lol/#contact for support.";
-                std::cout << WarningMsg(warning) << std::endl;
+                std::cout << WarningMsg("Syncing may be stuck. Try restarting ")
+                          << WarningMsg(WalletConfig::daemonName)
+                          << WarningMsg(".")
+                          << std::endl
+                          << WarningMsg("If this persists, visit ")
+                          << WarningMsg(WalletConfig::contactLink)
+                          << WarningMsg(" for support.")
+                          << std::endl;
             }
             else if (stuckCounter > 19)
             {

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ZedWallet/Types.h>
+#include <zedwallet/Types.h>
 
 char* getCmdOption(char ** begin, char ** end, const std::string & option);
 
@@ -14,4 +14,6 @@ Config parseArguments(int argc, char **argv);
 
 void helpMessage();
 
-void versionMessage();
+std::string getVersion();
+
+std::vector<CLICommand> getCLICommands();

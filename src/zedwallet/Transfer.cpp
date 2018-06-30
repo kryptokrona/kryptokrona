@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////
-#include <ZedWallet/Transfer.h>
+#include <zedwallet/Transfer.h>
 ///////////////////////////////
 
 #include <boost/algorithm/string.hpp>
@@ -24,10 +24,10 @@ namespace NodeErrors
     #include <NodeRpcProxy/NodeErrors.h>
 }
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/Fusion.h>
-#include <ZedWallet/Tools.h>
-#include <ZedWallet/WalletConfig.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/Fusion.h>
+#include <zedwallet/Tools.h>
+#include <zedwallet/WalletConfig.h>
 
 namespace WalletErrors
 {
@@ -84,7 +84,14 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
         strAmount.append(numDecimalPlaces - fractionSize, '0');
     }
 
-    return Common::fromString(strAmount, amount);
+    bool success = Common::fromString(strAmount, amount);
+
+    if (!success)
+    {
+        return false;
+    }
+
+    return amount >= WalletConfig::minimumSend;
 }
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
@@ -209,7 +216,7 @@ void splitTx(CryptoNote::WalletGreen &wallet,
     const size_t txSize = wallet.getTxSize(p);
     const uint64_t defaultFee = WalletConfig::defaultFee;
 
-    for (int numTxMultiplier = 2; ; numTxMultiplier++)
+    for (int numTxMultiplier = 1; ; numTxMultiplier++)
     {
         /* We modify p a bit in this function, so restore back to initial
            state each time */
@@ -217,9 +224,8 @@ void splitTx(CryptoNote::WalletGreen &wallet,
 
         /* We can't just evenly divide a transaction up to be < 115k bytes by
            decreasing the amount we're sending, because depending upon the
-           inputs we might need to split into more transactions, so a good
-           start is attempting to split them into chunks of 55k bytes or so.
-           We then check at the end that each transaction is small enough, and
+           inputs we might need to split into more transactions, so instead
+           check at the end that each transaction is small enough, and
            if not, we up the numTxMultiplier and try again with more
            transactions. */
         int numTransactions 
@@ -359,10 +365,11 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
 
     if (balance < amount + fee)
     {
-        std::cout << WarningMsg("You don't have enough funds to cover this "
-                            "transaction!") << std::endl
-                  << InformationMsg("Funds needed: " 
-                                  + formatAmount(amount + fee))
+        std::cout << WarningMsg("You don't have enough funds to cover this ")
+                  << WarningMsg("transaction!")
+                  << std::endl
+                  << InformationMsg("Funds needed: ")
+                  << InformationMsg(formatAmount(amount + fee))
                   << std::endl
                   << SuccessMsg("Funds available: " + formatAmount(balance))
                   << std::endl;
@@ -377,7 +384,7 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
     };
 
     p.fee = fee;
-    p.mixIn = CryptoNote::parameters::DEFAULT_MIXIN;
+    p.mixIn = WalletConfig::defaultMixin;
     p.extra = extra;
     p.changeDestination = walletInfo->walletAddress;
 
@@ -476,8 +483,11 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                     std::cout << "Try lowering the amount you are sending "
                               << "in one transaction." << std::endl;
 
-                    /* Mixin 0 not allowed after MIXIN_LIMITS_V2 */
-                    if (height < CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
+                    /* If a mixin of zero is allowed, or we are below the
+                       fork height when it's banned, ask them to resend with
+                       zero */
+                    if (!WalletConfig::mixinZeroDisabled ||
+                         height < WalletConfig::mixinZeroDisabledHeight)
                     {
                         std::cout << "Alternatively, you can sent the mixin "
                                   << "count to 0." << std::endl;
@@ -502,8 +512,9 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                     std::cout << WarningMsg("Couldn't connect to the network "
                                             "to send the transaction!")
                               << std::endl
-                              << "Ensure TurtleCoind or the remote node you "
-                              << "are using is open and functioning."
+                              << "Ensure " << WalletConfig::daemonName
+                              << " or the remote node you are using is open "
+                              << "and functioning."
                               << std::endl;
                     break;
                 }
@@ -638,14 +649,14 @@ Maybe<uint64_t> getFee()
                   << InformationMsg("What fee do you want to use?")
                   << std::endl
                   << "Hit enter for the default fee of "
-                  << formatAmount(CryptoNote::parameters::MINIMUM_FEE)
-                  << ":";
+                  << formatAmount(WalletConfig::defaultFee)
+                  << ": ";
 
         std::getline(std::cin, stringAmount);
 
         if (stringAmount == "")
         {
-            return Just<uint64_t>(CryptoNote::parameters::MINIMUM_FEE);
+            return Just<uint64_t>(WalletConfig::defaultFee);
         }
 
         if (stringAmount == "cancel")
@@ -670,7 +681,9 @@ Maybe<uint64_t> getTransferAmount()
         std::string stringAmount;
 
         std::cout << std::endl
-                  << InformationMsg("How much TRTL do you want to send?: ");
+                  << InformationMsg("How much ")
+                  << InformationMsg(WalletConfig::ticker)
+                  << InformationMsg(" do you want to send?: ");
 
         std::getline(std::cin, stringAmount);
 
@@ -695,8 +708,8 @@ Maybe<std::string> getDestinationAddress()
     {
         std::string transferAddr;
 
-        std::cout << InformationMsg("What address do you want to "
-                                    "transfer to?: ");
+        std::cout << InformationMsg("What address do you want to ")
+                  << InformationMsg("transfer to?: ");
 
         std::getline(std::cin, transferAddr);
         boost::algorithm::trim(transferAddr);
@@ -722,14 +735,18 @@ bool parseFee(std::string feeString)
         std::cout << WarningMsg("Failed to parse fee! Ensure you entered the "
                                 "value correctly.")
                   << std::endl
-                  << "Please note, you can only use 2 decimal places."
+                  << "Please note, you can only use "
+                  << WalletConfig::numDecimalPlaces << " decimal places."
                   << std::endl;
 
         return false;
     }
-    else if (fee < CryptoNote::parameters::MINIMUM_FEE)
+    else if (fee < WalletConfig::minimumFee)
     {
-        std::cout << WarningMsg("Fee must be at least 0.1 TRTL!") << std::endl;
+        std::cout << WarningMsg("Fee must be at least ")
+                  << formatAmount(WalletConfig::minimumFee) << "!"
+                  << std::endl;
+
         return false;
     }
 
@@ -764,7 +781,7 @@ bool parseAddress(std::string address)
     {
         std::cout << WarningMsg("Invalid address! It should start with ")
                   << WarningMsg(WalletConfig::addressPrefix)
-                  << WarningMsg(" !")
+                  << WarningMsg("!")
                   << std::endl << std::endl;
 
         return false;
@@ -773,8 +790,8 @@ bool parseAddress(std::string address)
        get to give more detailed error messages about the address */
     else if (!valid)
     {
-        std::cout << WarningMsg("Failed to parse address, address is not a "
-                                "valid ")
+        std::cout << WarningMsg("Failed to parse address, address is not a ")
+                  << WarningMsg("valid ")
                   << WarningMsg(WalletConfig::ticker)
                   << WarningMsg(" address!") << std::endl
                   << std::endl;
@@ -794,9 +811,11 @@ bool parseAmount(std::string amountString)
         std::cout << WarningMsg("Failed to parse amount! Ensure you entered "
                                 "the value correctly.")
                   << std::endl
-                  << "Please note, the minimum you can send is 0.01 TRTL,"
+                  << "Please note, the minimum you can send is "
+                  << formatAmount(WalletConfig::minimumSend) << ","
                   << std::endl
-                  << "and you can only use 2 decimal places."
+                  << "and you can only use " << WalletConfig::numDecimalPlaces
+                  << " decimal places."
                   << std::endl;
 
         return false;

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <ZedWallet/Types.h>
+#include <zedwallet/Types.h>
 
 #include <Wallet/WalletGreen.h>
 

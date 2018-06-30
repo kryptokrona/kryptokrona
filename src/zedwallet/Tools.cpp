@@ -3,15 +3,18 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////
-#include <ZedWallet/Tools.h>
+#include <zedwallet/Tools.h>
 ////////////////////////////
+
+#include <cmath>
 
 #include <Common/StringTools.h>
 
 #include <CryptoNoteCore/TransactionExtra.h>
 
-#include <ZedWallet/ColouredMsg.h>
-#include <ZedWallet/PasswordContainer.h>
+#include <zedwallet/ColouredMsg.h>
+#include <zedwallet/PasswordContainer.h>
+#include <zedwallet/WalletConfig.h>
 
 void confirmPassword(std::string walletPass, std::string msg)
 {
@@ -28,16 +31,25 @@ void confirmPassword(std::string walletPass, std::string msg)
 
 std::string formatAmount(uint64_t amount)
 {
-    const uint64_t dollars = amount / 100;
-    const uint64_t cents = amount % 100;
+    /* Get the amount we need to divide to convert from atomic to pretty
+       print, e.g. 100 for 2 decimal places */
+    const uint64_t divisor = pow(10, WalletConfig::numDecimalPlaces);
 
-    return formatDollars(dollars) + "." + formatCents(cents) + " TRTL";
+    const uint64_t dollars = amount / divisor;
+    const uint64_t cents = amount % divisor;
+
+    return formatDollars(dollars) + "." + formatCents(cents) + " "
+         + WalletConfig::ticker;
 }
 
 std::string formatAmountBasic(uint64_t amount)
 {
-    const uint64_t dollars = amount / 100;
-    const uint64_t cents = amount % 100;
+    /* Get the amount we need to divide to convert from atomic to pretty
+       print, e.g. 100 for 2 decimal places */
+    const uint64_t divisor = pow(10, WalletConfig::numDecimalPlaces);
+
+    const uint64_t dollars = amount / divisor;
+    const uint64_t cents = amount % divisor;
 
     return std::to_string(dollars) + "." + formatCents(cents);
 }
@@ -90,11 +102,13 @@ std::string formatDollars(uint64_t amount)
     return stream.str();
 }
 
-/* Pad to two spaces, e.g. 5 becomes 05, 50 remains 50 */
+/* Pad to the amount of decimal spaces, e.g. with 2 decimal spaces 5 becomes
+   05, 50 remains 50 */
 std::string formatCents(uint64_t amount)
 {
     std::stringstream stream;
-    stream << std::setfill('0') << std::setw(2) << amount;
+    stream << std::setfill('0') << std::setw(WalletConfig::numDecimalPlaces)
+           << amount;
     return stream.str();
 }
 
@@ -197,5 +211,5 @@ std::string getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
 
     const std::string shortName = walletName.substr(0, promptLength);
 
-    return "[TRTL " + shortName + "]: ";
+    return "[" + WalletConfig::ticker + " " + shortName + "]: ";
 }
