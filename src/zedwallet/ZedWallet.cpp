@@ -7,7 +7,6 @@
 ////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <Common/SignalHandler.h>
 #include <Common/StringTools.h>
@@ -518,7 +517,7 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     bool finishedShutdown = false;
 
-    boost::thread timelyShutdown([&finishedShutdown]
+    std::thread timelyShutdown([&finishedShutdown]
     {
         const auto startTime = std::chrono::system_clock::now();
 

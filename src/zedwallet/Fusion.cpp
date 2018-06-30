@@ -8,10 +8,11 @@
 
 #include "CryptoNoteConfig.h"
 
+#include <Wallet/WalletGreen.h>
+
 #include <zedwallet/ColouredMsg.h>
 #include <zedwallet/Tools.h>
-
-#include <Wallet/WalletGreen.h>
+#include <zedwallet/WalletConfig.h>
 
 size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet, 
                              uint64_t threshold)
@@ -22,7 +23,7 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
     /* Find the best threshold by starting at threshold and decreasing by
        half till we get to the minimum amount, storing the threshold that
        gave us the most amount of optimizable amounts */
-    while (threshold > CryptoNote::parameters::MINIMUM_FEE)
+    while (threshold > WalletConfig::minimumSend)
     {
         const auto fusionReadyCount
             = wallet.estimate(threshold).fusionReadyCount;
@@ -45,8 +46,7 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
     try
     {
         return wallet.createFusionTransaction(bestThreshold, 
-                                              CryptoNote::parameters
-                                                        ::DEFAULT_MIXIN,
+                                              WalletConfig::defaultMixin,
                                               {}, wallet.getAddress(0));
     }
     catch (const std::runtime_error &e)

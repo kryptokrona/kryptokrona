@@ -6,7 +6,7 @@
 #include <zedwallet/CommandImplementations.h>
 /////////////////////////////////////////////
 
-#include <boost/thread/thread.hpp>
+#include <atomic>
 
 #include <Common/StringTools.h>
 
@@ -105,19 +105,19 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
 
 void status(CryptoNote::INode &node)
 {
-    bool completed = false;
+    std::atomic_bool completed(false);
 
     std::string status;
 
-    boost::thread getStatus([&node, &completed, &status]
+    std::thread getStatus([&node, &completed, &status]
     {
         status = node.getInfo();
-        completed = true;
+        completed.store(true);
     });
 
     const auto startTime = std::chrono::system_clock::now();
 
-    while (!completed)
+    while (!completed.load())
     {
         const auto currentTime = std::chrono::system_clock::now();
 
