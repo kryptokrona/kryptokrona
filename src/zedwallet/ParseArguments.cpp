@@ -1,45 +1,28 @@
-/*
-Copyright (C) 2018, The TurtleCoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
-
-////////////////////////////////////////
-#include <ZedWallet/ParseArguments.h>
-////////////////////////////////////////
-
-#include <algorithm>
+/////////////////////////////////////
+#include <zedwallet/ParseArguments.h>
+/////////////////////////////////////
 
 #include "CryptoNoteConfig.h"
 
-#include <iostream>
-
-#include <iomanip>
-
-#include <string>
-
 #include "version.h"
+
+#include <zedwallet/WalletConfig.h>
 
 /* Thanks to https://stackoverflow.com/users/85381/iain for this small command
    line parsing snippet! https://stackoverflow.com/a/868894/8737306 */
 char* getCmdOption(char ** begin, char ** end, const std::string & option)
 {
-    char ** itr = std::find(begin, end, option);
-    if (itr != end && ++itr != end)
+    auto it = std::find(begin, end, option);
+
+    if (it != end && ++it != end)
     {
-        return *itr;
+        return *it;
     }
+
     return 0;
 }
 
@@ -52,16 +35,6 @@ Config parseArguments(int argc, char **argv)
 {
     Config config;
 
-    config.exit = false;
-    config.walletGiven = false;
-    config.passGiven = false;
-
-    config.host = "127.0.0.1";
-    config.port = CryptoNote::RPC_DEFAULT_PORT;
-
-    config.walletFile = "";
-    config.walletPass = "";
-
     if (cmdOptionExists(argv, argv+argc, "-h")
      || cmdOptionExists(argv, argv+argc, "--help"))
     {
@@ -73,9 +46,14 @@ Config parseArguments(int argc, char **argv)
     if (cmdOptionExists(argv, argv+argc, "-v")
      || cmdOptionExists(argv, argv+argc, "--version"))
     {
-        versionMessage();
+        std::cout << getVersion() << std::endl;
         config.exit = true;
         return config;
+    }
+
+    if (cmdOptionExists(argv, argv+argc, "--debug"))
+    {
+        config.debug = true;
     }
 
     if (cmdOptionExists(argv, argv+argc, "--wallet-file"))
@@ -133,10 +111,14 @@ Config parseArguments(int argc, char **argv)
             std::string urlString(url);
 
             /* Get the index of the ":" */
-            size_t splitter = urlString.find_first_of(":");
+            size_t splitter = urlString.find_last_of(":");
 
-            /* No ":" present */
-            if (splitter == std::string::npos)
+            /* Host is everything before ":" */
+            config.host = urlString.substr(0, splitter);
+
+            /* No ":" present, or user specifies http:// without port at end */
+            if (splitter == std::string::npos || config.host == "http"
+             || config.host == "https")
             {
                 config.host = urlString;
             }
@@ -165,31 +147,76 @@ Config parseArguments(int argc, char **argv)
     return config;
 }
 
-void versionMessage()
+std::string getVersion()
 {
-    std::cout << "TurtleCoin v" << PROJECT_VERSION << " Zedwallet"
-              << std::endl;
+    return WalletConfig::coinName + " v" + PROJECT_VERSION + " "
+         + WalletConfig::walletName;
+}
+
+std::vector<CLICommand> getCLICommands()
+{
+    std::vector<CLICommand> commands =
+    {
+        {"--help", "Display this help message and exit", "-h", true, false},
+
+        {"--version", "Display the version information and exit", "-v", true,
+         false},
+
+        {"--debug", "Enable " + WalletConfig::walletdName + " debugging to "
+                  + WalletConfig::walletName + ".log", "", false, false},
+
+        {"--remote-daemon <url>", "Connect to the remote daemon at <url>", "",
+         false, true},
+
+        {"--wallet-file <file>", "Open the wallet <file>", "", false, true},
+
+        {"--password <pass>", "Use the password <pass> to open the wallet", "",
+         false, true}
+    };
+
+    /* Pop em in alphabetical order */
+    std::sort(commands.begin(), commands.end(), [](const CLICommand &lhs,
+                                                   const CLICommand &rhs)
+    {
+        return lhs.name < rhs.name;
+    });
+
+
+    return commands;
 }
 
 void helpMessage()
 {
-    versionMessage();
+    std::cout << getVersion() << std::endl;
 
-    std::cout << std::endl << "zedwallet [--version] [--help] "
-              << "[--remote-daemon <url>] [--wallet-file <file>] "
-              << "[--password <pass>]"
-              << std::endl << std::endl
-              << "Commands:" << std::endl << "  -h, " << std::left
-              << std::setw(25) << "--help"
-              << "Display this help message and exit"
-              << std::endl << "  -v, " << std::left << std::setw(25)
-              << "--version" << "Display the version information and exit"
-              << std::endl << "      " << std::left << std::setw(25)
-              << "--remote-daemon <url>" << "Connect to the remote daemon at "
-              << "<url>"
-              << std::endl << "      " << std::left << std::setw(25)
-              << "--wallet-file <file>" << "Open the wallet <file>"
-              << std::endl << "      " << std::left << std::setw(25)
-              << "--password <pass>" << "Use the password <pass> to open the "
-              << "wallet" << std::endl;
+    const auto commands = getCLICommands();
+
+    std::cout << std::endl
+              << WalletConfig::walletName;
+
+    for (auto &command : commands)
+    {
+        if (command.hasArgument)
+        {
+            std::cout << " [" << command.name << "]";
+        }
+    }
+
+    std::cout << std::endl << std::endl
+              << "Commands: " << std::endl;
+
+    for (auto &command : commands)
+    {
+        if (command.hasShortName)
+        {
+            std::cout << "  " << command.shortName << ", "
+                      << std::left << std::setw(25) << command.name
+                      << command.description << std::endl;
+        }
+        else
+        {
+            std::cout << "      " << std::left << std::setw(25) << command.name
+                      << command.description << std::endl;
+        }
+    }
 }

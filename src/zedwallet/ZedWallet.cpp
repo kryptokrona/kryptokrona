@@ -2,14 +2,11 @@
 // 
 // Please see the included LICENSE file for more information.
 
-
-
-//////////////////////////////////////
-#include <ZedWallet/ZedWallet.h>
-//////////////////////////////////////
+////////////////////////////////
+#include <zedwallet/ZedWallet.h>
+////////////////////////////////
 
 #include <boost/algorithm/string.hpp>
-#include <boost/thread/thread.hpp>
 
 #include <Common/SignalHandler.h>
 #include <Common/StringTools.h>
@@ -21,19 +18,12 @@
 
 #include <NodeRpcProxy/NodeRpcProxy.h>
 
-#include <ZedWallet/Commands.h>
-#include <ZedWallet/Fusion.h>
-#include <ZedWallet/Open.h>
-#include <ZedWallet/ParseArguments.h>
-#include <ZedWallet/Sync.h>
-#include <ZedWallet/Transfer.h>
-#include <ZedWallet/Tools.h>
-
-
 #ifdef HAVE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
+
+#include "version.h"
 
 #ifdef _WIN32
 /* Prevents windows.h redefining min/max which breaks compilation */
@@ -41,14 +31,22 @@
 #include <windows.h>
 #endif
 
-#include "version.h"
-
+#include <zedwallet/Commands.h>
+#include <zedwallet/CommandImplementations.h>
+#include <zedwallet/Fusion.h>
+#include <zedwallet/Open.h>
+#include <zedwallet/ParseArguments.h>
+#include <zedwallet/Sync.h>
+#include <zedwallet/Transfer.h>
+#include <zedwallet/Tools.h>
+#include <zedwallet/WalletConfig.h>
 
 int main(int argc, char **argv)
 {
     /* On ctrl+c the program seems to throw "zedwallet.exe has stopped
        working" when calling exit(0)... I'm not sure why, this is a bit of
-       a hack, it disables that */
+       a hack, it disables that - possibly some deconstructers calling
+       terminate() */
     #ifdef _WIN32
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
     #endif
@@ -61,12 +59,26 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    /* Logging to a black hole... */
     Logging::LoggerManager logManager;
-    Logging::LoggerRef logger(logManager, "zedwallet");
+
+    /* We'd like these lines to be in the below if(), but because some genius
+       thought it was a good idea to pass everything by reference and then
+       use them after the functions lifetime they go out of scope and break
+       stuff */
+    logManager.setMaxLevel(Logging::DEBUGGING);
+
+    Logging::FileLogger fileLogger;
+
+    if (config.debug)
+    {
+        fileLogger.init(WalletConfig::walletName + ".log");
+        logManager.addLogger(fileLogger);
+    }
+
+    Logging::LoggerRef logger(logManager, WalletConfig::walletName);
 
     /* Currency contains our coin parameters, such as decimal places, supply */
-    CryptoNote::Currency currency 
+    const CryptoNote::Currency currency 
         = CryptoNote::CurrencyBuilder(logManager).currency();
 
     System::Dispatcher localDispatcher;
@@ -84,7 +96,8 @@ int main(int argc, char **argv)
 
     node->init(callback);
 
-    std::future<void> initNode = std::async(std::launch::async, [&] {
+    std::future<void> initNode = std::async(std::launch::async, [&]
+    {
             if (error.get())
             {
                 throw std::runtime_error("Failed to initialize node!");
@@ -127,13 +140,12 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
          Config &config)
 {
     auto maybeWalletInfo = Nothing<std::shared_ptr<WalletInfo>>();
+
     Action action;
 
     do
     {
-        std::cout << InformationMsg("TurtleCoin v"
-                                  + std::string(PROJECT_VERSION)
-                                  + " Zedwallet") << std::endl;
+        std::cout << InformationMsg(getVersion()) << std::endl;
 
         /* Open/import/generate the wallet */
         action = getAction(config);
@@ -148,7 +160,8 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     /* This will call shutdown when ctrl+c is hit. This is a lambda function,
        & means capture all variables by reference */
-    Tools::SignalHandler::install([&] {
+    Tools::SignalHandler::install([&]
+    {
         /* If we're already shutting down let control flow continue as normal */
         if (shutdown(walletInfo->wallet, node, alreadyShuttingDown))
         {
@@ -158,20 +171,21 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     while (node.getLastKnownBlockHeight() == 0)
     {
-        std::cout << WarningMsg("It looks like TurtleCoind isn't open!")
-                  << std::endl << std::endl
-                  << WarningMsg("Ensure TurtleCoind is open and has finished "
-                                "initializing.")
-                  << std::endl
-                  << WarningMsg("If it's still not working, try restarting "
-                                "TurtleCoind. The daemon sometimes gets stuck.") 
-                  << std::endl
-                  << WarningMsg("Alternatively, perhaps TurtleCoind can't "
-                                "communicate with any peers.")
-                  << std::endl << std::endl
-                  << WarningMsg("The wallet can't function until it can "
-                                "communicate with the network.")
-                  << std::endl << std::endl;
+        std::stringstream msg;
+
+        msg << "It looks like " << WalletConfig::daemonName << " isn't open!"
+            << std::endl << std::endl
+            << "Ensure " << WalletConfig::daemonName
+            << " is open and has finished initializing." << std::endl
+            << "If it's still not working, try restarting "
+            << WalletConfig::daemonName << ". The daemon sometimes gets stuck."
+            << std::endl << "Alternatively, perhaps "
+            << WalletConfig::daemonName << " can't communicate with any peers."
+            << std::endl << std::endl
+            << "The wallet can't function until it can communicate with "
+            << "the network." << std::endl;
+
+        std::cout << WarningMsg(msg.str()) << std::endl;
 
         bool proceed = false;
 
@@ -184,7 +198,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
             std::string answer;
             std::getline(std::cin, answer);
 
-            char c = std::tolower(answer[0]);
+            const char c = std::tolower(answer[0]);
 
             /* Lets people spam enter in the transaction screen */
             if (c == 't' || c == '\0')
@@ -312,8 +326,7 @@ Action getAction(Config &config)
         std::string answer;
         std::getline(std::cin, answer);
 
-        char c = answer[0];
-        c = std::tolower(c);
+        const char c = std::tolower(answer[0]);
 
         if (c == 'o')
         {
@@ -355,55 +368,48 @@ void welcomeMsg()
               << std::endl << std::endl;
 }
 
-
-
 #ifdef HAVE_READLINE
 
-//functions for completition with tab
-char **command_name_completion(const char *, int, int);
-char *command_name_generator(const char *, int);
-
-char *command_names[] = {
-    (char*)"balance",
-    (char*)"help",
-    (char*)"bc_height",
-    (char*)"balance",
-    (char*)"export_keys",
-    (char*)"address",
-    (char*)"exit",
-    (char*)"save",
-    (char*)"status",
-    (char*)"incoming_transfers",
-    (char*)"outgoing_transfers",
-    (char*)"list_transfers",
-    (char*)"save_csv",
-    (char*)"optimize",
-    (char*)"transfer",
-    NULL
-};
-
-char **
-command_name_completion(const char *text, int start, int end)
+char **getAutoCompleteMatches(const char *text, int start, int end)
 {
     rl_attempted_completion_over = 1;
     rl_completion_append_character = '\0';
-    return rl_completion_matches(text, command_name_generator);
+    return rl_completion_matches(text, getAutoCompleteMatch);
 }
 
-char *
-command_name_generator(const char *text, int state)
+char *getAutoCompleteMatch(const char *text, int state)
 {
-    static int list_index, len;
-    char *name;
+    /* Need to maintain position in vector across calls */
+    static long unsigned int i = 0;
 
-    if (!state) {
-        list_index = 0;
-        len = strlen(text);
+    /* Function is being called again, make sure we reset i to zero, otherwise
+       no matches will be returned. */
+    if (state == 0)
+    {
+        i = 0;
     }
 
-    while ((name = command_names[list_index++])) {
-        if (strncmp(name, text, len) == 0) {
-            return strdup(name);
+    const auto commands = allCommands();
+
+    while (i < commands.size())
+    {
+        std::string name = commands[i].name;
+
+        i++;
+
+        /* Check if text is a prefix of name */
+        if (name.find(std::string(text)) == 0)
+        {
+            /* Can't just return .c_str(), the underlying std::string will
+               be cleaned up and we'll have a dangling ptr - need to make a
+               copy. Readline will call free() on it for us, so it's OK. */
+
+            /* +1 for \0 */
+            char *ptr = new char[name.length() + 1];
+
+            strcpy(ptr, name.c_str());
+
+            return ptr;
         }
     }
 
@@ -412,44 +418,54 @@ command_name_generator(const char *text, int state)
 
 #endif
 
-//colors for prompt msg
-#define CYELLOW "\001\e[1m\e[33m\002"
-#define RESET   "\001\e[0m\002"
+std::string getCommand(std::shared_ptr<WalletInfo> &walletInfo)
+{
+    #ifdef HAVE_READLINE
 
+    /* disable the signal handlers libreadline installed so ctrl+c and
+       so on still work as expected */
+    rl_catch_signals = 0;
+
+    rl_attempted_completion_function = getAutoCompleteMatches;
+
+    std::string prompt = yellowANSIMsg(getPrompt(walletInfo));
+
+    char *command = readline(prompt.c_str());
+
+    while (command != nullptr)
+    {
+        if (strlen(command) > 0)
+        {
+            add_history(command);
+        }
+
+        std::string tmp = std::string(command);
+
+        free(command);
+
+        return tmp;
+    }
+
+    return std::string(command);
+    
+    #else
+    
+    std::string command;
+    std::getline(std::cin, command);
+    boost::algorithm::trim(command);
+    return command;
+
+    #endif     
+}
 
 std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
 {
     auto lastUpdated = std::chrono::system_clock::now();
 
-    std::future<std::string> inputGetter = std::async(std::launch::async, [&walletInfo] {
-            
-            #ifdef HAVE_READLINE
-
-            //disable the signal handlers libreadline installed
-            rl_catch_signals = 0;
-
-            rl_attempted_completion_function = command_name_completion;
-            std::string str = CYELLOW + getPrompt(walletInfo) + "" + RESET;
-            char *cstr = &str[0u];
-            char *command = readline(cstr);
-            while (command != nullptr) {
-                if (strlen(command) > 0) {
-                  add_history(command);
-                }
-                free(command);
-                return std::string(command);
-            }
-            return std::string(command);
-            
-            #else
-            
-            std::string command;
-            std::getline(std::cin, command);
-            boost::algorithm::trim(command);
-            return command;
-
-            #endif     
-            
+    std::future<std::string> inputGetter = std::async(std::launch::async, 
+                                                      [&walletInfo]
+    {
+        return getCommand(walletInfo);
     });
 
 
@@ -457,7 +473,8 @@ std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
     {
         /* Check if the user has inputted something yet (Wait for zero seconds
            to instantly return) */
-        std::future_status status = inputGetter.wait_for(std::chrono::seconds(0));
+        std::future_status status = inputGetter
+                                   .wait_for(std::chrono::seconds(0));
 
         /* User has inputted, get what they inputted and return it */
         if (status == std::future_status::ready)
@@ -465,7 +482,7 @@ std::string getInputAndDoWorkWhileIdle(std::shared_ptr<WalletInfo> &walletInfo)
             return inputGetter.get();
         }
 
-        auto currentTime = std::chrono::system_clock::now();
+        const auto currentTime = std::chrono::system_clock::now();
 
         /* Otherwise check if we need to update the wallet cache */
         if ((currentTime - lastUpdated) > std::chrono::seconds(5))
@@ -487,25 +504,27 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     {
         std::cout << "Patience little turtle, we're already shutting down!" 
                   << std::endl;
+
         return false;
     }
     else
     {
         alreadyShuttingDown = true;
+
         std::cout << InformationMsg("Saving wallet and shutting down, please "
                                     "wait...") << std::endl;
     }
 
     bool finishedShutdown = false;
 
-    boost::thread timelyShutdown([&finishedShutdown]
+    std::thread timelyShutdown([&finishedShutdown]
     {
-        auto startTime = std::chrono::system_clock::now();
+        const auto startTime = std::chrono::system_clock::now();
 
         /* Has shutdown finished? */
         while (!finishedShutdown)
         {
-            auto currentTime = std::chrono::system_clock::now();
+            const auto currentTime = std::chrono::system_clock::now();
 
             /* If not, wait for a max of 20 seconds then force exit. */
             if ((currentTime - startTime) > std::chrono::seconds(20))
@@ -520,6 +539,11 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
         }
     });
 
+    #ifdef HAVE_READLINE
+    /* clean readline to restore usual terminal history after shutdown */
+    rl_cleanup_after_signal();
+    #endif  
+
     wallet.save();
     wallet.shutdown();
     node.shutdown();
@@ -530,126 +554,24 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
     timelyShutdown.join();
 
     std::cout << "Bye." << std::endl;
-
-    #ifdef HAVE_READLINE
-    //clean readline to restore usual terminal history after shutdown
-    rl_cleanup_after_signal();
-    #endif  
-
+    
     return true;
 }
 
 void inputLoop(std::shared_ptr<WalletInfo> &walletInfo, CryptoNote::INode &node)
-{ 
+{
     while (true)
     {
-        #ifdef HAVE_READLINE 
-        //do nothing
-        #else
-        //pring yellow prompt
-        std::string str = CYELLOW + getPrompt(walletInfo) + "" + RESET;
-        std::cout << str;
+        #ifndef HAVE_READLINE
+        std::cout << InformationMsg(getPrompt(walletInfo));
         #endif
 
-        std::string command = getInputAndDoWorkWhileIdle(walletInfo);
+        const std::string command = getInputAndDoWorkWhileIdle(walletInfo);
 
-        if (command == "")
-        {
-            // no-op
-        }
-        else if (command == "export_keys")
-        {
-            exportKeys(walletInfo);
-        }
-        else if (command == "help")
-        {
-            help(walletInfo->viewWallet);
-        }
-        else if (command == "status")
-        {
-            status(node);
-        }
-        else if (command == "balance")
-        {
-            balance(node, walletInfo->wallet, walletInfo->viewWallet);
-        }
-        else if (command == "address")
-        {
-            std::cout << SuccessMsg(walletInfo->walletAddress) << std::endl;
-        }
-        else if (command == "incoming_transfers")
-        {
-            listTransfers(true, false, walletInfo->wallet, node);
-        }
-        else if (command == "save_csv")
-        {
-            saveCSV(walletInfo->wallet, node);
-        }
-        else if (command == "exit")
+        /* User used exit command */
+        if (dispatchCommand(walletInfo, node, command))
         {
             return;
-        }
-        else if (command == "save")
-        {
-            std::cout << InformationMsg("Saving.") << std::endl;
-            walletInfo->wallet.save();
-            std::cout << InformationMsg("Saved.") << std::endl;
-        }
-        else if (command == "bc_height")
-        {
-            blockchainHeight(node, walletInfo->wallet);
-        }
-        else if (command == "reset")
-        {
-            reset(node, walletInfo);
-        }
-        else if (!walletInfo->viewWallet)
-        {
-            if (command == "outgoing_transfers")
-            {
-                listTransfers(false, true, walletInfo->wallet, node);
-            }
-            else if (command == "list_transfers")
-            {
-                listTransfers(true, true, walletInfo->wallet, node);
-            }
-            else if (command == "transfer")
-            {
-                transfer(walletInfo, node.getLastKnownBlockHeight());
-            }
-            /* String starts with transfer, old transfer syntax */
-            else if (command.find("transfer") == 0)
-            {
-                std::cout << "This transfer syntax has been removed."
-                          << std::endl
-                          << "Run just the " << SuggestionMsg("transfer")
-                          << " command for a walk through guide to "
-                          << "transferring." << std::endl;
-            }
-            else if (command == "quick_optimize")
-            {
-                quickOptimize(walletInfo->wallet);
-            }
-            else if (command == "full_optimize" || command == "optimize")
-            {
-                fullOptimize(walletInfo->wallet);
-            }
-            else
-            {
-                std::cout << "Unknown command: " << WarningMsg(command) 
-                          << ", use " << SuggestionMsg("help") 
-                          << " command to list all possible commands."
-                          << std::endl;
-            }
-        }
-        else
-        {
-            std::cout << "Unknown command: " << WarningMsg(command) 
-                      << ", use " << SuggestionMsg("help") 
-                      << " command to list all possible commands." << std::endl
-                      << "Please note some commands such as transfer are "
-                      << "unavailable, as you are using a view only wallet."
-                      << std::endl;
         }
     }
 }
