@@ -8,6 +8,10 @@
 
 #include <boost/algorithm/string.hpp>
 
+#ifndef MSVC
+#include <fstream>
+#endif
+
 #include <Serialization/SerializationTools.h>
 
 #include <zedwallet/ColouredMsg.h>
