@@ -376,7 +376,9 @@ void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfigu
     Crypto::SecretKey private_spend_key;
     Crypto::SecretKey private_view_key;
 
-    if (!crypto::ElectrumWords::is_valid_mnemonic(conf.mnemonicSeed, private_spend_key))
+    auto x = log(Logging::ERROR, Logging::BRIGHT_RED);
+
+    if (!crypto::ElectrumWords::is_valid_mnemonic(conf.mnemonicSeed, private_spend_key, x))
     {
       return;
     }
