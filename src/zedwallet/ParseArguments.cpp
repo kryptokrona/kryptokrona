@@ -175,8 +175,8 @@ std::vector<CLICommand> getCLICommands()
     };
 
     /* Pop em in alphabetical order */
-    std::sort(commands.begin(), commands.end(), [](CLICommand &lhs,
-                                                   CLICommand &rhs)
+    std::sort(commands.begin(), commands.end(), [](const CLICommand &lhs,
+                                                   const CLICommand &rhs)
     {
         return lhs.name < rhs.name;
     });
