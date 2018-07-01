@@ -142,7 +142,7 @@ bool confirm(std::string msg, bool defaultReturn)
 
         const char c = std::tolower(answer[0]);
 
-        switch(std::tolower(answer[0]))
+        switch(c)
         {
             /* Lets people spam enter / choose default value */
             case '\0':

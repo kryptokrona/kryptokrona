@@ -112,7 +112,7 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
 
     std::cout << std::endl << InformationMsg("Your wallet ")
               << InformationMsg(walletAddress)
-              << InformationMsg(" has been succesffuly imported!")
+              << InformationMsg(" has been successfully imported!")
               << std::endl << std::endl;
 
     return std::make_shared<WalletInfo>(walletFileName, walletPass, 
