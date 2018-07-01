@@ -1,5 +1,6 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2018, The TurtleCoin Developers
+// Copyright (c) 2018, The Karai Developers
 // 
 // Please see the included LICENSE file for more information.
 
@@ -850,6 +851,22 @@ struct COMMAND_RPC_GET_PEERS {
     void serialize(ISerializer &s) {
       KV_MEMBER(status)
       KV_MEMBER(peers)
+    }
+  };
+};
+
+struct COMMAND_RPC_GET_FEE_ADDRESS {
+  typedef EMPTY_STRUCT request;
+
+  struct response {
+    std::string address;
+    uint32_t amount;
+    std::string status;
+
+    void serialize(ISerializer & s) {
+      KV_MEMBER(address)
+      KV_MEMBER(amount)
+      KV_MEMBER(status)
     }
   };
 };
