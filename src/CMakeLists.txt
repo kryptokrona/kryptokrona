@@ -62,7 +62,7 @@ if(MSVC)
   set(DAEMON_SOURCES_OS
     BinaryInfo/daemon.rc
   )
-  set(SIMPLE_WALLET_SOURCES_OS
+  set(ZED_WALLET_SOURCES_OS
     BinaryInfo/zedwallet.rc
   )
   set(POOLWALLET_SOURCES_OS
@@ -77,7 +77,7 @@ if(MSVC)
 endif()
 
 add_executable(Daemon ${Daemon} ${DAEMON_SOURCES_OS})
-add_executable(zedwallet ${zedwallet} ${SIMPLE_WALLET_SOURCES_OS})
+add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
 add_executable(PaymentGateService ${PaymentGateService} ${PG_SOURCES_OS})
 add_executable(PoolWallet ${PoolWallet} ${POOLWALLET_SOURCES_OS})
 add_executable(Miner ${Miner} ${MINER_SOURCES_OS})

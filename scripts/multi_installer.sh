@@ -125,6 +125,7 @@ _configure_osx() {
     _note "Updating homebrew and installing software dependencies..."
     brew update --quiet
     brew install --quiet git cmake boost rocksdb readline
+    brew link --force readline
 }
 
 _configure_os() {
