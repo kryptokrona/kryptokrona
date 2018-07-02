@@ -213,3 +213,11 @@ std::string getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
 
     return "[" + WalletConfig::ticker + " " + shortName + "]: ";
 }
+
+std::string unixTimeToDate(uint64_t timestamp)
+{
+    const std::time_t time = timestamp;
+    char buffer[100];
+    std::strftime(buffer, sizeof(buffer), "%F %R", std::localtime(&time));
+    return std::string(buffer);
+}
