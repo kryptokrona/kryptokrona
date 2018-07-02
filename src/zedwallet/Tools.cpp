@@ -29,12 +29,16 @@ void confirmPassword(std::string walletPass, std::string msg)
     }
 }
 
+/* Get the amount we need to divide to convert from atomic to pretty print,
+   e.g. 100 for 2 decimal places */
+uint64_t getDivisor()
+{
+    return static_cast<uint64_t>(pow(10, WalletConfig::numDecimalPlaces));
+}
+
 std::string formatAmount(uint64_t amount)
 {
-    /* Get the amount we need to divide to convert from atomic to pretty
-       print, e.g. 100 for 2 decimal places */
-    const uint64_t divisor = pow(10, WalletConfig::numDecimalPlaces);
-
+    const uint64_t divisor = getDivisor();
     const uint64_t dollars = amount / divisor;
     const uint64_t cents = amount % divisor;
 
@@ -44,10 +48,7 @@ std::string formatAmount(uint64_t amount)
 
 std::string formatAmountBasic(uint64_t amount)
 {
-    /* Get the amount we need to divide to convert from atomic to pretty
-       print, e.g. 100 for 2 decimal places */
-    const uint64_t divisor = pow(10, WalletConfig::numDecimalPlaces);
-
+    const uint64_t divisor = getDivisor();
     const uint64_t dollars = amount / divisor;
     const uint64_t cents = amount % divisor;
 

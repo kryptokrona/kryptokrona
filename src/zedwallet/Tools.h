@@ -23,3 +23,5 @@ std::string yellowANSIMsg(std::string msg);
 std::string getPrompt(std::shared_ptr<WalletInfo> &walletInfo);
 
 std::string unixTimeToDate(uint64_t timestamp);
+
+uint64_t getDivisor();
