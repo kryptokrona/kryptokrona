@@ -39,22 +39,28 @@ enum ForkStatus { UpToDate, ForkLater, ForkSoonReady, ForkSoonNotReady, OutOfDat
 
 ForkStatus get_fork_status(uint64_t height, std::vector<uint64_t> upgrade_heights, uint64_t supported_height)
 {
+    /* Allow fork heights to be empty */
+    if (upgrade_heights.empty())
+    {
+        return UpToDate;
+    }
+
     uint64_t next_fork = 0;
 
     for (auto upgrade : upgrade_heights)
     {
-      /* We have hit an upgrade already that the user cannot support */
-      if (height >= upgrade && supported_height < upgrade)
-      {
-          return OutOfDate;
-      }
+        /* We have hit an upgrade already that the user cannot support */
+        if (height >= upgrade && supported_height < upgrade)
+        {
+            return OutOfDate;
+        }
 
-      /* Get the next fork height */
-      if (upgrade > height)
-      {
-          next_fork = upgrade;
-          break;
-      }
+        /* Get the next fork height */
+        if (upgrade > height)
+        {
+            next_fork = upgrade;
+            break;
+        }
     }
 
     /* Next fork in < 25k blocks away */

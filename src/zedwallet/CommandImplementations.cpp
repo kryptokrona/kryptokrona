@@ -127,9 +127,19 @@ void status(CryptoNote::INode &node)
                       << WarningMsg("crashed/frozen?")
                       << std::endl;
 
+            /* Detach the thread so it doesn't call terminate() when we exit
+               scope */
+            getStatus.detach();
+
+            /* Wait a moment for detach to complete */
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
             return;
         }
     }
+
+    /* Wait for the thread to clean up so we don't call terminate() on exit */
+    getStatus.join();
 
     if (status == "Problem retrieving information from RPC server.")
     {

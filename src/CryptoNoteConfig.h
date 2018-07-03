@@ -38,8 +38,32 @@ const uint64_t DIFFICULTY_WINDOW_V3                          = 60;
 const uint64_t DIFFICULTY_BLOCKS_COUNT_V3                    = DIFFICULTY_WINDOW_V3 + 1;
 
 const unsigned EMISSION_SPEED_FACTOR                         = 25;
-const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(0);
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
+
+/* Premine amount */
+const uint64_t GENESIS_BLOCK_REWARD                          = UINT64_C(0);
+
+/* How to generate a premine:
+
+* Compile your code
+
+* Run zedwallet, ignore that it can't connect to the daemon, and generate an
+  address. Save this and the keys somewhere safe.
+
+* Launch the daemon with these arguments:
+--print-genesis-tx --genesis-block-reward-address <premine wallet address>
+
+For example:
+TurtleCoind --print-genesis-tx --genesis-block-reward-address TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+
+* Take the hash printed, and replace it with the hash below in GENESIS_COINBASE_TX_HEX
+
+* Recompile, setup your seed nodes, and start mining
+
+* You should see your premine appear in the previously generated wallet.
+
+*/
+const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff000188f3b501029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210142694232c5b04151d9e4c27d31ec7a68ea568b19488cfcb422659a07a0e44dd5";
 
 const size_t   CRYPTONOTE_REWARD_BLOCKS_WINDOW               = 100;
 const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE     = 100000; //size of block (bytes) after which reward for block calculated using block size
@@ -104,13 +128,9 @@ const uint32_t UPGRADE_WINDOW                                = EXPECTED_NUMBER_O
 static_assert(0 < UPGRADE_VOTING_THRESHOLD && UPGRADE_VOTING_THRESHOLD <= 100, "Bad UPGRADE_VOTING_THRESHOLD");
 static_assert(UPGRADE_VOTING_WINDOW > 1, "Bad UPGRADE_VOTING_WINDOW");
 
-/* The index in the FORK_HEIGHTS array that this version of the software will
-   support. For example, if CURRENT_FORK_INDEX is 3, this version of the
-   software will support the fork at 600,000 blocks. */
-const uint8_t CURRENT_FORK_INDEX = 3;
-
 /* Block heights we are going to have hard forks at */
-const uint64_t FORK_HEIGHTS[] = {
+const uint64_t FORK_HEIGHTS[] =
+{
     187000,
     350000,
     440000,
@@ -121,8 +141,19 @@ const uint64_t FORK_HEIGHTS[] = {
     1400000
 };
 
-/* Make sure CURRENT_FORK_INDEX is a valid index */
-static_assert(CURRENT_FORK_INDEX < (sizeof(FORK_HEIGHTS)/sizeof(*FORK_HEIGHTS)), "CURRENT_FORK_INDEX out of range of FORK_HEIGHTS!");
+const uint64_t FORK_HEIGHTS_SIZE = sizeof(FORK_HEIGHTS) / sizeof(*FORK_HEIGHTS);
+
+/* The index in the FORK_HEIGHTS array that this version of the software will
+   support. For example, if CURRENT_FORK_INDEX is 3, this version of the
+   software will support the fork at 600,000 blocks.
+
+   This will default to zero if the FORK_HEIGHTS array is empty, so you don't
+   need to change it manually. */
+const uint8_t CURRENT_FORK_INDEX = FORK_HEIGHTS_SIZE == 0 ? 0 : 3;
+
+static_assert(CURRENT_FORK_INDEX >= 0, "CURRENT FORK INDEX must be >= 0");
+/* Make sure CURRENT_FORK_INDEX is a valid index, unless FORK_HEIGHTS is empty */
+static_assert(FORK_HEIGHTS_SIZE == 0 || CURRENT_FORK_INDEX < FORK_HEIGHTS_SIZE, "CURRENT_FORK_INDEX out of range of FORK_HEIGHTS!");
 
 const char     CRYPTONOTE_BLOCKS_FILENAME[]                  = "blocks.bin";
 const char     CRYPTONOTE_BLOCKINDEXES_FILENAME[]            = "blockindexes.bin";
