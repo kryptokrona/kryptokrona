@@ -182,11 +182,11 @@ void syncWallet(CryptoNote::INode &node,
 
                         if (t.totalAmount < 0)
                         {
-                            printOutgoingTransfer(t, node, false);
+                            printOutgoingTransfer(t, node);
                         }
                         else
                         {
-                            printIncomingTransfer(t, node, false);
+                            printIncomingTransfer(t, node);
                         }
                     }
                 }

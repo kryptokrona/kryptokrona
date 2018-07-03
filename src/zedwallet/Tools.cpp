@@ -29,12 +29,16 @@ void confirmPassword(std::string walletPass, std::string msg)
     }
 }
 
+/* Get the amount we need to divide to convert from atomic to pretty print,
+   e.g. 100 for 2 decimal places */
+uint64_t getDivisor()
+{
+    return static_cast<uint64_t>(pow(10, WalletConfig::numDecimalPlaces));
+}
+
 std::string formatAmount(uint64_t amount)
 {
-    /* Get the amount we need to divide to convert from atomic to pretty
-       print, e.g. 100 for 2 decimal places */
-    const uint64_t divisor = pow(10, WalletConfig::numDecimalPlaces);
-
+    const uint64_t divisor = getDivisor();
     const uint64_t dollars = amount / divisor;
     const uint64_t cents = amount % divisor;
 
@@ -44,10 +48,7 @@ std::string formatAmount(uint64_t amount)
 
 std::string formatAmountBasic(uint64_t amount)
 {
-    /* Get the amount we need to divide to convert from atomic to pretty
-       print, e.g. 100 for 2 decimal places */
-    const uint64_t divisor = pow(10, WalletConfig::numDecimalPlaces);
-
+    const uint64_t divisor = getDivisor();
     const uint64_t dollars = amount / divisor;
     const uint64_t cents = amount % divisor;
 
@@ -212,4 +213,12 @@ std::string getPrompt(std::shared_ptr<WalletInfo> &walletInfo)
     const std::string shortName = walletName.substr(0, promptLength);
 
     return "[" + WalletConfig::ticker + " " + shortName + "]: ";
+}
+
+std::string unixTimeToDate(uint64_t timestamp)
+{
+    const std::time_t time = timestamp;
+    char buffer[100];
+    std::strftime(buffer, sizeof(buffer), "%F %R", std::localtime(&time));
+    return std::string(buffer);
 }

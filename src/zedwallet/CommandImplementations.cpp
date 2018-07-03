@@ -276,9 +276,6 @@ void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo)
 
 void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 {
-    const bool fetchTimestamp =
-         confirm("Output timestamps? (Takes lots longer to write file)", false);
-
     const size_t numTransactions = wallet.getTransactionCount();
 
     std::ofstream csv;
@@ -298,16 +295,8 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
     std::cout << InformationMsg("Saving CSV file...") << std::endl;
 
     /* Create CSV header */
-    if (fetchTimestamp)
-    {
-        csv << "Timestamp,Block Height,Hash,Amount,In/Out"
-            << std::endl;
-    }
-    else
-    {
-        csv << "Block Height,Hash,Amount,In/Out"
-            << std::endl;
-    }
+    csv << "Timestamp,Block Height,Hash,Amount,In/Out"
+        << std::endl;
 
     /* Loop through transactions */
     for (size_t i = 0; i < numTransactions; i++)
@@ -320,34 +309,14 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
             continue;
         }
 
-        if (fetchTimestamp)
-        {
-            auto block = getBlock(t.blockHeight, node);
-            std::string blockTime = getBlockTimestamp(block);
-
-            if (blockTime == "")
-            {
-                std::cout << WarningMsg("Failed to get timestamp, is ")
-                          << WarningMsg(WalletConfig::daemonName)
-                          << WarningMsg(" open?")
-                          << std::endl;
-
-                csv.close();
-                return;
-            }
-            
-            csv << blockTime << ",";                    /* Timestamp */
-        }
-
-        csv << t.blockHeight << ","                     /* Block Height */
-            << Common::podToHex(t.hash) << ",";         /* Hash */
-
-
         const std::string amount = formatAmountBasic(std::abs(t.totalAmount));
 
         const std::string direction = t.totalAmount > 0 ? "IN" : "OUT";
 
-        csv << amount << ","                            /* Amount */
+        csv << unixTimeToDate(t.timestamp) << ","       /* Timestamp */
+            << t.blockHeight << ","                     /* Block Height */
+            << Common::podToHex(t.hash) << ","          /* Hash */
+            << amount << ","                            /* Amount */
             << direction                                /* In/Out */
             << std::endl;
     }
@@ -361,16 +330,24 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 }
 
 void printOutgoingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node,
-                           bool fetchTimestamp)
+                           CryptoNote::INode &node)
 {
     std::cout << WarningMsg("Outgoing transfer:")
               << std::endl
               << WarningMsg("Hash: " + Common::podToHex(t.hash))
-              << std::endl
-              << WarningMsg("Block height: " + std::to_string(t.blockHeight))
-              << std::endl
-              << WarningMsg("Spent: " + formatAmount(-t.totalAmount - t.fee))
+              << std::endl;
+
+    if (t.timestamp != 0)
+    {
+        std::cout << WarningMsg("Block height: ")
+                  << WarningMsg(std::to_string(t.blockHeight))
+                  << std::endl
+                  << WarningMsg("Timestamp: ")
+                  << WarningMsg(unixTimeToDate(t.timestamp))
+                  << std::endl;
+    }
+
+    std::cout << WarningMsg("Spent: " + formatAmount(-t.totalAmount - t.fee))
               << std::endl
               << WarningMsg("Fee: " + formatAmount(t.fee))
               << std::endl
@@ -384,32 +361,29 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
         std::cout << WarningMsg("Payment ID: " + paymentID) << std::endl;
     }
 
-    if (fetchTimestamp)
-    {
-        const std::string blockTime
-            = getBlockTimestamp(getBlock(t.blockHeight, node));
-
-        /* Couldn't get timestamp, maybe old node or turtlecoind closed */
-        if (blockTime != "")
-        {
-            std::cout << WarningMsg("Timestamp: " + blockTime) << std::endl;
-        }
-    }
-
     std::cout << std::endl;
 }
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node,
-                           bool fetchTimestamp)
+                           CryptoNote::INode &node)
 {
     std::cout << SuccessMsg("Incoming transfer:")
               << std::endl
-              << SuccessMsg("Block height: " + std::to_string(t.blockHeight))
-              << std::endl
               << SuccessMsg("Hash: " + Common::podToHex(t.hash))
-              << std::endl
-              << SuccessMsg("Amount: " + formatAmount(t.totalAmount))
+              << std::endl;
+
+    if (t.timestamp != 0)
+    {
+        std::cout << SuccessMsg("Block height: ")
+                  << SuccessMsg(std::to_string(t.blockHeight))
+                  << std::endl
+                  << SuccessMsg("Timestamp: ")
+                  << SuccessMsg(unixTimeToDate(t.timestamp))
+                  << std::endl;
+    }
+
+
+    std::cout << SuccessMsg("Amount: " + formatAmount(t.totalAmount))
               << std::endl;
 
     const std::string paymentID = getPaymentIDFromExtra(t.extra);
@@ -419,28 +393,12 @@ void printIncomingTransfer(CryptoNote::WalletTransaction t,
         std::cout << SuccessMsg("Payment ID: " + paymentID) << std::endl;
     }
 
-    if (fetchTimestamp)
-    {
-        const std::string blockTime
-            = getBlockTimestamp(getBlock(t.blockHeight, node));
-
-        /* Couldn't get timestamp, maybe old node or turtlecoind closed */
-        if (blockTime != "")
-        {
-            std::cout << SuccessMsg("Timestamp: " + blockTime) << std::endl;
-        }
-    }
-
     std::cout << std::endl;
 }
 
 void listTransfers(bool incoming, bool outgoing, 
                    CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 {
-    const bool fetchTimestamp =
-         confirm("Display timestamps? (Takes lots longer to list transactions)",
-                 false);
-
     const size_t numTransactions = wallet.getTransactionCount();
 
     int64_t totalSpent = 0;
@@ -452,12 +410,12 @@ void listTransfers(bool incoming, bool outgoing,
 
         if (t.totalAmount < 0 && outgoing)
         {
-            printOutgoingTransfer(t, node, fetchTimestamp);
+            printOutgoingTransfer(t, node);
             totalSpent += -t.totalAmount;
         }
         else if (t.totalAmount > 0 && incoming)
         {
-            printIncomingTransfer(t, node, fetchTimestamp);
+            printIncomingTransfer(t, node);
             totalReceived += t.totalAmount;
         }
     }
@@ -474,50 +432,6 @@ void listTransfers(bool incoming, bool outgoing,
         std::cout << WarningMsg("Total spent: " + formatAmount(totalSpent))
                   << std::endl;
     }
-}
-
-CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
-                                  CryptoNote::INode &node)
-{
-    CryptoNote::BlockDetails block;
-
-    /* No connection to turtlecoind */
-    if (node.getLastKnownBlockHeight() == 0)
-    {
-        return block;
-    }
-
-    std::promise<std::error_code> errorPromise;
-
-    auto e = errorPromise.get_future();
-
-    auto callback = [&errorPromise](std::error_code e)
-    {
-        errorPromise.set_value(e);
-    };
-
-    node.getBlock(blockHeight, block, callback);
-
-    if (e.get())
-    {
-        /* Prevent the compiler optimizing it out... */
-        std::cout << "";
-    }
-
-    return block;
-}
-
-std::string getBlockTimestamp(CryptoNote::BlockDetails b)
-{
-    if (b.timestamp == 0)
-    {
-        return "";
-    }
-
-    const std::time_t time = b.timestamp;
-    char buffer[100];
-    std::strftime(buffer, sizeof(buffer), "%F %R", std::localtime(&time));
-    return std::string(buffer);
 }
 
 void save(CryptoNote::WalletGreen &wallet)

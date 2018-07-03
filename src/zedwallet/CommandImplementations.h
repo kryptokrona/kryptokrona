@@ -31,14 +31,7 @@ void listTransfers(bool incoming, bool outgoing,
                    CryptoNote::WalletGreen &wallet, CryptoNote::INode &node);
 
 void printOutgoingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node,
-                           bool fetchTimestamps);
+                           CryptoNote::INode &node);
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node,
-                           bool fetchTimestamps);
-
-std::string getBlockTimestamp(CryptoNote::BlockDetails b);
-
-CryptoNote::BlockDetails getBlock(uint32_t blockHeight,
-                                  CryptoNote::INode &node);
+                           CryptoNote::INode &node);
