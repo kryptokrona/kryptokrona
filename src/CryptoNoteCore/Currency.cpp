@@ -76,14 +76,7 @@ bool Currency::init() {
 bool Currency::generateGenesisBlock() {
   genesisBlockTemplate = boost::value_initialized<BlockTemplate>();
 
-  //account_public_address ac = boost::value_initialized<AccountPublicAddress>();
-  //std::vector<size_t> sz;
-  //constructMinerTx(0, 0, 0, 0, 0, ac, m_genesisBlock.baseTransaction); // zero fee in genesis
-  //BinaryArray txb = toBinaryArray(m_genesisBlock.baseTransaction);
-  //std::string hex_tx_represent = Common::toHex(txb);
-
-  // Hard code coinbase tx in genesis block, because through generating tx use random, but genesis should be always the same
-  std::string genesisCoinbaseTxHex = "010a01ff000188f3b501029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210142694232c5b04151d9e4c27d31ec7a68ea568b19488cfcb422659a07a0e44dd5";
+  std::string genesisCoinbaseTxHex = CryptoNote::parameters::GENESIS_COINBASE_TX_HEX;
   BinaryArray minerTxBlob;
 
   bool r =
