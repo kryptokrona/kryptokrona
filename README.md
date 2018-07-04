@@ -4,7 +4,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/an6je6l48eawteyg?svg=true)](https://ci.appveyor.com/project/RocksteadyTC/turtlecoin)
 ### How To Compile
 
-On Ubuntu or Mac on a non standard architecture, and can't get GNU Readline installed?
+On Linux or Mac on a non standard architecture, and can't get GNU Readline installed?
 
 Disable it with `cmake .. -DFORCE_READLINE=FALSE`
 
