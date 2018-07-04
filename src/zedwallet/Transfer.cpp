@@ -8,6 +8,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <Common/Base58.h>
 #include <Common/StringTools.h>
 
 #include "CryptoNoteConfig.h"
@@ -95,7 +96,8 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
 }
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
-                        std::shared_ptr<WalletInfo> walletInfo)
+                        std::shared_ptr<WalletInfo> walletInfo,
+                        bool integratedAddress)
 {
     std::cout << std::endl
               << InformationMsg("Confirm Transaction?") << std::endl;
@@ -106,7 +108,9 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
 
     const std::string paymentID = getPaymentIDFromExtra(t.extra);
 
-    if (paymentID != "")
+    /* Lets not split the integrated address out into its address and
+       payment ID combo. It'll confused users. */
+    if (paymentID != "" && !integratedAddress)
     {
         std::cout << ", " << std::endl
                   << "and a Payment ID of " << SuccessMsg(paymentID);
@@ -118,9 +122,19 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
     
     std::cout << std::endl << std::endl
               << "FROM: " << SuccessMsg(walletInfo->walletFileName)
-              << std::endl
-              << "TO: " << SuccessMsg(t.destinations[0].address)
-              << std::endl << std::endl;
+              << std::endl;
+
+    if (!integratedAddress)
+    {
+        std::cout << "TO: " << SuccessMsg(t.destinations[0].address)
+                  << std::endl << std::endl;
+    }
+    else
+    {
+        std::string addr = createIntegratedAddress(t.destinations[0].address,
+                                                   paymentID);
+        std::cout << "TO: " << SuccessMsg(addr) << std::endl << std::endl;
+    }
 
     if (confirm("Is this correct?"))
     {
@@ -291,7 +305,8 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height)
 
     const uint64_t balance = walletInfo->wallet.getActualBalance();
 
-    const auto maybeAddress = getDestinationAddress();
+    const auto maybeAddress = getAddress("What address do you want to transfer"
+                                         " to?: ");
 
     if (!maybeAddress.isJust)
     {
@@ -299,7 +314,20 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height)
         return;
     }
 
-    const std::string address = maybeAddress.x;
+    std::string address = maybeAddress.x.second;
+
+    std::string extra;
+
+    bool integratedAddress = maybeAddress.x.first == IntegratedAddress;
+
+    /* It's an integrated address, so lets extract out the true address and
+       payment ID from the pair */
+    if (integratedAddress)
+    {
+        auto addrPaymentIDPair = extractIntegratedAddress(maybeAddress.x.second);
+        address = addrPaymentIDPair.x.first;
+        extra = getExtraFromPaymentID(addrPaymentIDPair.x.second);
+    }
 
     const auto maybeAmount = getTransferAmount();
 
@@ -344,22 +372,28 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height)
         return;
     }
 
-    const auto maybeExtra = getExtra();
-
-    if (!maybeExtra.isJust)
+    /* Don't need to prompt for payment ID if they used an integrated
+       address */
+    if (!integratedAddress)
     {
-        std::cout << WarningMsg("Cancelling transaction.") << std::endl;
-        return;
+        const auto maybeExtra = getExtra();
+
+        if (!maybeExtra.isJust)
+        {
+            std::cout << WarningMsg("Cancelling transaction.") << std::endl;
+            return;
+        }
+
+        extra = maybeExtra.x;
     }
 
-    const std::string extra = maybeExtra.x;
-
-    doTransfer(address, amount, fee, extra, walletInfo, height);
+    doTransfer(address, amount, fee, extra, walletInfo, height,
+               integratedAddress);
 }
 
 void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                 std::string extra, std::shared_ptr<WalletInfo> walletInfo,
-                uint32_t height)
+                uint32_t height, bool integratedAddress)
 {
     const uint64_t balance = walletInfo->wallet.getActualBalance();
 
@@ -388,7 +422,7 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
     p.extra = extra;
     p.changeDestination = walletInfo->walletAddress;
 
-    if (!confirmTransaction(p, walletInfo))
+    if (!confirmTransaction(p, walletInfo, integratedAddress))
     {
         std::cout << WarningMsg("Cancelling transaction.") << std::endl;
         return;
@@ -702,30 +736,6 @@ Maybe<uint64_t> getTransferAmount()
     }
 }
 
-Maybe<std::string> getDestinationAddress()
-{
-    while (true)
-    {
-        std::string transferAddr;
-
-        std::cout << InformationMsg("What address do you want to ")
-                  << InformationMsg("transfer to?: ");
-
-        std::getline(std::cin, transferAddr);
-        boost::algorithm::trim(transferAddr);
-
-        if (transferAddr == "cancel")
-        {
-            return Nothing<std::string>();
-        }
-
-        if (parseAddress(transferAddr))
-        {
-            return Just<std::string>(transferAddr);
-        }
-    }
-}
-
 bool parseFee(std::string feeString)
 {
     uint64_t fee;
@@ -753,8 +763,130 @@ bool parseFee(std::string feeString)
     return true;
 }
 
+Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
+    std::string integratedAddress)
+{
+    if (integratedAddress.length() != WalletConfig::integratedAddressLength)
+    {
+        return Nothing<std::pair<std::string, std::string>>();
+    }
 
-bool parseAddress(std::string address)
+    std::string decoded;
+    uint64_t tag;
+
+    if (!Tools::Base58::decode_addr(integratedAddress, tag, decoded))
+    {
+        return Nothing<std::pair<std::string, std::string>>();
+    }
+
+    const uint64_t paymentIDLen = 64;
+
+    /* Should be the length of a standard address + payment ID */
+    if (decoded.length() != WalletConfig::standardAddressLength + paymentIDLen)
+    {
+        return Nothing<std::pair<std::string, std::string>>();
+    }
+
+    std::string paymentID = decoded.substr(0, paymentIDLen);
+    std::string address = decoded.substr(paymentIDLen, std::string::npos);
+
+    /* The address out should of course be a valid address */
+    if (!parseStandardAddress(address))
+    {
+        return Nothing<std::pair<std::string, std::string>>();
+    }
+    
+    std::vector<uint8_t> extra;
+
+    /* And the payment ID out should be valid as well! */
+    if (!CryptoNote::createTxExtraWithPaymentId(paymentID, extra))
+    {
+        return Nothing<std::pair<std::string, std::string>>();
+    }
+    
+    return Just<std::pair<std::string, std::string>>({address, paymentID});
+}
+
+Maybe<std::pair<AddressType, std::string>> getAddress(std::string msg)
+{
+    while (true)
+    {
+        std::string address;
+
+        std::cout << InformationMsg(msg);
+
+        std::getline(std::cin, address);
+        boost::algorithm::trim(address);
+
+        if (address == "cancel")
+        {
+            return Nothing<std::pair<AddressType, std::string>>();
+        }
+
+        auto addressType = parseAddress(address);
+
+        if (addressType != NotAnAddress)
+        {
+            return Just<std::pair<AddressType, std::string>>
+            ({
+                addressType, address
+            });
+        }
+    }
+}
+
+AddressType parseAddress(std::string address)
+{
+    if (parseStandardAddress(address))
+    {
+        return StandardAddress;
+    }
+
+    if (parseIntegratedAddress(address))
+    {
+        return IntegratedAddress;
+    }
+
+    /* Failed to parse, lets try and diagnose a more accurate failure message */
+
+    if (address.length() != WalletConfig::standardAddressLength &&
+        address.length() != WalletConfig::integratedAddressLength)
+    {
+        std::cout << WarningMsg("Address is wrong length!") << std::endl
+                  << "It should be " << WalletConfig::standardAddressLength
+                  << " or " << WalletConfig::integratedAddressLength
+                  << " characters long, but it is " << address.length()
+                  << " characters long!" << std::endl << std::endl;
+
+        return NotAnAddress;
+    }
+
+    if (address.substr(0, WalletConfig::addressPrefix.length()) !=
+        WalletConfig::addressPrefix)
+    {
+        std::cout << WarningMsg("Invalid address! It should start with ")
+                  << WarningMsg(WalletConfig::addressPrefix)
+                  << WarningMsg("!")
+                  << std::endl << std::endl;
+
+        return NotAnAddress;
+    }
+
+    std::cout << WarningMsg("Failed to parse address, address is not a ")
+              << WarningMsg("valid ")
+              << WarningMsg(WalletConfig::ticker)
+              << WarningMsg(" address!") << std::endl
+              << std::endl;
+
+    return NotAnAddress;
+}
+
+bool parseIntegratedAddress(std::string integratedAddress)
+{
+    return extractIntegratedAddress(integratedAddress).isJust;
+}
+
+bool parseStandardAddress(std::string address, bool printErrors)
 {
     uint64_t prefix;
 
@@ -763,12 +895,15 @@ bool parseAddress(std::string address)
     const bool valid = CryptoNote::parseAccountAddressString(prefix, addr,
                                                              address);
 
-    if (address.length() != WalletConfig::addressLength)
+    if (address.length() != WalletConfig::standardAddressLength)
     {
-        std::cout << WarningMsg("Address is wrong length!") << std::endl
-                  << "It should be " << WalletConfig::addressLength
-                  << " characters long, but it is " << address.length()
-                  << " characters long!" << std::endl << std::endl;
+        if (printErrors)
+        {
+            std::cout << WarningMsg("Address is wrong length!") << std::endl
+                      << "It should be " << WalletConfig::standardAddressLength
+                      << " characters long, but it is " << address.length()
+                      << " characters long!" << std::endl << std::endl;
+        }
 
         return false;
     }
@@ -779,10 +914,13 @@ bool parseAddress(std::string address)
     else if (address.substr(0, WalletConfig::addressPrefix.length()) 
           != WalletConfig::addressPrefix)
     {
-        std::cout << WarningMsg("Invalid address! It should start with ")
-                  << WarningMsg(WalletConfig::addressPrefix)
-                  << WarningMsg("!")
-                  << std::endl << std::endl;
+        if (printErrors)
+        {
+            std::cout << WarningMsg("Invalid address! It should start with ")
+                      << WarningMsg(WalletConfig::addressPrefix)
+                      << WarningMsg("!")
+                      << std::endl << std::endl;
+        }
 
         return false;
     }
@@ -790,11 +928,14 @@ bool parseAddress(std::string address)
        get to give more detailed error messages about the address */
     else if (!valid)
     {
-        std::cout << WarningMsg("Failed to parse address, address is not a ")
-                  << WarningMsg("valid ")
-                  << WarningMsg(WalletConfig::ticker)
-                  << WarningMsg(" address!") << std::endl
-                  << std::endl;
+        if (printErrors)
+        {
+            std::cout << WarningMsg("Failed to parse address, address is not a ")
+                      << WarningMsg("valid ")
+                      << WarningMsg(WalletConfig::ticker)
+                      << WarningMsg(" address!") << std::endl
+                      << std::endl;
+        }
 
         return false;
     }

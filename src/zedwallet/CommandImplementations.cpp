@@ -11,6 +11,7 @@
 #include <Common/StringTools.h>
 
 #include <CryptoNoteCore/Account.h>
+#include <CryptoNoteCore/TransactionExtra.h>
 
 #ifndef MSVC
 #include <fstream>
@@ -439,4 +440,55 @@ void save(CryptoNote::WalletGreen &wallet)
     std::cout << InformationMsg("Saving.") << std::endl;
     wallet.save();
     std::cout << InformationMsg("Saved.") << std::endl;
+}
+
+void createIntegratedAddress()
+{
+    std::cout << InformationMsg("Creating an integrated address from an ")
+              << InformationMsg("address and payment ID pair...")
+              << std::endl << std::endl;
+
+    std::string address;
+    std::string paymentID;
+
+    while (true)
+    {
+        std::cout << InformationMsg("Address: ");
+
+        std::getline(std::cin, address);
+        boost::algorithm::trim(address);
+
+        std::cout << std::endl;
+
+        if (parseStandardAddress(address, true))
+        {
+            break;
+        }
+    }
+
+    while (true)
+    {
+        std::cout << InformationMsg("Payment ID: ");
+
+        std::getline(std::cin, paymentID);
+        boost::algorithm::trim(paymentID);
+
+        std::vector<uint8_t> extra;
+
+        std::cout << std::endl;
+
+        if (!CryptoNote::createTxExtraWithPaymentId(paymentID, extra))
+        {
+            std::cout << WarningMsg("Failed to parse! Payment ID's are 64 "
+                                    "character hexadecimal strings.")
+                      << std::endl << std::endl;
+
+            continue;
+        }
+
+        break;
+    }
+
+    std::cout << InformationMsg(createIntegratedAddress(address, paymentID))
+              << std::endl;
 }
