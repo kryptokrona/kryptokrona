@@ -96,6 +96,7 @@ public:
   std::error_code sendFusionTransaction(uint64_t threshold, uint32_t anonymity, const std::vector<std::string>& addresses,
     const std::string& destinationAddress, std::string& transactionHash);
   std::error_code estimateFusion(uint64_t threshold, const std::vector<std::string>& addresses, uint32_t& fusionReadyCount, uint32_t& totalOutputCount);
+  std::error_code createIntegratedAddress(const std::string& address, const std::string& paymentId, std::string& integratedAddress);
 
 private:
   void refresh();

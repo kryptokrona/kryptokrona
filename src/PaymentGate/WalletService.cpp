@@ -27,6 +27,7 @@
 
 #include <System/Timer.h>
 #include <System/InterruptedException.h>
+#include "Common/Base58.h"
 #include "Common/Util.h"
 
 #include "crypto/crypto.h"
@@ -1193,6 +1194,27 @@ std::error_code WalletService::estimateFusion(uint64_t threshold, const std::vec
     logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Failed to estimate number of fusion outputs: " << x.what();
     return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
   }
+
+  return std::error_code();
+}
+
+std::error_code WalletService::createIntegratedAddress(const std::string &address, const std::string &paymentId, std::string& integratedAddress) {
+  try {
+    System::EventLock lk(readyEvent);
+
+    validateAddresses({address}, currency, logger);
+    validatePaymentId(paymentId, logger);
+
+  } catch (std::system_error& x) {
+    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while creating integrated address: " << x.what();
+    return x.code();
+  }
+
+  integratedAddress = Tools::Base58::encode_addr
+  (
+    CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+    paymentId + address
+  );
 
   return std::error_code();
 }
