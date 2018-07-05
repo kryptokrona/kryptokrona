@@ -191,7 +191,7 @@ std::error_code PaymentServiceJsonRpcServer::handleGetTransaction(const GetTrans
   return service.getTransaction(request.transactionHash, response.transaction);
 }
 
-std::error_code PaymentServiceJsonRpcServer::handleSendTransaction(const SendTransaction::Request& request, SendTransaction::Response& response) {
+std::error_code PaymentServiceJsonRpcServer::handleSendTransaction(SendTransaction::Request& request, SendTransaction::Response& response) {
   return service.sendTransaction(request, response.transactionHash);
 }
 

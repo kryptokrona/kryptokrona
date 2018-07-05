@@ -939,9 +939,87 @@ std::error_code WalletService::getAddresses(std::vector<std::string>& addresses)
   return std::error_code();
 }
 
-std::error_code WalletService::sendTransaction(const SendTransaction::Request& request, std::string& transactionHash) {
+std::error_code WalletService::sendTransaction(SendTransaction::Request& request, std::string& transactionHash) {
   try {
     System::EventLock lk(readyEvent);
+
+    /* Integrated address payment ID's are uppercase - lets convert the input
+       payment ID to upper so we can compare with more ease */
+    std::transform(request.paymentId.begin(), request.paymentId.end(), request.paymentId.begin(), ::toupper);
+
+    std::vector<std::string> paymentIDs;
+
+    for (auto &transfer : request.transfers)
+    {
+        std::string addr = transfer.address;
+        
+        /* It's not a standard address. Is it an integrated address? */
+        if (!CryptoNote::validateAddress(addr, currency))
+        {
+            std::string decoded;
+            uint64_t tag;
+
+            if (!Tools::Base58::decode_addr(addr, tag, decoded))
+            {
+                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+            }
+
+            const uint64_t paymentIDLen = 64;
+
+            /* Must be at least as long as the paymentID - don't know the exact
+               length because currency prefix could change - we'll verify the
+               extracted address and payment ID though, which will do the
+               trick. */
+            if (decoded.length() <= paymentIDLen)
+            {
+                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+            }
+
+            std::string paymentID = decoded.substr(0, paymentIDLen);
+
+            /* Check the extracted payment ID is good. */
+            validatePaymentId(paymentID, logger);
+
+            /* A payment ID was specified with the transaction, and it is not
+               the same as the decoded one -> we can't send a transaction
+               with two different payment ID's! */
+            if (request.paymentId != "" && request.paymentId != paymentID)
+            {
+                throw std::system_error(make_error_code(CryptoNote::error::CONFLICTING_PAYMENT_IDS));
+            }
+
+            std::string address = decoded.substr(paymentIDLen, std::string::npos);
+
+            /* Check the extracted address is good. */
+            validateAddresses({address}, currency, logger);
+
+            /* Replace the integrated transfer address with the actual
+               decoded address */
+            transfer.address = address;
+
+            paymentIDs.push_back(paymentID);
+        }
+    }
+
+    /* Only one integrated address specified, set the payment ID to the
+       decoded value */
+    if (paymentIDs.size() == 1)
+    {
+        request.paymentId = paymentIDs[0];
+    }
+
+    /* Check we don't have conflicting payment ID's */
+    if (paymentIDs.size() > 1)
+    {
+        /* Are all the specified payment IDs equal? */
+        if (!std::equal(paymentIDs.begin() + 1, paymentIDs.end(), paymentIDs.begin()))
+        {
+            throw std::system_error(make_error_code(CryptoNote::error::CONFLICTING_PAYMENT_IDS));
+        }
+
+        /* They are all equal, set the payment ID to the decoded value */
+        request.paymentId = paymentIDs[0];
+    }
 
     validateAddresses(request.sourceAddresses, currency, logger);
     validateAddresses(collectDestinationAddresses(request.transfers), currency, logger);
