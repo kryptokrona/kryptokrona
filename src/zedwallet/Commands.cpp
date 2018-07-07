@@ -154,6 +154,10 @@ bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
     {
         changePassword(walletInfo);
     }
+    else if (command == "make_integrated_address")
+    {
+        createIntegratedAddress();
+    }
     /* This should never happen */
     else
     {
@@ -168,8 +172,8 @@ bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
 }
 
 const Maybe<Command> resolveCommand(std::string command,
-                              std::vector<Command> &allCommands,
-                              std::vector<Command> &available)
+                                    std::vector<Command> &allCommands,
+                                    std::vector<Command> &available)
 {
     int index;
 
@@ -251,6 +255,10 @@ std::vector<Command> allCommands()
 
         {"bc_height", "Show the blockchain height", true, true},
         {"change_password", "Change your wallet password", true, true},
+
+        {"make_integrated_address", "Make an integrated address from an "
+                                    "address + payment ID", true, true},
+
         {"incoming_transfers", "Show incoming transfers", true, true},
         {"list_transfers", "Show all transfers", false, true},
         {"optimize", "Optimize your wallet to send large amounts", false, true},

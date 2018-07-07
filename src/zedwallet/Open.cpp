@@ -35,7 +35,7 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
         std::getline(std::cin, address);
         boost::algorithm::trim(address);
 
-        if (parseAddress(address))
+        if (parseStandardAddress(address, true))
         {
             break;
         }

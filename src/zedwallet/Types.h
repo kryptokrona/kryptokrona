@@ -125,22 +125,31 @@ struct AddressBookEntry
     AddressBookEntry(std::string friendlyName) : friendlyName(friendlyName) {}
 
     AddressBookEntry(std::string friendlyName, std::string address,
-                std::string paymentID) : friendlyName(friendlyName),
-                                         address(address),
-                                         paymentID(paymentID) {}
+                     std::string paymentID, bool integratedAddress) :
+                     friendlyName(friendlyName), address(address),
+                     paymentID(paymentID), integratedAddress(integratedAddress)
+                     {}
 
     /* Friendly name for this address book entry */
     std::string friendlyName;
+
     /* The wallet address of this entry */
     std::string address;
+
     /* The payment ID associated with this address */
     std::string paymentID;
+
+    /* Did the user enter this as an integrated address? (We need this to
+       display back the address as either an integrated address, or an
+       address + payment ID pair */
+    bool integratedAddress;
 
     void serialize(CryptoNote::ISerializer &s)
     {
         KV_MEMBER(friendlyName)
         KV_MEMBER(address)
         KV_MEMBER(paymentID)
+        KV_MEMBER(integratedAddress)
     }
 
     /* Only compare via name as we don't really care about the contents */

@@ -47,31 +47,6 @@ const std::string getAddressBookName(AddressBook addressBook)
     }
 }
 
-const Maybe<const std::string> getAddressBookAddress()
-{
-    std::cout << std::endl;
-
-    while (true)
-    {
-        std::string transferAddr;
-
-        std::cout << InformationMsg("What address does this user have?: ");
-
-        std::getline(std::cin, transferAddr);
-        boost::algorithm::trim(transferAddr);
-
-        if (transferAddr == "cancel")
-        {
-            return Nothing<const std::string>();
-        }
-
-        if (parseAddress(transferAddr))
-        {
-            return Just<const std::string>(transferAddr);
-        }
-    }
-}
-
 const Maybe<std::string> getAddressBookPaymentID()
 {
     std::stringstream msg;
@@ -100,7 +75,7 @@ void addToAddressBook()
         return;
     }
 
-    auto maybeAddress = getAddressBookAddress();
+    auto maybeAddress = getAddress("\nWhat address does this user have? ");
 
     if (!maybeAddress.isJust)
     {
@@ -109,15 +84,37 @@ void addToAddressBook()
         return;
     }
 
-    auto maybePaymentID = getAddressBookPaymentID();
+    std::string address = maybeAddress.x.second;
+    std::string paymentID;
 
-    if (!maybePaymentID.isJust)
+    bool integratedAddress = maybeAddress.x.first == IntegratedAddress;
+
+    /* It's an integrated address, so lets extract out the true address and
+       payment ID from the pair */
+    if (integratedAddress)
     {
-        std::cout << WarningMsg("Cancelling addition to address book.")
-                  << std::endl;
+        auto addrPaymentIDPair = extractIntegratedAddress(maybeAddress.x.second);
+        address = addrPaymentIDPair.x.first;
+        paymentID = addrPaymentIDPair.x.second;
     }
 
-    addressBook.emplace_back(friendlyName, maybeAddress.x, maybePaymentID.x);
+    if (!integratedAddress)
+    {
+        auto maybePaymentID = getAddressBookPaymentID();
+
+        if (!maybePaymentID.isJust)
+        {
+            std::cout << WarningMsg("Cancelling addition to address book.")
+                      << std::endl;
+
+            return;
+        }
+
+        paymentID = maybePaymentID.x;
+    }
+
+    addressBook.emplace_back(friendlyName, address, paymentID,
+                             integratedAddress);
 
     if (saveAddressBook(addressBook))
     {
@@ -206,8 +203,9 @@ void sendFromAddressBook(std::shared_ptr<WalletInfo> &walletInfo,
     auto amount = maybeAmount.x;
     auto fee = WalletConfig::defaultFee;
     auto extra = getExtraFromPaymentID(maybeAddressBookEntry.x.paymentID);
+    auto integrated = maybeAddressBookEntry.x.integratedAddress;
 
-    doTransfer(address, amount, fee, extra, walletInfo, height);
+    doTransfer(address, amount, fee, extra, walletInfo, height, integrated);
 }
 
 bool isAddressBookEmpty(AddressBook addressBook)
@@ -315,19 +313,28 @@ void listAddressBook()
                   << std::endl
                   << std::endl
                   << InformationMsg("Address: ")
-                  << std::endl
-                  << SuccessMsg(i.address)
-                  << std::endl
                   << std::endl;
 
-        if (i.paymentID != "")
+        if (!i.integratedAddress)
         {
-            std::cout << InformationMsg("Payment ID: ")
-                      << std::endl
-                      << SuccessMsg(i.paymentID)
-                      << std::endl
+            std::cout << SuccessMsg(i.address)
                       << std::endl
                       << std::endl;
+
+            if (i.paymentID != "")
+            {
+                std::cout << InformationMsg("Payment ID: ")
+                          << std::endl
+                          << SuccessMsg(i.paymentID)
+                          << std::endl
+                          << std::endl
+                          << std::endl;
+            }
+        }
+        else
+        {
+            std::string addr = createIntegratedAddress(i.address, i.paymentID);
+            std::cout << SuccessMsg(addr) << std::endl << std::endl;
         }
 
         index++;

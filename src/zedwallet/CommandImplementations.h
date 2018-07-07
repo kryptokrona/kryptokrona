@@ -35,3 +35,5 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
 
 void printIncomingTransfer(CryptoNote::WalletTransaction t,
                            CryptoNote::INode &node);
+
+void createIntegratedAddress();
