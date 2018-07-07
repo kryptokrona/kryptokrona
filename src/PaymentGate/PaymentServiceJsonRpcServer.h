@@ -84,7 +84,7 @@ private:
   std::error_code handleGetTransactions(const GetTransactions::Request& request, GetTransactions::Response& response);
   std::error_code handleGetUnconfirmedTransactionHashes(const GetUnconfirmedTransactionHashes::Request& request, GetUnconfirmedTransactionHashes::Response& response);
   std::error_code handleGetTransaction(const GetTransaction::Request& request, GetTransaction::Response& response);
-  std::error_code handleSendTransaction(const SendTransaction::Request& request, SendTransaction::Response& response);
+  std::error_code handleSendTransaction(SendTransaction::Request& request, SendTransaction::Response& response);
   std::error_code handleCreateDelayedTransaction(const CreateDelayedTransaction::Request& request, CreateDelayedTransaction::Response& response);
   std::error_code handleGetDelayedTransactionHashes(const GetDelayedTransactionHashes::Request& request, GetDelayedTransactionHashes::Response& response);
   std::error_code handleDeleteDelayedTransaction(const DeleteDelayedTransaction::Request& request, DeleteDelayedTransaction::Response& response);
@@ -96,6 +96,8 @@ private:
 
   std::error_code handleSendFusionTransaction(const SendFusionTransaction::Request& request, SendFusionTransaction::Response& response);
   std::error_code handleEstimateFusion(const EstimateFusion::Request& request, EstimateFusion::Response& response);
+  std::error_code handleCreateIntegratedAddress(const CreateIntegratedAddress::Request& request, CreateIntegratedAddress::Response& response);
+
 };
 
 }//namespace PaymentService

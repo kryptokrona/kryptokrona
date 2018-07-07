@@ -353,4 +353,18 @@ void EstimateFusion::Response::serialize(CryptoNote::ISerializer& serializer) {
   serializer(totalOutputCount, "totalOutputCount");
 }
 
+void CreateIntegratedAddress::Request::serialize(CryptoNote::ISerializer& serializer) {
+  if (!serializer(address, "address")) {
+    throw RequestSerializationError();
+  }
+
+  if (!serializer(paymentId, "paymentId")) {
+    throw RequestSerializationError();
+  }
+}
+
+void CreateIntegratedAddress::Response::serialize(CryptoNote::ISerializer& serializer) {
+  serializer(integratedAddress, "integratedAddress");
+}
+
 }

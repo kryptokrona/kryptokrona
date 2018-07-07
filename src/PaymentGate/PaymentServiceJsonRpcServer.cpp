@@ -58,6 +58,7 @@ PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher& sys
   handlers.emplace("getAddresses", jsonHandler<GetAddresses::Request, GetAddresses::Response>(std::bind(&PaymentServiceJsonRpcServer::handleGetAddresses, this, std::placeholders::_1, std::placeholders::_2)));
   handlers.emplace("sendFusionTransaction", jsonHandler<SendFusionTransaction::Request, SendFusionTransaction::Response>(std::bind(&PaymentServiceJsonRpcServer::handleSendFusionTransaction, this, std::placeholders::_1, std::placeholders::_2)));
   handlers.emplace("estimateFusion", jsonHandler<EstimateFusion::Request, EstimateFusion::Response>(std::bind(&PaymentServiceJsonRpcServer::handleEstimateFusion, this, std::placeholders::_1, std::placeholders::_2)));
+  handlers.emplace("createIntegratedAddress", jsonHandler<CreateIntegratedAddress::Request, CreateIntegratedAddress::Response>(std::bind(&PaymentServiceJsonRpcServer::handleCreateIntegratedAddress, this, std::placeholders::_1, std::placeholders::_2)));
 }
 
 void PaymentServiceJsonRpcServer::processJsonRpcRequest(const Common::JsonValue& req, Common::JsonValue& resp) {
@@ -190,7 +191,7 @@ std::error_code PaymentServiceJsonRpcServer::handleGetTransaction(const GetTrans
   return service.getTransaction(request.transactionHash, response.transaction);
 }
 
-std::error_code PaymentServiceJsonRpcServer::handleSendTransaction(const SendTransaction::Request& request, SendTransaction::Response& response) {
+std::error_code PaymentServiceJsonRpcServer::handleSendTransaction(SendTransaction::Request& request, SendTransaction::Response& response) {
   return service.sendTransaction(request, response.transactionHash);
 }
 
@@ -232,6 +233,10 @@ std::error_code PaymentServiceJsonRpcServer::handleSendFusionTransaction(const S
 
 std::error_code PaymentServiceJsonRpcServer::handleEstimateFusion(const EstimateFusion::Request& request, EstimateFusion::Response& response) {
   return service.estimateFusion(request.threshold, request.addresses, response.fusionReadyCount, response.totalOutputCount);
+}
+
+std::error_code PaymentServiceJsonRpcServer::handleCreateIntegratedAddress(const CreateIntegratedAddress::Request& request, CreateIntegratedAddress::Response& response) {
+  return service.createIntegratedAddress(request.address, request.paymentId, response.integratedAddress);
 }
 
 }
