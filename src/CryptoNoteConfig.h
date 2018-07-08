@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <limits>
 #include <initializer_list>
+#include <boost/uuid/uuid.hpp>
 
 namespace CryptoNote {
 namespace parameters {
@@ -195,6 +196,11 @@ const uint32_t P2P_DEFAULT_PING_CONNECTION_TIMEOUT           = 2000;          //
 const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT                    = 60 * 2 * 1000; // 2 minutes
 const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000;          // 5 seconds
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
+
+const static boost::uuids::uuid CRYPTONOTE_NETWORK =
+{
+    {  0xb5, 0x0c, 0x4a, 0x6c, 0xcf, 0x52, 0x57, 0x41, 0x65, 0xf9, 0x91, 0xa4, 0xb6, 0xc1, 0x43, 0xe9  }
+};
 
 const char* const SEED_NODES[] = {
   "174.138.68.141:11897", //rock

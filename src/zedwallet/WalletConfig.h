@@ -32,7 +32,7 @@ namespace WalletConfig
     const std::string walletdName = "walletd";
 
     /* The full name of your crypto */
-    const std::string coinName = "TurtleCoin";
+    const std::string coinName = std::string(CryptoNote::CRYPTONOTE_NAME);
 
     /* Where can your users contact you for support? E.g. discord */
     const std::string contactLink = "http://chat.turtlecoin.lol";

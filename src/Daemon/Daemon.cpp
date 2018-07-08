@@ -91,14 +91,14 @@ currencyBuilder.isBlockexplorer(blockexplorer_mode);
     } else {
   CryptoNote::Transaction tx = CryptoNote::CurrencyBuilder(logManager).generateGenesisTransaction();
   std::string tx_hex = Common::toHex(CryptoNote::toBinaryArray(tx));
-  std::cout << "Add this line into your coin configuration file as is: " << std::endl;
-  std::cout << "\"GENESIS_COINBASE_TX_HEX\":\"" << tx_hex << "\"," << std::endl;
+  std::cout << "Replace the current GENESIS_COINBASE_TX_HEX line in src/CryptoNoteConfig.h with this one:" << std::endl;
+  std::cout << "const char GENESIS_COINBASE_TX_HEX[] = \"" << tx_hex << "\";" << std::endl;
     }
   } else {
       CryptoNote::Transaction tx = CryptoNote::CurrencyBuilder(logManager).generateGenesisTransaction(targets);
       std::string tx_hex = Common::toHex(CryptoNote::toBinaryArray(tx));
-      std::cout << "Modify this line into your coin configuration file as is: " << std::endl;
-      std::cout << "\"GENESIS_COINBASE_TX_HEX\":\"" << tx_hex << "\"," << std::endl;
+      std::cout << "Replace the current GENESIS_COINBASE_TX_HEX line in src/CryptoNoteConfig.h with this one:" << std::endl;
+      std::cout << "const char GENESIS_COINBASE_TX_HEX[] = \"" << tx_hex << "\";" << std::endl;
   }
   return;
 }

@@ -40,7 +40,6 @@
 #include "NetNodeCommon.h"
 #include "NetNodeConfig.h"
 #include "P2pProtocolDefinitions.h"
-#include "P2pNetworks.h"
 #include "PeerListManager.h"
 
 namespace System {
