@@ -1322,6 +1322,25 @@ size_t WalletGreen::transfer(const TransactionParameters& transactionParameters)
   return id;
 }
 
+uint64_t WalletGreen::getBalanceMinusDust(const std::vector<std::string>& addresses)
+{
+    std::vector<WalletOuts> wallets = pickWallets(addresses);
+    std::vector<OutputToTransfer> unused;
+
+    /* We want to get the full balance, so don't stop getting outputs early */
+    uint64_t needed = std::numeric_limits<uint64_t>::max();
+
+    return selectTransfers
+    (
+        needed,
+        /* Don't include dust outputs */
+        false,
+        m_currency.defaultDustThreshold(m_node.getLastKnownBlockHeight()),
+        std::move(wallets),
+        unused
+    );
+}
+
 void WalletGreen::prepareTransaction(std::vector<WalletOuts>&& wallets,
   const std::vector<WalletOrder>& orders,
   uint64_t fee,
