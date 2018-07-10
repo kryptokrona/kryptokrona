@@ -63,8 +63,10 @@ ForkStatus get_fork_status(uint64_t height, std::vector<uint64_t> upgrade_height
         }
     }
 
-    /* Next fork in < 25k blocks away */
-    if (height + 25000 > next_fork)
+    float days = (next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+
+    /* Next fork in < 2 weeks away */
+    if (days < 14)
     {
         /* Software doesn't support the next fork yet */
         if (supported_height < next_fork)
