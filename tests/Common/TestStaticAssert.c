@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers, The TurtleCoin developers
 //
 // This file is part of Bytecoin.
 //
@@ -15,12 +15,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include <assert.h>
 
-#ifndef __cplusplus
-#ifdef __clang__
-
-#define static_assert _Static_assert
-
-#endif
-#endif
+static_assert(1, "Test static assert c");
+int main(int argc, char *argv[]) {
+	return 0;
+}
