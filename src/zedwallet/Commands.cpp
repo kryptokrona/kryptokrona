@@ -158,6 +158,10 @@ bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
     {
         createIntegratedAddress();
     }
+    else if (command == "send_all")
+    {
+        transfer(walletInfo, node.getLastKnownBlockHeight(), true);
+    }
     /* This should never happen */
     else
     {
@@ -265,7 +269,8 @@ std::vector<Command> allCommands()
         {"outgoing_transfers", "Show outgoing transfers", false, true},
         {"reset", "Recheck the chain from zero for transactions", true, true},
         {"save", "Save your wallet state", true, true},
-        {"save_csv", "Save all wallet transactions to a CSV file", false, true},
+        {"save_csv", "Save all wallet transactions to a CSV file", true, true},
+        {"send_all", "Send all your balance to someone", false, true},
         {"status", "Show the daemon status", true, true}
     };
 

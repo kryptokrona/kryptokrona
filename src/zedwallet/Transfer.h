@@ -7,14 +7,19 @@
 #include <memory>
 
 #include <zedwallet/Types.h>
+#include <zedwallet/WalletConfig.h>
 
 enum AddressType {NotAnAddress, IntegratedAddress, StandardAddress};
 
-void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height);
+enum BalanceInfo {NotEnoughBalance, EnoughBalance, SetMixinToZero};
+
+void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
+              bool sendAll = false);
 
 void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                 std::string extra, std::shared_ptr<WalletInfo> walletInfo,
-                uint32_t height, bool integratedAddress);
+                uint32_t height, bool integratedAddress,
+                uint64_t mixin = WalletConfig::defaultMixin);
 
 void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
                               std::vector<CryptoNote::TransactionParameters>
@@ -51,3 +56,7 @@ Maybe<uint64_t> getTransferAmount();
 
 Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     std::string integratedAddress);
+
+BalanceInfo doWeHaveEnoughBalance(uint64_t amount, uint64_t fee,
+                                  std::shared_ptr<WalletInfo> walletInfo,
+                                  uint64_t height);

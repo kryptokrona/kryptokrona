@@ -95,6 +95,7 @@ public:
   void createViewWallet(const std::string &path, const std::string &password,
                         const std::string address, 
                         const Crypto::SecretKey &viewSecretKey);
+  uint64_t getBalanceMinusDust(const std::vector<std::string>& addresses);
 
   virtual void start() override;
   virtual void stop() override;
