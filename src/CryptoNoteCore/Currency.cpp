@@ -293,7 +293,7 @@ bool Currency::isFusionTransaction(const std::vector<uint64_t>& inputsAmounts, c
 
   uint64_t inputAmount = 0;
   for (auto amount: inputsAmounts) {
-    if (amount < defaultDustThreshold(height)) {
+    if (amount < defaultFusionDustThreshold(height)) {
       return false;
     }
 
@@ -302,7 +302,7 @@ bool Currency::isFusionTransaction(const std::vector<uint64_t>& inputsAmounts, c
 
   std::vector<uint64_t> expectedOutputsAmounts;
   expectedOutputsAmounts.reserve(outputsAmounts.size());
-  decomposeAmount(inputAmount, defaultDustThreshold(height), expectedOutputsAmounts);
+  decomposeAmount(inputAmount, defaultFusionDustThreshold(height), expectedOutputsAmounts);
   std::sort(expectedOutputsAmounts.begin(), expectedOutputsAmounts.end());
 
   return expectedOutputsAmounts == outputsAmounts;
@@ -334,7 +334,7 @@ bool Currency::isAmountApplicableInFusionTransactionInput(uint64_t amount, uint6
     return false;
   }
 
-  if (amount < defaultDustThreshold(height)) {
+  if (amount < defaultFusionDustThreshold(height)) {
     return false;
   }
 
@@ -429,14 +429,59 @@ Difficulty Currency::getNextDifficulty(uint8_t version, uint32_t blockIndex, std
     {
         return nextDifficulty(version, blockIndex, timestamps, cumulativeDifficulties);
     }
+    else if (blockIndex < CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
+    {
+        return nextDifficultyV3(timestamps, cumulativeDifficulties);
+    }
 
-    return nextDifficultyV3(timestamps, cumulativeDifficulties);
+    return nextDifficultyV4(timestamps, cumulativeDifficulties);
 }
 
 // LWMA-2 difficulty algorithm 
 // Copyright (c) 2017-2018 Zawy, MIT License
 // https://github.com/zawy12/difficulty-algorithms/issues/3
 Difficulty Currency::nextDifficultyV3(std::vector<std::uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const
+{
+    int64_t T = CryptoNote::parameters::DIFFICULTY_TARGET;
+    int64_t N = CryptoNote::parameters::DIFFICULTY_WINDOW_V3;
+    int64_t FTL = CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3;
+    int64_t L(0), ST, sum_3_ST(0), next_D, prev_D;
+
+    if (timestamps.size() <= static_cast<uint64_t>(N))
+    {
+        return 1000;
+    }
+
+    for (int64_t i = 1; i <= N; i++)
+    {  
+        ST = std::max(-FTL, std::min(static_cast<int64_t>(timestamps[i]) - static_cast<int64_t>(timestamps[i-1]), 6 * T));
+
+        L +=  ST * i; 
+
+        if (i > N-3)
+        {
+            sum_3_ST += ST;
+        } 
+    }
+
+    next_D = (static_cast<int64_t>(cumulativeDifficulties[N] - cumulativeDifficulties[0]) * T * (N+1) * 99) / (100 * 2 * L);
+    prev_D = cumulativeDifficulties[N] - cumulativeDifficulties[N-1];
+
+    /* Make sure we don't divide by zero if 50x attacker (thanks fireice) */
+    next_D = std::max((prev_D*70)/100, std::min(next_D, (prev_D*107)/100));
+
+    if (sum_3_ST < (8 * T) / 10)
+    {  
+        next_D = (prev_D * 110) / 100;
+    }
+
+    return static_cast<uint64_t>(next_D);
+}
+
+// LWMA-2 difficulty algorithm 
+// Copyright (c) 2017-2018 Zawy, MIT License
+// https://github.com/zawy12/difficulty-algorithms/issues/3
+Difficulty Currency::nextDifficultyV4(std::vector<std::uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const
 {
     int64_t T = CryptoNote::parameters::DIFFICULTY_TARGET;
     int64_t N = CryptoNote::parameters::DIFFICULTY_WINDOW_V3;
@@ -473,6 +518,7 @@ Difficulty Currency::nextDifficultyV3(std::vector<std::uint64_t> timestamps, std
 
     return static_cast<uint64_t>(next_D);
 }
+
 
 Difficulty Currency::nextDifficulty(std::vector<uint64_t> timestamps,
   std::vector<Difficulty> cumulativeDifficulties) const {
