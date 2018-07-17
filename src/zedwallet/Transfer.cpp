@@ -260,58 +260,41 @@ void splitTX(CryptoNote::WalletGreen &wallet,
             continue;
         }
 
-        try
+        std::cout << InformationMsg("Sending transaction number ")
+                  << InformationMsg(std::to_string(txNumber))
+                  << InformationMsg("...")
+                  << std::endl;
+
+        const size_t id = wallet.transfer(prepared);
+        auto hash = wallet.getTransaction(id).hash;
+
+        std::cout << SuccessMsg("Transaction has been sent!")
+                  << std::endl
+                  << SuccessMsg("Hash: ")
+                  << SuccessMsg(Common::podToHex(hash))
+                  << std::endl
+                  << SuccessMsg("Amount: ")
+                  << SuccessMsg(formatAmount(p1.destinations[0].amount))
+                  << std::endl << std::endl;
+
+        txNumber++;
+
+        sentAmount += p1.destinations[0].amount;
+        /* Remember to remove the fee as well from balance */
+        balance = balance - p1.destinations[0].amount - p1.fee;
+        remainder = totalAmount - sentAmount;
+
+        /* We've sent the full amount required now */
+        if (sentAmount == totalAmount)
         {
-            std::cout << InformationMsg("Sending transaction number ")
-                      << InformationMsg(std::to_string(txNumber))
-                      << InformationMsg("...")
-                      << std::endl;
-
-            const size_t id = wallet.transfer(prepared);
-            auto hash = wallet.getTransaction(id).hash;
-
-            std::cout << SuccessMsg("Transaction has been sent!")
-                      << std::endl
-                      << SuccessMsg("Hash: ")
-                      << SuccessMsg(Common::podToHex(hash))
-                      << std::endl
-                      << SuccessMsg("Amount: ")
-                      << SuccessMsg(formatAmount(p1.destinations[0].amount))
-                      << std::endl << std::endl;
-
-            txNumber++;
-
-            sentAmount += p1.destinations[0].amount;
-            /* Remember to remove the fee as well from balance */
-            balance = balance - p1.destinations[0].amount - p1.fee;
-            remainder = totalAmount - sentAmount;
-
-            /* We've sent the full amount required now */
-            if (sentAmount == totalAmount)
-            {
-                std::cout << InformationMsg("All transactions have been sent!")
-                          << std::endl;
-
-                return;
-            }
-
-            /* Went well, lets restart with the original divider */
-            amountDivider = originalDivider;
-
-            continue;
-        }
-        catch (const std::system_error &e)
-        {
-            std::cout << WarningMsg("Failed to send transaction!")
-                      << std::endl
-                      << "Error message: " << e.what()
-                      << std::endl
-                      << "Total sent so far: "
-                      << SuccessMsg(formatAmount(sentAmount))
+            std::cout << InformationMsg("All transactions have been sent!")
                       << std::endl;
 
             return;
         }
+
+        /* Went well, lets restart with the original divider */
+        amountDivider = originalDivider;
     }
 }
 
@@ -584,10 +567,10 @@ void sendTX(std::shared_ptr<WalletInfo> walletInfo,
             CryptoNote::TransactionParameters p, uint32_t height,
             bool retried)
 {
-    auto tx = walletInfo->wallet.formTransaction(p);
-
     try
     {
+        auto tx = walletInfo->wallet.formTransaction(p);
+
         /* Transaction is too large. Lets try and perform fusion to let us
            send more at once */
         if (walletInfo->wallet.txIsTooLarge(tx))
@@ -684,7 +667,7 @@ bool handleTransferError(const std::system_error &e,
             if (!WalletConfig::mixinZeroDisabled ||
                  height < WalletConfig::mixinZeroDisabledHeight)
             {
-                std::cout << "Alternatively, you can sent the mixin "
+                std::cout << "Alternatively, you can set the mixin "
                           << "count to 0." << std::endl;
 
                 if(confirm("Retry transaction with mixin of 0? "
