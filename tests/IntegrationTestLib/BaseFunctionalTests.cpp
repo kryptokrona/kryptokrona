@@ -37,7 +37,6 @@
 
 #include "Logger.h"
 
-#include "InProcTestNode.h"
 #include "RPCTestNode.h"
 
 #if defined __linux__
@@ -68,44 +67,6 @@ void BaseFunctionalTests::launchTestnet(size_t count, Topology t) {
   for (size_t i = 0; i < m_testnetSize; ++i) {
     startNode(i);
   }
-
-  waitDaemonsReady();
-
-  nodeDaemons[0]->makeINode(mainNode);
-  makeWallet(workingWallet, mainNode);
-}
-
-void BaseFunctionalTests::launchInprocTestnet(size_t count, Topology t) {
-  m_testnetSize = count;
-  m_topology = t;
-
-  for (size_t i = 0; i < m_testnetSize; ++i) {
-    auto cfg = createNodeConfiguration(i);
-    nodeDaemons.emplace_back(new InProcTestNode(cfg, m_currency, m_dispatcher));
-  }
-
-  waitDaemonsReady();
-
-  nodeDaemons[0]->makeINode(mainNode);
-  makeWallet(workingWallet, mainNode);
-}
-
-void BaseFunctionalTests::launchTestnetWithInprocNode(size_t count, Topology t) {
-  if (count < 1) {
-    LOG_WARNING("Testnet has no nodes");
-  }
-
-  m_testnetSize = count;
-  m_topology = t;
-
-  nodeDaemons.resize(m_testnetSize);
-
-  for (size_t i = 0; i < m_testnetSize - 1; ++i) {
-    startNode(i);
-  }
-
-  auto cfg = createNodeConfiguration(m_testnetSize - 1);
-  nodeDaemons[m_testnetSize - 1].reset(new InProcTestNode(cfg, m_currency, m_dispatcher));
 
   waitDaemonsReady();
 
