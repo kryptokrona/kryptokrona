@@ -21,12 +21,12 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                 uint32_t height, bool integratedAddress,
                 uint64_t mixin = WalletConfig::defaultMixin);
 
-void sendMultipleTransactions(CryptoNote::WalletGreen &wallet,
-                              std::vector<CryptoNote::TransactionParameters>
-                              transfers);
+void splitTX(CryptoNote::WalletGreen &wallet,
+             const CryptoNote::TransactionParameters p);
 
-void splitTx(CryptoNote::WalletGreen &wallet,
-             CryptoNote::TransactionParameters p);
+void sendTX(std::shared_ptr<WalletInfo> walletInfo, 
+            CryptoNote::TransactionParameters p, uint32_t height,
+            bool retried = false);
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo,
@@ -39,6 +39,9 @@ bool parseStandardAddress(std::string address, bool printErrors = false);
 bool parseIntegratedAddress(std::string address);
 
 bool parseFee(std::string feeString);
+
+bool handleTransferError(const std::system_error &e, bool retried,
+                         uint32_t height);
 
 AddressType parseAddress(std::string address);
 

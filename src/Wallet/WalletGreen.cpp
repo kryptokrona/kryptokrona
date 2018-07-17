@@ -1273,6 +1273,33 @@ WalletGreen::TransfersRange WalletGreen::getTransactionTransfersRange(size_t tra
   return bounds;
 }
 
+size_t WalletGreen::transfer(const PreparedTransaction& preparedTransaction) {
+  size_t id = WALLET_INVALID_TRANSACTION_ID;
+  Tools::ScopeExit releaseContext([this, &id] {
+    m_dispatcher.yield();
+
+    if (id != WALLET_INVALID_TRANSACTION_ID) {
+      auto& tx = m_transactions[id];
+      m_logger(INFO, BRIGHT_WHITE) << "Transaction created and send, ID " << id <<
+        ", hash " << tx.hash <<
+        ", state " << tx.state <<
+        ", totalAmount " << m_currency.formatAmount(tx.totalAmount) <<
+        ", fee " << m_currency.formatAmount(tx.fee) <<
+        ", transfers: " << TransferListFormatter(m_currency, getTransactionTransfersRange(id));
+    }
+  });
+
+  System::EventLock lk(m_readyEvent);
+
+  throwIfNotInitialized();
+  throwIfTrackingMode();
+  throwIfStopped();
+
+  id = validateSaveAndSendTransaction(*preparedTransaction.transaction, preparedTransaction.destinations, false, true);
+  return id;
+}
+
+
 size_t WalletGreen::transfer(const TransactionParameters& transactionParameters) {
   size_t id = WALLET_INVALID_TRANSACTION_ID;
   Tools::ScopeExit releaseContext([this, &id] {
@@ -1585,7 +1612,17 @@ size_t WalletGreen::doTransfer(const TransactionParameters& transactionParameter
   return validateSaveAndSendTransaction(*preparedTransaction.transaction, preparedTransaction.destinations, false, true);
 }
 
-size_t WalletGreen::getTxSize(const TransactionParameters &sendingTransaction)
+size_t WalletGreen::getTxSize(const PreparedTransaction &p)
+{
+  return p.transaction->getTransactionData().size();
+}
+
+bool WalletGreen::txIsTooLarge(const PreparedTransaction &p)
+{
+  return getTxSize(p) > getMaxTxSize();
+}
+
+PreparedTransaction WalletGreen::formTransaction(const TransactionParameters &sendingTransaction)
 {
   System::EventLock lk(m_readyEvent);
 
@@ -1614,13 +1651,7 @@ size_t WalletGreen::getTxSize(const TransactionParameters &sendingTransaction)
     changeDestination,
     preparedTransaction);
 
-  BinaryArray transactionData = preparedTransaction.transaction->getTransactionData();
-  return transactionData.size();
-}
-
-bool WalletGreen::txIsTooLarge(const TransactionParameters& sendingTransaction)
-{
-  return getTxSize(sendingTransaction) > getMaxTxSize();
+  return preparedTransaction;
 }
 
 size_t WalletGreen::makeTransaction(const TransactionParameters& sendingTransaction) {
