@@ -41,7 +41,7 @@
 
 #define MEMORY                 2097152 // 2MB scratchpad 2^21
 #define ITER                   1048576 // 2^20
-#define ITER_Divded            524288 // 2^19
+#define ITER_Divided           524288 // 2^19
 #define MEMORY_Light           1048576 // 1MB scratchpad 2^20
 #define ITER_Light             524288 // 2^19
 #define ITER_Light_Divided     262144 // 2^18
