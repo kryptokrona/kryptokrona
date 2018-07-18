@@ -22,7 +22,7 @@ file(GLOB_RECURSE Wallet Wallet/*)
 file(GLOB_RECURSE WalletLegacy WalletLegacy/*)
 file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 file(GLOB_RECURSE PaymentGate PaymentGate/*)
-file(GLOB_RECURSE walletd PaymentGateService/*)
+file(GLOB_RECURSE service PaymentGateService/*)
 file(GLOB_RECURSE poolwallet PoolWallet/*)
 file(GLOB_RECURSE zedwallet zedwallet/*)
 
@@ -70,20 +70,20 @@ if(MSVC)
     BinaryInfo/miner.rc
   )
   set(PG_SOURCES_OS
-    BinaryInfo/walletd.rc
+    BinaryInfo/service.rc
   )
 endif()
 
 add_executable(TurtleCoind ${TurtleCoind} ${DAEMON_SOURCES_OS})
 add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
-add_executable(walletd ${walletd} ${PG_SOURCES_OS})
+add_executable(service ${service} ${PG_SOURCES_OS})
 add_executable(poolwallet ${poolwallet} ${POOLWALLET_SOURCES_OS})
 add_executable(miner ${miner} ${MINER_SOURCES_OS})
 
 if(MSVC)
   target_link_libraries(System ws2_32)
   target_link_libraries(TurtleCoind Rpcrt4)
-  target_link_libraries(walletd Rpcrt4)
+  target_link_libraries(service Rpcrt4)
 endif ()
 
 # Add the dependencies we need
@@ -99,9 +99,9 @@ endif()
 target_link_libraries(zedwallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES})
 target_link_libraries(PaymentGate Mnemonics)
 if(MSVC)
-	target_link_libraries(walletd PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common ${Boost_LIBRARIES})
+	target_link_libraries(service PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common ${Boost_LIBRARIES})
 else()
-	target_link_libraries(walletd PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common ${Boost_LIBRARIES})
+	target_link_libraries(service PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common ${Boost_LIBRARIES})
 endif()
 target_link_libraries(poolwallet Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
@@ -112,13 +112,13 @@ target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging
 add_dependencies(Rpc version)
 add_dependencies(TurtleCoind version)
 add_dependencies(zedwallet version)
-add_dependencies(walletd version)
+add_dependencies(service version)
 add_dependencies(poolwallet version)
 add_dependencies(P2P version)
 
 # Finally build the binaries
 set_property(TARGET TurtleCoind PROPERTY OUTPUT_NAME "TurtleCoind")
 set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "zedwallet")
-set_property(TARGET walletd PROPERTY OUTPUT_NAME "service")
+set_property(TARGET service PROPERTY OUTPUT_NAME "service")
 set_property(TARGET poolwallet PROPERTY OUTPUT_NAME "poolwallet")
 set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
