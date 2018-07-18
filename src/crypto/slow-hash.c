@@ -39,8 +39,12 @@
 #include "hash-ops.h"
 #include "oaes_lib.h"
 
-#define MEMORY         (1 << 21) // 2MB scratchpad
-#define ITER           (1 << 20)
+#define MEMORY                 2097152 // 2MB scratchpad 2^21
+#define ITER                   1048576 // 2^20
+#define ITER_Divded            524288 // 2^19
+#define MEMORY_Light           1048576 // 1MB scratchpad 2^20
+#define ITER_Light             524288 // 2^19
+#define ITER_Light_Divided     262144 // 2^18
 #define AES_BLOCK_SIZE  16
 #define AES_KEY_SIZE    32
 #define INIT_SIZE_BLK   8
@@ -607,7 +611,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     if(useAes)
     {
         aes_expand_key(state.hs.b, expandedKey);
-        for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+        for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
         {
             aes_pseudo_round(text, text, expandedKey, INIT_SIZE_BLK);
             memcpy(&hp_state[i * INIT_SIZE_BYTE], text, INIT_SIZE_BYTE);
@@ -617,7 +621,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     {
         aes_ctx = (oaes_ctx *) oaes_alloc();
         oaes_key_import_data(aes_ctx, state.hs.b, AES_KEY_SIZE);
-        for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+        for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
         {
             for(j = 0; j < INIT_SIZE_BLK; j++)
                 aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], aes_ctx->key->exp_data);
@@ -641,7 +645,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     // the useAes test is only performed once, not every iteration.
     if(useAes)
     {
-        for(i = 0; i < ITER / (light?2:1) / 2; i++)
+        for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
         {
             pre_aes();
             _c = _mm_aesenc_si128(_c, _a);
@@ -650,7 +654,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     }
     else
     {
-        for(i = 0; i < ITER / (light?2:1) / 2; i++)
+        for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
         {
             pre_aes();
             aesb_single_round((uint8_t *) &_c, (uint8_t *) &_c, (uint8_t *) &_a);
@@ -666,7 +670,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     if(useAes)
     {
         aes_expand_key(&state.hs.b[32], expandedKey);
-        for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+        for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
         {
             // add the xor to the pseudo round
             aes_pseudo_round_xor(text, text, expandedKey, &hp_state[i * INIT_SIZE_BYTE], INIT_SIZE_BLK);
@@ -675,7 +679,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     else
     {
         oaes_key_import_data(aes_ctx, &state.hs.b[32], AES_KEY_SIZE);
-        for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+        for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
         {
             for(j = 0; j < INIT_SIZE_BLK; j++)
             {
@@ -942,7 +946,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
      */
 
     aes_expand_key(state.hs.b, expandedKey);
-    for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+    for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
     {
         aes_pseudo_round(text, text, expandedKey, INIT_SIZE_BLK);
         memcpy(&hp_state[i * INIT_SIZE_BYTE], text, INIT_SIZE_BYTE);
@@ -961,7 +965,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     _b = vld1q_u8((const uint8_t *)b);
 
 
-    for(i = 0; i < ITER / (light?2:1) / 2; i++)
+    for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
     {
         pre_aes();
         _c = vaeseq_u8(_c, zero);
@@ -977,7 +981,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     memcpy(text, state.init, INIT_SIZE_BYTE);
 
     aes_expand_key(&state.hs.b[32], expandedKey);
-    for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+    for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
     {
         // add the xor to the pseudo round
         aes_pseudo_round_xor(text, text, expandedKey, &hp_state[i * INIT_SIZE_BYTE], INIT_SIZE_BLK);
@@ -1145,7 +1149,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
 
     // use aligned data
     memcpy(expandedKey, aes_ctx->key->exp_data, aes_ctx->key->exp_data_len);
-    for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+    for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
     {
         for(j = 0; j < INIT_SIZE_BLK; j++)
             aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], expandedKey);
@@ -1157,7 +1161,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     U64(b)[0] = U64(&state.k[16])[0] ^ U64(&state.k[48])[0];
     U64(b)[1] = U64(&state.k[16])[1] ^ U64(&state.k[48])[1];
 
-    for(i = 0; i < ITER / (light?2:1) / 2; i++)
+    for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
     {
       #define MASK(div) ((uint32_t)(((MEMORY / AES_BLOCK_SIZE) / (div) - 1) << 4))
       #define state_index(x,div) ((*(uint32_t *) x) & MASK(div))
@@ -1185,7 +1189,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     memcpy(text, state.init, INIT_SIZE_BYTE);
     oaes_key_import_data(aes_ctx, &state.hs.b[32], AES_KEY_SIZE);
     memcpy(expandedKey, aes_ctx->key->exp_data, aes_ctx->key->exp_data_len);
-    for(i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++)
+    for(i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++)
     {
         for(j = 0; j < INIT_SIZE_BLK; j++)
         {
@@ -1317,7 +1321,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
   VARIANT1_PORTABLE_INIT();
 
   oaes_key_import_data(aes_ctx, aes_key, AES_KEY_SIZE);
-  for (i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++) {
+  for (i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++) {
     for (j = 0; j < INIT_SIZE_BLK; j++) {
       aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], aes_ctx->key->exp_data);
     }
@@ -1329,23 +1333,23 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     b[i] = state.k[16 + i] ^ state.k[48 + i];
   }
 
-  for (i = 0; i < ITER / (light?2:1) / 2; i++) {
+  for (i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++) {
     /* Dependency chain: address -> read value ------+
      * written value <-+ hard function (AES or MUL) <+
      * next address  <-+
      */
     /* Iteration 1 */
-    j = e2i(a, MEMORY / (light?2:1) / AES_BLOCK_SIZE);
+    j = e2i(a, ((light? MEMORY_Light : MEMORY) / AES_BLOCK_SIZE));
     copy_block(c, &long_state[j * AES_BLOCK_SIZE]);
     aesb_single_round(c, c, a);
     xor_blocks(b, c);
     swap_blocks(b, c);
     copy_block(&long_state[j * AES_BLOCK_SIZE], c);
-    assert(j == e2i(a, MEMORY / (light?2:1) / AES_BLOCK_SIZE));
+    assert(j == e2i(a, ((light? MEMORY_Light : MEMORY) / AES_BLOCK_SIZE)));
     swap_blocks(a, b);
     VARIANT1_1(&long_state[j * AES_BLOCK_SIZE]);
     /* Iteration 2 */
-    j = e2i(a, MEMORY / (light?2:1) / AES_BLOCK_SIZE);
+    j = e2i(a, ((light? MEMORY_Light : MEMORY) / AES_BLOCK_SIZE));
     copy_block(c, &long_state[j * AES_BLOCK_SIZE]);
     mul(a, c, d);
     sum_half_blocks(b, d);
@@ -1353,13 +1357,13 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     xor_blocks(b, c);
     VARIANT1_2(c + 8);
     copy_block(&long_state[j * AES_BLOCK_SIZE], c);
-    assert(j == e2i(a, MEMORY / (light?2:1) / AES_BLOCK_SIZE));
+    assert(j == e2i(a, ((light? MEMORY_Light : MEMORY) / AES_BLOCK_SIZE)));
     swap_blocks(a, b);
   }
 
   memcpy(text, state.init, INIT_SIZE_BYTE);
   oaes_key_import_data(aes_ctx, &state.hs.b[32], AES_KEY_SIZE);
-  for (i = 0; i < MEMORY / (light?2:1) / INIT_SIZE_BYTE; i++) {
+  for (i = 0; i < ((light? MEMORY_Light : MEMORY) / INIT_SIZE_BYTE); i++) {
     for (j = 0; j < INIT_SIZE_BLK; j++) {
       xor_blocks(&text[j * AES_BLOCK_SIZE], &long_state[i * INIT_SIZE_BYTE + j * AES_BLOCK_SIZE]);
       aesb_pseudo_round(&text[AES_BLOCK_SIZE * j], &text[AES_BLOCK_SIZE * j], aes_ctx->key->exp_data);
