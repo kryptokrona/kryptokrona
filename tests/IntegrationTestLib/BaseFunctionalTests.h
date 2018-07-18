@@ -142,8 +142,6 @@ namespace Tests {
       const CryptoNote::Currency& m_currency;
 
       void launchTestnet(size_t count, Topology t = Line);
-      void launchTestnetWithInprocNode(size_t count, Topology t = Line);
-      void launchInprocTestnet(size_t count, Topology t = Line);
       void stopTestnet();
 
       void startNode(size_t index);
