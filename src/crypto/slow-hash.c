@@ -645,7 +645,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     // the useAes test is only performed once, not every iteration.
     if(useAes)
     {
-        for(i = 0; i < (light? MEMORY_Light : MEMORY); i++)
+        for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
         {
             pre_aes();
             _c = _mm_aesenc_si128(_c, _a);
@@ -654,7 +654,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     }
     else
     {
-        for(i = 0; i < (light? MEMORY_Light : MEMORY); i++)
+        for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
         {
             pre_aes();
             aesb_single_round((uint8_t *) &_c, (uint8_t *) &_c, (uint8_t *) &_a);
@@ -965,7 +965,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     _b = vld1q_u8((const uint8_t *)b);
 
 
-    for(i = 0; i < (light? MEMORY_Light : MEMORY); i++)
+    for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
     {
         pre_aes();
         _c = vaeseq_u8(_c, zero);
@@ -1161,7 +1161,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     U64(b)[0] = U64(&state.k[16])[0] ^ U64(&state.k[48])[0];
     U64(b)[1] = U64(&state.k[16])[1] ^ U64(&state.k[48])[1];
 
-    for(i = 0; i < (light? MEMORY_Light : MEMORY); i++)
+    for(i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++)
     {
       #define MASK(div) ((uint32_t)(((MEMORY / AES_BLOCK_SIZE) / (div) - 1) << 4))
       #define state_index(x,div) ((*(uint32_t *) x) & MASK(div))
@@ -1333,7 +1333,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     b[i] = state.k[16 + i] ^ state.k[48 + i];
   }
 
-  for (i = 0; i < (light? MEMORY_Light : MEMORY); i++) {
+  for (i = 0; i < (light? ITER_Light_Divided : ITER_Divided); i++) {
     /* Dependency chain: address -> read value ------+
      * written value <-+ hard function (AES or MUL) <+
      * next address  <-+
