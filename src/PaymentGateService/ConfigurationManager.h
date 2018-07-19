@@ -28,11 +28,8 @@ public:
   ConfigurationManager();
   bool init(int argc, char** argv);
 
-  bool startInprocess;
   Configuration gateConfiguration;
-  CryptoNote::NetNodeConfig netNodeConfig;
   RpcNodeConfiguration remoteNodeConfig;
-  std::string dataDir;
 };
 
 } //namespace PaymentService

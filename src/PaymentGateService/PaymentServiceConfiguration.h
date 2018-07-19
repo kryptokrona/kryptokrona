@@ -53,7 +53,6 @@ struct Configuration {
   bool daemonize;
   bool registerService;
   bool unregisterService;
-  bool testnet;
   bool printAddresses;
   bool syncFromZero;
   bool legacySecurity;

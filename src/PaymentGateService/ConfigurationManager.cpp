@@ -25,28 +25,23 @@
 #include "version.h"
 
 namespace PaymentService {
-
 namespace po = boost::program_options;
 
 ConfigurationManager::ConfigurationManager() {
-  startInprocess = false;
 }
 
 bool ConfigurationManager::init(int argc, char** argv) {
   po::options_description cmdGeneralOptions("Common Options");
-
   cmdGeneralOptions.add_options()
-      ("config,c", po::value<std::string>(), "configuration file");
+    ("config,c", po::value<std::string>(), "configuration file")
+    ("help,h", "produce this help message and exit")
+    ("version,v", "Output version information");
 
   po::options_description confGeneralOptions;
 
-  cmdGeneralOptions.add_options()
-      ("help,h", "produce this help message and exit")
-      ("version", "Output version information");
-
   Configuration::initOptions(cmdGeneralOptions);
   Configuration::initOptions(confGeneralOptions);
-  
+
   po::options_description remoteNodeOptions("Remote Node Options");
   RpcNodeConfiguration::initOptions(remoteNodeOptions);
 
@@ -60,13 +55,13 @@ bool ConfigurationManager::init(int argc, char** argv) {
   po::store(po::parse_command_line(argc, argv, cmdOptionsDesc), cmdOptions);
   po::notify(cmdOptions);
 
-  if (cmdOptions.count("help")) {
+  if (cmdOptions.count("help") > 0) {
     std::cout << cmdOptionsDesc << std::endl;
     return false;
   }
 
   if (cmdOptions.count("version") > 0) {
-    std::cout << "walletd v" << PROJECT_VERSION_LONG << std::endl;
+    std::cout << "service v" << PROJECT_VERSION_LONG << std::endl;
     return false;
   }
 
@@ -84,13 +79,7 @@ bool ConfigurationManager::init(int argc, char** argv) {
   po::notify(allOptions);
 
   gateConfiguration.init(allOptions);
-  netNodeConfig.init(allOptions);
   remoteNodeConfig.init(allOptions);
-  dataDir = command_line::get_arg(allOptions, command_line::arg_data_dir);
-
-  netNodeConfig.setTestnet(allOptions["testnet"].as<bool>());
-  startInprocess = allOptions["local"].as<bool>();
-
   return true;
 }
 

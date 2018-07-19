@@ -75,11 +75,6 @@ bool PaymentGateService::init(int argc, char** argv) {
 
   Logging::LoggerRef log(logger, "main");
 
-  if (config.gateConfiguration.testnet) {
-    log(Logging::INFO) << "Starting in testnet mode";
-    currencyBuilder.testnet(true);
-  }
-
   if (!config.gateConfiguration.serverRoot.empty()) {
     changeDirectory(config.gateConfiguration.serverRoot);
     log(Logging::INFO) << "Current working directory now is " << config.gateConfiguration.serverRoot;

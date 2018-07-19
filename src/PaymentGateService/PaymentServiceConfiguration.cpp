@@ -34,8 +34,7 @@ Configuration::Configuration() {
   registerService = false;
   unregisterService = false;
   containerPassword = "";
-  logFile = "walletd.log";
-  testnet = false;
+  logFile = "service.log";
   printAddresses = false;
   syncFromZero = false;
   logLevel = Logging::INFO;
@@ -89,10 +88,6 @@ void Configuration::init(const boost::program_options::variables_map& options) {
 
   if (registerService && unregisterService) {
     throw ConfigurationError("It's impossible to use both \"register-service\" and \"unregister-service\" at the same time");
-  }
-
-  if (options["testnet"].as<bool>()) {
-    testnet = true;
   }
 
   if (options.count("log-file") != 0) {
