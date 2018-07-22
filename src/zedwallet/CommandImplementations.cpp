@@ -329,7 +329,7 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
             << Common::podToHex(t.hash) << ",";         /* Hash */
             
             /* Make outgoing transfers negative for easier spreadsheet math */
-            if (t.totalamount < 0)
+            if (t.totalAmount < 0)
             {
                 csv << "-" << amount << ",";
             }
