@@ -29,7 +29,7 @@ namespace WalletConfig
     const std::string walletName = "zedwallet";
 
     /* The name of walletd, the programmatic rpc interface to a wallet */
-    const std::string walletdName = "walletd";
+    const std::string walletdName = "service";
 
     /* The full name of your crypto */
     const std::string coinName = std::string(CryptoNote::CRYPTONOTE_NAME);
