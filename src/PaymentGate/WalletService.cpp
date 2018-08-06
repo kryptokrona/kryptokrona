@@ -34,6 +34,7 @@
 #include "CryptoNote.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
+#include "CryptoNoteCore/CryptoNoteTools.h"
 #include "CryptoNoteCore/TransactionExtra.h"
 #include "CryptoNoteCore/Account.h"
 
@@ -957,24 +958,24 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
         if (!CryptoNote::validateAddress(addr, currency))
         {
             std::string decoded;
-            uint64_t tag;
+            uint64_t prefix;
 
-            if (!Tools::Base58::decode_addr(addr, tag, decoded))
+            /* Need to be able to decode the string as an address */
+            if (!Tools::Base58::decode_addr(addr, prefix, decoded))
+            {
+                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+            }
+
+            /* The prefix needs to be the same as the base58 prefix */
+            if (prefix !=
+                CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
             {
                 throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
             }
 
             const uint64_t paymentIDLen = 64;
 
-            /* Must be at least as long as the paymentID - don't know the exact
-               length because currency prefix could change - we'll verify the
-               extracted address and payment ID though, which will do the
-               trick. */
-            if (decoded.length() <= paymentIDLen)
-            {
-                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
-            }
-
+            /* Grab the payment ID from the decoded address */
             std::string paymentID = decoded.substr(0, paymentIDLen);
 
             /* Check the extracted payment ID is good. */
@@ -988,7 +989,20 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
                 throw std::system_error(make_error_code(CryptoNote::error::CONFLICTING_PAYMENT_IDS));
             }
 
-            std::string address = decoded.substr(paymentIDLen, std::string::npos);
+            /* The binary array encoded keys are the rest of the address */
+            std::string keys = decoded.substr(paymentIDLen, std::string::npos);
+
+            CryptoNote::AccountPublicAddress addr;
+            CryptoNote::BinaryArray ba = Common::asBinaryArray(keys);
+
+            if (!CryptoNote::fromBinaryArray(addr, ba))
+            {
+                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+            }
+
+            /* Parse the AccountPublicAddress into a standard wallet address */
+            /* Use the calculated prefix from earlier for less typing :p */
+            std::string address = CryptoNote::getAccountAddressAsStr(prefix, addr);
 
             /* Check the extracted address is good. */
             validateAddresses({address}, currency, logger);
@@ -1288,10 +1302,24 @@ std::error_code WalletService::createIntegratedAddress(const std::string &addres
     return x.code();
   }
 
+  uint64_t prefix;
+
+  CryptoNote::AccountPublicAddress addr;
+
+  /* Get the private + public key from the address */
+  const bool valid = CryptoNote::parseAccountAddressString(prefix, addr,
+                                                           address);
+
+  /* Pack as a binary array */
+  CryptoNote::BinaryArray ba;
+  CryptoNote::toBinaryArray(addr, ba);
+  std::string keys = Common::asString(ba);
+
+  /* Encode prefix + paymentID + keys as an address */
   integratedAddress = Tools::Base58::encode_addr
   (
-    CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
-    paymentId + address
+      CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+      paymentId + keys
   );
 
   return std::error_code();

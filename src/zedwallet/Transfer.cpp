@@ -14,6 +14,7 @@
 #include "CryptoNoteConfig.h"
 
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
+#include <CryptoNoteCore/CryptoNoteTools.h>
 #include <CryptoNoteCore/TransactionExtra.h>
 
 #include "IWallet.h"
@@ -913,23 +914,40 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     }
 
     std::string decoded;
-    uint64_t tag;
+    uint64_t prefix;
 
-    if (!Tools::Base58::decode_addr(integratedAddress, tag, decoded))
+    /* Need to be able to decode the string as an address */
+    if (!Tools::Base58::decode_addr(integratedAddress, prefix, decoded))
+    {
+        return Nothing<std::pair<std::string, std::string>>();
+    }
+
+    /* The prefix needs to be the same as the base58 prefix */
+    if (prefix !=
+        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
 
     const uint64_t paymentIDLen = 64;
 
-    /* Should be the length of a standard address + payment ID */
-    if (decoded.length() != WalletConfig::standardAddressLength + paymentIDLen)
+    /* Grab the payment ID from the decoded address */
+    std::string paymentID = decoded.substr(0, paymentIDLen);
+
+    /* The binary array encoded keys are the rest of the address */
+    std::string keys = decoded.substr(paymentIDLen, std::string::npos);
+
+    CryptoNote::AccountPublicAddress addr;
+    CryptoNote::BinaryArray ba = Common::asBinaryArray(keys);
+
+    if (!CryptoNote::fromBinaryArray(addr, ba))
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
 
-    std::string paymentID = decoded.substr(0, paymentIDLen);
-    std::string address = decoded.substr(paymentIDLen, std::string::npos);
+    /* Parse the AccountPublicAddress into a standard wallet address */
+    /* Use the calculated prefix from earlier for less typing :p */
+    std::string address = CryptoNote::getAccountAddressAsStr(prefix, addr);
 
     /* The address out should of course be a valid address */
     if (!parseStandardAddress(address))
