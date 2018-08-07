@@ -16,18 +16,15 @@ find_library(Readline_LIBRARY
 )
 
 # Conditionally set READLINE_FOUND value
-if(Readline_INCLUDE_DIR AND Readline_LIBRARY 
-  AND Ncurses_LIBRARY)
+if(Readline_INCLUDE_DIR AND Readline_LIBRARY AND Ncurses_LIBRARY)
   set(READLINE_FOUND TRUE)
-else(Readline_INCLUDE_DIR AND Readline_LIBRARY 
-  AND Ncurses_LIBRARY)
+else()
   FIND_LIBRARY(Readline_LIBRARY NAMES readline)
   include(FindPackageHandleStandardArgs)
   FIND_PACKAGE_HANDLE_STANDARD_ARGS(Readline DEFAULT_MSG 
     Readline_INCLUDE_DIR Readline_LIBRARY )
   MARK_AS_ADVANCED(Readline_INCLUDE_DIR Readline_LIBRARY)
-endif(Readline_INCLUDE_DIR AND Readline_LIBRARY 
-  AND Ncurses_LIBRARY)
+endif()
 
 # Hide these variables in cmake GUIs
 mark_as_advanced(
@@ -35,3 +32,9 @@ mark_as_advanced(
     Readline_INCLUDE_DIR
     Readline_LIBRARY
 )
+
+# Apple uses the system readline library rather than GNU Readline, which doesn't
+# support the stuff we need.
+if (APPLE AND READLINE_FOUND AND Readline_INCLUDE_DIR EQUAL "/usr/include")
+    message(FATAL_ERROR "Readline library found, but it is using the apple version of readline rather than GNU Readline.\nTo fix this, run:\nbrew install readline; brew link --force readline\nAlternatively, run:\ncmake .. -DFORCE_READLINE=FALSE\nTo disable readline support")
+endif()
