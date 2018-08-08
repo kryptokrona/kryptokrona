@@ -23,7 +23,6 @@ file(GLOB_RECURSE WalletLegacy WalletLegacy/*)
 file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 file(GLOB_RECURSE PaymentGate PaymentGate/*)
 file(GLOB_RECURSE service PaymentGateService/*)
-file(GLOB_RECURSE poolwallet PoolWallet/*)
 file(GLOB_RECURSE zedwallet zedwallet/*)
 
 if(MSVC)
@@ -37,7 +36,7 @@ endif()
 # This appears to be an IDE thing, to group files together.
 # https://cmake.org/cmake/help/v3.0/command/source_group.html
 # Probably not what you need to be looking at if something isn't building
-source_group("" FILES $${Common} ${ConnectivityTool} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TurtleCoind} ${JsonRpcServer} ${Http} ${Logging} ${miner} ${Mnemonics} ${NodeRpcProxy} ${poolwallet} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletLegacy} ${zedwallet})
+source_group("" FILES $${Common} ${ConnectivityTool} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TurtleCoind} ${JsonRpcServer} ${Http} ${Logging} ${miner} ${Mnemonics} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletLegacy} ${zedwallet})
 
 add_library(BlockchainExplorer ${BlockchainExplorer})
 add_library(Common ${Common})
@@ -63,9 +62,6 @@ if(MSVC)
   set(ZED_WALLET_SOURCES_OS
     BinaryInfo/zedwallet.rc
   )
-  set(POOLWALLET_SOURCES_OS
-    BinaryInfo/poolwallet.rc
-  )
   set(MINER_SOURCES_OS
     BinaryInfo/miner.rc
   )
@@ -77,7 +73,6 @@ endif()
 add_executable(TurtleCoind ${TurtleCoind} ${DAEMON_SOURCES_OS})
 add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
 add_executable(service ${service} ${PG_SOURCES_OS})
-add_executable(poolwallet ${poolwallet} ${POOLWALLET_SOURCES_OS})
 add_executable(miner ${miner} ${MINER_SOURCES_OS})
 
 if(MSVC)
@@ -103,7 +98,7 @@ if(MSVC)
 else()
 	target_link_libraries(service PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common ${Boost_LIBRARIES})
 endif()
-target_link_libraries(poolwallet Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
+target_link_libraries(Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
 
 # Add dependencies means we have to build the latter before we build the former
@@ -113,12 +108,10 @@ add_dependencies(Rpc version)
 add_dependencies(TurtleCoind version)
 add_dependencies(zedwallet version)
 add_dependencies(service version)
-add_dependencies(poolwallet version)
 add_dependencies(P2P version)
 
 # Finally build the binaries
 set_property(TARGET TurtleCoind PROPERTY OUTPUT_NAME "TurtleCoind")
 set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "zedwallet")
-set_property(TARGET service PROPERTY OUTPUT_NAME "service")
-set_property(TARGET poolwallet PROPERTY OUTPUT_NAME "poolwallet")
+set_property(TARGET service PROPERTY OUTPUT_NAME "turtle-service")
 set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
