@@ -320,25 +320,15 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
             continue;
         }
 
-        const std::string amount = formatAmountBasic(std::abs(t.totalAmount));
+        const std::string amount = formatAmountBasic(t.totalAmount);
 
         const std::string direction = t.totalAmount > 0 ? "IN" : "OUT";
 
         csv << unixTimeToDate(t.timestamp) << ","       /* Timestamp */
             << t.blockHeight << ","                     /* Block Height */
-            << Common::podToHex(t.hash) << ",";         /* Hash */
-            
-            /* Make outgoing transfers negative for easier spreadsheet math */
-            if (t.totalAmount < 0)
-            {
-                csv << "-" << amount << ",";
-            }
-            else
-            {
-                csv << amount << ",";
-            }
-            
-        csv << direction                                /* In/Out */
+            << Common::podToHex(t.hash) << ","          /* Hash */
+            << amount << ","                            /* Amount */
+            << direction                                /* In/Out */
             << std::endl;
     }
 
