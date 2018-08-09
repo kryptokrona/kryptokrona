@@ -27,6 +27,7 @@ public:
   virtual uint32_t getKnownBlockCount() const override { return 0; }
   virtual uint64_t getLastLocalBlockTimestamp() const override { return 0; }
   virtual std::string getInfo() override { return std::string(); }
+  virtual void getFeeInfo() override { }
 
   virtual void getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount, std::vector<Crypto::Hash>& blockHashes, const Callback& callback) override {
     callback(std::error_code());
@@ -73,7 +74,8 @@ public:
     const Callback& callback) override { }
 
   virtual void isSynchronized(bool& syncStatus, const Callback& callback) override { }
-
+  virtual std::string feeAddress() override { return std::string(); }
+  virtual uint32_t feeAmount() override { return 0; }
 };
 
 

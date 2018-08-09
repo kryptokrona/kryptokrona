@@ -32,6 +32,7 @@ public:
   virtual uint32_t getKnownBlockCount() const override { return 0; };
   virtual uint64_t getLastLocalBlockTimestamp() const override { return 0; }
   virtual std::string getInfo() override { return std::string(); }
+  virtual void getFeeInfo() override { }
   virtual CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo() const override { return CryptoNote::BlockHeaderInfo(); }
 
   virtual void getNewBlocks(std::vector<Crypto::Hash>&& knownBlockIds, std::vector<CryptoNote::RawBlock>& newBlocks, uint32_t& height, const Callback& callback) override { callback(std::error_code()); };
@@ -61,6 +62,8 @@ public:
   }
 
   void updateObservers();
+  virtual std::string feeAddress() override { return std::string(); }
+  virtual uint32_t feeAmount() override { return 0; }
 
   Tools::ObserverManager<CryptoNote::INodeObserver> observerManager;
 
