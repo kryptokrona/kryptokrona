@@ -148,7 +148,7 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
 }
 
 void splitTX(CryptoNote::WalletGreen &wallet, 
-             const CryptoNote::TransactionParameters p)
+             const CryptoNote::TransactionParameters p, uint32_t nodeFee)
 {
     std::cout << "Transaction is still too large to send, splitting into "
               << "multiple chunks." 
@@ -212,9 +212,9 @@ void splitTX(CryptoNote::WalletGreen &wallet,
         {
             p1.destinations[0].amount = remainder;
         }
-        else if (p1.destinations[0].amount + p1.fee > balance)
+        else if (p1.destinations[0].amount + p1.fee + nodeFee > balance)
         {
-            p1.destinations[0].amount = balance - p1.fee;
+            p1.destinations[0].amount = balance - p1.fee - nodeFee;
 
             if (p1.destinations[0].amount < WalletConfig::minimumSend)
             {
@@ -230,7 +230,7 @@ void splitTX(CryptoNote::WalletGreen &wallet,
             return;
         }
 
-        uint64_t totalNeeded = p1.destinations[0].amount + p1.fee;
+        uint64_t totalNeeded = p1.destinations[0].amount + p1.fee + nodeFee;
 
         /* Need to update before checking intially */
         wallet.updateInternalCache();
@@ -283,7 +283,7 @@ void splitTX(CryptoNote::WalletGreen &wallet,
 
         sentAmount += p1.destinations[0].amount;
         /* Remember to remove the fee as well from balance */
-        balance = balance - p1.destinations[0].amount - p1.fee;
+        balance = balance - p1.destinations[0].amount - p1.fee - nodeFee;
         remainder = totalAmount - sentAmount;
 
         /* We've sent the full amount required now */
@@ -572,12 +572,12 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
         return;
     }
 
-    sendTX(walletInfo, p, height);
+    sendTX(walletInfo, p, height, false, nodeFee);
 }
 
 void sendTX(std::shared_ptr<WalletInfo> walletInfo, 
             CryptoNote::TransactionParameters p, uint32_t height,
-            bool retried)
+            bool retried, uint32_t nodeFee)
 {
     try
     {
@@ -600,7 +600,7 @@ void sendTX(std::shared_ptr<WalletInfo> walletInfo,
                smaller chunks */
             if (walletInfo->wallet.txIsTooLarge(tx))
             {
-                splitTX(walletInfo->wallet, p);
+                splitTX(walletInfo->wallet, p, nodeFee);
                 return;
             }
         }
@@ -622,7 +622,7 @@ void sendTX(std::shared_ptr<WalletInfo> walletInfo,
         if (setMixinToZero)
         {
             p.mixIn = 0;
-            sendTX(walletInfo, p, height, true);
+            sendTX(walletInfo, p, height, true, nodeFee);
         }
     }
 }

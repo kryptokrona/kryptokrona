@@ -27,7 +27,7 @@ void splitTX(CryptoNote::WalletGreen &wallet,
 
 void sendTX(std::shared_ptr<WalletInfo> walletInfo, 
             CryptoNote::TransactionParameters p, uint32_t height,
-            bool retried = false);
+            bool retried = false, uint32_t nodeFee = 0);
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo,
