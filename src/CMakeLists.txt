@@ -98,7 +98,6 @@ if(MSVC)
 else()
 	target_link_libraries(service PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common ${Boost_LIBRARIES})
 endif()
-target_link_libraries(Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
 
 # Add dependencies means we have to build the latter before we build the former
