@@ -128,7 +128,7 @@ bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
     }
     else if (command == "transfer")
     {
-        transfer(walletInfo, node.getLastKnownBlockHeight());
+        transfer(walletInfo, node.getLastKnownBlockHeight(), false, node.feeAddress(), node.feeAmount());
     }
     else if (command == "optimize")
     {
@@ -148,7 +148,7 @@ bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
     }
     else if (command == "ab_send")
     {
-        sendFromAddressBook(walletInfo, node.getLastKnownBlockHeight());
+        sendFromAddressBook(walletInfo, node.getLastKnownBlockHeight(), node.feeAddress(), node.feeAmount());
     }
     else if (command == "change_password")
     {
@@ -160,7 +160,7 @@ bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
     }
     else if (command == "send_all")
     {
-        transfer(walletInfo, node.getLastKnownBlockHeight(), true);
+        transfer(walletInfo, node.getLastKnownBlockHeight(), true, node.feeAddress(), node.feeAmount());
     }
     /* This should never happen */
     else
