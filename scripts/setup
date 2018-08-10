@@ -62,7 +62,7 @@ zip turtlecoin-dev-bin-$(date +%F)-linux.zip miner LICENSE zedwallet TurtleCoind
 # Create directories to keep always-up-to-date binaries for 
 # TRTL Network files. Ideally, your bashrc has aliases to run
 # from this folder, or you can add it to your $PATH.
-mkdir ~/.Crypto/{Athena,TurtleCoin,Karai}
+mkdir -p ~/.Crypto/{Athena,TurtleCoin,Karai}
 mkdir ~/Binaries
 
 # Move the zip we created to the Binaries snapshot folder.
