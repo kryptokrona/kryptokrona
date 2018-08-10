@@ -37,7 +37,7 @@ sudo apt-get install librocksdb-dev
 
 ##### Building
 
-- `git clone -b master https://github.com/turtlecoin/turtlecoin`
+- `git clone -b master --single-branch https://github.com/turtlecoin/turtlecoin`
 - `cd turtlecoin`
 - `mkdir build && cd $_`
 - `cmake ..`
