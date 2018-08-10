@@ -3,7 +3,7 @@
 # Turtlecoin Multi-installer
 # a one line clone-and-compile for turtlecoin:
 #
-#     ` $ curl -sL "https://raw.githubusercontent.com/turtlecoin/turtlecoin/master/multi_installer.sh" | bash
+#     ` $ curl -sL "https://raw.githubusercontent.com/turtlecoin/turtlecoin/master/scripts/multi_installer.sh" | bash
 #
 # Supports Ubuntu 16.04 LTS, OSX 10.10+
 # Supports building project from current directory (automatic detection)
@@ -54,7 +54,7 @@ _set_wd() {
             esac
         fi
         mkdir turtlecoin
-        git clone -q https://github.com/turtlecoin/turtlecoin turtlecoin   >>build.log 2>&1 || _fail "Unable to clone git repository. Please see build.log for more information"
+        git clone -b master -q https://github.com/turtlecoin/turtlecoin turtlecoin   >>build.log 2>&1 || _fail "Unable to clone git repository. Please see build.log for more information"
         cd turtlecoin
     fi
 }
@@ -84,7 +84,7 @@ _configure_ubuntu() {
         _note "Sudo privileges required for package installation"
     fi
     $_sudo apt-get update -qq
-    $_sudo apt-get install -qq -y git build-essential python-dev gcc g++ git cmake libboost-all-dev librocksdb-dev  >>build.log 2>&1 || _fail "Unable to install build dependencies. Please see build.log for more information"
+    $_sudo apt-get install -qq -y git build-essential python-dev gcc g++ git cmake libboost-all-dev librocksdb-dev libreadline-dev >>build.log 2>&1 || _fail "Unable to install build dependencies. Please see build.log for more information"
 
     export CXXFLAGS="-std=gnu++11"
 }
@@ -124,7 +124,8 @@ _configure_osx() {
     fi
     _note "Updating homebrew and installing software dependencies..."
     brew update --quiet
-    brew install --quiet git cmake boost rocksdb
+    brew install --quiet git cmake boost rocksdb readline
+    brew link --force readline
 }
 
 _configure_os() {

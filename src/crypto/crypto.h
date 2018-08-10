@@ -1,19 +1,9 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2016-2018, The Karbowanec developers
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
@@ -52,8 +42,10 @@ struct EllipticCurveScalar {
 
     static void generate_keys(PublicKey &, SecretKey &);
     friend void generate_keys(PublicKey &, SecretKey &);
-    static void generate_keys_from_seed(PublicKey &, SecretKey &, SecretKey &);
-    friend void generate_keys_from_seed(PublicKey &, SecretKey &, SecretKey &);
+	static void generate_deterministic_keys(PublicKey &pub, SecretKey &sec, SecretKey& second);
+	friend void generate_deterministic_keys(PublicKey &pub, SecretKey &sec, SecretKey& second);
+	static SecretKey generate_m_keys(PublicKey &pub, SecretKey &sec, const SecretKey& recovery_key = SecretKey(), bool recover = false);
+	friend SecretKey generate_m_keys(PublicKey &pub, SecretKey &sec, const SecretKey& recovery_key, bool recover);
     static bool check_key(const PublicKey &);
     friend bool check_key(const PublicKey &);
     static bool secret_key_to_public_key(const SecretKey &, PublicKey &);
@@ -143,10 +135,12 @@ struct EllipticCurveScalar {
     crypto_ops::generate_keys(pub, sec);
   }
 
-  /* Generate a new key pair from a seed
-   */
-  inline void generate_keys_from_seed(PublicKey &pub, SecretKey &sec, SecretKey &seed) {
-    crypto_ops::generate_keys_from_seed(pub, sec, seed);
+  inline void generate_deterministic_keys(PublicKey &pub, SecretKey &sec, SecretKey& second) {
+    crypto_ops::generate_deterministic_keys(pub, sec, second);
+  }
+
+  inline SecretKey generate_m_keys(PublicKey &pub, SecretKey &sec, const SecretKey& recovery_key = SecretKey(), bool recover = false) {
+    return crypto_ops::generate_m_keys(pub, sec, recovery_key, recover);
   }
 
   /* Check a public key. Returns true if it is valid, false otherwise.

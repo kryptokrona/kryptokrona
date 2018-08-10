@@ -1,5 +1,6 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2018, The TurtleCoin Developers
+// Copyright (c) 2018, The Karai Developers
 // 
 // Please see the included LICENSE file for more information.
 
@@ -55,7 +56,7 @@ struct COMMAND_RPC_GET_BLOCKS_FAST {
     std::vector<Crypto::Hash> block_ids; //*first 10 blocks id goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block */
     
     void serialize(ISerializer &s) {
-      serializeAsBinary(block_ids, "block_ids", s);
+      KV_MEMBER(block_ids);
     }
   };
 
@@ -96,7 +97,7 @@ struct COMMAND_RPC_GET_POOL_CHANGES {
 
     void serialize(ISerializer &s) {
       KV_MEMBER(tailBlockId)
-      serializeAsBinary(knownTxsIds, "knownTxsIds", s);
+      KV_MEMBER(knownTxsIds);
     }
   };
 
@@ -109,7 +110,7 @@ struct COMMAND_RPC_GET_POOL_CHANGES {
     void serialize(ISerializer &s) {
       KV_MEMBER(isTailBlockActual)
       KV_MEMBER(addedTxs)
-      serializeAsBinary(deletedTxsIds, "deletedTxsIds", s);
+      KV_MEMBER(deletedTxsIds);
       KV_MEMBER(status)
     }
   };
@@ -122,7 +123,7 @@ struct COMMAND_RPC_GET_POOL_CHANGES_LITE {
 
     void serialize(ISerializer &s) {
       KV_MEMBER(tailBlockId)
-      serializeAsBinary(knownTxsIds, "knownTxsIds", s);
+      KV_MEMBER(knownTxsIds);
     }
   };
 
@@ -135,7 +136,7 @@ struct COMMAND_RPC_GET_POOL_CHANGES_LITE {
     void serialize(ISerializer &s) {
       KV_MEMBER(isTailBlockActual)
       KV_MEMBER(addedTxs)
-      serializeAsBinary(deletedTxsIds, "deletedTxsIds", s);
+      KV_MEMBER(deletedTxsIds);
       KV_MEMBER(status)
     }
   };
@@ -177,6 +178,11 @@ struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request {
 struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_out_entry {
   uint32_t global_amount_index;
   Crypto::PublicKey out_key;
+  
+  void serialize(ISerializer &s) {
+    KV_MEMBER(global_amount_index)
+    KV_MEMBER(out_key);
+  }
 };
 #pragma pack(pop)
 
@@ -186,7 +192,7 @@ struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_outs_for_amount {
 
   void serialize(ISerializer &s) {
     KV_MEMBER(amount)
-    serializeAsBinary(outs, "outs", s);
+    KV_MEMBER(outs);
   }
 };
 
@@ -667,7 +673,7 @@ struct COMMAND_RPC_QUERY_BLOCKS {
     uint64_t timestamp;
 
     void serialize(ISerializer &s) {
-      serializeAsBinary(block_ids, "block_ids", s);
+      KV_MEMBER(block_ids);
       KV_MEMBER(timestamp)
     }
   };
@@ -695,7 +701,7 @@ struct COMMAND_RPC_QUERY_BLOCKS_LITE {
     uint64_t timestamp;
 
     void serialize(ISerializer &s) {
-      serializeAsBinary(blockIds, "block_ids", s);
+      KV_MEMBER(blockIds);
       KV_MEMBER(timestamp)
     }
   };
@@ -722,7 +728,7 @@ struct COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HEIGHTS {
     std::vector<uint32_t> blockHeights;
 
     void serialize(ISerializer& s) {
-      serializeAsBinary(blockHeights, "blockHeights", s);
+      KV_MEMBER(blockHeights);
     }
   };
 
@@ -742,7 +748,7 @@ struct COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HASHES {
     std::vector<Crypto::Hash> blockHashes;
 
     void serialize(ISerializer& s) {
-      serializeAsBinary(blockHashes, "blockHashes", s);
+      KV_MEMBER(blockHashes);
     }
   };
 
@@ -814,7 +820,7 @@ struct COMMAND_RPC_GET_TRANSACTION_HASHES_BY_PAYMENT_ID {
 
     void serialize(ISerializer &s) {
       KV_MEMBER(status)
-      serializeAsBinary(transactionHashes, "transactionHashes", s);
+      KV_MEMBER(transactionHashes);
     }
   };
 };
@@ -824,7 +830,7 @@ struct COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASHES {
     std::vector<Crypto::Hash> transactionHashes;
 
     void serialize(ISerializer &s) {
-      serializeAsBinary(transactionHashes, "transactionHashes", s);
+      KV_MEMBER(transactionHashes);
     }
   };
 
@@ -850,6 +856,22 @@ struct COMMAND_RPC_GET_PEERS {
     void serialize(ISerializer &s) {
       KV_MEMBER(status)
       KV_MEMBER(peers)
+    }
+  };
+};
+
+struct COMMAND_RPC_GET_FEE_ADDRESS {
+  typedef EMPTY_STRUCT request;
+
+  struct response {
+    std::string address;
+    uint32_t amount;
+    std::string status;
+
+    void serialize(ISerializer & s) {
+      KV_MEMBER(address)
+      KV_MEMBER(amount)
+      KV_MEMBER(status)
     }
   };
 };

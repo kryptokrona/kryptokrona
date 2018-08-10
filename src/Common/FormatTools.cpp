@@ -18,14 +18,25 @@ namespace Common {
 std::string get_mining_speed(uint32_t hr) {
   if (hr>1e9) return (boost::format("%.2f GH/s") % (hr/1e9)).str();
   if (hr>1e6) return (boost::format("%.2f MH/s") % (hr/1e6)).str();
-  if (hr>1e3) return (boost::format("%.2f kH/s") % (hr/1e3)).str();
+  if (hr>1e3) return (boost::format("%.2f KH/s") % (hr/1e3)).str();
 
   return (boost::format("%.0f H/s") % hr).str();
 }
 
 //--------------------------------------------------------------------------------
 std::string get_sync_percentage(uint64_t height, uint64_t target_height) {
-  target_height = target_height ? target_height < height ? height : target_height : height;
+  /* Don't divide by zero */
+  if (height == 0 || target_height == 0)
+  {
+    return "0.00";
+  }
+
+  /* So we don't have > 100% */
+  if (target_height > height)
+  {
+      target_height = height;
+  }
+
   float pc = 100.0f * height / target_height;
 
   if (height < target_height && pc > 99.99f) {
@@ -39,26 +50,34 @@ enum ForkStatus { UpToDate, ForkLater, ForkSoonReady, ForkSoonNotReady, OutOfDat
 
 ForkStatus get_fork_status(uint64_t height, std::vector<uint64_t> upgrade_heights, uint64_t supported_height)
 {
+    /* Allow fork heights to be empty */
+    if (upgrade_heights.empty())
+    {
+        return UpToDate;
+    }
+
     uint64_t next_fork = 0;
 
     for (auto upgrade : upgrade_heights)
     {
-      /* We have hit an upgrade already that the user cannot support */
-      if (height >= upgrade && supported_height < upgrade)
-      {
-          return OutOfDate;
-      }
+        /* We have hit an upgrade already that the user cannot support */
+        if (height >= upgrade && supported_height < upgrade)
+        {
+            return OutOfDate;
+        }
 
-      /* Get the next fork height */
-      if (upgrade > height)
-      {
-          next_fork = upgrade;
-          break;
-      }
+        /* Get the next fork height */
+        if (upgrade > height)
+        {
+            next_fork = upgrade;
+            break;
+        }
     }
 
-    /* Next fork in < 25k blocks away */
-    if (height + 25000 > next_fork)
+    float days = (next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+
+    /* Next fork in < 2 weeks away */
+    if (days < 14)
     {
         /* Software doesn't support the next fork yet */
         if (supported_height < next_fork)

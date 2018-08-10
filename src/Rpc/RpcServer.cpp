@@ -1,5 +1,6 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2018, The TurtleCoin Developers
+// Copyright (c) 2018, The Karai Developers
 // 
 // Please see the included LICENSE file for more information.
 
@@ -119,6 +120,7 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/gettransactions", { jsonMethod<COMMAND_RPC_GET_TRANSACTIONS>(&RpcServer::on_get_transactions), false } },
   { "/sendrawtransaction", { jsonMethod<COMMAND_RPC_SEND_RAW_TX>(&RpcServer::on_send_raw_tx), false } },
   { "/stop_daemon", { jsonMethod<COMMAND_RPC_STOP_DAEMON>(&RpcServer::on_stop_daemon), true } },
+  { "/feeinfo", { jsonMethod<COMMAND_RPC_GET_FEE_ADDRESS>(&RpcServer::on_get_fee_info), true } }, 
   { "/getpeers", { jsonMethod<COMMAND_RPC_GET_PEERS>(&RpcServer::on_get_peers), true } },
 
   // New copies of the binary handlers but in JSON
@@ -218,6 +220,16 @@ bool RpcServer::processJsonRpcRequest(const HttpRequest& request, HttpResponse& 
 
   response.setBody(jsonResponse.getBody());
   logger(TRACE) << "JSON-RPC response: " << jsonResponse.getBody();
+  return true;
+}
+
+bool RpcServer::setFeeAddress(const std::string fee_address) {
+  m_fee_address = fee_address;
+  return true;
+}
+
+bool RpcServer::setFeeAmount(const uint32_t fee_amount) {
+  m_fee_amount = fee_amount;
   return true;
 }
 
@@ -492,9 +504,8 @@ bool RpcServer::on_get_info(const COMMAND_RPC_GET_INFO::request& req, COMMAND_RP
   res.grey_peerlist_size = m_p2p.getPeerlistManager().get_gray_peers_count();
   res.last_known_block_index = std::max(static_cast<uint32_t>(1), m_protocol.getObservedHeight()) - 1;
   res.network_height = std::max(static_cast<uint32_t>(1), m_protocol.getBlockchainHeight());
-  res.upgrade_heights = std::vector<uint64_t>(std::begin(CryptoNote::parameters::FORK_HEIGHTS),
-                                              std::end(CryptoNote::parameters::FORK_HEIGHTS));
-  res.supported_height = CryptoNote::parameters::FORK_HEIGHTS[CryptoNote::parameters::CURRENT_FORK_INDEX];
+  res.upgrade_heights = CryptoNote::parameters::FORK_HEIGHTS_SIZE == 0 ? std::vector<uint64_t>() : std::vector<uint64_t>(CryptoNote::parameters::FORK_HEIGHTS, CryptoNote::parameters::FORK_HEIGHTS + CryptoNote::parameters::FORK_HEIGHTS_SIZE);
+  res.supported_height = CryptoNote::parameters::FORK_HEIGHTS_SIZE == 0 ? 0 : CryptoNote::parameters::FORK_HEIGHTS[CryptoNote::parameters::CURRENT_FORK_INDEX];
   res.hashrate = (uint32_t)round(res.difficulty / CryptoNote::parameters::DIFFICULTY_TARGET);
   res.synced = ((uint64_t)res.height == (uint64_t)res.network_height);
   res.testnet = m_core.getCurrency().isTestnet();
@@ -564,6 +575,18 @@ bool RpcServer::on_send_raw_tx(const COMMAND_RPC_SEND_RAW_TX::request& req, COMM
 
   m_protocol.relayTransactions(transactions);
   //TODO: make sure that tx has reached other nodes here, probably wait to receive reflections from other nodes
+  res.status = CORE_RPC_STATUS_OK;
+  return true;
+}
+
+bool RpcServer::on_get_fee_info(const COMMAND_RPC_GET_FEE_ADDRESS::request & req, COMMAND_RPC_GET_FEE_ADDRESS::response & res) {
+  if (m_fee_address.empty()) {
+    res.status = CORE_RPC_STATUS_OK;
+    return false;
+  }
+
+  res.address = m_fee_address;
+  res.amount = m_fee_amount;
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }

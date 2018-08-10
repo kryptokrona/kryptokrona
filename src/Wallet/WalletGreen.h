@@ -33,6 +33,13 @@
 
 namespace CryptoNote {
 
+struct PreparedTransaction {
+    std::shared_ptr<ITransaction> transaction;
+    std::vector<WalletTransfer> destinations;
+    uint64_t neededMoney;
+    uint64_t changeAmount;
+};
+
 class WalletGreen : public IWallet,
                     ITransfersObserver,
                     IBlockchainSynchronizerObserver,
@@ -81,20 +88,24 @@ public:
   virtual std::vector<WalletTransactionWithTransfers> getUnconfirmedTransactions() const override;
   virtual std::vector<size_t> getDelayedTransactionIds() const override;
 
-  virtual size_t transfer(const TransactionParameters& sendingTransaction) override;
+  virtual size_t transfer(const TransactionParameters& transactionParameters) override;
 
   virtual size_t makeTransaction(const TransactionParameters& sendingTransaction) override;
   virtual void commitTransaction(size_t) override;
   virtual void rollbackUncommitedTransaction(size_t) override;
-  bool txIsTooLarge(const TransactionParameters& sendingTransaction);
-  size_t getTxSize(const TransactionParameters &sendingTransaction);
+
+  size_t transfer(const PreparedTransaction& preparedTransaction);
+  bool txIsTooLarge(const PreparedTransaction &p);
+  size_t getTxSize(const PreparedTransaction &p);
   size_t getMaxTxSize();
+  PreparedTransaction formTransaction(const TransactionParameters &sendingTransaction);
   void updateInternalCache();
   void clearCaches(bool clearTransactions, bool clearCachedData);
   void clearCacheAndShutdown();
   void createViewWallet(const std::string &path, const std::string &password,
                         const std::string address, 
                         const Crypto::SecretKey &viewSecretKey);
+  uint64_t getBalanceMinusDust(const std::vector<std::string>& addresses);
 
   virtual void start() override;
   virtual void stop() override;
@@ -220,13 +231,7 @@ protected:
   void pushEvent(const WalletEvent& event);
   bool isFusionTransaction(const WalletTransaction& walletTx) const;
 
-  struct PreparedTransaction {
-    std::unique_ptr<ITransaction> transaction;
-    std::vector<WalletTransfer> destinations;
-    uint64_t neededMoney;
-    uint64_t changeAmount;
-  };
-
+  
   void prepareTransaction(std::vector<WalletOuts>&& wallets,
     const std::vector<WalletOrder>& orders,
     uint64_t fee,

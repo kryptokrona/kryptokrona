@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 2.8.6)
 
+# Required for finding Threads on arm
+enable_language(C)
+enable_language(CXX)
+find_package(Threads)
+
 set(VERSION "0.1")
 # $Format:Packaged from commit %H%nset(COMMIT %h)%nset(REFS "%d")$
 
@@ -10,6 +15,13 @@ set(CMAKE_SKIP_INSTALL_RULES OFF)
 set(CMAKE_SKIP_PACKAGE_ALL_DEPENDENCY ON)
 set(CMAKE_SUPPRESS_REGENERATION ON)
 set(DO_TESTS ON CACHE STRING "Spend time making tests? Defaults to ON")
+set(FORCE_READLINE ON CACHE BOOL "Make readline support mandatory on Linux and Mac? Defaults to ON")
+
+# GNU Readline isn't easy to get working on Windows :(
+if (MSVC)
+    set(FORCE_READLINE OFF)
+endif()
+
 set(STATIC ON CACHE BOOL "Link libraries statically")
 
 set(ENABLE_AVX OFF CACHE STRING "Enable RocksDB AVX/AVX2 support detection? Defaults to OFF")
@@ -20,6 +32,7 @@ set(ENABLE_SYNC_FILE_RANGE_WRITE OFF CACHE STRING "Enable RocksDB SYNC_FILE_RANG
 set(ENABLE_PTHREAD_MUTEX_ADAPTIVE_NP OFF CACHE STRING "Enable RocksDB PTHREAD_MUTEX_ADAPTIVE_NP support detection? Defaults to OFF")
 set(ENABLE_MALLOC_USABLE_SIZE OFF CACHE STRING "Enable RocksDB MALLOC_USABLE_SIZE support detection? Defaults to OFF")
 set(ENABLE_SCHED_GETCPU OFF CACHE STRING "Enable RocksDB SCHED_GETCPU support detection? Defaults to OFF")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 if(DO_TESTS)
   message(STATUS "BUILD TESTS: enabled")
@@ -48,6 +61,21 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Posix)
 else()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Linux)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Posix)
+endif()
+
+# Don't bother searching for readline on windows
+if (NOT MSVC)
+    find_package(Readline)
+
+    if(READLINE_FOUND)
+        add_definitions(-DHAVE_READLINE)
+        include_directories(${Readline_INCLUDE_DIR})
+        link_libraries(${Readline_LIBRARY})
+    else()
+        if(FORCE_READLINE)
+            message(FATAL_ERROR "Could not find GNU Readline library!\nYou can fix this by either re-running cmake like so:\ncmake .. -DFORCE_READLINE=FALSE\nAlternatively, you can install the readline package for your operating system.\nUbuntu: sudo apt-get install libreadline-dev\nApple: brew install readline; brew link --force readline")
+        endif()
+    endif()
 endif()
 
 if(MSVC)
@@ -89,11 +117,31 @@ else()
   endif()
   set(C_WARNINGS "-Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes")
   set(CXX_WARNINGS "-Wno-reorder -Wno-missing-field-initializers")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${MINGW_FLAG} ${WARNINGS} ${C_WARNINGS} ${ARCH_FLAG} -maes")
+  
+  try_compile(STATICASSERTC_RESULT "${CMAKE_CURRENT_BINARY_DIR}/static-assert" "${CMAKE_CURRENT_SOURCE_DIR}/tests/Common/TestStaticAssert.c" COMPILE_DEFINITIONS "-std=c11")
+  if(STATICASSERTC_RESULT)
+    set(STATICASSERTC_FLAG "")
+  else()
+    set(STATICASSERTC_FLAG "-Dstatic_assert=_Static_assert")
+  endif()
+
+  try_compile(STATICASSERTCPP_RESULT "${CMAKE_CURRENT_BINARY_DIR}/static-assert" "${CMAKE_CURRENT_SOURCE_DIR}/tests/Common/TestStaticAssert.cpp" COMPILE_DEFINITIONS "-std=c++11")
+  if(STATICASSERTCPP_RESULT)
+    set(STATICASSERTCPP_FLAG "")
+  else()
+    set(STATICASSERTCPP_FLAG "-Dstatic_assert=_Static_assert")
+  endif()
+  
+  # -maes is not supported on arm
+  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${MINGW_FLAG} ${STATICASSERTC_FLAG} ${WARNINGS} ${C_WARNINGS} ${ARCH_FLAG} -maes")
+  endif()
   if(NOT APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
   endif()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${MINGW_FLAG} ${WARNINGS} ${CXX_WARNINGS} ${ARCH_FLAG} -maes")
+  if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${MINGW_FLAG} ${STATICASSERTCPP_FLAG} ${WARNINGS} ${CXX_WARNINGS} ${ARCH_FLAG} -maes")
+  endif()
   if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_HAS_TR1_TUPLE=0")
   endif()
@@ -179,7 +227,7 @@ endif()
 ## We need to setup the RocksDB build environment to match our system
 if(NOT MSVC)
   execute_process(
-    COMMAND cmake ${CMAKE_CURRENT_SOURCE_DIR}/external/rocksdb -DWITH_GFLAGS=0 -B${PROJECT_BINARY_DIR}/rocksdb
+    COMMAND cmake ${CMAKE_CURRENT_SOURCE_DIR}/external/rocksdb -DWITH_GFLAGS=0 -DCMAKE_BUILD_TYPE=MinSizeRel -DWITH_TESTS=OFF -DWITH_TOOLS=OFF -DPORTABLE=ON -B${PROJECT_BINARY_DIR}/rocksdb
   )
   set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_BINARY_DIR}/rocksdb/librocksdb.a")
 endif()

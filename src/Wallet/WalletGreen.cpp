@@ -1,19 +1,8 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #include "WalletGreen.h"
 
@@ -357,8 +346,7 @@ void WalletGreen::initWithKeys(const std::string& path, const std::string& passw
   prefix->version = static_cast<uint8_t>(WalletSerializerV2::SERIALIZATION_VERSION);
   prefix->nextIv = Crypto::rand<Crypto::chacha8_iv>();
 
-  Crypto::cn_context cnContext;
-  Crypto::generate_chacha8_key(cnContext, password, m_key);
+  Crypto::generate_chacha8_key(password, m_key);
 
   uint64_t creationTimestamp = time(nullptr);
   prefix->encryptedViewKeys = encryptKeyPair(viewPublicKey, viewSecretKey, creationTimestamp, m_key, prefix->nextIv);
@@ -426,8 +414,7 @@ void WalletGreen::exportWallet(const std::string& path, bool encrypt, WalletSave
     if (encrypt) {
       newStorageKey = m_key;
     } else {
-      cn_context cnContext;
-      generate_chacha8_key(cnContext, "", newStorageKey);
+      generate_chacha8_key("", newStorageKey);
     }
 
     copyContainerStoragePrefix(m_containerStorage, m_key, newStorage, newStorageKey);
@@ -459,8 +446,7 @@ void WalletGreen::load(const std::string& path, const std::string& password, std
 
   stopBlockchainSynchronizer();
 
-  Crypto::cn_context cnContext;
-  generate_chacha8_key(cnContext, password, m_key);
+  generate_chacha8_key(password, m_key);
 
   std::ifstream walletFileStream(path, std::ios_base::binary);
   int version = walletFileStream.peek();
@@ -898,9 +884,8 @@ void WalletGreen::changePassword(const std::string& oldPassword, const std::stri
     return;
   }
 
-  Crypto::cn_context cnContext;
   Crypto::chacha8_key newKey;
-  Crypto::generate_chacha8_key(cnContext, newPassword, newKey);
+  Crypto::generate_chacha8_key(newPassword, newKey);
 
   m_containerStorage.atomicUpdate([this, newKey](ContainerStorage& newStorage) {
     copyContainerStoragePrefix(m_containerStorage, m_key, newStorage, newKey);
@@ -1288,6 +1273,33 @@ WalletGreen::TransfersRange WalletGreen::getTransactionTransfersRange(size_t tra
   return bounds;
 }
 
+size_t WalletGreen::transfer(const PreparedTransaction& preparedTransaction) {
+  size_t id = WALLET_INVALID_TRANSACTION_ID;
+  Tools::ScopeExit releaseContext([this, &id] {
+    m_dispatcher.yield();
+
+    if (id != WALLET_INVALID_TRANSACTION_ID) {
+      auto& tx = m_transactions[id];
+      m_logger(INFO, BRIGHT_WHITE) << "Transaction created and send, ID " << id <<
+        ", hash " << tx.hash <<
+        ", state " << tx.state <<
+        ", totalAmount " << m_currency.formatAmount(tx.totalAmount) <<
+        ", fee " << m_currency.formatAmount(tx.fee) <<
+        ", transfers: " << TransferListFormatter(m_currency, getTransactionTransfersRange(id));
+    }
+  });
+
+  System::EventLock lk(m_readyEvent);
+
+  throwIfNotInitialized();
+  throwIfTrackingMode();
+  throwIfStopped();
+
+  id = validateSaveAndSendTransaction(*preparedTransaction.transaction, preparedTransaction.destinations, false, true);
+  return id;
+}
+
+
 size_t WalletGreen::transfer(const TransactionParameters& transactionParameters) {
   size_t id = WALLET_INVALID_TRANSACTION_ID;
   Tools::ScopeExit releaseContext([this, &id] {
@@ -1320,6 +1332,25 @@ size_t WalletGreen::transfer(const TransactionParameters& transactionParameters)
 
   id = doTransfer(transactionParameters);
   return id;
+}
+
+uint64_t WalletGreen::getBalanceMinusDust(const std::vector<std::string>& addresses)
+{
+    std::vector<WalletOuts> wallets = pickWallets(addresses);
+    std::vector<OutputToTransfer> unused;
+
+    /* We want to get the full balance, so don't stop getting outputs early */
+    uint64_t needed = std::numeric_limits<uint64_t>::max();
+
+    return selectTransfers
+    (
+        needed,
+        /* Don't include dust outputs */
+        false,
+        m_currency.defaultDustThreshold(m_node.getLastKnownBlockHeight()),
+        std::move(wallets),
+        unused
+    );
 }
 
 void WalletGreen::prepareTransaction(std::vector<WalletOuts>&& wallets,
@@ -1581,7 +1612,17 @@ size_t WalletGreen::doTransfer(const TransactionParameters& transactionParameter
   return validateSaveAndSendTransaction(*preparedTransaction.transaction, preparedTransaction.destinations, false, true);
 }
 
-size_t WalletGreen::getTxSize(const TransactionParameters &sendingTransaction)
+size_t WalletGreen::getTxSize(const PreparedTransaction &p)
+{
+  return p.transaction->getTransactionData().size();
+}
+
+bool WalletGreen::txIsTooLarge(const PreparedTransaction &p)
+{
+  return getTxSize(p) > getMaxTxSize();
+}
+
+PreparedTransaction WalletGreen::formTransaction(const TransactionParameters &sendingTransaction)
 {
   System::EventLock lk(m_readyEvent);
 
@@ -1610,13 +1651,7 @@ size_t WalletGreen::getTxSize(const TransactionParameters &sendingTransaction)
     changeDestination,
     preparedTransaction);
 
-  BinaryArray transactionData = preparedTransaction.transaction->getTransactionData();
-  return transactionData.size();
-}
-
-bool WalletGreen::txIsTooLarge(const TransactionParameters& sendingTransaction)
-{
-  return getTxSize(sendingTransaction) > getMaxTxSize();
+  return preparedTransaction;
 }
 
 size_t WalletGreen::makeTransaction(const TransactionParameters& sendingTransaction) {
@@ -3017,10 +3052,10 @@ size_t WalletGreen::createFusionTransaction(uint64_t threshold, uint16_t mixin,
 
   uint32_t height = m_node.getLastKnownBlockHeight();
 
-  if (threshold <= m_currency.defaultDustThreshold(height)) {
+  if (threshold <= m_currency.defaultFusionDustThreshold(height)) {
     m_logger(ERROR, BRIGHT_RED) << "Fusion transaction threshold is too small. Threshold " << m_currency.formatAmount(threshold) <<
-      ", minimum threshold " << m_currency.formatAmount(m_currency.defaultDustThreshold(height) + 1);
-    throw std::runtime_error("Threshold must be greater than " + m_currency.formatAmount(m_currency.defaultDustThreshold(height)));
+      ", minimum threshold " << m_currency.formatAmount(m_currency.defaultFusionDustThreshold(height) + 1);
+    throw std::runtime_error("Threshold must be greater than " + m_currency.formatAmount(m_currency.defaultFusionDustThreshold(height)));
   }
 
   if (m_walletsContainer.get<RandomAccessIndex>().size() == 0) {

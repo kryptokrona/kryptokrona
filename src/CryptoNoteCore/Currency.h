@@ -33,7 +33,11 @@ public:
   uint64_t blockFutureTimeLimit() const { return m_blockFutureTimeLimit; }
   uint64_t blockFutureTimeLimit(uint32_t blockHeight) const
   {
-      if (blockHeight >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+      if (blockHeight >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
+      {
+          return CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4;
+      }
+      else if (blockHeight >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
       {
           return CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3;
       }
@@ -61,6 +65,14 @@ public:
   uint64_t minimumFee() const { return m_mininumFee; }
   uint64_t defaultDustThreshold(uint32_t height) const {
       if (height >= CryptoNote::parameters::DUST_THRESHOLD_V2_HEIGHT)
+      {
+          return CryptoNote::parameters::DEFAULT_DUST_THRESHOLD_V2;
+      }
+
+      return m_defaultDustThreshold;
+  }
+  uint64_t defaultFusionDustThreshold(uint32_t height) const {
+      if (height >= CryptoNote::parameters::FUSION_DUST_THRESHOLD_HEIGHT_V2)
       {
           return CryptoNote::parameters::DEFAULT_DUST_THRESHOLD_V2;
       }
@@ -136,10 +148,12 @@ size_t difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion, uint32_t h
   Difficulty nextDifficulty(std::vector<uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const;
 Difficulty nextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const;
   Difficulty nextDifficultyV3(std::vector<uint64_t> timestamps, std::vector<Difficulty> cumulative_difficulties) const;
+  Difficulty nextDifficultyV4(std::vector<std::uint64_t> timestamps, std::vector<Difficulty> cumulativeDifficulties) const;
 
-  bool checkProofOfWorkV1(Crypto::cn_context& context, const CachedBlock& block, Difficulty currentDifficulty) const;
-  bool checkProofOfWorkV2(Crypto::cn_context& context, const CachedBlock& block, Difficulty currentDifficulty) const;
-  bool checkProofOfWork(Crypto::cn_context& context, const CachedBlock& block, Difficulty currentDifficulty) const;
+
+  bool checkProofOfWorkV1(const CachedBlock& block, Difficulty currentDifficulty) const;
+  bool checkProofOfWorkV2(const CachedBlock& block, Difficulty currentDifficulty) const;
+  bool checkProofOfWork(const CachedBlock& block, Difficulty currentDifficulty) const;
 
   Currency(Currency&& currency);
 

@@ -142,7 +142,7 @@ void MiningConfig::printHelp() {
 }
 
 void MiningConfig::printVersion() {
-  std::cout << "TurtleCoin v" << PROJECT_VERSION << " Miner" << std::endl;
+  std::cout << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << " Miner" << std::endl;
 }
 
 }

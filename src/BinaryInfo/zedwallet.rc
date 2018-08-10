@@ -21,7 +21,7 @@ VS_VERSION_INFO VERSIONINFO
       BLOCK "000004b0"
       BEGIN
         VALUE "CompanyName",      PROJECT_SITE
-        VALUE "FileDescription",  PROJECT_NAME " ZedWallet " PROJECT_VERSION_LONG
+        VALUE "FileDescription",  PROJECT_NAME " zedwallet " PROJECT_VERSION_LONG
         VALUE "FileVersion",      PROJECT_VERSION_BUILD_NO
         VALUE "LegalCopyright",   PROJECT_COPYRIGHT
         VALUE "OriginalFilename", "zedwallet.exe"

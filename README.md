@@ -4,6 +4,10 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/an6je6l48eawteyg?svg=true)](https://ci.appveyor.com/project/RocksteadyTC/turtlecoin)
 ### How To Compile
 
+On Linux or Mac on a non standard architecture, and can't get GNU Readline installed?
+
+Disable it with `cmake .. -DFORCE_READLINE=FALSE`
+
 #### Ubuntu 16.04+ and MacOS 10.10+
 
 There is a bash installation script for Ubuntu 16.04+ and MacOS 10.10+ which can be used to checkout and build the project from source:
@@ -20,12 +24,10 @@ If the script doesn't work for you:
 
 #### Linux
 
-If you are using Arch Linux, there is an AUR precompiled package, `turtlecoin-bin`, or a build from source version, `turtlecoin-git`.
-
 ##### Prerequisites
 
-- You will need the following packages: boost (1.55 or higher), rocksdb, cmake, git, gcc (4.9 or higher), g++ (4.9 or higher), make, and python. Most of these should already be installed on your system.
-- For example on Ubuntu: `sudo apt-get install -y build-essential python-dev gcc g++ git cmake libboost-all-dev librocksdb-dev`
+- You will need the following packages: boost (1.55 or higher), rocksdb, cmake, git, gcc (4.9 or higher), g++ (4.9 or higher), make, GNU readline, and python. Most of these should already be installed on your system.
+- For example on Ubuntu: `sudo apt-get install -y build-essential python-dev gcc g++ git cmake libboost-all-dev librocksdb-dev libreadline-dev`
 - If you are using Ubuntu and your version of Ubuntu doesn't have librocksdb-dev, you can get it from a ppa instead:
 ```
 sudo add-apt-repository ppa:ethcore/ethcore -y
@@ -35,7 +37,7 @@ sudo apt-get install librocksdb-dev
 
 ##### Building
 
-- `git clone https://github.com/turtlecoin/turtlecoin`
+- `git clone -b master https://github.com/turtlecoin/turtlecoin`
 - `cd turtlecoin`
 - `mkdir build && cd $_`
 - `cmake ..`
@@ -47,11 +49,12 @@ sudo apt-get install librocksdb-dev
 
 - Install [cmake](https://cmake.org/). See [here](https://stackoverflow.com/questions/23849962/cmake-installer-for-mac-fails-to-create-usr-bin-symlinks) if you are unable call `cmake` from the terminal after installing.
 - Install the [boost](http://www.boost.org/) libraries. Either compile boost manually or run `brew install boost`.
+- Install [GNU Readline](https://tiswww.case.edu/php/chet/readline/rltop.html) by running `brew install readline; brew link --force readline`. - Make sure you run this full command, or it will link the wrong version of readline
 - Install XCode and Developer Tools.
 
 ##### Building
 
-- `git clone https://github.com/turtlecoin/turtlecoin`
+- `git clone -b master https://github.com/turtlecoin/turtlecoin`
 - `cd turtlecoin`
 - `mkdir build && cd $_`
 - `cmake ..` or `cmake -DBOOST_ROOT=<path_to_boost_install> ..` when building

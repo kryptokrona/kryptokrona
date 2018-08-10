@@ -629,7 +629,7 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
       logger(Logging::WARNING) << "Checkpoint block hash mismatch for block " << blockStr;
       return error::BlockValidationError::CHECKPOINT_BLOCK_HASH_MISMATCH;
     }
-  } else if (!currency.checkProofOfWork(cryptoContext, cachedBlock, currentDifficulty)) {
+  } else if (!currency.checkProofOfWork(cachedBlock, currentDifficulty)) {
     logger(Logging::WARNING) << "Proof of work too weak for block " << blockStr;
     return error::BlockValidationError::PROOF_OF_WORK_TOO_WEAK;
   }
@@ -1041,7 +1041,8 @@ bool Core::isTransactionValidForPool(const CachedTransaction& cachedTransaction,
     return false;
   }
 
-  bool isFusion = fee == 0 && currency.isFusionTransaction(cachedTransaction.getTransaction(), cachedTransaction.getTransactionBinaryArray().size());
+  bool isFusion = fee == 0 && currency.isFusionTransaction(cachedTransaction.getTransaction(), cachedTransaction.getTransactionBinaryArray().size(), getTopBlockIndex());
+
   if (!isFusion && fee < currency.minimumFee()) {
     logger(Logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
       << " is not valid. Reason: fee is too small and it's not a fusion transaction";
