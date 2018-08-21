@@ -233,8 +233,7 @@ std::string createIntegratedAddress(std::string address, std::string paymentID)
     CryptoNote::AccountPublicAddress addr;
 
     /* Get the private + public key from the address */
-    const bool valid = CryptoNote::parseAccountAddressString(prefix, addr,
-                                                             address);
+    CryptoNote::parseAccountAddressString(prefix, addr, address);
 
     /* Pack as a binary array */
     CryptoNote::BinaryArray ba;
