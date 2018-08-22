@@ -308,6 +308,14 @@ void status(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
 
 void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo)
 {
+    std::cout << InformationMsg("This process may take some time to complete. "
+                                "You can't make any transactions during the process.")
+              << std::endl;
+    
+    if (!confirm("Are you sure?")){
+        return;
+    }
+    
     std::cout << InformationMsg("Resetting wallet...") << std::endl;
 
     walletInfo->knownTransactionCount = 0;
