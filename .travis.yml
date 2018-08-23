@@ -1,8 +1,6 @@
-sudo: true
+sudo: false
 language: cpp
-compiler: gcc
-env:
-- CXXFLAGS="-std=gnu++11"
+
 matrix:
   include:
   - os: linux
@@ -11,29 +9,61 @@ matrix:
         sources:
         - ubuntu-toolchain-r-test
         packages:
-        #- g++-4.9
         - libboost1.55-all-dev
     env:
-    - MATRIX_EVAL="CC=gcc && CXX=g++
+    - MATRIX_EVAL="CC=gcc && CXX=g++"
+    - LABEL="linux"
+    - STRIP="strip"
   - os: osx
+    env:
+    - MATRIX_EVAL="CC=gcc && CXX=g++"
+    - CXXFLAGS="-std=gnu++11"
+    - LABEL="osx"
+    - STRIP="strip"
+  - os: linux
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-aarch64-linux-gnu
+        - g++-aarch64-linux-gnu
+    env:
+    - MATRIX_EVAL="CC=aarch64-linux-gnu-gcc && CXX=aarch64-linux-gnu-g++"
+    - LABEL="aarch64"
+    - STRIP="aarch64-linux-gnu-strip"
+
 before_install:
+- eval $MATRIX_EVAL
+
 install:
+- if [[ "$LABEL" == "aarch64" ]]; then wget http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.gz ; fi
+- if [[ "$LABEL" == "aarch64" ]]; then tar zxvf boost_1_55_0.tar.gz >/dev/null ; fi
+- if [[ "$LABEL" == "aarch64" ]]; then cd boost_1_55_0 ; fi
+- if [[ "$LABEL" == "aarch64" ]]; then ./bootstrap.sh ; fi
+- if [[ "$LABEL" == "aarch64" ]]; then curl https://gist.githubusercontent.com/brandonlehmann/06a8cebbbd5e91814067fcd741879f2f/raw/41fc014ac53f64a6f465356a5b1e29179101b23f/fix_boost_aarch64.sh | sh ; fi
+- if [[ "$LABEL" == "aarch64" ]]; then ./b2 toolset=gcc-aarch64 --with-system --with-filesystem --with-thread --with-date_time --with-chrono --with-regex --with-serialization --with-program_options >/dev/null ; fi
+- if [[ "$LABEL" == "aarch64" ]]; then export CUSTOM_BOOST_ROOT="-DBOOST_ROOT=`pwd`" ; fi
+- if [[ "$LABEL" == "aarch64" ]]; then cd .. ; fi
+
 script:
 - mkdir build && cd build
-- cmake -DCMAKE_BUILD_TYPE=Release -DSTATIC=true .. && make -j2
+- cmake -DCMAKE_BUILD_TYPE=Release -DSTATIC=true .. ${CUSTOM_BOOST_ROOT} && make -j2
+
 before_deploy:
 - cd src
-- strip TurtleCoind miner zedwallet turtle-service
+- ${STRIP} TurtleCoind miner zedwallet turtle-service
 - mkdir turtlecoin-${TRAVIS_TAG}
 - mv TurtleCoind miner zedwallet turtle-service  turtlecoin-${TRAVIS_TAG}/
 - cp ../../LICENSE turtlecoin-${TRAVIS_TAG}/
-- tar cvfz turtlecoin-${TRAVIS_TAG}-${TRAVIS_OS_NAME}.tar.gz turtlecoin-${TRAVIS_TAG}/
+- tar cvfz turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz turtlecoin-${TRAVIS_TAG}/
+
 deploy:
   provider: releases
   api_key:
     secure: XyM7qAnX9Slm4bX7WYPOnWGRuXfuwc7wnJHb7wN4WGy+GefXm3xSFoNIZdmTY1XnJ2HpIAXuuHL2aey8KKt+gEXbhp882z6m9jZWOdog3cjObdRCsOuETNE0rbXasDvntdhm1Jn7PM+mkN6O9GoqRVaEnyyIwCGEFA7Cc/d2KgtqpTu0NB6nIPZbTgJnudHDQYEWl0kwA1UjkYrEIRlAOFTaRHBUsUHPTFW8758mgerYitLm27BNJTbo74lYe65iExtguKFN/VRVXDl08/2i3gnAxzWJ2K0qUZu7PD8ePd+2UC1wwE2Dc1uiTOmhDgVeuQO6k0tuipjIA+dh5r7A8/YPyOX4zoZ4ac+g1mWSRO1VS/WQ2Uvq2XU848KACLJ+ky3kHWZKowTSl/v3+3rU4c6kqYJHShkH5XlFp503yRqlaqOow4ogz020eIEHEFCgwLhNxZSEUzKP4rEZPpboZyNJbW7lL92UxMZDZm1zKMvnrY5zi2HltYzIQyOjDvmXUxQD8blz1C66lqfBc6mApjDRZVLUcfTT4WIGAWc6opTYJAJpCg34zGAQgXoFaOG0cH3ApsREmBd1dg9d8cJscedy9qZjn3HsmibmdRiGctB5o08JrjfM5sZVk620iKFgovis7q7XfIKb3rQdSfsiRwsfZEwhE2lvY3bf9B0VMrU=
   file:
-    - turtlecoin-${TRAVIS_TAG}-${TRAVIS_OS_NAME}.tar.gz
+    - turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz
   skip_cleanup: true
   on:
     repo: turtlecoin/turtlecoin
