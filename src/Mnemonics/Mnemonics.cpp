@@ -34,7 +34,7 @@ namespace Mnemonics
     {
         Crypto::SecretKey key;
 
-        const int len = words.size();
+        const size_t len = words.size();
 
         /* Mnemonics must be 25 words long */
         if (len != 25)
@@ -83,7 +83,7 @@ namespace Mnemonics
             const uint32_t w3 = wordIndexes[i + 2];
 
             /* Word list length */
-            const uint32_t wlLen = WordList::English.size();
+            const size_t wlLen = WordList::English.size();
 
             /* no idea what this does lol */
             const uint32_t val = w1 + wlLen * (((wlLen - w1) + w2) % wlLen) + wlLen 
@@ -159,7 +159,7 @@ namespace Mnemonics
         auto wordsNoChecksum = words;
 
         /* Remove the last checksum word */
-        wordsNoChecksum.erase(wordsNoChecksum.end());
+        wordsNoChecksum.erase(wordsNoChecksum.end() - 1);
 
         /* Assert the last word (the checksum word) is equal to the derived
            checksum */
@@ -194,7 +194,7 @@ namespace Mnemonics
 
             /* Take it away from the beginning of the vector, giving us the
                index of the item in the vector */
-            result.push_back(std::distance(WordList::English.begin(), it));
+            result.push_back(static_cast<int>(std::distance(WordList::English.begin(), it)));
         }
 
         return result;
