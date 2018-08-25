@@ -1,6 +1,9 @@
 add_definitions(-DSTATICLIB)
 
 include_directories(${CMAKE_SOURCE_DIR}/external/rocksdb/include)
+if(ENABLE_LINENOISE)
+include_directories(${CMAKE_SOURCE_DIR}/external/linenoise)
+endif()
 
 file(GLOB_RECURSE BlockchainExplorer BlockchainExplorer/*)
 file(GLOB_RECURSE Common Common/*)
@@ -89,9 +92,19 @@ target_link_libraries(WalletService Mnemonics)
 if(MSVC)
 	target_link_libraries(TurtleCoind P2P Rpc Serialization System Http Logging CryptoNoteCore Crypto Common rocksdb ${Boost_LIBRARIES} )
 else()
-	target_link_libraries(TurtleCoind P2P Rpc Serialization System Http Logging CryptoNoteCore Crypto Common rocksdblib ${Boost_LIBRARIES} )
+    if(ENABLE_LINENOISE)
+        target_link_libraries(TurtleCoind P2P Rpc Serialization System Http Logging CryptoNoteCore Crypto Common rocksdblib linenoise ${Boost_LIBRARIES} )
+    else()
+        target_link_libraries(TurtleCoind P2P Rpc Serialization System Http Logging CryptoNoteCore Crypto Common rocksdblib ${Boost_LIBRARIES} )
+    endif()
 endif()
-target_link_libraries(zedwallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES})
+
+if(ENABLE_LINENOISE)
+    target_link_libraries(zedwallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common linenoise ${Boost_LIBRARIES})
+else()
+    target_link_libraries(zedwallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES})
+endif()
+
 target_link_libraries(service WalletService JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common ${Boost_LIBRARIES})
 target_link_libraries(Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
@@ -99,6 +112,7 @@ target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging
 # Add dependencies means we have to build the latter before we build the former
 # In this case it's because we need to have the current version name rather
 # than a cached one
+add_dependencies(WalletService version)
 add_dependencies(Rpc version)
 add_dependencies(TurtleCoind version)
 add_dependencies(zedwallet version)

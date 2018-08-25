@@ -20,8 +20,8 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
 void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                 std::string extra, std::shared_ptr<WalletInfo> walletInfo,
                 uint32_t height, bool integratedAddress,
-                uint64_t mixin = WalletConfig::defaultMixin, 
-                std::string nodeAddress = std::string(), uint32_t nodeFee = 0);
+                uint64_t mixin, std::string nodeAddress, uint32_t nodeFee,
+                std::string originalAddress);
 
 void splitTX(CryptoNote::WalletGreen &wallet,
              const CryptoNote::TransactionParameters splitTXParams,
@@ -33,7 +33,8 @@ void sendTX(std::shared_ptr<WalletInfo> walletInfo,
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo,
-                        bool integratedAddress, uint32_t nodeFee);
+                        bool integratedAddress, uint32_t nodeFee,
+                        std::string originalAddress);
 
 bool parseAmount(std::string amountString);
 

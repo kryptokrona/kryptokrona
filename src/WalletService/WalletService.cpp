@@ -1,19 +1,8 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-//
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
 
 #include "WalletService.h"
 
@@ -50,7 +39,7 @@
 #include "Wallet/WalletUtils.h"
 #include "WalletServiceErrorCategory.h"
 
-#include "Mnemonics/electrum-words.h"
+#include "Mnemonics/Mnemonics.h"
 
 namespace PaymentService {
 
@@ -333,9 +322,15 @@ std::vector<std::string> collectDestinationAddresses(const std::vector<PaymentSe
   return result;
 }
 
-std::vector<CryptoNote::WalletOrder> convertWalletRpcOrdersToWalletOrders(const std::vector<PaymentService::WalletRpcOrder>& orders) {
+std::vector<CryptoNote::WalletOrder> convertWalletRpcOrdersToWalletOrders(const std::vector<PaymentService::WalletRpcOrder>& orders, const std::string nodeAddress, const uint32_t nodeFee) {
   std::vector<CryptoNote::WalletOrder> result;
-  result.reserve(orders.size());
+  
+  if (!nodeAddress.empty() && nodeFee != 0) {
+    result.reserve(orders.size() + 1);
+    result.emplace_back(CryptoNote::WalletOrder {nodeAddress, nodeFee});
+  } else {
+    result.reserve(orders.size());
+  }
 
   for (const auto& order: orders) {
     result.emplace_back(CryptoNote::WalletOrder {order.address, order.amount});
@@ -378,11 +373,15 @@ void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfigu
     Crypto::SecretKey private_spend_key;
     Crypto::SecretKey private_view_key;
 
-    auto x = log(Logging::ERROR, Logging::BRIGHT_RED);
+    std::string error;
 
-    if (!crypto::ElectrumWords::is_valid_mnemonic(conf.mnemonicSeed, private_spend_key, x))
+    std::tie(error, private_spend_key)
+        = Mnemonics::MnemonicToPrivateKey(conf.mnemonicSeed);
+
+    if (!error.empty())
     {
-      return;
+        log(Logging::ERROR, Logging::BRIGHT_RED) << error;
+        return;
     }
 
     CryptoNote::AccountBase::generateViewFromSpend(private_spend_key, private_view_key);
@@ -452,9 +451,41 @@ void WalletService::init() {
   loadWallet();
   loadTransactionIdIndex();
 
+  getNodeFee();
   refreshContext.spawn([this] { refresh(); });
-
+  
   inited = true;
+}
+
+void WalletService::getNodeFee() {
+  logger(Logging::DEBUGGING) <<
+    "Trying to retrieve node fee information." << std::endl;
+    
+  m_node_address = node.feeAddress();
+  m_node_fee = node.feeAmount();
+  
+  if (!m_node_address.empty() && m_node_fee != 0) {
+    // Partially borrowed from <zedwallet/Tools.h>
+    uint32_t div = static_cast<uint32_t>(pow(10, CryptoNote::parameters::CRYPTONOTE_DISPLAY_DECIMAL_POINT));
+    uint32_t coins = m_node_fee / div;
+    uint32_t cents = m_node_fee % div;
+    std::stringstream stream;
+    stream << std::setfill('0') << std::setw(CryptoNote::parameters::CRYPTONOTE_DISPLAY_DECIMAL_POINT) << cents;
+    std::string amount = std::to_string(coins) + "." + stream.str();
+    
+    logger(Logging::INFO, Logging::RED) << 
+      "You have connected to a node that charges " <<
+      "a fee to send transactions." << std::endl;
+    
+    logger(Logging::INFO, Logging::RED) << 
+      "The fee for sending transactions is: " <<
+      amount << " per transaction." << std::endl ;
+    
+    logger(Logging::INFO, Logging::RED) <<
+      "If you don't want to pay the node fee, please " <<
+      "relaunch this program and specify a different " <<
+      "node or run your own." << std::endl;
+  }
 }
 
 void WalletService::saveWallet() {
@@ -783,7 +814,7 @@ std::error_code WalletService::getMnemonicSeed(const std::string& address, std::
     bool deterministic_private_keys = deterministic_private_view_key == viewKey.secretKey;
 
     if (deterministic_private_keys) {
-      crypto::ElectrumWords::bytes_to_words(key.secretKey, mnemonicSeed, "English");
+      mnemonicSeed = Mnemonics::PrivateKeyToMnemonic(key.secretKey);
     } else {
       /* Have to be able to derive view key from spend key to create a mnemonic
          seed, due to being able to generate multiple addresses we can't do
@@ -949,7 +980,7 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
     std::transform(request.paymentId.begin(), request.paymentId.end(), request.paymentId.begin(), ::toupper);
 
     std::vector<std::string> paymentIDs;
-
+    
     for (auto &transfer : request.transfers)
     {
         std::string addr = transfer.address;
@@ -1051,7 +1082,7 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
     }
 
     sendParams.sourceAddresses = request.sourceAddresses;
-    sendParams.destinations = convertWalletRpcOrdersToWalletOrders(request.transfers);
+    sendParams.destinations = convertWalletRpcOrdersToWalletOrders(request.transfers, m_node_address, m_node_fee);
     sendParams.fee = request.fee;
     sendParams.mixIn = request.anonymity;
     sendParams.unlockTimestamp = request.unlockTime;
@@ -1090,7 +1121,7 @@ std::error_code WalletService::createDelayedTransaction(const CreateDelayedTrans
     }
 
     sendParams.sourceAddresses = request.addresses;
-    sendParams.destinations = convertWalletRpcOrdersToWalletOrders(request.transfers);
+    sendParams.destinations = convertWalletRpcOrdersToWalletOrders(request.transfers, m_node_address, m_node_fee);
     sendParams.fee = request.fee;
     sendParams.mixIn = request.anonymity;
     sendParams.unlockTimestamp = request.unlockTime;
@@ -1307,8 +1338,7 @@ std::error_code WalletService::createIntegratedAddress(const std::string &addres
   CryptoNote::AccountPublicAddress addr;
 
   /* Get the private + public key from the address */
-  const bool valid = CryptoNote::parseAccountAddressString(prefix, addr,
-                                                           address);
+  CryptoNote::parseAccountAddressString(prefix, addr, address);
 
   /* Pack as a binary array */
   CryptoNote::BinaryArray ba;
@@ -1322,6 +1352,13 @@ std::error_code WalletService::createIntegratedAddress(const std::string &addres
       paymentId + keys
   );
 
+  return std::error_code();
+}
+
+std::error_code WalletService::getFeeInfo(std::string& address, uint32_t& amount) {
+  address = m_node_address;
+  amount = m_node_fee;
+  
   return std::error_code();
 }
 

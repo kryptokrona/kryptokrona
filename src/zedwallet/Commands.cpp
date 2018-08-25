@@ -6,11 +6,6 @@
 #include <zedwallet/Commands.h>
 ///////////////////////////////
 
-#ifdef HAVE_READLINE
-#include <readline/readline.h>
-#include <readline/history.h>
-#endif
-
 #include <zedwallet/AddressBook.h>
 #include <zedwallet/ColouredMsg.h>
 #include <zedwallet/CommandImplementations.h>
@@ -302,7 +297,7 @@ const std::vector<Command> availableCommands(bool viewWallet,
     });
 }
 
-int numBasicCommands(std::vector<Command> &commands)
+uint64_t numBasicCommands(std::vector<Command> &commands)
 {
     return std::count_if(commands.begin(), commands.end(), [](Command c)
     {
@@ -314,7 +309,7 @@ void listCommands(std::vector<Command> &commands, bool advanced)
 {
     const int commandPadding = 25;
 
-    int index = 1;
+    uint64_t index = 1;
 
     if (advanced)
     {

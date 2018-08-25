@@ -98,7 +98,8 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
 
 bool confirmTransaction(CryptoNote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo,
-                        bool integratedAddress, uint32_t nodeFee)
+                        bool integratedAddress, uint32_t nodeFee,
+                        std::string originalAddress)
 {
     std::cout << std::endl
               << InformationMsg("Confirm Transaction?") << std::endl;
@@ -106,7 +107,8 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
     std::cout << "You are sending "
               << SuccessMsg(formatAmount(t.destinations[0].amount))
               << ", with a network fee of " << SuccessMsg(formatAmount(t.fee))
-              << " and a node fee of " << SuccessMsg(formatAmount(nodeFee));
+              << "," << std::endl
+              << "and a node fee of " << SuccessMsg(formatAmount(nodeFee));
 
     const std::string paymentID = getPaymentIDFromExtra(t.extra);
 
@@ -124,19 +126,8 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
     
     std::cout << std::endl << std::endl
               << "FROM: " << SuccessMsg(walletInfo->walletFileName)
-              << std::endl;
-
-    if (integratedAddress)
-    {
-        std::string addr = createIntegratedAddress(t.destinations[0].address,
-                                                   paymentID);
-        std::cout << "TO: " << SuccessMsg(addr) << std::endl << std::endl;
-    }
-    else
-    {
-         std::cout << "TO: " << SuccessMsg(t.destinations[0].address)
-                   << std::endl << std::endl;
-    }
+              << std::endl
+              << "TO: " << SuccessMsg(originalAddress) << std::endl << std::endl;
 
     if (confirm("Is this correct?"))
     {
@@ -318,7 +309,13 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
         return;
     }
 
-    std::string address = maybeAddress.x.second;
+    /* We keep around the original entered address since we can't get back
+       the original integratedAddress from extra, since payment ID's can
+       be upper, lower, or mixed case, but they're only stored as lower in
+       extra. We want this for the confirmation screen. */
+    std::string originalAddress = maybeAddress.x.second;
+
+    std::string address = originalAddress;
 
     std::string extra;
 
@@ -456,7 +453,8 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
     }
 
     doTransfer(address, amount, fee, extra, walletInfo, height,
-               integratedAddress, mixin, nodeAddress, nodeFee);
+               integratedAddress, mixin, nodeAddress, nodeFee,
+               originalAddress);
 }
 
 BalanceInfo doWeHaveEnoughBalance(uint64_t amount, uint64_t fee,
@@ -528,7 +526,8 @@ BalanceInfo doWeHaveEnoughBalance(uint64_t amount, uint64_t fee,
 void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                 std::string extra, std::shared_ptr<WalletInfo> walletInfo,
                 uint32_t height, bool integratedAddress, uint64_t mixin,
-                std::string nodeAddress, uint32_t nodeFee)
+                std::string nodeAddress, uint32_t nodeFee,
+                std::string originalAddress)
 {
     const uint64_t balance = walletInfo->wallet.getActualBalance();
 
@@ -558,11 +557,12 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
     }
 
     p.fee = fee;
-    p.mixIn = mixin;
+    p.mixIn = static_cast<uint16_t>(mixin);
     p.extra = extra;
     p.changeDestination = walletInfo->walletAddress;
 
-    if (!confirmTransaction(p, walletInfo, integratedAddress, nodeFee))
+    if (!confirmTransaction(p, walletInfo, integratedAddress, nodeFee,
+                            originalAddress))
     {
         std::cout << WarningMsg("Cancelling transaction.") << std::endl;
         return;

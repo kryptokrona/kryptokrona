@@ -8,6 +8,8 @@
 
 #include <atomic>
 
+#include <boost/algorithm/string.hpp>
+
 #include <Common/FormatTools.h>
 #include <Common/StringTools.h>
 
@@ -18,7 +20,7 @@
 #include <fstream>
 #endif
 
-#include <Mnemonics/electrum-words.h>
+#include <Mnemonics/Mnemonics.h>
 
 #include <zedwallet/ColouredMsg.h>
 #include <zedwallet/Open.h>
@@ -91,16 +93,10 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
 
     if (deterministicPrivateKeys)
     {
-        std::string mnemonicSeed;
-
-        crypto::ElectrumWords::bytes_to_words(privateSpendKey, 
-                                              mnemonicSeed,
-                                              "English");
-
         std::cout << std::endl
                   << SuccessMsg("Mnemonic seed:")
                   << std::endl
-                  << SuccessMsg(mnemonicSeed)
+                  << SuccessMsg(Mnemonics::PrivateKeyToMnemonic(privateSpendKey))
                   << std::endl;
     }
 }
@@ -267,8 +263,9 @@ void printHashrate(uint64_t difficulty)
     }
 
     /* Hashrate is difficulty divided by block target time */
-    uint64_t hashrate = round(difficulty / 
-                              CryptoNote::parameters::DIFFICULTY_TARGET);
+    uint32_t hashrate = static_cast<uint32_t>(
+        round(difficulty / CryptoNote::parameters::DIFFICULTY_TARGET)
+    );
 
     std::cout << "Network hashrate: "
               << SuccessMsg(Common::get_mining_speed(hashrate))
@@ -308,6 +305,14 @@ void status(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
 
 void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> &walletInfo)
 {
+    std::cout << InformationMsg("This process may take some time to complete. "
+                                "You can't make any transactions during the process.")
+              << std::endl;
+    
+    if (!confirm("Are you sure?")){
+        return;
+    }
+    
     std::cout << InformationMsg("Resetting wallet...") << std::endl;
 
     walletInfo->knownTransactionCount = 0;
