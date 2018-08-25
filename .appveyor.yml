@@ -15,10 +15,10 @@ after_build:
   - mkdir turtlecoin-%APPVEYOR_REPO_TAG_NAME%
   - copy *.exe turtlecoin-%APPVEYOR_REPO_TAG_NAME%
   - copy ..\..\..\LICENSE turtlecoin-%APPVEYOR_REPO_TAG_NAME%
-  - 7z a turtlecoin-%APPVEYOR_REPO_TAG_NAME%.zip turtlecoin-%APPVEYOR_REPO_TAG_NAME%
+  - 7z a turtlecoin-%APPVEYOR_REPO_TAG_NAME%-windows.zip turtlecoin-%APPVEYOR_REPO_TAG_NAME%
     
 artifacts:
-  - path: src\Release\turtlecoin-%APPVEYOR_REPO_TAG_NAME%.zip
+  - path: turtlecoin-%APPVEYOR_REPO_TAG_NAME%-windows.zip
     name: TurtleCoinRelease
     
 deploy:
@@ -29,5 +29,4 @@ deploy:
     draft: false
     prerelease: false
     on:
-      branch: master
       appveyor_repo_tag: true
