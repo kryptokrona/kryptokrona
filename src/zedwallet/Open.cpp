@@ -17,6 +17,7 @@
 
 #include <zedwallet/ColouredMsg.h>
 #include <zedwallet/CommandImplementations.h>
+#include <zedwallet/Tools.h>
 #include <zedwallet/Transfer.h>
 #include <zedwallet/Types.h>
 #include <zedwallet/PasswordContainer.h>
@@ -46,8 +47,10 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
     const std::string msg = "Give your new wallet a password: ";
     const std::string walletPass = getWalletPassword(true, msg);
 
+    const uint64_t scanHeight = getScanHeight();
+
     wallet.createViewWallet(walletFileName, walletPass, address,
-                            privateViewKey);
+                            privateViewKey, scanHeight, false);
 
     std::cout << std::endl << InformationMsg("Your view wallet ")
               << InformationMsg(address)
@@ -115,11 +118,17 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
     const std::string msg = "Give your new wallet a password: ";
     const std::string walletPass = getWalletPassword(true, msg);
 
+    const uint64_t scanHeight = getScanHeight();
+
     connectingMsg();
 
-    wallet.initializeWithViewKey(walletFileName, walletPass, privateViewKey);
+    wallet.initializeWithViewKey(
+        walletFileName, walletPass, privateViewKey, scanHeight, false
+    );
 
-    const std::string walletAddress = wallet.createAddress(privateSpendKey);
+    const std::string walletAddress = wallet.createAddress(
+        privateSpendKey, scanHeight, false
+    );
 
     std::cout << std::endl << InformationMsg("Your wallet ")
               << InformationMsg(walletAddress)
@@ -144,9 +153,13 @@ std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
     CryptoNote::AccountBase::generateViewFromSpend(spendKey.secretKey,
                                                    privateViewKey);
 
-    wallet.initializeWithViewKey(walletFileName, walletPass, privateViewKey);
+    wallet.initializeWithViewKey(
+        walletFileName, walletPass, privateViewKey, 0, true
+    );
 
-    const std::string walletAddress = wallet.createAddress(spendKey.secretKey);
+    const std::string walletAddress = wallet.createAddress(
+        spendKey.secretKey, 0, true
+    );
 
     promptSaveKeys(wallet);
 

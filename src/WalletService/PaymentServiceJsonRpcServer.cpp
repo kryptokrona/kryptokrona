@@ -117,9 +117,9 @@ std::error_code PaymentServiceJsonRpcServer::handleExport(const Export::Request&
 
 std::error_code PaymentServiceJsonRpcServer::handleReset(const Reset::Request& request, Reset::Response& response) {
   if (request.viewSecretKey.empty()) {
-    return service.resetWallet();
+    return service.resetWallet(request.scanHeight);
   } else {
-    return service.replaceWithNewWallet(request.viewSecretKey);
+    return service.replaceWithNewWallet(request.viewSecretKey, request.scanHeight, request.newAddress);
   }
 }
 
@@ -127,14 +127,14 @@ std::error_code PaymentServiceJsonRpcServer::handleCreateAddress(const CreateAdd
   if (request.spendSecretKey.empty() && request.spendPublicKey.empty()) {
     return service.createAddress(response.address);
   } else if (!request.spendSecretKey.empty()) {
-    return service.createAddress(request.spendSecretKey, response.address);
+    return service.createAddress(request.spendSecretKey, request.scanHeight, request.newAddress, response.address);
   } else {
-    return service.createTrackingAddress(request.spendPublicKey, response.address);
+    return service.createTrackingAddress(request.spendPublicKey, request.scanHeight, request.newAddress, response.address);
   }
 }
 
 std::error_code PaymentServiceJsonRpcServer::handleCreateAddressList(const CreateAddressList::Request& request, CreateAddressList::Response& response) {
-  return service.createAddressList(request.spendSecretKeys, response.addresses);
+  return service.createAddressList(request.spendSecretKeys, request.scanHeight, request.newAddress, response.addresses);
 }
 
 std::error_code PaymentServiceJsonRpcServer::handleDeleteAddress(const DeleteAddress::Request& request, DeleteAddress::Response& response) {
