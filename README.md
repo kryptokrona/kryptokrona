@@ -8,7 +8,7 @@
 
 ### How To Compile
 
-#### Ubuntu 16.04+ and MacOS 10.10+
+#### Ubuntu LTS and MacOS 10.10+
 
 There is a bash installation script for Ubuntu 16.04+ and MacOS 10.10+ which can be used to checkout and build the project from source:
 
@@ -21,6 +21,19 @@ This script can be used from inside the git repository to build the project from
 See the script for more installation details and please consider extending it for your operating system and distribution!
 
 If the script doesn't work for you:
+
+#### [new!] Raspberry Pi 3 B+
+The following images are known to work.
+https://github.com/Crazyhead90/pi64/releases
+https://fedoraproject.org/wiki/Architectures/ARM/Raspberry_Pi#aarch64_supported_images_for_Raspberry_Pi_3
+https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3
+
+- `git clone -b master --single-branch https://github.com/turtlecoin/turtlecoin`
+- `cd turtlecoin`
+- `mkdir build && cd $_`
+- `cmake ..`
+- `make`
+
 
 #### Linux
 
