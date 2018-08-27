@@ -24,9 +24,14 @@ If the script doesn't work for you:
 
 #### [new!] Raspberry Pi 3 B+
 The following images are known to work.
-https://github.com/Crazyhead90/pi64/releases
-https://fedoraproject.org/wiki/Architectures/ARM/Raspberry_Pi#aarch64_supported_images_for_Raspberry_Pi_3
-https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3
+
+##### OS Distribution
+
+- https://github.com/Crazyhead90/pi64/releases
+- https://fedoraproject.org/wiki/Architectures/ARM/Raspberry_Pi#aarch64_supported_images_for_Raspberry_Pi_3
+- https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3
+
+##### Building
 
 - `git clone -b master --single-branch https://github.com/turtlecoin/turtlecoin`
 - `cd turtlecoin`
