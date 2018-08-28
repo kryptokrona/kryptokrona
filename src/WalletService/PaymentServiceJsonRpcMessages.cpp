@@ -6,6 +6,7 @@
 
 #include "PaymentServiceJsonRpcMessages.h"
 #include "Serialization/SerializationOverloads.h"
+#include "WalletService.h"
 
 namespace PaymentService {
 
@@ -257,7 +258,7 @@ void WalletRpcOrder::serialize(CryptoNote::ISerializer& serializer) {
   }
 }
 
-void SendTransaction::Request::serialize(CryptoNote::ISerializer& serializer) {
+void SendTransaction::Request::serialize(CryptoNote::ISerializer& serializer, const WalletService &service) {
   serializer(sourceAddresses, "addresses");
 
   if (!serializer(transfers, "transfers")) {
@@ -271,7 +272,7 @@ void SendTransaction::Request::serialize(CryptoNote::ISerializer& serializer) {
   }
 
   if (!serializer(anonymity, "anonymity")) {
-    throw RequestSerializationError();
+    anonymity = service.getDefaultMixin();
   }
 
   bool hasExtra = serializer(extra, "extra");
@@ -288,7 +289,7 @@ void SendTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
   serializer(transactionHash, "transactionHash");
 }
 
-void CreateDelayedTransaction::Request::serialize(CryptoNote::ISerializer& serializer) {
+void CreateDelayedTransaction::Request::serialize(CryptoNote::ISerializer& serializer, const WalletService &service) {
   serializer(addresses, "addresses");
 
   if (!serializer(transfers, "transfers")) {
@@ -302,7 +303,7 @@ void CreateDelayedTransaction::Request::serialize(CryptoNote::ISerializer& seria
   }
 
   if (!serializer(anonymity, "anonymity")) {
-    throw RequestSerializationError();
+    anonymity = service.getDefaultMixin();
   }
 
   bool hasExtra = serializer(extra, "extra");
@@ -344,13 +345,13 @@ void SendDelayedTransaction::Request::serialize(CryptoNote::ISerializer& seriali
 void SendDelayedTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
 }
 
-void SendFusionTransaction::Request::serialize(CryptoNote::ISerializer& serializer) {
+void SendFusionTransaction::Request::serialize(CryptoNote::ISerializer& serializer, const WalletService &service) {
   if (!serializer(threshold, "threshold")) {
     throw RequestSerializationError();
   }
 
   if (!serializer(anonymity, "anonymity")) {
-    throw RequestSerializationError();
+    anonymity = service.getDefaultMixin();
   }
 
   serializer(addresses, "addresses");
