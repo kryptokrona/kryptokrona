@@ -123,7 +123,7 @@ bool dispatchCommand(std::shared_ptr<WalletInfo> &walletInfo,
     }
     else if (command == "optimize")
     {
-        fullOptimize(walletInfo->wallet);
+        fullOptimize(walletInfo->wallet, node.getLastKnownBlockHeight());
     }
     else if (command == "ab_add")
     {

@@ -88,6 +88,8 @@ public:
   std::error_code estimateFusion(uint64_t threshold, const std::vector<std::string>& addresses, uint32_t& fusionReadyCount, uint32_t& totalOutputCount);
   std::error_code createIntegratedAddress(const std::string& address, const std::string& paymentId, std::string& integratedAddress);
   std::error_code getFeeInfo(std::string& address, uint32_t& amount);
+  uint64_t getDefaultMixin() const;
+
 
 private:
   void refresh();

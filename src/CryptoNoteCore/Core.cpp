@@ -958,6 +958,11 @@ bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
     /* We also need to ensure that the mixin enforced is for the limit that
      was correct when the block was formed - i.e. if 0 mixin was allowed at
      block 100, but is no longer allowed - we should still validate block 100 */
+    if (height >= CryptoNote::parameters::MIXIN_LIMITS_V3_HEIGHT)
+    {
+        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V3;
+        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V3;
+    }
     if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
     {
         minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
