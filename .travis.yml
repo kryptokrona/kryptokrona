@@ -79,7 +79,7 @@ deploy:
     bucket: turtlecoin
     skip_cleanup: true
     acl: public_read
-    region: us-east-1
+    region: us-east-2
     upload-dir: turtlecoin
     local-dir: builds
     on:
