@@ -364,7 +364,7 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
             continue;
         }
 
-        const std::string amount = formatAmountBasic(t.totalAmount);
+        const std::string amount = formatAmountBasic(std::abs(t.totalAmount));
 
         const std::string direction = t.totalAmount > 0 ? "IN" : "OUT";
 
