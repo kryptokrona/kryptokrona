@@ -51,20 +51,37 @@ script:
 - cmake -DCMAKE_BUILD_TYPE=Release -DSTATIC=true .. ${CUSTOM_BOOST_ROOT} && make -j2
 
 before_deploy:
+- if [[ "${TRAVIS_TAG}" == "" ]]; then export TRAVIS_TAG=${TRAVIS_COMMIT} ; fi
 - cd src
 - ${STRIP} TurtleCoind miner zedwallet turtle-service
 - mkdir turtlecoin-${TRAVIS_TAG}
 - mv TurtleCoind miner zedwallet turtle-service  turtlecoin-${TRAVIS_TAG}/
 - cp ../../LICENSE turtlecoin-${TRAVIS_TAG}/
 - tar cvfz turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz turtlecoin-${TRAVIS_TAG}/
+- mkdir builds
+- cp turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz builds
 
 deploy:
-  provider: releases
-  api_key:
-    secure: XyM7qAnX9Slm4bX7WYPOnWGRuXfuwc7wnJHb7wN4WGy+GefXm3xSFoNIZdmTY1XnJ2HpIAXuuHL2aey8KKt+gEXbhp882z6m9jZWOdog3cjObdRCsOuETNE0rbXasDvntdhm1Jn7PM+mkN6O9GoqRVaEnyyIwCGEFA7Cc/d2KgtqpTu0NB6nIPZbTgJnudHDQYEWl0kwA1UjkYrEIRlAOFTaRHBUsUHPTFW8758mgerYitLm27BNJTbo74lYe65iExtguKFN/VRVXDl08/2i3gnAxzWJ2K0qUZu7PD8ePd+2UC1wwE2Dc1uiTOmhDgVeuQO6k0tuipjIA+dh5r7A8/YPyOX4zoZ4ac+g1mWSRO1VS/WQ2Uvq2XU848KACLJ+ky3kHWZKowTSl/v3+3rU4c6kqYJHShkH5XlFp503yRqlaqOow4ogz020eIEHEFCgwLhNxZSEUzKP4rEZPpboZyNJbW7lL92UxMZDZm1zKMvnrY5zi2HltYzIQyOjDvmXUxQD8blz1C66lqfBc6mApjDRZVLUcfTT4WIGAWc6opTYJAJpCg34zGAQgXoFaOG0cH3ApsREmBd1dg9d8cJscedy9qZjn3HsmibmdRiGctB5o08JrjfM5sZVk620iKFgovis7q7XfIKb3rQdSfsiRwsfZEwhE2lvY3bf9B0VMrU=
-  file:
-    - turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz
-  skip_cleanup: true
-  on:
-    repo: turtlecoin/turtlecoin
-    tags: true
+  - provider: releases
+    api_key:
+      secure: XyM7qAnX9Slm4bX7WYPOnWGRuXfuwc7wnJHb7wN4WGy+GefXm3xSFoNIZdmTY1XnJ2HpIAXuuHL2aey8KKt+gEXbhp882z6m9jZWOdog3cjObdRCsOuETNE0rbXasDvntdhm1Jn7PM+mkN6O9GoqRVaEnyyIwCGEFA7Cc/d2KgtqpTu0NB6nIPZbTgJnudHDQYEWl0kwA1UjkYrEIRlAOFTaRHBUsUHPTFW8758mgerYitLm27BNJTbo74lYe65iExtguKFN/VRVXDl08/2i3gnAxzWJ2K0qUZu7PD8ePd+2UC1wwE2Dc1uiTOmhDgVeuQO6k0tuipjIA+dh5r7A8/YPyOX4zoZ4ac+g1mWSRO1VS/WQ2Uvq2XU848KACLJ+ky3kHWZKowTSl/v3+3rU4c6kqYJHShkH5XlFp503yRqlaqOow4ogz020eIEHEFCgwLhNxZSEUzKP4rEZPpboZyNJbW7lL92UxMZDZm1zKMvnrY5zi2HltYzIQyOjDvmXUxQD8blz1C66lqfBc6mApjDRZVLUcfTT4WIGAWc6opTYJAJpCg34zGAQgXoFaOG0cH3ApsREmBd1dg9d8cJscedy9qZjn3HsmibmdRiGctB5o08JrjfM5sZVk620iKFgovis7q7XfIKb3rQdSfsiRwsfZEwhE2lvY3bf9B0VMrU=
+    file:
+      - turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz
+    skip_cleanup: true
+    on:
+      repo: turtlecoin/turtlecoin
+      tags: true
+
+  - provider: s3
+    access_key_id: AKIAI6BZ72QG2LKAPM5Q
+    secret_access_key:
+      secure: cmy8eYUr8Hpii10a5fsTzhsBT5YNrQp5DCqaGCl6Ebd4T7t4+DpaHbERSUWjM6JCt9z1nmipT976ViJrnWUCBIxhxS/GAKbLPSSXxe6L7mA97ucwTLsICxZaWYjG/PkZl/7bIXH9GIslkxU/490ghciAk9AjNNjkX2jVt/62JOQiuzQomQvwg++3ececI3SfNKm+pNtL789no309PoEuyFewD0C/g15rsOvNoAZqNREcrSOPYJQXph4KWda/hBSWKIHU+kOKWUcdQQBKOchAoJQGJIFRwj4dDhuUwqb9Fz9DSdu6vyujNAOicUxKmrWV2KTNC2mGVK7Oa7dH2oDWV4WcBpI50bZDYghE4e4lz14mV3xkeuQaGGVF21d63jPxEzbXsLwObKtjx+dNqXpFWaVwyGflEkddvLIyqFd8CUtI45kTAHuoeQg0uRG/ols09AfW5iezHkOI50XxWZLZUwfrScTix0vSRwguHRCEnSolIylu36zMg8+azfmKY/aqLt1XidHGDtDjvNvoWZkKimlhC1thGXqzB+e86sTjs3ETdWuaiM/Pi6zJGcLVEnd7hxF98yxQVpJ4zJZzc5Lrc1yomRWkxgWpM+2dHfUomIYj+WSdsJw3YlNmDFL6Ymizw483FBUhStF0BCSSDafC1YatIx5XRUEoElzMz0zIczs=
+    bucket: turtlecoin
+    skip_cleanup: true
+    acl: public_read
+    region: us-east-1
+    upload-dir: turtlecoin
+    local-dir: builds
+    on:
+      repo: turtlecoin/turtlecoin
+      all_branches: true
