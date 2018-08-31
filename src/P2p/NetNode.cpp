@@ -582,6 +582,9 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     if (rsp.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
       logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(rsp.node_data.version) << "), closing connection.";
       return false;
+    } else if (rsp.node_data.version > CryptoNote::P2P_CURRENT_VERSION) {
+      logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE Warning, our software may be out of date. Please visit: "
+        << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
     }
 
     if (!handle_remote_peerlist(rsp.local_peerlist, rsp.node_data.local_time, context)) {
@@ -1149,6 +1152,9 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
       logger(Logging::INFO) << context << "UNSUPPORTED NETWORK AGENT VERSION CONNECTED! version=" << std::to_string(arg.node_data.version);
       context.m_state = CryptoNoteConnectionContext::state_shutdown;
       return 1;
+    } else if (arg.node_data.version > CryptoNote::P2P_CURRENT_VERSION) {
+      logger(Logging::INFO) << context << "Our software may be out of date. Please visit: "
+        << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
     }
 
     if(!context.m_is_income) {
