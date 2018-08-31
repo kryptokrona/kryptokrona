@@ -391,15 +391,15 @@ bool P2pNode::fetchPeerList(ContextPtr connection) {
     }
 
     if (response.node_data.network_id != request.node_data.network_id) {
-      logger(ERROR) << *connection << "COMMAND_HANDSHAKE failed, wrong network: " << response.node_data.network_id;
+      logger(DEBUGGING) << *connection << "COMMAND_HANDSHAKE failed, wrong network: " << response.node_data.network_id;
       return false;
     }
 
     if (response.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
-      logger(ERROR) << *connection << "COMMAND_HANDSHAKE Failed, peer is wrong version: " << std::to_string(response.node_data.version);
+      logger(DEBUGGING) << *connection << "COMMAND_HANDSHAKE Failed, peer is wrong version: " << std::to_string(response.node_data.version);
       return false;
     } else if (response.node_data.version > CryptoNote::P2P_CURRENT_VERSION) {
-      logger(ERROR) << *connection << "COMMAND_HANDSHAKE Warning, our software may be out of date. Please visit: "
+      logger(WARNING) << *connection << "COMMAND_HANDSHAKE Warning, our software may be out of date. Please visit: "
         << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
     }
 

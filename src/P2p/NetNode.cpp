@@ -575,15 +575,15 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     context.version = rsp.node_data.version;
 
     if (rsp.node_data.network_id != m_network_id) {
-      logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE Failed, wrong network! (" << rsp.node_data.network_id << "), closing connection.";
+      logger(Logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, wrong network! (" << rsp.node_data.network_id << "), closing connection.";
       return false;
     }
 
     if (rsp.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
-      logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(rsp.node_data.version) << "), closing connection.";
+      logger(Logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(rsp.node_data.version) << "), closing connection.";
       return false;
     } else if (rsp.node_data.version > CryptoNote::P2P_CURRENT_VERSION) {
-      logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE Warning, our software may be out of date. Please visit: "
+      logger(Logging::WARNING) << context << "COMMAND_HANDSHAKE Warning, our software may be out of date. Please visit: "
         << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
     }
 
@@ -1143,17 +1143,17 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     context.version = arg.node_data.version;
 
     if (arg.node_data.network_id != m_network_id) {
-      logger(Logging::INFO) << context << "WRONG NETWORK AGENT CONNECTED! id=" << arg.node_data.network_id;
+      logger(Logging::DEBUGGING) << context << "WRONG NETWORK AGENT CONNECTED! id=" << arg.node_data.network_id;
       context.m_state = CryptoNoteConnectionContext::state_shutdown;
       return 1;
     }
 
     if (arg.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
-      logger(Logging::INFO) << context << "UNSUPPORTED NETWORK AGENT VERSION CONNECTED! version=" << std::to_string(arg.node_data.version);
+      logger(Logging::DEBUGGING) << context << "UNSUPPORTED NETWORK AGENT VERSION CONNECTED! version=" << std::to_string(arg.node_data.version);
       context.m_state = CryptoNoteConnectionContext::state_shutdown;
       return 1;
     } else if (arg.node_data.version > CryptoNote::P2P_CURRENT_VERSION) {
-      logger(Logging::INFO) << context << "Our software may be out of date. Please visit: "
+      logger(Logging::WARNING) << context << "Our software may be out of date. Please visit: "
         << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
     }
 
