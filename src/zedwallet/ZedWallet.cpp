@@ -150,31 +150,28 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
 
     std::tie(quit, walletInfo) = selectionScreen(config, wallet, node);
 
-    if (quit)
-    {
-        std::cout << "Bye." << std::endl;
-        return;
-    }
-
     bool alreadyShuttingDown = false;
 
-    /* This will call shutdown when ctrl+c is hit. This is a lambda function,
-       & means capture all variables by reference */
-    Tools::SignalHandler::install([&]
+    if (!quit)
     {
-        /* If we're already shutting down let control flow continue as normal */
-        if (shutdown(walletInfo->wallet, node, alreadyShuttingDown))
+        /* Call shutdown on ctrl+c */
+        Tools::SignalHandler::install([&]
         {
-            exit(0);
-        }
-    });
+            /* If we're already shutting down let control flow continue
+               as normal */
+            if (shutdown(walletInfo, node, alreadyShuttingDown))
+            {
+                exit(0);
+            }
+        });
 
-    mainLoop(walletInfo, node);
+        mainLoop(walletInfo, node);
+    }
     
-    shutdown(walletInfo->wallet, node, alreadyShuttingDown);
+    shutdown(walletInfo, node, alreadyShuttingDown);
 }
 
-bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+bool shutdown(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
               bool &alreadyShuttingDown)
 {
     if (alreadyShuttingDown)
@@ -213,14 +210,17 @@ bool shutdown(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
         }
     });
 
-    std::cout << InformationMsg("Saving wallet file...") << std::endl;
+    if (walletInfo != nullptr)
+    {
+        std::cout << InformationMsg("Saving wallet file...") << std::endl;
 
-    wallet.save();
+        walletInfo->wallet.save();
 
-    std::cout << InformationMsg("Shutting down wallet interface...")
-              << std::endl;
+        std::cout << InformationMsg("Shutting down wallet interface...")
+                  << std::endl;
 
-    wallet.shutdown();
+        walletInfo->wallet.shutdown();
+    }
 
     std::cout << InformationMsg("Shutting down node connection...")
               << std::endl;
