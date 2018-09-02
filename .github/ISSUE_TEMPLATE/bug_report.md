@@ -20,9 +20,18 @@ about: Create a report to help us improve
 
 **Version:** <!-- please indicate the full build number ex. 0.8.0.1269 -->
 **Binary Source:** <!-- please indicate if you compiled the binaries yourself or if you are using pre-compiled binaries please link to the source of those binaries  -->
-**If self compiled, please provide CMake output**:
+**If self compiled, please provide all the build commands you used**
 ```
-Please insert your CMake output here
+Please insert your build commands here. Example:
+
+mkdir build && cd build
+cmake .. -DBOOST_ROOT=/home/turtlecoin/boost_1_59_0
+make -j4
+```
+
+**If self compiled, please provide of your TurtleCoin CMake output at the default verbosity**:
+```
+Please insert your default verbosity CMake output here
 ```
 
 ### Issue Report
