@@ -1090,6 +1090,8 @@ std::vector<std::string> WalletGreen::doCreateAddressList(const std::vector<NewA
 
       for (auto& addressData : addressDataList) {
         std::string address = addWallet(addressData, scanHeight, newAddress);
+        
+        m_logger(INFO, BRIGHT_WHITE) << "New wallet added " << address;
 
         addresses.push_back(std::move(address));
       }
