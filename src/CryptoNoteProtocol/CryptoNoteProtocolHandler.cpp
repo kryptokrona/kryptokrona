@@ -255,7 +255,7 @@ bool CryptoNoteProtocolHandler::process_payload_sync_data(const CORE_SYNC_DATA& 
     /* We're ahead of the remote node, no need to print percentages */
     else
     {
-        ss << "You are " << std::abs(diff) << " blocks (" << days << " days) ahead";
+        ss << "You are " << std::abs(diff) << " blocks (" << days << " days) ahead ";
     }
 
     ss << "the current peer you're connected to. Slow and steady wins the race! ";
