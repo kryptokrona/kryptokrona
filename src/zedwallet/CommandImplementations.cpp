@@ -8,8 +8,6 @@
 
 #include <atomic>
 
-#include <boost/algorithm/string.hpp>
-
 #include <Common/FormatTools.h>
 #include <Common/StringTools.h>
 
@@ -510,7 +508,7 @@ void createIntegratedAddress()
         std::cout << InformationMsg("Address: ");
 
         std::getline(std::cin, address);
-        boost::algorithm::trim(address);
+        trim(address);
 
         std::cout << std::endl;
 
@@ -525,7 +523,7 @@ void createIntegratedAddress()
         std::cout << InformationMsg("Payment ID: ");
 
         std::getline(std::cin, paymentID);
-        boost::algorithm::trim(paymentID);
+        trim(paymentID);
 
         std::vector<uint8_t> extra;
 
