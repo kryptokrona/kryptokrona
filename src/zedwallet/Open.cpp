@@ -6,8 +6,6 @@
 #include <zedwallet/Open.h>
 ///////////////////////////
 
-#include <boost/algorithm/string.hpp>
-
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 
@@ -36,7 +34,7 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
                   << InformationMsg(" address: ");
 
         std::getline(std::cin, address);
-        boost::algorithm::trim(address);
+        trim(address);
 
         if (parseStandardAddress(address, true))
         {
@@ -91,7 +89,7 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
 
         std::getline(std::cin, mnemonicPhrase);
 
-        boost::algorithm::trim(mnemonicPhrase);
+        trim(mnemonicPhrase);
         
         std::string error;
 
@@ -293,10 +291,10 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
 
             const std::string errorMsg = e.what();
                 
-            /* The message actually has a \r\n on the end but i'd prefer to
-               keep just the raw string in the source so check the it starts
-               with instead */
-            if (boost::starts_with(errorMsg, alreadyOpenMsg))
+            /* The message actually has a \r\n on the end but I'd prefer to
+               keep just the raw string in the source so check if it starts
+               with the message instead */
+            if (startsWith(errorMsg, alreadyOpenMsg))
             {
                 std::cout << WarningMsg("Could not open wallet! It is already "
                                         "open in another process.")
@@ -342,7 +340,7 @@ Crypto::SecretKey getPrivateKey(std::string msg)
         std::cout << InformationMsg(msg);
 
         std::getline(std::cin, privateKeyString);
-        boost::algorithm::trim(privateKeyString);
+        trim(privateKeyString);
 
         if (privateKeyString.length() != privateKeyLen)
         {
@@ -416,11 +414,11 @@ std::string getExistingWalletFileName(Config &config)
                       << std::endl << std::endl;
         }
         /* Allow people to enter wallet name with or without file extension */
-        else if (boost::filesystem::exists(walletName))
+        else if (fileExists(walletName))
         {
             return walletName;
         }
-        else if (boost::filesystem::exists(walletFileName))
+        else if (fileExists(walletFileName))
         {
             return walletFileName;
         }
@@ -452,7 +450,7 @@ std::string getNewWalletFileName()
 
         const std::string walletFileName = walletName + ".wallet";
 
-        if (boost::filesystem::exists(walletFileName))
+        if (fileExists(walletFileName))
         {
             std::cout << std::endl
                       << WarningMsg("A wallet with the filename " )

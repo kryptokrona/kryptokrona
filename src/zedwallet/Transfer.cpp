@@ -6,8 +6,6 @@
 #include <zedwallet/Transfer.h>
 ///////////////////////////////
 
-#include <boost/algorithm/string.hpp>
-
 #include <Common/Base58.h>
 #include <Common/StringTools.h>
 
@@ -41,9 +39,11 @@ namespace WalletErrors
 
 bool parseAmount(std::string strAmount, uint64_t &amount)
 {
-    boost::algorithm::trim(strAmount);
+    /* Trim any whitespace */
+    trim(strAmount);
+
     /* If the user entered thousand separators, remove them */
-    boost::erase_all(strAmount, ",");
+    removeCharFromString(strAmount, ',');
 
     const size_t pointIndex = strAmount.find_first_of('.');
     const size_t numDecimalPlaces = WalletConfig::numDecimalPlaces;
@@ -984,7 +984,7 @@ Maybe<std::pair<AddressType, std::string>> getAddress(std::string msg)
         std::cout << InformationMsg(msg);
 
         std::getline(std::cin, address);
-        boost::algorithm::trim(address);
+        trim(address);
 
         if (address == "cancel")
         {

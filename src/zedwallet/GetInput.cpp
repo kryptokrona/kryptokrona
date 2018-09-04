@@ -6,11 +6,10 @@
 #include <zedwallet/GetInput.h>
 ///////////////////////////////
 
-#include <boost/algorithm/string.hpp>
-
 #include "linenoise.hpp"
 
 #include <zedwallet/Sync.h>
+#include <zedwallet/Tools.h>
 
 /* Note: this is not portable, it only works with terminals that support ANSI
    codes (e.g., not Windows) - however! due to the way linenoise-cpp works,
@@ -132,7 +131,7 @@ std::string getInput(const std::vector<T> &availableCommands,
     bool quit = linenoise::Readline(promptMsg.c_str(), command);
 	
     /* Remove any whitespace */
-    boost::algorithm::trim(command);
+    trim(command);
 
     if (command != "")
     {
