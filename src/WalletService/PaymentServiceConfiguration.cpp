@@ -187,6 +187,10 @@ void Configuration::init(const boost::program_options::variables_map& options) {
     }
   }
 
+  if (options.count("scan-height") != 0) {
+    scanHeight = options["scan-height"].as<uint64_t>();
+  }
+
   // If generating a container skip the authentication parameters.
   if (generateNewContainer) {
     return;
@@ -207,11 +211,6 @@ void Configuration::init(const boost::program_options::variables_map& options) {
   if (options.count("enable-cors") != 0) {
     corsHeader = options["enable-cors"].as<std::string>();
   }
-
-  if (options.count("scan-height") != 0) {
-    scanHeight = options["scan-height"].as<uint64_t>();
-  }
-
 }
 
 } //namespace PaymentService
