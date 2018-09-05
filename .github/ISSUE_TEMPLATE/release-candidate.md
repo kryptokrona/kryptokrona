@@ -95,6 +95,10 @@ Binaries for Testing:
   - [ ] Windows
   - [ ] Linux
   - [ ] MacOS
+- Scan From Height Works Correctly
+  - [ ] Windows
+  - [ ] Linux
+  - [ ] MacOS
 
 ### Turtle-Service Tests
 - Connect to local daemon
@@ -137,6 +141,10 @@ Binaries for Testing:
   - [ ] Windows
   - [ ] Linux
   - [ ] MacOS
+- Scan From Height Works Correctly
+  - [ ] Windows
+  - [ ] Linux
+  - [ ] MacOS
 
 ### GUI Wallet Testing
 - Connect to local daemon
@@ -172,6 +180,10 @@ Binaries for Testing:
   - [ ] Linux
   - [ ] MacOS
 - Integrated Addresses work
+  - [ ] Windows
+  - [ ] Linux
+  - [ ] MacOS
+- Scan From Height Works Correctly
   - [ ] Windows
   - [ ] Linux
   - [ ] MacOS
