@@ -17,9 +17,10 @@ after_build:
   - copy *.exe turtlecoin-%APPVEYOR_REPO_TAG_NAME%
   - copy ..\..\..\LICENSE turtlecoin-%APPVEYOR_REPO_TAG_NAME%
   - 7z a turtlecoin-%APPVEYOR_REPO_TAG_NAME%-windows.zip turtlecoin-%APPVEYOR_REPO_TAG_NAME%
+  - copy turtlecoin-%APPVEYOR_REPO_TAG_NAME%-windows.zip ..\..\..\
 
 artifacts:
-  - path: build\src\Release\turtlecoin-$(APPVEYOR_REPO_TAG_NAME)-windows.zip
+  - path: turtlecoin-$(APPVEYOR_REPO_TAG_NAME)-windows.zip
     name: TurtleCoinRelease
 
 deploy:
