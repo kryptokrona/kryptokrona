@@ -963,7 +963,7 @@ bool Core::validateMixin(const std::vector<CachedTransaction> transactions,
         minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V3;
         maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V3;
     }
-    if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
+    else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
     {
         minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
         maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V2;
