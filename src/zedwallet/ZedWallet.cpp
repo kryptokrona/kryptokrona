@@ -133,7 +133,7 @@ int main(int argc, char **argv)
 void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
          Config &config)
 {
-    auto[quit, walletInfo] = selectionScreen(config, wallet, node);
+    auto [quit, walletInfo] = selectionScreen(config, wallet, node);
 
     bool alreadyShuttingDown = false;
 
