@@ -60,6 +60,7 @@ before_deploy:
 - tar cvfz turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz turtlecoin-${TRAVIS_TAG}/
 - mkdir builds
 - cp turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz builds
+- cd ..
 
 deploy:
   - provider: releases
