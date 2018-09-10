@@ -16,6 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PaymentServiceConfiguration.h"
+#include "CryptoNoteConfig.h"
 
 #include <iostream>
 #include <fstream>
@@ -52,7 +53,7 @@ Configuration::Configuration() {
 void Configuration::initOptions(boost::program_options::options_description& desc) {
   desc.add_options()
       ("bind-address", po::value<std::string>()->default_value("127.0.0.1"), "payment service bind address")
-      ("bind-port", po::value<uint16_t>()->default_value(8070), "payment service bind port")
+      ("bind-port", po::value<uint16_t>()->default_value(CryptoNote::SERVICE_DEFAULT_PORT), "payment service bind port")
       ("rpc-password", po::value<std::string>(), "Specify the password to access the rpc server.")
       ("rpc-legacy-security", "Enable legacy mode (no password for RPC). WARNING: INSECURE. USE ONLY AS A LAST RESORT.")
       ("container-file,w", po::value<std::string>(), "container file")
