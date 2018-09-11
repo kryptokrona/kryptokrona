@@ -219,7 +219,7 @@ const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
 const uint8_t  P2P_CURRENT_VERSION                           = 3;
 const uint8_t  P2P_MINIMUM_VERSION                           = 2;
 // This defines the number of versions ahead we must seed peers before we start displaying
-// warning messages that we need to upgrade out software.
+// warning messages that we need to upgrade our software.
 const uint8_t  P2P_UPGRADE_WINDOW                            = 2;
 
 const size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE          = 32 * 1024 * 1024; // 32 MB
