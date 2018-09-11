@@ -582,7 +582,7 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
     if (rsp.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
       logger(Logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(rsp.node_data.version) << "), closing connection.";
       return false;
-    } else if (rsp.node_data.version > CryptoNote::P2P_CURRENT_VERSION) {
+    } else if ((rsp.node_data.version - CryptoNote::P2P_CURRENT_VERSION) >= CryptoNote::P2P_UPGRADE_WINDOW) {
       logger(Logging::WARNING) << context << "COMMAND_HANDSHAKE Warning, our software may be out of date. Please visit: "
         << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
     }
