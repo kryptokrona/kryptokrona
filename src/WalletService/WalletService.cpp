@@ -1247,21 +1247,17 @@ std::error_code WalletService::getUnconfirmedTransactionHashes(const std::vector
   return std::error_code();
 }
 
-std::error_code WalletService::getStatus(uint32_t& blockCount, uint32_t& knownBlockCount, std::string& lastBlockHash, uint32_t& peerCount) {
+/* blockCount = the blocks the wallet has synced. knownBlockCount = the top block the daemon knows of. localDaemonBlockCount = the blocks the daemon has synced. */
+std::error_code WalletService::getStatus(uint32_t& blockCount, uint32_t& knownBlockCount, uint32_t& localDaemonBlockCount, std::string& lastBlockHash, uint32_t& peerCount) {
   try {
     System::EventLock lk(readyEvent);
 
-    System::RemoteContext<std::pair<uint32_t, uint32_t>> remoteContext(dispatcher, [this] () {
-      std::pair<uint32_t, uint32_t> res;
-      res.first = node.getKnownBlockCount();
-      res.second = static_cast<uint32_t>(node.getPeerCount());
-
-      return res;
+    System::RemoteContext<std::tuple<uint32_t, uint32_t, uint32_t>> remoteContext(dispatcher, [this] () {
+      /* Daemon remote height, daemon local height, peer count */
+      return std::make_tuple(node.getKnownBlockCount(), node.getLocalBlockCount(), static_cast<uint32_t>(node.getPeerCount()));
     });
 
-    auto remoteResult = remoteContext.get();
-    knownBlockCount = remoteResult.first;
-    peerCount = remoteResult.second;
+    std::tie(knownBlockCount, localDaemonBlockCount, peerCount) = remoteContext.get();
 
     blockCount = wallet.getBlockCount();
 
