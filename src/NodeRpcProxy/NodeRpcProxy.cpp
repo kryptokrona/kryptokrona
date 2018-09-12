@@ -105,7 +105,6 @@ void NodeRpcProxy::init(const INode::Callback& callback) {
 
 bool NodeRpcProxy::shutdown() {
   if (m_workerThread.joinable()) {
-    /* FUCK OFF */
     m_workerThread.detach();
   }
 
