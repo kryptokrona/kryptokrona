@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #include "WalletService.h"
@@ -329,7 +329,7 @@ std::vector<std::string> collectDestinationAddresses(const std::vector<PaymentSe
 
 std::vector<CryptoNote::WalletOrder> convertWalletRpcOrdersToWalletOrders(const std::vector<PaymentService::WalletRpcOrder>& orders, const std::string nodeAddress, const uint32_t nodeFee) {
   std::vector<CryptoNote::WalletOrder> result;
-  
+
   if (!nodeAddress.empty() && nodeFee != 0) {
     result.reserve(orders.size() + 1);
     result.emplace_back(CryptoNote::WalletOrder {nodeAddress, nodeFee});
@@ -458,17 +458,17 @@ void WalletService::init() {
 
   getNodeFee();
   refreshContext.spawn([this] { refresh(); });
-  
+
   inited = true;
 }
 
 void WalletService::getNodeFee() {
   logger(Logging::DEBUGGING) <<
     "Trying to retrieve node fee information." << std::endl;
-    
+
   m_node_address = node.feeAddress();
   m_node_fee = node.feeAmount();
-  
+
   if (!m_node_address.empty() && m_node_fee != 0) {
     // Partially borrowed from <zedwallet/Tools.h>
     uint32_t div = static_cast<uint32_t>(pow(10, CryptoNote::parameters::CRYPTONOTE_DISPLAY_DECIMAL_POINT));
@@ -477,15 +477,15 @@ void WalletService::getNodeFee() {
     std::stringstream stream;
     stream << std::setfill('0') << std::setw(CryptoNote::parameters::CRYPTONOTE_DISPLAY_DECIMAL_POINT) << cents;
     std::string amount = std::to_string(coins) + "." + stream.str();
-    
-    logger(Logging::INFO, Logging::RED) << 
+
+    logger(Logging::INFO, Logging::RED) <<
       "You have connected to a node that charges " <<
       "a fee to send transactions." << std::endl;
-    
-    logger(Logging::INFO, Logging::RED) << 
+
+    logger(Logging::INFO, Logging::RED) <<
       "The fee for sending transactions is: " <<
       amount << " per transaction." << std::endl ;
-    
+
     logger(Logging::INFO, Logging::RED) <<
       "If you don't want to pay the node fee, please " <<
       "relaunch this program and specify a different " <<
@@ -985,11 +985,11 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
     std::transform(request.paymentId.begin(), request.paymentId.end(), request.paymentId.begin(), ::toupper);
 
     std::vector<std::string> paymentIDs;
-    
+
     for (auto &transfer : request.transfers)
     {
         std::string addr = transfer.address;
-        
+
         /* It's not a standard address. Is it an integrated address? */
         if (!CryptoNote::validateAddress(addr, currency))
         {
@@ -1248,13 +1248,13 @@ std::error_code WalletService::getUnconfirmedTransactionHashes(const std::vector
 }
 
 /* blockCount = the blocks the wallet has synced. knownBlockCount = the top block the daemon knows of. localDaemonBlockCount = the blocks the daemon has synced. */
-std::error_code WalletService::getStatus(uint32_t& blockCount, uint32_t& knownBlockCount, uint32_t& localDaemonBlockCount, std::string& lastBlockHash, uint32_t& peerCount) {
+std::error_code WalletService::getStatus(uint32_t& blockCount, uint32_t& knownBlockCount, uint64_t& localDaemonBlockCount, std::string& lastBlockHash, uint32_t& peerCount) {
   try {
     System::EventLock lk(readyEvent);
 
-    System::RemoteContext<std::tuple<uint32_t, uint32_t, uint32_t>> remoteContext(dispatcher, [this] () {
+    System::RemoteContext<std::tuple<uint32_t, uint64_t, uint32_t>> remoteContext(dispatcher, [this] () {
       /* Daemon remote height, daemon local height, peer count */
-      return std::make_tuple(node.getKnownBlockCount(), node.getLocalBlockCount(), static_cast<uint32_t>(node.getPeerCount()));
+      return std::make_tuple(node.getKnownBlockCount(), node.getNodeHeight(), static_cast<uint32_t>(node.getPeerCount()));
     });
 
     std::tie(knownBlockCount, localDaemonBlockCount, peerCount) = remoteContext.get();
@@ -1359,7 +1359,7 @@ std::error_code WalletService::createIntegratedAddress(const std::string &addres
 std::error_code WalletService::getFeeInfo(std::string& address, uint32_t& amount) {
   address = m_node_address;
   amount = m_node_fee;
-  
+
   return std::error_code();
 }
 

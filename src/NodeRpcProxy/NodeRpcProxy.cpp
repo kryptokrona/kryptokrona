@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 
@@ -98,8 +98,8 @@ void NodeRpcProxy::init(const INode::Callback& callback) {
 
   m_state = STATE_INITIALIZING;
   resetInternalState();
-  m_workerThread = std::thread([this, callback] { 
-    workerThread(callback); 
+  m_workerThread = std::thread([this, callback] {
+    workerThread(callback);
   });
 }
 
@@ -131,9 +131,9 @@ void NodeRpcProxy::workerThread(const INode::Callback& initialized_callback) {
       m_state = STATE_INITIALIZED;
       m_cv_initialized.notify_all();
     }
-	
+
     getFeeInfo();
-	
+
     updateNodeStatus();
 
     initialized_callback(std::error_code());
@@ -242,6 +242,8 @@ void NodeRpcProxy::updateBlockchainStatus() {
       m_observerManager.notify(&INodeObserver::lastKnownBlockHeightUpdated, m_networkHeight.load(std::memory_order_relaxed));
     }
 
+    m_nodeHeight.store(getInfoResp.height, std::memory_order_relaxed);
+
     updatePeerCount(getInfoResp.incoming_connections_count + getInfoResp.outgoing_connections_count);
   }
 
@@ -272,15 +274,15 @@ void NodeRpcProxy::updatePoolState(const std::vector<std::unique_ptr<ITransactio
 void NodeRpcProxy::getFeeInfo() {
   CryptoNote::COMMAND_RPC_GET_FEE_ADDRESS::request ireq = AUTO_VAL_INIT(ireq);
   CryptoNote::COMMAND_RPC_GET_FEE_ADDRESS::response iresp = AUTO_VAL_INIT(iresp);
-  
+
   std::error_code ec = jsonCommand("/feeinfo", ireq, iresp);
-  
+
   if (ec || iresp.status != CORE_RPC_STATUS_OK) {
     return;
   }
   m_fee_address = iresp.address;
   m_fee_amount = iresp.amount;
-  
+
   return;
 }
 
@@ -300,8 +302,8 @@ std::string NodeRpcProxy::getInfo() {
 
   if (ec || iresp.status != CORE_RPC_STATUS_OK) {
     return std::string("Problem retrieving information from RPC server.");
-  } 
-    
+  }
+
   return Common::get_status_string(iresp);
 }
 
@@ -345,6 +347,10 @@ uint32_t NodeRpcProxy::getLocalBlockCount() const {
 
 uint32_t NodeRpcProxy::getKnownBlockCount() const {
   return m_networkHeight.load(std::memory_order_relaxed) + 1;
+}
+
+uint64_t NodeRpcProxy::getNodeHeight() const {
+  return m_nodeHeight.load(std::memory_order_relaxed);
 }
 
 uint64_t NodeRpcProxy::getLastLocalBlockTimestamp() const {
