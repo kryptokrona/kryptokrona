@@ -588,7 +588,16 @@ std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlo
     return error::BlockValidationError::DIFFICULTY_OVERHEAD;
   }
 
-  if (!validateMixin(transactions, blockIndex))
+  // This allows us to accept blocks with transaction mixins for the mined money unlock window
+  // that may be using older mixin rules on the network. This helps to clear out the transaction
+  // pool during a network soft fork that requires a mixin lower or upper bound change
+  uint32_t mixinChangeWindow = blockIndex;
+  if (mixinChangeWindow > CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
+  {
+    mixinChangeWindow = mixinChangeWindow - CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
+  }
+
+  if (!validateMixin(transactions, blockIndex) && !validateMixin(transactions, mixinChangeWindow))
   {
       return error::TransactionValidationError::INVALID_MIXIN;
   }
