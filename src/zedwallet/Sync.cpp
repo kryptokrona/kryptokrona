@@ -106,10 +106,10 @@ void syncWallet(CryptoNote::INode &node,
                   << std::endl << std::endl;
     }
 
+    int counter = 1;
+
     while (walletHeight < localHeight)
     {
-        int counter = 1;
-
         /* This MUST be called on the main thread! */
         walletInfo->wallet.updateInternalCache();
 
@@ -128,6 +128,10 @@ void syncWallet(CryptoNote::INode &node,
            wallets so lets do it every 10 minutes */
         if (counter % 600 == 0)
         {
+            std::cout << std::endl
+                      << InformationMsg("Saving current progress...")
+                      << std::endl << std::endl;
+
             walletInfo->wallet.save();
         }
 
@@ -155,7 +159,6 @@ void syncWallet(CryptoNote::INode &node,
                    to sometimes force the sync to resume properly.
                    So we'll try this before warning the user.
                 */
-                std::cout << InformationMsg("Saving wallet.") << std::endl;
                 walletInfo->wallet.save();
                 waitSeconds = 5;
             }
