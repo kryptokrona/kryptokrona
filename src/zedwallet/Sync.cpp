@@ -13,7 +13,7 @@
 #include <zedwallet/GetInput.h>
 #include <zedwallet/Tools.h>
 #include <zedwallet/Types.h>
-#include <zedwallet/WalletConfig.h>
+#include <config/WalletConfig.h>
 
 void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
 {

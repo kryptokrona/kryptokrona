@@ -14,7 +14,7 @@
 #include <System/TcpConnection.h>
 #include <System/TcpConnector.h>
 
-#include "CryptoNoteConfig.h"
+#include <config/CryptoNoteConfig.h>
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
 #include "Serialization/BinaryInputStreamSerializer.h"
