@@ -1,9 +1,7 @@
-#include <config/CryptoNoteConfig.h>
-
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
-#define PROJECT_NAME CryptoNote::CRYPTONOTE_NAME
+#define PROJECT_NAME "TurtleCoin"
 #define PROJECT_SITE "http://www.turtlecoin.lol"
 #define PROJECT_COPYRIGHT "Copyright 2018, The TurtleCoin Developers"
 #define APP_VER_MAJOR 0
