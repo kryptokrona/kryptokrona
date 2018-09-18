@@ -6,11 +6,11 @@
 #include <zedwallet/ParseArguments.h>
 /////////////////////////////////////
 
-#include "CryptoNoteConfig.h"
+#include <config/CryptoNoteConfig.h>
 
 #include "version.h"
 
-#include <zedwallet/WalletConfig.h>
+#include <config/WalletConfig.h>
 
 /* Thanks to https://stackoverflow.com/users/85381/iain for this small command
    line parsing snippet! https://stackoverflow.com/a/868894/8737306 */

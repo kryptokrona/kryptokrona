@@ -9,7 +9,7 @@
 #include <Common/Base58.h>
 #include <Common/StringTools.h>
 
-#include "CryptoNoteConfig.h"
+#include <config/CryptoNoteConfig.h>
 
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
@@ -27,7 +27,7 @@ namespace NodeErrors
 #include <zedwallet/ColouredMsg.h>
 #include <zedwallet/Fusion.h>
 #include <zedwallet/Tools.h>
-#include <zedwallet/WalletConfig.h>
+#include <config/WalletConfig.h>
 
 namespace WalletErrors
 {
