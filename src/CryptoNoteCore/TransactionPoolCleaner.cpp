@@ -91,13 +91,13 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t heig
       transactions.emplace_back(transaction);
 
       bool success;
-      std::string err;
+      std::string error;
 
-      std::tie(success, err) = Mixins::validate(transactions, height);
+      std::tie(success, error) = Mixins::validate(transactions, height);
       if (!success)
       {
         logger(Logging::DEBUGGING) << "Deleting invalid transaction " << Common::podToHex(hash) << " from pool." <<
-          err;
+          error;
         recentlyDeletedTransactions.emplace(hash, currentTime);
         transactionPool->removeTransaction(hash);
         deletedTransactions.emplace_back(std::move(hash));

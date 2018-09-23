@@ -4,6 +4,7 @@
 // Please see the included LICENSE file for more information.
 
 #pragma once
+
 #include "CachedTransaction.h"
 #include "TransactionApi.h"
 #include "Wallet/WalletErrors.h"
@@ -15,13 +16,21 @@ namespace CryptoNote
   {
     public:
 
-      /* This method is used by WalletService to determine if the mixin amount is correct
-         for the current block height */
-      static std::tuple<bool, std::string, std::error_code> validate(const uint32_t mixin, const uint32_t height)
+      /* This method is used to get the minimum and maximum mixin permitted for the
+         requested height */
+      static std::tuple<uint64_t, uint64_t> getMixinAllowableRange(const uint32_t height)
       {
         uint64_t minMixin = 0;
         uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
-        
+
+        /* We now limit the mixin allowed in a transaction. However, there have been
+           some transactions outside these limits in the past, so we need to only
+           enforce this on new blocks, otherwise wouldn't be able to sync the chain */
+
+        /* We also need to ensure that the mixin enforced is for the limit that
+           was correct when the block was formed - i.e. if 0 mixin was allowed at
+           block 100, but is no longer allowed - we should still validate block 100 */
+
         if (height >= CryptoNote::parameters::MIXIN_LIMITS_V3_HEIGHT)
         {
           minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V3;
@@ -37,7 +46,19 @@ namespace CryptoNote
           minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V1;
           maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V1;
         }
-        
+
+        return std::make_tuple(minMixin, maxMixin);
+      }
+
+      /* This method is used by WalletService to determine if the mixin amount is correct
+         for the current block height */
+      static std::tuple<bool, std::string, std::error_code> validate(const uint32_t mixin, const uint32_t height)
+      {
+        uint64_t minMixin;
+        uint64_t maxMixin;
+
+        std::tie(minMixin, maxMixin) = getMixinAllowableRange(height);
+
         std::stringstream str;
 
         if (mixin < minMixin)
@@ -50,39 +71,18 @@ namespace CryptoNote
           str << "Mixin of " << mixin << " above maximum mixin threshold of " << maxMixin;
           return std::make_tuple(false, str.str(), make_error_code(CryptoNote::error::MIXIN_ABOVE_THRESHOLD));
         }
-        
+
         return std::make_tuple(true, std::string(), std::error_code());
       }
-    
+
       /* This method is commonly used by the node to determine if the transactions in the vector have
          the correct mixin (anonymity) as defined by the current rules */
       static std::tuple<bool, std::string> validate(std::vector<CachedTransaction> transactions, uint32_t height)
       {
-        uint64_t minMixin = 0;
-        uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
+        uint64_t minMixin;
+        uint64_t maxMixin;
 
-        /* We now limit the mixin allowed in a transaction. However, there have been
-           some transactions outside these limits in the past, so we need to only
-           enforce this on new blocks, otherwise wouldn't be able to sync the chain */
-
-        /* We also need to ensure that the mixin enforced is for the limit that
-           was correct when the block was formed - i.e. if 0 mixin was allowed at
-           block 100, but is no longer allowed - we should still validate block 100 */
-        if (height >= CryptoNote::parameters::MIXIN_LIMITS_V3_HEIGHT)
-        {
-            minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V3;
-            maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V3;
-        }
-        else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
-        {
-            minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
-            maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V2;
-        }
-        else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT)
-        {
-            minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V1;
-            maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V1;
-        }
+        std::tie(minMixin, maxMixin) = getMixinAllowableRange(height);
 
         for (const auto& transaction : transactions)
         {
@@ -124,7 +124,7 @@ namespace CryptoNote
         const uint64_t mixin = ringSize - 1;
 
         std::stringstream str;
-        
+
         if (mixin > maxMixin) {
           str << "Transaction " << transaction.getTransactionHash()
             << " is not valid. Reason: transaction mixin is too large (" << mixin
