@@ -92,7 +92,7 @@ namespace CryptoNote
             std::tie(success, error) = validate(transaction, minMixin, maxMixin);
             if (!success)
             {
-                return std::make_tuple(success, error);
+                return std::make_tuple(false, error);
             }
         }
 
