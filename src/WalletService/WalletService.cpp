@@ -26,6 +26,7 @@
 #include "CryptoNoteCore/CryptoNoteTools.h"
 #include "CryptoNoteCore/TransactionExtra.h"
 #include "CryptoNoteCore/Account.h"
+#include "CryptoNoteCore/Mixins.h"
 
 #include <System/EventLock.h>
 #include <System/RemoteContext.h>
@@ -271,40 +272,6 @@ void validateAddresses(const std::vector<std::string>& addresses, const CryptoNo
       throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
     }
   }
-}
-
-void validateMixin(const uint32_t mixin, const uint32_t height, Logging::LoggerRef logger) {
-    uint64_t minMixin = 0;
-    uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
-
-    if (height >= CryptoNote::parameters::MIXIN_LIMITS_V3_HEIGHT)
-    {
-        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V3;
-        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V3;
-    }
-    else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
-    {
-        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
-        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V2;
-    }
-    else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT)
-    {
-        minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V1;
-        maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V1;
-    }
-
-    if (mixin < minMixin)
-    {
-        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin of " << mixin
-            << " under minimum mixin threshold of " << minMixin;
-        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_BELOW_THRESHOLD));
-    }
-    else if (mixin > maxMixin)
-    {
-        logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Mixin of " << mixin
-          << " above maximum mixin threshold of " << maxMixin;
-        throw std::system_error(make_error_code(CryptoNote::error::MIXIN_ABOVE_THRESHOLD));
-    }
 }
 
 std::string getValidatedTransactionExtraString(const std::string& extraString) {
@@ -1077,7 +1044,17 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
       validateAddresses({ request.changeAddress }, currency, logger);
     }
 
-    validateMixin(request.anonymity, node.getLastKnownBlockHeight(), logger);
+    bool success;
+    std::string error;
+    std::error_code error_code;
+
+    std::tie(success, error, error_code) = CryptoNote::Mixins::validate(request.anonymity, node.getLastKnownBlockHeight());
+
+    if (!success)
+    {
+      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << error;
+      throw std::system_error(error_code);
+    }
 
     CryptoNote::TransactionParameters sendParams;
     if (!request.paymentId.empty()) {
