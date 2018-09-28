@@ -55,7 +55,7 @@ namespace Mnemonics
         /* All words must be present in the word list */
         for (auto &word : words)
         {
-			std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+            std::transform(word.begin(), word.end(), word.begin(), ::tolower);
             if (std::find(WordList::English.begin(),
                           WordList::English.end(), word) == WordList::English.end())
             {
