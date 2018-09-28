@@ -33,8 +33,7 @@ namespace Mnemonics
     std::tuple<std::string, Crypto::SecretKey> MnemonicToPrivateKey(std::vector<std::string> words)
     {
         Crypto::SecretKey key;
-		
-		
+
         const size_t len = words.size();
 
         /* Mnemonics must be 25 words long */
@@ -49,8 +48,6 @@ namespace Mnemonics
 
             return std::make_tuple(str.str(), key);
         }
-		
-		
 
         /* All words must be present in the word list */
         for (auto &word : words)
