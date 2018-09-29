@@ -70,7 +70,7 @@ else()
   endif()
 
   # No config file for this
-  option(WITH_GFLAGS "build with GFlags" ON)
+  option(WITH_GFLAGS "build with GFlags" OFF)
   if(WITH_GFLAGS)
     find_package(gflags)
     if(gflags_FOUND)
@@ -145,7 +145,7 @@ set(ROCKSDB_VERSION_PATCH ${CMAKE_MATCH_1})
 set(ROCKSDB_VERSION ${ROCKSDB_VERSION_MAJOR}.${ROCKSDB_VERSION_MINOR}.${ROCKSDB_VERSION_PATCH})
 
 
-option(WITH_MD_LIBRARY "build with MD" ON)
+option(WITH_MD_LIBRARY "build with MD" OFF)
 if(WIN32 AND MSVC)
   if(WITH_MD_LIBRARY)
     set(RUNTIME_LIBRARY "MD")
@@ -172,9 +172,11 @@ else()
   if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
     include(CheckCXXCompilerFlag)
-    CHECK_CXX_COMPILER_FLAG("-momit-leaf-frame-pointer" HAVE_OMIT_LEAF_FRAME_POINTER)
-    if(HAVE_OMIT_LEAF_FRAME_POINTER)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -momit-leaf-frame-pointer")
+    if(ENABLE_LEAF_FRAME)
+      CHECK_CXX_COMPILER_FLAG("-momit-leaf-frame-pointer" HAVE_OMIT_LEAF_FRAME_POINTER)
+      if(HAVE_OMIT_LEAF_FRAME_POINTER)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -momit-leaf-frame-pointer")
+      endif()
     endif()
   endif()
 endif()
@@ -191,7 +193,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc64le")
   endif(HAS_ALTIVEC)
 endif(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc64le")
 
-option(PORTABLE "build a portable binary" OFF)
+option(PORTABLE "build a portable binary" ON)
 option(FORCE_SSE42 "force building with SSE4.2, even when PORTABLE=ON" OFF)
 if(PORTABLE)
   # MSVC does not need a separate compiler flag to enable SSE4.2; if nmmintrin.h
@@ -210,39 +212,43 @@ else()
 endif()
 
 include(CheckCXXSourceCompiles)
-if(NOT MSVC)
-  set(CMAKE_REQUIRED_FLAGS "-msse4.2 -mpclmul")
-endif()
-CHECK_CXX_SOURCE_COMPILES("
-#include <cstdint>
-#include <nmmintrin.h>
-#include <wmmintrin.h>
-int main() {
-  volatile uint32_t x = _mm_crc32_u32(0, 0);
-  const auto a = _mm_set_epi64x(0, 0);
-  const auto b = _mm_set_epi64x(0, 0);
-  const auto c = _mm_clmulepi64_si128(a, b, 0x00);
-  auto d = _mm_cvtsi128_si64(c);
-}
-" HAVE_SSE42)
-unset(CMAKE_REQUIRED_FLAGS)
-if(HAVE_SSE42)
-  add_definitions(-DHAVE_SSE42)
-  add_definitions(-DHAVE_PCLMUL)
-elseif(FORCE_SSE42)
-  message(FATAL_ERROR "FORCE_SSE42=ON but unable to compile with SSE4.2 enabled")
+if(ENABLE_SSE42)
+  if(NOT MSVC)
+    set(CMAKE_REQUIRED_FLAGS "-msse4.2 -mpclmul")
+  endif()
+  CHECK_CXX_SOURCE_COMPILES("
+  #include <cstdint>
+  #include <nmmintrin.h>
+  #include <wmmintrin.h>
+  int main() {
+    volatile uint32_t x = _mm_crc32_u32(0, 0);
+    const auto a = _mm_set_epi64x(0, 0);
+    const auto b = _mm_set_epi64x(0, 0);
+    const auto c = _mm_clmulepi64_si128(a, b, 0x00);
+    auto d = _mm_cvtsi128_si64(c);
+  }
+  " HAVE_SSE42)
+  unset(CMAKE_REQUIRED_FLAGS)
+  if(HAVE_SSE42)
+    add_definitions(-DHAVE_SSE42)
+    add_definitions(-DHAVE_PCLMUL)
+  elseif(FORCE_SSE42)
+    message(FATAL_ERROR "FORCE_SSE42=ON but unable to compile with SSE4.2 enabled")
+  endif()
 endif()
 
-CHECK_CXX_SOURCE_COMPILES("
-#if defined(_MSC_VER) && !defined(__thread)
-#define __thread __declspec(thread)
-#endif
-int main() {
-  static __thread int tls;
-}
-" HAVE_THREAD_LOCAL)
-if(HAVE_THREAD_LOCAL)
-  add_definitions(-DROCKSDB_SUPPORT_THREAD_LOCAL)
+if(ENABLE_THREAD_LOCAL)
+  CHECK_CXX_SOURCE_COMPILES("
+  #if defined(_MSC_VER) && !defined(__thread)
+  #define __thread __declspec(thread)
+  #endif
+  int main() {
+    static __thread int tls;
+  }
+  " HAVE_THREAD_LOCAL)
+  if(HAVE_THREAD_LOCAL)
+    add_definitions(-DROCKSDB_SUPPORT_THREAD_LOCAL)
+  endif()
 endif()
 
 option(FAIL_ON_WARNINGS "Treat compile warnings as errors" ON)
@@ -393,7 +399,7 @@ if(NOT WIN32)
   add_definitions(-DROCKSDB_PLATFORM_POSIX -DROCKSDB_LIB_IO_POSIX)
 endif()
 
-option(WITH_FALLOCATE "build with fallocate" ON)
+option(WITH_FALLOCATE "build with fallocate" OFF)
 if(WITH_FALLOCATE)
   CHECK_CXX_SOURCE_COMPILES("
 #include <fcntl.h>
@@ -408,36 +414,44 @@ int main() {
   endif()
 endif()
 
-CHECK_CXX_SOURCE_COMPILES("
-#include <fcntl.h>
-int main() {
-  int fd = open(\"/dev/null\", 0);
-  sync_file_range(fd, 0, 1024, SYNC_FILE_RANGE_WRITE);
-}
-" HAVE_SYNC_FILE_RANGE_WRITE)
-if(HAVE_SYNC_FILE_RANGE_WRITE)
-  add_definitions(-DROCKSDB_RANGESYNC_PRESENT)
+if(ENABLE_SYNC_FILE_RANGE_WRITE)
+  CHECK_CXX_SOURCE_COMPILES("
+  #include <fcntl.h>
+  int main() {
+    int fd = open(\"/dev/null\", 0);
+    sync_file_range(fd, 0, 1024, SYNC_FILE_RANGE_WRITE);
+  }
+  " HAVE_SYNC_FILE_RANGE_WRITE)
+  if(HAVE_SYNC_FILE_RANGE_WRITE)
+    add_definitions(-DROCKSDB_RANGESYNC_PRESENT)
+  endif()
 endif()
 
-CHECK_CXX_SOURCE_COMPILES("
-#include <pthread.h>
-int main() {
-  (void) PTHREAD_MUTEX_ADAPTIVE_NP;
-}
-" HAVE_PTHREAD_MUTEX_ADAPTIVE_NP)
-if(HAVE_PTHREAD_MUTEX_ADAPTIVE_NP)
-  add_definitions(-DROCKSDB_PTHREAD_ADAPTIVE_MUTEX)
+if(ENABLE_PTHREAD_MUTEX_ADAPTIVE_NP)
+  CHECK_CXX_SOURCE_COMPILES("
+  #include <pthread.h>
+  int main() {
+    (void) PTHREAD_MUTEX_ADAPTIVE_NP;
+  }
+  " HAVE_PTHREAD_MUTEX_ADAPTIVE_NP)
+  if(HAVE_PTHREAD_MUTEX_ADAPTIVE_NP)
+    add_definitions(-DROCKSDB_PTHREAD_ADAPTIVE_MUTEX)
+  endif()
 endif()
 
 include(CheckCXXSymbolExists)
-check_cxx_symbol_exists(malloc_usable_size malloc.h HAVE_MALLOC_USABLE_SIZE)
-if(HAVE_MALLOC_USABLE_SIZE)
-  add_definitions(-DROCKSDB_MALLOC_USABLE_SIZE)
+if(ENABLE_MALLOC_USABLE_SIZE)
+  check_cxx_symbol_exists(malloc_usable_size malloc.h HAVE_MALLOC_USABLE_SIZE)
+  if(HAVE_MALLOC_USABLE_SIZE)
+    add_definitions(-DROCKSDB_MALLOC_USABLE_SIZE)
+  endif()
 endif()
 
-check_cxx_symbol_exists(sched_getcpu sched.h HAVE_SCHED_GETCPU)
-if(HAVE_SCHED_GETCPU)
-  add_definitions(-DROCKSDB_SCHED_GETCPU_PRESENT)
+if(ENABLE_SCHED_GETCPU)
+  check_cxx_symbol_exists(sched_getcpu sched.h HAVE_SCHED_GETCPU)
+  if(HAVE_SCHED_GETCPU)
+    add_definitions(-DROCKSDB_SCHED_GETCPU_PRESENT)
+  endif()
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR})
@@ -826,7 +840,7 @@ if(NOT WIN32 OR ROCKSDB_INSTALL_ON_WINDOWS)
   )
 endif()
 
-option(WITH_TESTS "build with tests" ON)
+option(WITH_TESTS "build with tests" OFF)
 if(WITH_TESTS)
   set(TESTS
         cache/cache_test.cc
@@ -1049,7 +1063,67 @@ if(WITH_TESTS)
   endforeach(sourcefile ${C_TEST_EXES})
 endif()
 
-option(WITH_TOOLS "build with tools" ON)
+option(WITH_TOOLS "build with tools" OFF)
 if(WITH_TOOLS)
   add_subdirectory(tools)
+endif()
+
+
+if(MSVC)
+  # Check for the presence of AVX and figure out the flags to use for it.
+  string (REPLACE "/arch:AVX2" ""     CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+  string (REPLACE "/arch:AVX" ""     CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+
+  if(ENABLE_AVX)
+    include(CheckCXXSourceRuns)
+    
+    # Check AVX
+    check_cxx_source_runs("
+      #include <immintrin.h>
+      int main()
+      {
+        __m256 a, b, c;
+        const float src[8] = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f };
+        float dst[8];
+        a = _mm256_loadu_ps( src );
+        b = _mm256_loadu_ps( src );
+        c = _mm256_add_ps( a, b );
+        _mm256_storeu_ps( dst, c );
+        for( int i = 0; i < 8; i++ ){
+          if( ( src[i] + src[i] ) != dst[i] ){
+            return -1;
+          }
+        }
+        return 0;
+      }"
+      HAVE_AVX_EXTENSIONS)
+
+    # Check AVX2
+    check_cxx_source_runs("
+      #include <immintrin.h>
+      int main()
+      {
+        __m256i a, b, c;
+        const int src[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+        int dst[8];
+        a =  _mm256_loadu_si256( (__m256i*)src );
+        b =  _mm256_loadu_si256( (__m256i*)src );
+        c = _mm256_add_epi32( a, b );
+        _mm256_storeu_si256( (__m256i*)dst, c );
+        for( int i = 0; i < 8; i++ ){
+          if( ( src[i] + src[i] ) != dst[i] ){
+            return -1;
+          }
+        }
+        return 0;
+      }"
+      HAVE_AVX2_EXTENSIONS)
+
+    # Set Flags
+    if(HAVE_AVX2_EXTENSIONS AND NOT MSVC_VERSION LESS 1800)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
+    elseif(HAVE_AVX_EXTENSIONS  AND NOT MSVC_VERSION LESS 1600)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX")
+    endif()
+  endif()
 endif()
