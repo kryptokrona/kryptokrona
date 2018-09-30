@@ -23,24 +23,27 @@ int main(int argc, char** argv) {
 
     const BinaryArray& rawData = Common::fromHex(input);
 
-    std::cout << "\n\nInput: " << input << "\n\n";
+    std::cout << "\nInput: " << input << "\n\n";
 
     Hash hash = Hash();
 
     cn_fast_hash(rawData.data(), rawData.size(), hash);
-    std::cout << "Cryptonight Fast Hash: " << Common::podToHex(hash) << "\n";
+    std::cout << "Cryptonight Fast Hash: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
     cn_slow_hash_v6(rawData.data(), rawData.size(), hash);
-    std::cout << "Cryptonight v0: " << Common::podToHex(hash) << "\n";
+    std::cout << "Cryptonight v0: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
-    cn_slow_hash_v7(rawData.data(), rawData.size(), hash);
-    std::cout << "Cryptonight v1: " << Common::podToHex(hash) << "\n";
+    if (rawData.size() >= 43)
+    {
+      cn_slow_hash_v7(rawData.data(), rawData.size(), hash);
+      std::cout << "Cryptonight v1: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
-    cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
-    std::cout << "Cryptonight Lite v0: " << Common::podToHex(hash) << "\n";
+      cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
+      std::cout << "Cryptonight Lite v0: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
-    cn_lite_slow_hash_v1(rawData.data(), rawData.size(), hash);
-    std::cout << "Cryptonight Lite v1: " << Common::podToHex(hash) << "\n";
+      cn_lite_slow_hash_v1(rawData.data(), rawData.size(), hash);
+      std::cout << "Cryptonight Lite v1: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+    }
   }
   catch (std::exception& e)
   {
