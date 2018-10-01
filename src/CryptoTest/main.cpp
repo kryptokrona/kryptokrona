@@ -30,12 +30,12 @@ int main(int argc, char** argv) {
     cn_fast_hash(rawData.data(), rawData.size(), hash);
     std::cout << "Cryptonight Fast Hash: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
-    cn_slow_hash_v6(rawData.data(), rawData.size(), hash);
+    cn_slow_hash_v0(rawData.data(), rawData.size(), hash);
     std::cout << "Cryptonight v0: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
     if (rawData.size() >= 43)
     {
-      cn_slow_hash_v7(rawData.data(), rawData.size(), hash);
+      cn_slow_hash_v1(rawData.data(), rawData.size(), hash);
       std::cout << "Cryptonight v1: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
       cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
