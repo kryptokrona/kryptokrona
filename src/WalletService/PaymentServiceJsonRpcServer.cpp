@@ -1,13 +1,15 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #include "PaymentServiceJsonRpcServer.h"
 
 #include <functional>
 
+#include <CryptoTypes.h>
+#include "crypto/hash.h"
 #include "PaymentServiceJsonRpcMessages.h"
 #include "WalletService.h"
 
@@ -18,7 +20,7 @@
 
 namespace PaymentService {
 
-PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, WalletService& service, Logging::ILogger& loggerGroup, PaymentService::Configuration& config) 
+PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, WalletService& service, Logging::ILogger& loggerGroup, PaymentService::Configuration& config)
   : JsonRpcServer(sys, stopEvent, loggerGroup, config)
   , service(service)
   , logger(loggerGroup, "PaymentServiceJsonRpcServer")
@@ -55,19 +57,23 @@ PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher& sys
 void PaymentServiceJsonRpcServer::processJsonRpcRequest(const Common::JsonValue& req, Common::JsonValue& resp) {
   try {
     prepareJsonResponse(req, resp);
-    
+
     if (!config.legacySecurity) {
       std::string clientPassword;
       if (!req.contains("password")) {
         makeInvalidPasswordResponse(resp);
         return;
-      }   
+      }
       if (!req("password").isString()) {
         makeInvalidPasswordResponse(resp);
         return;
       }
       clientPassword = req("password").getString();
-      if (clientPassword != config.rpcPassword) {
+
+      std::vector<uint8_t> rawData(clientPassword.begin(), clientPassword.end());
+      Crypto::Hash hashedPassword = Crypto::Hash();
+      cn_slow_hash_v0(rawData.data(), rawData.size(), hashedPassword);
+      if (hashedPassword != config.rpcPassword) {
         makeInvalidPasswordResponse(resp);
         return;
       }
