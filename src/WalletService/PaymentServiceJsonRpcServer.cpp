@@ -8,6 +8,8 @@
 
 #include <functional>
 
+#include <CryptoTypes.h>
+#include "crypto/hash.h"
 #include "PaymentServiceJsonRpcMessages.h"
 #include "WalletService.h"
 
@@ -67,7 +69,11 @@ void PaymentServiceJsonRpcServer::processJsonRpcRequest(const Common::JsonValue&
         return;
       }
       clientPassword = req("password").getString();
-      if (clientPassword != config.rpcPassword) {
+
+      std::vector<uint8_t> rawData(clientPassword.begin(), clientPassword.end());
+      Crypto::Hash hashedPassword = Crypto::Hash();
+      cn_slow_hash_v0(rawData.data(), rawData.size(), hashedPassword);
+      if (hashedPassword != config.rpcPassword) {
         makeInvalidPasswordResponse(resp);
         return;
       }
