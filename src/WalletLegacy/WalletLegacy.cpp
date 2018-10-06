@@ -1,19 +1,9 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The BBSCoin Developers
+// Copyright (c) 2018, The Karbo Developers
+// Copyright (c) 2018, The TurtleCoin Developers
 //
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Please see the included LICENSE file for more information.
 
 #include "WalletLegacy.h"
 
@@ -191,7 +181,7 @@ void WalletLegacy::initAndLoad(std::istream& source, const std::string& password
 
   m_password = password;
   m_state = LOADING;
-      
+
   m_asyncContextCounter.addAsyncContext();
   std::thread loader(&WalletLegacy::doLoad, this, std::ref(source));
   loader.detach();
@@ -210,14 +200,14 @@ void WalletLegacy::initSync() {
     }
   }
   std::cout << "Sync from timestamp: " << sub.syncStart.timestamp << std::endl;
-  
+
   auto& subObject = m_transfersSync.addSubscription(sub);
   m_transferDetails = &subObject.getContainer();
   subObject.addObserver(this);
 
   m_sender.reset(new WalletTransactionSender(m_currency, m_transactionsCache, m_account.getAccountKeys(), *m_transferDetails));
   m_state = INITIALIZED;
-  
+
   m_blockchainSync.addObserver(this);
 }
 
@@ -225,11 +215,11 @@ void WalletLegacy::doLoad(std::istream& source) {
   ContextCounterHolder counterHolder(m_asyncContextCounter);
   try {
     std::unique_lock<std::mutex> lock(m_cacheMutex);
-    
+
     std::string cache;
     WalletLegacySerializer serializer(m_account, m_transactionsCache);
     serializer.deserialize(source, m_password, cache);
-      
+
     initSync();
 
     try {
@@ -239,6 +229,16 @@ void WalletLegacy::doLoad(std::istream& source) {
       }
     } catch (const std::exception&) {
       // ignore cache loading errors
+    }
+
+	// Read all output keys cache
+    std::vector<TransactionOutputInformation> allTransfers;
+    m_transferDetails->getOutputs(allTransfers, ITransfersContainer::IncludeAll);
+    std::cout << "Loaded " + std::to_string(allTransfers.size()) + " known transfer(s)\r\n";
+    for (auto& o : allTransfers) {
+      if (o.type == TransactionTypes::OutputType::Key) {
+        m_transfersSync.addPublicKeysSeen(m_account.getAccountKeys().address, o.transactionHash, o.outputKey);
+      }
     }
   } catch (std::system_error& e) {
     runAtomic(m_cacheMutex, [this] () {this->m_state = WalletLegacy::NOT_INITIALIZED;} );
@@ -273,7 +273,7 @@ void WalletLegacy::shutdown() {
   m_asyncContextCounter.waitAsyncContextsFinish();
 
   m_sender.release();
-   
+
   {
     std::unique_lock<std::mutex> lock(m_cacheMutex);
     m_isStopping = false;
@@ -346,7 +346,7 @@ void WalletLegacy::doSave(std::ostream& destination, bool saveDetailed, bool sav
   try {
     m_blockchainSync.stop();
     std::unique_lock<std::mutex> lock(m_cacheMutex);
-    
+
     WalletLegacySerializer serializer(m_account, m_transactionsCache);
     std::string cache;
 
