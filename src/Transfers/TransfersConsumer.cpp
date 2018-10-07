@@ -472,11 +472,6 @@ std::error_code createTransfers(
           throw std::runtime_error("duplicate transaction output key is found");
         }
 
-        if (std::find(temp_keys.begin(), temp_keys.end(), out.key) != temp_keys.end())
-        {
-          throw std::runtime_error("duplicate transaction output key is found");
-        }
-
         temp_keys.push_back(out.key);
       }
 
@@ -487,6 +482,7 @@ std::error_code createTransfers(
     transfers.push_back(info);
   }
 
+  transactions_hash_seen.insert(tx.getTransactionHash());
   std::copy(temp_keys.begin(), temp_keys.end(), std::inserter(public_keys_seen, public_keys_seen.end()));
   temp_keys.clear();
   temp_keys.shrink_to_fit();
