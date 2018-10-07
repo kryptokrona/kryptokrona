@@ -420,23 +420,24 @@ std::error_code createTransfers(
   const ITransactionReader& tx,
   const std::vector<uint32_t>& outputs,
   const std::vector<uint32_t>& globalIdxs,
-  std::vector<TransactionOutputInformationIn>& transfers) {
+  std::vector<TransactionOutputInformationIn>& transfers)
+{
 
   auto txPubKey = tx.getTransactionPublicKey();
   std::vector<PublicKey> temp_keys;
-
   std::lock_guard<std::mutex> lk(seen_mutex);
 
-  for (auto idx : outputs) {
-
-    if (idx >= tx.getOutputCount()) {
+  for (auto idx : outputs)
+  {
+    if (idx >= tx.getOutputCount())
+    {
       return std::make_error_code(std::errc::argument_out_of_domain);
     }
 
     auto outType = tx.getOutputType(size_t(idx));
 
-    if (
-      outType != TransactionTypes::OutputType::Key) {
+    if (outType != TransactionTypes::OutputType::Key)
+    {
       continue;
     }
 
@@ -448,7 +449,8 @@ std::error_code createTransfers(
     info.globalOutputIndex = (blockInfo.height == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) ?
       UNCONFIRMED_TRANSACTION_GLOBAL_OUTPUT_INDEX : globalIdxs[idx];
 
-    if (outType == TransactionTypes::OutputType::Key) {
+    if (outType == TransactionTypes::OutputType::Key)
+    {
       uint64_t amount;
       KeyOutput out;
       tx.getOutput(idx, out, amount);
@@ -463,28 +465,29 @@ std::error_code createTransfers(
 
       assert(out.key == reinterpret_cast<const PublicKey&>(in_ephemeral.publicKey));
 
-      std::unordered_set<Crypto::Hash>::iterator it = transactions_hash_seen.find(tx.getTransactionHash());
-	  if (it == transactions_hash_seen.end()) {
-        std::unordered_set<Crypto::PublicKey>::iterator key_it = public_keys_seen.find(out.key);
-        if (key_it != public_keys_seen.end()) {
+      if (transactions_hash_seen.find(tx.getTransactionHash()) == transactions_hash_seen.end())
+      {
+        if (public_keys_seen.find(out.key) != public_keys_seen.end())
+        {
           throw std::runtime_error("duplicate transaction output key is found");
-          return std::error_code();
         }
+
+        if (std::find(temp_keys.begin(), temp_keys.end(), out.key) != temp_keys.end())
+        {
+          throw std::runtime_error("duplicate transaction output key is found");
+        }
+
         temp_keys.push_back(out.key);
-	  }
+      }
+
       info.amount = amount;
       info.outputKey = out.key;
-
     }
 
     transfers.push_back(info);
   }
 
-  transactions_hash_seen.insert(tx.getTransactionHash());
-  for (std::vector<PublicKey>::iterator it = temp_keys.begin(); it != temp_keys.end(); it++) {
-    public_keys_seen.insert(*it);
-  }
-
+  std::copy(temp_keys.begin(), temp_keys.end(), std::inserter(public_keys_seen, public_keys_seen.end()));
   temp_keys.clear();
   temp_keys.shrink_to_fit();
 
@@ -493,23 +496,28 @@ std::error_code createTransfers(
 
 std::error_code TransfersConsumer::preprocessOutputs(const TransactionBlockInfo& blockInfo, const ITransactionReader& tx, PreprocessInfo& info) {
   std::unordered_map<PublicKey, std::vector<uint32_t>> outputs;
-  try {
+  try
+  {
     findMyOutputs(tx, m_viewSecret, m_spendKeys, outputs);
   }
-  catch (const std::exception& e) {
-    m_logger(ERROR, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << Common::podToHex(tx.getTransactionHash());
+  catch (const std::exception& e)
+  {
+    m_logger(WARNING, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << Common::podToHex(tx.getTransactionHash());
     return std::error_code();
   }
 
-  if (outputs.empty()) {
+  if (outputs.empty())
+  {
     return std::error_code();
   }
 
   std::error_code errorCode;
   auto txHash = tx.getTransactionHash();
-  if (blockInfo.height != WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
+  if (blockInfo.height != WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
+  {
     errorCode = getGlobalIndices(reinterpret_cast<const Hash&>(txHash), info.globalIdxs);
-    if (errorCode) {
+    if (errorCode)
+    {
       return errorCode;
     }
   }
@@ -518,16 +526,19 @@ std::error_code TransfersConsumer::preprocessOutputs(const TransactionBlockInfo&
     auto it = m_subscriptions.find(kv.first);
     if (it != m_subscriptions.end()) {
       auto& transfers = info.outputs[kv.first];
-      try {
+      try
+      {
           errorCode = createTransfers(it->second->getKeys(), blockInfo, tx, kv.second, info.globalIdxs, transfers);
-          if (errorCode) {
+          if (errorCode)
+          {
             return errorCode;
           }
-	  }
-	  catch (const std::exception& e) {
-		  m_logger(ERROR, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << Common::podToHex(tx.getTransactionHash());
-		  return std::error_code();
-	  }
+      }
+      catch (const std::exception& e)
+      {
+        m_logger(WARNING, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << Common::podToHex(tx.getTransactionHash());
+        return std::error_code();
+      }
     }
   }
 
