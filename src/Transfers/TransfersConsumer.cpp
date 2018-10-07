@@ -420,7 +420,8 @@ std::error_code createTransfers(
   const ITransactionReader& tx,
   const std::vector<uint32_t>& outputs,
   const std::vector<uint32_t>& globalIdxs,
-  std::vector<TransactionOutputInformationIn>& transfers)
+  std::vector<TransactionOutputInformationIn>& transfers,
+  Logging::LoggerRef& m_logger)
 {
 
   auto txPubKey = tx.getTransactionPublicKey();
@@ -429,6 +430,8 @@ std::error_code createTransfers(
 
   for (auto idx : outputs)
   {
+    bool isDuplicate = false;
+
     if (idx >= tx.getOutputCount())
     {
       return std::make_error_code(std::errc::argument_out_of_domain);
@@ -469,17 +472,23 @@ std::error_code createTransfers(
       {
         if (public_keys_seen.find(out.key) != public_keys_seen.end())
         {
-          throw std::runtime_error("duplicate transaction output key is found");
+          m_logger(WARNING, BRIGHT_RED) << "A duplicate public key was found in " << Common::podToHex(tx.getTransactionHash());
+          isDuplicate = true;
         }
-
-        temp_keys.push_back(out.key);
+        else
+        {
+          temp_keys.push_back(out.key);
+        }
       }
 
       info.amount = amount;
       info.outputKey = out.key;
     }
 
-    transfers.push_back(info);
+    if (!isDuplicate)
+    {
+      transfers.push_back(info);
+    }
   }
 
   transactions_hash_seen.insert(tx.getTransactionHash());
@@ -522,18 +531,10 @@ std::error_code TransfersConsumer::preprocessOutputs(const TransactionBlockInfo&
     auto it = m_subscriptions.find(kv.first);
     if (it != m_subscriptions.end()) {
       auto& transfers = info.outputs[kv.first];
-      try
+      errorCode = createTransfers(it->second->getKeys(), blockInfo, tx, kv.second, info.globalIdxs, transfers, m_logger);
+      if (errorCode)
       {
-          errorCode = createTransfers(it->second->getKeys(), blockInfo, tx, kv.second, info.globalIdxs, transfers);
-          if (errorCode)
-          {
-            return errorCode;
-          }
-      }
-      catch (const std::exception& e)
-      {
-        m_logger(WARNING, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << Common::podToHex(tx.getTransactionHash());
-        return std::error_code();
+        return errorCode;
       }
     }
   }
