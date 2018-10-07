@@ -493,9 +493,6 @@ std::error_code createTransfers(
 
   transactions_hash_seen.insert(tx.getTransactionHash());
   std::copy(temp_keys.begin(), temp_keys.end(), std::inserter(public_keys_seen, public_keys_seen.end()));
-  temp_keys.clear();
-  temp_keys.shrink_to_fit();
-
   return std::error_code();
 }
 
