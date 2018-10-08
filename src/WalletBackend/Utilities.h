@@ -12,4 +12,10 @@
 
 #include <WalletBackend/WalletErrors.h>
 
-std::vector<Crypto::PublicKey> addressesToViewKeys(std::vector<std::string> addresses);
+std::vector<Crypto::PublicKey> addressesToViewKeys(const std::vector<std::string> addresses);
+
+std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses);
+
+uint64_t getTransactionSum(const std::unordered_map<std::string, uint64_t> destinations);
+
+std::tuple<std::string, std::string> extractIntegratedAddressData(const std::string address);

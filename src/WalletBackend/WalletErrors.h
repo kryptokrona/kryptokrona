@@ -70,6 +70,45 @@ enum WalletError
 
     /* The payment ID encoded in the integrated address is not valid */ 
     INTEGRATED_ADDRESS_PAYMENT_ID_INVALID = 16,
+
+    /* The fee given is lower than the CryptoNote::parameters::MINIMUM_FEE */
+    FEE_TOO_SMALL = 17,
+
+    /* The address given does not exist in this container, and it's required,
+       for example you specified it as the address to get the balance from */
+    ADDRESS_NOT_IN_WALLET = 18,
+
+    /* The destinations array is empty */
+    NO_DESTINATIONS_GIVEN = 19,
+
+    /* One of the destination parameters has an amount given of zero. */
+    AMOUNT_IS_ZERO = 20,
+
+    /* Amount + fee is greater than the total balance available in the
+       subwallets specified (or all wallets, if not specified) */
+    NOT_ENOUGH_BALANCE = 21,
+
+    /* The mixin given is too low for the current height known by the wallet */
+    MIXIN_TOO_SMALL = 22,
+
+    /* The mixin given is too large for the current height known by the wallet */
+    MIXIN_TOO_BIG = 23,
+
+    /* Payment ID is not 64 chars */
+    PAYMENT_ID_WRONG_LENGTH = 24,
+
+    /* The payment ID is not hex */
+    PAYMENT_ID_INVALID = 25,
+
+    /* The address is an integrated address - but integrated addresses aren't
+       valid for this parameter, for example, change address */
+    ADDRESS_IS_INTEGRATED = 26,
+
+    /* Conflicting payment ID's were found, due to integrated addresses. These
+       could mean an integrated address + payment ID were given, where they
+       are not the same, or that multiple integrated addresses with different
+       payment IDs were given */
+    CONFLICTING_PAYMENT_IDS = 27,
 };
 
 std::string getErrorMessage(WalletError error);

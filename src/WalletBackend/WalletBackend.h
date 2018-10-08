@@ -95,14 +95,25 @@ class WalletBackend
         
         /* Defined in Transfer.cpp */
         std::tuple<WalletError, Crypto::Hash> sendTransactionBasic(
-            std::string destination, uint64_t amount, std::string paymentID);
+            const std::string destination,
+            const uint64_t amount,
+            const std::string paymentID);
 
         /* Defined in Transfer.cpp */
         std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
-            std::unordered_map<std::string, uint64_t> destinations,
-            uint64_t mixin, uint64_t fee, std::string paymentID,
-            std::vector<std::string> subWalletsToTakeFrom,
-            std::string changeAddress);
+            const std::unordered_map<std::string, uint64_t> destinations,
+            const uint64_t mixin,
+            const uint64_t fee,
+            const std::string paymentID,
+            const std::vector<std::string> subWalletsToTakeFrom,
+            const std::string changeAddress);
+
+        /* Get the balance for one subwallet */
+        std::tuple<WalletError, uint64_t> getBalance(
+            const std::string address) const;
+
+        /* Get the balance for all subwallets */
+        uint64_t getTotalBalance() const;
 
     private:
         WalletBackend(std::string filename, std::string password,

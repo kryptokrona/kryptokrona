@@ -27,6 +27,8 @@
 
 #include <WalletBackend/Constants.h>
 #include <WalletBackend/JsonSerialization.h>
+#include <WalletBackend/Utilities.h>
+#include <WalletBackend/ValidateParameters.h>
 
 using json = nlohmann::json;
 
@@ -203,9 +205,7 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromSeed(
     const std::string daemonHost, const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    WalletError error = checkNewWalletFilename(filename);
-
-    if (error)
+    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
@@ -235,15 +235,13 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromSeed(
         scanHeight, newWallet, daemonHost, daemonPort
     );
 
-    error = wallet.init();
-
-    if (error)
+    if (WalletError error = wallet.init(); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
 
     /* Save to disk */
-    error = wallet.save();
+    WalletError error = wallet.save();
 
     return {error, std::move(wallet)};
 }
@@ -257,12 +255,11 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromKeys(
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    WalletError error = checkNewWalletFilename(filename);
-
-    if (error)
+    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
+
 
     /* Just defining here so it's more obvious what we're doing in the
        constructor */
@@ -274,15 +271,13 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromKeys(
         scanHeight, newWallet, daemonHost, daemonPort
     );
 
-    error = wallet.init();
-
-    if (error)
+    if (WalletError error = wallet.init(); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
 
     /* Save to disk */
-    error = wallet.save();
+    WalletError error = wallet.save();
 
     return {error, std::move(wallet)};
 }
@@ -297,9 +292,7 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importViewWallet(
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    WalletError error = checkNewWalletFilename(filename);
-
-    if (error)
+    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
@@ -314,15 +307,13 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importViewWallet(
         isViewWallet, scanHeight, newWallet, daemonHost, daemonPort
     );
 
-    error = wallet.init();
-
-    if (error)
+    if (WalletError error = wallet.init(); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
 
     /* Save to disk */
-    error = wallet.save();
+    WalletError error = wallet.save();
 
     return {error, std::move(wallet)};
 }
@@ -333,9 +324,7 @@ std::tuple<WalletError, WalletBackend> WalletBackend::createWallet(
     const std::string daemonHost, const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    WalletError error = checkNewWalletFilename(filename);
-
-    if (error)
+    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
@@ -363,15 +352,13 @@ std::tuple<WalletError, WalletBackend> WalletBackend::createWallet(
         scanHeight, newWallet, daemonHost, daemonPort
     );
 
-    error = wallet.init();
-
-    if (error)
+    if (WalletError error = wallet.init(); error != SUCCESS)
     {
         return {error, WalletBackend()};
     }
 
     /* Save to disk */
-    error = wallet.save();
+    WalletError error = wallet.save();
 
     return {error, std::move(wallet)};
 }
@@ -643,4 +630,28 @@ WalletError WalletBackend::save() const
     file << encryptedData;
 
     return SUCCESS;
+}
+
+std::tuple<WalletError, uint64_t> WalletBackend::getBalance(
+    const std::string address) const
+{
+    /* Verify the address is good, and one of our subwallets */
+    if (WalletError error = validateOurAddresses({address}, *m_subWallets); error != SUCCESS)
+    {
+        return {error, 0};
+    }
+
+    uint64_t balance = m_subWallets->getBalance(
+        addressesToSpendKeys({address}),
+        false
+    );
+
+    return {SUCCESS, balance};
+}
+
+/* Gets the combined balance for all wallets in the container */
+uint64_t WalletBackend::getTotalBalance() const
+{
+    /* Get combined balance from every container */
+    return m_subWallets->getBalance({}, true);
 }

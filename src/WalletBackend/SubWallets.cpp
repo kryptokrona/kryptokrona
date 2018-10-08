@@ -81,9 +81,11 @@ SubWallets::SubWallets()
 }
 
 /* Makes a new view only subwallet */
-SubWallets::SubWallets(const Crypto::PublicKey publicSpendKey,
-                       const std::string address,
-                       const uint64_t scanHeight, const bool newWallet)
+SubWallets::SubWallets(
+    const Crypto::PublicKey publicSpendKey,
+    const std::string address,
+    const uint64_t scanHeight,
+    const bool newWallet)
 {
     uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
 
@@ -94,9 +96,11 @@ SubWallets::SubWallets(const Crypto::PublicKey publicSpendKey,
 }
 
 /* Makes a new subwallet */
-SubWallets::SubWallets(const Crypto::SecretKey privateSpendKey,
-                       const std::string address,
-                       const uint64_t scanHeight, const bool newWallet)
+SubWallets::SubWallets(
+    const Crypto::SecretKey privateSpendKey,
+    const std::string address,
+    const uint64_t scanHeight,
+    const bool newWallet)
 {
     Crypto::PublicKey publicSpendKey;
 
@@ -116,9 +120,11 @@ SubWallets::SubWallets(const Crypto::SecretKey privateSpendKey,
 /////////////////////
 
 /* So much duplicated code ;_; */
-void SubWallets::addSubWallet(const Crypto::PublicKey publicSpendKey,
-                              const std::string address,
-                              const uint64_t scanHeight, const bool newWallet)
+void SubWallets::addSubWallet(
+    const Crypto::PublicKey publicSpendKey,
+    const std::string address,
+    const uint64_t scanHeight,
+    const bool newWallet)
 {
     uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
 
@@ -128,9 +134,11 @@ void SubWallets::addSubWallet(const Crypto::PublicKey publicSpendKey,
     m_publicSpendKeys.push_back(publicSpendKey);
 }
 
-void SubWallets::addSubWallet(const Crypto::SecretKey privateSpendKey,
-                              const std::string address,
-                              const uint64_t scanHeight, const bool newWallet)
+void SubWallets::addSubWallet(
+    const Crypto::SecretKey privateSpendKey,
+    const std::string address,
+    const uint64_t scanHeight,
+    const bool newWallet)
 {
     Crypto::PublicKey publicSpendKey;
 
@@ -154,7 +162,7 @@ void SubWallets::addSubWallet(const Crypto::SecretKey privateSpendKey,
 
    Alternatively, if the timestamp corresponded to 500,000, we would return
    400,000 for the height, and zero for the timestamp. */
-std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart()
+std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart() const
 {
     /* Get the smallest sub wallet (by timestamp) */
     auto minElementByTimestamp = *std::min_element(m_subWallets.begin(), m_subWallets.end(),
@@ -163,7 +171,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart()
         return lhs.second.m_syncStartTimestamp < rhs.second.m_syncStartTimestamp;
     });
 
-    uint64_t minTimestamp = minElementByTimestamp.second.m_syncStartTimestamp;
+    const uint64_t minTimestamp = minElementByTimestamp.second.m_syncStartTimestamp;
 
     /* Get the smallest sub wallet (by height) */
     auto minElementByHeight = *std::min_element(m_subWallets.begin(), m_subWallets.end(),
@@ -172,7 +180,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart()
         return lhs.second.m_syncStartHeight < rhs.second.m_syncStartHeight;
     });
 
-    uint64_t minHeight = minElementByHeight.second.m_syncStartHeight;
+    const uint64_t minHeight = minElementByHeight.second.m_syncStartHeight;
 
     /* One or both of the values are zero, caller will use whichever is non
        zero */
@@ -183,7 +191,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart()
 
     /* Convert timestamp to height so we can compare them, then return the min
        of the two, and set the other to zero */
-    uint64_t timestampFromHeight = scanHeightToTimestamp(minHeight);
+    const uint64_t timestampFromHeight = scanHeightToTimestamp(minHeight);
 
     if (timestampFromHeight < minTimestamp)
     {
@@ -195,7 +203,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart()
     }
 }
 
-void SubWallets::addTransaction(Transaction tx)
+void SubWallets::addTransaction(const Transaction tx)
 {
     m_transactions.push_back(tx);
 
@@ -231,10 +239,11 @@ void SubWallets::addTransaction(Transaction tx)
     }
 }
 
-void SubWallets::generateAndStoreKeyImage(Crypto::PublicKey publicSpendKey,
-                                          Crypto::KeyDerivation derivation,
-                                          size_t outputIndex,
-                                          uint64_t amount)
+void SubWallets::generateAndStoreKeyImage(
+    const Crypto::PublicKey publicSpendKey,
+    const Crypto::KeyDerivation derivation,
+    const size_t outputIndex,
+    const uint64_t amount)
 {
     const auto subWallet = m_subWallets.find(publicSpendKey);
 
@@ -248,7 +257,7 @@ void SubWallets::generateAndStoreKeyImage(Crypto::PublicKey publicSpendKey,
 }
 
 std::tuple<bool, Crypto::PublicKey>
-    SubWallets::getKeyImageOwner(Crypto::KeyImage keyImage)
+    SubWallets::getKeyImageOwner(const Crypto::KeyImage keyImage) const
 {
     for (const auto & [publicKey, subWallet] : m_subWallets)
     {
@@ -275,9 +284,10 @@ std::tuple<bool, Crypto::PublicKey>
    
    This may throw if you don't validate the user has enough balance, and
    that each of the subwallets exist. */
-std::vector<WalletTypes::TransactionInput>
-    SubWallets::getTransactionInputsForAmount(uint64_t amount,
-        bool takeFromAll, std::vector<Crypto::PublicKey> subWalletsToTakeFrom)
+std::vector<WalletTypes::TransactionInput> SubWallets::getTransactionInputsForAmount(
+    const uint64_t amount,
+    const bool takeFromAll,
+    std::vector<Crypto::PublicKey> subWalletsToTakeFrom) const
 {
     /* If we're able to take from every subwallet, set the wallets to take from
        to all our public spend keys */
@@ -291,7 +301,7 @@ std::vector<WalletTypes::TransactionInput>
     /* Loop through each public key and grab the associated wallet */
     for (const auto &publicKey : subWalletsToTakeFrom)
     {
-        wallets.push_back(m_subWallets[publicKey]);
+        wallets.push_back(m_subWallets.at(publicKey));
     }
 
     std::vector<WalletTypes::TransactionInput> availableInputs;
@@ -332,7 +342,30 @@ std::vector<WalletTypes::TransactionInput>
 /* Gets the address of the 'first' wallet. Since this is an unordered_map, the
    wallet this points to is undefined. You should only really use this in a
    single wallet container */
-std::string SubWallets::getDefaultChangeAddress()
+std::string SubWallets::getDefaultChangeAddress() const
 {
     return (*m_subWallets.begin()).second.m_address;
+}
+
+/* Will throw if the public keys given don't exist */
+uint64_t SubWallets::getBalance(
+    std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
+    const bool takeFromAll) const
+{
+    /* If we're able to take from every subwallet, set the wallets to take from
+       to all our public spend keys */
+    if (takeFromAll)
+    {
+        subWalletsToTakeFrom = m_publicSpendKeys;
+    }
+
+    uint64_t total = 0;
+
+    /* TODO: Overflow */
+    for (const auto pubKey : subWalletsToTakeFrom)
+    {
+        total += m_subWallets.at(pubKey).m_balance;
+    }
+
+    return total;
 }

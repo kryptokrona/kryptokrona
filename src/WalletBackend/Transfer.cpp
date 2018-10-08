@@ -11,7 +11,7 @@
 #include <CryptoNoteCore/Mixins.h>
 
 #include <WalletBackend/Utilities.h>
-#include <WalletBackend/ValidateTransaction.h>
+#include <WalletBackend/ValidateParameters.h>
 
 //////////////////////////
 /* NON MEMBER FUNCTIONS */
@@ -45,20 +45,7 @@ namespace
 
         return splitAmounts;
     }
-
-    uint64_t getTransactionSum(std::unordered_map<std::string, uint64_t> destinations)
-    {
-        uint64_t amountSum = 0;
-
-        /* TODO: Overflow */
-        for (const auto & [destination, amount] : destinations)
-        {
-            amountSum += amount;
-        }
-
-        return amountSum;
-    }
-
+    
 } // namespace
 
 /////////////////////
@@ -76,21 +63,23 @@ namespace
    If you want to return change to a specific wallet, use
    sendTransactionAdvanced() */
 std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionBasic(
-    std::string destination, uint64_t amount, std::string paymentID)
+    const std::string destination,
+    const uint64_t amount,
+    const std::string paymentID)
 {
-    std::unordered_map<std::string, uint64_t> destinations = {
+    const std::unordered_map<std::string, uint64_t> destinations = {
         {destination, amount}
     };
 
-    uint64_t mixin = CryptoNote::Mixins::getDefaultMixin(
+    const uint64_t mixin = CryptoNote::Mixins::getDefaultMixin(
         m_daemon->getLastKnownBlockHeight()
     );
 
-    uint64_t fee = WalletConfig::defaultFee;
+    const uint64_t fee = WalletConfig::defaultFee;
 
     /* Assumes the container has at least one subwallet - this is true as long
        as the static constructors were used */
-    std::string changeAddress = m_subWallets->getDefaultChangeAddress();
+    const std::string changeAddress = m_subWallets->getDefaultChangeAddress();
 
     return sendTransactionAdvanced(
         destinations, mixin, fee, paymentID, {}, changeAddress
@@ -98,14 +87,17 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionBasic(
 }
 
 std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
-    std::unordered_map<std::string, uint64_t> destinations,
-    uint64_t mixin, uint64_t fee, std::string paymentID,
-    std::vector<std::string> addressesToTakeFrom,
-    std::string changeAddress)
+    const std::unordered_map<std::string, uint64_t> destinations,
+    const uint64_t mixin,
+    const uint64_t fee,
+    const std::string paymentID,
+    const std::vector<std::string> addressesToTakeFrom,
+    const std::string changeAddress)
 {
     /* Validate the transaction input parameters */
-    WalletError error = validateTransaction(
-        destinations, mixin, fee, paymentID, addressesToTakeFrom, changeAddress
+    const WalletError error = validateTransaction(
+        destinations, mixin, fee, paymentID, addressesToTakeFrom, changeAddress,
+        *m_subWallets, m_daemon->getLastKnownBlockHeight()
     );
 
     if (error)
@@ -121,9 +113,9 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
     /* The total amount we are sending */
     const uint64_t amount = getTransactionSum(destinations);
 
-    /* Convert the addresses to public view keys */
-    std::vector<Crypto::PublicKey> subWalletsToTakeFrom
-        = addressesToViewKeys(addressesToTakeFrom);
+    /* Convert the addresses to public spend keys */
+    const std::vector<Crypto::PublicKey> subWalletsToTakeFrom
+        = addressesToSpendKeys(addressesToTakeFrom);
 
     /* The transaction 'inputs' - key images we have previously received */
     const auto inputs = m_subWallets->getTransactionInputsForAmount(
