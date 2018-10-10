@@ -19,7 +19,7 @@
 #include <WalletBackend/Utilities.h>
 
 WalletError validateTransaction(
-    const std::unordered_map<std::string, uint64_t> destinations,
+    const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,
     const uint64_t fee,
     const std::string paymentID,
@@ -71,7 +71,7 @@ WalletError validateTransaction(
 }
 
 WalletError validateIntegratedAddresses(
-    const std::unordered_map<std::string, uint64_t> destinations,
+    const std::vector<std::pair<std::string, uint64_t>> destinations,
     std::string paymentID)
 {
     for (const auto [address, amount] : destinations)
@@ -139,7 +139,7 @@ WalletError validateMixin(const uint64_t mixin, const uint64_t height)
 }
 
 WalletError validateAmount(
-    const std::unordered_map<std::string, uint64_t> destinations,
+    const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t fee,
     const std::vector<std::string> subWalletsToTakeFrom,
     const SubWallets &subWallets)
@@ -159,7 +159,8 @@ WalletError validateAmount(
     /* Get the available balance, using the source addresses */
     uint64_t availableBalance = subWallets.getBalance(
         addressesToSpendKeys(subWalletsToTakeFrom),
-        false
+        /* Take from all if no subwallets specified */
+        subWalletsToTakeFrom.empty()
     );
 
     /* Get the total amount of the transaction */
@@ -174,7 +175,7 @@ WalletError validateAmount(
 }
 
 WalletError validateDestinations(
-    const std::unordered_map<std::string, uint64_t> destinations)
+    const std::vector<std::pair<std::string, uint64_t>> destinations)
 {
     /* Make sure there is at least one destination */
     if (destinations.empty())

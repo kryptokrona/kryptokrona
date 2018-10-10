@@ -163,6 +163,15 @@ uint64_t WalletSynchronizer::processTransactionInputs(
                it will default to zero, so this is just setting the value
                to the negative amount in that case */
             transfers[publicSpendKey] -= keyInput.amount;
+
+            WalletTypes::TransactionInput txInput;
+
+            txInput.keyImage = keyInput.keyImage;
+            txInput.amount = keyInput.amount;
+
+            /* The transaction has been spent, discard the key image so we
+               don't double spend it */
+            m_subWallets->removeSpentKeyImage(txInput, publicSpendKey);
         }
     }
 
@@ -398,7 +407,7 @@ void WalletSynchronizer::downloadBlocks()
 
         if (err)
         {
-            std::cout << "Failed to query blocks: " << err << ", "
+            std::cout << "Failed to download blocks from daemon: " << err << ", "
                       << err.message() << std::endl;
 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));

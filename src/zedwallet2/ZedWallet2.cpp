@@ -69,7 +69,7 @@ int main()
 
     std::tie(error, transactionHash) = wallet.sendTransactionBasic(
         "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
-        12345,
+        100,
         std::string()
     );
 

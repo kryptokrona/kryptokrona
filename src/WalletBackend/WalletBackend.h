@@ -95,16 +95,16 @@ class WalletBackend
         
         /* Defined in Transfer.cpp */
         std::tuple<WalletError, Crypto::Hash> sendTransactionBasic(
-            const std::string destination,
+            std::string destination,
             const uint64_t amount,
-            const std::string paymentID);
+            std::string paymentID);
 
         /* Defined in Transfer.cpp */
         std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
-            const std::unordered_map<std::string, uint64_t> destinations,
+            std::vector<std::pair<std::string, uint64_t>> destinations,
             const uint64_t mixin,
             const uint64_t fee,
-            const std::string paymentID,
+            std::string paymentID,
             const std::vector<std::string> subWalletsToTakeFrom,
             const std::string changeAddress);
 

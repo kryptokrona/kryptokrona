@@ -63,6 +63,11 @@ namespace WalletTypes
 
     struct TransactionInput
     {
+        bool operator==(const TransactionInput &other) const
+        {
+            return (keyImage == other.keyImage) && (amount == other.amount);
+        }
+
         /* The key image of this amount */
         Crypto::KeyImage keyImage;
 

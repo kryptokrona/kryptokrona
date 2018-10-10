@@ -83,6 +83,11 @@ class SubWallets
             std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
             const bool takeFromAll) const;
 
+        /* Removes a spent key image from the store */
+        void removeSpentKeyImage(
+            const WalletTypes::TransactionInput txInput,
+            const Crypto::PublicKey publicKey);
+
     private:
         /* The subwallets, indexed by public spend key */ 
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;

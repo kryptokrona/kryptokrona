@@ -74,7 +74,7 @@ std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::strin
     return spendKeys;
 }
 
-uint64_t getTransactionSum(const std::unordered_map<std::string, uint64_t> destinations)
+uint64_t getTransactionSum(const std::vector<std::pair<std::string, uint64_t>> destinations)
 {
     uint64_t amountSum = 0;
 

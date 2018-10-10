@@ -17,32 +17,102 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include <cstdint>
+
+#include <iterator>
 
 namespace Crypto {
 
-struct Hash {
-  uint8_t data[32];
+struct Hash
+{
+    bool operator==(const Hash &other) const
+    {
+        return std::equal(std::begin(data), std::end(data), std::begin(other.data));
+    }
+
+    bool operator!=(const Hash &other) const
+    {
+        return !(*this == other);
+    }
+
+    uint8_t data[32];
 };
 
-struct PublicKey {
-  uint8_t data[32];
+struct PublicKey
+{
+    bool operator==(const PublicKey &other) const
+    {
+        return std::equal(std::begin(data), std::end(data), std::begin(other.data));
+    }
+
+    bool operator!=(const PublicKey &other) const
+    {
+        return !(*this == other);
+    }
+
+    uint8_t data[32];
 };
 
-struct SecretKey {
-  uint8_t data[32];
+struct SecretKey
+{
+    bool operator==(const SecretKey &other) const
+    {
+        return std::equal(std::begin(data), std::end(data), std::begin(other.data));
+    }
+    
+    bool operator!=(const SecretKey &other) const
+    {
+        return !(*this == other);
+    }
+
+    uint8_t data[32];
 };
 
-struct KeyDerivation {
-  uint8_t data[32];
+struct KeyDerivation
+{
+    bool operator==(const KeyDerivation &other) const
+    {
+        return std::equal(std::begin(data), std::end(data), std::begin(other.data));
+    }
+
+    bool operator!=(const KeyDerivation &other) const
+    {
+        return !(*this == other);
+    }
+
+    uint8_t data[32];
 };
 
-struct KeyImage {
-  uint8_t data[32];
+struct KeyImage
+{
+    bool operator==(const KeyImage &other) const
+    {
+        return std::equal(std::begin(data), std::end(data), std::begin(other.data));
+    }
+
+    bool operator!=(const KeyImage &other) const
+    {
+        return !(*this == other);
+    }
+
+    uint8_t data[32];
 };
 
-struct Signature {
-  uint8_t data[64];
+struct Signature
+{
+    bool operator==(const Signature &other) const
+    {
+        return std::equal(std::begin(data), std::end(data), std::begin(other.data));
+    }
+
+    bool operator!=(const Signature &other) const
+    {
+        return !(*this == other);
+    }
+
+    uint8_t data[64];
 };
 
 }

@@ -369,3 +369,16 @@ uint64_t SubWallets::getBalance(
 
     return total;
 }
+
+/* Removes a spent key image so we don't double spend */
+void SubWallets::removeSpentKeyImage(
+    const WalletTypes::TransactionInput txInput,
+    const Crypto::PublicKey publicKey)
+{
+    /* Grab a reference to the key images so we don't have to type this each
+       time */
+    auto &keyImages = m_subWallets.at(publicKey).m_keyImages;
+
+    /* Erase the key image */
+    keyImages.erase(std::remove(keyImages.begin(), keyImages.end(), txInput), keyImages.end());
+}

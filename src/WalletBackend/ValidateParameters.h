@@ -14,7 +14,7 @@
 #include <WalletBackend/WalletErrors.h>
 
 WalletError validateTransaction(
-    const std::unordered_map<std::string, uint64_t> destinations,
+    const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,
     const uint64_t fee,
     const std::string paymentID,
@@ -24,7 +24,7 @@ WalletError validateTransaction(
     const uint64_t height);
 
 WalletError validateIntegratedAddresses(
-    const std::unordered_map<std::string, uint64_t> destinations,
+    const std::vector<std::pair<std::string, uint64_t>> destinations,
     std::string paymentID);
 
 WalletError validatePaymentID(const std::string paymentID);
@@ -32,13 +32,13 @@ WalletError validatePaymentID(const std::string paymentID);
 WalletError validateMixin(const uint64_t mixin, const uint64_t height);
 
 WalletError validateAmount(
-    const std::unordered_map<std::string, uint64_t> destinations,
+    const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t fee,
     const std::vector<std::string> subWalletsToTakeFrom,
     const SubWallets &subWallets);
 
 WalletError validateDestinations(
-    const std::unordered_map<std::string, uint64_t> destinations);
+    const std::vector<std::pair<std::string, uint64_t>> destinations);
 
 WalletError validateAddresses(
     std::vector<std::string> addresses,

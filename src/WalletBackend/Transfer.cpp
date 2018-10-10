@@ -63,11 +63,11 @@ namespace
    If you want to return change to a specific wallet, use
    sendTransactionAdvanced() */
 std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionBasic(
-    const std::string destination,
+    std::string destination,
     const uint64_t amount,
-    const std::string paymentID)
+    std::string paymentID)
 {
-    const std::unordered_map<std::string, uint64_t> destinations = {
+    std::vector<std::pair<std::string, uint64_t>> destinations = {
         {destination, amount}
     };
 
@@ -87,10 +87,10 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionBasic(
 }
 
 std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
-    const std::unordered_map<std::string, uint64_t> destinations,
+    std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,
     const uint64_t fee,
-    const std::string paymentID,
+    std::string paymentID,
     const std::vector<std::string> addressesToTakeFrom,
     const std::string changeAddress)
 {
@@ -105,7 +105,21 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
         return {error, Crypto::Hash()};
     }
 
-    /* TODO: Convert integrated address to standard + payment ID */
+    /* Convert integrated addresses to standard address + paymentID, if
+       present. We have already validated they are valid integrated addresses
+       in validateTransaction(), and the paymentID's do not conflict. */
+    for (auto &[address, amount] : destinations)
+    {
+        if (address.length() != WalletConfig::integratedAddressLength)
+        {
+            continue;
+        }
+
+        auto [extractedAddress, extractedPaymentID] = extractIntegratedAddressData(address);
+
+        address = extractedAddress;
+        paymentID = extractedPaymentID;
+    }
 
     /* If no address to take from is given, we will take from all available. */
     const bool takeFromAllSubWallets = addressesToTakeFrom.empty();
