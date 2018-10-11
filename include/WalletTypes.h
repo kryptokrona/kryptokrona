@@ -65,7 +65,9 @@ namespace WalletTypes
     {
         bool operator==(const TransactionInput &other) const
         {
-            return (keyImage == other.keyImage) && (amount == other.amount);
+            return (keyImage == other.keyImage)
+                && (amount == other.amount)
+                && (blockHeight == other.blockHeight);
         }
 
         /* The key image of this amount */
@@ -73,5 +75,10 @@ namespace WalletTypes
 
         /* The value of this key image */
         uint64_t amount;
+
+        /* The block height this key images transaction was included in
+           (Need this for removing key images that were received on a forked
+           chain) */
+        uint64_t blockHeight;
     };
 }

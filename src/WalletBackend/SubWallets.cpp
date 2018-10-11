@@ -382,3 +382,34 @@ void SubWallets::removeSpentKeyImage(
     /* Erase the key image */
     keyImages.erase(std::remove(keyImages.begin(), keyImages.end(), txInput), keyImages.end());
 }
+
+/* Remove transactions and key images that occured on a forked chain */
+void SubWallets::removeForkedTransactions(uint64_t forkHeight)
+{
+    /* std::remove_if doesn't actually remove anything, it just moves the
+       removed items to the end, and gives an iterator to the 'new' end.
+       We then call std::erase(newEnd, oldEnd) to remove the items */
+    auto newEnd = std::remove_if(m_transactions.begin(), m_transactions.end(),
+    [forkHeight](auto tx)
+    {
+        /* Remove the transaction if it's height is >= than the fork height */
+        return tx.blockHeight >= forkHeight;
+    });
+
+    m_transactions.erase(newEnd, m_transactions.end());
+
+    /* Loop through each subwallet */
+    for (const auto & [publicKey, subWallet] : m_subWallets)
+    {
+        auto &keyImages = m_subWallets.at(publicKey).m_keyImages;
+
+        /* Remove the key image if it's height is >= fork height */
+        auto newKeyImagesEnd = std::remove_if(keyImages.begin(), keyImages.end(),
+        [forkHeight](auto keyImage)
+        {
+            return keyImage.blockHeight >= forkHeight;
+        });
+
+        keyImages.erase(newKeyImagesEnd, keyImages.end());
+    }
+}

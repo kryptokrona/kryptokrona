@@ -299,6 +299,7 @@ namespace WalletTypes
         j = {
             {"keyImage", Common::podToHex(t.keyImage)},
             {"amount", t.amount},
+            {"blockHeight", t.blockHeight},
         };
     }
 
@@ -306,6 +307,7 @@ namespace WalletTypes
     {
         Common::podFromHex(j.at("keyImage").get<std::string>(), t.keyImage.data);
         t.amount = j.at("amount").get<int64_t>();
+        t.blockHeight = j.at("blockHeight").get<uint64_t>();
     }
 }
 

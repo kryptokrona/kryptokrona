@@ -60,31 +60,32 @@ class WalletSynchronizer
 
         void stop();
 
-        /* Invalidate transactions from this height and above, they occured
+        /* Remove transactions from this height and above, they occured
            on a forked chain */
-        void invalidateTransactions(uint64_t height);
+        void removeForkedTransactions(uint64_t forkHeight);
 
         /* Process the transaction inputs to find transactions which we spent */
         uint64_t processTransactionInputs(
-            std::vector<CryptoNote::KeyInput> keyInputs,
-            std::unordered_map<Crypto::PublicKey, int64_t> &transfers);
+            const std::vector<CryptoNote::KeyInput> keyInputs,
+            std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
+            const uint64_t blockHeight);
 
         /* Process the transaction outputs to find incoming transactions */
         std::tuple<bool, uint64_t> processTransactionOutputs(
-            std::vector<WalletTypes::KeyOutput> keyOutputs,
-            Crypto::PublicKey txPublicKey,
+            const std::vector<WalletTypes::KeyOutput> keyOutputs,
+            const Crypto::PublicKey txPublicKey,
             std::unordered_map<Crypto::PublicKey, int64_t> &transfers);
 
         /* Process a coinbase transaction to see if it belongs to us */
         void processCoinbaseTransaction(
-            WalletTypes::RawCoinbaseTransaction rawTX,
-            uint64_t blockTimestamp,
-            uint64_t blockHeight);
+            const WalletTypes::RawCoinbaseTransaction rawTX,
+            const uint64_t blockTimestamp,
+            const uint64_t blockHeight);
 
         /* Process a transaction to see if it belongs to us */
-        void processTransaction(WalletTypes::RawTransaction rawTX,
-                                uint64_t blockTimestamp,
-                                uint64_t blockHeight);
+        void processTransaction(const WalletTypes::RawTransaction rawTX,
+                                const uint64_t blockTimestamp,
+                                const uint64_t blockHeight);
 
         /* The thread ID of the block downloader thread */
         std::thread m_blockDownloaderThread;

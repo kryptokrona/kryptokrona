@@ -133,14 +133,16 @@ void WalletSynchronizer::stop()
 
 /* Remove any transactions at this height or above, they were on a forked
    chain */
-void WalletSynchronizer::invalidateTransactions(uint64_t height)
+void WalletSynchronizer::removeForkedTransactions(const uint64_t forkHeight)
 {
+    m_subWallets->removeForkedTransactions(forkHeight);
 }
 
 /* Find inputs that belong to us (i.e., outgoing transactions) */
 uint64_t WalletSynchronizer::processTransactionInputs(
-    std::vector<CryptoNote::KeyInput> keyInputs,
-    std::unordered_map<Crypto::PublicKey, int64_t> &transfers)
+    const std::vector<CryptoNote::KeyInput> keyInputs,
+    std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
+    const uint64_t blockHeight)
 {
     uint64_t sumOfInputs = 0;
 
@@ -168,6 +170,7 @@ uint64_t WalletSynchronizer::processTransactionInputs(
 
             txInput.keyImage = keyInput.keyImage;
             txInput.amount = keyInput.amount;
+            txInput.blockHeight = blockHeight;
 
             /* The transaction has been spent, discard the key image so we
                don't double spend it */
@@ -180,8 +183,8 @@ uint64_t WalletSynchronizer::processTransactionInputs(
 
 /* Find outputs that belong to us (i.e., incoming transactions) */
 std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
-    std::vector<WalletTypes::KeyOutput> keyOutputs,
-    Crypto::PublicKey txPublicKey,
+    const std::vector<WalletTypes::KeyOutput> keyOutputs,
+    const Crypto::PublicKey txPublicKey,
     std::unordered_map<Crypto::PublicKey, int64_t> &transfers)
 {
     Crypto::KeyDerivation derivation;
@@ -244,9 +247,9 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
 }
 
 void WalletSynchronizer::processCoinbaseTransaction(
-    WalletTypes::RawCoinbaseTransaction rawTX,
-    uint64_t blockTimestamp,
-    uint64_t blockHeight)
+    const WalletTypes::RawCoinbaseTransaction rawTX,
+    const uint64_t blockTimestamp,
+    const uint64_t blockHeight)
 {
     /* TODO: Input is a uint64_t, but we store it as an int64_t so it can be
        negative - need to handle overflow */
@@ -276,9 +279,10 @@ void WalletSynchronizer::processCoinbaseTransaction(
 }
 
 /* Find the inputs and outputs of a transaction that belong to us */
-void WalletSynchronizer::processTransaction(WalletTypes::RawTransaction rawTX,
-                                            uint64_t blockTimestamp,
-                                            uint64_t blockHeight)
+void WalletSynchronizer::processTransaction(
+    const WalletTypes::RawTransaction rawTX,
+    const uint64_t blockTimestamp,
+    const uint64_t blockHeight)
 {
     //std::cout << Common::podToHex(rawTX.transactionPublicKey) << std::endl;
 
@@ -288,11 +292,13 @@ void WalletSynchronizer::processTransaction(WalletTypes::RawTransaction rawTX,
 
     /* Finds the sum of inputs, addds the amounts that belong to us to the
        transfers map */
-    uint64_t sumOfInputs = processTransactionInputs(rawTX.keyInputs, transfers);
+    const uint64_t sumOfInputs = processTransactionInputs(
+        rawTX.keyInputs, transfers, blockHeight
+    );
 
     /* Finds the sum of outputs, adds the amounts that belong to us to the
        transfers map, and stores any key images that belong to us */
-    auto [success, sumOfOutputs] = processTransactionOutputs(
+    const auto [success, sumOfOutputs] = processTransactionOutputs(
         rawTX.keyOutputs, rawTX.transactionPublicKey, transfers
     );
 
@@ -306,10 +312,10 @@ void WalletSynchronizer::processTransaction(WalletTypes::RawTransaction rawTX,
     if (!transfers.empty())
     {
         /* Fee is the difference between inputs and outputs */
-        uint64_t fee = sumOfInputs - sumOfOutputs;
+        const uint64_t fee = sumOfInputs - sumOfOutputs;
 
         /* Form the actual transaction */
-        Transaction tx(
+        const Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight,
             rawTX.paymentID
         );
@@ -334,7 +340,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
         /* Chain forked, invalidate previous transactions */
         if (m_transactionSynchronizerStatus.getHeight() >= b.blockHeight)
         {
-            invalidateTransactions(b.blockHeight);
+            removeForkedTransactions(b.blockHeight);
         }
 
         /* Process the coinbase transaction */

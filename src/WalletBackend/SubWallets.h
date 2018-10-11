@@ -88,6 +88,10 @@ class SubWallets
             const WalletTypes::TransactionInput txInput,
             const Crypto::PublicKey publicKey);
 
+        /* Remove any transactions at this height or above, they were on a 
+           forked chain */
+        void removeForkedTransactions(uint64_t forkHeight);
+
     private:
         /* The subwallets, indexed by public spend key */ 
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;

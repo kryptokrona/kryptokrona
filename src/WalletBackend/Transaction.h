@@ -44,5 +44,6 @@ struct Transaction
     /* The timestamp of this transaction (taken from the block timestamp) */
     uint64_t timestamp;
 
+    /* The paymentID of this transaction (will be an empty string if no pid) */
     std::string paymentID;
 };
