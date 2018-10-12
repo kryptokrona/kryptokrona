@@ -583,7 +583,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
 	size_t init_rounds = (light ? CN_LIGHT_INIT : CN_INIT);
 	size_t aes_rounds = (light ? ITER_Light_Divided : ITER_Divided);
 	size_t lightFlag = (light ? 2 : 1);
-	
+
     RDATA_ALIGN16 uint8_t expandedKey[240];  /* These buffers are aligned to use later with SSE functions */
 
     uint8_t text[INIT_SIZE_BYTE];
@@ -604,9 +604,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
         hash_extra_blake, hash_extra_groestl, hash_extra_jh, hash_extra_skein
     };
 
-    // this isn't supposed to happen, but guard against it for now.
-    if(hp_state == NULL)
-        slow_hash_allocate_state();
+    slow_hash_allocate_state();
 
     /* CryptoNight Step 1:  Use Keccak1600 to initialize the 'state' (and 'text') buffers from the data. */
     if (prehashed) {
@@ -714,6 +712,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
     memcpy(state.init, text, INIT_SIZE_BYTE);
     hash_permutation(&state.hs);
     extra_hashes[state.hs.b[0] & 3](&state, 200, hash);
+    slow_hash_free_state();
 }
 
 #elif !defined NO_AES && (defined(__arm__) || defined(__aarch64__))
@@ -928,7 +927,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
 	size_t init_rounds = (light ? CN_LIGHT_INIT : CN_INIT);
 	size_t aes_rounds = (light ? ITER_Light_Divided : ITER_Divided);
 	size_t lightFlag = (light ? 2 : 1);
-	
+
     RDATA_ALIGN16 uint8_t expandedKey[240];
     RDATA_ALIGN16 uint8_t hp_state[MEMORY];
 
@@ -1132,7 +1131,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int light, int va
 	size_t init_rounds = (light ? CN_LIGHT_INIT : CN_INIT);
 	size_t aes_rounds = (light ? ITER_Light_Divided : ITER_Divided);
 	size_t lightFlag = (light ? 2 : 1);
-	
+
     uint8_t text[INIT_SIZE_BYTE];
     uint8_t a[AES_BLOCK_SIZE];
     uint8_t b[AES_BLOCK_SIZE];
