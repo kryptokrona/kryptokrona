@@ -564,6 +564,13 @@ bool RpcServer::on_get_peers(const COMMAND_RPC_GET_PEERS::request& req, COMMAND_
     stream << peer.adr;
     res.peers.push_back(stream.str());
   }
+
+  for (const auto& peer : peers_gray) {
+    std::stringstream stream;
+    stream << peer.adr;
+    res.gray_peers.push_back(stream.str());
+  }
+
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }
