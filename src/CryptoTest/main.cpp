@@ -41,11 +41,17 @@ int main(int argc, char** argv) {
       cn_slow_hash_v1(rawData.data(), rawData.size(), hash);
       std::cout << "cn_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
+      cn_slow_hash_v2(rawData.data(), rawData.size(), hash);
+      std::cout << "cn_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+
       cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
       std::cout << "cn_lite_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
 
       cn_lite_slow_hash_v1(rawData.data(), rawData.size(), hash);
       std::cout << "cn_lite_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+
+      cn_lite_slow_hash_v2(rawData.data(), rawData.size(), hash);
+      std::cout << "cn_lite_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
     }
 
     std::cout <<  "\nPerformance Tests: Please wait, this may take a while depending on your system...\n\n";
