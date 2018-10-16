@@ -65,23 +65,28 @@ int main()
         return 1;
     }
 
-    Crypto::Hash transactionHash;
-
-    std::tie(error, transactionHash) = wallet.sendTransactionBasic(
-        "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
-        100,
-        std::string()
-    );
-
-    if (error)
+    wallet.m_eventHandler->registerOnSynced([&](int blockHeight)
     {
-        std::cout << "Failed to send transaction: " << getErrorMessage(error) << std::endl;
-    }
-    else
-    {
-        std::cout << "Sent transaction: " << transactionHash << std::endl;
-    }
+        std::cout << "Wallet is synced! Top block: " << blockHeight << std::endl;
 
+        Crypto::Hash transactionHash;
+
+        std::tie(error, transactionHash) = wallet.sendTransactionBasic(
+            "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
+            100,
+            std::string()
+        );
+
+        if (error)
+        {
+            std::cout << "Failed to send transaction: " << getErrorMessage(error) << std::endl;
+        }
+        else
+        {
+            std::cout << "Sent transaction: " << transactionHash << std::endl;
+        }
+    });
+    
     std::string input;
 
     /* Wait for input */

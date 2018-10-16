@@ -115,6 +115,8 @@ class WalletBackend
         /* Get the balance for all subwallets */
         uint64_t getTotalBalance() const;
 
+        std::shared_ptr<EventHandler> m_eventHandler;
+
     private:
         WalletBackend(std::string filename, std::string password,
                       Crypto::SecretKey privateSpendKey,

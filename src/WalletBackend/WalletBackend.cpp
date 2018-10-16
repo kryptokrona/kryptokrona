@@ -151,6 +151,7 @@ WalletBackend & WalletBackend::operator=(WalletBackend && old)
     m_daemon = old.m_daemon;
     m_subWallets = old.m_subWallets;
     m_walletSynchronizer = old.m_walletSynchronizer;
+    m_eventHandler = old.m_eventHandler;
 
     /* Invalidate the old pointers */
     old.m_logManager = nullptr;
@@ -158,6 +159,7 @@ WalletBackend & WalletBackend::operator=(WalletBackend && old)
     old.m_logger = nullptr;
     old.m_subWallets = nullptr;
     old.m_walletSynchronizer = nullptr;
+    old.m_eventHandler = nullptr;
 
     return *this;
 }
@@ -191,6 +193,8 @@ WalletBackend::WalletBackend(std::string filename, std::string password,
     m_subWallets = std::make_shared<SubWallets>(
         privateSpendKey, address, scanHeight, newWallet
     );
+
+    m_eventHandler = std::make_shared<EventHandler>();
 }
 
 /////////////////////
@@ -259,7 +263,6 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromKeys(
     {
         return {error, WalletBackend()};
     }
-
 
     /* Just defining here so it's more obvious what we're doing in the
        constructor */
@@ -477,6 +480,8 @@ WalletError WalletBackend::initializeAfterLoad(std::string filename,
         daemonHost, daemonPort, m_logger->getLogger()
     );
 
+    m_eventHandler = std::make_shared<EventHandler>();
+
     return init();
 }
 
@@ -528,13 +533,14 @@ WalletError WalletBackend::init()
             m_daemon, 
             startHeight,
             startTimestamp,
-            m_privateViewKey
+            m_privateViewKey,
+            m_eventHandler
         );
     }
-    /* If it has, just set the daemon */
+    /* If it has, just initialize the stuff we can't from file */
     else
     {
-        m_walletSynchronizer->m_daemon = m_daemon;
+        m_walletSynchronizer->initializeAfterLoad(m_daemon, m_eventHandler);
     }
 
     m_walletSynchronizer->m_subWallets = m_subWallets;

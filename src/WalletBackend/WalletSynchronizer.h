@@ -8,6 +8,7 @@
 
 #include <NodeRpcProxy/NodeRpcProxy.h>
 
+#include <WalletBackend/EventHandler.h>
 #include <WalletBackend/MultiThreadedDeque.h>
 #include <WalletBackend/SubWallets.h>
 #include <WalletBackend/SynchronizationStatus.h>
@@ -21,10 +22,12 @@ class WalletSynchronizer
         WalletSynchronizer();
 
         /* Parameterized constructor */
-        WalletSynchronizer(std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
-                           uint64_t startTimestamp,
-                           uint64_t startHeight,
-                           Crypto::SecretKey privateViewKey);
+        WalletSynchronizer(
+            const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+            const uint64_t startTimestamp,
+            const uint64_t startHeight,
+            const Crypto::SecretKey privateViewKey,
+            const std::shared_ptr<EventHandler> eventHandler);
 
         /* Delete the copy constructor */
         WalletSynchronizer(const WalletSynchronizer &) = delete;
@@ -47,8 +50,9 @@ class WalletSynchronizer
 
         void fromJson(const json &j);
 
-        /* The daemon connection */
-        std::shared_ptr<CryptoNote::NodeRpcProxy> m_daemon;
+        void initializeAfterLoad(
+            const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+            const std::shared_ptr<EventHandler> eventHandler);
 
         /* The sub wallets (shared with the main class) */
         std::shared_ptr<SubWallets> m_subWallets;
@@ -129,4 +133,10 @@ class WalletSynchronizer
 
         /* The private view key we use for decrypting transactions */
         Crypto::SecretKey m_privateViewKey;
+
+        /* Used for firing events, such as onSynced() */
+        std::shared_ptr<EventHandler> m_eventHandler;
+
+        /* The daemon connection */
+        std::shared_ptr<CryptoNote::NodeRpcProxy> m_daemon;
 };

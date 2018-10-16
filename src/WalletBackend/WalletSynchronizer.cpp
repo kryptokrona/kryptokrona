@@ -33,14 +33,18 @@ WalletSynchronizer::WalletSynchronizer() :
 
 /* Parameterized constructor */
 WalletSynchronizer::WalletSynchronizer(
-    std::shared_ptr<CryptoNote::NodeRpcProxy> daemon, uint64_t startHeight,
-    uint64_t startTimestamp, Crypto::SecretKey privateViewKey) :
+    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const uint64_t startHeight,
+    const uint64_t startTimestamp,
+    const Crypto::SecretKey privateViewKey,
+    const std::shared_ptr<EventHandler> eventHandler) :
 
     m_daemon(daemon),
     m_shouldStop(false),
     m_startHeight(startHeight),
     m_startTimestamp(startTimestamp),
-    m_privateViewKey(privateViewKey)
+    m_privateViewKey(privateViewKey),
+    m_eventHandler(eventHandler)
 {
 }
 
@@ -71,6 +75,8 @@ WalletSynchronizer & WalletSynchronizer::operator=(WalletSynchronizer && old)
     m_startHeight = std::move(old.m_startHeight);
 
     m_privateViewKey = std::move(old.m_privateViewKey);
+
+    m_eventHandler = std::move(old.m_eventHandler);
 
     return *this;
 }
@@ -362,6 +368,11 @@ void WalletSynchronizer::findTransactionsInBlocks()
         m_transactionSynchronizerStatus.storeBlockHash(
             b.blockHash, b.blockHeight
         );
+
+        if (b.blockHeight >= m_daemon->getLastKnownBlockHeight())
+        {
+            m_eventHandler->fireOnSynced(b.blockHeight);
+        }
     }
 }
 
@@ -453,4 +464,12 @@ void WalletSynchronizer::downloadBlocks()
             newBlocks.clear();
         }
     }
+}
+
+void WalletSynchronizer::initializeAfterLoad(
+    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const std::shared_ptr<EventHandler> eventHandler)
+{
+    m_daemon = daemon;
+    m_eventHandler = eventHandler;
 }
