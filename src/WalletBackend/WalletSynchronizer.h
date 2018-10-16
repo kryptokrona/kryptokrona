@@ -74,7 +74,9 @@ class WalletSynchronizer
         std::tuple<bool, uint64_t> processTransactionOutputs(
             const std::vector<WalletTypes::KeyOutput> keyOutputs,
             const Crypto::PublicKey txPublicKey,
-            std::unordered_map<Crypto::PublicKey, int64_t> &transfers);
+            std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
+            const uint64_t blockHeight,
+            const std::vector<uint32_t> globalIndexes);
 
         /* Process a coinbase transaction to see if it belongs to us */
         void processCoinbaseTransaction(

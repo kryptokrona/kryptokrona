@@ -175,9 +175,9 @@ private:
   void fillQueryBlockDetails(uint32_t fullOffset, uint32_t currentIndex, size_t maxItemsCount, std::vector<BlockDetails>& entries) const;
   std::vector<WalletTypes::WalletBlockInfo> getRequestedWalletBlocks(uint64_t startIndex, uint64_t currentIndex) const;
 
-  static WalletTypes::RawCoinbaseTransaction getRawCoinbaseTransaction(const CryptoNote::Transaction t);
+  WalletTypes::RawCoinbaseTransaction getRawCoinbaseTransaction(const CryptoNote::Transaction t) const;
 
-  static WalletTypes::RawTransaction getRawTransaction(const std::vector<uint8_t> rawTX);
+  WalletTypes::RawTransaction getRawTransaction(const std::vector<uint8_t> rawTX) const;
 
   static Crypto::PublicKey getPubKeyFromExtra(std::vector<uint8_t> extra);
 

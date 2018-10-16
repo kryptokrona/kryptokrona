@@ -166,15 +166,9 @@ uint64_t WalletSynchronizer::processTransactionInputs(
                to the negative amount in that case */
             transfers[publicSpendKey] -= keyInput.amount;
 
-            WalletTypes::TransactionInput txInput;
-
-            txInput.keyImage = keyInput.keyImage;
-            txInput.amount = keyInput.amount;
-            txInput.blockHeight = blockHeight;
-
             /* The transaction has been spent, discard the key image so we
                don't double spend it */
-            m_subWallets->removeSpentKeyImage(txInput, publicSpendKey);
+            m_subWallets->removeSpentKeyImage(keyInput.keyImage, publicSpendKey);
         }
     }
 
@@ -185,7 +179,9 @@ uint64_t WalletSynchronizer::processTransactionInputs(
 std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
     const std::vector<WalletTypes::KeyOutput> keyOutputs,
     const Crypto::PublicKey txPublicKey,
-    std::unordered_map<Crypto::PublicKey, int64_t> &transfers)
+    std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
+    const uint64_t blockHeight,
+    const std::vector<uint32_t> globalIndexes)
 {
     Crypto::KeyDerivation derivation;
 
@@ -231,14 +227,21 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
                to the amount in that case */
             transfers[*ourSpendKey] += amount;
 
-            /* Next we get the key image for this transaction. We store these,
-               and thus can then detect when an outgoing transaction is made
-               by us. We need a private spend key for this. 
-               
-               If the wallet this spend key belongs to is a view wallet, this
-               won't do anything! */
-            m_subWallets->generateAndStoreKeyImage(
-                *ourSpendKey, derivation, outputIndex, amount
+            /* TODO: Don't need to do this in a view wallet */
+            WalletTypes::TransactionInput input;
+
+            input.amount = amount;
+            input.blockHeight = blockHeight;
+            input.transactionPublicKey = txPublicKey;
+            input.transactionIndex = outputIndex;
+            input.globalOutputIndex = globalIndexes[outputIndex];
+
+            /* We need to fill in the key image of the transaction input -
+               we'll let the subwallet do this since we need the private spend
+               key. We use the key images to detect outgoing transactions,
+               and we use the transaction inputs to make transactions ourself */
+            m_subWallets->completeAndStoreTransactionInput(
+                *ourSpendKey, derivation, outputIndex, input
             );
         }
     }
@@ -256,7 +259,8 @@ void WalletSynchronizer::processCoinbaseTransaction(
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
     processTransactionOutputs(
-        rawTX.keyOutputs, rawTX.transactionPublicKey, transfers
+        rawTX.keyOutputs, rawTX.transactionPublicKey, transfers, blockHeight,
+        rawTX.globalIndexes
     );
 
     /* Process any transactions we found belonging to us */
@@ -269,7 +273,7 @@ void WalletSynchronizer::processCoinbaseTransaction(
         std::string paymentID;
 
         /* Form the actual transaction */
-        Transaction tx(
+        WalletTypes::Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight, paymentID
         );
 
@@ -284,8 +288,6 @@ void WalletSynchronizer::processTransaction(
     const uint64_t blockTimestamp,
     const uint64_t blockHeight)
 {
-    //std::cout << Common::podToHex(rawTX.transactionPublicKey) << std::endl;
-
     /* TODO: Input is a uint64_t, but we store it as an int64_t so it can be
        negative - need to handle overflow */
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
@@ -299,7 +301,8 @@ void WalletSynchronizer::processTransaction(
     /* Finds the sum of outputs, adds the amounts that belong to us to the
        transfers map, and stores any key images that belong to us */
     const auto [success, sumOfOutputs] = processTransactionOutputs(
-        rawTX.keyOutputs, rawTX.transactionPublicKey, transfers
+        rawTX.keyOutputs, rawTX.transactionPublicKey, transfers, blockHeight,
+        rawTX.globalIndexes
     );
 
     /* Failed to parse a key */
@@ -315,7 +318,7 @@ void WalletSynchronizer::processTransaction(
         const uint64_t fee = sumOfInputs - sumOfOutputs;
 
         /* Form the actual transaction */
-        const Transaction tx(
+        const WalletTypes::Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight,
             rawTX.paymentID
         );

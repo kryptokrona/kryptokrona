@@ -79,7 +79,7 @@ int main()
     }
     else
     {
-        std::cout << "Sent transaction" << std::endl;
+        std::cout << "Sent transaction: " << transactionHash << std::endl;
     }
 
     std::string input;

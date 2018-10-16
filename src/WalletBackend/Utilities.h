@@ -19,3 +19,5 @@ std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::strin
 uint64_t getTransactionSum(const std::vector<std::pair<std::string, uint64_t>> destinations);
 
 std::tuple<std::string, std::string> extractIntegratedAddressData(const std::string address);
+
+std::tuple<Crypto::PublicKey, Crypto::PublicKey> addressToKeys(const std::string address);

@@ -52,21 +52,22 @@ class SubWallets
         void fromJson(const json &j);
 
         /* Store a transaction */
-        void addTransaction(const Transaction tx);
+        void addTransaction(const WalletTypes::Transaction tx);
 
         /* Generates a key image using the public+private spend key of the
            subwallet. Wallet must not be a view wallet (and must exist, but
            the WalletSynchronizer already checks this) */
-        void generateAndStoreKeyImage(
-            const Crypto::PublicKey,
-            const Crypto::KeyDerivation,
+        void completeAndStoreTransactionInput(
+            const Crypto::PublicKey publicSpendKey,
+            const Crypto::KeyDerivation derivation,
             const size_t outputIndex,
-            const uint64_t amount);
+            WalletTypes::TransactionInput input);
 
         /* Get key images + amounts for the specified transfer amount. We
            can either take from all subwallets, or from some subset
            (usually just one address, e.g. if we're running a web wallet) */
-        std::vector<WalletTypes::TransactionInput> getTransactionInputsForAmount(
+        std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
+                getTransactionInputsForAmount(
             const uint64_t amount,
             const bool takeFromAll,
             std::vector<Crypto::PublicKey> subWalletsToTakeFrom) const;
@@ -85,7 +86,7 @@ class SubWallets
 
         /* Removes a spent key image from the store */
         void removeSpentKeyImage(
-            const WalletTypes::TransactionInput txInput,
+            const Crypto::KeyImage keyImage,
             const Crypto::PublicKey publicKey);
 
         /* Remove any transactions at this height or above, they were on a 
@@ -97,5 +98,5 @@ class SubWallets
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;
 
         /* A vector of transactions */
-        std::vector<Transaction> m_transactions;
+        std::vector<WalletTypes::Transaction> m_transactions;
 };

@@ -203,7 +203,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart() const
     }
 }
 
-void SubWallets::addTransaction(const Transaction tx)
+void SubWallets::addTransaction(const WalletTypes::Transaction tx)
 {
     m_transactions.push_back(tx);
 
@@ -239,19 +239,19 @@ void SubWallets::addTransaction(const Transaction tx)
     }
 }
 
-void SubWallets::generateAndStoreKeyImage(
+void SubWallets::completeAndStoreTransactionInput(
     const Crypto::PublicKey publicSpendKey,
     const Crypto::KeyDerivation derivation,
     const size_t outputIndex,
-    const uint64_t amount)
+    WalletTypes::TransactionInput input)
 {
     const auto subWallet = m_subWallets.find(publicSpendKey);
 
     /* Check it exists */
     if (subWallet != m_subWallets.end())
     {
-        subWallet->second.generateAndStoreKeyImage(
-            derivation, outputIndex, amount
+        subWallet->second.completeAndStoreTransactionInput(
+            derivation, outputIndex, input
         );
     }
 }
@@ -262,15 +262,15 @@ std::tuple<bool, Crypto::PublicKey>
     for (const auto & [publicKey, subWallet] : m_subWallets)
     {
         /* See if the sub wallet contains the key image */
-        auto it = std::find_if(subWallet.m_keyImages.begin(),
-                               subWallet.m_keyImages.end(),
-        [&keyImage](const WalletTypes::TransactionInput &input)
+        auto it = std::find_if(subWallet.m_transactionInputs.begin(),
+                               subWallet.m_transactionInputs.end(),
+        [&keyImage](const auto &input)
         {
             return input.keyImage == keyImage;
         });
 
         /* Found the key image */
-        if (it != subWallet.m_keyImages.end())
+        if (it != subWallet.m_transactionInputs.end())
         {
             return {true, subWallet.m_publicSpendKey};
         }
@@ -284,7 +284,8 @@ std::tuple<bool, Crypto::PublicKey>
    
    This may throw if you don't validate the user has enough balance, and
    that each of the subwallets exist. */
-std::vector<WalletTypes::TransactionInput> SubWallets::getTransactionInputsForAmount(
+std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
+        SubWallets::getTransactionInputsForAmount(
     const uint64_t amount,
     const bool takeFromAll,
     std::vector<Crypto::PublicKey> subWalletsToTakeFrom) const
@@ -304,13 +305,25 @@ std::vector<WalletTypes::TransactionInput> SubWallets::getTransactionInputsForAm
         wallets.push_back(m_subWallets.at(publicKey));
     }
 
-    std::vector<WalletTypes::TransactionInput> availableInputs;
+    std::vector<WalletTypes::TxInputAndOwner> availableInputs;
 
-    /* Copy the key images from this sub wallet to inputs */
+    /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
     {
-        std::copy(subWallet.m_keyImages.begin(), subWallet.m_keyImages.end(),
-                  std::back_inserter(availableInputs));
+        std::transform(subWallet.m_transactionInputs.begin(),
+                       subWallet.m_transactionInputs.end(),
+                       std::back_inserter(availableInputs),
+        [&subWallet](const auto input)
+        {
+            /* Add in the keys */
+            WalletTypes::TxInputAndOwner t;
+
+            t.input = input;
+            t.privateSpendKey = subWallet.m_privateSpendKey;
+            t.publicSpendKey = subWallet.m_publicSpendKey;
+
+            return t;
+        });
     }
 
     /* Shuffle the inputs */
@@ -318,20 +331,20 @@ std::vector<WalletTypes::TransactionInput> SubWallets::getTransactionInputsForAm
 
     uint64_t foundMoney = 0;
 
-    std::vector<WalletTypes::TransactionInput> inputsToUse;
+    std::vector<WalletTypes::TxInputAndOwner> inputsToUse;
 
     /* Loop through each input */
-    for (const auto &input : availableInputs)
+    for (const auto &walletAmount : availableInputs)
     {
         /* Add each input */
-        inputsToUse.push_back(input);
+        inputsToUse.push_back(walletAmount);
 
-        foundMoney += input.amount;
+        foundMoney += walletAmount.input.amount;
 
         /* Keep adding until we have enough money for the transaction */
         if (foundMoney >= amount)
         {
-            return inputsToUse;
+            return {inputsToUse, foundMoney};
         }
     }
 
@@ -372,15 +385,27 @@ uint64_t SubWallets::getBalance(
 
 /* Removes a spent key image so we don't double spend */
 void SubWallets::removeSpentKeyImage(
-    const WalletTypes::TransactionInput txInput,
+    const Crypto::KeyImage keyImage,
     const Crypto::PublicKey publicKey)
 {
-    /* Grab a reference to the key images so we don't have to type this each
-       time */
-    auto &keyImages = m_subWallets.at(publicKey).m_keyImages;
+    /* Grab a reference to the transaction inputs so we don't have to type
+       this each time */
+    auto &inputs = m_subWallets.at(publicKey).m_transactionInputs;
 
-    /* Erase the key image */
-    keyImages.erase(std::remove(keyImages.begin(), keyImages.end(), txInput), keyImages.end());
+    /* Find the key image to remove and move it to the end of the vector */
+    auto it = std::remove_if(inputs.begin(), inputs.end(), [&keyImage](const auto x)
+    {
+        return x.keyImage == keyImage;
+    });
+
+    /* Shouldn't happen */
+    if (it == inputs.end())
+    {
+        throw std::runtime_error("Could not find key image to remove!");
+    }
+
+    /* Erase the key image from the vector */
+    inputs.erase(it);
 }
 
 /* Remove transactions and key images that occured on a forked chain */
@@ -401,15 +426,15 @@ void SubWallets::removeForkedTransactions(uint64_t forkHeight)
     /* Loop through each subwallet */
     for (const auto & [publicKey, subWallet] : m_subWallets)
     {
-        auto &keyImages = m_subWallets.at(publicKey).m_keyImages;
+        auto &inputs = m_subWallets.at(publicKey).m_transactionInputs;
 
-        /* Remove the key image if it's height is >= fork height */
-        auto newKeyImagesEnd = std::remove_if(keyImages.begin(), keyImages.end(),
-        [forkHeight](auto keyImage)
+        /* Remove the tx input if it's height is >= fork height */
+        auto newInputsEnd = std::remove_if(inputs.begin(), inputs.end(),
+        [forkHeight](auto input)
         {
-            return keyImage.blockHeight >= forkHeight;
+            return input.blockHeight >= forkHeight;
         });
 
-        keyImages.erase(newKeyImagesEnd, keyImages.end());
+        inputs.erase(newInputsEnd, inputs.end());
     }
 }

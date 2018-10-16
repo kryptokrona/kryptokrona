@@ -29,6 +29,9 @@ namespace WalletTypes
 
         /* The public key of this transaction, taken from the tx extra */
         Crypto::PublicKey transactionPublicKey;
+
+        /* The global indexes of the transaction key images */
+        std::vector<uint32_t> globalIndexes;
     };
 
     /* A raw transaction, simply key images and amounts */
@@ -63,13 +66,6 @@ namespace WalletTypes
 
     struct TransactionInput
     {
-        bool operator==(const TransactionInput &other) const
-        {
-            return (keyImage == other.keyImage)
-                && (amount == other.amount)
-                && (blockHeight == other.blockHeight);
-        }
-
         /* The key image of this amount */
         Crypto::KeyImage keyImage;
 
@@ -80,5 +76,111 @@ namespace WalletTypes
            (Need this for removing key images that were received on a forked
            chain) */
         uint64_t blockHeight;
+
+        /* We need to store this to allow us to create transactions with this
+           input in the future */
+        Crypto::PublicKey transactionPublicKey;
+
+        /* The index of this input in the transaction */
+        uint64_t transactionIndex;
+
+        /* The index of this output in the 'DB' */
+        uint64_t globalOutputIndex;
+    };
+
+    /* Includes the owner of the input so we can sign the input with the
+       correct keys */
+    struct TxInputAndOwner
+    {
+        TransactionInput input;
+
+        Crypto::PublicKey publicSpendKey;
+
+        Crypto::SecretKey privateSpendKey;
+    };
+
+    struct TransactionDestination
+    {
+        /* The public spend key of the receiver of the transaction output */
+        Crypto::PublicKey receiverPublicSpendKey;
+
+        /* The public view key of the receiver of the transaction output */
+        Crypto::PublicKey receiverPublicViewKey;
+
+        /* The amount of the transaction output */
+        uint64_t amount;
+    };
+
+    struct GlobalIndexToKey
+    {
+        uint32_t index;
+        Crypto::PublicKey key;
+    };
+
+    struct ObscuredInput
+    {
+        /* The outputs, including our real output, and the fake mixin outputs */
+        std::vector<GlobalIndexToKey> outputs;
+
+        /* The index of the real output in the outputs vector */
+        uint64_t realOutput;
+
+        /* The real transaction public key */
+        Crypto::PublicKey realTransactionPublicKey;
+
+        /* The index in the transaction outputs vector */
+        uint64_t realOutputTransactionIndex;
+
+        /* The amount being sent */
+        uint64_t amount;
+
+        /* The owners keys, so we can sign the input correctly */
+        Crypto::PublicKey ownerPublicSpendKey;
+
+        Crypto::SecretKey ownerPrivateSpendKey;
+    };
+
+    struct Transaction
+    {
+        Transaction() {};
+
+        Transaction(std::unordered_map<Crypto::PublicKey, int64_t> transfers,
+                    Crypto::Hash hash,
+                    uint64_t fee,
+                    uint64_t timestamp,
+                    uint64_t blockHeight,
+                    std::string paymentID) :
+            transfers(transfers),
+            hash(hash),
+            fee(fee),
+            timestamp(timestamp),
+            blockHeight(blockHeight),
+            paymentID(paymentID)
+        {
+        }
+
+        /* A map of public keys to amounts, since one transaction can go to
+           multiple addresses. These can be positive or negative, for example
+           one address might have sent 10,000 TRTL (-10000) to two recipients
+           (+5000), (+5000) 
+           
+           All the public keys in this map, are ones that the wallet container
+           owns, it won't store amounts belonging to random people */
+        std::unordered_map<Crypto::PublicKey, int64_t> transfers;
+
+        /* The hash of the transaction */
+        Crypto::Hash hash;
+
+        /* The fee the transaction was sent with (always positive) */
+        uint64_t fee;
+
+        /* The blockheight this transaction is in */
+        uint64_t blockHeight;
+
+        /* The timestamp of this transaction (taken from the block timestamp) */
+        uint64_t timestamp;
+
+        /* The paymentID of this transaction (will be an empty string if no pid) */
+        std::string paymentID;
     };
 }

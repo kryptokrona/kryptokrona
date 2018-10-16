@@ -74,6 +74,15 @@ std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::strin
     return spendKeys;
 }
 
+/* Assumes the address is valid */
+std::tuple<Crypto::PublicKey, Crypto::PublicKey> addressToKeys(const std::string address)
+{
+    Crypto::PublicKey publicSpendKey = addressesToSpendKeys({address})[0];
+    Crypto::PublicKey publicViewKey = addressesToViewKeys({address})[0];
+
+    return {publicSpendKey, publicViewKey};
+}
+
 uint64_t getTransactionSum(const std::vector<std::pair<std::string, uint64_t>> destinations)
 {
     uint64_t amountSum = 0;
