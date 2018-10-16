@@ -13,6 +13,9 @@
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
 
+namespace Utilities
+{
+
 /* Will throw an exception if the addresses are invalid. Please check they
    are valid before calling this function. (e.g. use validateAddresses)
    
@@ -131,3 +134,32 @@ std::tuple<std::string, std::string> extractIntegratedAddressData(const std::str
 
     return {actualAddress, paymentID};
 }
+
+std::string publicKeysToAddress(
+    const Crypto::PublicKey publicSpendKey,
+    const Crypto::PublicKey publicViewKey)
+{
+    return CryptoNote::getAccountAddressAsStr(
+        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        { publicSpendKey, publicViewKey }
+    );
+}
+
+/* Generates a public address from the given private keys */
+std::string privateKeysToAddress(
+    const Crypto::SecretKey privateSpendKey,
+    const Crypto::SecretKey privateViewKey)
+{
+    Crypto::PublicKey publicSpendKey;
+    Crypto::PublicKey publicViewKey;
+
+    Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
+    Crypto::secret_key_to_public_key(privateViewKey, publicViewKey);
+
+    return CryptoNote::getAccountAddressAsStr(
+        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        { publicSpendKey, publicViewKey }
+    );
+}
+
+} // namespace Utilities

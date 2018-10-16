@@ -51,8 +51,8 @@ json SubWallet::toJson() const
 /* TODO: https://github.com/nlohmann/json/issues/1267 */
 void SubWallet::fromJson(const json &j)
 {
-    Common::podFromHex(j.at("publicSpendKey").get<std::string>(), m_publicSpendKey.data);
-    Common::podFromHex(j.at("privateSpendKey").get<std::string>(), m_privateSpendKey.data);
+    m_publicSpendKey = j.at("publicSpendKey").get<Crypto::PublicKey>();
+    m_privateSpendKey = j.at("privateSpendKey").get<Crypto::SecretKey>();
     m_address = j.at("address").get<std::string>();
     m_syncStartTimestamp = j.at("syncStartTimestamp").get<uint64_t>();
     m_isViewWallet = j.at("isViewWallet").get<bool>();
@@ -82,14 +82,18 @@ json SubWallets::toJson() const
         {"publicSpendKeys", m_publicSpendKeys},
         {"subWallet", subWalletsToVector(m_subWallets)},
         {"transactions", m_transactions},
+        {"privateViewKey", m_privateViewKey},
+        {"isViewWallet", m_isViewWallet},
     };
 }
 
 void SubWallets::fromJson(const json &j)
 {
-    m_publicSpendKeys = vectorToContainer<std::vector<Crypto::PublicKey>>(j.at("publicSpendKeys").get<std::vector<std::string>>());
+    m_publicSpendKeys = j.at("publicSpendKeys").get<std::vector<Crypto::PublicKey>>();
     m_subWallets = vectorToSubWallets(j.at("subWallet").get<std::vector<SubWallet>>());
     m_transactions = j.at("transactions").get<std::vector<WalletTypes::Transaction>>();
+    m_privateViewKey = j.at("privateViewKey").get<Crypto::SecretKey>();
+    m_isViewWallet = j.at("isViewWallet").get<bool>();
 }
 
 ///////////////////
@@ -111,9 +115,7 @@ json WalletBackend::toJson() const
     return
     {
         {"walletFileFormatVersion", Constants::WALLET_FILE_FORMAT_VERSION},
-        {"privateViewKey", m_privateViewKey},
         {"subWallets", *m_subWallets},
-        {"isViewWallet", m_isViewWallet},
         {"walletSynchronizer", *m_walletSynchronizer}
     };
 }
@@ -132,13 +134,9 @@ void WalletBackend::fromJson(const json &j)
         );
     }
 
-    Common::podFromHex(j.at("privateViewKey").get<std::string>(), m_privateViewKey.data);
-
     m_subWallets = std::make_shared<SubWallets>(
         j.at("subWallets").get<SubWallets>()
     );
-
-    m_isViewWallet = j.at("isViewWallet").get<bool>();
 
     m_walletSynchronizer = std::make_shared<WalletSynchronizer>(
         j.at("walletSynchronizer").get<WalletSynchronizer>()
@@ -158,13 +156,23 @@ namespace Crypto
         j = Common::podToHex(s);
     }
 
+    void from_json(const json &j, SecretKey &s)
+    {
+        Common::podFromHex(j.get<std::string>(), s.data);
+    }
+
     ///////////////////////
     /* Crypto::PublicKey */
     ///////////////////////
 
-    void to_json(json &j, const PublicKey &s)
+    void to_json(json &j, const PublicKey &p)
     {
-        j = Common::podToHex(s);
+        j = Common::podToHex(p);
+    }
+
+    void from_json(const json &j, PublicKey &p)
+    {
+        Common::podFromHex(j.get<std::string>(), p.data);
     }
 
     //////////////////
@@ -176,16 +184,25 @@ namespace Crypto
         j = Common::podToHex(h);
     }
 
+    void from_json(const json &j, Hash &h)
+    {
+        Common::podFromHex(j.get<std::string>(), h.data);
+    }
+
     //////////////////////
     /* Crypto::KeyImage */
     //////////////////////
 
-    void to_json(json &j, const KeyImage &h)
+    void to_json(json &j, const KeyImage &k)
     {
-        j = Common::podToHex(h);
+        j = Common::podToHex(k);
+    }
+
+    void from_json(const json &j, KeyImage &k)
+    {
+        Common::podFromHex(j.get<std::string>(), k.data);
     }
 }
-
 
 ////////////////////////
 /* WalletSynchronizer */
@@ -221,7 +238,7 @@ void WalletSynchronizer::fromJson(const json &j)
     m_startTimestamp = j.at("startTimestamp").get<uint64_t>();
     m_startHeight = j.at("startHeight").get<uint64_t>();
 
-    Common::podFromHex(j.at("privateViewKey").get<std::string>(), m_privateViewKey.data);
+    m_privateViewKey = j.at("privateViewKey").get<Crypto::SecretKey>();
 }
 
 ///////////////////////////
@@ -250,8 +267,8 @@ json SynchronizationStatus::toJson() const
 
 void SynchronizationStatus::fromJson(const json &j)
 {
-    m_blockHashCheckpoints = vectorToContainer<std::deque<Crypto::Hash>>(j.at("blockHashCheckpoints").get<std::vector<std::string>>());
-    m_lastKnownBlockHashes = vectorToContainer<std::deque<Crypto::Hash>>(j.at("lastKnownBlockHashes").get<std::vector<std::string>>());
+    m_blockHashCheckpoints = j.at("blockHashCheckpoints").get<std::deque<Crypto::Hash>>();
+    m_lastKnownBlockHashes = j.at("lastKnownBlockHashes").get<std::deque<Crypto::Hash>>();
     m_lastKnownBlockHeight = j.at("lastKnownBlockHeight").get<uint64_t>();
 }
 
@@ -264,23 +281,25 @@ namespace WalletTypes
     void to_json(json &j, const TransactionInput &t)
     {
         j = {
-            {"keyImage", Common::podToHex(t.keyImage)},
+            {"keyImage", t.keyImage},
             {"amount", t.amount},
             {"blockHeight", t.blockHeight},
             {"transactionPublicKey", t.transactionPublicKey},
             {"transactionIndex", t.transactionIndex},
             {"globalOutputIndex", t.globalOutputIndex},
+            {"key", t.key},
         };
     }
 
     void from_json(const json &j, TransactionInput &t)
     {
-        Common::podFromHex(j.at("keyImage").get<std::string>(), t.keyImage.data);
+        t.keyImage = j.at("keyImage").get<Crypto::KeyImage>();
         t.amount = j.at("amount").get<int64_t>();
         t.blockHeight = j.at("blockHeight").get<uint64_t>();
-        Common::podFromHex(j.at("transactionPublicKey").get<std::string>(), t.transactionPublicKey.data);
+        t.transactionPublicKey = j.at("transactionPublicKey").get<Crypto::PublicKey>();
         t.transactionIndex = j.at("transactionIndex").get<uint64_t>();
         t.globalOutputIndex = j.at("globalOutputIndex").get<uint64_t>();
+        t.key = j.at("key").get<Crypto::PublicKey>();
     }
 
     //////////////////////////////
@@ -302,7 +321,7 @@ namespace WalletTypes
     void from_json(const json &j, Transaction &t)
     {
         t.transfers = vectorToTransfers(j.at("transfers").get<std::vector<Transfer>>());
-        Common::podFromHex(j.at("hash").get<std::string>(), t.hash.data);
+        t.hash = j.at("hash").get<Crypto::Hash>();
         t.fee = j.at("fee").get<uint64_t>();
         t.timestamp = j.at("timestamp").get<uint64_t>();
         t.blockHeight = j.at("blockHeight").get<uint32_t>();
@@ -317,14 +336,14 @@ namespace WalletTypes
 void to_json(json &j, const Transfer &t)
 {
     j = {
-        {"publicKey", Common::podToHex(t.publicKey)},
+        {"publicKey", t.publicKey},
         {"amount", t.amount},
     };
 }
 
 void from_json(const json &j, Transfer &t)
 {
-    Common::podFromHex(j.at("publicKey").get<std::string>(), t.publicKey.data);
+    t.publicKey = j.at("publicKey").get<Crypto::PublicKey>();
     t.amount = j.at("amount").get<int64_t>();
 }
 

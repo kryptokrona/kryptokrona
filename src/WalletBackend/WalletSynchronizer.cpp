@@ -241,6 +241,7 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
             input.transactionPublicKey = txPublicKey;
             input.transactionIndex = outputIndex;
             input.globalOutputIndex = globalIndexes[outputIndex];
+            input.key = keyOutputs[outputIndex].key;
 
             /* We need to fill in the key image of the transaction input -
                we'll let the subwallet do this since we need the private spend

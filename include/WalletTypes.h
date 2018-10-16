@@ -77,8 +77,8 @@ namespace WalletTypes
            chain) */
         uint64_t blockHeight;
 
-        /* We need to store this to allow us to create transactions with this
-           input in the future */
+        /* The transaction public key that was included in the tx_extra of the
+           transaction */
         Crypto::PublicKey transactionPublicKey;
 
         /* The index of this input in the transaction */
@@ -86,6 +86,9 @@ namespace WalletTypes
 
         /* The index of this output in the 'DB' */
         uint64_t globalOutputIndex;
+
+        /* The transaction key we took from the key outputs */
+        Crypto::PublicKey key;
     };
 
     /* Includes the owner of the input so we can sign the input with the

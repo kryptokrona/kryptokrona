@@ -13,27 +13,27 @@ class SubWallets
     public:
         SubWallets();
 
-        SubWallets(
-            const Crypto::PublicKey publicSpendKey,
-            const std::string address,
-            const uint64_t scanHeight,
-            const bool newWallet);
-
+        /* Creates a new wallet */
         SubWallets(
             const Crypto::SecretKey privateSpendKey,
+            const Crypto::SecretKey privateViewKey,
             const std::string address,
             const uint64_t scanHeight,
             const bool newWallet);
 
-        void addSubWallet(
-            const Crypto::PublicKey publicSpendKey,
+        /* Creates a new view only subwallet */
+        SubWallets(
+            const Crypto::SecretKey privateViewKey,
             const std::string address,
             const uint64_t scanHeight,
             const bool newWallet);
 
-        void addSubWallet(
+        /* Adds a sub wallet with a random spend key */
+        void addSubWallet();
+
+        /* Imports a sub wallet with the given private spend key */
+        void importSubWallet(
             const Crypto::SecretKey privateSpendKey,
-            const std::string address,
             const uint64_t scanHeight,
             const bool newWallet);
 
@@ -93,10 +93,16 @@ class SubWallets
            forked chain */
         void removeForkedTransactions(uint64_t forkHeight);
 
+        Crypto::SecretKey getPrivateViewKey() const;
+
     private:
         /* The subwallets, indexed by public spend key */ 
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;
 
         /* A vector of transactions */
         std::vector<WalletTypes::Transaction> m_transactions;
+
+        Crypto::SecretKey m_privateViewKey;
+
+        bool m_isViewWallet;
 };

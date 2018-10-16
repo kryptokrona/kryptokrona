@@ -14,13 +14,15 @@ int main()
     std::string seed = "biggest yields peeled pawnshop godfather likewise hickory queen exit trying buying island wagtail vitals lucky theatrics dewdrop licks update pivot digit foes ensign estate queen";
     std::string address = "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW";
 
-    uint64_t scanHeight = 822500;
+    uint64_t seedScanHeight = 822500;
+
+    uint64_t keyScanHeight = 890800;
 
     Crypto::SecretKey privateSpendKey;
     Crypto::SecretKey privateViewKey;
 
-    Common::podFromHex("b8e348a89ad416267ce9cf947e6c0d4b269cfa901aa2da4bd25438893b9f0a02", privateSpendKey.data);
-    Common::podFromHex("9cf71be446b123e930fc0fc9e27ce5730386b93e30c7eb1747834d56b108ed08", privateViewKey.data);
+    Common::podFromHex("bf09c76d79e35ff67c73cd4c7f4c6093f369e2c3a249b6a3d77dca6ad48b790a", privateSpendKey.data);
+    Common::podFromHex("8b3b27f3b2f5109e22b86c5bc99ca0a68c8f442b7eff201bc84feaec62239505", privateViewKey.data);
 
     uint16_t daemonPort = 11898;
 
@@ -43,15 +45,15 @@ int main()
     }
     else if (selection == "seed")
     {
-        std::tie(error, wallet) = WalletBackend::importWalletFromSeed(seed, walletName, walletPass, scanHeight, daemonHost, daemonPort);
+        std::tie(error, wallet) = WalletBackend::importWalletFromSeed(seed, walletName, walletPass, seedScanHeight, daemonHost, daemonPort);
     }
     else if (selection == "keys")
     {
-        std::tie(error, wallet) = WalletBackend::importWalletFromKeys(privateSpendKey, privateViewKey, walletName, walletPass, scanHeight, daemonHost, daemonPort);
+        std::tie(error, wallet) = WalletBackend::importWalletFromKeys(privateSpendKey, privateViewKey, walletName, walletPass, keyScanHeight, daemonHost, daemonPort);
     }
     else if (selection == "view")
     {
-        std::tie(error, wallet) = WalletBackend::importViewWallet(privateSpendKey, address, walletName, walletPass, scanHeight, daemonHost, daemonPort);
+        std::tie(error, wallet) = WalletBackend::importViewWallet(privateSpendKey, address, walletName, walletPass, keyScanHeight, daemonHost, daemonPort);
     }
     else
     {
@@ -73,7 +75,7 @@ int main()
 
         std::tie(error, transactionHash) = wallet.sendTransactionBasic(
             "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
-            100,
+            1000000,
             std::string()
         );
 

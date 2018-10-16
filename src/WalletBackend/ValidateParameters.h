@@ -20,7 +20,7 @@ WalletError validateTransaction(
     const std::string paymentID,
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string changeAddress,
-    const SubWallets &subWallets,
+    const std::shared_ptr<SubWallets> subWallets,
     const uint64_t height);
 
 WalletError validateIntegratedAddresses(
@@ -35,7 +35,7 @@ WalletError validateAmount(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t fee,
     const std::vector<std::string> subWalletsToTakeFrom,
-    const SubWallets &subWallets);
+    const std::shared_ptr<SubWallets> subWallets);
 
 WalletError validateDestinations(
     const std::vector<std::pair<std::string, uint64_t>> destinations);
@@ -46,4 +46,4 @@ WalletError validateAddresses(
 
 WalletError validateOurAddresses(
     const std::vector<std::string> addresses,
-    const SubWallets &subWallets);
+    const std::shared_ptr<SubWallets> subWallets);

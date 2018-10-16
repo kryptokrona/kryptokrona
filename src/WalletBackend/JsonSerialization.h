@@ -71,39 +71,6 @@ void from_json(const json &j, WalletTypes::TransactionInput &t);
 void to_json(json &j, const WalletTypes::Transaction &t);
 void from_json(const json &j, WalletTypes::Transaction &t);
 
-/* Generic serializers for any hash type with a data member
-   (e.g., CryptoTypes.h) */
-template<typename Data>
-void jsonToHash(const json &j, Data &d, const std::string &dataName)
-{
-    std::string hash = j.at(dataName).get<std::string>();
-
-    Common::podFromHex(hash, d.data);
-}
-
-/* Converts from a vector of 64 char hex strings to a container of a crypto
-   type, such as Crypto::PublicKey */
-template<typename Container>
-Container vectorToContainer(std::vector<std::string> input)
-{
-    Container result;
-
-    for (const auto &x : input)
-    {
-        /* Make a temporary value (this is the type that the template parameter
-           container holds) */
-        typename Container::value_type tmp;
-
-        /* Convert from hex string to crypto type */
-        Common::podFromHex(x, tmp.data);
-
-        /* Insert in the container */
-        result.insert(result.end(), tmp);
-    }
-
-    return result;
-}
-
 std::vector<Transfer> transfersToVector(std::unordered_map<Crypto::PublicKey, int64_t> transfers);
 
 std::unordered_map<Crypto::PublicKey, int64_t> vectorToTransfers(std::vector<Transfer> vector);

@@ -25,7 +25,7 @@ WalletError validateTransaction(
     const std::string paymentID,
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string changeAddress,
-    const SubWallets &subWallets,
+    const std::shared_ptr<SubWallets> subWallets,
     const uint64_t height)
 {
     /* Validate the destinations */
@@ -82,7 +82,8 @@ WalletError validateIntegratedAddresses(
         }
 
         /* Grab the address + pid from the integrated address */
-        const auto [extractedAddress, extractedPaymentID] = extractIntegratedAddressData(address);
+        const auto [extractedAddress, extractedPaymentID] 
+            = Utilities::extractIntegratedAddressData(address);
 
         /* No payment ID given, set it to the extracted one */
         if (paymentID == "")
@@ -142,7 +143,7 @@ WalletError validateAmount(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t fee,
     const std::vector<std::string> subWalletsToTakeFrom,
-    const SubWallets &subWallets)
+    const std::shared_ptr<SubWallets> subWallets)
 {
     /* Verify the fee is valid */
     if (fee < CryptoNote::parameters::MINIMUM_FEE)
@@ -157,14 +158,14 @@ WalletError validateAmount(
     }
 
     /* Get the available balance, using the source addresses */
-    uint64_t availableBalance = subWallets.getBalance(
-        addressesToSpendKeys(subWalletsToTakeFrom),
+    uint64_t availableBalance = subWallets->getBalance(
+        Utilities::addressesToSpendKeys(subWalletsToTakeFrom),
         /* Take from all if no subwallets specified */
         subWalletsToTakeFrom.empty()
     );
 
     /* Get the total amount of the transaction */
-    uint64_t totalAmount = getTransactionSum(destinations) + fee;
+    uint64_t totalAmount = Utilities::getTransactionSum(destinations) + fee;
 
     if (totalAmount > availableBalance)
     {
@@ -294,7 +295,7 @@ WalletError validateAddresses(
 
 WalletError validateOurAddresses(
     const std::vector<std::string> addresses,
-    const SubWallets &subWallets)
+    const std::shared_ptr<SubWallets> subWallets)
 {
     /* Validate the addresses are valid [Integrated addreses not allowed] */
     if (WalletError error = validateAddresses(addresses, false); error != SUCCESS)
@@ -303,9 +304,9 @@ WalletError validateOurAddresses(
     }
 
     /* Validate we own the addresses */
-    for (const auto key : addressesToSpendKeys(addresses))
+    for (const auto key : Utilities::addressesToSpendKeys(addresses))
     {
-        const auto &keys = subWallets.m_publicSpendKeys;
+        const auto &keys = subWallets->m_publicSpendKeys;
 
         if (std::find(keys.begin(), keys.end(), key) == keys.end())
         {

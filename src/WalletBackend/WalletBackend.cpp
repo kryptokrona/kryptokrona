@@ -29,6 +29,7 @@
 #include <WalletBackend/JsonSerialization.h>
 #include <WalletBackend/Utilities.h>
 #include <WalletBackend/ValidateParameters.h>
+#include <WalletBackend/Transfer.h>
 
 using json = nlohmann::json;
 
@@ -66,22 +67,6 @@ WalletError hasMagicIdentifier(Buffer &data, Iterator first, Iterator last,
     data.erase(data.begin(), data.begin() + identifierSize);
 
     return SUCCESS;
-}
-
-/* Generates a public address from the given private keys */
-std::string addressFromPrivateKeys(const Crypto::SecretKey &privateSpendKey,
-                                   const Crypto::SecretKey &privateViewKey)
-{
-    Crypto::PublicKey publicSpendKey;
-    Crypto::PublicKey publicViewKey;
-
-    Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
-    Crypto::secret_key_to_public_key(privateViewKey, publicViewKey);
-
-    return CryptoNote::getAccountAddressAsStr(
-        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
-        { publicSpendKey, publicViewKey }
-    );
 }
 
 /* Check the wallet filename for the new wallet to be created is valid */
@@ -145,8 +130,6 @@ WalletBackend & WalletBackend::operator=(WalletBackend && old)
 {
     m_filename = old.m_filename;
     m_password = old.m_password;
-    m_privateViewKey = old.m_privateViewKey;
-    m_isViewWallet = old.m_isViewWallet;
     m_logManager = old.m_logManager;
     m_daemon = old.m_daemon;
     m_subWallets = old.m_subWallets;
@@ -164,17 +147,19 @@ WalletBackend & WalletBackend::operator=(WalletBackend && old)
     return *this;
 }
 
-/* Constructor */
-WalletBackend::WalletBackend(std::string filename, std::string password,
-                             Crypto::SecretKey privateSpendKey,
-                             Crypto::SecretKey privateViewKey,
-                             bool isViewWallet, uint64_t scanHeight,
-                             bool newWallet, std::string daemonHost,
-                             uint16_t daemonPort) :
+/* Standard Constructor */
+WalletBackend::WalletBackend(
+    const std::string filename,
+    const std::string password,
+    const Crypto::SecretKey privateSpendKey,
+    const Crypto::SecretKey privateViewKey,
+    const uint64_t scanHeight,
+    const bool newWallet,
+    const std::string daemonHost,
+    const uint16_t daemonPort) :
+
     m_filename(filename),
-    m_password(password),
-    m_privateViewKey(privateViewKey),
-    m_isViewWallet(isViewWallet)
+    m_password(password)
 {
     m_logManager = std::make_shared<Logging::LoggerManager>();
 
@@ -187,11 +172,44 @@ WalletBackend::WalletBackend(std::string filename, std::string password,
     );
 
     /* Generate the address from the two private keys */
-    std::string address = addressFromPrivateKeys(privateSpendKey,
-                                                 privateViewKey);
+    std::string address = Utilities::privateKeysToAddress(
+        privateSpendKey, privateViewKey
+    );
 
     m_subWallets = std::make_shared<SubWallets>(
-        privateSpendKey, address, scanHeight, newWallet
+        privateSpendKey, privateViewKey, address, scanHeight, newWallet
+    );
+
+    m_eventHandler = std::make_shared<EventHandler>();
+}
+
+/* View Wallet Constructor */
+WalletBackend::WalletBackend(
+    const std::string filename,
+    const std::string password,
+    const Crypto::SecretKey privateViewKey,
+    const std::string address,
+    const uint64_t scanHeight,
+    const std::string daemonHost,
+    const uint16_t daemonPort) :
+
+    m_filename(filename),
+    m_password(password)
+{
+    m_logManager = std::make_shared<Logging::LoggerManager>();
+
+    m_logger = std::make_shared<Logging::LoggerRef>(
+        *m_logManager, "WalletBackend"
+    );
+
+    m_daemon = std::make_shared<CryptoNote::NodeRpcProxy>(
+        daemonHost, daemonPort, m_logger->getLogger()
+    );
+
+    bool newWallet = false;
+
+    m_subWallets = std::make_shared<SubWallets>(
+        privateViewKey, address, scanHeight, newWallet
     );
 
     m_eventHandler = std::make_shared<EventHandler>();
@@ -204,9 +222,12 @@ WalletBackend::WalletBackend(std::string filename, std::string password,
 /* Imports a wallet from a mnemonic seed. Returns the wallet class,
    or an error. */
 std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromSeed(
-    const std::string mnemonicSeed, const std::string filename,
-    const std::string password, const uint64_t scanHeight,
-    const std::string daemonHost, const uint16_t daemonPort)
+    const std::string mnemonicSeed,
+    const std::string filename,
+    const std::string password,
+    const uint64_t scanHeight,
+    const std::string daemonHost,
+    const uint16_t daemonPort)
 {
     /* Check the filename is valid */
     if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
@@ -226,16 +247,16 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromSeed(
     Crypto::SecretKey privateViewKey;
 
     /* Derive the private view key from the private spend key */
-    CryptoNote::AccountBase::generateViewFromSpend(privateSpendKey,
-                                                   privateViewKey);
+    CryptoNote::AccountBase::generateViewFromSpend(
+        privateSpendKey, privateViewKey
+    );
 
     /* Just defining here so it's more obvious what we're doing in the
        constructor */
     bool newWallet = false;
-    bool isViewWallet = false;
 
     WalletBackend wallet(
-        filename, password, privateSpendKey, privateViewKey, isViewWallet,
+        filename, password, privateSpendKey, privateViewKey,
         scanHeight, newWallet, daemonHost, daemonPort
     );
 
@@ -253,9 +274,12 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromSeed(
 /* Imports a wallet from a private spend key and a view key. Returns
    the wallet class, or an error. */
 std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromKeys(
-    Crypto::SecretKey privateSpendKey, Crypto::SecretKey privateViewKey,
-    const std::string filename, const std::string password,
-    const uint64_t scanHeight, const std::string daemonHost,
+    const Crypto::SecretKey privateSpendKey,
+    const Crypto::SecretKey privateViewKey,
+    const std::string filename,
+    const std::string password,
+    const uint64_t scanHeight,
+    const std::string daemonHost,
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
@@ -267,11 +291,10 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromKeys(
     /* Just defining here so it's more obvious what we're doing in the
        constructor */
     bool newWallet = false;
-    bool isViewWallet = false;
 
     auto wallet = WalletBackend(
-        filename, password, privateSpendKey, privateViewKey, isViewWallet,
-        scanHeight, newWallet, daemonHost, daemonPort
+        filename, password, privateSpendKey, privateViewKey, scanHeight,
+        newWallet, daemonHost, daemonPort
     );
 
     if (WalletError error = wallet.init(); error != SUCCESS)
@@ -289,9 +312,12 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromKeys(
    Returns the wallet class, or an error. */
 /* TODO: Parse address into public spend key, pass to synchronizer */
 std::tuple<WalletError, WalletBackend> WalletBackend::importViewWallet(
-    const Crypto::SecretKey privateViewKey, const std::string address,
-    const std::string filename, const std::string password,
-    const uint64_t scanHeight, const std::string daemonHost,
+    const Crypto::SecretKey privateViewKey,
+    const std::string address,
+    const std::string filename,
+    const std::string password,
+    const uint64_t scanHeight,
+    const std::string daemonHost,
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
@@ -300,14 +326,9 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importViewWallet(
         return {error, WalletBackend()};
     }
 
-    /* Just defining here so it's more obvious what we're doing in the
-       constructor */
-    bool newWallet = false;
-    bool isViewWallet = true;
-
     auto wallet = WalletBackend(
-        filename, password, CryptoNote::NULL_SECRET_KEY, privateViewKey,
-        isViewWallet, scanHeight, newWallet, daemonHost, daemonPort
+        filename, password, privateViewKey, address, scanHeight, daemonHost,
+        daemonPort
     );
 
     if (WalletError error = wallet.init(); error != SUCCESS)
@@ -323,8 +344,10 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importViewWallet(
 
 /* Creates a new wallet with the given filename and password */
 std::tuple<WalletError, WalletBackend> WalletBackend::createWallet(
-    const std::string filename, const std::string password,
-    const std::string daemonHost, const uint16_t daemonPort)
+    const std::string filename,
+    const std::string password,
+    const std::string daemonHost,
+    const uint16_t daemonPort)
 {
     /* Check the filename is valid */
     if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
@@ -347,11 +370,10 @@ std::tuple<WalletError, WalletBackend> WalletBackend::createWallet(
     /* Just defining here so it's more obvious what we're doing in the
        constructor */
     bool newWallet = true;
-    bool isViewWallet = false;
     uint64_t scanHeight = 0;
 
     auto wallet = WalletBackend(
-        filename, password, spendKey.secretKey, privateViewKey, isViewWallet,
+        filename, password, spendKey.secretKey, privateViewKey,
         scanHeight, newWallet, daemonHost, daemonPort
     );
 
@@ -368,8 +390,10 @@ std::tuple<WalletError, WalletBackend> WalletBackend::createWallet(
 
 /* Opens a wallet already on disk with the given filename + password */
 std::tuple<WalletError, WalletBackend> WalletBackend::openWallet(
-    const std::string filename, const std::string password,
-    const std::string daemonHost, const uint16_t daemonPort)
+    const std::string filename,
+    const std::string password,
+    const std::string daemonHost,
+    const uint16_t daemonPort)
 {
     /* Open in binary mode, since we have encrypted data */
     std::ifstream file(filename, std::ios::binary);
@@ -470,8 +494,11 @@ std::tuple<WalletError, WalletBackend> WalletBackend::openWallet(
     return {error, std::move(wallet)};
 }
 
-WalletError WalletBackend::initializeAfterLoad(std::string filename,
-    std::string password, std::string daemonHost, uint16_t daemonPort)
+WalletError WalletBackend::initializeAfterLoad(
+    const std::string filename,
+    const std::string password,
+    const std::string daemonHost,
+    const uint16_t daemonPort)
 {
     m_filename = filename;
     m_password = password;
@@ -533,7 +560,7 @@ WalletError WalletBackend::init()
             m_daemon, 
             startHeight,
             startTimestamp,
-            m_privateViewKey,
+            m_subWallets->getPrivateViewKey(),
             m_eventHandler
         );
     }
@@ -642,13 +669,13 @@ std::tuple<WalletError, uint64_t> WalletBackend::getBalance(
     const std::string address) const
 {
     /* Verify the address is good, and one of our subwallets */
-    if (WalletError error = validateOurAddresses({address}, *m_subWallets); error != SUCCESS)
+    if (WalletError error = validateOurAddresses({address}, m_subWallets); error != SUCCESS)
     {
         return {error, 0};
     }
 
     uint64_t balance = m_subWallets->getBalance(
-        addressesToSpendKeys({address}),
+        Utilities::addressesToSpendKeys({address}),
         false
     );
 
@@ -660,4 +687,30 @@ uint64_t WalletBackend::getTotalBalance() const
 {
     /* Get combined balance from every container */
     return m_subWallets->getBalance({}, true);
+}
+
+/* This is simply a wrapper for Transfer::sendTransactionBasic - we need to
+   pass in the daemon and subwallets instance */
+std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionBasic(
+    const std::string destination,
+    const uint64_t amount,
+    const std::string paymentID)
+{
+    return SendTransaction::sendTransactionBasic(
+        destination, amount, paymentID, m_daemon, m_subWallets
+    );
+}
+
+std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
+    const std::vector<std::pair<std::string, uint64_t>> destinations,
+    const uint64_t mixin,
+    const uint64_t fee,
+    const std::string paymentID,
+    const std::vector<std::string> subWalletsToTakeFrom,
+    const std::string changeAddress)
+{
+    return SendTransaction::sendTransactionAdvanced(
+        destinations, mixin, fee, paymentID, subWalletsToTakeFrom,
+        changeAddress, m_daemon, m_subWallets
+    );
 }

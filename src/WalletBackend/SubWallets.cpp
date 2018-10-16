@@ -6,9 +6,6 @@
 #include <WalletBackend/SubWallets.h>
 /////////////////////////////////////
 
-/* TODO: Remove */
-#include <Common/StringTools.h>
-
 #include <config/CryptoNoteConfig.h>
 
 #include <ctime>
@@ -17,6 +14,8 @@
 #include <iostream>
 
 #include <random>
+
+#include <WalletBackend/Utilities.h>
 
 //////////////////////////
 /* NON MEMBER FUNCTIONS */
@@ -80,27 +79,16 @@ SubWallets::SubWallets()
 {
 }
 
-/* Makes a new view only subwallet */
-SubWallets::SubWallets(
-    const Crypto::PublicKey publicSpendKey,
-    const std::string address,
-    const uint64_t scanHeight,
-    const bool newWallet)
-{
-    uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
-
-    m_subWallets[publicSpendKey]
-        = SubWallet(publicSpendKey, address, scanHeight, timestamp);
-
-    m_publicSpendKeys.push_back(publicSpendKey);
-}
-
 /* Makes a new subwallet */
 SubWallets::SubWallets(
     const Crypto::SecretKey privateSpendKey,
+    const Crypto::SecretKey privateViewKey,
     const std::string address,
     const uint64_t scanHeight,
-    const bool newWallet)
+    const bool newWallet) :
+
+    m_privateViewKey(privateViewKey),
+    m_isViewWallet(false)
 {
     Crypto::PublicKey publicSpendKey;
 
@@ -115,36 +103,73 @@ SubWallets::SubWallets(
     m_publicSpendKeys.push_back(publicSpendKey);
 }
 
-/////////////////////
-/* CLASS FUNCTIONS */
-/////////////////////
-
-/* So much duplicated code ;_; */
-void SubWallets::addSubWallet(
-    const Crypto::PublicKey publicSpendKey,
+/* Makes a new view only subwallet */
+SubWallets::SubWallets(
+    const Crypto::SecretKey privateViewKey,
     const std::string address,
     const uint64_t scanHeight,
-    const bool newWallet)
+    const bool newWallet) :
+
+    m_privateViewKey(privateViewKey),
+    m_isViewWallet(true)
 {
+    const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
+
     uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
 
-    m_subWallets[publicSpendKey]
-        = SubWallet(publicSpendKey, address, scanHeight, timestamp);
+    m_subWallets[publicSpendKey] = SubWallet(
+        publicSpendKey, address, scanHeight, timestamp
+    );
 
     m_publicSpendKeys.push_back(publicSpendKey);
 }
 
-void SubWallets::addSubWallet(
+/////////////////////
+/* CLASS FUNCTIONS */
+/////////////////////
+
+void SubWallets::addSubWallet()
+{
+    if (m_isViewWallet)
+    {
+        throw std::runtime_error("Wallet is a view wallet");
+    }
+
+    CryptoNote::KeyPair spendKey;
+
+    /* Generate a spend key */
+    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+
+    const std::string address = Utilities::privateKeysToAddress(
+        spendKey.secretKey, m_privateViewKey
+    );
+
+    m_subWallets[spendKey.publicKey] = SubWallet(
+        spendKey.publicKey, spendKey.secretKey, address, 0,
+        getCurrentTimestampAdjusted()
+    );
+}
+
+void SubWallets::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
-    const std::string address,
     const uint64_t scanHeight,
     const bool newWallet)
 {
+    /* TODO: return a wallet error */
+    if (m_isViewWallet)
+    {
+        throw std::runtime_error("Wallet is a view wallet");
+    }
+
     Crypto::PublicKey publicSpendKey;
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
 
     uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+
+    const std::string address = Utilities::privateKeysToAddress(
+        privateSpendKey, m_privateViewKey
+    );
 
     m_subWallets[publicSpendKey] = SubWallet(
         publicSpendKey, privateSpendKey, address, scanHeight, timestamp
@@ -230,7 +255,7 @@ void SubWallets::addTransaction(const WalletTypes::Transaction tx)
             std::cout << "Fusion transaction found!" << std::endl;
         }
 
-        std::cout << "Hash: " << Common::podToHex(tx.hash) << std::endl
+        std::cout << "Hash: " << tx.hash << std::endl
                   << "Amount: " << std::abs(amount) << std::endl
                   << "Fee: " << tx.fee << std::endl
                   << "Block height: " << tx.blockHeight << std::endl
@@ -437,4 +462,9 @@ void SubWallets::removeForkedTransactions(uint64_t forkHeight)
 
         inputs.erase(newInputsEnd, inputs.end());
     }
+}
+
+Crypto::SecretKey SubWallets::getPrivateViewKey() const
+{
+    return m_privateViewKey;
 }
