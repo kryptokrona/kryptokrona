@@ -35,7 +35,6 @@
 #include "NodeFactory.h"
 
 #include "Wallet/WalletGreen.h"
-#include "Wallet/LegacyKeysImporter.h"
 #include "Wallet/WalletErrors.h"
 #include "Wallet/WalletUtils.h"
 #include "WalletServiceErrorCategory.h"

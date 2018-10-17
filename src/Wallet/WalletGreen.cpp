@@ -39,7 +39,6 @@
 #include "CryptoNoteCore/TransactionApi.h"
 #include "crypto/crypto.h"
 #include "Transfers/TransfersContainer.h"
-#include "WalletSerializationV1.h"
 #include "WalletSerializationV2.h"
 #include "WalletErrors.h"
 #include "WalletUtils.h"
@@ -470,15 +469,11 @@ void WalletGreen::load(const std::string& path, const std::string& password, std
     throw std::system_error(make_error_code(error::WRONG_VERSION), "Failed to read wallet version");
   }
 
-  if (version < WalletSerializerV2::MIN_VERSION) {
-    convertAndLoadWalletFile(path, std::move(walletFileStream));
+  if (version < WalletSerializerV2::MIN_VERSION || version > WalletSerializerV2::SERIALIZATION_VERSION) {
+    m_logger(ERROR, BRIGHT_RED) << "Unsupported wallet version: " << version;
+    throw std::system_error(make_error_code(error::WRONG_VERSION), "Unsupported wallet version");
   } else {
     walletFileStream.close();
-
-    if (version > WalletSerializerV2::SERIALIZATION_VERSION) {
-      m_logger(ERROR, BRIGHT_RED) << "Unsupported wallet version: " << version;
-      throw std::system_error(make_error_code(error::WRONG_VERSION), "Unsupported wallet version");
-    }
 
     loadContainerStorage(path);
     subscribeWallets();
@@ -844,68 +839,6 @@ void WalletGreen::subscribeWallets() {
 
     throw;
   }
-}
-
-void WalletGreen::convertAndLoadWalletFile(const std::string& path, std::ifstream&& walletFileStream) {
-  WalletSerializerV1 s(
-    *this,
-    m_viewPublicKey,
-    m_viewSecretKey,
-    m_actualBalance,
-    m_pendingBalance,
-    m_walletsContainer,
-    m_synchronizer,
-    m_unlockTransactionsJob,
-    m_transactions,
-    m_transfers,
-    m_uncommitedTransactions,
-    m_transactionSoftLockTime
-  );
-
-  StdInputStream stream(walletFileStream);
-  s.load(m_key, stream);
-  walletFileStream.close();
-
-  boost::filesystem::path bakPath = path + ".backup";
-  boost::filesystem::path tmpPath = boost::filesystem::unique_path(path + ".tmp.%%%%-%%%%");
-
-  if (boost::filesystem::exists(bakPath)) {
-    throw std::system_error(make_error_code(std::errc::file_exists), ".backup file already exists");
-  }
-
-  Tools::ScopeExit tmpFileDeleter([&tmpPath] {
-    boost::system::error_code ignore;
-    boost::filesystem::remove(tmpPath, ignore);
-  });
-
-  m_containerStorage.open(tmpPath.string(), Common::FileMappedVectorOpenMode::CREATE, sizeof(ContainerStoragePrefix));
-  ContainerStoragePrefix* prefix = reinterpret_cast<ContainerStoragePrefix*>(m_containerStorage.prefix());
-  prefix->version = WalletSerializerV2::SERIALIZATION_VERSION;
-  prefix->nextIv = Crypto::rand<Crypto::chacha8_iv>();
-
-  uint64_t creationTimestamp = time(nullptr);
-  prefix->encryptedViewKeys = encryptKeyPair(m_viewPublicKey, m_viewSecretKey, creationTimestamp);
-
-  for (auto spendKeys : m_walletsContainer.get<RandomAccessIndex>()) {
-    m_containerStorage.push_back(encryptKeyPair(spendKeys.spendPublicKey, spendKeys.spendSecretKey, spendKeys.creationTimestamp));
-    incNextIv();
-  }
-
-  saveWalletCache(m_containerStorage, m_key, WalletSaveLevel::SAVE_ALL, "");
-
-  boost::filesystem::rename(path, bakPath);
-  std::error_code ec;
-  m_containerStorage.rename(path, ec);
-  if (ec) {
-    m_logger(ERROR, BRIGHT_RED) << "Failed to rename " << tmpPath << " to " << path;
-
-    boost::system::error_code ignore;
-    boost::filesystem::rename(bakPath, path, ignore);
-    throw std::system_error(ec, "Failed to replace wallet file");
-  }
-
-  tmpFileDeleter.cancel();
-  m_logger(INFO, BRIGHT_WHITE) << "Wallet file converted! Previous version: " << bakPath;
 }
 
 void WalletGreen::changePassword(const std::string& oldPassword, const std::string& newPassword) {

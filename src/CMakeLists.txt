@@ -19,7 +19,6 @@ file(GLOB_RECURSE Rpc Rpc/*)
 file(GLOB_RECURSE Serialization Serialization/*)
 file(GLOB_RECURSE Transfers Transfers/*)
 file(GLOB_RECURSE Wallet Wallet/*)
-file(GLOB_RECURSE WalletLegacy WalletLegacy/*)
 file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 file(GLOB_RECURSE service WalletService/*)
 file(GLOB_RECURSE zedwallet zedwallet/*)
@@ -36,7 +35,7 @@ endif()
 # This appears to be an IDE thing, to group files together.
 # https://cmake.org/cmake/help/v3.0/command/source_group.html
 # Probably not what you need to be looking at if something isn't building
-source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TurtleCoind} ${JsonRpcServer} ${Http} ${Logging} ${miner} ${Mnemonics} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletLegacy} ${zedwallet} ${CryptoTest})
+source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TurtleCoind} ${JsonRpcServer} ${Http} ${Logging} ${miner} ${Mnemonics} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${zedwallet} ${CryptoTest})
 
 add_library(BlockchainExplorer ${BlockchainExplorer})
 add_library(Common ${Common})
@@ -51,7 +50,7 @@ add_library(P2P ${CryptoNoteProtocol} ${P2p})
 add_library(Serialization ${Serialization})
 add_library(System ${System})
 add_library(Transfers ${Transfers})
-add_library(Wallet ${Wallet} ${WalletLegacy})
+add_library(Wallet ${Wallet})
 add_library(JsonRpcServer ${JsonRpcServer})
 add_library(WalletService ${service})
 
