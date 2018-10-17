@@ -286,6 +286,8 @@ void WalletSynchronizer::processCoinbaseTransaction(
 
         /* Store the transaction */
         m_subWallets->addTransaction(tx);
+
+        m_eventHandler->onTransaction.fire(tx);
     }
 }
 
@@ -332,6 +334,8 @@ void WalletSynchronizer::processTransaction(
 
         /* Store the transaction */
         m_subWallets->addTransaction(tx);
+
+        m_eventHandler->onTransaction.fire(tx);
     }
 }
 
@@ -372,7 +376,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
 
         if (b.blockHeight >= m_daemon->getLastKnownBlockHeight())
         {
-            m_eventHandler->fireOnSynced(b.blockHeight);
+            m_eventHandler->onSynced.fire(b.blockHeight);
         }
     }
 }

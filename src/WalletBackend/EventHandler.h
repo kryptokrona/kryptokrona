@@ -6,15 +6,38 @@
 
 #include <functional>
 
+template <typename T>
+class Event
+{
+    public:
+        void subscribe(std::function<void(T)> function)
+        {
+            m_function = function;
+        }
+
+        void unsubscribe()
+        {
+            m_function = {};
+        }
+
+        void fire(T args)
+        {
+            if (m_function)
+            {
+                m_function(args);
+            }
+        }
+
+    private:
+        std::function<void(T)> m_function;
+};
+
 class EventHandler
 {
     public:
-        void registerOnSynced(std::function<void(int)> function);
+        Event<int> onSynced;
 
-        void deregisterOnSynced();
-
-        void fireOnSynced(uint64_t blockHeight);
+        Event<WalletTypes::Transaction> onTransaction;
 
     private:
-        std::function<void(int)> onSyncedFunction;
 };

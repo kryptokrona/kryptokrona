@@ -2,9 +2,13 @@
 // 
 // Please see the included LICENSE file for more information.
 
-#include <tuple>
-#include <WalletBackend/WalletBackend.h>
 #include <Common/StringTools.h>
+
+#include <config/CryptoNoteConfig.h>
+
+#include <tuple>
+
+#include <WalletBackend/WalletBackend.h>
 
 int main()
 {
@@ -16,7 +20,7 @@ int main()
 
     uint64_t seedScanHeight = 822500;
 
-    uint64_t keyScanHeight = 890800;
+    uint64_t keyScanHeight = 890000;
 
     Crypto::SecretKey privateSpendKey;
     Crypto::SecretKey privateViewKey;
@@ -24,7 +28,7 @@ int main()
     Common::podFromHex("bf09c76d79e35ff67c73cd4c7f4c6093f369e2c3a249b6a3d77dca6ad48b790a", privateSpendKey.data);
     Common::podFromHex("8b3b27f3b2f5109e22b86c5bc99ca0a68c8f442b7eff201bc84feaec62239505", privateViewKey.data);
 
-    uint16_t daemonPort = 11898;
+    uint16_t daemonPort = CryptoNote::RPC_DEFAULT_PORT;
 
     WalletBackend wallet;
     WalletError error;
@@ -67,25 +71,38 @@ int main()
         return 1;
     }
 
-    wallet.m_eventHandler->registerOnSynced([&](int blockHeight)
+    wallet.m_eventHandler->onSynced.subscribe([&](int blockHeight)
     {
         std::cout << "Wallet is synced! Top block: " << blockHeight << std::endl;
+    });
 
-        Crypto::Hash transactionHash;
-
-        std::tie(error, transactionHash) = wallet.sendTransactionBasic(
-            "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
-            1000000,
-            std::string()
-        );
-
-        if (error)
+    wallet.m_eventHandler->onTransaction.subscribe([&](WalletTypes::Transaction tx)
+    {
+        for (const auto & [pubKey, amount] : tx.transfers)
         {
-            std::cout << "Failed to send transaction: " << getErrorMessage(error) << std::endl;
-        }
-        else
-        {
-            std::cout << "Sent transaction: " << transactionHash << std::endl;
+            if (amount != 0 && tx.fee == 0)
+            {
+                std::cout << "Coinbase transaction found!" << std::endl;
+            }
+            else if (amount > 0)
+            {
+                std::cout << "Incoming transaction found!" << std::endl;
+            }
+            else if (amount < 0)
+            {
+                std::cout << "Outgoing transaction found!" << std::endl;
+            }
+            else
+            {
+                std::cout << "Fusion transaction found!" << std::endl;
+            }
+
+            std::cout << "Hash: " << tx.hash << std::endl
+                      << "Amount: " << std::abs(amount) << std::endl
+                      << "Fee: " << tx.fee << std::endl
+                      << "Block height: " << tx.blockHeight << std::endl
+                      << "Timestamp: " << tx.timestamp << std::endl
+                      << "Payment ID: " << tx.paymentID << std::endl << std::endl;
         }
     });
     

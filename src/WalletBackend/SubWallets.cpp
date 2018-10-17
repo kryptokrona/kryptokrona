@@ -10,9 +10,6 @@
 
 #include <ctime>
 
-/* TODO: Remove */
-#include <iostream>
-
 #include <random>
 
 #include <WalletBackend/Utilities.h>
@@ -237,30 +234,6 @@ void SubWallets::addTransaction(const WalletTypes::Transaction tx)
     for (const auto & [pubKey, amount] : tx.transfers)
     {
         m_subWallets[pubKey].m_balance += amount;
-        
-        if (amount != 0 && tx.fee == 0)
-        {
-            std::cout << "Coinbase transaction found!" << std::endl;
-        }
-        else if (amount > 0)
-        {
-            std::cout << "Incoming transaction found!" << std::endl;
-        }
-        else if (amount < 0)
-        {
-            std::cout << "Outgoing transaction found!" << std::endl;
-        }
-        else
-        {
-            std::cout << "Fusion transaction found!" << std::endl;
-        }
-
-        std::cout << "Hash: " << tx.hash << std::endl
-                  << "Amount: " << std::abs(amount) << std::endl
-                  << "Fee: " << tx.fee << std::endl
-                  << "Block height: " << tx.blockHeight << std::endl
-                  << "Timestamp: " << tx.timestamp << std::endl
-                  << "Payment ID: " << tx.paymentID << std::endl << std::endl;
     }
 }
 

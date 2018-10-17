@@ -102,6 +102,8 @@ WalletBackend::WalletBackend()
         *m_logManager, "WalletBackend"
     );
 
+    m_eventHandler = std::make_shared<EventHandler>();
+
     /* Remember to call initializeAfterLoad() to initialize the daemon - 
     we can't do it here since we don't have the host/port, and the json
     serialization uses the default constructor */
@@ -176,11 +178,11 @@ WalletBackend::WalletBackend(
         privateSpendKey, privateViewKey
     );
 
+    m_eventHandler = std::make_shared<EventHandler>();
+
     m_subWallets = std::make_shared<SubWallets>(
         privateSpendKey, privateViewKey, address, scanHeight, newWallet
     );
-
-    m_eventHandler = std::make_shared<EventHandler>();
 }
 
 /* View Wallet Constructor */
@@ -208,11 +210,11 @@ WalletBackend::WalletBackend(
 
     bool newWallet = false;
 
+    m_eventHandler = std::make_shared<EventHandler>();
+
     m_subWallets = std::make_shared<SubWallets>(
         privateViewKey, address, scanHeight, newWallet
     );
-
-    m_eventHandler = std::make_shared<EventHandler>();
 }
 
 /////////////////////
@@ -507,8 +509,6 @@ WalletError WalletBackend::initializeAfterLoad(
         daemonHost, daemonPort, m_logger->getLogger()
     );
 
-    m_eventHandler = std::make_shared<EventHandler>();
-
     return init();
 }
 
@@ -543,7 +543,6 @@ WalletError WalletBackend::init()
             return SUCCESS;
         }
     });
-
 
     /* Wait for the daemon to init */
     /* TODO: This can hang - can't do it in a std::future since that hangs
