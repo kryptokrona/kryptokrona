@@ -551,35 +551,6 @@ std::error_code WalletService::resetWallet(const uint64_t scanHeight) {
   return std::error_code();
 }
 
-std::error_code WalletService::replaceWithNewWallet(const std::string& viewSecretKeyText, const uint64_t scanHeight, const bool newAddress) {
-  try {
-    System::EventLock lk(readyEvent);
-
-    Crypto::SecretKey viewSecretKey;
-    if (!Common::podFromHex(viewSecretKeyText, viewSecretKey)) {
-      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Cannot restore view secret key: " << viewSecretKeyText;
-      return make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
-    }
-
-    Crypto::PublicKey viewPublicKey;
-    if (!Crypto::secret_key_to_public_key(viewSecretKey, viewPublicKey)) {
-      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Cannot derive view public key, wrong secret key: " << viewSecretKeyText;
-      return make_error_code(CryptoNote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
-    }
-
-    replaceWithNewWallet(viewSecretKey, scanHeight, newAddress);
-    logger(Logging::INFO, Logging::BRIGHT_WHITE) << "The container has been replaced";
-  } catch (std::system_error& x) {
-    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while replacing container: " << x.what();
-    return x.code();
-  } catch (std::exception& x) {
-    logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while replacing container: " << x.what();
-    return make_error_code(CryptoNote::error::INTERNAL_WALLET_ERROR);
-  }
-
-  return std::error_code();
-}
-
 std::error_code WalletService::createAddress(const std::string& spendSecretKeyText, uint64_t scanHeight, bool newAddress, std::string& address) {
   try {
     System::EventLock lk(readyEvent);
@@ -1364,33 +1335,6 @@ void WalletService::refresh() {
 
 void WalletService::reset(const uint64_t scanHeight) {
   wallet.reset(scanHeight);
-}
-
-void WalletService::replaceWithNewWallet(const Crypto::SecretKey& viewSecretKey, const uint64_t scanHeight, const bool newAddress) {
-  wallet.stop();
-  wallet.shutdown();
-  inited = false;
-  refreshContext.wait();
-
-  transactionIdIndex.clear();
-
-  for (size_t i = 0; ; ++i) {
-    boost::system::error_code ec;
-    std::string backup = config.walletFile + ".backup";
-    if (i != 0) {
-      backup += "." + std::to_string(i);
-    }
-
-    if (!boost::filesystem::exists(backup)) {
-      boost::filesystem::rename(config.walletFile, backup);
-      logger(Logging::DEBUGGING) << "Wallet file '" << config.walletFile  << "' backed up to '" << backup << '\'';
-      break;
-    }
-  }
-
-  wallet.start();
-  wallet.initializeWithViewKey(config.walletFile, config.walletPassword, viewSecretKey, scanHeight, newAddress);
-  inited = true;
 }
 
 std::vector<CryptoNote::TransactionsInBlockInfo> WalletService::getTransactions(const Crypto::Hash& blockHash, size_t blockCount) const {
