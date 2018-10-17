@@ -329,7 +329,10 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                 std::cout << "Please report this error message and what "
                           << "you did to cause it." << std::endl << std::endl;
 
-                return nullptr;
+                /* We're sorry, the thing you tried doing didn't do the thing
+                   you thought it might do so we're going to give up and not
+                   try doing another thing. */
+                exit(1);
             }
         }
     }
