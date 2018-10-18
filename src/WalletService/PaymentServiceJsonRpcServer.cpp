@@ -123,11 +123,7 @@ std::error_code PaymentServiceJsonRpcServer::handleExport(const Export::Request&
 }
 
 std::error_code PaymentServiceJsonRpcServer::handleReset(const Reset::Request& request, Reset::Response& response) {
-  if (request.viewSecretKey.empty()) {
-    return service.resetWallet(request.scanHeight);
-  } else {
-    return service.replaceWithNewWallet(request.viewSecretKey, request.scanHeight, request.newAddress);
-  }
+  return service.resetWallet(request.scanHeight);
 }
 
 std::error_code PaymentServiceJsonRpcServer::handleCreateAddress(const CreateAddress::Request& request, CreateAddress::Response& response) {
