@@ -522,7 +522,7 @@ std::tuple<WalletError, CryptoNote::Transaction> generateRingSignatures(
 
         /* Generate the ring signatures - note - modifying the transaction
            post signature generation will invalidate the signatures. */
-        const auto [success, signatures] = Crypto::generateRingSignatures(
+        const auto [success, signatures] = Crypto::crypto_ops::generateRingSignatures(
             txPrefixHash, boost::get<CryptoNote::KeyInput>(tx.inputs[i]).keyImage,
             publicKeys, tmpSecretKeys[i], input.realOutput
         );
