@@ -87,6 +87,20 @@ struct EllipticCurveScalar {
       const PublicKey *const *, size_t, const Signature *, bool);
     friend bool check_ring_signature(const Hash &, const KeyImage &,
       const PublicKey *const *, size_t, const Signature *, bool);
+
+    static std::tuple<bool, std::vector<Signature>> generateRingSignatures(
+        const Hash prefixHash,
+        const KeyImage keyImage,
+        const std::vector<PublicKey> publicKeys,
+        const Crypto::SecretKey transactionSecretKey,
+        uint64_t realOutput);
+
+    friend std::tuple<bool, std::vector<Signature>> generateRingSignatures(
+        const Hash prefixHash,
+        const KeyImage keyImage,
+        const std::vector<PublicKey> publicKeys,
+        const Crypto::SecretKey transactionSecretKey,
+        uint64_t realOutput);
   };
 
   /* Generate a value filled with random bytes.
@@ -247,4 +261,15 @@ struct EllipticCurveScalar {
     return check_ring_signature(prefix_hash, image, pubs.data(), pubs.size(), sig, checkKeyImage);
   }
 
+    inline std::tuple<bool, std::vector<Signature>> generateRingSignature(
+        const Hash prefixHash,
+        const KeyImage keyImage,
+        const std::vector<PublicKey> publicKeys,
+        const Crypto::SecretKey transactionSecretKey,
+        uint64_t realOutput)
+    {
+        return crypto_ops::generateRingSignature(
+            prefixHash, keyImage, publicKeys, transactionSecretKey, realOutput
+        );
+    }
 }

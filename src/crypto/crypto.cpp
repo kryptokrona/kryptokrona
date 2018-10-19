@@ -370,6 +370,105 @@ namespace Crypto {
     return sizeof(rs_comm) + pubs_count * sizeof(((rs_comm*)0)->ab[0]);
   }
 
+    std::tuple<bool, std::vector<Signature>> crypto_ops::generateRingSignatures(
+        const Hash prefixHash,
+        const KeyImage keyImage,
+        const std::vector<PublicKey> publicKeys,
+        const Crypto::SecretKey transactionSecretKey,
+        uint64_t realOutput)
+    {
+        std::vector<Signature> signatures(publicKeys.size());
+
+        lock_guard<mutex> lock(random_lock);
+
+        ge_p3 image_unp;
+        ge_dsmp image_pre;
+        EllipticCurveScalar sum, k, h;
+
+        rs_comm *const buf = reinterpret_cast<rs_comm *>(alloca(rs_comm_size(publicKeys.size())));
+
+        if (ge_frombytes_vartime(&image_unp, reinterpret_cast<const unsigned char*>(&keyImage)) != 0)
+        {
+            return {false, signatures};
+        }
+
+        ge_dsm_precomp(image_pre, &image_unp);
+
+        sc_0(reinterpret_cast<unsigned char*>(&sum));
+
+        buf->h = prefixHash;
+
+        for (size_t i = 0; i < publicKeys.size(); i++)
+        {
+            ge_p2 tmp2;
+            ge_p3 tmp3;
+
+            if (i == realOutput)
+            {
+                random_scalar(k);
+                ge_scalarmult_base(&tmp3, reinterpret_cast<unsigned char*>(&k));
+                ge_p3_tobytes(reinterpret_cast<unsigned char*>(&buf->ab[i].a), &tmp3);
+                hash_to_ec(publicKeys[i], tmp3);
+                ge_scalarmult(&tmp2, reinterpret_cast<unsigned char*>(&k), &tmp3);
+                ge_tobytes(reinterpret_cast<unsigned char*>(&buf->ab[i].b), &tmp2);
+            }
+            else
+            {
+                random_scalar(reinterpret_cast<EllipticCurveScalar&>(signatures[i]));
+                random_scalar(*reinterpret_cast<EllipticCurveScalar*>(reinterpret_cast<unsigned char*>(&signatures[i]) + 32));
+
+                if (ge_frombytes_vartime(&tmp3, reinterpret_cast<const unsigned char*>(&publicKeys[i])) != 0)
+                {
+                    return {false, signatures};
+                }
+
+                ge_double_scalarmult_base_vartime(
+                    &tmp2,
+                    reinterpret_cast<unsigned char*>(&signatures[i]),
+                    &tmp3,
+                    reinterpret_cast<unsigned char*>(&signatures[i]) + 32
+                );
+
+                ge_tobytes(reinterpret_cast<unsigned char*>(&buf->ab[i].a), &tmp2);
+
+                hash_to_ec(publicKeys[i], tmp3);
+
+                ge_double_scalarmult_precomp_vartime(
+                    &tmp2,
+                    reinterpret_cast<unsigned char*>(&signatures[i]) + 32,
+                    &tmp3,
+                    reinterpret_cast<unsigned char*>(&signatures[i]),
+                    image_pre
+                );
+
+                ge_tobytes(reinterpret_cast<unsigned char*>(&buf->ab[i].b), &tmp2);
+
+                sc_add(
+                    reinterpret_cast<unsigned char*>(&sum),
+                    reinterpret_cast<unsigned char*>(&sum),
+                    reinterpret_cast<unsigned char*>(&signatures[i])
+                );
+            }
+        }
+
+        hash_to_scalar(buf, rs_comm_size(publicKeys.size()), h);
+
+        sc_sub(
+            reinterpret_cast<unsigned char*>(&signatures[realOutput]),
+            reinterpret_cast<unsigned char*>(&h),
+            reinterpret_cast<unsigned char*>(&sum)
+        );
+
+        sc_mulsub(
+            reinterpret_cast<unsigned char*>(&signatures[realOutput]) + 32,
+            reinterpret_cast<unsigned char*>(&signatures[realOutput]),
+            reinterpret_cast<const unsigned char*>(&transactionSecretKey),
+            reinterpret_cast<unsigned char*>(&k)
+        );
+
+        return {true, signatures};
+    }
+
   bool crypto_ops::generate_ring_signature(const Hash &prefix_hash, const KeyImage &image,
     const PublicKey *const *pubs, size_t pubs_count,
     const SecretKey &sec, size_t sec_index,

@@ -512,27 +512,22 @@ std::tuple<WalletError, CryptoNote::Transaction> generateRingSignatures(
     /* Add the transaction signatures */
     for (const auto input : inputsAndFakes)
     {
-        /* Make a vector of signatures large enough to hold this set of
-           signatures */
-        std::vector<Crypto::Signature> signatures(input.outputs.size());
-
-        std::vector<const Crypto::PublicKey *> publicKeys;
+        std::vector<Crypto::PublicKey> publicKeys;
 
         /* Add all the fake outs public keys to a vector */
-        /* TODO: Do this in a less horrible pointerifc way along with
-           generate_ring_signature */
-        for (const auto &output : input.outputs)
+        for (const auto output : input.outputs)
         {
-            publicKeys.push_back(&output.key);
+            publicKeys.push_back(output.key);
         }
 
-        /* Generate the ring signature, result is placed in signatures */
-        bool r = Crypto::generate_ring_signature(
+        /* Generate the ring signatures - note - modifying the transaction
+           post signature generation will invalidate the signatures. */
+        const auto [success, signatures] = Crypto::generateRingSignatures(
             txPrefixHash, boost::get<CryptoNote::KeyInput>(tx.inputs[i]).keyImage,
-            publicKeys, tmpSecretKeys[i], input.realOutput, signatures.data()
+            publicKeys, tmpSecretKeys[i], input.realOutput
         );
 
-        if (!r)
+        if (!success)
         {
             return {FAILED_TO_CREATE_RING_SIGNATURE, tx};
         }
