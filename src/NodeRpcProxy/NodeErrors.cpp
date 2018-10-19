@@ -18,7 +18,7 @@
 #include "NodeErrors.h"
 
 namespace CryptoNote {
-namespace error {
+namespace NodeError {
 
 NodeErrorCategory NodeErrorCategory::INSTANCE;
 

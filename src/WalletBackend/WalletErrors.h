@@ -109,6 +109,36 @@ enum WalletError
        are not the same, or that multiple integrated addresses with different
        payment IDs were given */
     CONFLICTING_PAYMENT_IDS = 27,
+
+    /* Can't get mixin/fake outputs from the daemon, and mixin is not zero */
+    CANT_GET_FAKE_OUTPUTS = 28,
+
+    /* We got mixin/fake outputs from the daemon, but not enough. E.g. using a
+       mixin of 3, we only got one fake output -> can't form transaction.
+       This is most likely to be encountered on new networks, where not
+       enough outputs have been created, or if you have a very large output
+       that not enough have been created of.
+
+       Try resending the transaction with a mixin of zero, if that is an option
+       on your network. */
+    NOT_ENOUGH_FAKE_OUTPUTS = 29,
+
+    /* The key image generated was not valid. This is most likely a programmer
+       error. */
+    INVALID_GENERATED_KEYIMAGE = 30,
+
+    /* Could not contact the daemon to complete the request. Ensure it is
+       online and not frozen */
+    DAEMON_OFFLINE = 31,
+
+    /* An error occured whilst the daemon processed the request. Possibly our
+       software is outdated, the daemon is faulty, or there is a programmer
+       error. Check your daemon logs for more info (set_log 4) */
+    DAEMON_ERROR = 32,
+
+    /* Something went wrong creating the ring signatures. Probably a programmer
+       error */
+    FAILED_TO_CREATE_RING_SIGNATURE = 33,
 };
 
 std::string getErrorMessage(WalletError error);

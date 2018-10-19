@@ -30,7 +30,7 @@ namespace SendTransaction
         const uint64_t fee,
         std::string paymentID,
         const std::vector<std::string> addressesToTakeFrom,
-        const std::string changeAddress,
+        std::string changeAddress,
         const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
         const std::shared_ptr<SubWallets> subWallets);
 
@@ -39,19 +39,19 @@ namespace SendTransaction
         const uint64_t changeRequired,
         const std::string changeAddress);
 
-    std::vector<WalletTypes::ObscuredInput> setupFakeInputs(
+    std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> setupFakeInputs(
         std::vector<WalletTypes::TxInputAndOwner> sources,
         const uint64_t mixin,
         const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon);
 
-    std::tuple<std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
+    std::tuple<WalletError, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
         const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
         const Crypto::SecretKey privateViewKey);
 
     std::tuple<std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> setupOutputs(
         std::vector<WalletTypes::TransactionDestination> destinations);
 
-    CryptoNote::Transaction generateRingSignatures(
+    std::tuple<WalletError, CryptoNote::Transaction> generateRingSignatures(
         CryptoNote::Transaction tx,
         const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
         const std::vector<Crypto::SecretKey> tmpSecretKeys);
@@ -65,4 +65,25 @@ namespace SendTransaction
         const std::vector<WalletTypes::KeyOutput> keyOutputs);
 
     Crypto::Hash getTransactionHash(CryptoNote::Transaction tx);
+
+    std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getFakeOuts(
+        const uint64_t mixin,
+        const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+        const std::vector<WalletTypes::TxInputAndOwner> sources);
+
+    std::tuple<WalletError, CryptoNote::Transaction> makeTransaction(
+        const uint64_t mixin,
+        const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+        const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+        const std::string paymentID,
+        const std::vector<WalletTypes::TransactionDestination> destinations,
+        const std::shared_ptr<SubWallets> subWallets);
+
+    std::tuple<WalletError, Crypto::Hash> relayTransaction(
+        const CryptoNote::Transaction tx,
+        const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon);
+
+    std::tuple<CryptoNote::KeyPair, Crypto::KeyImage> genKeyImage(
+        const WalletTypes::ObscuredInput input,
+        const Crypto::SecretKey privateViewKey);
 }

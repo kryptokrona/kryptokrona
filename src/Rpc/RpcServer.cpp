@@ -369,7 +369,7 @@ bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOU
     }
 
     assert(globalIndexes.size() == publicKeys.size());
-    res.outs.emplace_back(COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_outs_for_amount{amount, {}});
+    res.outs.push_back({amount, {}});
     for (size_t i = 0; i < globalIndexes.size(); ++i) {
       res.outs.back().outs.push_back({globalIndexes[i], publicKeys[i]});
     }
@@ -378,15 +378,13 @@ bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOU
   res.status = CORE_RPC_STATUS_OK;
 
   std::stringstream ss;
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount outs_for_amount;
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::out_entry out_entry;
 
-  std::for_each(res.outs.begin(), res.outs.end(), [&](outs_for_amount& ofa)  {
+  std::for_each(res.outs.begin(), res.outs.end(), [&](auto& ofa)  {
     ss << "[" << ofa.amount << "]:";
 
     assert(ofa.outs.size() && "internal error: ofa.outs.size() is empty");
 
-    std::for_each(ofa.outs.begin(), ofa.outs.end(), [&](out_entry& oe)
+    std::for_each(ofa.outs.begin(), ofa.outs.end(), [&](auto& oe)
     {
       ss << oe.global_amount_index << " ";
     });

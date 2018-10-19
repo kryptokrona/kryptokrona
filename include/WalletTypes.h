@@ -116,7 +116,7 @@ namespace WalletTypes
 
     struct GlobalIndexToKey
     {
-        uint32_t index;
+        uint64_t index;
         Crypto::PublicKey key;
     };
 

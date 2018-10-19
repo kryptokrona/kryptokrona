@@ -21,7 +21,7 @@
 #include <system_error>
 
 namespace CryptoNote {
-namespace error {
+namespace NodeError {
 
 // custom error conditions enum type:
 enum NodeErrorCodes {
@@ -68,6 +68,6 @@ private:
 }
 }
  
-inline std::error_code make_error_code(CryptoNote::error::NodeErrorCodes e) {
-  return std::error_code(static_cast<int>(e), CryptoNote::error::NodeErrorCategory::INSTANCE);
+inline std::error_code make_error_code(CryptoNote::NodeError::NodeErrorCodes e) {
+  return std::error_code(static_cast<int>(e), CryptoNote::NodeError::NodeErrorCategory::INSTANCE);
 }

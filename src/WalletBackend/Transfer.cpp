@@ -14,6 +14,8 @@
 
 #include <future>
 
+#include <NodeRpcProxy/NodeErrors.h>
+
 #include <WalletBackend/Utilities.h>
 #include <WalletBackend/ValidateParameters.h>
 #include <WalletBackend/WalletBackend.h>
@@ -64,10 +66,15 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
     const uint64_t fee,
     std::string paymentID,
     const std::vector<std::string> addressesToTakeFrom,
-    const std::string changeAddress,
+    std::string changeAddress,
     const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
     const std::shared_ptr<SubWallets> subWallets)
 {
+    if (changeAddress == "")
+    {
+        changeAddress = subWallets->getDefaultChangeAddress();
+    }
+
     /* Validate the transaction input parameters */
     const WalletError error = validateTransaction(
         addressesAndAmounts, mixin, fee, paymentID, addressesToTakeFrom,
@@ -123,85 +130,47 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
         addressesAndAmounts, changeRequired, changeAddress
     );
 
-    /* TODO: Split into separate function here */
-
-    /* Mix our inputs with fake ones from the network to hide who we are */
-    const auto inputsAndFakes = setupFakeInputs(ourInputs, mixin, daemon);
-
-    /* Setup the transaction inputs */
-    const auto [transactionInputs, tmpSecretKeys] = setupInputs(
-        inputsAndFakes, subWallets->getPrivateViewKey()
+    const auto [creationError, tx] = makeTransaction(
+        mixin, daemon, ourInputs, paymentID, destinations, subWallets
     );
 
-    /* Setup the transaction outputs */
-    const auto [transactionOutputs, transactionPublicKey] = setupOutputs(destinations);
+    const auto [sendError, txHash] = relayTransaction(tx, daemon);
 
-    std::vector<uint8_t> extra;
-
-    if (paymentID != "")
+    if (sendError)
     {
-        CryptoNote::createTxExtraWithPaymentId(paymentID, extra);
-    }
-
-    /* Append the transaction public key we generated earlier to the extra
-       data */
-    CryptoNote::addTransactionPublicKeyToExtra(extra, transactionPublicKey);
-
-    CryptoNote::Transaction setupTX;
-
-    setupTX.version = CryptoNote::CURRENT_TRANSACTION_VERSION;
-
-    setupTX.unlockTime = 0;
-
-    /* Convert from key inputs to the boost uglyness */
-    setupTX.inputs = keyInputToTransactionInput(transactionInputs);
-
-    /* We can't really remove boost from here yet and simplify our data types
-       since we take a hash of the transaction prefix. Once we've got this
-       working, maybe we can work some magic. TODO */
-    setupTX.outputs = keyOutputToTransactionOutput(transactionOutputs);
-
-    /* Pubkey, payment ID */
-    setupTX.extra = extra;
-
-    /* Fill in the transaction signatures */
-    /* NOTE: Do not modify the transaction after this, or the ring signatures
-       will be invalidated */
-    const CryptoNote::Transaction finalTransaction = generateRingSignatures(
-        setupTX, inputsAndFakes, tmpSecretKeys
-    );
-
-    /* TODO: Maybe another function here */
-    std::promise<std::error_code> errorPromise;
-
-    auto callback = [&errorPromise](std::error_code e)
-    {
-        errorPromise.set_value(e);
-    };
-
-    errorPromise = std::promise<std::error_code>();
-
-    /* TODO */
-    auto error1 = errorPromise.get_future();
-
-    daemon->relayTransaction(finalTransaction, callback);
-
-    auto err = error1.get();
-
-    Crypto::Hash transactionHash = getTransactionHash(finalTransaction);
-
-    if (err)
-    {
-        std::cout << "Failed to send transaction: " << err << ", "
-                  << err.message() << std::endl;
-
-        /* TODO: Handle error here */
-        return {SUCCESS, transactionHash};
+        return {sendError, Crypto::Hash()};
     }
 
     /* TODO: Deduct balance, remove inputs, etc */
 
-    return {SUCCESS, transactionHash};
+    return {SUCCESS, txHash};
+}
+
+std::tuple<WalletError, Crypto::Hash> relayTransaction(
+    const CryptoNote::Transaction tx,
+    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon)
+{
+    std::promise<std::error_code> errorPromise = std::promise<std::error_code>();
+
+    auto callback = [&errorPromise](auto e) { errorPromise.set_value(e); };
+
+    daemon->relayTransaction(tx, callback);
+
+    auto error = errorPromise.get_future().get();
+
+    if (error)
+    {
+        if (error == make_error_code(CryptoNote::NodeError::CONNECT_ERROR) ||
+            error == make_error_code(CryptoNote::NodeError::NETWORK_ERROR) ||
+            error == make_error_code(CryptoNote::NodeError::NODE_BUSY))
+        {
+            return {DAEMON_OFFLINE, Crypto::Hash()};
+        }
+
+        return {DAEMON_ERROR, Crypto::Hash()};
+    }
+
+    return {SUCCESS, getTransactionHash(tx)};
 }
 
 std::vector<WalletTypes::TransactionDestination> setupDestinations(
@@ -238,8 +207,72 @@ std::vector<WalletTypes::TransactionDestination> setupDestinations(
     return destinations;
 }
 
+std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getFakeOuts(
+    const uint64_t mixin,
+    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const std::vector<WalletTypes::TxInputAndOwner> sources)
+{
+    /* Request one more than our mixin, then if we get our output as one of
+       the mixin outs, we can skip it and still form the transaction */
+    uint64_t requestedOuts = mixin + 1;
+
+    std::vector<CryptoNote::RandomOuts> fakeOuts;
+
+    if (mixin == 0)
+    {
+        return {SUCCESS, fakeOuts};
+    }
+
+    std::promise<std::error_code> errorPromise = std::promise<std::error_code>();
+
+    auto callback = [&errorPromise](auto e) { errorPromise.set_value(e); };
+
+    std::vector<uint64_t> amounts;
+
+    /* Add each amount to the request vector */
+    std::transform(sources.begin(), sources.end(), std::back_inserter(amounts), [](const auto destination)
+    {
+        return destination.input.amount;
+    });
+
+    daemon->getRandomOutsByAmounts(
+        std::move(amounts), requestedOuts, fakeOuts, callback
+    );
+
+    /* Wait for the call to complete */
+    if (errorPromise.get_future().get())
+    {
+        return {CANT_GET_FAKE_OUTPUTS, fakeOuts};
+    }
+
+    /* Check we have at least mixin outputs for each fake out. We *may* need
+       mixin+1 outs for some, in case our real output gets included. This is
+       unlikely though, and so we will error out down the line instead of here. */
+    bool enoughOuts = std::all_of(fakeOuts.begin(), fakeOuts.end(), [&mixin](const auto fakeOut)
+    {
+        return fakeOut.outs.size() >= mixin;
+    });
+
+    if (!enoughOuts)
+    {
+        return {NOT_ENOUGH_FAKE_OUTPUTS, fakeOuts};
+    }
+
+    for (auto fakeOut : fakeOuts)
+    {
+        /* Sort the fake outputs by their indexes (don't want there to be an
+           easy way to determine which output is the real one) */
+        std::sort(fakeOut.outs.begin(), fakeOut.outs.end(), [](const auto &lhs, const auto &rhs)
+        {
+            return lhs.global_amount_index < rhs.global_amount_index;
+        });
+    }
+
+    return {SUCCESS, fakeOuts};
+}
+
 /* Take our inputs and pad them with fake inputs, based on our mixin value */
-std::vector<WalletTypes::ObscuredInput> setupFakeInputs(
+std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> setupFakeInputs(
     std::vector<WalletTypes::TxInputAndOwner> sources,
     const uint64_t mixin,
     const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon)
@@ -251,50 +284,23 @@ std::vector<WalletTypes::ObscuredInput> setupFakeInputs(
         return lhs.input.amount < rhs.input.amount;
     });
 
-    /* TODO: Better rpc method? */
-    std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount> fakeOuts;
-
-    /* TODO: Separate function */
-    std::promise<std::error_code> errorPromise;
-
-    auto callback = [&errorPromise](std::error_code e)
-    {
-        errorPromise.set_value(e);
-    };
-
-    errorPromise = std::promise<std::error_code>();
-
-    auto error = errorPromise.get_future();
-
-    std::vector<uint64_t> amounts;
-
-    for (const auto destination : sources)
-    {
-        amounts.push_back(destination.input.amount);
-    }
-
-    daemon->getRandomOutsByAmounts(std::move(amounts), mixin, fakeOuts, callback);
-
-    auto err = error.get();
-
-    if (err)
-    {
-        std::cout << "Failed to get random outputs: " << err << ", "
-                  << err.message() << std::endl;
-    }
-
     std::vector<WalletTypes::ObscuredInput> result;
+
+    const auto [error, fakeOuts] = getFakeOuts(mixin, daemon, sources);
+
+    if (error)
+    {
+        return {error, result};
+    }
 
     size_t i = 0;
 
-    /* TODO: Doesn't this need to be sorted so we select the correct fake
-       outs? */
     for (const auto walletAmount : sources)
     {
-        WalletTypes::GlobalIndexToKey realOutput;
-
-        realOutput.index = walletAmount.input.globalOutputIndex;
-        realOutput.key = walletAmount.input.key;
+        WalletTypes::GlobalIndexToKey realOutput {
+            walletAmount.input.globalOutputIndex,
+            walletAmount.input.key
+        };
 
         WalletTypes::ObscuredInput obscuredInput;
 
@@ -310,14 +316,6 @@ std::vector<WalletTypes::ObscuredInput> setupFakeInputs(
         obscuredInput.ownerPublicSpendKey = walletAmount.publicSpendKey;
 
         obscuredInput.ownerPrivateSpendKey = walletAmount.privateSpendKey;
-
-        /* Sort the fake outputs by their indexes (don't want there to be an
-           easy way to determine which output is the real one) */
-        std::sort(fakeOuts[i].outs.begin(), fakeOuts[i].outs.end(),
-        [](const auto &lhs, const auto &rhs)
-        {
-            return lhs.global_amount_index < rhs.global_amount_index;
-        });
 
         /* Add the fake outputs to the transaction */
         for (const auto fakeOut : fakeOuts[i].outs)
@@ -336,6 +334,12 @@ std::vector<WalletTypes::ObscuredInput> setupFakeInputs(
             {
                 break;
             }
+        }
+
+        /* Didn't get enough fake outs to meet the mixin criteria */
+        if (obscuredInput.outputs.size() < mixin)
+        {
+            return {NOT_ENOUGH_FAKE_OUTPUTS, result};
         }
 
         /* Find the position where our real input belongs, e.g. if the fake
@@ -359,10 +363,46 @@ std::vector<WalletTypes::ObscuredInput> setupFakeInputs(
         i++;
     }
 
-    return result;
+    return {SUCCESS, result};
 }
 
-std::tuple<std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
+std::tuple<CryptoNote::KeyPair, Crypto::KeyImage> genKeyImage(
+    const WalletTypes::ObscuredInput input,
+    const Crypto::SecretKey privateViewKey)
+{
+    Crypto::KeyDerivation derivation;
+
+    /* Derive the key from the transaction public key, and our private
+       view key */
+    Crypto::generate_key_derivation(
+        input.realTransactionPublicKey, privateViewKey, derivation
+    );
+
+    CryptoNote::KeyPair tmpKeyPair;
+
+    /* Derive the public key of the tmp key pair */
+    Crypto::derive_public_key(
+        derivation, input.realOutputTransactionIndex, input.ownerPublicSpendKey,
+        tmpKeyPair.publicKey
+    );
+
+    /* Derive the secret key of the tmp key pair */
+    Crypto::derive_secret_key(
+        derivation, input.realOutputTransactionIndex, input.ownerPrivateSpendKey,
+        tmpKeyPair.secretKey
+    );
+
+    Crypto::KeyImage keyImage;
+
+    /* Generate the key image */
+    Crypto::generate_key_image(
+        tmpKeyPair.publicKey, tmpKeyPair.secretKey, keyImage
+    );
+
+    return {tmpKeyPair, keyImage};
+}
+
+std::tuple<WalletError, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
     const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
     const Crypto::SecretKey privateViewKey)
 {
@@ -372,45 +412,14 @@ std::tuple<std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> se
 
     for (const auto input : inputsAndFakes)
     {
-        /* TODO: Do this in another function? */
-        Crypto::KeyDerivation derivation;
+        const auto [tmpKeyPair, keyImage] = genKeyImage(input, privateViewKey);
 
-        /* Derive the key from the transaction public key, and our private
-           view key */
-        Crypto::generate_key_derivation(
-            input.realTransactionPublicKey, privateViewKey, derivation
-        );
-
-        CryptoNote::KeyPair tmpKeyPair;
-
-        /* Derive the public key of the tmp key pair */
-        Crypto::derive_public_key(
-            derivation, input.realOutputTransactionIndex, input.ownerPublicSpendKey,
-            tmpKeyPair.publicKey
-        );
-
-        /* Derive the secret key of the tmp key pair */
-        Crypto::derive_secret_key(
-            derivation, input.realOutputTransactionIndex, input.ownerPrivateSpendKey,
-            tmpKeyPair.secretKey
-        );
-
-        /* Store the tmp secret keys for later, so we can generate the ring
-           signatures */
-        tmpSecretKeys.push_back(tmpKeyPair.secretKey);
-
-        Crypto::KeyImage keyImage;
-
-        /* Generate the key image */
-        Crypto::generate_key_image(
-            tmpKeyPair.publicKey, tmpKeyPair.secretKey, keyImage
-        );
-
-        /* TODO: Log this or throw an exception? */
         if (tmpKeyPair.publicKey != input.outputs[input.realOutput].key)
         {
-            std::cout << "Invalid transaction..." << std::endl;
+            return {INVALID_GENERATED_KEYIMAGE, inputs, tmpSecretKeys};
         }
+
+        tmpSecretKeys.push_back(tmpKeyPair.secretKey);
 
         CryptoNote::KeyInput keyInput;
 
@@ -418,10 +427,11 @@ std::tuple<std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> se
         keyInput.keyImage = keyImage;
 
         /* Add each output index from the fake outs */
-        for (const auto output : input.outputs)
+        std::transform(input.outputs.begin(), input.outputs.end(), std::back_inserter(keyInput.outputIndexes),
+        [](const auto output)
         {
-            keyInput.outputIndexes.push_back(output.index);
-        }
+            return output.index;
+        });
         
         /* Convert our indexes to relative indexes - for example, if we
            originally had [5, 10, 20, 21, 22], this would become
@@ -433,7 +443,7 @@ std::tuple<std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> se
         inputs.push_back(keyInput);
     }
 
-    return {inputs, tmpSecretKeys};
+    return {SUCCESS, inputs, tmpSecretKeys};
 }
 
 std::tuple<std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> setupOutputs(
@@ -484,7 +494,7 @@ std::tuple<std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> setupOutputs(
     return {outputs, randomTxKey.publicKey};
 }
 
-CryptoNote::Transaction generateRingSignatures(
+std::tuple<WalletError, CryptoNote::Transaction> generateRingSignatures(
     CryptoNote::Transaction tx,
     const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
     const std::vector<Crypto::SecretKey> tmpSecretKeys)
@@ -522,10 +532,9 @@ CryptoNote::Transaction generateRingSignatures(
             publicKeys, tmpSecretKeys[i], input.realOutput, signatures.data()
         );
 
-        /* TODO: Log this or throw an exception? */
         if (!r)
         {
-            std::cout << "Failed to create ring signature..." << std::endl;
+            return {FAILED_TO_CREATE_RING_SIGNATURE, tx};
         }
 
         /* Add the signatures to the transaction */
@@ -534,7 +543,7 @@ CryptoNote::Transaction generateRingSignatures(
         i++;
     }
 
-    return tx;
+    return {SUCCESS, tx};
 }
 
 /* Split each amount into uniform amounts, e.g.
@@ -604,6 +613,71 @@ Crypto::Hash getTransactionHash(CryptoNote::Transaction tx)
 {
     std::vector<uint8_t> data = CryptoNote::toBinaryArray(tx);
     return Crypto::cn_fast_hash(data.data(), data.size());
+}
+
+std::tuple<WalletError, CryptoNote::Transaction> makeTransaction(
+    const uint64_t mixin,
+    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+    const std::string paymentID,
+    const std::vector<WalletTypes::TransactionDestination> destinations,
+    const std::shared_ptr<SubWallets> subWallets)
+{
+    /* Mix our inputs with fake ones from the network to hide who we are */
+    const auto [mixinError, inputsAndFakes] = setupFakeInputs(
+        ourInputs, mixin, daemon
+    );
+
+    if (mixinError)
+    {
+        return {mixinError, CryptoNote::Transaction()};
+    }
+
+    /* Setup the transaction inputs */
+    const auto [inputError, transactionInputs, tmpSecretKeys] = setupInputs(
+        inputsAndFakes, subWallets->getPrivateViewKey()
+    );
+
+    if (inputError)
+    {
+        return {inputError, CryptoNote::Transaction()};
+    }
+
+    /* Setup the transaction outputs */
+    const auto [transactionOutputs, transactionPublicKey] = setupOutputs(destinations);
+
+    std::vector<uint8_t> extra;
+
+    if (paymentID != "")
+    {
+        CryptoNote::createTxExtraWithPaymentId(paymentID, extra);
+    }
+
+    /* Append the transaction public key we generated earlier to the extra
+       data */
+    CryptoNote::addTransactionPublicKeyToExtra(extra, transactionPublicKey);
+
+    CryptoNote::Transaction setupTX;
+
+    setupTX.version = CryptoNote::CURRENT_TRANSACTION_VERSION;
+
+    setupTX.unlockTime = 0;
+
+    /* Convert from key inputs to the boost uglyness */
+    setupTX.inputs = keyInputToTransactionInput(transactionInputs);
+
+    /* We can't really remove boost from here yet and simplify our data types
+       since we take a hash of the transaction prefix. Once we've got this
+       working, maybe we can work some magic. TODO */
+    setupTX.outputs = keyOutputToTransactionOutput(transactionOutputs);
+
+    /* Pubkey, payment ID */
+    setupTX.extra = extra;
+
+    /* Fill in the transaction signatures */
+    /* NOTE: Do not modify the transaction after this, or the ring signatures
+       will be invalidated */
+    return generateRingSignatures(setupTX, inputsAndFakes, tmpSecretKeys);
 }
 
 } // namespace SendTransaction
