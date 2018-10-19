@@ -343,7 +343,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
 {
     while (!m_shouldStop.load())
     {
-        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.pop_back();
+        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.pop();
 
         /* Could have stopped between entering the loop and getting a block */
         if (m_shouldStop.load())
@@ -462,7 +462,7 @@ void WalletSynchronizer::downloadBlocks()
                                                        block.blockHeight);
 
                 /* Add the block to the queue for processing */
-                m_blockProcessingQueue.push_front(block);
+                m_blockProcessingQueue.push(block);
             }
 
             /* Empty the vector so we're not re-iterating the old ones */

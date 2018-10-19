@@ -19,7 +19,7 @@ class MultiThreadedDeque
         {
         }
 
-        void push_front(T item)
+        void push(T item)
         {
             /* Aquire the lock */
             std::lock_guard<std::mutex> lock(m_mutex);
@@ -31,7 +31,7 @@ class MultiThreadedDeque
             }
 
             /* Add the item to the front of the queue */
-            m_queue.push_front(item);
+            m_queue.push(item);
 
             /* Notify the consumer that we have some data */
             m_haveData.notify_one();
@@ -39,8 +39,8 @@ class MultiThreadedDeque
             /* Lock is automatically released when we go out of scope */
         }
 
-        /* Take an item from the end of the queue */
-        T pop_back()
+        /* Take an item from the front of the queue */
+        T pop()
         {
             /* Aquire the lock */
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -72,11 +72,11 @@ class MultiThreadedDeque
                 return item;
             }
 
-            /* Get the last item in the queue */
-            item = m_queue.back();
+            /* Get the first item in the queue */
+            item = m_queue.front();
 
-            /* Remove the last item from the queue */
-            m_queue.pop_back();
+            /* Remove the first item from the queue */
+            m_queue.pop();
 
             /* Return the item */
             return item;
@@ -100,7 +100,7 @@ class MultiThreadedDeque
 
     private:
         /* The deque data structure */
-        std::deque<T> m_queue;
+        std::queue<T> m_queue;
 
         /* The mutex, to ensure we have atomic access to the queue */
         std::mutex m_mutex;
