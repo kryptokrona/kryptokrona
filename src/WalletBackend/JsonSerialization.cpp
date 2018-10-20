@@ -288,6 +288,8 @@ namespace WalletTypes
             {"transactionIndex", t.transactionIndex},
             {"globalOutputIndex", t.globalOutputIndex},
             {"key", t.key},
+            {"spent", t.spent},
+            {"spendHeight", t.spendHeight},
         };
     }
 
@@ -300,6 +302,8 @@ namespace WalletTypes
         t.transactionIndex = j.at("transactionIndex").get<uint64_t>();
         t.globalOutputIndex = j.at("globalOutputIndex").get<uint64_t>();
         t.key = j.at("key").get<Crypto::PublicKey>();
+        t.spent = j.at("spent").get<bool>();
+        t.spendHeight = j.at("spendHeight").get<uint64_t>();
     }
 
     //////////////////////////////
@@ -312,9 +316,10 @@ namespace WalletTypes
             {"transfers", transfersToVector(t.transfers)},
             {"hash", t.hash},
             {"fee", t.fee},
-            {"timestamp", t.timestamp},
             {"blockHeight", t.blockHeight},
+            {"timestamp", t.timestamp},
             {"paymentID", t.paymentID},
+            {"confirmed", t.confirmed},
         };
     }
 
@@ -323,9 +328,10 @@ namespace WalletTypes
         t.transfers = vectorToTransfers(j.at("transfers").get<std::vector<Transfer>>());
         t.hash = j.at("hash").get<Crypto::Hash>();
         t.fee = j.at("fee").get<uint64_t>();
-        t.timestamp = j.at("timestamp").get<uint64_t>();
         t.blockHeight = j.at("blockHeight").get<uint32_t>();
+        t.timestamp = j.at("timestamp").get<uint64_t>();
         t.paymentID = j.at("paymentID").get<std::string>();
+        t.confirmed = j.at("confirmed").get<bool>();
     }
 }
 

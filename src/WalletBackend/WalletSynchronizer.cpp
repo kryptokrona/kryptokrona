@@ -174,7 +174,10 @@ uint64_t WalletSynchronizer::processTransactionInputs(
 
             /* The transaction has been spent, discard the key image so we
                don't double spend it */
-            m_subWallets->removeSpentKeyImage(keyInput.keyImage, publicSpendKey);
+            m_subWallets->markInputAsSpent(
+                keyInput.keyImage, publicSpendKey, blockHeight,
+                m_daemon->getLastKnownBlockHeight()
+            );
         }
     }
 
@@ -242,6 +245,8 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
             input.transactionIndex = outputIndex;
             input.globalOutputIndex = globalIndexes[outputIndex];
             input.key = keyOutputs[outputIndex].key;
+            input.spent = false;
+            input.spendHeight = 0;
 
             /* We need to fill in the key image of the transaction input -
                we'll let the subwallet do this since we need the private spend
@@ -281,7 +286,8 @@ void WalletSynchronizer::processCoinbaseTransaction(
 
         /* Form the actual transaction */
         WalletTypes::Transaction tx(
-            transfers, rawTX.hash, fee, blockTimestamp, blockHeight, paymentID
+            transfers, rawTX.hash, fee, blockTimestamp, blockHeight, paymentID,
+            true
         );
 
         /* Store the transaction */
@@ -329,7 +335,7 @@ void WalletSynchronizer::processTransaction(
         /* Form the actual transaction */
         const WalletTypes::Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight,
-            rawTX.paymentID
+            rawTX.paymentID, true
         );
 
         /* Store the transaction */
@@ -358,8 +364,9 @@ void WalletSynchronizer::findTransactionsInBlocks()
         }
 
         /* Process the coinbase transaction */
-        processCoinbaseTransaction(b.coinbaseTransaction, b.blockTimestamp,
-                                   b.blockHeight);
+        processCoinbaseTransaction(
+            b.coinbaseTransaction, b.blockTimestamp, b.blockHeight
+        );
 
         /* Process the rest of the transactions */
         for (const auto &tx : b.transactions)

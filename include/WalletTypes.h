@@ -89,12 +89,33 @@ namespace WalletTypes
 
         /* The transaction key we took from the key outputs */
         Crypto::PublicKey key;
+
+        /* Has this input been spent */
+        bool spent;
+
+        uint64_t spendHeight;
+
+        bool operator==(const TransactionInput &other)
+        {
+            return keyImage == other.keyImage;
+        }
     };
 
     /* Includes the owner of the input so we can sign the input with the
        correct keys */
     struct TxInputAndOwner
     {
+        TxInputAndOwner(
+            const TransactionInput input,
+            const Crypto::PublicKey publicSpendKey,
+            const Crypto::SecretKey privateSpendKey) :
+
+            input(input),
+            publicSpendKey(publicSpendKey),
+            privateSpendKey(privateSpendKey)
+        {
+        }
+
         TransactionInput input;
 
         Crypto::PublicKey publicSpendKey;
@@ -147,18 +168,22 @@ namespace WalletTypes
     {
         Transaction() {};
 
-        Transaction(std::unordered_map<Crypto::PublicKey, int64_t> transfers,
-                    Crypto::Hash hash,
-                    uint64_t fee,
-                    uint64_t timestamp,
-                    uint64_t blockHeight,
-                    std::string paymentID) :
+        Transaction(
+            const std::unordered_map<Crypto::PublicKey, int64_t> transfers,
+            const Crypto::Hash hash,
+            const uint64_t fee,
+            const uint64_t timestamp,
+            const uint64_t blockHeight,
+            const std::string paymentID,
+            const bool confirmed) :
+
             transfers(transfers),
             hash(hash),
             fee(fee),
             timestamp(timestamp),
             blockHeight(blockHeight),
-            paymentID(paymentID)
+            paymentID(paymentID),
+            confirmed(confirmed)
         {
         }
 
@@ -185,5 +210,7 @@ namespace WalletTypes
 
         /* The paymentID of this transaction (will be an empty string if no pid) */
         std::string paymentID;
+
+        bool confirmed;
     };
 }

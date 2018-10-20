@@ -99,3 +99,13 @@ void SubWallet::completeAndStoreTransactionInput(
 
     m_transactionInputs.push_back(input);
 }
+
+uint64_t SubWallet::getBalance() const
+{
+    return m_balance;
+}
+
+void SubWallet::addBalance(int64_t amount)
+{
+    m_balance += amount;
+}

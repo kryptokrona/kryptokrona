@@ -141,9 +141,66 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
         return {sendError, Crypto::Hash()};
     }
 
-    /* TODO: Deduct balance, remove inputs, etc */
+    /* Store the unconfirmed transaction, update our balance */
+    storeSentTransaction(
+        txHash, fee, paymentID, ourInputs, changeAddress, changeRequired,
+        subWallets
+    );
+
+    /* Mark inputs as spent so we don't double spend */
+    markInputsSpent(ourInputs, subWallets, daemon->getLastKnownBlockHeight());
 
     return {SUCCESS, txHash};
+}
+
+void storeSentTransaction(
+    const Crypto::Hash hash,
+    const uint64_t fee,
+    const std::string paymentID,
+    const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+    const std::string changeAddress,
+    const uint64_t changeRequired,
+    const std::shared_ptr<SubWallets> subWallets)
+{
+    std::unordered_map<Crypto::PublicKey, int64_t> transfers;
+
+    /* Loop through each input, and take that much off each subwallet */
+    for (const auto input : ourInputs)
+    {
+        transfers[input.publicSpendKey] -= input.input.amount;
+    }
+
+    /* Grab the subwallet the change address points to */
+    const auto [spendKey, viewKey] = Utilities::addressToKeys(changeAddress);
+
+    /* Increment the change address with the amount we returned to ourselves */
+    transfers[spendKey] += changeRequired;
+
+    /* Create the unconfirmed transaction (Will be overwritten by the
+       confirmed transaction later) */
+    WalletTypes::Transaction tx(
+        transfers, hash, fee, 0, 0, paymentID, false
+    );
+
+    subWallets->addTransaction(tx);
+}
+
+void markInputsSpent(
+    const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+    const std::shared_ptr<SubWallets> subWallets,
+    const uint64_t spendHeight)
+{
+    /* Mark inputs as spent, update balance */
+    for (const auto input : ourInputs)
+    {
+        subWallets->markInputAsSpent(
+            input.input.keyImage, input.publicSpendKey, spendHeight,
+            spendHeight
+        );
+    }
+
+    /* Remove any inputs that are older than 24 hours */
+    subWallets->removeConfirmedSpentInputs(spendHeight);
 }
 
 std::tuple<WalletError, Crypto::Hash> relayTransaction(

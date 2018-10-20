@@ -49,6 +49,10 @@ class SubWallet
             const size_t outputIndex,
             WalletTypes::TransactionInput);
 
+        uint64_t getBalance() const;
+
+        void addBalance(int64_t amount);
+
         /* Whether this is a view only wallet */
         bool m_isViewWallet;
 
@@ -62,9 +66,6 @@ class SubWallet
         /* The subwallet's private spend key */
         Crypto::SecretKey m_privateSpendKey;
 
-        /* This wallets balance */
-        uint64_t m_balance = 0;
-
         /* The timestamp to begin syncing the wallet at
            (usually creation time or zero) */
         uint64_t m_syncStartTimestamp = 0;
@@ -76,4 +77,8 @@ class SubWallet
         std::string m_address;
 
     private:
+
+        /* This wallets balance */
+        uint64_t m_balance = 0;
+
 };

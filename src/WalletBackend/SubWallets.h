@@ -95,6 +95,14 @@ class SubWallets
 
         Crypto::SecretKey getPrivateViewKey() const;
 
+        void markInputAsSpent(
+            const Crypto::KeyImage keyImage,
+            const Crypto::PublicKey publicKey,
+            const uint64_t spendHeight,
+            const uint64_t currentHeight);
+
+        void removeConfirmedSpentInputs(uint64_t currentHeight);
+
     private:
         /* The subwallets, indexed by public spend key */ 
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;

@@ -86,4 +86,18 @@ namespace SendTransaction
     std::tuple<CryptoNote::KeyPair, Crypto::KeyImage> genKeyImage(
         const WalletTypes::ObscuredInput input,
         const Crypto::SecretKey privateViewKey);
+
+    void storeSentTransaction(
+        const Crypto::Hash hash,
+        const uint64_t fee,
+        const std::string paymentID,
+        const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+        const std::string changeAddress,
+        const uint64_t changeRequired,
+        const std::shared_ptr<SubWallets> subWallets);
+
+    void markInputsSpent(
+        const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+        const std::shared_ptr<SubWallets> subWallets,
+        const uint64_t spendHeight);
 }
