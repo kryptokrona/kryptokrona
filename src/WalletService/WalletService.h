@@ -76,7 +76,7 @@ public:
   std::error_code getTransaction(const std::string& transactionHash, TransactionRpcInfo& transaction);
   std::error_code getAddresses(std::vector<std::string>& addresses);
   std::error_code sendTransaction(SendTransaction::Request& request, std::string& transactionHash);
-  std::error_code createDelayedTransaction(const CreateDelayedTransaction::Request& request, std::string& transactionHash);
+  std::error_code createDelayedTransaction(CreateDelayedTransaction::Request& request, std::string& transactionHash);
   std::error_code getDelayedTransactionHashes(std::vector<std::string>& transactionHashes);
   std::error_code deleteDelayedTransaction(const std::string& transactionHash);
   std::error_code sendDelayedTransaction(const std::string& transactionHash);
