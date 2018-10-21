@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <sstream>
 #include <unordered_set>
+#include <tuple>
 
 #include <boost/filesystem/operations.hpp>
 
@@ -275,7 +276,7 @@ void validateAddresses(const std::vector<std::string>& addresses, const CryptoNo
   }
 }
 
-std::vector<std::string> decodeIntegratedAddress(const std::string& integratedAddr, const CryptoNote::Currency& currency, Logging::LoggerRef logger) {
+std::tuple<std::string, std::string> decodeIntegratedAddress(const std::string& integratedAddr, const CryptoNote::Currency& currency, Logging::LoggerRef logger) {
     std::string decoded;
     uint64_t prefix;
 
@@ -316,9 +317,8 @@ std::vector<std::string> decodeIntegratedAddress(const std::string& integratedAd
     
     /* Check the extracted address is good. */
     validateAddresses({address}, currency, logger);
-
-    std::vector<std::string> decodedValues{address, paymentID};
-    return decodedValues;
+    
+    return std::make_tuple(address, paymentID);
 }
 
 std::string getValidatedTransactionExtraString(const std::string& extraString) {
@@ -978,9 +978,9 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
         /* It's not a standard address. Is it an integrated address? */
         if (!CryptoNote::validateAddress(addr, currency))
         {
-            std::vector<std::string> decodedValues = decodeIntegratedAddress(addr, currency, logger);
-            std::string address = decodedValues[0];
-            std::string paymentID = decodedValues[1];
+            auto decodedValues = decodeIntegratedAddress(addr, currency, logger);
+            std::string address = std::get<0>(decodedValues);
+            std::string paymentID = std::get<1>(decodedValues);
             
             /* A payment ID was specified with the transaction, and it is not
                the same as the decoded one -> we can't send a transaction
@@ -1003,11 +1003,10 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
     if (paymentIDs.size() == 1)
     {
         request.paymentId = paymentIDs[0];
+        
     }
-
-    /* Check we don't have conflicting payment ID's */
-    if (paymentIDs.size() > 1)
-    {
+    else if (paymentIDs.size() > 1)
+    {   
         /* Are all the specified payment IDs equal? */
         if (!std::equal(paymentIDs.begin() + 1, paymentIDs.end(), paymentIDs.begin()))
         {
@@ -1082,9 +1081,9 @@ std::error_code WalletService::createDelayedTransaction(CreateDelayedTransaction
         /* It's not a standard address. Is it an integrated address? */
         if (!CryptoNote::validateAddress(addr, currency))
         {
-            std::vector<std::string> decodedValues = decodeIntegratedAddress(addr, currency, logger);
-            std::string address = decodedValues[0];
-            std::string paymentID = decodedValues[1];
+            auto decodedValues = decodeIntegratedAddress(addr, currency, logger);
+            std::string address = std::get<0>(decodedValues);
+            std::string paymentID = std::get<1>(decodedValues);
             
             /* A payment ID was specified with the transaction, and it is not
                the same as the decoded one -> we can't send a transaction
@@ -1108,9 +1107,7 @@ std::error_code WalletService::createDelayedTransaction(CreateDelayedTransaction
     {
         request.paymentId = paymentIDs[0];
     }
-
-    /* Check we don't have conflicting payment ID's */
-    if (paymentIDs.size() > 1)
+    else if (paymentIDs.size() > 1)
     {
         /* Are all the specified payment IDs equal? */
         if (!std::equal(paymentIDs.begin() + 1, paymentIDs.end(), paymentIDs.begin()))
