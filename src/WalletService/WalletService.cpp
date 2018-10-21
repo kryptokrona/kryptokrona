@@ -978,9 +978,8 @@ std::error_code WalletService::sendTransaction(SendTransaction::Request& request
         /* It's not a standard address. Is it an integrated address? */
         if (!CryptoNote::validateAddress(addr, currency))
         {
-            auto decodedValues = decodeIntegratedAddress(addr, currency, logger);
-            std::string address = std::get<0>(decodedValues);
-            std::string paymentID = std::get<1>(decodedValues);
+            std::string address, paymentID;
+            std::tie(address, paymentID) = decodeIntegratedAddress(addr, currency, logger);
             
             /* A payment ID was specified with the transaction, and it is not
                the same as the decoded one -> we can't send a transaction
@@ -1081,9 +1080,8 @@ std::error_code WalletService::createDelayedTransaction(CreateDelayedTransaction
         /* It's not a standard address. Is it an integrated address? */
         if (!CryptoNote::validateAddress(addr, currency))
         {
-            auto decodedValues = decodeIntegratedAddress(addr, currency, logger);
-            std::string address = std::get<0>(decodedValues);
-            std::string paymentID = std::get<1>(decodedValues);
+            std::string address, paymentID; 
+            std::tie(address, paymentID) = decodeIntegratedAddress(addr, currency, logger);
             
             /* A payment ID was specified with the transaction, and it is not
                the same as the decoded one -> we can't send a transaction
