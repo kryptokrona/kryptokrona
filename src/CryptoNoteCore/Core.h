@@ -26,8 +26,6 @@
 #include "TransactionValidatiorState.h"
 #include "SwappedVector.h"
 
-#include "CryptoNoteCore/MinerConfig.h"
-
 #include <System/ContextGroup.h>
 
 namespace CryptoNote {
