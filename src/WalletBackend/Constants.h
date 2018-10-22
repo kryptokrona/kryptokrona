@@ -54,4 +54,9 @@ namespace Constants
        
        This value determines how many blocks to take from. */
     const uint64_t GLOBAL_INDEXES_OBSCURITY = 10;
+
+    /* The maximum amount of blocks we can have waiting to be processed in
+       the queue. If we exceed this, we will wait till it drops below this
+       amount. */
+    const uint32_t MAXIMUM_SYNC_QUEUE_SIZE = 1000;
 }
