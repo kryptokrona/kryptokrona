@@ -166,6 +166,35 @@ struct COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES {
   };
 };
 
+struct COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE
+{
+    struct request
+    {
+        uint64_t startHeight;
+        uint64_t endHeight;
+
+        void serialize(ISerializer &s)
+        {
+            KV_MEMBER(startHeight);
+            KV_MEMBER(endHeight);
+        }
+    };
+
+    struct response
+    {
+        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
+
+        std::string status;
+
+        void serialize(ISerializer &s)
+        {
+            KV_MEMBER(indexes)
+            KV_MEMBER(status)
+        }
+    };
+};
+
+
 //-----------------------------------------------
 
 #pragma pack(push, 1)

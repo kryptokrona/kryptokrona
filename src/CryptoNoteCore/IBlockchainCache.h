@@ -158,6 +158,9 @@ public:
   //NOTE: not recursive!
   virtual bool getTransactionGlobalIndexes(const Crypto::Hash& transactionHash, std::vector<uint32_t>& globalIndexes) const = 0;
 
+  virtual std::unordered_map<Crypto::Hash, std::vector<uint64_t>> getGlobalIndexes( 
+    const std::vector<Crypto::Hash> transactionHashes) const = 0;
+
   virtual size_t getTransactionCount() const = 0;
 
   virtual uint32_t getBlockIndexContainingTx(const Crypto::Hash& transactionHash) const = 0;
@@ -176,6 +179,10 @@ public:
 
   virtual std::vector<Crypto::Hash> getTransactionHashesByPaymentId(const Crypto::Hash& paymentId) const = 0;
   virtual std::vector<Crypto::Hash> getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const = 0;
+
+  virtual std::vector<RawBlock> getBlocksByHeight(
+    const uint64_t startHeight,
+    const uint64_t endHeight) const = 0;
 };
 
 }

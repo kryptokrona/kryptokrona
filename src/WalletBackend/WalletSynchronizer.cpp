@@ -12,6 +12,9 @@
 
 #include <future>
 
+#include <WalletBackend/Constants.h>
+#include <WalletBackend/Utilities.h>
+
 //////////////////////////
 /* NON MEMBER FUNCTIONS */
 //////////////////////////
@@ -190,7 +193,7 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
     const Crypto::PublicKey txPublicKey,
     std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
     const uint64_t blockHeight,
-    const std::vector<uint32_t> globalIndexes)
+    const Crypto::Hash transactionHash)
 {
     Crypto::KeyDerivation derivation;
 
@@ -204,6 +207,8 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
 
     /* The sum of all the outputs in the transaction */
     uint64_t sumOfOutputs = 0;
+
+    std::vector<uint64_t> globalIndexes;
 
     for (size_t outputIndex = 0; outputIndex < keyOutputs.size(); outputIndex++)
     {
@@ -231,6 +236,18 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
         /* If it does, the transaction belongs to us */
         if (ourSpendKey != spendKeys.end())
         {
+            /* Get the indexes, if we haven't already got them. */
+            if (globalIndexes.empty())
+            {
+                globalIndexes = getGlobalIndexes(blockHeight, transactionHash);
+
+                /* We are stopping */
+                if (globalIndexes.empty())
+                {
+                    return {false, 0};
+                }
+            }
+
             /* Add the amount to the current amount (If a key doesn't exist,
                it will default to zero, so this is just setting the value
                to the amount in that case */
@@ -261,6 +278,65 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
     return {true, sumOfOutputs};
 }
 
+/* When we get the global indexes, we pass in a range of blocks, to obscure
+   which transactions we are interested in - the ones that belong to us.
+   To do this, we get the global indexes for all transactions in a range.
+
+   For example, if we want the global indexes for a transaction in block
+   17, we get all the indexes from block 10 to block 20. */
+std::vector<uint64_t> WalletSynchronizer::getGlobalIndexes(
+    const uint64_t blockHeight,
+    const Crypto::Hash transactionHash)
+{
+    uint64_t startHeight = Utilities::getLowerBound(
+        blockHeight, Constants::GLOBAL_INDEXES_OBSCURITY
+    );
+
+    uint64_t endHeight = Utilities::getUpperBound(
+        blockHeight, Constants::GLOBAL_INDEXES_OBSCURITY
+    );
+
+    while (true)
+    {
+        std::promise<std::error_code> errorPromise = std::promise<std::error_code>();
+
+        auto callback = [&errorPromise](auto e) { errorPromise.set_value(e); };
+
+        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
+
+        m_daemon->getGlobalIndexesForRange(
+            startHeight, endHeight, indexes, callback
+        );
+
+        auto error = errorPromise.get_future().get();
+
+        /* Need to get the indexes, or we can't continue... */
+        if (error)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            /* We don't store the latest transaction if we're stopping, so it's
+               ok to be in an invalid state */
+            if (m_shouldStop.load())
+            {
+                return {};
+            }
+
+            continue;
+        }
+
+        const auto it = indexes.find(transactionHash);
+
+        /* There's no real way to recover from this. */
+        if (it == indexes.end())
+        {
+            throw std::runtime_error("Could not get global indexes from daemon! Possibly faulty/malicious daemon.");
+        }
+
+        return it->second;
+    }
+}
+
 void WalletSynchronizer::processCoinbaseTransaction(
     const WalletTypes::RawCoinbaseTransaction rawTX,
     const uint64_t blockTimestamp,
@@ -272,7 +348,7 @@ void WalletSynchronizer::processCoinbaseTransaction(
 
     processTransactionOutputs(
         rawTX.keyOutputs, rawTX.transactionPublicKey, transfers, blockHeight,
-        rawTX.globalIndexes
+        rawTX.hash
     );
 
     /* Process any transactions we found belonging to us */
@@ -317,7 +393,7 @@ void WalletSynchronizer::processTransaction(
        transfers map, and stores any key images that belong to us */
     const auto [success, sumOfOutputs] = processTransactionOutputs(
         rawTX.keyOutputs, rawTX.transactionPublicKey, transfers, blockHeight,
-        rawTX.globalIndexes
+        rawTX.hash
     );
 
     /* Failed to parse a key */
@@ -372,6 +448,13 @@ void WalletSynchronizer::findTransactionsInBlocks()
         for (const auto &tx : b.transactions)
         {
             processTransaction(tx, b.blockTimestamp, b.blockHeight);
+        }
+
+        /* Don't store the transaction if we're stopping - we might have had
+           to cancel out of an unfinished state. */
+        if (m_shouldStop.load())
+        {
+            return;
         }
 
         /* Make sure to do this at the end, once the transactions are fully

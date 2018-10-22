@@ -29,9 +29,6 @@ namespace WalletTypes
 
         /* The public key of this transaction, taken from the tx extra */
         Crypto::PublicKey transactionPublicKey;
-
-        /* The global indexes of the transaction key images */
-        std::vector<uint32_t> globalIndexes;
     };
 
     /* A raw transaction, simply key images and amounts */

@@ -47,6 +47,16 @@ BlockchainReadBatch& BlockchainReadBatch::requestCachedTransaction(const Crypto:
   return *this;
 }
 
+BlockchainReadBatch& BlockchainReadBatch::requestCachedTransactions(const std::vector<Crypto::Hash> &transactions)
+{
+    for (const auto hash : transactions)
+    {
+        state.cachedTransactions.emplace(hash, ExtendedTransactionInfo());
+    }
+
+    return *this;
+}
+
 BlockchainReadBatch& BlockchainReadBatch::requestTransactionHashesByBlock(uint32_t blockIndex) {
   state.transactionHashesByBlocks.emplace(blockIndex, std::vector<Crypto::Hash>());
   return *this;
@@ -75,6 +85,26 @@ BlockchainReadBatch& BlockchainReadBatch::requestKeyOutputGlobalIndexForAmount(I
 BlockchainReadBatch& BlockchainReadBatch::requestRawBlock(uint32_t blockIndex) {
   state.rawBlocks.emplace(blockIndex, RawBlock());
   return *this;
+}
+
+BlockchainReadBatch& BlockchainReadBatch::requestRawBlocks(uint64_t startHeight, uint64_t endHeight)
+{
+    for (uint64_t i = startHeight; i < endHeight; i++)
+    {
+        state.rawBlocks.emplace(i, RawBlock());
+    }
+
+    return *this;
+}
+
+BlockchainReadBatch& BlockchainReadBatch::requestCachedBlocks(uint64_t startHeight, uint64_t endHeight)
+{
+    for (uint64_t i = startHeight; i < endHeight; i++)
+    {
+        state.cachedBlocks.emplace(i, CachedBlockInfo());
+    }
+
+    return *this;
 }
 
 BlockchainReadBatch& BlockchainReadBatch::requestLastBlockIndex() {

@@ -80,7 +80,7 @@ class WalletSynchronizer
             const Crypto::PublicKey txPublicKey,
             std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
             const uint64_t blockHeight,
-            const std::vector<uint32_t> globalIndexes);
+            const Crypto::Hash transactionHash);
 
         /* Process a coinbase transaction to see if it belongs to us */
         void processCoinbaseTransaction(
@@ -89,9 +89,14 @@ class WalletSynchronizer
             const uint64_t blockHeight);
 
         /* Process a transaction to see if it belongs to us */
-        void processTransaction(const WalletTypes::RawTransaction rawTX,
-                                const uint64_t blockTimestamp,
-                                const uint64_t blockHeight);
+        void processTransaction(
+            const WalletTypes::RawTransaction rawTX,
+            const uint64_t blockTimestamp,
+            const uint64_t blockHeight);
+
+        std::vector<uint64_t> getGlobalIndexes(
+            const uint64_t blockHeight,
+            const Crypto::Hash transactionHash);
 
         /* The thread ID of the block downloader thread */
         std::thread m_blockDownloaderThread;

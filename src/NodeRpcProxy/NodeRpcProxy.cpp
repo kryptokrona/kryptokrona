@@ -452,6 +452,23 @@ void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::Hash& transacti
     std::ref(outsGlobalIndices)), callback);
 }
 
+void NodeRpcProxy::getGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes,
+    const Callback &callback)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (m_state != STATE_INITIALIZED)
+    {
+        callback(make_error_code(NodeError::NOT_INITIALIZED));
+        return;
+    }
+
+    scheduleRequest(std::bind(&NodeRpcProxy::doGetGlobalIndexesForRange, this, startHeight, endHeight, std::ref(indexes)), callback);
+}
+
 void NodeRpcProxy::queryBlocks(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks,
   uint32_t& startHeight, const Callback& callback) {
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -612,6 +629,35 @@ std::error_code NodeRpcProxy::doGetTransactionOutsGlobalIndices(const Crypto::Ha
   }
 
   return ec;
+}
+
+std::error_code NodeRpcProxy::doGetGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes)
+{
+    CryptoNote::COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::request req = AUTO_VAL_INIT(req);
+    CryptoNote::COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::response rsp = AUTO_VAL_INIT(rsp);
+
+    req.startHeight = startHeight;
+    req.endHeight = endHeight;
+
+    m_logger(TRACE) << "Send get_global_indexes_for_range request";
+
+    std::error_code ec = jsonCommand("/get_global_indexes_for_range", req, rsp);
+
+    if (!ec)
+    {
+        m_logger(TRACE) << "get_global_indexes_for_range complete";
+    }
+    else
+    {
+        m_logger(TRACE) << "get_global_indexes_for_range failed: " << ec << ", " << ec.message();
+    }
+
+    indexes.insert(rsp.indexes.begin(), rsp.indexes.end());
+
+    return ec;
 }
 
 std::error_code NodeRpcProxy::doQueryBlocksLite(const std::vector<Crypto::Hash>& knownBlockIds, uint64_t timestamp,

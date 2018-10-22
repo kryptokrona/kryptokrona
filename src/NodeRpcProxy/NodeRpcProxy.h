@@ -67,6 +67,13 @@ public:
   virtual void getRandomOutsByAmounts(std::vector<uint64_t>&& amounts, uint16_t outsCount, std::vector<RandomOuts>& result, const Callback& callback) override;
   virtual void getNewBlocks(std::vector<Crypto::Hash>&& knownBlockIds, std::vector<CryptoNote::RawBlock>& newBlocks, uint32_t& startHeight, const Callback& callback) override;
   virtual void getTransactionOutsGlobalIndices(const Crypto::Hash& transactionHash, std::vector<uint32_t>& outsGlobalIndices, const Callback& callback) override;
+
+  virtual void getGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes,
+    const Callback &callback) override;
+
   virtual void queryBlocks(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const Callback& callback) override;
   virtual void getWalletSyncData(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo>& newBlocks, const Callback& callback) override;
   virtual void getPoolSymmetricDifference(std::vector<Crypto::Hash>&& knownPoolTxIds, Crypto::Hash knownBlockId, bool& isBcActual,
@@ -102,6 +109,12 @@ private:
     std::vector<CryptoNote::RawBlock>& newBlocks, uint32_t& startHeight);
   std::error_code doGetTransactionOutsGlobalIndices(const Crypto::Hash& transactionHash,
                                                     std::vector<uint32_t>& outsGlobalIndices);
+
+  std::error_code doGetGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes);
+
   std::error_code doQueryBlocksLite(const std::vector<Crypto::Hash>& knownBlockIds, uint64_t timestamp,
     std::vector<CryptoNote::BlockShortEntry>& newBlocks, uint32_t& startHeight);
 

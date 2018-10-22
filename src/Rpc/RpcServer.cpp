@@ -69,7 +69,6 @@ void serialize(WalletTypes::RawTransaction &rawTransaction, ISerializer &s)
     KV_MEMBER(rawTransaction.keyOutputs);
     KV_MEMBER(rawTransaction.hash);
     KV_MEMBER(rawTransaction.transactionPublicKey);
-    KV_MEMBER(rawTransaction.globalIndexes);
 }
 
 void serialize(WalletTypes::RawCoinbaseTransaction &rawCoinbaseTransaction, ISerializer &s)
@@ -77,7 +76,6 @@ void serialize(WalletTypes::RawCoinbaseTransaction &rawCoinbaseTransaction, ISer
     KV_MEMBER(rawCoinbaseTransaction.keyOutputs);
     KV_MEMBER(rawCoinbaseTransaction.hash);
     KV_MEMBER(rawCoinbaseTransaction.transactionPublicKey);
-    KV_MEMBER(rawCoinbaseTransaction.globalIndexes);
 }
 
 void serialize(WalletTypes::KeyOutput &keyOutput, ISerializer &s)
@@ -143,6 +141,7 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/get_blocks_hashes_by_timestamps", { jsonMethod<COMMAND_RPC_GET_BLOCKS_HASHES_BY_TIMESTAMPS>(&RpcServer::onGetBlocksHashesByTimestamps), false } },
   { "/get_transaction_details_by_hashes", { jsonMethod<COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASHES>(&RpcServer::onGetTransactionDetailsByHashes), false } },
   { "/get_transaction_hashes_by_payment_id", { jsonMethod<COMMAND_RPC_GET_TRANSACTION_HASHES_BY_PAYMENT_ID>(&RpcServer::onGetTransactionHashesByPaymentId), false } },
+  { "/get_global_indexes_for_range", { jsonMethod<COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE>(&RpcServer::onGetGlobalIndexesForRange), false} },
 
   // json rpc
   { "/json_rpc", { std::bind(&RpcServer::processJsonRpcRequest, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), true } }
@@ -356,6 +355,21 @@ bool RpcServer::on_get_indexes(const COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::
   res.status = CORE_RPC_STATUS_OK;
   logger(TRACE) << "COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES: [" << res.o_indexes.size() << "]";
   return true;
+}
+
+bool RpcServer::onGetGlobalIndexesForRange(
+    const COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::request &req,
+    COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::response &res)
+{
+    if (!m_core.getGlobalIndexesForRange(req.startHeight, req.endHeight, res.indexes))
+    {
+        res.status = "Failed";
+        return true;
+    }
+
+    res.status = CORE_RPC_STATUS_OK;
+
+    return true;
 }
 
 bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::request& req, COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::response& res) {

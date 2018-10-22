@@ -162,4 +162,18 @@ std::string privateKeysToAddress(
     );
 }
 
+/* Round value to the nearest multiple (rounding down) */
+uint64_t getLowerBound(const uint64_t val, const uint64_t nearestMultiple)
+{
+    uint64_t remainder = val % nearestMultiple;
+
+    return val - remainder;
+}
+
+/* Round value to the nearest multiple (rounding down) */
+uint64_t getUpperBound(const uint64_t val, const uint64_t nearestMultiple)
+{
+    return getLowerBound(val, nearestMultiple) + nearestMultiple;
+}
+
 } // namespace Utilities

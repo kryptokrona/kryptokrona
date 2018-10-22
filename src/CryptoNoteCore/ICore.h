@@ -78,6 +78,11 @@ public:
   virtual bool getRandomOutputs(uint64_t amount, uint16_t count, std::vector<uint32_t>& globalIndexes,
                                 std::vector<Crypto::PublicKey>& publicKeys) const = 0;
 
+  virtual bool getGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes) const = 0;
+
   virtual bool addTransactionToPool(const BinaryArray& transactionBinaryArray) = 0;
 
   virtual std::vector<Crypto::Hash> getPoolTransactionHashes() const = 0;

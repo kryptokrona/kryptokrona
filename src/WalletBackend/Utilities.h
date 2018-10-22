@@ -31,4 +31,7 @@ namespace Utilities
     std::string publicKeysToAddress(
         const Crypto::PublicKey publicSpendKey,
         const Crypto::PublicKey publicViewKey);
+
+    uint64_t getUpperBound(const uint64_t val, const uint64_t nearestMultiple);
+    uint64_t getLowerBound(const uint64_t val, const uint64_t nearestMultiple);
 }

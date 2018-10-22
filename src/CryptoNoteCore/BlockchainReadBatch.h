@@ -118,12 +118,15 @@ public:
   BlockchainReadBatch& requestSpentKeyImagesByBlock(uint32_t blockIndex);
   BlockchainReadBatch& requestBlockIndexBySpentKeyImage(const Crypto::KeyImage& keyImage);
   BlockchainReadBatch& requestCachedTransaction(const Crypto::Hash& txHash);
+  BlockchainReadBatch& requestCachedTransactions(const std::vector<Crypto::Hash> &transactions);
   BlockchainReadBatch& requestTransactionHashesByBlock(uint32_t blockIndex);
   BlockchainReadBatch& requestCachedBlock(uint32_t blockIndex);
+  BlockchainReadBatch& requestCachedBlocks(uint64_t startHeight, uint64_t endHeight);
   BlockchainReadBatch& requestBlockIndexByBlockHash(const Crypto::Hash& blockHash);
   BlockchainReadBatch& requestKeyOutputGlobalIndexesCountForAmount(IBlockchainCache::Amount amount);
   BlockchainReadBatch& requestKeyOutputGlobalIndexForAmount(IBlockchainCache::Amount amount, uint32_t outputIndexWithinAmout);
   BlockchainReadBatch& requestRawBlock(uint32_t blockIndex);
+  BlockchainReadBatch& requestRawBlocks(uint64_t startHeight, uint64_t endHeight);
   BlockchainReadBatch& requestLastBlockIndex();
   BlockchainReadBatch& requestClosestTimestampBlockIndex(uint64_t timestamp);
   BlockchainReadBatch& requestKeyOutputAmountsCount();

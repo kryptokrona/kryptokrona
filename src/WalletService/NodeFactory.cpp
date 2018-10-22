@@ -51,6 +51,15 @@ public:
   }
   virtual void getTransactionOutsGlobalIndices(const Crypto::Hash& transactionHash, std::vector<uint32_t>& outsGlobalIndices, const Callback& callback) override { }
 
+  virtual void getGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes,
+    const Callback &callback) override
+  {
+      callback(std::error_code());
+  };
+
   virtual void queryBlocks(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t timestamp, std::vector<CryptoNote::BlockShortEntry>& newBlocks,
     uint32_t& startHeight, const Callback& callback) override {
     startHeight = 0;

@@ -44,4 +44,14 @@ namespace Constants
     /* Save a block hash checkpoint every BLOCK_HASH_CHECKPOINTS_INTERVAL
        blocks */
     const uint32_t BLOCK_HASH_CHECKPOINTS_INTERVAL = 5000;
+
+    /* When we get the global indexes, we pass in a range of blocks, to obscure
+       which transactions we are interested in - the ones that belong to us.
+       To do this, we get the global indexes for all transactions in a range.
+
+       For example, if we want the global indexes for a transaction in block
+       17, we get all the indexes from block 10 to block 20.
+       
+       This value determines how many blocks to take from. */
+    const uint64_t GLOBAL_INDEXES_OBSCURITY = 10;
 }

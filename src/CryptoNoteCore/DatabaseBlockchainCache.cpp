@@ -1608,6 +1608,44 @@ std::vector<Crypto::Hash> DatabaseBlockchainCache::getBlockHashesByTimestamps(ui
   return blockHashes;
 }
 
+std::vector<RawBlock> DatabaseBlockchainCache::getBlocksByHeight(
+    const uint64_t startHeight, const uint64_t endHeight) const
+{
+    auto blockBatch = BlockchainReadBatch().requestRawBlocks(startHeight, endHeight);
+
+    /* Get the info from the DB */
+    auto rawBlocks = readDatabase(blockBatch).getRawBlocks();
+    
+    std::vector<RawBlock> orderedBlocks;
+
+    /* Order, and convert from map, to vector */
+    for (uint64_t height = startHeight; height < startHeight + rawBlocks.size(); height++)
+    {
+        orderedBlocks.push_back(rawBlocks.at(height));
+    }
+
+    return orderedBlocks;
+}
+
+std::unordered_map<Crypto::Hash, std::vector<uint64_t>> DatabaseBlockchainCache::getGlobalIndexes( 
+    const std::vector<Crypto::Hash> transactionHashes) const
+{
+    auto txBatch = BlockchainReadBatch().requestCachedTransactions(transactionHashes);
+
+    database.read(txBatch);
+
+    auto txs = txBatch.extractResult().getCachedTransactions();
+
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
+
+    for (const auto [txHash, transaction] : txs)
+    {
+        indexes[txHash].assign(transaction.globalIndexes.begin(), transaction.globalIndexes.end());
+    }
+
+    return indexes;
+}
+
 DatabaseBlockchainCache::ExtendedPushedBlockInfo DatabaseBlockchainCache::getExtendedPushedBlockInfo(uint32_t blockIndex) const {
   assert(blockIndex <= getTopBlockIndex());
 

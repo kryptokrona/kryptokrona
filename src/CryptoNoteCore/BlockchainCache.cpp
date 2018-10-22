@@ -560,6 +560,69 @@ size_t BlockchainCache::getTransactionCount() const {
   return count;
 }
 
+std::vector<RawBlock> BlockchainCache::getBlocksByHeight(
+    const uint64_t startHeight, const uint64_t endHeight) const
+{
+    if (endHeight < startIndex)
+    {
+        return parent->getBlocksByHeight(startHeight, endHeight);
+    }
+
+    std::vector<RawBlock> blocks;
+
+    if (startHeight < startIndex)
+    {
+        blocks = parent->getBlocksByHeight(startHeight, startIndex - 1);
+    }
+
+    uint64_t startOffset = std::max(startHeight, static_cast<uint64_t>(startIndex));
+
+    for (uint64_t i = startOffset; i < endHeight; i++)
+    {
+        blocks.push_back(storage->getBlockByIndex(i - startIndex));
+    }
+
+    return blocks;
+}
+
+std::unordered_map<Crypto::Hash, std::vector<uint64_t>> BlockchainCache::getGlobalIndexes(
+    const std::vector<Crypto::Hash> transactionHashes) const
+{
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
+
+    auto &availableTransactions = transactions.get<TransactionHashTag>();
+
+    std::vector<Crypto::Hash> remainingTransactions;
+
+    for (const auto hash : transactionHashes)
+    {
+        const auto tx = availableTransactions.find(hash);
+
+        /* Found the transaction, pop it in the result */
+        if (tx != availableTransactions.end())
+        {
+            indexes[hash].assign(tx->globalIndexes.begin(), tx->globalIndexes.end());
+        }
+        /* Couldn't find, query the parent for it */
+        else
+        {
+            remainingTransactions.push_back(hash);
+        }
+    }
+
+    /* Didn't find all the transactions in this segment, query parent */
+    if (!remainingTransactions.empty())
+    {
+        /* Query the parent for the transactions we couldn't find */
+        auto parentResult = parent->getGlobalIndexes(remainingTransactions);
+
+        /* Insert the transactions we found from the parent */
+        indexes.insert(parentResult.begin(), parentResult.end());
+    }
+
+    return indexes;
+}
+
 RawBlock BlockchainCache::getBlockByIndex(uint32_t index) const {
   return index < startIndex ? parent->getBlockByIndex(index) : storage->getBlockByIndex(index - startIndex);
 }
