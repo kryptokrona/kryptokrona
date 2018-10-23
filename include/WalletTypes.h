@@ -29,6 +29,13 @@ namespace WalletTypes
 
         /* The public key of this transaction, taken from the tx extra */
         Crypto::PublicKey transactionPublicKey;
+
+        /* When this transaction's inputs become spendable. Some genius thought
+           it was a good idea to use this field as both a block height, and a
+           unix timestamp. If the value is greater than
+           CRYPTONOTE_MAX_BLOCK_NUMBER (In cryptonoteconfig) it is treated
+           as a unix timestamp, else it is treated as a block height. */
+        uint64_t unlockTime;
     };
 
     /* A raw transaction, simply key images and amounts */
@@ -86,11 +93,28 @@ namespace WalletTypes
 
         /* The transaction key we took from the key outputs */
         Crypto::PublicKey key;
+        
+        /* When we send a transaction, it hangs around in the transaction pool
+           for a bit until it gets added to a block. We can't mark it as spent,
+           since we don't know what block height it was spent at. Thus, then
+           we get to a chain fork, we don't know if we should reverse marking
+           it as spent or not. So, instead we lock it. When we scan the block
+           it was included in, we can mark it as spent. */
+        bool isLocked;
 
         /* Has this input been spent */
-        bool spent;
+        bool isSpent;
 
+        /* If spent, what height did we spend it at. Used to remove spent
+           transaction inputs once they are sure to not be removed from a
+           forked chain. */
         uint64_t spendHeight;
+
+        /* When does this input unlock for spending. Default is instantly
+           unlocked, or blockHeight + CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW
+           for a coinbase/miner transaction. Users can specify a custom
+           unlock height however. */
+        uint64_t unlockTime;
 
         bool operator==(const TransactionInput &other)
         {
@@ -172,7 +196,8 @@ namespace WalletTypes
             const uint64_t timestamp,
             const uint64_t blockHeight,
             const std::string paymentID,
-            const bool confirmed) :
+            const bool confirmed,
+            const uint64_t unlockTime) :
 
             transfers(transfers),
             hash(hash),
@@ -180,7 +205,8 @@ namespace WalletTypes
             timestamp(timestamp),
             blockHeight(blockHeight),
             paymentID(paymentID),
-            confirmed(confirmed)
+            confirmed(confirmed),
+            unlockTime(unlockTime)
         {
         }
 
@@ -208,6 +234,10 @@ namespace WalletTypes
         /* The paymentID of this transaction (will be an empty string if no pid) */
         std::string paymentID;
 
+        /* Is the transaction in a block yet */
         bool confirmed;
+
+        /* When does the transaction unlock */
+        uint64_t unlockTime;
     };
 }

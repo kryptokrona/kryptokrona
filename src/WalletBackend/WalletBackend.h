@@ -116,11 +116,11 @@ class WalletBackend
             const std::string changeAddress);
 
         /* Get the balance for one subwallet */
-        std::tuple<WalletError, uint64_t> getBalance(
+        std::tuple<WalletError, uint64_t, uint64_t> getBalance(
             const std::string address) const;
 
         /* Get the balance for all subwallets */
-        uint64_t getTotalBalance() const;
+        std::tuple<uint64_t, uint64_t> getTotalBalance() const;
 
         std::shared_ptr<EventHandler> m_eventHandler;
 

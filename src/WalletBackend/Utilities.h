@@ -34,4 +34,8 @@ namespace Utilities
 
     uint64_t getUpperBound(const uint64_t val, const uint64_t nearestMultiple);
     uint64_t getLowerBound(const uint64_t val, const uint64_t nearestMultiple);
+
+    bool isInputUnlocked(
+        const uint64_t unlockTime,
+        const uint64_t currentHeight);
 }

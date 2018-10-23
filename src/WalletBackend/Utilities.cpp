@@ -176,4 +176,31 @@ uint64_t getUpperBound(const uint64_t val, const uint64_t nearestMultiple)
     return getLowerBound(val, nearestMultiple) + nearestMultiple;
 }
 
+bool isInputUnlocked(
+    const uint64_t unlockTime,
+    const uint64_t currentHeight)
+{
+    /* Might as well return fast with the case that is true for nearly all
+       transactions (excluding coinbase) */
+    if (unlockTime == 0)
+    {
+        return true;
+    }
+
+    /* if unlockTime is greater than this amount, we treat it as a
+       timestamp, otherwise we treat it as a block height */
+    if (unlockTime >= CryptoNote::parameters::CRYPTONOTE_MAX_BLOCK_NUMBER)
+    {
+        const uint64_t currentTimeAdjusted = static_cast<uint64_t>(std::time(nullptr))
+            + CryptoNote::parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS;
+
+        return currentTimeAdjusted >= unlockTime;
+    }
+
+    const uint64_t currentHeightAdjusted = unlockTime
+        + CryptoNote::parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
+
+    return currentHeightAdjusted >= unlockTime;
+}
+
 } // namespace Utilities

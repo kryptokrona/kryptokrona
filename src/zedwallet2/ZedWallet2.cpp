@@ -75,23 +75,24 @@ int main()
     {
         std::cout << "Wallet is synced! Top block: " << blockHeight << std::endl;
 
-        const auto [error, hash] = wallet.sendTransactionAdvanced({
-            {"TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW", 100},
-            {"TRTLuxtaj1Q9aGxQ4Tovu59ukhuCam5gE9EP492YrcMEA4vSDHLymoyCQhqNT9YwSRAQvxTAvdazc9QgjMJWf8XAAZsfrbCv4i22eeNaty9F3VXnU8GXwoVRvTvHaVVafpGKTfBJXYGySdQ5C7uwFkx7uSJpp4fwwkv3nUQ54MbFStQmjaC8yFnB5gi", 1234}},
-            3,
-            100,
-            "",
-            {},
-            ""
-        );
+        const bool doTransaction = false;
 
-        if (error)
+        if (doTransaction)
         {
-            std::cout << "Transaction failed, error: " << getErrorMessage(error) << std::endl;
-        }
-        else
-        {
-            std::cout << "Transaction sent, hash: " << hash << std::endl;
+            const auto [error, hash] = wallet.sendTransactionBasic(
+                "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
+                123,
+                ""
+            );
+
+            if (error)
+            {
+                std::cout << "Transaction failed, error: " << getErrorMessage(error) << std::endl;
+            }
+            else
+            {
+                std::cout << "Transaction sent, hash: " << hash << std::endl;
+            }
         }
 
         wallet.m_eventHandler->onSynced.unsubscribe();

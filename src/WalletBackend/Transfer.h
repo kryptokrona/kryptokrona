@@ -95,9 +95,4 @@ namespace SendTransaction
         const std::string changeAddress,
         const uint64_t changeRequired,
         const std::shared_ptr<SubWallets> subWallets);
-
-    void markInputsSpent(
-        const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
-        const std::shared_ptr<SubWallets> subWallets,
-        const uint64_t spendHeight);
 }

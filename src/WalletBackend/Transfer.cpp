@@ -147,8 +147,13 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
         subWallets
     );
 
-    /* Mark inputs as spent so we don't double spend */
-    markInputsSpent(ourInputs, subWallets, daemon->getLastKnownBlockHeight());
+    /* Lock the input for spending till it is confirmed as spent in a block */
+    for (const auto input : ourInputs)
+    {
+        subWallets->markInputAsLocked(
+            input.input.keyImage, input.publicSpendKey
+        );
+    }
 
     return {SUCCESS, txHash};
 }
@@ -176,31 +181,21 @@ void storeSentTransaction(
     /* Increment the change address with the amount we returned to ourselves */
     transfers[spendKey] += changeRequired;
 
+    /* Not initialized till it's in a block */
+    const int timestamp(0), blockHeight(0);
+
+    const bool isConfirmed = false;
+
+    const uint64_t unlockTime = 0;
+
     /* Create the unconfirmed transaction (Will be overwritten by the
        confirmed transaction later) */
     WalletTypes::Transaction tx(
-        transfers, hash, fee, 0, 0, paymentID, false
+        transfers, hash, fee, timestamp, blockHeight, paymentID, isConfirmed,
+        unlockTime
     );
 
     subWallets->addTransaction(tx);
-}
-
-void markInputsSpent(
-    const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
-    const std::shared_ptr<SubWallets> subWallets,
-    const uint64_t spendHeight)
-{
-    /* Mark inputs as spent, update balance */
-    for (const auto input : ourInputs)
-    {
-        subWallets->markInputAsSpent(
-            input.input.keyImage, input.publicSpendKey, spendHeight,
-            spendHeight
-        );
-    }
-
-    /* Remove any inputs that are older than 24 hours */
-    subWallets->removeConfirmedSpentInputs(spendHeight);
 }
 
 std::tuple<WalletError, Crypto::Hash> relayTransaction(

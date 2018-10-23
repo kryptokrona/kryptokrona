@@ -228,9 +228,9 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart() const
 void SubWallets::addTransaction(const WalletTypes::Transaction tx)
 {
     /* If we sent this transaction, we will input it into the transactions
-       vector, sans info. This lets us instantly update balance, but we need
-       to be careful not to update balance twice when we receive it from the
-       network. */
+       vector instantly. This lets us display the data to the user, and then
+       when the transaction actually comes in, we will update the transaction
+       with the block infomation. */
     const auto it = std::find_if(m_transactions.begin(), m_transactions.end(),
     [tx](const auto transaction)
     {
@@ -245,13 +245,6 @@ void SubWallets::addTransaction(const WalletTypes::Transaction tx)
     }
 
     m_transactions.push_back(tx);
-
-    /* We can regenerate the balance from the transactions, but this will be
-       faster, as getting the balance is a common operation */
-    for (const auto & [pubKey, amount] : tx.transfers)
-    {
-        m_subWallets.at(pubKey).addBalance(amount);
-    }
 }
 
 void SubWallets::completeAndStoreTransactionInput(
@@ -327,8 +320,9 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     {
         for (const auto input : subWallet.m_transactionInputs)
         {
-            /* Can't spend an input we've already spent */
-            if (input.spent)
+            /* Can't spend an input we've already spent, or one that is
+               currently in the transaction pool*/
+            if (input.isSpent || input.isLocked)
             {
                 continue;
             }
@@ -374,9 +368,10 @@ std::string SubWallets::getDefaultChangeAddress() const
 }
 
 /* Will throw if the public keys given don't exist */
-uint64_t SubWallets::getBalance(
+std::tuple<uint64_t, uint64_t> SubWallets::getBalance(
     std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
-    const bool takeFromAll) const
+    const bool takeFromAll,
+    const uint64_t currentHeight) const
 {
     /* If we're able to take from every subwallet, set the wallets to take from
        to all our public spend keys */
@@ -385,30 +380,34 @@ uint64_t SubWallets::getBalance(
         subWalletsToTakeFrom = m_publicSpendKeys;
     }
 
-    uint64_t total = 0;
+    uint64_t unlockedBalance = 0;
+
+    uint64_t lockedBalance = 0;
 
     /* TODO: Overflow */
     for (const auto pubKey : subWalletsToTakeFrom)
     {
-        total += m_subWallets.at(pubKey).getBalance();
+        const auto [unlocked, locked] = m_subWallets.at(pubKey).getBalance(currentHeight);
+
+        unlockedBalance += unlocked;
+        lockedBalance += locked;
     }
 
-    return total;
+    return {unlockedBalance, lockedBalance};
 }
 
-/* Removes a spent key image so we don't double spend */
+/* Mark a key image as spent, no longer can be used in transactions */
 void SubWallets::markInputAsSpent(
     const Crypto::KeyImage keyImage,
     const Crypto::PublicKey publicKey,
-    const uint64_t spendHeight,
-    const uint64_t currentHeight)
+    const uint64_t spendHeight)
 {
     /* Grab a reference to the transaction inputs so we don't have to type
        this each time */
     auto &inputs = m_subWallets.at(publicKey).m_transactionInputs;
 
-    /* Find the key image to remove and move it to the end of the vector */
-    auto it = std::remove_if(inputs.begin(), inputs.end(), [&keyImage](const auto x)
+    /* Find the input */
+    auto it = std::find_if(inputs.begin(), inputs.end(), [&keyImage](const auto x)
     {
         return x.keyImage == keyImage;
     });
@@ -419,20 +418,36 @@ void SubWallets::markInputAsSpent(
         throw std::runtime_error("Could not find key image to remove!");
     }
 
-    uint64_t oneDay = CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+    it->isLocked = false;
 
-    /* Remove it if it's older than 24 hours */
-    if (spendHeight + oneDay < currentHeight)
+    it->isSpent = true;
+    it->spendHeight = spendHeight;
+}
+
+/* Mark a key image as locked, can no longer be used in transactions till it
+   returns from the pool, or we find it in a block, in which case we will
+   mark it as spent. */
+void SubWallets::markInputAsLocked(
+    const Crypto::KeyImage keyImage,
+    const Crypto::PublicKey publicKey)
+{
+    /* Grab a reference to the transaction inputs so we don't have to type
+       this each time */
+    auto &inputs = m_subWallets.at(publicKey).m_transactionInputs;
+
+    /* Find the input */
+    auto it = std::find_if(inputs.begin(), inputs.end(), [&keyImage](const auto x)
     {
-        /* Erase the key image from the vector */
-        inputs.erase(it);
-    }
-    /* Otherwise mark as spent, and remove later */
-    else
+        return x.keyImage == keyImage;
+    });
+
+    /* Shouldn't happen */
+    if (it == inputs.end())
     {
-        it->spent = true;
-        it->spendHeight = spendHeight;
+        throw std::runtime_error("Could not find key image to remove!");
     }
+
+    it->isLocked = true;
 }
 
 /* Remove transactions and key images that occured on a forked chain */
@@ -442,15 +457,8 @@ void SubWallets::removeForkedTransactions(uint64_t forkHeight)
        removed items to the end, and gives an iterator to the 'new' end.
        We then call std::erase(newEnd, oldEnd) to remove the items */
     auto newEnd = std::remove_if(m_transactions.begin(), m_transactions.end(),
-    [forkHeight, this](auto tx)
+    [forkHeight](auto tx)
     {
-        /* If the transaction was an incoming one, decrease the balance, since
-           the transaction no longer exists, and visa versa. */
-        for (const auto [publicKey, amount] : tx.transfers)
-        {
-            m_subWallets.at(publicKey).addBalance(-amount);
-        }
-
         /* Remove the transaction if it's height is >= than the fork height */
         return tx.blockHeight >= forkHeight;
     });
@@ -466,12 +474,10 @@ void SubWallets::removeForkedTransactions(uint64_t forkHeight)
         {
             /* If an input was spent on a forked chain, mark it as unspent, 
                and re-add the spent balance to the owner */
-            if (input.spent && input.spendHeight >= forkHeight)
+            if (input.isSpent && input.spendHeight >= forkHeight)
             {
-                input.spent = false;
+                input.isSpent = false;
                 input.spendHeight = 0;
-
-                subWallet.addBalance(input.amount);
             }
         }
 
@@ -489,31 +495,4 @@ void SubWallets::removeForkedTransactions(uint64_t forkHeight)
 Crypto::SecretKey SubWallets::getPrivateViewKey() const
 {
     return m_privateViewKey;
-}
-
-/* We could remove spent inputs instantly, but then if we were on a forked 
-   chain, we would have no way to recover them. So, we remove spent inputs
-   once they are older than 24 hours since a fork of this depth is unheard of.
-    
-   We re-run this operation every time a transaction is sent, there might be
-   a more elegant way to do it, but this will work. */
-void SubWallets::removeConfirmedSpentInputs(uint64_t currentHeight)
-{
-    uint64_t oneDay = CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
-
-    for (auto & [publicKey, subWallet] : m_subWallets)
-    {
-        auto &inputs = subWallet.m_transactionInputs;
-
-        auto it = std::remove_if(inputs.begin(), inputs.end(),
-        [&oneDay, &currentHeight](const auto input)
-        {
-            return input.spent && ((input.spendHeight + oneDay) < currentHeight);
-        });
-
-        if (it != inputs.end())
-        {
-            inputs.erase(it);
-        }
-    }
 }

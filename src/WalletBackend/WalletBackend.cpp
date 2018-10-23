@@ -664,28 +664,31 @@ WalletError WalletBackend::save() const
     return SUCCESS;
 }
 
-std::tuple<WalletError, uint64_t> WalletBackend::getBalance(
+std::tuple<WalletError, uint64_t, uint64_t> WalletBackend::getBalance(
     const std::string address) const
 {
     /* Verify the address is good, and one of our subwallets */
     if (WalletError error = validateOurAddresses({address}, m_subWallets); error != SUCCESS)
     {
-        return {error, 0};
+        return {error, 0, 0};
     }
 
-    uint64_t balance = m_subWallets->getBalance(
+    const auto [unlockedBalance, lockedBalance] = m_subWallets->getBalance(
         Utilities::addressesToSpendKeys({address}),
-        false
+        false,
+        m_daemon->getLastKnownBlockHeight()
     );
 
-    return {SUCCESS, balance};
+    return {SUCCESS, unlockedBalance, lockedBalance};
 }
 
 /* Gets the combined balance for all wallets in the container */
-uint64_t WalletBackend::getTotalBalance() const
+std::tuple<uint64_t, uint64_t> WalletBackend::getTotalBalance() const
 {
     /* Get combined balance from every container */
-    return m_subWallets->getBalance({}, true);
+    return m_subWallets->getBalance(
+        {}, true, m_daemon->getLastKnownBlockHeight()
+    );
 }
 
 /* This is simply a wrapper for Transfer::sendTransactionBasic - we need to

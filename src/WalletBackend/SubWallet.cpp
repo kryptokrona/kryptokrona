@@ -9,11 +9,7 @@
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 
-#include "json.hpp"
-
-using json = nlohmann::json;
-
-#include <WalletBackend/JsonSerialization.h>
+#include <WalletBackend/Utilities.h>
 
 //////////////////////////
 /* NON MEMBER FUNCTIONS */
@@ -100,12 +96,31 @@ void SubWallet::completeAndStoreTransactionInput(
     m_transactionInputs.push_back(input);
 }
 
-uint64_t SubWallet::getBalance() const
+std::tuple<uint64_t, uint64_t> SubWallet::getBalance(
+    const uint64_t currentHeight) const
 {
-    return m_balance;
-}
+    uint64_t unlockedBalance = 0;
 
-void SubWallet::addBalance(int64_t amount)
-{
-    m_balance += amount;
+    uint64_t lockedBalance = 0;
+
+    for (const auto input : m_transactionInputs)
+    {
+        /* In transaction pool, or has been spent already */
+        if (input.isLocked || input.isSpent)
+        {
+            continue;
+        }
+
+        /* If an unlock height is present, check if the input is unlocked */
+        if (Utilities::isInputUnlocked(input.unlockTime, currentHeight))
+        {
+            unlockedBalance += input.amount;
+        }
+        else
+        {
+            lockedBalance += input.amount;
+        }
+    }
+
+    return {unlockedBalance, lockedBalance};
 }

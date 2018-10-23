@@ -80,9 +80,10 @@ class SubWallets
 
         /* Get the sum of the balance of the subwallets pointed to. If
            takeFromAll, get the total balance from all subwallets. */
-        uint64_t getBalance(
+        std::tuple<uint64_t, uint64_t> getBalance(
             std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
-            const bool takeFromAll) const;
+            const bool takeFromAll,
+            const uint64_t currentHeight) const;
 
         /* Removes a spent key image from the store */
         void removeSpentKeyImage(
@@ -98,10 +99,11 @@ class SubWallets
         void markInputAsSpent(
             const Crypto::KeyImage keyImage,
             const Crypto::PublicKey publicKey,
-            const uint64_t spendHeight,
-            const uint64_t currentHeight);
+            const uint64_t spendHeight);
 
-        void removeConfirmedSpentInputs(uint64_t currentHeight);
+        void markInputAsLocked(
+            const Crypto::KeyImage keyImage,
+            const Crypto::PublicKey publicKey);
 
     private:
         /* The subwallets, indexed by public spend key */ 

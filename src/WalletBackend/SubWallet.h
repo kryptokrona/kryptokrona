@@ -49,9 +49,8 @@ class SubWallet
             const size_t outputIndex,
             WalletTypes::TransactionInput);
 
-        uint64_t getBalance() const;
-
-        void addBalance(int64_t amount);
+        std::tuple<uint64_t, uint64_t> getBalance(
+            const uint64_t currentHeight) const;
 
         /* Whether this is a view only wallet */
         bool m_isViewWallet;
@@ -77,8 +76,6 @@ class SubWallet
         std::string m_address;
 
     private:
-
-        /* This wallets balance */
-        uint64_t m_balance = 0;
+        /* TODO: Getters/setters */
 
 };

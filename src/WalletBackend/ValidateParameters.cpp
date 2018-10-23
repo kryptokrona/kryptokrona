@@ -26,7 +26,7 @@ WalletError validateTransaction(
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string changeAddress,
     const std::shared_ptr<SubWallets> subWallets,
-    const uint64_t height)
+    const uint64_t currentHeight)
 {
     /* Validate the destinations */
     if (WalletError error = validateDestinations(destinations); error != SUCCESS)
@@ -44,13 +44,13 @@ WalletError validateTransaction(
 
     /* Validate we have enough money for the transaction */
     if (WalletError error = validateAmount(destinations, fee,
-            subWalletsToTakeFrom, subWallets); error != SUCCESS)
+            subWalletsToTakeFrom, subWallets, currentHeight); error != SUCCESS)
     {
         return error;
     }
 
     /* Validate the mixin */
-    if (WalletError error = validateMixin(mixin, height); error != SUCCESS)
+    if (WalletError error = validateMixin(mixin, currentHeight); error != SUCCESS)
     {
         return error;
     }
@@ -143,7 +143,8 @@ WalletError validateAmount(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t fee,
     const std::vector<std::string> subWalletsToTakeFrom,
-    const std::shared_ptr<SubWallets> subWallets)
+    const std::shared_ptr<SubWallets> subWallets,
+    const uint64_t currentHeight)
 {
     /* Verify the fee is valid */
     if (fee < CryptoNote::parameters::MINIMUM_FEE)
@@ -158,10 +159,11 @@ WalletError validateAmount(
     }
 
     /* Get the available balance, using the source addresses */
-    uint64_t availableBalance = subWallets->getBalance(
+    const auto [availableBalance, lockedBalance] = subWallets->getBalance(
         Utilities::addressesToSpendKeys(subWalletsToTakeFrom),
         /* Take from all if no subwallets specified */
-        subWalletsToTakeFrom.empty()
+        subWalletsToTakeFrom.empty(),
+        currentHeight
     );
 
     /* Get the total amount of the transaction */
