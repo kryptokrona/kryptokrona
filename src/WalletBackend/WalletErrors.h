@@ -48,11 +48,13 @@ enum WalletError
     /* The call to NodeRpcProxy::init() failed */
     FAILED_TO_INIT_DAEMON = 9,
 
-    /* The address given does not exist in the wallet container */
-    ADDRESS_NOT_FOUND = 10,
+    /* The address given does not exist in this container, and it's required,
+       for example you specified it as the address to get the balance from */
+    ADDRESS_NOT_IN_WALLET = 10,
 
-    /* Not enough funds were found for the transaction */
-    NOT_ENOUGH_FUNDS = 11,
+    /* Amount + fee is greater than the total balance available in the
+       subwallets specified (or all wallets, if not specified) */
+    NOT_ENOUGH_BALANCE = 11,
 
     /* The address is the wrong length - neither a standard, nor an integrated
        address */
@@ -74,44 +76,40 @@ enum WalletError
     /* The fee given is lower than the CryptoNote::parameters::MINIMUM_FEE */
     FEE_TOO_SMALL = 17,
 
-    /* The address given does not exist in this container, and it's required,
-       for example you specified it as the address to get the balance from */
-    ADDRESS_NOT_IN_WALLET = 18,
-
     /* The destinations array is empty */
-    NO_DESTINATIONS_GIVEN = 19,
+    NO_DESTINATIONS_GIVEN = 18,
 
     /* One of the destination parameters has an amount given of zero. */
-    AMOUNT_IS_ZERO = 20,
+    AMOUNT_IS_ZERO = 19,
 
-    /* Amount + fee is greater than the total balance available in the
-       subwallets specified (or all wallets, if not specified) */
-    NOT_ENOUGH_BALANCE = 21,
+    /* Something went wrong creating the ring signatures. Probably a programmer
+       error */
+    FAILED_TO_CREATE_RING_SIGNATURE = 20,
 
     /* The mixin given is too low for the current height known by the wallet */
-    MIXIN_TOO_SMALL = 22,
+    MIXIN_TOO_SMALL = 21,
 
     /* The mixin given is too large for the current height known by the wallet */
-    MIXIN_TOO_BIG = 23,
+    MIXIN_TOO_BIG = 22,
 
     /* Payment ID is not 64 chars */
-    PAYMENT_ID_WRONG_LENGTH = 24,
+    PAYMENT_ID_WRONG_LENGTH = 23,
 
     /* The payment ID is not hex */
-    PAYMENT_ID_INVALID = 25,
+    PAYMENT_ID_INVALID = 24,
 
     /* The address is an integrated address - but integrated addresses aren't
        valid for this parameter, for example, change address */
-    ADDRESS_IS_INTEGRATED = 26,
+    ADDRESS_IS_INTEGRATED = 25,
 
     /* Conflicting payment ID's were found, due to integrated addresses. These
        could mean an integrated address + payment ID were given, where they
        are not the same, or that multiple integrated addresses with different
        payment IDs were given */
-    CONFLICTING_PAYMENT_IDS = 27,
+    CONFLICTING_PAYMENT_IDS = 26,
 
     /* Can't get mixin/fake outputs from the daemon, and mixin is not zero */
-    CANT_GET_FAKE_OUTPUTS = 28,
+    CANT_GET_FAKE_OUTPUTS = 27,
 
     /* We got mixin/fake outputs from the daemon, but not enough. E.g. using a
        mixin of 3, we only got one fake output -> can't form transaction.
@@ -121,24 +119,20 @@ enum WalletError
 
        Try resending the transaction with a mixin of zero, if that is an option
        on your network. */
-    NOT_ENOUGH_FAKE_OUTPUTS = 29,
+    NOT_ENOUGH_FAKE_OUTPUTS = 28,
 
     /* The key image generated was not valid. This is most likely a programmer
        error. */
-    INVALID_GENERATED_KEYIMAGE = 30,
+    INVALID_GENERATED_KEYIMAGE = 29,
 
     /* Could not contact the daemon to complete the request. Ensure it is
        online and not frozen */
-    DAEMON_OFFLINE = 31,
+    DAEMON_OFFLINE = 30,
 
     /* An error occured whilst the daemon processed the request. Possibly our
        software is outdated, the daemon is faulty, or there is a programmer
        error. Check your daemon logs for more info (set_log 4) */
-    DAEMON_ERROR = 32,
-
-    /* Something went wrong creating the ring signatures. Probably a programmer
-       error */
-    FAILED_TO_CREATE_RING_SIGNATURE = 33,
+    DAEMON_ERROR = 31,
 };
 
 std::string getErrorMessage(WalletError error);
