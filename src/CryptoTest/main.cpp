@@ -8,6 +8,9 @@
 #include <chrono>
 #include <assert.h>
 
+#include <cxxopts.hpp>
+#include <config/CliHeader.h>
+
 #include "CryptoNote.h"
 #include "CryptoTypes.h"
 #include "Common/StringTools.h"
@@ -101,134 +104,181 @@ static inline bool CompareHashes(const Hash leftHash, const std::string right)
 }
 
 int main(int argc, char** argv) {
+  bool o_help, o_version, o_benchmark;
+  int o_iterations;
+
+  cxxopts::Options options(argv[0], getProjectCLIHeader());
+
+  options.add_options("Core")
+    ("h,help", "Display this help message", cxxopts::value<bool>(o_help)->implicit_value("true"))
+    ("v,version", "Output software version information", cxxopts::value<bool>(o_version)->default_value("false")->implicit_value("true"));
+
+  options.add_options("Performance Testing")
+    ("b,benchmark", "Run quick performance benchmark", cxxopts::value<bool>(o_benchmark)->default_value("false")->implicit_value("true"))
+    ("i,iterations", "The number of iterations for the benchmark test. Minimum of 1,000 iterations required.",
+      cxxopts::value<int>(o_iterations)->default_value(std::to_string(PERFORMANCE_ITERATIONS)), "#");
+
+  try
+  {
+    auto result = options.parse(argc, argv);
+  }
+  catch (const cxxopts::OptionException& e)
+  {
+    std::cout << "Error: Unable to parse command line argument options: " << e.what() << std::endl << std::endl;
+    std::cout << options.help({}) << std::endl;
+    exit(1);
+  }
+
+  if (o_help) // Do we want to display the help message?
+  {
+    std::cout << options.help({}) << std::endl;
+    exit(0);
+  }
+  else if (o_version) // Do we want to display the software version?
+  {
+    std::cout << getProjectCLIHeader() << std::endl;
+    exit(0);
+  }
+
+  if (o_iterations < 1000 && o_benchmark)
+  {
+    std::cout << std::endl << "Error: The number of --iterations should be at least 1,000 for reasonable accuracy" << std::endl;
+    exit(1);
+  }
+
   try {
     const BinaryArray& rawData = Common::fromHex(INPUT_DATA);
 
-    std::cout << "\nInput: " << INPUT_DATA << "\n\n";
+    std::cout << getProjectCLIHeader() << std::endl;
+
+    std::cout << "Input: " << INPUT_DATA << std::endl << std::endl;
 
     Hash hash = Hash();
 
     cn_fast_hash(rawData.data(), rawData.size(), hash);
-    std::cout << "cn_fast_hash: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+    std::cout << "cn_fast_hash: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
     assert(CompareHashes(hash, CN_FAST_HASH));
 
-    std::cout << "\n";
+    std::cout << std::endl;
 
     cn_slow_hash_v0(rawData.data(), rawData.size(), hash);
-    std::cout << "cn_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+    std::cout << "cn_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
     assert(CompareHashes(hash, CN_SLOW_HASH_V0));
 
     if (rawData.size() >= 43)
     {
       cn_slow_hash_v1(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+      std::cout << "cn_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
       assert(CompareHashes(hash, CN_SLOW_HASH_V1));
 
       cn_slow_hash_v2(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+      std::cout << "cn_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
       assert(CompareHashes(hash, CN_SLOW_HASH_V2));
 
-      std::cout << "\n";
+      std::cout << std::endl;
 
       cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_lite_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+      std::cout << "cn_lite_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
       assert(CompareHashes(hash, CN_LITE_SLOW_HASH_V0));
 
       cn_lite_slow_hash_v1(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_lite_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+      std::cout << "cn_lite_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
       assert(CompareHashes(hash, CN_LITE_SLOW_HASH_V1));
 
       cn_lite_slow_hash_v2(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_lite_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+      std::cout << "cn_lite_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
       assert(CompareHashes(hash, CN_LITE_SLOW_HASH_V2));
 
-      std::cout << "\n";
+      std::cout << std::endl;
 
       for (uint32_t height = 0; height <= 8192; height = height + 512)
       {
         cn_soft_shell_slow_hash_v0(rawData.data(), rawData.size(), hash, height);
-        std::cout << "cn_soft_shell_slow_hash_v0 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+        std::cout << "cn_soft_shell_slow_hash_v0 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
         assert(CompareHashes(hash, CN_SOFT_SHELL_V0[height / 512]));
       }
 
-      std::cout << "\n";
+      std::cout << std::endl;
 
       for (uint32_t height = 0; height <= 8192; height = height + 512)
       {
         cn_soft_shell_slow_hash_v1(rawData.data(), rawData.size(), hash, height);
-        std::cout << "cn_soft_shell_slow_hash_v1 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+        std::cout << "cn_soft_shell_slow_hash_v1 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
         assert(CompareHashes(hash, CN_SOFT_SHELL_V1[height / 512]));
       }
 
-      std::cout << "\n";
+      std::cout << std::endl;
 
       for (uint32_t height = 0; height <= 8192; height = height + 512)
       {
         cn_soft_shell_slow_hash_v2(rawData.data(), rawData.size(), hash, height);
-        std::cout << "cn_soft_shell_slow_hash_v2 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << "\n";
+        std::cout << "cn_soft_shell_slow_hash_v2 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
         assert(CompareHashes(hash, CN_SOFT_SHELL_V2[height / 512]));
       }
     }
 
-    std::cout <<  "\nPerformance Tests: Please wait, this may take a while depending on your system...\n\n";
-
-    auto startTimer = std::chrono::high_resolution_clock::now();
-    for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+    if (o_benchmark)
     {
-      cn_slow_hash_v0(rawData.data(), rawData.size(), hash);
-    }
-    auto elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
-    std::cout << "cn_slow_hash_v0: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+      std::cout <<  "\nPerformance Tests: Please wait, this may take a while depending on your system...\n\n";
 
-    if (rawData.size() >= 43)
-    {
-      startTimer = std::chrono::high_resolution_clock::now();
+      auto startTimer = std::chrono::high_resolution_clock::now();
       for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
       {
-        cn_slow_hash_v1(rawData.data(), rawData.size(), hash);
+        cn_slow_hash_v0(rawData.data(), rawData.size(), hash);
       }
-      elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
-      std::cout << "cn_slow_hash_v1: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+      auto elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+      std::cout << "cn_slow_hash_v0: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
 
-      startTimer = std::chrono::high_resolution_clock::now();
-      for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+      if (rawData.size() >= 43)
       {
-        cn_slow_hash_v2(rawData.data(), rawData.size(), hash);
-      }
-      elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
-      std::cout << "cn_slow_hash_v2: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
-    }
+        startTimer = std::chrono::high_resolution_clock::now();
+        for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+        {
+          cn_slow_hash_v1(rawData.data(), rawData.size(), hash);
+        }
+        elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+        std::cout << "cn_slow_hash_v1: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
 
-    startTimer = std::chrono::high_resolution_clock::now();
-    for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
-    {
-      cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
-    }
-    elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
-    std::cout << "cn_lite_slow_hash_v0: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
-
-    if (rawData.size() >= 43)
-    {
-      startTimer = std::chrono::high_resolution_clock::now();
-      for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
-      {
-        cn_lite_slow_hash_v1(rawData.data(), rawData.size(), hash);
+        startTimer = std::chrono::high_resolution_clock::now();
+        for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+        {
+          cn_slow_hash_v2(rawData.data(), rawData.size(), hash);
+        }
+        elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+        std::cout << "cn_slow_hash_v2: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
       }
-      elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
-      std::cout << "cn_lite_slow_hash_v1: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
 
       startTimer = std::chrono::high_resolution_clock::now();
       for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
       {
-        cn_lite_slow_hash_v2(rawData.data(), rawData.size(), hash);
+        cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
       }
       elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
-      std::cout << "cn_lite_slow_hash_v2: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+      std::cout << "cn_lite_slow_hash_v0: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+
+      if (rawData.size() >= 43)
+      {
+        startTimer = std::chrono::high_resolution_clock::now();
+        for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+        {
+          cn_lite_slow_hash_v1(rawData.data(), rawData.size(), hash);
+        }
+        elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+        std::cout << "cn_lite_slow_hash_v1: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+
+        startTimer = std::chrono::high_resolution_clock::now();
+        for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+        {
+          cn_lite_slow_hash_v2(rawData.data(), rawData.size(), hash);
+        }
+        elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+        std::cout << "cn_lite_slow_hash_v2: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+      }
     }
   }
   catch (std::exception& e)
   {
-    std::cout << "Something went terribly wrong...\n" << e.what() << "\n\n";
+    std::cout << "Something went terribly wrong..." << std::endl << e.what() << std::endl << std::endl;
   }
 
   return 0;

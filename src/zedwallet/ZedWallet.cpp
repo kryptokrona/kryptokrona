@@ -6,10 +6,9 @@
 #include <zedwallet/ZedWallet.h>
 ////////////////////////////////
 
+#include <config/CliHeader.h>
 #include <Common/SignalHandler.h>
-
 #include <CryptoNoteCore/Currency.h>
-
 #include <Logging/FileLogger.h>
 #include <Logging/LoggerManager.h>
 
@@ -34,12 +33,8 @@ int main(int argc, char **argv)
     #endif
 
     Config config = parseArguments(argc, argv);
-
-    /* User requested --help or --version, or invalid arguments */
-    if (config.exit)
-    {
-        return 0;
-    }
+    
+    std::cout << InformationMsg(CryptoNote::getProjectCLIHeader()) << std::endl;
 
     Logging::LoggerManager logManager;
 
@@ -138,8 +133,6 @@ int main(int argc, char **argv)
 void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
          Config &config)
 {
-    std::cout << InformationMsg(getVersion()) << std::endl;
-
     std::shared_ptr<WalletInfo> walletInfo;
 
     bool quit;
