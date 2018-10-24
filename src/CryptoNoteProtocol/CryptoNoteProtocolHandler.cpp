@@ -545,13 +545,13 @@ int CryptoNoteProtocolHandler::handle_request_chain(int command, NOTIFY_REQUEST_
   logger(Logging::TRACE) << context << "NOTIFY_REQUEST_CHAIN: m_block_ids.size()=" << arg.block_ids.size();
 
   if (arg.block_ids.empty()) {
-    logger(Logging::ERROR, Logging::BRIGHT_RED) << context << "Failed to handle NOTIFY_REQUEST_CHAIN. block_ids is empty";
+    logger(Logging::DEBUGGING, Logging::BRIGHT_RED) << context << "Failed to handle NOTIFY_REQUEST_CHAIN. block_ids is empty";
     context.m_state = CryptoNoteConnectionContext::state_shutdown;
     return 1;
   }
 
   if (arg.block_ids.back() != m_core.getBlockHashByIndex(0)) {
-    logger(Logging::ERROR) << context << "Failed to handle NOTIFY_REQUEST_CHAIN. block_ids doesn't end with genesis block ID";
+    logger(Logging::DEBUGGING) << context << "Failed to handle NOTIFY_REQUEST_CHAIN. block_ids doesn't end with genesis block ID";
     context.m_state = CryptoNoteConnectionContext::state_shutdown;
     return 1;
   }
