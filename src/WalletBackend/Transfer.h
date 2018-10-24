@@ -95,4 +95,8 @@ namespace SendTransaction
         const std::string changeAddress,
         const uint64_t changeRequired,
         const std::shared_ptr<SubWallets> subWallets);
+
+    WalletError isTransactionTooBig(
+        const CryptoNote::Transaction tx,
+        const uint64_t currentHeight);
 }

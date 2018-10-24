@@ -537,7 +537,7 @@ void WalletSynchronizer::downloadBlocks()
                 continue;
             }
 
-            std::cout << "Syncing blocks: " << newBlocks[0].blockHeight
+            std::cout << "Syncing blocks: " << newBlocks.back().blockHeight
                       << std::endl;
 
             for (const auto &block : newBlocks)

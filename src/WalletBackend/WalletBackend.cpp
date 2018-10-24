@@ -18,7 +18,10 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/pwdbased.h>
 
+#include <filesystem>
+
 #include <fstream>
+
 #include <future>
 
 #include "json.hpp"
@@ -83,6 +86,9 @@ WalletError checkNewWalletFilename(std::string filename)
     {
         return INVALID_WALLET_FILENAME;
     }
+
+    /* Don't leave random files around if we fail later down the road */
+    std::filesystem::remove(filename);
     
     return SUCCESS;
 }
@@ -240,10 +246,9 @@ std::tuple<WalletError, WalletBackend> WalletBackend::importWalletFromSeed(
     /* Convert the mnemonic into a private spend key */
     auto [mnemonicError, privateSpendKey] = Mnemonics::MnemonicToPrivateKey(mnemonicSeed);
 
-    /* TODO: Return a more informative error */
-    if (!mnemonicError.empty())
+    if (mnemonicError)
     {
-        return {INVALID_MNEMONIC, WalletBackend()};
+        return {mnemonicError, WalletBackend()};
     }
 
     Crypto::SecretKey privateViewKey;
@@ -531,8 +536,8 @@ WalletError WalletBackend::init()
 
     m_daemon->init(callback);
 
-    std::future<WalletError> initDaemon = std::async(std::launch::async,
-                                                    [&error]
+    std::future<WalletErrorCode> initDaemon = std::async(std::launch::async,
+    [&error]
     {
         if (error.get())
         {

@@ -128,12 +128,20 @@ WalletError validateMixin(const uint64_t mixin, const uint64_t height)
 
     if (mixin < minMixin)
     {
-        return MIXIN_TOO_SMALL;
+        return WalletError(
+            MIXIN_TOO_SMALL,
+            "The mixin value given (" + std::to_string(mixin) + ") is lower "
+            "than the minimum mixin allowed (" + std::to_string(minMixin)
+        );
     }
 
     if (mixin > maxMixin)
     {
-        return MIXIN_TOO_BIG;
+        return WalletError(
+            MIXIN_TOO_BIG,
+            "The mixin value given (" + std::to_string(mixin) + ") is greater "
+            "than the maximum mixin allowed (" + std::to_string(maxMixin)
+        );
     }
 
     return SUCCESS;
@@ -155,7 +163,7 @@ WalletError validateAmount(
     /* Verify the subwallets to take from exist */
     if (WalletError error = validateOurAddresses(subWalletsToTakeFrom, subWallets); error != SUCCESS)
     {
-        return ADDRESS_NOT_IN_WALLET;
+        return error;
     }
 
     /* Get the available balance, using the source addresses */
@@ -232,7 +240,12 @@ WalletError validateAddresses(
         {
             if (!integratedAddressesAllowed)
             {
-                return ADDRESS_IS_INTEGRATED;
+                return WalletError(
+                    ADDRESS_IS_INTEGRATED,
+                    "The address given (" + address + ") is an integrated "
+                    "address, but integrated addresses aren't valid for "
+                    "this parameter."
+                );
             }
 
             std::string decoded;
@@ -305,14 +318,19 @@ WalletError validateOurAddresses(
         return error;
     }
 
-    /* Validate we own the addresses */
-    for (const auto key : Utilities::addressesToSpendKeys(addresses))
+    for (const auto address : addresses)
     {
+        const auto [spendKey, viewKey] = Utilities::addressToKeys(address);
+
         const auto &keys = subWallets->m_publicSpendKeys;
 
-        if (std::find(keys.begin(), keys.end(), key) == keys.end())
+        if (std::find(keys.begin(), keys.end(), spendKey) == keys.end())
         {
-            return ADDRESS_NOT_IN_WALLET;
+            return WalletError(
+                ADDRESS_NOT_IN_WALLET,
+                "The address given (" + address + ") does not exist in the "
+                "wallet container, but it is required to exist for this operation."
+            );
         }
     }
 

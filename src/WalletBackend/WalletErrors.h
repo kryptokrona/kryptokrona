@@ -9,7 +9,7 @@
 /* Note: Putting the number of the error is not needed, as they auto increment,
    however, it makes it easier to see at a glance what error you got, whilst
    developing */
-enum WalletError
+enum WalletErrorCode
 {
     /* No error, operation suceeded. */
     SUCCESS = 0,
@@ -133,6 +133,74 @@ enum WalletError
        software is outdated, the daemon is faulty, or there is a programmer
        error. Check your daemon logs for more info (set_log 4) */
     DAEMON_ERROR = 31,
+
+    /* The transction is too large (in BYTES, not AMOUNT) to fit in a block.
+       Either:
+       1) decrease the amount you are sending
+       2) decrease the mixin value
+       3) split your transaction up into multiple smaller transactions
+       4) perform fusion transaction to combine multiple small inputs into
+          fewer, larger inputs. */
+    TOO_MANY_INPUTS_TO_FIT_IN_BLOCK = 32,
+
+    /* Mnemonic has a word that is not in the english word list */
+    MNEMONIC_INVALID_WORD = 33,
+
+    /* Mnemonic seed is not 25 words */
+    MNEMONIC_WRONG_LENGTH = 34,
+
+    /* The mnemonic seed has an invalid checksum word */
+    MNEMONIC_INVALID_CHECKSUM = 35,
 };
 
-std::string getErrorMessage(WalletError error);
+class WalletError
+{
+    public:
+        /* Default constructor */
+        WalletError() : m_errorCode(SUCCESS) {};
+
+        WalletError(const WalletErrorCode code) :
+            m_errorCode(code) {};
+
+        /* We can use a custom message instead of our standard message, for example,
+           if the message depends upon the parameters. E.g: "Mnemonic seed should
+           be 25 words, but it is 23 words" */
+        WalletError(
+            const WalletErrorCode code,
+            const std::string customMessage) :
+            m_errorCode(code),
+            m_customMessage(customMessage) {};
+
+        std::string getErrorMessage() const;
+
+        bool operator==(const WalletErrorCode code) const
+        {
+            return code == m_errorCode;
+        }
+
+        bool operator!=(const WalletErrorCode code) const
+        {
+            return !(code == m_errorCode);
+        }
+
+        /* Allows us to do stuff like:
+           if (error) {}
+           Returns true if the error code is not success. */
+        explicit operator bool() const
+        {
+            return m_errorCode != SUCCESS;
+        }
+
+    private:
+        /* May be empty */
+        std::string m_customMessage;
+
+        WalletErrorCode m_errorCode;
+};
+
+/* Overloading the << operator */
+inline std::ostream &operator<<(std::ostream &os, const WalletError &error)
+{
+    os << error.getErrorMessage();
+    return os;
+}

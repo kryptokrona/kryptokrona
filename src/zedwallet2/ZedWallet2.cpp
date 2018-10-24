@@ -67,7 +67,7 @@ int main()
 
     if (error)
     {
-        std::cout << "Operation failed, error: " << getErrorMessage(error) << std::endl;
+        std::cout << "Operation failed, error: " << error << std::endl;
         return 1;
     }
 
@@ -87,7 +87,7 @@ int main()
 
             if (error)
             {
-                std::cout << "Transaction failed, error: " << getErrorMessage(error) << std::endl;
+                std::cout << "Transaction failed, error: " << error << std::endl;
             }
             else
             {

@@ -76,7 +76,7 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
     }
 
     /* Validate the transaction input parameters */
-    const WalletError error = validateTransaction(
+    WalletError error = validateTransaction(
         addressesAndAmounts, mixin, fee, paymentID, addressesToTakeFrom,
         changeAddress, subWallets, daemon->getLastKnownBlockHeight()
     );
@@ -134,6 +134,13 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
         mixin, daemon, ourInputs, paymentID, destinations, subWallets
     );
 
+    error = isTransactionTooBig(tx, daemon->getLastKnownBlockHeight());
+
+    if (error)
+    {
+        return {error, Crypto::Hash()};
+    }
+
     const auto [sendError, txHash] = relayTransaction(tx, daemon);
 
     if (sendError)
@@ -158,6 +165,34 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
     return {SUCCESS, txHash};
 }
 
+WalletError isTransactionTooBig(
+    const CryptoNote::Transaction tx,
+    const uint64_t currentHeight)
+{
+    const uint64_t txSize = CryptoNote::toBinaryArray(tx).size();
+
+    const uint64_t maxTxSize = Utilities::getMaxTxSize(currentHeight);
+
+    if (txSize > maxTxSize)
+    {
+        std::stringstream errorMsg; 
+
+        errorMsg << "Transaction is too large: (" 
+                 << Utilities::prettyPrintBytes(txSize)
+                 << "). Max allowed size is "
+                 << Utilities::prettyPrintBytes(maxTxSize)
+                 << ". Decrease the amount you are sending, or perform some "
+                 << "fusion transactions.";
+
+        return WalletError(
+            TOO_MANY_INPUTS_TO_FIT_IN_BLOCK,
+            errorMsg.str()
+        );
+    }
+
+    return SUCCESS;
+}
+
 void storeSentTransaction(
     const Crypto::Hash hash,
     const uint64_t fee,
@@ -169,7 +204,7 @@ void storeSentTransaction(
 {
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
-    /* Loop through each input, and take that much off each subwallet */
+    /* Loop through each input, and minus that from the transfers array */
     for (const auto input : ourInputs)
     {
         transfers[input.publicSpendKey] -= input.input.amount;
@@ -182,11 +217,9 @@ void storeSentTransaction(
     transfers[spendKey] += changeRequired;
 
     /* Not initialized till it's in a block */
-    const int timestamp(0), blockHeight(0);
+    const uint64_t timestamp(0), blockHeight(0), unlockTime(0);
 
     const bool isConfirmed = false;
-
-    const uint64_t unlockTime = 0;
 
     /* Create the unconfirmed transaction (Will be overwritten by the
        confirmed transaction later) */

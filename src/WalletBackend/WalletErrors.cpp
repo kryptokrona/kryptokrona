@@ -6,10 +6,15 @@
 #include <WalletBackend/WalletErrors.h>
 ///////////////////////////////////////
 
-/* TODO: Fill me in */
-std::string getErrorMessage(WalletError error)
+std::string WalletError::getErrorMessage() const
 {
-    switch (error)
+    /* Custom message being used, return that instead */
+    if (m_customMessage != "")
+    {
+        return m_customMessage;
+    }
+
+    switch (m_errorCode)
     {
         case SUCCESS:
         {
@@ -77,7 +82,7 @@ std::string getErrorMessage(WalletError error)
         case ADDRESS_WRONG_PREFIX:
         {
             return "The address does not have the correct prefix corresponding "
-                   "to this coin - appears to be an address for another "
+                   "to this coin - it appears to be an address for another "
                    "cryptocurrency.";
         }
         case ADDRESS_NOT_BASE58:
@@ -173,9 +178,28 @@ std::string getErrorMessage(WalletError error)
                    "or there is a programmer error. Check your daemon logs "
                    "for more info. (set_log 4)";
         }
+        case TOO_MANY_INPUTS_TO_FIT_IN_BLOCK:
+        {
+            return "The transaction is too large (in BYTES, not AMOUNT) to fit "
+                   "in a block. Either decrease the amount you are sending, "
+                   "perform fusion transactions, or decrease mixin (if possible).";
+        }
+        case MNEMONIC_INVALID_WORD:
+        {
+            return "The mnemonic seed given has a word that is not present in "
+                   "the english word list.";
+        }
+        case MNEMONIC_WRONG_LENGTH:
+        {
+            return "The mnemonic seed given is the wrong length.";
+        }
+        case MNEMONIC_INVALID_CHECKSUM:
+        {
+            return "The mnemonic seed given has an invalid checksum word.";
+        }
         default:
         {
-            return "Unknown error - Error code: " + std::to_string(error);
+            return "Unknown error - Error code: " + std::to_string(m_errorCode);
         }
     }
 }
