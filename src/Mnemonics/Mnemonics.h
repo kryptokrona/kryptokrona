@@ -1,4 +1,3 @@
-//
 // Copyright 2014-2018 The Monero Developers
 // Copyright 2018 The TurtleCoin Developers
 //
