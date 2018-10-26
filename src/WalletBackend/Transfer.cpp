@@ -16,6 +16,7 @@
 
 #include <NodeRpcProxy/NodeErrors.h>
 
+#include <WalletBackend/NodeFee.h>
 #include <WalletBackend/Utilities.h>
 #include <WalletBackend/ValidateParameters.h>
 #include <WalletBackend/WalletBackend.h>
@@ -70,6 +71,9 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
     const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
     const std::shared_ptr<SubWallets> subWallets)
 {
+    /* Append the fee transaction, if a fee is being used */
+    addressesAndAmounts = appendFeeTransaction(daemon, addressesAndAmounts);
+
     if (changeAddress == "")
     {
         changeAddress = subWallets->getDefaultChangeAddress();
