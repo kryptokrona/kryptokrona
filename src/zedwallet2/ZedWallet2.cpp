@@ -71,6 +71,12 @@ int main()
         return 1;
     }
 
+    const auto [unlockedBalance, lockedBalance] = wallet.getTotalBalance();
+
+    std::cout << std::endl
+              << "Unlocked balance: " << unlockedBalance << std::endl
+              << "Locked balance: " << lockedBalance << std::endl << std::endl;
+
     wallet.m_eventHandler->onSynced.subscribe([&](int blockHeight)
     {
         std::cout << "Wallet is synced! Top block: " << blockHeight << std::endl;

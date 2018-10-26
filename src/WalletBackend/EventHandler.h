@@ -24,7 +24,14 @@ class Event
         {
             if (m_function)
             {
-                m_function(args);
+                /* Launch the function, and return instantly. This way we
+                   can have multiple functions running at once.
+                   
+                   If you use std::cout in your function, you may experience
+                   interleaved characters when printing. To resolve this,
+                   consider using std::osyncstream.
+                   Further reading: https://stackoverflow.com/q/14718124/8737306 */
+                std::thread(m_function, args).detach();
             }
         }
 
@@ -38,6 +45,4 @@ class EventHandler
         Event<int> onSynced;
 
         Event<WalletTypes::Transaction> onTransaction;
-
-    private:
 };

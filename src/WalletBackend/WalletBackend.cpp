@@ -492,6 +492,18 @@ std::tuple<WalletError, WalletBackend> WalletBackend::openWallet(
 
     WalletBackend wallet = json::parse(decryptedData);
 
+    const bool dumpJson = true;
+
+    /* For debugging purposes */
+    if (dumpJson)
+    {
+        json j = json::parse(decryptedData);
+
+        std::ofstream o("walletData.json");
+
+        o << std::setw(4) << j << std::endl;
+    }
+
     /* Since json::parse() uses the default constructor, the node, filename,
        and password won't be initialized. */
     error = wallet.initializeAfterLoad(
