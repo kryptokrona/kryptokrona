@@ -84,8 +84,7 @@ SubWallets::SubWallets(
     const uint64_t scanHeight,
     const bool newWallet) :
 
-    m_privateViewKey(privateViewKey),
-    m_isViewWallet(false)
+    m_privateViewKey(privateViewKey)
 {
     Crypto::PublicKey publicSpendKey;
 
@@ -110,8 +109,7 @@ SubWallets::SubWallets(
     const uint64_t scanHeight,
     const bool newWallet) :
 
-    m_privateViewKey(privateViewKey),
-    m_isViewWallet(true)
+    m_privateViewKey(privateViewKey)
 {
     const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
 
@@ -132,11 +130,6 @@ SubWallets::SubWallets(
 
 void SubWallets::addSubWallet()
 {
-    if (m_isViewWallet)
-    {
-        throw std::runtime_error("Wallet is a view wallet");
-    }
-
     CryptoNote::KeyPair spendKey;
 
     /* Generate a spend key */
@@ -159,12 +152,6 @@ void SubWallets::importSubWallet(
     const uint64_t scanHeight,
     const bool newWallet)
 {
-    /* TODO: return a wallet error */
-    if (m_isViewWallet)
-    {
-        throw std::runtime_error("Wallet is a view wallet");
-    }
-
     Crypto::PublicKey publicSpendKey;
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);

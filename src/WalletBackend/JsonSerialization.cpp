@@ -82,7 +82,6 @@ json SubWallets::toJson() const
         {"subWallet", subWalletsToVector(m_subWallets)},
         {"transactions", m_transactions},
         {"privateViewKey", m_privateViewKey},
-        {"isViewWallet", m_isViewWallet},
     };
 }
 
@@ -92,7 +91,6 @@ void SubWallets::fromJson(const json &j)
     m_subWallets = vectorToSubWallets(j.at("subWallet").get<std::vector<SubWallet>>());
     m_transactions = j.at("transactions").get<std::vector<WalletTypes::Transaction>>();
     m_privateViewKey = j.at("privateViewKey").get<Crypto::SecretKey>();
-    m_isViewWallet = j.at("isViewWallet").get<bool>();
 }
 
 ///////////////////
