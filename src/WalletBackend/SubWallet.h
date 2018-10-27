@@ -25,16 +25,20 @@ class SubWallet
     public:
         SubWallet();
 
-        SubWallet(const Crypto::PublicKey publicSpendKey,
-                  const std::string address,
-                  const uint64_t scanHeight,
-                  const uint64_t scanTimestamp);
+        SubWallet(
+            const Crypto::PublicKey publicSpendKey,
+            const std::string address,
+            const uint64_t scanHeight,
+            const uint64_t scanTimestamp,
+            const bool isPrimaryAddress);
 
-        SubWallet(const Crypto::PublicKey publicSpendKey,
-                  const Crypto::SecretKey privateSpendKey,
-                  const std::string address,
-                  const uint64_t scanHeight,
-                  const uint64_t scanTimestamp);
+        SubWallet(
+            const Crypto::PublicKey publicSpendKey,
+            const Crypto::SecretKey privateSpendKey,
+            const std::string address,
+            const uint64_t scanHeight,
+            const uint64_t scanTimestamp,
+            const bool isPrimaryAddress);
 
         /* Converts the class to a json object */
         json toJson() const;
@@ -74,6 +78,10 @@ class SubWallet
 
         /* This subwallet's public address */
         std::string m_address;
+
+        /* The wallet has one 'main' address which we will use by default
+           when treating it as a single user wallet */
+        bool m_isPrimaryAddress;
 
     private:
         /* TODO: Getters/setters */

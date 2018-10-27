@@ -44,6 +44,7 @@ json SubWallet::toJson() const
         {"isViewWallet", m_isViewWallet},
         {"transactionInputs", m_transactionInputs},
         {"syncStartHeight", m_syncStartHeight},
+        {"isPrimaryAddress", m_isPrimaryAddress},
     };
 }
 
@@ -56,6 +57,7 @@ void SubWallet::fromJson(const json &j)
     m_isViewWallet = j.at("isViewWallet").get<bool>();
     m_transactionInputs = j.at("transactionInputs").get<std::vector<WalletTypes::TransactionInput>>();
     m_syncStartHeight = j.at("syncStartHeight").get<uint64_t>();
+    m_isPrimaryAddress = j.at("isPrimaryAddress").get<bool>();
 }
 
 ///////////////

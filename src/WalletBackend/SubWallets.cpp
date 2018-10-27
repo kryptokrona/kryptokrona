@@ -91,10 +91,13 @@ SubWallets::SubWallets(
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
 
-    uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+    const uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+
+    const bool isPrimaryAddress = true;
 
     m_subWallets[publicSpendKey] = SubWallet(
-        publicSpendKey, privateSpendKey, address, scanHeight, timestamp
+        publicSpendKey, privateSpendKey, address, scanHeight, timestamp,
+        isPrimaryAddress
     );
 
     m_publicSpendKeys.push_back(publicSpendKey);
@@ -112,10 +115,12 @@ SubWallets::SubWallets(
 {
     const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
 
-    uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+    const uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+
+    const bool isPrimaryAddress = true;
 
     m_subWallets[publicSpendKey] = SubWallet(
-        publicSpendKey, address, scanHeight, timestamp
+        publicSpendKey, address, scanHeight, timestamp, isPrimaryAddress
     );
 
     m_publicSpendKeys.push_back(publicSpendKey);
@@ -141,9 +146,11 @@ void SubWallets::addSubWallet()
         spendKey.secretKey, m_privateViewKey
     );
 
+    const bool isPrimaryAddress = false;
+
     m_subWallets[spendKey.publicKey] = SubWallet(
         spendKey.publicKey, spendKey.secretKey, address, 0,
-        getCurrentTimestampAdjusted()
+        getCurrentTimestampAdjusted(), isPrimaryAddress
     );
 }
 
@@ -168,8 +175,11 @@ void SubWallets::importSubWallet(
         privateSpendKey, m_privateViewKey
     );
 
+    const bool isPrimaryAddress = false;
+
     m_subWallets[publicSpendKey] = SubWallet(
-        publicSpendKey, privateSpendKey, address, scanHeight, timestamp
+        publicSpendKey, privateSpendKey, address, scanHeight, timestamp,
+        isPrimaryAddress
     );
 
     m_publicSpendKeys.push_back(publicSpendKey);
@@ -359,12 +369,22 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     throw std::invalid_argument("Not enough funds found!");
 }
 
-/* Gets the address of the 'first' wallet. Since this is an unordered_map, the
-   wallet this points to is undefined. You should only really use this in a
-   single wallet container */
+/* Gets the primary address, which is the first address created with the
+   wallet */
 std::string SubWallets::getDefaultChangeAddress() const
 {
-    return (*m_subWallets.begin()).second.m_address;
+    const auto it = 
+    std::find_if(m_subWallets.begin(), m_subWallets.end(), [](const auto subWallet)
+    {
+        return subWallet.second.m_isPrimaryAddress;
+    });
+
+    if (it == m_subWallets.end())
+    {
+        throw std::runtime_error("This container has no primary address!");
+    }
+
+    return it->second.m_address;
 }
 
 /* Will throw if the public keys given don't exist */

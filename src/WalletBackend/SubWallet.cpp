@@ -27,29 +27,38 @@ SubWallet::SubWallet()
 }
 
 /* Makes a view only subwallet */
-SubWallet::SubWallet(const Crypto::PublicKey publicSpendKey,
-                     const std::string address,
-                     const uint64_t scanHeight, const uint64_t scanTimestamp) :
+SubWallet::SubWallet(
+    const Crypto::PublicKey publicSpendKey,
+    const std::string address,
+    const uint64_t scanHeight,
+    const uint64_t scanTimestamp,
+    const bool isPrimaryAddress) :
+
     m_publicSpendKey(publicSpendKey),
     m_address(address),
     m_syncStartHeight(scanHeight),
     m_syncStartTimestamp(scanTimestamp),
-    m_isViewWallet(true)
+    m_isViewWallet(true),
+    m_isPrimaryAddress(isPrimaryAddress)
 {
 }
 
 /* Makes a standard subwallet */
-SubWallet::SubWallet(const Crypto::PublicKey publicSpendKey,
-                     const Crypto::SecretKey privateSpendKey,
-                     const std::string address,
-                     const uint64_t scanHeight, const uint64_t scanTimestamp) :
+SubWallet::SubWallet(
+    const Crypto::PublicKey publicSpendKey,
+    const Crypto::SecretKey privateSpendKey,
+    const std::string address,
+    const uint64_t scanHeight,
+    const uint64_t scanTimestamp,
+    const bool isPrimaryAddress) :
 
     m_publicSpendKey(publicSpendKey),
     m_address(address),
     m_syncStartHeight(scanHeight),
     m_syncStartTimestamp(scanTimestamp),
     m_isViewWallet(false),
-    m_privateSpendKey(privateSpendKey)
+    m_privateSpendKey(privateSpendKey),
+    m_isPrimaryAddress(isPrimaryAddress)
 {
 }
 
