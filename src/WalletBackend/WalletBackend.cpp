@@ -733,3 +733,18 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
         changeAddress, m_daemon, m_subWallets
     );
 }
+
+std::tuple<WalletError, Crypto::Hash> WalletBackend::sendFusionTransactionBasic()
+{
+    return SendTransaction::sendFusionTransactionBasic(m_daemon, m_subWallets);
+}
+
+std::tuple<WalletError, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
+    const uint64_t mixin,
+    const std::vector<std::string> subWalletsToTakeFrom,
+    const std::string destination)
+{
+    return SendTransaction::sendFusionTransactionAdvanced(
+        mixin, subWalletsToTakeFrom, destination, m_daemon, m_subWallets
+    );
+}

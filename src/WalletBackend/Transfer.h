@@ -17,6 +17,17 @@
 
 namespace SendTransaction
 {
+    std::tuple<WalletError, Crypto::Hash> sendFusionTransactionBasic(
+        const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+        const std::shared_ptr<SubWallets> subWallets);
+
+    std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
+        const uint64_t mixin,
+        const std::vector<std::string> addressesToTakeFrom,
+        std::string destination,
+        const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+        const std::shared_ptr<SubWallets> subWallets);
+
     std::tuple<WalletError, Crypto::Hash> sendTransactionBasic(
         std::string destination,
         const uint64_t amount,

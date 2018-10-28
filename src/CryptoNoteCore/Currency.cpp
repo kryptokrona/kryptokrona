@@ -629,7 +629,7 @@ bool Currency::checkProofOfWork(const CachedBlock& block, uint64_t currentDiffic
   return false;
 }
 
-size_t Currency::getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount) const {
+size_t Currency::getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount) {
   const size_t KEY_IMAGE_SIZE = sizeof(Crypto::KeyImage);
   const size_t OUTPUT_KEY_SIZE = sizeof(decltype(KeyOutput::key));
   const size_t AMOUNT_SIZE = sizeof(uint64_t) + 2; //varint

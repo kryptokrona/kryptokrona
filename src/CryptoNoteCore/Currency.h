@@ -163,7 +163,7 @@ size_t difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion, uint32_t h
 
   Currency(Currency&& currency);
 
-  size_t getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount) const;
+  static size_t getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount);
 
 private:
   Currency(Logging::ILogger& log) : logger(log, "currency") {

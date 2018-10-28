@@ -8,6 +8,8 @@
 
 #include <config/CryptoNoteConfig.h>
 
+#include <CryptoNoteCore/Currency.h>
+
 #include <ctime>
 
 #include <random>
@@ -354,6 +356,134 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
 
     /* Not enough money to cover the transaction */
     throw std::invalid_argument("Not enough funds found!");
+}
+
+/* Remember if the transaction suceeds, we need to remove these key images
+   so we don't double spend. */
+std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
+    SubWallets::getFusionTransactionInputs(
+    const bool takeFromAll,
+    std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
+    const uint64_t mixin) const
+{
+    /* If we're able to take from every subwallet, set the wallets to take from
+       to all our public spend keys */
+    if (takeFromAll)
+    {
+        subWalletsToTakeFrom = m_publicSpendKeys;
+    }
+
+    std::vector<SubWallet> wallets;
+
+    /* Loop through each public key and grab the associated wallet */
+    for (const auto &publicKey : subWalletsToTakeFrom)
+    {
+        wallets.push_back(m_subWallets.at(publicKey));
+    }
+
+    std::vector<WalletTypes::TxInputAndOwner> availableInputs;
+
+    /* Copy the transaction inputs from this sub wallet to inputs */
+    for (const auto &subWallet : wallets)
+    {
+        for (const auto input : subWallet.m_transactionInputs)
+        {
+            /* Can't spend an input we've already spent, or one that is
+               currently in the transaction pool*/
+            if (input.isSpent || input.isLocked)
+            {
+                continue;
+            }
+
+            availableInputs.emplace_back(
+                input, subWallet.m_publicSpendKey, subWallet.m_privateSpendKey
+            );
+        }
+    }
+
+    /* Get an approximation of the max amount of inputs we can include in this
+       transaction */
+    uint64_t maxInputsToTake = CryptoNote::Currency::getApproximateMaximumInputCount(
+        CryptoNote::parameters::FUSION_TX_MAX_SIZE,
+        CryptoNote::parameters::FUSION_TX_MIN_IN_OUT_COUNT_RATIO,
+        mixin
+    );
+
+    /* Shuffle the inputs */
+    std::shuffle(availableInputs.begin(), availableInputs.end(), std::random_device{});
+
+    /* Split the inputs into buckets based on what power of ten they are in
+       (For example, [1, 2, 5, 7], [20, 50, 80, 80], [100, 600, 700]) */
+    std::unordered_map<uint64_t, std::vector<WalletTypes::TxInputAndOwner>> buckets;
+
+    for (const auto &walletAmount : availableInputs)
+    {
+        /* Find out how many digits the amount has, i.e. 1337 has 4 digits,
+           420 has 3 digits */
+        int numberOfDigits = log10(walletAmount.input.amount);
+
+        /* Insert the amount into the correct bucket */
+        buckets[numberOfDigits].push_back(walletAmount);
+    }
+
+    /* Find the buckets which have enough inputs to meet the fusion tx
+       requirements */
+    std::vector<std::vector<WalletTypes::TxInputAndOwner>> fullBuckets;
+
+    for (const auto [amount, bucket] : buckets)
+    {
+        /* Skip the buckets with not enough items */
+        if (bucket.size() >= CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+        {
+            fullBuckets.push_back(bucket);
+        }
+    }
+
+    /* Shuffle the full buckets */
+    std::shuffle(fullBuckets.begin(), fullBuckets.end(), std::random_device{});
+
+    /* The buckets to pick inputs from */
+    std::vector<std::vector<WalletTypes::TxInputAndOwner>> bucketsToTakeFrom;
+
+    /* We have full buckets, take the first full bucket */
+    if (!fullBuckets.empty())
+    {
+        bucketsToTakeFrom = { fullBuckets.front() };
+    }
+    /* Otherwise just use all buckets */
+    else
+    {
+        for (const auto [amount, bucket] : buckets)
+        {
+            bucketsToTakeFrom.push_back(bucket);
+        }
+    }
+
+    std::vector<WalletTypes::TxInputAndOwner> inputsToUse;
+
+    uint64_t foundMoney = 0;
+
+    /* Loop through each bucket (Remember we're only looping through one if
+       we've got a full bucket) */
+    for (const auto bucket : bucketsToTakeFrom)
+    {
+        /* Loop through each input in this bucket */
+        for (const auto &walletAmount : bucket)
+        {
+            /* Add each input */
+            inputsToUse.push_back(walletAmount);
+
+            foundMoney += walletAmount.input.amount;
+
+            /* Got enough inputs, return */
+            if (inputsToUse.size() >= maxInputsToTake)
+            {
+                return {inputsToUse, maxInputsToTake, foundMoney};
+            }
+        }
+    }
+
+    return {inputsToUse, maxInputsToTake, foundMoney};
 }
 
 /* Gets the primary address, which is the first address created with the

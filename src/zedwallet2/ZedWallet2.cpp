@@ -81,15 +81,19 @@ int main()
     {
         std::cout << "Wallet is synced! Top block: " << blockHeight << std::endl;
 
-        const bool doTransaction = false;
+        const bool doTransaction = true;
 
         if (doTransaction)
         {
+            /*
             const auto [error, hash] = wallet.sendTransactionBasic(
                 "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
                 123,
                 ""
             );
+            */
+
+            const auto [error, hash] = wallet.sendFusionTransactionBasic();
 
             if (error)
             {
@@ -101,7 +105,7 @@ int main()
             }
         }
 
-        wallet.m_eventHandler->onSynced.unsubscribe();
+        //wallet.m_eventHandler->onSynced.unsubscribe();
     });
 
     wallet.m_eventHandler->onTransaction.subscribe([&](WalletTypes::Transaction tx)

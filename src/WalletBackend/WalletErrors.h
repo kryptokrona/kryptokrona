@@ -151,6 +151,14 @@ enum WalletErrorCode
 
     /* The mnemonic seed has an invalid checksum word */
     MNEMONIC_INVALID_CHECKSUM = 35,
+
+    /* Don't have enough inputs to make a fusion transaction, wallet is fully
+       optimized */
+    FULLY_OPTIMIZED = 36,
+
+    /* Mixin given for this fusion transaction is too large to be able to hit
+       the min input requirement */
+    FUSION_MIXIN_TOO_LARGE = 37,
 };
 
 class WalletError

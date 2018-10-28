@@ -24,6 +24,168 @@
 namespace SendTransaction
 {
 
+std::tuple<WalletError, Crypto::Hash> sendFusionTransactionBasic(
+    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const std::shared_ptr<SubWallets> subWallets)
+{
+    const uint64_t mixin = CryptoNote::Mixins::getDefaultMixin(
+        daemon->getLastKnownBlockHeight()
+    );
+
+    /* Assumes the container has at least one subwallet - this is true as long
+       as the static constructors were used */
+    const std::string defaultAddress = subWallets->getDefaultChangeAddress();
+
+    return sendFusionTransactionAdvanced(
+        mixin, {}, defaultAddress, daemon, subWallets
+    );
+}
+
+std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
+    const uint64_t mixin,
+    const std::vector<std::string> addressesToTakeFrom,
+    std::string destination,
+    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const std::shared_ptr<SubWallets> subWallets)
+{
+    if (destination == "")
+    {
+        destination = subWallets->getDefaultChangeAddress();
+    }
+
+    /* Validate the transaction input parameters */
+    WalletError error = validateFusionTransaction(
+        mixin, addressesToTakeFrom, destination, subWallets,
+        daemon->getLastKnownBlockHeight()
+    );
+
+    if (error)
+    {
+        return {error, Crypto::Hash()};
+    }
+
+    /* If no address to take from is given, we will take from all available. */
+    const bool takeFromAllSubWallets = addressesToTakeFrom.empty();
+
+    /* Convert the addresses to public spend keys */
+    const std::vector<Crypto::PublicKey> subWalletsToTakeFrom
+        = Utilities::addressesToSpendKeys(addressesToTakeFrom);
+
+    /* Grab inputs for our fusion transaction */
+    auto [ourInputs, maxFusionInputs, foundMoney] = subWallets->getFusionTransactionInputs(
+        takeFromAllSubWallets, subWalletsToTakeFrom, mixin
+    );
+
+    /* Mixin is too large to get enough outputs whilst remaining in the size
+       and ratio constraints */
+    if (maxFusionInputs < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+    {
+        return {FUSION_MIXIN_TOO_LARGE, Crypto::Hash()};
+    }
+
+    /* Payment ID's are not needed with fusion transactions */
+    const std::string paymentID = "";
+
+    CryptoNote::Transaction tx;
+
+    while (true)
+    {
+        /* Not got enough unspent inputs for a fusion tx - we're fully optimized. */
+        if (ourInputs.size() < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+        {
+            return {FULLY_OPTIMIZED, Crypto::Hash()};
+        }
+
+        /* Grab the public keys from the receiver address */
+        const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(destination);
+
+        std::vector<WalletTypes::TransactionDestination> destinations;
+
+        /* Split transfer into denominations and create an output for each */
+        for (const auto denomination : splitAmountIntoDenominations(foundMoney))
+        {
+            WalletTypes::TransactionDestination destination;
+
+            destination.amount = denomination;
+            destination.receiverPublicSpendKey = publicSpendKey;
+            destination.receiverPublicViewKey = publicViewKey;
+
+            destinations.push_back(destination);
+        }
+
+        uint64_t requiredInputOutputRatio
+            = CryptoNote::parameters::FUSION_TX_MIN_IN_OUT_COUNT_RATIO;
+
+        /* We need to have at least 4x more inputs than outputs */
+        if (destinations.size() == 0 || (ourInputs.size() / destinations.size()) < requiredInputOutputRatio)
+        {
+            /* Reduce the amount we're sending */
+            foundMoney -= ourInputs.back().input.amount;
+
+            /* Remove the last input */
+            ourInputs.pop_back();
+            
+            /* And try again */
+            continue;
+        }
+
+        WalletError creationError;
+
+        std::tie(creationError, tx) = makeTransaction(
+            mixin, daemon, ourInputs, paymentID, destinations, subWallets
+        );
+
+        if (creationError)
+        {
+            return {creationError, Crypto::Hash()};
+        }
+
+        const uint64_t txSize = CryptoNote::toBinaryArray(tx).size();
+
+        /* Transaction is too large, remove an input and try again */
+        if (txSize > CryptoNote::parameters::FUSION_TX_MAX_SIZE)
+        {
+            /* Reduce the amount we're sending */
+            foundMoney -= ourInputs.back().input.amount;
+
+            /* Remove the last input */
+            ourInputs.pop_back();
+
+            /* And try again */
+            continue;
+        }
+        
+        break;
+    }
+
+    /* Try and send the transaction */
+    const auto [sendError, txHash] = relayTransaction(tx, daemon);
+
+    if (sendError)
+    {
+        return {sendError, Crypto::Hash()};
+    }
+    
+    /* No fee or change with fusion */
+    const uint64_t fee(0), changeRequired(0);
+
+    /* Store the unconfirmed transaction, update our balance */
+    storeSentTransaction(
+        txHash, fee, paymentID, ourInputs, destination, changeRequired,
+        subWallets
+    );
+
+    /* Lock the input for spending till it is confirmed as spent in a block */
+    for (const auto input : ourInputs)
+    {
+        subWallets->markInputAsLocked(
+            input.input.keyImage, input.publicSpendKey
+        );
+    }
+
+    return {SUCCESS, txHash};
+}
+
 /* A basic send transaction, the most common transaction, one destination,
    default fee, default mixin, default change address
    
@@ -218,7 +380,10 @@ void storeSentTransaction(
     const auto [spendKey, viewKey] = Utilities::addressToKeys(changeAddress);
 
     /* Increment the change address with the amount we returned to ourselves */
-    transfers[spendKey] += changeRequired;
+    if (changeRequired != 0)
+    {
+        transfers[spendKey] += changeRequired;
+    }
 
     /* Not initialized till it's in a block */
     const uint64_t timestamp(0), blockHeight(0), unlockTime(0);

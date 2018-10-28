@@ -13,6 +13,13 @@
 #include <WalletBackend/SubWallets.h>
 #include <WalletBackend/WalletErrors.h>
 
+WalletError validateFusionTransaction(
+    const uint64_t mixin,
+    const std::vector<std::string> subWalletsToTakeFrom,
+    const std::string destinationAddress,
+    const std::shared_ptr<SubWallets> subWallets,
+    const uint64_t currentHeight);
+
 WalletError validateTransaction(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,

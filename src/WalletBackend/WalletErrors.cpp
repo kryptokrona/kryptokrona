@@ -197,9 +197,17 @@ std::string WalletError::getErrorMessage() const
         {
             return "The mnemonic seed given has an invalid checksum word.";
         }
-        default:
+        case FULLY_OPTIMIZED:
         {
-            return "Unknown error - Error code: " + std::to_string(m_errorCode);
+            return "Cannot send fusion transaction - wallet is already fully optimized.";
         }
+        case FUSION_MIXIN_TOO_LARGE:
+        {
+            return "Cannot send fusion transacton - mixin is too large to meet "
+                   "input/output ratio requirements whilst remaining in "
+                   "size constraints.";
+        }
+
+        /* No default case so the compiler warns us if we missed one */
     }
 }

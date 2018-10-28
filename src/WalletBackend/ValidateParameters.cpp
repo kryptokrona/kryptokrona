@@ -18,6 +18,34 @@
 
 #include <WalletBackend/Utilities.h>
 
+WalletError validateFusionTransaction(
+    const uint64_t mixin,
+    const std::vector<std::string> subWalletsToTakeFrom,
+    const std::string destinationAddress,
+    const std::shared_ptr<SubWallets> subWallets,
+    const uint64_t currentHeight)
+{
+    /* Validate the mixin */
+    if (WalletError error = validateMixin(mixin, currentHeight); error != SUCCESS)
+    {
+        return error;
+    }
+    
+    /* Verify the subwallets to take from are valid and exist in the subwallets */
+    if (WalletError error = validateOurAddresses({subWalletsToTakeFrom}, subWallets); error != SUCCESS)
+    {
+        return error;
+    }
+
+    /* Verify the destination address is valid and exists in the subwallets */
+    if (WalletError error = validateOurAddresses({destinationAddress}, subWallets); error != SUCCESS)
+    {
+        return error;
+    }
+
+    return SUCCESS;
+}
+
 WalletError validateTransaction(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,
@@ -38,6 +66,12 @@ WalletError validateTransaction(
        integrated addresses, and the payment ID's. Verify the paymentID's
        don't conflict */
     if (WalletError error = validateIntegratedAddresses(destinations, paymentID); error != SUCCESS)
+    {
+        return error;
+    }
+
+    /* Verify the subwallets to take from exist */
+    if (WalletError error = validateOurAddresses(subWalletsToTakeFrom, subWallets); error != SUCCESS)
     {
         return error;
     }
@@ -158,12 +192,6 @@ WalletError validateAmount(
     if (fee < CryptoNote::parameters::MINIMUM_FEE)
     {
         return FEE_TOO_SMALL;
-    }
-
-    /* Verify the subwallets to take from exist */
-    if (WalletError error = validateOurAddresses(subWalletsToTakeFrom, subWallets); error != SUCCESS)
-    {
-        return error;
     }
 
     /* Get the available balance, using the source addresses */
