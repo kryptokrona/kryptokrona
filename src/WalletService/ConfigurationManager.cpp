@@ -1,87 +1,141 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
 //
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Please see the included LICENSE file for more information.
 
 #include "ConfigurationManager.h"
 
+#include <iostream>
 #include <fstream>
-#include <boost/program_options.hpp>
+
+#include <CryptoTypes.h>
+#include <config/CliHeader.h>
+#include <config/CryptoNoteConfig.h>
 
 #include "Common/CommandLine.h"
 #include "Common/Util.h"
-#include "version.h"
+#include "crypto/hash.h"
+#include "Logging/ILogger.h"
 
 namespace PaymentService {
-namespace po = boost::program_options;
 
 ConfigurationManager::ConfigurationManager() {
+  rpcSecret = Crypto::Hash();
 }
 
-bool ConfigurationManager::init(int argc, char** argv) {
-  po::options_description cmdGeneralOptions("Common Options");
-  cmdGeneralOptions.add_options()
-    ("config,c", po::value<std::string>(), "configuration file")
-    ("help,h", "produce this help message and exit")
-    ("version,v", "Output version information");
+bool ConfigurationManager::init(int argc, char** argv)
+{
+  serviceConfig = initConfiguration();
 
-  po::options_description confGeneralOptions;
+  // Load in the initial CLI options
+  handleSettings(argc, argv, serviceConfig);
 
-  Configuration::initOptions(cmdGeneralOptions);
-  Configuration::initOptions(confGeneralOptions);
-
-  po::options_description remoteNodeOptions("Remote Node Options");
-  RpcNodeConfiguration::initOptions(remoteNodeOptions);
-
-  po::options_description cmdOptionsDesc;
-  cmdOptionsDesc.add(cmdGeneralOptions).add(remoteNodeOptions);
-
-  po::options_description confOptionsDesc;
-  confOptionsDesc.add(confGeneralOptions).add(remoteNodeOptions);
-
-  po::variables_map cmdOptions;
-  po::store(po::parse_command_line(argc, argv, cmdOptionsDesc), cmdOptions);
-  po::notify(cmdOptions);
-
-  if (cmdOptions.count("help") > 0) {
-    std::cout << cmdOptionsDesc << std::endl;
-    return false;
-  }
-
-  if (cmdOptions.count("version") > 0) {
-    /* TODO: Take this from a variable for easier forking */
-    std::cout << "turtle-service v" << PROJECT_VERSION_LONG << std::endl;
-    return false;
-  }
-
-  po::variables_map allOptions;
-  if (cmdOptions.count("config")) {
-    std::ifstream confStream(cmdOptions["config"].as<std::string>(), std::ifstream::in);
-    if (!confStream.good()) {
-      throw ConfigurationError("Cannot open configuration file");
+  // If the user passed in the --config-file option, we need to handle that first
+  if (!serviceConfig.configFile.empty())
+  {
+    try
+    {
+      handleSettings(serviceConfig.configFile, serviceConfig);
     }
-    po::store(po::parse_config_file(confStream, confOptionsDesc), allOptions);
-    po::notify(allOptions);
+    catch (std::exception& e)
+    {
+      std::cout << std::endl << "There was an error parsing the specified configuration file. Please check the file and try again"
+        << std::endl << e.what() << std::endl;
+      exit(1);
+    }
   }
 
-  po::store(po::parse_command_line(argc, argv, cmdOptionsDesc), allOptions);
-  po::notify(allOptions);
+  // Load in the CLI specified parameters again to overwrite any given in the config file
+  handleSettings(argc, argv, serviceConfig);
 
-  gateConfiguration.init(allOptions);
-  remoteNodeConfig.init(allOptions);
+  if (serviceConfig.dumpConfig)
+  {
+    std::cout << CryptoNote::getProjectCLIHeader() << asString(serviceConfig) << std::endl;
+    exit(0);
+  }
+  else if (!serviceConfig.outputFile.empty())
+  {
+    try {
+      asFile(serviceConfig, serviceConfig.outputFile);
+      std::cout << CryptoNote::getProjectCLIHeader() << "Configuration saved to: " << serviceConfig.outputFile << std::endl;
+      exit(0);
+    }
+    catch (std::exception& e)
+    {
+      std::cout << CryptoNote::getProjectCLIHeader() << "Could not save configuration to: " << serviceConfig.outputFile
+        << std::endl << e.what() << std::endl;
+      exit(1);
+    }
+  }
+
+  if (serviceConfig.registerService && serviceConfig.unregisterService)
+  {
+    throw std::runtime_error("It's impossible to use both --register-service and --unregister-service at the same time");
+  }
+
+  if (serviceConfig.logLevel > Logging::TRACE)
+  {
+    throw std::runtime_error("log-level must be between " + std::to_string(Logging::FATAL) +  ".." + std::to_string(Logging::TRACE));
+  }
+
+  if (serviceConfig.containerFile.empty())
+  {
+    throw std::runtime_error("You must specify a wallet file to open!");
+  }
+
+  if (!std::ifstream(serviceConfig.containerFile) && !serviceConfig.generateNewContainer)
+  {
+    if (std::ifstream(serviceConfig.containerFile + ".wallet"))
+    {
+      throw std::runtime_error("The wallet file you specified does not exist. Did you mean: " + serviceConfig.containerFile + ".wallet?");
+    }
+    else
+    {
+      throw std::runtime_error("The wallet file you specified does not exist; please check your spelling and try again.");
+    }
+  }
+
+  if ((!serviceConfig.secretViewKey.empty() || !serviceConfig.secretSpendKey.empty()) && !serviceConfig.generateNewContainer)
+  {
+    throw std::runtime_error("--generate-container is required");
+  }
+
+  if (!serviceConfig.mnemonicSeed.empty() && !serviceConfig.generateNewContainer)
+  {
+    throw std::runtime_error("--generate-container is required");
+  }
+
+  if (!serviceConfig.mnemonicSeed.empty() && (!serviceConfig.secretViewKey.empty() || !serviceConfig.secretSpendKey.empty()))
+  {
+    throw std::runtime_error("You cannot specify import from both Mnemonic seed and private keys");
+  }
+
+  if ((serviceConfig.registerService || serviceConfig.unregisterService) && serviceConfig.containerFile.empty())
+  {
+    throw std::runtime_error("--container-file parameter is required");
+  }
+
+  // If we are generating a new container, we can skip additional checks
+  if (serviceConfig.generateNewContainer)
+  {
+    return true;
+  }
+
+  // Run authentication checks
+
+  if(serviceConfig.rpcPassword.empty() && !serviceConfig.legacySecurity)
+  {
+    throw std::runtime_error("Please specify either an RPC password or use the --rpc-legacy-security flag");
+  }
+
+  if (!serviceConfig.rpcPassword.empty())
+  {
+    std::vector<uint8_t> rawData(serviceConfig.rpcPassword.begin(), serviceConfig.rpcPassword.end());
+    Crypto::cn_slow_hash_v0(rawData.data(), rawData.size(), rpcSecret);
+    serviceConfig.rpcPassword = "";
+  }
+
   return true;
 }
 
-} //namespace PaymentService
+}

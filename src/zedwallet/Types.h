@@ -10,31 +10,6 @@
 
 #include <Wallet/WalletGreen.h>
 
-struct CLICommand
-{
-    CLICommand() {}
-
-    CLICommand(std::string name, std::string description,
-               std::string shortName, bool hasShortName, bool hasArgument) :
-               name(name), description(description), shortName(shortName),
-               hasShortName(hasShortName), hasArgument(hasArgument) {}
-
-    /* The command name */
-    std::string name;
-
-    /* The command description */
-    std::string description;
-
-    /* The command shortname, e.g. --help == -h */
-    std::string shortName;
-
-    /* Does the command have a shortname */
-    bool hasShortName;
-
-    /* Does the command take an argument, e.g. --wallet-file yourwalletname */
-    bool hasArgument;
-};
-
 struct WalletInfo
 {
     WalletInfo(std::string walletFileName, 
@@ -69,9 +44,6 @@ struct WalletInfo
 
 struct Config
 {
-    /* Should we exit after parsing arguments */
-    bool exit = false;
-
     /* Was the wallet file specified on CLI */
     bool walletGiven = false;
 

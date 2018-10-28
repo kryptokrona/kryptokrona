@@ -1,19 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2018, The TurtleCoin Developers
 //
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
@@ -24,8 +12,7 @@
 #include "Logging/ILogger.h"
 #include "Logging/LoggerRef.h"
 #include "Rpc/HttpServer.h"
-#include "WalletService/PaymentServiceConfiguration.h"
-
+#include "WalletService/ConfigurationManager.h"
 
 namespace CryptoNote {
 class HttpResponse;
@@ -44,7 +31,7 @@ namespace CryptoNote {
 
 class JsonRpcServer : HttpServer {
 public:
-  JsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, Logging::ILogger& loggerGroup, PaymentService::Configuration& config);
+  JsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, Logging::ILogger& loggerGroup, PaymentService::ConfigurationManager& config);
   JsonRpcServer(const JsonRpcServer&) = delete;
 
   void start(const std::string& bindAddress, uint16_t bindPort);
@@ -59,7 +46,7 @@ protected:
   static void makeJsonParsingErrorResponse(Common::JsonValue& resp);
 
   virtual void processJsonRpcRequest(const Common::JsonValue& req, Common::JsonValue& resp) = 0;
-  PaymentService::Configuration& config;
+  PaymentService::ConfigurationManager& config;
 
 private:
   // HttpServer
