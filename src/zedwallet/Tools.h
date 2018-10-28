@@ -63,3 +63,6 @@ std::vector<T> filter(const std::vector<T> &input, Function predicate)
 
     return result;
 }
+
+std::vector<std::string> split(const std::string& str, char delim);
+bool parseDaemonAddressFromString(std::string& host, int& port, const std::string& address);

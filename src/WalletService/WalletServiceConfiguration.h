@@ -287,7 +287,7 @@ namespace PaymentService {
 
   inline void handleSettings(const std::string configFile, WalletServiceConfiguration& config)
   {
-    std::ifstream data(configFile.c_str());
+    std::ifstream data(configFile);
 
     if (!data.good())
     {

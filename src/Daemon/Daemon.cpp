@@ -311,10 +311,10 @@ int main(int argc, char* argv[])
 
     // Fire up the RPC Server
     logger(INFO) << "Starting core rpc server on address " << config.rpcInterface << ":" << config.rpcPort;
-    rpcServer.start(config.rpcInterface, config.rpcPort);
     rpcServer.setFeeAddress(config.feeAddress);
     rpcServer.setFeeAmount(config.feeAmount);
     rpcServer.enableCors(config.enableCors);
+    rpcServer.start(config.rpcInterface, config.rpcPort);
     logger(INFO) << "Core rpc server started ok";
 
     Tools::SignalHandler::install([&dch, &p2psrv] {

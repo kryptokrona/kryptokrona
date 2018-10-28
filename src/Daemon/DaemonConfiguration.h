@@ -342,7 +342,7 @@ namespace {
 
   void handleSettings(const std::string configFile, DaemonConfiguration& config)
   {
-    std::ifstream data(configFile.c_str());
+    std::ifstream data(configFile);
 
     if (!data.good())
     {
