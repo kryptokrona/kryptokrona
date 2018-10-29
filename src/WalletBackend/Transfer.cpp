@@ -388,16 +388,14 @@ void storeSentTransaction(
     /* Not initialized till it's in a block */
     const uint64_t timestamp(0), blockHeight(0), unlockTime(0);
 
-    const bool isConfirmed = false;
-
     /* Create the unconfirmed transaction (Will be overwritten by the
        confirmed transaction later) */
     WalletTypes::Transaction tx(
-        transfers, hash, fee, timestamp, blockHeight, paymentID, isConfirmed,
+        transfers, hash, fee, timestamp, blockHeight, paymentID,
         unlockTime
     );
 
-    subWallets->addTransaction(tx);
+    subWallets->addUnconfirmedTransaction(tx);
 }
 
 std::tuple<WalletError, Crypto::Hash> relayTransaction(

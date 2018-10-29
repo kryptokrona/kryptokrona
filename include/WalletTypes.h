@@ -94,17 +94,6 @@ namespace WalletTypes
         /* The transaction key we took from the key outputs */
         Crypto::PublicKey key;
         
-        /* When we send a transaction, it hangs around in the transaction pool
-           for a bit until it gets added to a block. We can't mark it as spent,
-           since we don't know what block height it was spent at. Thus, then
-           we get to a chain fork, we don't know if we should reverse marking
-           it as spent or not. So, instead we lock it. When we scan the block
-           it was included in, we can mark it as spent. */
-        bool isLocked;
-
-        /* Has this input been spent */
-        bool isSpent;
-
         /* If spent, what height did we spend it at. Used to remove spent
            transaction inputs once they are sure to not be removed from a
            forked chain. */
@@ -115,6 +104,9 @@ namespace WalletTypes
            for a coinbase/miner transaction. Users can specify a custom
            unlock height however. */
         uint64_t unlockTime;
+
+        /* The transaction hash of the transaction that contains this input */
+        Crypto::Hash hashOfContainingTransaction;
 
         bool operator==(const TransactionInput &other)
         {
@@ -196,7 +188,6 @@ namespace WalletTypes
             const uint64_t timestamp,
             const uint64_t blockHeight,
             const std::string paymentID,
-            const bool confirmed,
             const uint64_t unlockTime) :
 
             transfers(transfers),
@@ -205,7 +196,6 @@ namespace WalletTypes
             timestamp(timestamp),
             blockHeight(blockHeight),
             paymentID(paymentID),
-            confirmed(confirmed),
             unlockTime(unlockTime)
         {
         }
@@ -233,9 +223,6 @@ namespace WalletTypes
 
         /* The paymentID of this transaction (will be an empty string if no pid) */
         std::string paymentID;
-
-        /* Is the transaction in a block yet */
-        bool confirmed;
 
         /* When does the transaction unlock */
         uint64_t unlockTime;

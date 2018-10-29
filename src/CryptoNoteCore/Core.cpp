@@ -497,9 +497,71 @@ bool Core::queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes
   }
 }
 
+/* Transaction hashes = The hashes the wallet wants to query.
+   transactions in pool - We'll add hashes to this if the transaction is in the pool
+   transactions in block - We'll add hashes to this if the transaction is in a block
+   transactions unknown - We'll add hashes to this if we don't know about them - possibly fell out the tx pool */
+bool Core::getTransactionsStatus(
+    std::unordered_set<Crypto::Hash> transactionHashes,
+    std::unordered_set<Crypto::Hash> &transactionsInPool,
+    std::unordered_set<Crypto::Hash> &transactionsInBlock,
+    std::unordered_set<Crypto::Hash> &transactionsUnknown) const
+{
+    throwIfNotInitialized();
+
+    try
+    {
+        const auto txs = transactionPool->getTransactionHashes();
+
+        /* Pop into a set for quicker .find() */
+        std::unordered_set<Crypto::Hash> poolTransactions(txs.begin(), txs.end());
+
+        /* Loop through the inputted hashes */
+        for (auto it = transactionHashes.begin(); it != transactionHashes.end();)
+        {
+            /* Transaction exists in the pool */
+            if (poolTransactions.find(*it) != poolTransactions.end())
+            {
+                transactionsInPool.insert(*it);
+
+                /* We have processed this transaction, remove it from the
+                   container, and update the iterators */
+                it = transactionHashes.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        for (auto it = transactionHashes.begin(); it != transactionHashes.end();)
+        {
+            /* The transaction is present in a block */
+            if (findSegmentContainingTransaction(*it) != nullptr)
+            {
+                transactionsInBlock.insert(*it);
+
+                /* We have processed this transaction, remove it from the container
+                   and update the iterators */
+                it = transactionHashes.erase(it);
+            }
+        }
+
+        /* Anything remaining, the daemon does not know about. */
+        transactionsUnknown = transactionHashes;
+
+        return true;
+    }
+    catch (std::exception &e)
+    {
+        logger(Logging::ERROR) << "Failed to get transactions status: " << e.what();
+        return false;
+    }
+}
+
 /* Known block hashes = The hashes the wallet knows about. We'll give blocks starting from this hash.
    Timestamp = The timestamp to start giving blocks from, if knownBlockHashes is empty. Used for syncing a new wallet.
-   Blocks = The returned vector of blocks */
+   walletBlocks = The returned vector of blocks */
 bool Core::getWalletSyncData(
     const std::vector<Crypto::Hash> &knownBlockHashes,
     const uint64_t startHeight,

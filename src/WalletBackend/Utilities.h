@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <CryptoNote.h>
 
 #include <iomanip>
@@ -44,4 +46,8 @@ namespace Utilities
     uint64_t getMaxTxSize(const uint64_t currentHeight);
 
     std::string prettyPrintBytes(const uint64_t numBytes);
+
+    void sleepUnlessStopping(
+        const std::chrono::milliseconds duration,
+        std::atomic<bool> &condition);
 }

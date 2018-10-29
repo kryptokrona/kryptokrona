@@ -144,6 +144,7 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/get_transaction_details_by_hashes", { jsonMethod<COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASHES>(&RpcServer::onGetTransactionDetailsByHashes), false } },
   { "/get_transaction_hashes_by_payment_id", { jsonMethod<COMMAND_RPC_GET_TRANSACTION_HASHES_BY_PAYMENT_ID>(&RpcServer::onGetTransactionHashesByPaymentId), false } },
   { "/get_global_indexes_for_range", { jsonMethod<COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE>(&RpcServer::onGetGlobalIndexesForRange), false} },
+  { "/get_transactions_status", { jsonMethod<COMMAND_RPC_GET_TRANSACTIONS_STATUS>(&RpcServer::onGetTransactionsStatus), false} },
 
   // json rpc
   { "/json_rpc", { std::bind(&RpcServer::processJsonRpcRequest, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), true } }
@@ -336,6 +337,21 @@ bool RpcServer::on_query_blocks_detailed(const COMMAND_RPC_QUERY_BLOCKS_DETAILED
 bool RpcServer::on_get_wallet_sync_data(const COMMAND_RPC_GET_WALLET_SYNC_DATA::request &req, COMMAND_RPC_GET_WALLET_SYNC_DATA::response &res)
 {
     if (!m_core.getWalletSyncData(req.blockIds, req.startHeight, req.startTimestamp, res.items))
+    {
+        res.status = "Failed to perform query";
+        return false;
+    }
+
+    res.status = CORE_RPC_STATUS_OK;
+
+    return true;
+}
+
+bool RpcServer::onGetTransactionsStatus(
+    const COMMAND_RPC_GET_TRANSACTIONS_STATUS::request &req,
+    COMMAND_RPC_GET_TRANSACTIONS_STATUS::response &res)
+{
+    if (!m_core.getTransactionsStatus(req.transactionHashes, res.transactionsInPool, res.transactionsInBlock, res.transactionsUnknown))
     {
         res.status = "Failed to perform query";
         return false;

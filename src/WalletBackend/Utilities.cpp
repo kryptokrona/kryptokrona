@@ -6,12 +6,16 @@
 #include <WalletBackend/Utilities.h>
 ////////////////////////////////////
 
+#include <atomic>
+
 #include <Common/Base58.h>
 
 #include <config/CryptoNoteConfig.h>
 
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
+
+#include <thread>
 
 namespace Utilities
 {
@@ -250,5 +254,23 @@ std::string prettyPrintBytes(uint64_t input)
     return msg.str();
 }
 
+/* Sleep for approximately duration, unless condition is true. This lets us
+   not bother the node too often, but makes shutdown times still quick. */
+void sleepUnlessStopping(
+    const std::chrono::milliseconds duration,
+    std::atomic<bool> &condition)
+{
+    auto sleptFor = std::chrono::milliseconds::zero();
+
+    /* 0.5 seconds */
+    const auto sleepDuration = std::chrono::milliseconds(500);
+
+    while (!condition.load() && sleptFor < duration)
+    {
+        std::this_thread::sleep_for(sleepDuration);
+
+        sleptFor += sleepDuration;
+    }
+}
 
 } // namespace Utilities

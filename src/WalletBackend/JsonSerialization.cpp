@@ -42,7 +42,9 @@ json SubWallet::toJson() const
         {"address", m_address},
         {"syncStartTimestamp", m_syncStartTimestamp},
         {"isViewWallet", m_isViewWallet},
-        {"transactionInputs", m_transactionInputs},
+        {"unspentInputs", m_unspentInputs},
+        {"lockedInputs", m_lockedInputs},
+        {"spentInputs", m_spentInputs},
         {"syncStartHeight", m_syncStartHeight},
         {"isPrimaryAddress", m_isPrimaryAddress},
     };
@@ -55,7 +57,9 @@ void SubWallet::fromJson(const json &j)
     m_address = j.at("address").get<std::string>();
     m_syncStartTimestamp = j.at("syncStartTimestamp").get<uint64_t>();
     m_isViewWallet = j.at("isViewWallet").get<bool>();
-    m_transactionInputs = j.at("transactionInputs").get<std::vector<WalletTypes::TransactionInput>>();
+    m_unspentInputs = j.at("unspentInputs").get<std::vector<WalletTypes::TransactionInput>>();
+    m_lockedInputs = j.at("lockedInputs").get<std::vector<WalletTypes::TransactionInput>>();
+    m_spentInputs = j.at("spentInputs").get<std::vector<WalletTypes::TransactionInput>>();
     m_syncStartHeight = j.at("syncStartHeight").get<uint64_t>();
     m_isPrimaryAddress = j.at("isPrimaryAddress").get<bool>();
 }
@@ -81,6 +85,7 @@ json SubWallets::toJson() const
         {"publicSpendKeys", m_publicSpendKeys},
         {"subWallet", subWalletsToVector(m_subWallets)},
         {"transactions", m_transactions},
+        {"lockedTransctions", m_lockedTransactions},
         {"privateViewKey", m_privateViewKey},
     };
 }
@@ -90,6 +95,7 @@ void SubWallets::fromJson(const json &j)
     m_publicSpendKeys = j.at("publicSpendKeys").get<std::vector<Crypto::PublicKey>>();
     m_subWallets = vectorToSubWallets(j.at("subWallet").get<std::vector<SubWallet>>());
     m_transactions = j.at("transactions").get<std::vector<WalletTypes::Transaction>>();
+    m_lockedTransactions = j.at("lockedTransactions").get<std::vector<WalletTypes::Transaction>>();
     m_privateViewKey = j.at("privateViewKey").get<Crypto::SecretKey>();
 }
 
@@ -285,10 +291,9 @@ namespace WalletTypes
             {"transactionIndex", t.transactionIndex},
             {"globalOutputIndex", t.globalOutputIndex},
             {"key", t.key},
-            {"isLocked", t.isLocked},
-            {"isSpent", t.isSpent},
             {"spendHeight", t.spendHeight},
             {"unlockTime", t.unlockTime},
+            {"hashOfContainingTransaction", t.hashOfContainingTransaction},
         };
     }
 
@@ -301,10 +306,9 @@ namespace WalletTypes
         t.transactionIndex = j.at("transactionIndex").get<uint64_t>();
         t.globalOutputIndex = j.at("globalOutputIndex").get<uint64_t>();
         t.key = j.at("key").get<Crypto::PublicKey>();
-        t.isLocked = j.at("isLocked").get<bool>();
-        t.isSpent = j.at("isSpent").get<bool>();
         t.spendHeight = j.at("spendHeight").get<uint64_t>();
         t.unlockTime = j.at("unlockTime").get<uint64_t>();
+        t.hashOfContainingTransaction = j.at("hashOfContainingTransaction").get<Crypto::Hash>();
     }
 
     //////////////////////////////
@@ -320,7 +324,6 @@ namespace WalletTypes
             {"blockHeight", t.blockHeight},
             {"timestamp", t.timestamp},
             {"paymentID", t.paymentID},
-            {"confirmed", t.confirmed},
             {"unlockTime", t.unlockTime},
         };
     }
@@ -333,7 +336,6 @@ namespace WalletTypes
         t.blockHeight = j.at("blockHeight").get<uint64_t>();
         t.timestamp = j.at("timestamp").get<uint64_t>();
         t.paymentID = j.at("paymentID").get<std::string>();
-        t.confirmed = j.at("confirmed").get<bool>();
         t.unlockTime = j.at("unlockTime").get<uint64_t>();
     }
 }

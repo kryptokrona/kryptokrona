@@ -69,6 +69,12 @@ public:
     const uint64_t startTimestamp,
     std::vector<WalletTypes::WalletBlockInfo> &walletBlocks) const override;
 
+  virtual bool getTransactionsStatus(
+    std::unordered_set<Crypto::Hash> transactionHashes,
+    std::unordered_set<Crypto::Hash> &transactionsInPool,
+    std::unordered_set<Crypto::Hash> &transactionsInBlock,
+    std::unordered_set<Crypto::Hash> &transactionsUnknown) const override;
+
   virtual bool hasTransaction(const Crypto::Hash& transactionHash) const override;
   virtual void getTransactions(const std::vector<Crypto::Hash>& transactionHashes, std::vector<BinaryArray>& transactions, std::vector<Crypto::Hash>& missedHashes) const override;
 

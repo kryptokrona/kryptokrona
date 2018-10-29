@@ -68,6 +68,7 @@ WalletSynchronizer & WalletSynchronizer::operator=(WalletSynchronizer && old)
 
     m_blockDownloaderThread = std::move(old.m_blockDownloaderThread);
     m_transactionSynchronizerThread = std::move(old.m_transactionSynchronizerThread);
+    m_poolWatcherThread = std::move(old.m_poolWatcherThread);
 
     m_shouldStop.store(old.m_shouldStop.load());
 
@@ -117,7 +118,8 @@ void WalletSynchronizer::stop()
 {
     /* If either of the threads are running (and not detached) */
     if (m_blockDownloaderThread.joinable() || 
-        m_transactionSynchronizerThread.joinable())
+        m_transactionSynchronizerThread.joinable() ||
+        m_poolWatcherThread.joinable())
     {
         /* Tell the threads to stop */
         m_shouldStop.store(true);
@@ -136,6 +138,12 @@ void WalletSynchronizer::stop()
         if (m_transactionSynchronizerThread.joinable())
         {
             m_transactionSynchronizerThread.join();
+        }
+
+        /* Wait for the pool watcher thread to finish (if applicable) */
+        if (m_poolWatcherThread.joinable())
+        {
+            m_poolWatcherThread.join();
         }
     }
 }
@@ -259,10 +267,9 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
             input.transactionIndex = outputIndex;
             input.globalOutputIndex = globalIndexes[outputIndex];
             input.key = tx.keyOutputs[outputIndex].key;
-            input.isLocked = false;
-            input.isSpent = false;
             input.spendHeight = 0;
             input.unlockTime = tx.unlockTime;
+            input.hashOfContainingTransaction = tx.hash;
 
             /* We need to fill in the key image of the transaction input -
                we'll let the subwallet do this since we need the private spend
@@ -356,13 +363,10 @@ void WalletSynchronizer::processCoinbaseTransaction(
         /* Coinbase transactions can't have payment ID's */
         const std::string paymentID;
 
-        /* It's in a block, not in the pool */
-        const bool isConfirmed = true;
-
         /* Form the actual transaction */
         WalletTypes::Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight, paymentID,
-            isConfirmed, rawTX.unlockTime
+            rawTX.unlockTime
         );
 
         /* Store the transaction */
@@ -406,12 +410,10 @@ void WalletSynchronizer::processTransaction(
         /* Fee is the difference between inputs and outputs */
         const uint64_t fee = sumOfInputs - sumOfOutputs;
 
-        const bool isConfirmed = true;
-
         /* Form the actual transaction */
         const WalletTypes::Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight,
-            rawTX.paymentID, isConfirmed, rawTX.unlockTime
+            rawTX.paymentID, rawTX.unlockTime
         );
 
         /* Store the transaction */
@@ -467,7 +469,69 @@ void WalletSynchronizer::findTransactionsInBlocks()
         if (b.blockHeight >= m_daemon->getLastKnownBlockHeight())
         {
             m_eventHandler->onSynced.fire(b.blockHeight);
+
+            /* We are synced, launch the pool watcher thread to watch for
+               locked transactions being spent or returning to the wallet */
+            if (!m_hasPoolWatcherThreadLaunched)
+            {
+                m_poolWatcherThread = std::thread(
+                    &WalletSynchronizer::monitorLockedTransactions, this
+                );
+            }
         }
+    }
+}
+
+/* TODO: Multithreading */
+void WalletSynchronizer::monitorLockedTransactions()
+{
+    while (!m_shouldStop.load())
+    {
+        /* Get the hashes of any locked tx's we have */
+        const auto lockedTxHashes = m_subWallets->getLockedTransactionsHashes();
+
+        if (lockedTxHashes.size() != 0)
+        {
+            std::promise<std::error_code> errorPromise = std::promise<std::error_code>();
+
+            auto callback = [&errorPromise](auto e) { errorPromise.set_value(e); };
+
+            /* Transactions that are in the pool - we'll query these again
+               next time to see if they have moved */
+            std::unordered_set<Crypto::Hash> transactionsInPool;
+
+            /* Transactions that are in a block - don't need to do anything,
+               when we get to the block they will be processed and unlocked. */
+            std::unordered_set<Crypto::Hash> transactionsInBlock;
+
+            /* Transactions that the daemon doesn't know about - returned to
+               our wallet for timeout or other reason */
+            std::unordered_set<Crypto::Hash> cancelledTransactions;
+
+            /* Get the status of the locked transactions */
+            m_daemon->getTransactionsStatus(
+                lockedTxHashes, transactionsInPool, transactionsInBlock,
+                cancelledTransactions, callback
+            );
+
+            /* Couldn't get info from the daemon, try again later */
+            if (errorPromise.get_future().get())
+            {
+                Utilities::sleepUnlessStopping(std::chrono::seconds(15), m_shouldStop);
+
+                continue;
+            }
+
+            /* If some transactions have been cancelled, remove them, and their
+               inputs */
+            if (cancelledTransactions.size() != 0)
+            {
+                m_subWallets->removeCancelledTransactions(cancelledTransactions);
+            }
+        }
+
+        /* Sleep for 15 seconds, unless we're exiting */
+        Utilities::sleepUnlessStopping(std::chrono::seconds(15), m_shouldStop);
     }
 }
 
@@ -504,7 +568,7 @@ void WalletSynchronizer::downloadBlocks()
         while (true)
         {
             /* Don't hang if the daemon doesn't respond */
-            auto status = error.wait_for(std::chrono::milliseconds(50));
+            auto status = error.wait_for(std::chrono::seconds(1));
 
             if (m_shouldStop.load())
             {
@@ -525,7 +589,7 @@ void WalletSynchronizer::downloadBlocks()
             std::cout << "Failed to download blocks from daemon: " << err << ", "
                       << err.message() << std::endl;
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
         }
         else
         {
@@ -533,7 +597,7 @@ void WalletSynchronizer::downloadBlocks()
                don't spam the daemon. */
             if (newBlocks.empty())
             {
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                Utilities::sleepUnlessStopping(std::chrono::seconds(30), m_shouldStop);
                 continue;
             }
 
@@ -542,11 +606,6 @@ void WalletSynchronizer::downloadBlocks()
 
             for (const auto &block : newBlocks)
             {
-                if (m_shouldStop.load())
-                {
-                    return;
-                }
-
                 /* Store that we've downloaded the block */
                 m_blockDownloaderStatus.storeBlockHash(block.blockHash,
                                                        block.blockHeight);

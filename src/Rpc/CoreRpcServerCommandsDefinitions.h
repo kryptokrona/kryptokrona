@@ -804,6 +804,41 @@ struct COMMAND_RPC_GET_WALLET_SYNC_DATA {
   };
 };
 
+struct COMMAND_RPC_GET_TRANSACTIONS_STATUS
+{
+    struct request
+    {
+        std::unordered_set<Crypto::Hash> transactionHashes;
+
+        void serialize(ISerializer &s)
+        {
+            KV_MEMBER(transactionHashes);
+        }
+    };
+
+    struct response
+    {
+        std::string status;
+
+        /* These transactions are in the transaction pool */
+        std::unordered_set<Crypto::Hash> transactionsInPool;
+
+        /* These transactions are in a block */
+        std::unordered_set<Crypto::Hash> transactionsInBlock;
+        
+        /* We don't know anything about these hashes */
+        std::unordered_set<Crypto::Hash> transactionsUnknown;
+
+        void serialize(ISerializer &s)
+        {
+            KV_MEMBER(status);
+            KV_MEMBER(transactionsInPool);
+            KV_MEMBER(transactionsInBlock);
+            KV_MEMBER(transactionsUnknown);
+        }
+    };
+};
+
 struct COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HEIGHTS {
   struct request {
     std::vector<uint32_t> blockHeights;

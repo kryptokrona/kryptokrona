@@ -469,6 +469,29 @@ void NodeRpcProxy::getGlobalIndexesForRange(
     scheduleRequest(std::bind(&NodeRpcProxy::doGetGlobalIndexesForRange, this, startHeight, endHeight, std::ref(indexes)), callback);
 }
 
+void NodeRpcProxy::getTransactionsStatus(
+    const std::unordered_set<Crypto::Hash> transactionHashes,
+    std::unordered_set<Crypto::Hash> &transactionsInPool,
+    std::unordered_set<Crypto::Hash> &transactionsInBlock,
+    std::unordered_set<Crypto::Hash> &transactionsUnknown,
+    const Callback &callback)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (m_state != STATE_INITIALIZED)
+    {
+        callback(make_error_code(NodeError::NOT_INITIALIZED));
+        return;
+    }
+
+    scheduleRequest(
+        std::bind(&NodeRpcProxy::doGetTransactionsStatus, this, transactionHashes,
+                  std::ref(transactionsInPool), std::ref(transactionsInBlock),
+                  std::ref(transactionsUnknown)),
+        callback
+    );
+}
+
 void NodeRpcProxy::queryBlocks(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks,
   uint32_t& startHeight, const Callback& callback) {
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -656,6 +679,37 @@ std::error_code NodeRpcProxy::doGetGlobalIndexesForRange(
     }
 
     indexes.insert(rsp.indexes.begin(), rsp.indexes.end());
+
+    return ec;
+}
+
+std::error_code NodeRpcProxy::doGetTransactionsStatus(
+    const std::unordered_set<Crypto::Hash> transactionHashes,
+    std::unordered_set<Crypto::Hash> &transactionsInPool,
+    std::unordered_set<Crypto::Hash> &transactionsInBlock,
+    std::unordered_set<Crypto::Hash> &transactionsUnknown)
+{
+    CryptoNote::COMMAND_RPC_GET_TRANSACTIONS_STATUS::request req = AUTO_VAL_INIT(req);
+    CryptoNote::COMMAND_RPC_GET_TRANSACTIONS_STATUS::response rsp = AUTO_VAL_INIT(rsp);
+
+    req.transactionHashes = transactionHashes;
+
+    m_logger(TRACE) << "Send get_transactions_status request";
+
+    std::error_code ec = jsonCommand("/get_transactions_status", req, rsp);
+
+    if (!ec)
+    {
+        m_logger(TRACE) << "get_transactions_status complete";
+    }
+    else
+    {
+        m_logger(TRACE) << "get_transactions_status failed: " << ec << ", " << ec.message();
+    }
+
+    transactionsInPool = rsp.transactionsInPool;
+    transactionsInBlock = rsp.transactionsInBlock;
+    transactionsUnknown = rsp.transactionsUnknown;
 
     return ec;
 }

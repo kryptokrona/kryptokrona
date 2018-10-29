@@ -61,7 +61,14 @@ class SubWallet
 
         /* A vector of the stored transaction input data, to be used for
            sending transactions later */
-        std::vector<WalletTypes::TransactionInput> m_transactionInputs;
+        std::vector<WalletTypes::TransactionInput> m_unspentInputs;
+
+        /* Inputs which have been used in a transaction, and are waiting to
+           either be put into a block, or return to our wallet */
+        std::vector<WalletTypes::TransactionInput> m_lockedInputs;
+
+        /* Inputs which have been spent in a transaction */
+        std::vector<WalletTypes::TransactionInput> m_spentInputs;
 
         /* This subwallet's public spend key */
         Crypto::PublicKey m_publicSpendKey;

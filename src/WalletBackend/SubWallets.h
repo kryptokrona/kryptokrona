@@ -28,6 +28,9 @@ class SubWallets
             const uint64_t scanHeight,
             const bool newWallet);
 
+        /* Copy constructor */
+        SubWallets(const SubWallets &other);
+
         /* Adds a sub wallet with a random spend key */
         void addSubWallet();
 
@@ -53,6 +56,9 @@ class SubWallets
 
         /* Store a transaction */
         void addTransaction(const WalletTypes::Transaction tx);
+
+        /* Store an outgoing tx, not yet in a block */
+        void addUnconfirmedTransaction(const WalletTypes::Transaction tx);
 
         /* Generates a key image using the public+private spend key of the
            subwallet. Wallet must not be a view wallet (and must exist, but
@@ -111,6 +117,11 @@ class SubWallets
             const Crypto::KeyImage keyImage,
             const Crypto::PublicKey publicKey);
 
+        std::unordered_set<Crypto::Hash> getLockedTransactionsHashes() const;
+
+        void removeCancelledTransactions(
+            const std::unordered_set<Crypto::Hash> cancelledTransactions);
+
     private:
         /* The subwallets, indexed by public spend key */ 
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;
@@ -118,7 +129,14 @@ class SubWallets
         /* A vector of transactions */
         std::vector<WalletTypes::Transaction> m_transactions;
 
+        /* Transactions which we sent, but haven't been added to a block yet */
+        std::vector<WalletTypes::Transaction> m_lockedTransactions;
+
         Crypto::SecretKey m_privateViewKey;
 
         bool m_isViewWallet;
+
+        /* Need a mutex for accessing inputs, transactions, and locked
+           transactions, etc as these are modified on multiple threads */
+        mutable std::mutex m_mutex;
 };

@@ -58,6 +58,10 @@ private:
   bool on_get_wallet_sync_data(const COMMAND_RPC_GET_WALLET_SYNC_DATA::request &req, COMMAND_RPC_GET_WALLET_SYNC_DATA::response &res);
   bool on_get_indexes(const COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::request& req, COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::response& res);
 
+  bool onGetTransactionsStatus(
+    const COMMAND_RPC_GET_TRANSACTIONS_STATUS::request &req,
+    COMMAND_RPC_GET_TRANSACTIONS_STATUS::response &res);
+
   bool onGetGlobalIndexesForRange(
     const COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::request &req,
     COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::response &res);

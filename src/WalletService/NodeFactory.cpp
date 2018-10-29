@@ -60,6 +60,16 @@ public:
       callback(std::error_code());
   };
 
+  virtual void getTransactionsStatus(
+    const std::unordered_set<Crypto::Hash> transactionHashes,
+    std::unordered_set<Crypto::Hash> &transactionsInPool,
+    std::unordered_set<Crypto::Hash> &transactionsInBlock,
+    std::unordered_set<Crypto::Hash> &transactionsUnknown,
+    const Callback &callback) override
+  {
+      callback(std::error_code());
+  };
+
   virtual void queryBlocks(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t timestamp, std::vector<CryptoNote::BlockShortEntry>& newBlocks,
     uint32_t& startHeight, const Callback& callback) override {
     startHeight = 0;

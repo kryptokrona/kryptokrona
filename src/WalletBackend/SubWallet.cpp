@@ -102,7 +102,7 @@ void SubWallet::completeAndStoreTransactionInput(
 
     input.keyImage = keyImage;
 
-    m_transactionInputs.push_back(input);
+    m_unspentInputs.push_back(input);
 }
 
 std::tuple<uint64_t, uint64_t> SubWallet::getBalance(
@@ -112,14 +112,8 @@ std::tuple<uint64_t, uint64_t> SubWallet::getBalance(
 
     uint64_t lockedBalance = 0;
 
-    for (const auto input : m_transactionInputs)
+    for (const auto input : m_unspentInputs)
     {
-        /* In transaction pool, or has been spent already */
-        if (input.isLocked || input.isSpent)
-        {
-            continue;
-        }
-
         /* If an unlock height is present, check if the input is unlocked */
         if (Utilities::isInputUnlocked(input.unlockTime, currentHeight))
         {
