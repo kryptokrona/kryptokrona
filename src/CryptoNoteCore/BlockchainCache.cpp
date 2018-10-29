@@ -175,7 +175,7 @@ void BlockchainCache::doPushBlock(const CachedBlock& cachedBlock,
 
   assert(!hasBlock(blockInfo.blockHash));
 
-  blockInfos.get<BlockIndexTag>().emplace_back(std::move(blockInfo));
+  blockInfos.get<BlockIndexTag>().push_back(std::move(blockInfo));
 
   auto blockIndex = cachedBlock.getBlockIndex();
   assert(blockIndex == blockInfos.size() + startIndex - 1);
@@ -297,7 +297,7 @@ void BlockchainCache::removePaymentId(const Crypto::Hash& transactionHash, Block
     return;
   }
 
-  newCache.paymentIds.emplace(*it);
+  newCache.paymentIds.insert(*it);
   index.erase(it);
 }
 
@@ -328,7 +328,7 @@ void BlockchainCache::addSpentKeyImage(const Crypto::KeyImage& keyImage, uint32_
                                                    //to prevent fail when pushing block from DatabaseBlockchainCache.
                                                    //In case of pushing external block double spend within block
                                                    //should be checked by Core.
-  spentKeyImages.get<BlockIndexTag>().emplace(SpentKeyImage{blockIndex, keyImage});
+  spentKeyImages.get<BlockIndexTag>().insert(SpentKeyImage{blockIndex, keyImage});
 }
 
 std::vector<Crypto::Hash> BlockchainCache::getTransactionHashes() const {
@@ -337,7 +337,7 @@ std::vector<Crypto::Hash> BlockchainCache::getTransactionHashes() const {
   for (auto& tx : txInfos) {
     // skip base transaction
     if (tx.transactionIndex != 0) {
-      hashes.emplace_back(tx.transactionHash);
+      hashes.push_back(tx.transactionHash);
     }
   }
   return hashes;
@@ -376,7 +376,7 @@ void BlockchainCache::pushTransaction(const CachedTransaction& cachedTransaction
   }
 
   assert(transactions.get<TransactionHashTag>().count(transactionCacheInfo.transactionHash) == 0);
-  transactions.get<TransactionInBlockTag>().emplace(std::move(transactionCacheInfo));
+  transactions.get<TransactionInBlockTag>().insert(std::move(transactionCacheInfo));
 
   PaymentIdTransactionHashPair paymentIdTransactionHash;
   if (!getPaymentIdFromTxExtra(tx.extra, paymentIdTransactionHash.paymentId)) {
@@ -387,12 +387,12 @@ void BlockchainCache::pushTransaction(const CachedTransaction& cachedTransaction
   logger(Logging::DEBUGGING) << "Payment id found: " << paymentIdTransactionHash.paymentId;
 
   paymentIdTransactionHash.transactionHash = cachedTransaction.getTransactionHash();
-  paymentIds.emplace(std::move(paymentIdTransactionHash));
+  paymentIds.insert(std::move(paymentIdTransactionHash));
   logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash() << " successfully added";
 }
 
 uint32_t BlockchainCache::insertKeyOutputToGlobalIndex(uint64_t amount, PackedOutIndex output, uint32_t blockIndex) {
-  auto pair = keyOutputsGlobalIndexes.emplace(amount, OutputGlobalIndexesForAmount{});
+  auto pair = keyOutputsGlobalIndexes.insert({amount, OutputGlobalIndexesForAmount{}});
   auto& indexEntry = pair.first->second;
   indexEntry.outputs.push_back(output);
   if (pair.second && parent != nullptr) {
@@ -601,12 +601,12 @@ void BlockchainCache::getRawTransactions(const std::vector<Crypto::Hash>& reques
   for (const auto& transactionHash : requestedTransactions) {
     auto it = index.find(transactionHash);
     if (it == index.end()) {
-      missedTransactions.emplace_back(transactionHash);
+      missedTransactions.push_back(transactionHash);
       continue;
     }
 
     // assert(startIndex <= it->blockIndex);
-    foundTransactions.emplace_back(getRawTransaction(it->blockIndex, it->transactionIndex));
+    foundTransactions.push_back(getRawTransaction(it->blockIndex, it->transactionIndex));
   }
 }
 
@@ -702,36 +702,69 @@ ExtractOutputKeysResult BlockchainCache::extractKeyOutputKeys(uint64_t amount,
 }
 
 std::vector<uint32_t> BlockchainCache::getRandomOutsByAmount(Amount amount, size_t count, uint32_t blockIndex) const {
-  std::vector<uint32_t> offs;
-  auto it = keyOutputsGlobalIndexes.find(amount);
-  if (it == keyOutputsGlobalIndexes.end()) {
-    return parent != nullptr ? parent->getRandomOutsByAmount(amount, count, blockIndex) : offs;
-  }
+    std::vector<uint32_t> outputs;
 
-  auto& outs = it->second.outputs;
-  auto end = std::find_if(outs.rbegin(), outs.rend(), [&](PackedOutIndex index) {
-               return index.blockIndex <= blockIndex - currency.minedMoneyUnlockWindow();
-             }).base();
-  uint32_t dist = static_cast<uint32_t>(std::distance(outs.begin(), end));
-  dist = std::min(static_cast<uint32_t>(count), dist);
-  ShuffleGenerator<uint32_t, Crypto::random_engine<uint32_t>> generator(dist);
-  while (dist--) {
-    auto offset = generator();
-    auto& outIndex = it->second.outputs[offset];
-    auto transactionIterator = transactions.get<TransactionInBlockTag>().find(
-        boost::make_tuple<uint32_t, uint32_t>(outIndex.blockIndex, outIndex.transactionIndex));
-    if (isTransactionSpendTimeUnlocked(transactionIterator->unlockTime, blockIndex)) {
-      offs.push_back(it->second.startIndex + offset);
+    const auto it = keyOutputsGlobalIndexes.find(amount);
+
+    /* No outputs found for this amount */
+    if (it == keyOutputsGlobalIndexes.end())
+    {
+        /* Try the parent if it exists */
+        if (parent != nullptr)
+        {
+            return parent->getRandomOutsByAmount(amount, count, blockIndex);
+        }
+        /* Failed to get outputs */
+        else
+        {
+            return outputs;
+        }
     }
-  }
 
-  if (offs.size() < count && parent != nullptr) {
-    auto prevs = parent->getRandomOutsByAmount(amount, count - offs.size(), blockIndex);
-    offs.reserve(prevs.size() + offs.size());
-    std::copy(prevs.begin(), prevs.end(), std::back_inserter(offs));
-  }
+    const std::vector<PackedOutIndex> outs = it->second.outputs;
 
-  return offs;
+    /* Starting from the end of the outputs vector, return the first output
+       that is unlocked */
+    const auto end = std::find_if(outs.rbegin(), outs.rend(), [&](const auto index)
+    {
+        return index.blockIndex <= blockIndex - currency.minedMoneyUnlockWindow();
+    }).base();
+
+    /* Distance between the first output and the selected output, in the vector */
+    uint32_t dist = static_cast<uint32_t>(std::distance(outs.begin(), end));
+
+    /* We only need count outputs, so trim to that amount */
+    dist = std::min(static_cast<uint32_t>(count), dist);
+
+    ShuffleGenerator<uint32_t, Crypto::random_engine<uint32_t>> generator(dist);
+
+    /* While we still have outputs to get */
+    while (dist--)
+    {
+        const auto offset = generator();
+
+        const auto &outIndex = it->second.outputs[offset];
+
+        const auto transactionIterator = transactions.get<TransactionInBlockTag>().find(
+            boost::make_tuple<uint32_t, uint32_t>(outIndex.blockIndex, outIndex.transactionIndex)
+        );
+
+        /* Check the output is unlocked (it should be, since we checked earlier) */
+        if (isTransactionSpendTimeUnlocked(transactionIterator->unlockTime, blockIndex))
+        {
+            outputs.push_back(it->second.startIndex + offset);
+        }
+    }
+
+    /* Didn't get enough outputs. Try parent. */
+    if (outputs.size() < count && parent != nullptr)
+    {
+        const auto prevs = parent->getRandomOutsByAmount(amount, count - outputs.size(), blockIndex);
+
+        std::copy(prevs.begin(), prevs.end(), std::back_inserter(outputs));
+    }
+
+    return outputs;
 }
 
 ExtractOutputKeysResult BlockchainCache::extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex,
@@ -839,7 +872,7 @@ std::vector<Crypto::Hash> BlockchainCache::getTransactionHashesByPaymentId(const
 
   transactionHashes.reserve(transactionHashes.size() + std::distance(range.first, range.second));
   for (auto it = range.first; it != range.second; ++it) {
-    transactionHashes.emplace_back(it->transactionHash);
+    transactionHashes.push_back(it->transactionHash);
   }
 
   logger(Logging::DEBUGGING) << "Found " << transactionHashes.size() << " transactions with payment id " << paymentId;
