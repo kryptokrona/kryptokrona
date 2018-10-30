@@ -41,7 +41,6 @@ json SubWallet::toJson() const
         {"privateSpendKey", m_privateSpendKey},
         {"address", m_address},
         {"syncStartTimestamp", m_syncStartTimestamp},
-        {"isViewWallet", m_isViewWallet},
         {"unspentInputs", m_unspentInputs},
         {"lockedInputs", m_lockedInputs},
         {"spentInputs", m_spentInputs},
@@ -56,7 +55,6 @@ void SubWallet::fromJson(const json &j)
     m_privateSpendKey = j.at("privateSpendKey").get<Crypto::SecretKey>();
     m_address = j.at("address").get<std::string>();
     m_syncStartTimestamp = j.at("syncStartTimestamp").get<uint64_t>();
-    m_isViewWallet = j.at("isViewWallet").get<bool>();
     m_unspentInputs = j.at("unspentInputs").get<std::vector<WalletTypes::TransactionInput>>();
     m_lockedInputs = j.at("lockedInputs").get<std::vector<WalletTypes::TransactionInput>>();
     m_spentInputs = j.at("spentInputs").get<std::vector<WalletTypes::TransactionInput>>();
@@ -87,6 +85,7 @@ json SubWallets::toJson() const
         {"transactions", m_transactions},
         {"lockedTransctions", m_lockedTransactions},
         {"privateViewKey", m_privateViewKey},
+        {"isViewWallet", m_isViewWallet},
     };
 }
 
@@ -97,6 +96,7 @@ void SubWallets::fromJson(const json &j)
     m_transactions = j.at("transactions").get<std::vector<WalletTypes::Transaction>>();
     m_lockedTransactions = j.at("lockedTransactions").get<std::vector<WalletTypes::Transaction>>();
     m_privateViewKey = j.at("privateViewKey").get<Crypto::SecretKey>();
+    m_isViewWallet = j.at("isViewWallet").get<bool>();
 }
 
 ///////////////////

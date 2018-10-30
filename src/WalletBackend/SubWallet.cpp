@@ -38,7 +38,6 @@ SubWallet::SubWallet(
     m_address(address),
     m_syncStartHeight(scanHeight),
     m_syncStartTimestamp(scanTimestamp),
-    m_isViewWallet(true),
     m_isPrimaryAddress(isPrimaryAddress)
 {
 }
@@ -56,7 +55,6 @@ SubWallet::SubWallet(
     m_address(address),
     m_syncStartHeight(scanHeight),
     m_syncStartTimestamp(scanTimestamp),
-    m_isViewWallet(false),
     m_privateSpendKey(privateSpendKey),
     m_isPrimaryAddress(isPrimaryAddress)
 {
@@ -69,38 +67,37 @@ SubWallet::SubWallet(
 void SubWallet::completeAndStoreTransactionInput(
     const Crypto::KeyDerivation derivation,
     const size_t outputIndex,
-    WalletTypes::TransactionInput input)
+    WalletTypes::TransactionInput input,
+    const bool isViewWallet)
 {
-    if (m_isViewWallet)
+    /* Can't create a key image with a view wallet - but we still store the
+       input so we can calculate the balance */
+    if (!isViewWallet)
     {
-        throw std::invalid_argument(
-            "Attempted to generate key image from view only subwallet!"
+        Crypto::KeyImage keyImage;
+
+        /* Make a temporary key pair */
+        CryptoNote::KeyPair tmp;
+
+        /* Get the tmp public key from the derivation, the index,
+           and our public spend key */
+        Crypto::derive_public_key(
+            derivation, outputIndex, m_publicSpendKey, tmp.publicKey
         );
+
+        /* Get the tmp private key from the derivation, the index,
+           and our private spend key */
+        Crypto::derive_secret_key(
+            derivation, outputIndex, m_privateSpendKey, tmp.secretKey
+        );
+
+        /* Get the key image from the tmp public and private key */
+        Crypto::generate_key_image(
+            tmp.publicKey, tmp.secretKey, keyImage
+        );
+
+        input.keyImage = keyImage;
     }
-
-    Crypto::KeyImage keyImage;
-
-    /* Make a temporary key pair */
-    CryptoNote::KeyPair tmp;
-
-    /* Get the tmp public key from the derivation, the index,
-       and our public spend key */
-    Crypto::derive_public_key(
-        derivation, outputIndex, m_publicSpendKey, tmp.publicKey
-    );
-
-    /* Get the tmp private key from the derivation, the index,
-       and our private spend key */
-    Crypto::derive_secret_key(
-        derivation, outputIndex, m_privateSpendKey, tmp.secretKey
-    );
-
-    /* Get the key image from the tmp public and private key */
-    Crypto::generate_key_image(
-        tmp.publicKey, tmp.secretKey, keyImage
-    );
-
-    input.keyImage = keyImage;
 
     m_unspentInputs.push_back(input);
 }

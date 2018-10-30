@@ -207,6 +207,18 @@ std::string WalletError::getErrorMessage() const
                    "input/output ratio requirements whilst remaining in "
                    "size constraints.";
         }
+        case SUBWALLET_ALREADY_EXISTS:
+        {
+            return "A subwallet with the given key already exists.";
+        }
+        case ILLEGAL_VIEW_WALLET_OPERATION:
+        {
+            return "This function cannot be called when using a view wallet.";
+        }
+        case ILLEGAL_NON_VIEW_WALLET_OPERATION:
+        {
+            return "This function can only be used when using a view wallet.";
+        }
 
         /* No default case so the compiler warns us if we missed one */
     }

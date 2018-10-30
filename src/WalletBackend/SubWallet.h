@@ -51,13 +51,11 @@ class SubWallet
         void completeAndStoreTransactionInput(
             const Crypto::KeyDerivation derivation,
             const size_t outputIndex,
-            WalletTypes::TransactionInput);
+            WalletTypes::TransactionInput,
+            const bool isViewWallet);
 
         std::tuple<uint64_t, uint64_t> getBalance(
             const uint64_t currentHeight) const;
-
-        /* Whether this is a view only wallet */
-        bool m_isViewWallet;
 
         /* A vector of the stored transaction input data, to be used for
            sending transactions later */
@@ -92,5 +90,4 @@ class SubWallet
 
     private:
         /* TODO: Getters/setters */
-
 };

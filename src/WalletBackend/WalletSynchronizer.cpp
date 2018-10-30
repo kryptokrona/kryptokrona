@@ -167,6 +167,8 @@ uint64_t WalletSynchronizer::processTransactionInputs(
     {
         sumOfInputs += keyInput.amount;
         
+        /* Note: If we're using a view wallet, this just returns false */
+
         /* See if any of the sub wallets contain this key image. If they do,
            it means this keyInput is an outgoing transfer from that wallet.
            
@@ -241,8 +243,9 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
         /* If it does, the transaction belongs to us */
         if (ourSpendKey != spendKeys.end())
         {
-            /* Get the indexes, if we haven't already got them. */
-            if (globalIndexes.empty())
+            /* Get the indexes, if we haven't already got them. (Don't need
+               to get them if we're in a view wallet, since we can't spend.) */
+            if (globalIndexes.empty() && !m_subWallets->isViewWallet())
             {
                 globalIndexes = getGlobalIndexes(blockHeight, tx.hash);
 
@@ -258,18 +261,31 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
                to the amount in that case */
             transfers[*ourSpendKey] += amount;
 
-            /* TODO: Don't need to do this in a view wallet */
             WalletTypes::TransactionInput input;
 
             input.amount = amount;
             input.blockHeight = blockHeight;
             input.transactionPublicKey = tx.transactionPublicKey;
             input.transactionIndex = outputIndex;
-            input.globalOutputIndex = globalIndexes[outputIndex];
+
+            /* We don't fetch global indexes if using a view wallet since we
+               don't need the global index */
+            if (m_subWallets->isViewWallet())
+            {
+                input.globalOutputIndex = 0;
+            }
+            else
+            {
+                input.globalOutputIndex = globalIndexes[outputIndex];
+            }
+
             input.key = tx.keyOutputs[outputIndex].key;
             input.spendHeight = 0;
             input.unlockTime = tx.unlockTime;
             input.hashOfContainingTransaction = tx.hash;
+
+            /* Note: If we're using a view wallet, this just stores the input,
+               since we can't generate the key images */
 
             /* We need to fill in the key image of the transaction input -
                we'll let the subwallet do this since we need the private spend
@@ -319,7 +335,7 @@ std::vector<uint64_t> WalletSynchronizer::getGlobalIndexes(
         /* Need to get the indexes, or we can't continue... */
         if (error)
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            Utilities::sleepUnlessStopping(std::chrono::seconds(1), m_shouldStop);
 
             /* We don't store the latest transaction if we're stopping, so it's
                ok to be in an invalid state */
@@ -471,8 +487,10 @@ void WalletSynchronizer::findTransactionsInBlocks()
             m_eventHandler->onSynced.fire(b.blockHeight);
 
             /* We are synced, launch the pool watcher thread to watch for
-               locked transactions being spent or returning to the wallet */
-            if (!m_hasPoolWatcherThreadLaunched)
+               locked transactions being spent or returning to the wallet.
+               No need to launch if we're using a view wallet - can't have
+               locked transactions in the pool */
+            if (!m_hasPoolWatcherThreadLaunched && !m_subWallets->isViewWallet())
             {
                 m_poolWatcherThread = std::thread(
                     &WalletSynchronizer::monitorLockedTransactions, this
@@ -482,7 +500,6 @@ void WalletSynchronizer::findTransactionsInBlocks()
     }
 }
 
-/* TODO: Multithreading */
 void WalletSynchronizer::monitorLockedTransactions()
 {
     while (!m_shouldStop.load())

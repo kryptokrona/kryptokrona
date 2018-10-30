@@ -159,6 +159,15 @@ enum WalletErrorCode
     /* Mixin given for this fusion transaction is too large to be able to hit
        the min input requirement */
     FUSION_MIXIN_TOO_LARGE = 37,
+
+    /* Attempted to add a subwallet which already exists in the container */
+    SUBWALLET_ALREADY_EXISTS = 38,
+
+    /* Cannot perform this operation when using a view wallet */
+    ILLEGAL_VIEW_WALLET_OPERATION = 39,
+
+    /* Cannot perform this operation when using a non view wallet */
+    ILLEGAL_NON_VIEW_WALLET_OPERATION = 40,
 };
 
 class WalletError

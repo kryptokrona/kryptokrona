@@ -32,11 +32,17 @@ class SubWallets
         SubWallets(const SubWallets &other);
 
         /* Adds a sub wallet with a random spend key */
-        void addSubWallet();
+        WalletError addSubWallet();
 
         /* Imports a sub wallet with the given private spend key */
-        void importSubWallet(
+        WalletError importSubWallet(
             const Crypto::SecretKey privateSpendKey,
+            const uint64_t scanHeight,
+            const bool newWallet);
+
+        /* Imports a sub view only wallet with the given public spend key */
+        WalletError importViewSubWallet(
+            const Crypto::PublicKey privateSpendKey,
             const uint64_t scanHeight,
             const bool newWallet);
 
@@ -122,7 +128,11 @@ class SubWallets
         void removeCancelledTransactions(
             const std::unordered_set<Crypto::Hash> cancelledTransactions);
 
+        bool isViewWallet() const;
+
     private:
+        void throwIfViewWallet() const;
+
         /* The subwallets, indexed by public spend key */ 
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;
 
