@@ -265,12 +265,78 @@ void sleepUnlessStopping(
     /* 0.5 seconds */
     const auto sleepDuration = std::chrono::milliseconds(500);
 
-    while (!condition.load() && sleptFor < duration)
+    while (!condition && sleptFor < duration)
     {
         std::this_thread::sleep_for(sleepDuration);
 
         sleptFor += sleepDuration;
     }
+}
+
+/* Converts a height to a timestamp */
+uint64_t scanHeightToTimestamp(const uint64_t scanHeight)
+{
+    if (scanHeight == 0)
+    {
+        return 0;
+    }
+
+    /* Get the amount of seconds since the blockchain launched */
+    uint64_t secondsSinceLaunch = scanHeight * 
+                                  CryptoNote::parameters::DIFFICULTY_TARGET;
+
+    /* Get the genesis block timestamp and add the time since launch */
+    uint64_t timestamp = CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP
+                       + secondsSinceLaunch;
+
+    /* Don't make timestamp too large or daemon throws an error */
+    if (timestamp >= getCurrentTimestampAdjusted())
+    {
+        return getCurrentTimestampAdjusted();
+    }
+
+    return timestamp;
+}
+
+uint64_t timestampToScanHeight(const uint64_t timestamp)
+{
+    if (timestamp == 0)
+    {
+        return 0;
+    }
+
+    /* Timestamp is before the chain launched! */
+    if (timestamp <= CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP)
+    {
+        return 0;
+    }
+
+    /* Find the amount of seconds between launch and the timestamp */
+    uint64_t launchTimestampDelta = timestamp - CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP;
+
+    /* Get an estimation of the amount of blocks that have passed before the
+       timestamp */
+    return launchTimestampDelta / CryptoNote::parameters::DIFFICULTY_TARGET;
+}
+
+uint64_t getCurrentTimestampAdjusted()
+{
+    /* Get the current time as a unix timestamp */
+    std::time_t time = std::time(nullptr);
+
+    /* Take the amount of time a block can potentially be in the past/future */
+    std::initializer_list<uint64_t> limits =
+    {
+        CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT,
+        CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3,
+        CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4
+    };
+
+    /* Get the largest adjustment possible */
+    uint64_t adjust = std::max(limits);
+
+    /* Take the earliest timestamp that will include all possible blocks */
+    return time - adjust;
 }
 
 } // namespace Utilities

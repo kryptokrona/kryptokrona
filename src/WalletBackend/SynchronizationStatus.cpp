@@ -11,27 +11,18 @@
 
 #include <WalletBackend/Constants.h>
 
-//////////////////////////
-/* NON MEMBER FUNCTIONS */
-//////////////////////////
-
-namespace {
-} // namespace
-
-///////////////////////////////////
-/* CONSTRUCTORS / DECONSTRUCTORS */
-///////////////////////////////////
-
 /////////////////////
 /* CLASS FUNCTIONS */
 /////////////////////
 
-uint64_t SynchronizationStatus::getHeight()
+uint64_t SynchronizationStatus::getHeight() const
 {
     return m_lastKnownBlockHeight;
 }
 
-void SynchronizationStatus::storeBlockHash(Crypto::Hash hash, uint64_t height)
+void SynchronizationStatus::storeBlockHash(
+    const Crypto::Hash hash,
+    const uint64_t height)
 {
     m_lastKnownBlockHeight = height;
 
@@ -66,7 +57,7 @@ void SynchronizationStatus::storeBlockHash(Crypto::Hash hash, uint64_t height)
    database, then returns the height it found. So, if you put your earliest
    block at the start of the vector, you're just going to start syncing from
    that block every time. */
-std::vector<Crypto::Hash> SynchronizationStatus::getBlockHashCheckpoints()
+std::vector<Crypto::Hash> SynchronizationStatus::getBlockHashCheckpoints() const
 {
     std::vector<Crypto::Hash> result;
 

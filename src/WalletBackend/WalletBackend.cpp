@@ -598,6 +598,27 @@ WalletError WalletBackend::init()
 
 WalletError WalletBackend::save() const
 {
+    /* Stop the wallet synchronizer, so we're not in an invalid state */
+    if (m_walletSynchronizer != nullptr)
+    {
+        m_walletSynchronizer->stop();
+    }
+
+    WalletError error = unsafeSave();
+
+    /* Continue syncing */
+    if (m_walletSynchronizer != nullptr)
+    {
+        m_walletSynchronizer->start();
+    }
+
+    return error;
+}
+
+/* Unsafe because it doesn't lock any data structures - need to stop the
+   blockchain synchronizer first (Call save()) */
+WalletError WalletBackend::unsafeSave() const
+{
     /* Add an identifier to the start of the string so we can verify the wallet
        has been correctly decrypted */
     std::string identiferAsString(
@@ -747,4 +768,124 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanc
     return SendTransaction::sendFusionTransactionAdvanced(
         mixin, subWalletsToTakeFrom, destination, m_daemon, m_subWallets
     );
+}
+
+void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
+{
+    /* Though the wallet synchronizer can support both a timestamp and a
+       scanheight, we need a fixed scan height to cut transactions from.
+       Since a transaction in block 10 could have a timestamp before a
+       transaction in block 9, we can't rely on timestamps to reset accurately. */
+    if (timestamp != 0)
+    {
+        scanHeight = Utilities::timestampToScanHeight(timestamp);
+        timestamp = 0;
+    }
+
+    /* Empty the sync status and reset the start height */
+    m_walletSynchronizer->reset(scanHeight);
+
+    /* Reset transactions, inputs, etc */
+    m_subWallets->reset(scanHeight);
+
+    /* Start the sync process back up */
+    m_walletSynchronizer->start();
+}
+
+WalletError WalletBackend::addSubWallet()
+{
+    /* Stop the wallet synchronizer, so we're not in an invalid state */
+    m_walletSynchronizer->stop();
+
+    /* Add the sub wallet */
+    WalletError error = m_subWallets->addSubWallet(); 
+
+    /* Don't need to use the safe save that stops the synchronizer since
+       we've done it ourselves */
+    unsafeSave();
+
+    /* Continue syncing, syncing the new wallet as well now */
+    m_walletSynchronizer->start();
+
+    return error;
+}
+
+WalletError WalletBackend::importSubWallet(
+    const Crypto::SecretKey privateSpendKey,
+    const uint64_t scanHeight,
+    const bool newWallet)
+{
+    /* Stop the wallet synchronizer, so we're not in an invalid state */
+    m_walletSynchronizer->stop();
+
+    /* Add the sub wallet */
+    WalletError error = m_subWallets->importSubWallet(
+        privateSpendKey, scanHeight, newWallet
+    ); 
+
+    /* If we're not making a new wallet, check if we need to reset the scan
+       height of the wallet synchronizer, to pick up the new wallet data
+       from the requested height */
+    if (!newWallet)
+    {
+        uint64_t currentHeight = m_walletSynchronizer->getCurrentScanHeight();
+
+        if (currentHeight >= scanHeight)
+        {
+            /* Empty the sync status and reset the start height */
+            m_walletSynchronizer->reset(scanHeight);
+
+            /* Reset transactions, inputs, etc */
+            m_subWallets->reset(scanHeight);
+        }
+    }
+
+    /* Don't need to use the safe save that stops the synchronizer since
+       we've done it ourselves */
+    unsafeSave();
+
+    /* Continue syncing, syncing the new wallet as well now */
+    m_walletSynchronizer->start();
+
+    return error;
+}
+
+WalletError WalletBackend::importViewSubWallet(
+    const Crypto::PublicKey publicSpendKey,
+    const uint64_t scanHeight,
+    const bool newWallet)
+{
+    /* Stop the wallet synchronizer, so we're not in an invalid state */
+    m_walletSynchronizer->stop();
+
+    /* Add the sub wallet */
+    WalletError error = m_subWallets->importViewSubWallet(
+        publicSpendKey, scanHeight, newWallet
+    ); 
+
+    /* If we're not making a new wallet, check if we need to reset the scan
+       height of the wallet synchronizer, to pick up the new wallet data
+       from the requested height */
+    if (!newWallet)
+    {
+        uint64_t currentHeight = m_walletSynchronizer->getCurrentScanHeight();
+
+        if (currentHeight >= scanHeight)
+        {
+            /* Empty the sync status and reset the start height */
+            m_walletSynchronizer->reset(scanHeight);
+
+            /* Reset transactions, inputs, etc */
+            m_subWallets->reset(scanHeight);
+        }
+    }
+
+    /* Don't need to use the safe save that stops the synchronizer since
+       we've done it ourselves */
+    unsafeSave();
+
+    /* Continue syncing, syncing the new wallet as well now */
+    m_walletSynchronizer->start();
+
+    return error;
 }

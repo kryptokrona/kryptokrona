@@ -28,6 +28,10 @@ class WalletBackend
 {
     public:
 
+        /////////////////////////
+        /* Public Constructors */
+        /////////////////////////
+
         /* Very heavily suggested to not call this directly. Call one of the
            below functions to correctly initialize a wallet. This is left
            public so the json serialization works correctly. */
@@ -47,6 +51,10 @@ class WalletBackend
 
         /* Move Assignment Operator */
         WalletBackend & operator=(WalletBackend && old);
+
+        /////////////////////////////
+        /* Public static functions */
+        /////////////////////////////
 
         /* Imports a wallet from a mnemonic seed. Returns the wallet class,
            or an error. */
@@ -94,6 +102,10 @@ class WalletBackend
             const std::string daemonHost,
             const uint16_t daemonPort);
 
+        /////////////////////////////
+        /* Public member functions */
+        /////////////////////////////
+
         WalletError save() const;
 
         /* Converts the class to a json object */
@@ -129,9 +141,31 @@ class WalletBackend
         /* Get the balance for all subwallets */
         std::tuple<uint64_t, uint64_t> getTotalBalance() const;
 
+        WalletError addSubWallet();
+
+        WalletError importSubWallet(
+            const Crypto::SecretKey privateSpendKey,
+            const uint64_t scanHeight,
+            const bool newWallet);
+
+        WalletError importViewSubWallet(
+            const Crypto::PublicKey publicSpendKey,
+            const uint64_t scanHeight,
+            const bool newWallet);
+
+        void reset(uint64_t scanHeight, uint64_t timestamp);
+
+        /////////////////////////////
+        /* Public member variables */
+        /////////////////////////////
+
         std::shared_ptr<EventHandler> m_eventHandler;
 
     private:
+
+        //////////////////////////
+        /* Private constructors */
+        //////////////////////////
 
         /* Standard Constructor */
         WalletBackend(
@@ -154,6 +188,12 @@ class WalletBackend
             const std::string daemonHost,
             const uint16_t daemonPort);
 
+        //////////////////////////////
+        /* Private member functions */
+        //////////////////////////////
+
+        WalletError unsafeSave() const;
+
         WalletError init();
 
         /* Initialize stuff which can't be initialized via the json
@@ -164,8 +204,9 @@ class WalletBackend
             const std::string daemonHost,
             const uint16_t daemonPort);
 
-        /* Start the sync process */
-        void sync();
+        //////////////////////////////
+        /* Private member variables */
+        //////////////////////////////
 
         /* The filename the wallet is saved to */
         std::string m_filename;

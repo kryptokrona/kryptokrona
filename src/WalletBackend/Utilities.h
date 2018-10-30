@@ -50,4 +50,10 @@ namespace Utilities
     void sleepUnlessStopping(
         const std::chrono::milliseconds duration,
         std::atomic<bool> &condition);
+
+    uint64_t scanHeightToTimestamp(const uint64_t scanHeight);
+
+    uint64_t timestampToScanHeight(const uint64_t timestamp);
+
+    uint64_t getCurrentTimestampAdjusted();
 }

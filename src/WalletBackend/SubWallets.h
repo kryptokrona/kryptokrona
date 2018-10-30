@@ -11,6 +11,11 @@
 class SubWallets
 {
     public:
+
+        //////////////////
+        /* Constructors */
+        //////////////////
+
         SubWallets();
 
         /* Creates a new wallet */
@@ -31,6 +36,10 @@ class SubWallets
         /* Copy constructor */
         SubWallets(const SubWallets &other);
 
+        /////////////////////////////
+        /* Public member functions */
+        /////////////////////////////
+
         /* Adds a sub wallet with a random spend key */
         WalletError addSubWallet();
 
@@ -45,10 +54,6 @@ class SubWallets
             const Crypto::PublicKey privateSpendKey,
             const uint64_t scanHeight,
             const bool newWallet);
-
-        /* The public spend keys, used for verifying if a transaction is
-           ours */
-        std::vector<Crypto::PublicKey> m_publicSpendKeys;
 
         /* Returns (height, timestamp) to begin syncing at. Only one (if any)
            of the values will be non zero */
@@ -130,8 +135,27 @@ class SubWallets
 
         bool isViewWallet() const;
 
+        void reset(const uint64_t scanHeight);
+
+        /////////////////////////////
+        /* Public member variables */
+        /////////////////////////////
+
+        /* The public spend keys, used for verifying if a transaction is
+           ours */
+        std::vector<Crypto::PublicKey> m_publicSpendKeys;
+
     private:
+
+        //////////////////////////////
+        /* Private member functions */
+        //////////////////////////////
+
         void throwIfViewWallet() const;
+
+        //////////////////////////////
+        /* Private member variables */
+        //////////////////////////////
 
         /* The subwallets, indexed by public spend key */ 
         std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;

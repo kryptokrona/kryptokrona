@@ -18,6 +18,10 @@
 class WalletSynchronizer
 {
     public:
+        //////////////////
+        /* Constructors */
+        //////////////////
+
         /* Default constructor */
         WalletSynchronizer();
 
@@ -44,7 +48,13 @@ class WalletSynchronizer
         /* Deconstructor */
         ~WalletSynchronizer();
 
+        /////////////////////////////
+        /* Public member functions */
+        /////////////////////////////
+
         void start();
+
+        void stop();
 
         json toJson() const;
 
@@ -54,17 +64,28 @@ class WalletSynchronizer
             const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
             const std::shared_ptr<EventHandler> eventHandler);
 
+        void reset(uint64_t startHeight);
+
+        uint64_t getCurrentScanHeight() const;
+
+        /////////////////////////////
+        /* Public member variables */
+        /////////////////////////////
+
         /* The sub wallets (shared with the main class) */
         std::shared_ptr<SubWallets> m_subWallets;
 
     private:
+
+        //////////////////////////////
+        /* Private member functions */
+        //////////////////////////////
+
         void monitorLockedTransactions();
 
         void downloadBlocks();
 
         void findTransactionsInBlocks();
-
-        void stop();
 
         /* Remove transactions from this height and above, they occured
            on a forked chain */
@@ -97,6 +118,10 @@ class WalletSynchronizer
         std::vector<uint64_t> getGlobalIndexes(
             const uint64_t blockHeight,
             const Crypto::Hash transactionHash);
+
+        //////////////////////////////
+        /* Private member variables */
+        //////////////////////////////
 
         /* The thread ID of the block downloader thread */
         std::thread m_blockDownloaderThread;

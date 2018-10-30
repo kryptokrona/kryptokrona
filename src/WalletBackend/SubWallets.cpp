@@ -16,60 +16,6 @@
 
 #include <WalletBackend/Utilities.h>
 
-//////////////////////////
-/* NON MEMBER FUNCTIONS */
-//////////////////////////
-
-namespace
-{
-
-    uint64_t getCurrentTimestampAdjusted()
-    {
-        /* Get the current time as a unix timestamp */
-        std::time_t time = std::time(nullptr);
-
-        /* Take the amount of time a block can potentially be in the past/future */
-        std::initializer_list<uint64_t> limits =
-        {
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT,
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3,
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4
-        };
-
-        /* Get the largest adjustment possible */
-        uint64_t adjust = std::max(limits);
-
-        /* Take the earliest timestamp that will include all possible blocks */
-        return time - adjust;
-    }
-
-    /* Converts a height to a timestamp */
-    uint64_t scanHeightToTimestamp(const uint64_t scanHeight)
-    {
-        if (scanHeight == 0)
-        {
-            return 0;
-        }
-
-        /* Get the amount of seconds since the blockchain launched */
-        uint64_t secondsSinceLaunch = scanHeight * 
-                                      CryptoNote::parameters::DIFFICULTY_TARGET;
-
-        /* Get the genesis block timestamp and add the time since launch */
-        uint64_t timestamp = CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP
-                           + secondsSinceLaunch;
-
-        /* Don't make timestamp too large or daemon throws an error */
-        if (timestamp >= getCurrentTimestampAdjusted())
-        {
-            return getCurrentTimestampAdjusted();
-        }
-
-        return timestamp;
-    }
-    
-} // namespace
-
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */
 ///////////////////////////////////
@@ -93,7 +39,7 @@ SubWallets::SubWallets(
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
 
-    const uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+    const uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
 
     const bool isPrimaryAddress = true;
 
@@ -117,7 +63,7 @@ SubWallets::SubWallets(
 {
     const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
 
-    const uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+    const uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
 
     const bool isPrimaryAddress = true;
 
@@ -163,9 +109,11 @@ WalletError SubWallets::addSubWallet()
 
     const bool isPrimaryAddress = false;
 
+    const uint64_t scanHeight = 0;
+
     m_subWallets[spendKey.publicKey] = SubWallet(
-        spendKey.publicKey, spendKey.secretKey, address, 0,
-        getCurrentTimestampAdjusted(), isPrimaryAddress
+        spendKey.publicKey, spendKey.secretKey, address, scanHeight,
+        Utilities::getCurrentTimestampAdjusted(), isPrimaryAddress
     );
 
     return SUCCESS;
@@ -188,7 +136,7 @@ WalletError SubWallets::importSubWallet(
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
 
-    uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+    uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
 
     const std::string address = Utilities::privateKeysToAddress(
         privateSpendKey, m_privateViewKey
@@ -229,7 +177,7 @@ WalletError SubWallets::importViewSubWallet(
         return SUBWALLET_ALREADY_EXISTS;
     }
 
-    uint64_t timestamp = newWallet ? getCurrentTimestampAdjusted() : 0;
+    uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
 
     Crypto::PublicKey publicViewKey;
 
@@ -290,7 +238,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart() const
 
     /* Convert timestamp to height so we can compare them, then return the min
        of the two, and set the other to zero */
-    const uint64_t timestampFromHeight = scanHeightToTimestamp(minHeight);
+    const uint64_t timestampFromHeight = Utilities::scanHeightToTimestamp(minHeight);
 
     if (timestampFromHeight < minTimestamp)
     {
@@ -864,4 +812,28 @@ void SubWallets::throwIfViewWallet() const
 bool SubWallets::isViewWallet() const
 {
     return m_isViewWallet;
+}
+
+void SubWallets::reset(const uint64_t scanHeight)
+{
+    std::scoped_lock lock(m_mutex);
+
+    /* If the transaction is in the pool, we'll find it when we scan the next
+       top block. If it's returned and in an earlier block - too bad, you should
+       have set your scan height lower! */
+    m_lockedTransactions.clear();
+
+    /* Find transactions that are above the scan height, and remove them */
+    const auto it = std::remove_if(m_transactions.begin(), m_transactions.end(), 
+    [&scanHeight](const auto tx)
+    {
+        return tx.blockHeight >= scanHeight;
+    });
+
+    m_transactions.erase(it);
+
+    for (auto &[pubKey, subWallet] : m_subWallets)
+    {
+        subWallet.reset(scanHeight);
+    }
 }

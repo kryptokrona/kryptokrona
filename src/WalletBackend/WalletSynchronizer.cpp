@@ -64,13 +64,9 @@ WalletSynchronizer & WalletSynchronizer::operator=(WalletSynchronizer && old)
     /* Stop any running threads */
     stop();
 
-    m_daemon = std::move(old.m_daemon);
-
     m_blockDownloaderThread = std::move(old.m_blockDownloaderThread);
     m_transactionSynchronizerThread = std::move(old.m_transactionSynchronizerThread);
     m_poolWatcherThread = std::move(old.m_poolWatcherThread);
-
-    m_shouldStop.store(old.m_shouldStop.load());
 
     m_blockDownloaderStatus = std::move(old.m_blockDownloaderStatus);
     m_transactionSynchronizerStatus = std::move(old.m_transactionSynchronizerStatus);
@@ -81,6 +77,10 @@ WalletSynchronizer & WalletSynchronizer::operator=(WalletSynchronizer && old)
     m_privateViewKey = std::move(old.m_privateViewKey);
 
     m_eventHandler = std::move(old.m_eventHandler);
+
+    m_daemon = std::move(old.m_daemon);
+
+    m_hasPoolWatcherThreadLaunched = std::move(old.m_hasPoolWatcherThreadLaunched);
 
     return *this;
 }
@@ -100,10 +100,19 @@ WalletSynchronizer::~WalletSynchronizer()
    and if we do any inheritance, things don't go awry. */
 void WalletSynchronizer::start()
 {
+    /* Reinit any vars which may have changed if we previously called stop() */
+    m_shouldStop = false;
+
+    m_hasPoolWatcherThreadLaunched = false;
+
     if (m_daemon == nullptr)
     {
         throw std::runtime_error("Daemon has not been initialized!");
     }
+
+    /* Make sure to start the queue before the downloader, and the downloader
+       before the synchronizer, to avoid data races */
+    m_blockProcessingQueue.start();
 
     m_blockDownloaderThread = std::thread(
         &WalletSynchronizer::downloadBlocks, this
@@ -122,7 +131,7 @@ void WalletSynchronizer::stop()
         m_poolWatcherThread.joinable())
     {
         /* Tell the threads to stop */
-        m_shouldStop.store(true);
+        m_shouldStop = true;
 
         /* Stop the block processing queue so the threads don't hang trying
            to push/pull from the queue */
@@ -146,6 +155,22 @@ void WalletSynchronizer::stop()
             m_poolWatcherThread.join();
         }
     }
+}
+
+void WalletSynchronizer::reset(uint64_t startHeight)
+{
+    stop();
+
+    /* Reset start height / timestamp */
+    m_startHeight = startHeight;
+    m_startTimestamp = 0;
+
+    /* Discard sync progress */
+    m_blockDownloaderStatus = SynchronizationStatus();
+    m_transactionSynchronizerStatus = SynchronizationStatus();
+
+    /* Need to call start in your calling code - We don't call it here so
+       you can schedule the start correctly */
 }
 
 /* Remove any transactions at this height or above, they were on a forked
@@ -339,7 +364,7 @@ std::vector<uint64_t> WalletSynchronizer::getGlobalIndexes(
 
             /* We don't store the latest transaction if we're stopping, so it's
                ok to be in an invalid state */
-            if (m_shouldStop.load())
+            if (m_shouldStop)
             {
                 return {};
             }
@@ -441,12 +466,12 @@ void WalletSynchronizer::processTransaction(
 
 void WalletSynchronizer::findTransactionsInBlocks()
 {
-    while (!m_shouldStop.load())
+    while (!m_shouldStop)
     {
         WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.pop();
 
         /* Could have stopped between entering the loop and getting a block */
-        if (m_shouldStop.load())
+        if (m_shouldStop)
         {
             return;
         }
@@ -470,7 +495,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
 
         /* Don't store the transaction if we're stopping - we might have had
            to cancel out of an unfinished state. */
-        if (m_shouldStop.load())
+        if (m_shouldStop)
         {
             return;
         }
@@ -495,6 +520,8 @@ void WalletSynchronizer::findTransactionsInBlocks()
                 m_poolWatcherThread = std::thread(
                     &WalletSynchronizer::monitorLockedTransactions, this
                 );
+
+                m_hasPoolWatcherThreadLaunched = true;
             }
         }
     }
@@ -502,7 +529,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
 
 void WalletSynchronizer::monitorLockedTransactions()
 {
-    while (!m_shouldStop.load())
+    while (!m_shouldStop)
     {
         /* Get the hashes of any locked tx's we have */
         const auto lockedTxHashes = m_subWallets->getLockedTransactionsHashes();
@@ -566,7 +593,7 @@ void WalletSynchronizer::downloadBlocks()
     };
 
     /* While we haven't been told to stop */
-    while (!m_shouldStop.load())
+    while (!m_shouldStop)
     {
         /* Re-assign promise (can't reuse) */
         errorPromise = std::promise<std::error_code>();
@@ -587,7 +614,7 @@ void WalletSynchronizer::downloadBlocks()
             /* Don't hang if the daemon doesn't respond */
             auto status = error.wait_for(std::chrono::seconds(1));
 
-            if (m_shouldStop.load())
+            if (m_shouldStop)
             {
                 return;
             }
@@ -643,4 +670,9 @@ void WalletSynchronizer::initializeAfterLoad(
 {
     m_daemon = daemon;
     m_eventHandler = eventHandler;
+}
+
+uint64_t WalletSynchronizer::getCurrentScanHeight() const
+{
+    return m_transactionSynchronizerStatus.getHeight();
 }

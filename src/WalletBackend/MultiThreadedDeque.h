@@ -17,7 +17,7 @@ class MultiThreadedDeque
 {
     public:
         MultiThreadedDeque() :
-            m_stop(false)
+            m_shouldStop(false)
         {
         }
 
@@ -27,7 +27,7 @@ class MultiThreadedDeque
             std::unique_lock<std::mutex> lock(m_mutex);
 
             /* Stopping, don't push data */
-            if (m_stop)
+            if (m_shouldStop)
             {
                 return;
             }
@@ -37,7 +37,7 @@ class MultiThreadedDeque
                 m_consumedBlock.wait(lock, [&]
                 {
                     /* Stopping, don't block */
-                    if (m_stop)
+                    if (m_shouldStop)
                     {
                         return true;
                     }
@@ -68,7 +68,7 @@ class MultiThreadedDeque
             T item;
 
             /* Stopping, don't return data */
-            if (m_stop)
+            if (m_shouldStop)
             {
                 return item;
             }
@@ -78,7 +78,7 @@ class MultiThreadedDeque
             m_haveData.wait(lock, [&]
             { 
                 /* Stopping, don't block */
-                if (m_stop)
+                if (m_shouldStop)
                 {
                     return true;
                 }
@@ -87,7 +87,7 @@ class MultiThreadedDeque
             });
 
             /* Stopping, don't return data */
-            if (m_stop)
+            if (m_shouldStop)
             {
                 return item;
             }
@@ -113,7 +113,7 @@ class MultiThreadedDeque
         void stop()
         {
             /* Make sure the queue knows to return */
-            m_stop.store(true);
+            m_shouldStop = true;
 
             /* Unlock the mutex so things stop waiting */
             m_mutex.unlock();
@@ -122,6 +122,11 @@ class MultiThreadedDeque
             m_haveData.notify_one();
 
             m_consumedBlock.notify_one();
+        }
+
+        void start()
+        {
+            m_shouldStop = false;
         }
 
     private:
@@ -138,5 +143,5 @@ class MultiThreadedDeque
         std::condition_variable m_consumedBlock;
 
         /* Whether we're stopping */
-        std::atomic<bool> m_stop;
+        std::atomic<bool> m_shouldStop;
 };

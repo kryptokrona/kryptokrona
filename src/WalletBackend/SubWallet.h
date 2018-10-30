@@ -23,6 +23,11 @@ using nlohmann::json;
 class SubWallet
 {
     public:
+
+        //////////////////
+        /* Constructors */
+        //////////////////
+
         SubWallet();
 
         SubWallet(
@@ -40,6 +45,10 @@ class SubWallet
             const uint64_t scanTimestamp,
             const bool isPrimaryAddress);
 
+        /////////////////////////////
+        /* Public member functions */
+        /////////////////////////////
+
         /* Converts the class to a json object */
         json toJson() const;
 
@@ -56,6 +65,12 @@ class SubWallet
 
         std::tuple<uint64_t, uint64_t> getBalance(
             const uint64_t currentHeight) const;
+
+        void reset(const uint64_t scanHeight);
+
+        /////////////////////////////
+        /* Public member variables */
+        /////////////////////////////
 
         /* A vector of the stored transaction input data, to be used for
            sending transactions later */

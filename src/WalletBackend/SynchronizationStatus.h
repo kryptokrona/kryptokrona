@@ -17,17 +17,29 @@ using nlohmann::json;
 class SynchronizationStatus
 {
     public:
-        void storeBlockHash(Crypto::Hash hash, uint64_t blockHeight);
 
-        std::vector<Crypto::Hash> getBlockHashCheckpoints();
+        /////////////////////////////
+        /* Public member functions */
+        /////////////////////////////
+
+        void storeBlockHash(
+            const Crypto::Hash hash,
+            const uint64_t blockHeight);
+
+        std::vector<Crypto::Hash> getBlockHashCheckpoints() const;
 
         json toJson() const;
 
         void fromJson(const json &j);
 
-        uint64_t getHeight();
+        uint64_t getHeight() const;
 
     private:
+
+        //////////////////////////////
+        /* Private member variables */
+        //////////////////////////////
+
         /* A store of block hashes (later blocks first, i.e. block 2 comes
            before block 1) These are stored every 5000 blocks or so, used
            for knowing where to resume sync from. We store these in addition

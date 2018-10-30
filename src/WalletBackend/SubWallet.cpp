@@ -124,3 +124,48 @@ std::tuple<uint64_t, uint64_t> SubWallet::getBalance(
 
     return {unlockedBalance, lockedBalance};
 }
+
+void SubWallet::reset(const uint64_t scanHeight)
+{
+    m_syncStartTimestamp = 0;
+    m_syncStartHeight = scanHeight;
+
+    /* If the transaction is in the pool, we'll find it when we scan the next
+       top block. If it's returned and in an earlier block - too bad, you should
+       have set your scan height lower! */
+    m_lockedInputs.clear();
+
+    /* Remove inputs which are above the scan height */
+    auto it = std::remove_if(m_unspentInputs.begin(), m_unspentInputs.end(),
+    [&scanHeight](const auto input)
+    {
+        return input.blockHeight >= scanHeight;
+    });
+
+    m_unspentInputs.erase(it);
+
+    it = std::remove_if(m_spentInputs.begin(), m_spentInputs.end(),
+    [&scanHeight, this](auto &input)
+    {
+        /* Input was received after scan height, remove */
+        if (input.blockHeight >= scanHeight)
+        {
+            return true;
+        }
+
+        /* Input was received before scan height, but spent after - move back
+           into unspent inputs. */
+        if (input.spendHeight >= scanHeight)
+        {
+            input.spendHeight = 0;
+
+            m_unspentInputs.push_back(input);
+
+            return true;
+        }
+
+        return false;
+    });
+
+    m_spentInputs.erase(it);
+}

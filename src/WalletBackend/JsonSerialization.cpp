@@ -83,7 +83,7 @@ json SubWallets::toJson() const
         {"publicSpendKeys", m_publicSpendKeys},
         {"subWallet", subWalletsToVector(m_subWallets)},
         {"transactions", m_transactions},
-        {"lockedTransctions", m_lockedTransactions},
+        {"lockedTransactions", m_lockedTransactions},
         {"privateViewKey", m_privateViewKey},
         {"isViewWallet", m_isViewWallet},
     };
