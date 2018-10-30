@@ -6,6 +6,8 @@
 #include <WalletBackend/WalletBackend.h>
 ////////////////////////////////////////
 
+#include <Common/FileSystemShim.h>
+
 #include <config/CryptoNoteConfig.h>
 
 #include <CryptoNoteCore/Account.h>
@@ -17,8 +19,6 @@
 #include <cryptopp/modes.h>
 #include <cryptopp/sha.h>
 #include <cryptopp/pwdbased.h>
-
-#include <filesystem>
 
 #include <fstream>
 
@@ -88,7 +88,7 @@ WalletError checkNewWalletFilename(std::string filename)
     }
 
     /* Don't leave random files around if we fail later down the road */
-    std::filesystem::remove(filename);
+    fs::remove(filename);
     
     return SUCCESS;
 }
@@ -124,35 +124,6 @@ WalletBackend::~WalletBackend()
     {
         save();
     }
-}
-
-/* Move constructor */
-WalletBackend::WalletBackend(WalletBackend && old)
-{
-    /* Call the move assignment operator */
-    *this = std::move(old);
-}
-
-/* Move assignment operator */
-WalletBackend & WalletBackend::operator=(WalletBackend && old)
-{
-    m_filename = old.m_filename;
-    m_password = old.m_password;
-    m_logManager = old.m_logManager;
-    m_daemon = old.m_daemon;
-    m_subWallets = old.m_subWallets;
-    m_walletSynchronizer = old.m_walletSynchronizer;
-    m_eventHandler = old.m_eventHandler;
-
-    /* Invalidate the old pointers */
-    old.m_logManager = nullptr;
-    old.m_daemon = nullptr;
-    old.m_logger = nullptr;
-    old.m_subWallets = nullptr;
-    old.m_walletSynchronizer = nullptr;
-    old.m_eventHandler = nullptr;
-
-    return *this;
 }
 
 /* Standard Constructor */

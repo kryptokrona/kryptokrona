@@ -109,7 +109,15 @@ target_link_libraries(service WalletService JsonRpcServer Wallet NodeRpcProxy Tr
 target_link_libraries(Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(cryptotest Crypto Common)
-target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static stdc++fs)
+
+if (MSVC)
+    target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static)
+elseif (APPLE)
+    target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static /usr/local/opt/llvm/lib/libc++fs.a) 
+else()
+    target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static stdc++fs)
+endif()
+
 target_link_libraries(zedwallet2 WalletBackend)
 
 # Add dependencies means we have to build the latter before we build the former

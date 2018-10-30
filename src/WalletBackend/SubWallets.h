@@ -16,7 +16,7 @@ class SubWallets
         /* Constructors */
         //////////////////
 
-        SubWallets();
+        SubWallets() = default;
 
         /* Creates a new wallet */
         SubWallets(

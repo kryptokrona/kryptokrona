@@ -46,11 +46,11 @@ class WalletBackend
         /* Delete the Assignment operator */
         WalletBackend & operator=(const WalletBackend &) = delete;
 
-        /* Move constructor */
-        WalletBackend(WalletBackend && old);
+        /* Move constructor (use the default compiler generated constructor) */
+        WalletBackend(WalletBackend && old) = default;
 
-        /* Move Assignment Operator */
-        WalletBackend & operator=(WalletBackend && old);
+        /* Move Assignment Operator (use the default compiler generated ctor) */
+        WalletBackend & operator=(WalletBackend && old) = default;
 
         /////////////////////////////
         /* Public static functions */

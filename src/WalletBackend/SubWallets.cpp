@@ -12,6 +12,8 @@
 
 #include <ctime>
 
+#include <mutex>
+
 #include <random>
 
 #include <WalletBackend/Utilities.h>
@@ -19,10 +21,6 @@
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */
 ///////////////////////////////////
-
-SubWallets::SubWallets()
-{
-}
 
 /* Makes a new subwallet */
 SubWallets::SubWallets(

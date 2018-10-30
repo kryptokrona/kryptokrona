@@ -6,6 +6,8 @@
 
 #include <CryptoNote.h>
 
+#include <unordered_map>
+
 namespace WalletTypes
 {
     struct KeyOutput

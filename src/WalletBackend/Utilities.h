@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <chrono>
 
 #include <CryptoNote.h>

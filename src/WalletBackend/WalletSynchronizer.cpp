@@ -15,13 +15,6 @@
 #include <WalletBackend/Constants.h>
 #include <WalletBackend/Utilities.h>
 
-//////////////////////////
-/* NON MEMBER FUNCTIONS */
-//////////////////////////
-
-namespace {
-} // namespace
-
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */
 ///////////////////////////////////

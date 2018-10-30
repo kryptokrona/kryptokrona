@@ -22,7 +22,7 @@ namespace CryptoNote
 
       /* This method is used to get the minimum and maximum mixin permitted for the
          requested height */
-      static std::tuple<uint64_t, uint64_t> getMixinAllowableRange(const uint32_t height)
+      static std::tuple<uint64_t, uint64_t> getMixinAllowableRange(const uint64_t height)
       {
         uint64_t minMixin = 0;
         uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
@@ -56,7 +56,7 @@ namespace CryptoNote
 
       /* This method is used by WalletService to determine if the mixin amount is correct
          for the current block height */
-      static std::tuple<bool, std::string, std::error_code> validate(const uint32_t mixin, const uint32_t height)
+      static std::tuple<bool, std::string, std::error_code> validate(const uint64_t mixin, const uint64_t height)
       {
         auto [minMixin, maxMixin] = getMixinAllowableRange(height);
 
@@ -78,7 +78,7 @@ namespace CryptoNote
 
       /* This method is commonly used by the node to determine if the transactions in the vector have
          the correct mixin (anonymity) as defined by the current rules */
-      static std::tuple<bool, std::string> validate(std::vector<CachedTransaction> transactions, uint32_t height)
+      static std::tuple<bool, std::string> validate(std::vector<CachedTransaction> transactions, uint64_t height)
       {
         auto [minMixin, maxMixin] = getMixinAllowableRange(height);
 

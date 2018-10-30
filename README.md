@@ -24,9 +24,9 @@ You will also need either GCC/G++, or Clang.
 
 If you are using GCC, you will need GCC-6.0 or higher.
 
-If you are using Clang, you will need Clang 5.0 or higher. You will also need libstdc++\-6.0 or higher.
+If you are using Clang, you will need Clang 6.0 or higher. You will also need libstdc++\-6.0 or higher.
 
-##### GCC setup, on Ubuntu
+##### Ubuntu, using GCC
 
 - `sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y`
 - `sudo apt-get update`
@@ -47,7 +47,7 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./TurtleCoind --version`
 
-##### Clang setup, on Ubuntu
+##### Ubuntu, using Clang
 
 - `sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y`
 - `wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -`
@@ -100,22 +100,23 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./TurtleCoind --version`
 
-#### Apple
+#### OSX/Apple, using GCC
 
 ##### Prerequisites
 
-- Install [cmake](https://cmake.org/). See [here](https://stackoverflow.com/questions/23849962/cmake-installer-for-mac-fails-to-create-usr-bin-symlinks) if you are unable to call `cmake` from the terminal after installing.
-- Install the [boost](http://www.boost.org/) libraries. Either compile boost manually or run `brew install boost`.
 - Install XCode and Developer Tools.
-
 
 ##### Building
 
+- `which brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+- `brew install --force cmake boost llvm gcc@8`
+- `export CC=gcc-8`
+- `export CXX=g++-8`
 - `git clone -b master --single-branch https://github.com/turtlecoin/turtlecoin`
 - `cd turtlecoin`
-- `mkdir build && cd $_`
-- `cmake ..` or `cmake -DBOOST_ROOT=<path_to_boost_install> ..` when building
-  from a specific boost install. If you used brew to install boost, your path is most likely `/usr/local/include/boost.`
+- `mkdir build`
+- `cd build`
+- `cmake ..`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
@@ -123,11 +124,30 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./TurtleCoind --version`
 
-If your version of gcc is too old, you may need to run:
+#### OSX/Apple, using Clang
 
-- `brew install gcc@8`
-- `export CC=gcc-8`
-- `export CXX=g++-8`
+##### Prerequisites
+
+- Install XCode and Developer Tools.
+
+##### Building
+
+- `which brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
+- `brew install --force cmake boost llvm`
+- `export CC=/usr/local/opt/llvm/bin/clang`
+- `export CXX=/usr/local/opt/llvm/bin/clang++`
+- `git clone -b master --single-branch https://github.com/turtlecoin/turtlecoin`
+- `cd turtlecoin`
+- `mkdir build`
+- `cd build`
+- `cmake ..`
+- `make`
+
+The binaries will be in the `src` folder when you are complete.
+
+- `cd src`
+- `./TurtleCoind --version`
+
 
 #### Windows
 
