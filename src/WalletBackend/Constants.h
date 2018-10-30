@@ -59,4 +59,13 @@ namespace Constants
        the queue. If we exceed this, we will wait till it drops below this
        amount. */
     const uint32_t MAXIMUM_SYNC_QUEUE_SIZE = 1000;
+
+    /* Handy if we don't want to use a secret key (for example, for view wallets)
+       and want to make it explicit that this is uninitialized. */
+    const Crypto::SecretKey BLANK_SECRET_KEY = Crypto::SecretKey({
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+    });
 }

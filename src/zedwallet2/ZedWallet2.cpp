@@ -15,8 +15,10 @@ int main()
     std::string walletName = "test.wallet";
     std::string walletPass = "password";
     std::string daemonHost = "127.0.0.1";
+
     std::string seed = "biggest yields peeled pawnshop godfather likewise hickory queen exit trying buying island wagtail vitals lucky theatrics dewdrop licks update pivot digit foes ensign estate queen";
-    std::string address = "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW";
+
+    std::string viewWalletAddress = "TRTLuyw6gDNCFwe3MWctb2PpUP6xMS2Q8AX6H3MbRLStSWKoypA8mNBfv6SFHaCupQHVnZSUZv8k169eg5VaoCxZYKReQezN6jN";
 
     uint64_t seedScanHeight = 822500;
 
@@ -57,7 +59,7 @@ int main()
     }
     else if (selection == "view")
     {
-        std::tie(error, wallet) = WalletBackend::importViewWallet(privateSpendKey, address, walletName, walletPass, keyScanHeight, daemonHost, daemonPort);
+        std::tie(error, wallet) = WalletBackend::importViewWallet(privateViewKey, viewWalletAddress, walletName, walletPass, keyScanHeight, daemonHost, daemonPort);
     }
     else
     {
@@ -81,7 +83,7 @@ int main()
     {
         std::cout << "Wallet is synced! Top block: " << blockHeight << std::endl;
 
-        const bool doTransaction = true;
+        const bool doTransaction = false;
 
         if (doTransaction)
         {

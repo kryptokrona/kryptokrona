@@ -9,14 +9,8 @@
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 
+#include <WalletBackend/Constants.h>
 #include <WalletBackend/Utilities.h>
-
-//////////////////////////
-/* NON MEMBER FUNCTIONS */
-//////////////////////////
-
-namespace {
-} // namespace
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */
@@ -38,6 +32,7 @@ SubWallet::SubWallet(
     m_address(address),
     m_syncStartHeight(scanHeight),
     m_syncStartTimestamp(scanTimestamp),
+    m_privateSpendKey(Constants::BLANK_SECRET_KEY),
     m_isPrimaryAddress(isPrimaryAddress)
 {
 }
