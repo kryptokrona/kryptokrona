@@ -13,22 +13,26 @@
 
 using namespace CryptoNote;
 
+namespace {
+  const uint64_t MEGABYTE = 1024 * 1024;
+}
+
 DataBaseConfig::DataBaseConfig() :
   dataDir(Tools::getDefaultDataDirectory()),
   backgroundThreadsCount(DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT),
   maxOpenFiles(DATABASE_DEFAULT_MAX_OPEN_FILES),
-  writeBufferSize(DATABASE_WRITE_BUFFER_DEFAULT_SIZE),
-  readCacheSize(DATABASE_READ_BUFFER_DEFAULT_SIZE),
+  writeBufferSize(DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE * MEGABYTE),
+  readCacheSize(DATABASE_READ_BUFFER_MB_DEFAULT_SIZE * MEGABYTE),
   testnet(false) {
 }
 
-bool DataBaseConfig::init(const std::string dataDirectory, const int backgroundThreads, const int openFiles, const int writeBuffer, const int readCache)
+bool DataBaseConfig::init(const std::string dataDirectory, const int backgroundThreads, const int openFiles, const int writeBufferMB, const int readCacheMB)
 {
   dataDir = dataDirectory;
   backgroundThreadsCount = backgroundThreads;
   maxOpenFiles = openFiles;
-  writeBufferSize = writeBuffer;
-  readCacheSize = readCache;
+  writeBufferSize = writeBufferMB * MEGABYTE;
+  readCacheSize = readCacheMB * MEGABYTE;
 
   if (dataDir == Tools::getDefaultDataDirectory())
   {

@@ -42,6 +42,7 @@
 using Common::JsonValue;
 using namespace CryptoNote;
 using namespace Logging;
+using namespace DaemonConfig;
 
 void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const bool blockExplorerMode, LoggerManager& logManager)
 {
@@ -148,6 +149,25 @@ int main(int argc, char* argv[])
   {
     try
     {
+      if(updateConfigFormat(config.configFile, config))
+      {
+          std::cout << std::endl << "Updating daemon configuration format..." << std::endl;
+          asFile(config, config.configFile);
+      }
+    }
+    catch(std::runtime_error& e)
+    {
+      std::cout << std::endl << "There was an error parsing the specified configuration file. Please check the file and try again:"
+        << std::endl << e.what() << std::endl;
+      exit(1);
+    }
+    catch(std::exception& e)
+    {
+      // pass
+    }
+
+    try
+    {
       handleSettings(config.configFile, config);
     }
     catch (std::exception& e)
@@ -244,7 +264,7 @@ int main(int argc, char* argv[])
       config.seedNodes);
 
     DataBaseConfig dbConfig;
-    dbConfig.init(config.dataDirectory, config.dbThreads, config.dbMaxOpenFiles, config.dbWriteBufferSize, config.dbReadCacheSize);
+    dbConfig.init(config.dataDirectory, config.dbThreads, config.dbMaxOpenFiles, config.dbWriteBufferSizeMB, config.dbReadCacheSizeMB);
 
     if (dbConfig.isConfigFolderDefaulted())
     {
