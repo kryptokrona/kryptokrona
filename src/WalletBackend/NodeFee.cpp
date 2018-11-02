@@ -8,6 +8,9 @@
 
 #include <WalletBackend/ValidateParameters.h>
 
+namespace NodeFee
+{
+
 std::tuple<uint64_t, std::string> getNodeFee(const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon)
 {
     const uint64_t feeAmount = daemon->feeAmount();
@@ -44,3 +47,5 @@ std::vector<std::pair<std::string, uint64_t>> appendFeeTransaction(
 
     return transactions;
 }
+
+} // namespace

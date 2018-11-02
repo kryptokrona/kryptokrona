@@ -583,6 +583,14 @@ bool Core::getWalletSyncData(
                                     mainChain->getTimestampLowerBoundBlockIndex(startTimestamp) :
                                     startHeight;
 
+        /* If we couldn't get the first block timestamp, then the node is
+           synced less than the current height, so return no blocks till we're
+           synced. */
+        if (startTimestamp != 0 && firstBlockHeight == 0)
+        {
+            return true;
+        }
+
         /* Start returning either from the start height, or the height of the
            last block we know about, whichever is higher */
         uint64_t startIndex = std::max(

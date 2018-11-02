@@ -20,9 +20,20 @@ class Event
             m_function = {};
         }
 
+        void pause()
+        {
+            m_paused = true;
+        }
+
+        void resume()
+        {
+            m_paused = false;
+        }
+
         void fire(T args)
         {
-            if (m_function)
+            /* If we have a function to run, and we're not ignoring events */
+            if (m_function && !m_paused)
             {
                 /* Launch the function, and return instantly. This way we
                    can have multiple functions running at once.
@@ -37,6 +48,8 @@ class Event
 
     private:
         std::function<void(T)> m_function;
+
+        bool m_paused = false;
 };
 
 class EventHandler

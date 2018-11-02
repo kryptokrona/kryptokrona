@@ -32,7 +32,7 @@ int main()
 
     uint16_t daemonPort = CryptoNote::RPC_DEFAULT_PORT;
 
-    WalletBackend wallet;
+    std::shared_ptr<WalletBackend> wallet(nullptr);
     WalletError error;
 
     std::string selection;
@@ -73,13 +73,13 @@ int main()
         return 1;
     }
 
-    const auto [unlockedBalance, lockedBalance] = wallet.getTotalBalance();
+    const auto [unlockedBalance, lockedBalance] = wallet->getTotalBalance();
 
     std::cout << std::endl
               << "Unlocked balance: " << unlockedBalance << std::endl
               << "Locked balance: " << lockedBalance << std::endl << std::endl;
 
-    wallet.m_eventHandler->onSynced.subscribe([&](int blockHeight)
+    wallet->m_eventHandler->onSynced.subscribe([&](int blockHeight)
     {
         std::cout << "Wallet is synced! Top block: " << blockHeight << std::endl;
 
@@ -88,14 +88,14 @@ int main()
         if (doTransaction)
         {
             /*
-            const auto [error, hash] = wallet.sendTransactionBasic(
+            const auto [error, hash] = wallet->sendTransactionBasic(
                 "TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW",
                 123,
                 ""
             );
             */
 
-            const auto [error, hash] = wallet.sendFusionTransactionBasic();
+            const auto [error, hash] = wallet->sendFusionTransactionBasic();
 
             if (error)
             {
@@ -107,10 +107,10 @@ int main()
             }
         }
 
-        //wallet.m_eventHandler->onSynced.unsubscribe();
+        //wallet->m_eventHandler->onSynced.unsubscribe();
     });
 
-    wallet.m_eventHandler->onTransaction.subscribe([&](WalletTypes::Transaction tx)
+    wallet->m_eventHandler->onTransaction.subscribe([&](WalletTypes::Transaction tx)
     {
         for (const auto & [pubKey, amount] : tx.transfers)
         {

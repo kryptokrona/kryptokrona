@@ -148,6 +148,25 @@ void WalletBackend::fromJson(const json &j)
     );
 }
 
+WalletError WalletBackend::fromJson(
+    const json &j,
+    const std::string filename,
+    const std::string password,
+    const std::string daemonHost,
+    const uint16_t daemonPort)
+{
+    fromJson(j);
+
+    m_filename = filename;
+    m_password = password;
+
+    m_daemon = std::make_shared<CryptoNote::NodeRpcProxy>(
+        daemonHost, daemonPort, m_logger->getLogger()
+    );
+
+    return init();
+}
+
 /* Declaration of to_json and from_json have to be in the same namespace as
    the type itself was declared in */
 namespace Crypto
@@ -327,6 +346,7 @@ namespace WalletTypes
             {"timestamp", t.timestamp},
             {"paymentID", t.paymentID},
             {"unlockTime", t.unlockTime},
+            {"isCoinbaseTransaction", t.isCoinbaseTransaction},
         };
     }
 
@@ -339,6 +359,7 @@ namespace WalletTypes
         t.timestamp = j.at("timestamp").get<uint64_t>();
         t.paymentID = j.at("paymentID").get<std::string>();
         t.unlockTime = j.at("unlockTime").get<uint64_t>();
+        t.isCoinbaseTransaction = j.at("isCoinbaseTransaction").get<bool>();
     }
 }
 

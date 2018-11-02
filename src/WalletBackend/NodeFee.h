@@ -10,10 +10,14 @@
 
 #include <vector>
 
-std::tuple<uint64_t, std::string> getNodeFee(const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon);
+namespace NodeFee
+{
+    std::tuple<uint64_t, std::string> getNodeFee(
+        const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon);
 
-bool isValidFee(uint64_t feeAmount, std::string feeAddress);
+    bool isValidFee(uint64_t feeAmount, std::string feeAddress);
 
-std::vector<std::pair<std::string, uint64_t>> appendFeeTransaction(
-    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
-    std::vector<std::pair<std::string, uint64_t>> transactions);
+    std::vector<std::pair<std::string, uint64_t>> appendFeeTransaction(
+        const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+        std::vector<std::pair<std::string, uint64_t>> transactions);
+}

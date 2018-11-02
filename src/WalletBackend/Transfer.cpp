@@ -34,7 +34,7 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionBasic(
 
     /* Assumes the container has at least one subwallet - this is true as long
        as the static constructors were used */
-    const std::string defaultAddress = subWallets->getDefaultChangeAddress();
+    const std::string defaultAddress = subWallets->getPrimaryAddress();
 
     return sendFusionTransactionAdvanced(
         mixin, {}, defaultAddress, daemon, subWallets
@@ -50,7 +50,7 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
 {
     if (destination == "")
     {
-        destination = subWallets->getDefaultChangeAddress();
+        destination = subWallets->getPrimaryAddress();
     }
 
     /* Validate the transaction input parameters */
@@ -215,7 +215,7 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionBasic(
 
     /* Assumes the container has at least one subwallet - this is true as long
        as the static constructors were used */
-    const std::string changeAddress = subWallets->getDefaultChangeAddress();
+    const std::string changeAddress = subWallets->getPrimaryAddress();
 
     return sendTransactionAdvanced(
         destinations, mixin, fee, paymentID, {}, changeAddress, daemon,
@@ -234,11 +234,11 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
     const std::shared_ptr<SubWallets> subWallets)
 {
     /* Append the fee transaction, if a fee is being used */
-    addressesAndAmounts = appendFeeTransaction(daemon, addressesAndAmounts);
+    addressesAndAmounts = NodeFee::appendFeeTransaction(daemon, addressesAndAmounts);
 
     if (changeAddress == "")
     {
-        changeAddress = subWallets->getDefaultChangeAddress();
+        changeAddress = subWallets->getPrimaryAddress();
     }
 
     /* Validate the transaction input parameters */
@@ -388,11 +388,13 @@ void storeSentTransaction(
     /* Not initialized till it's in a block */
     const uint64_t timestamp(0), blockHeight(0), unlockTime(0);
 
+    const bool isCoinbaseTransaction = false;
+
     /* Create the unconfirmed transaction (Will be overwritten by the
        confirmed transaction later) */
     WalletTypes::Transaction tx(
         transfers, hash, fee, timestamp, blockHeight, paymentID,
-        unlockTime
+        unlockTime, isCoinbaseTransaction
     );
 
     subWallets->addUnconfirmedTransaction(tx);

@@ -254,7 +254,14 @@ WalletError validateAddresses(
         if (address.length() != WalletConfig::standardAddressLength &&
             address.length() != WalletConfig::integratedAddressLength)
         {
-            return ADDRESS_WRONG_LENGTH;
+            std::stringstream stream;
+
+            stream << "The address given is the wrong length. It should be "
+                   << WalletConfig::standardAddressLength << " chars or "
+                   << WalletConfig::integratedAddressLength << " chars, but "
+                   << "it is " << address.length() << " chars.";
+
+            return WalletError(ADDRESS_WRONG_LENGTH, stream.str());
         }
 
         /* Address has the wrong prefix */

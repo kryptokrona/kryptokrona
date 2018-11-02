@@ -78,7 +78,8 @@ SubWallets::SubWallets(const SubWallets &other) :
     m_transactions(other.m_transactions),
     m_lockedTransactions(other.m_lockedTransactions),
     m_privateViewKey(other.m_privateViewKey),
-    m_isViewWallet(other.m_isViewWallet)
+    m_isViewWallet(other.m_isViewWallet),
+    m_publicSpendKeys(other.m_publicSpendKeys)
 {
 }
 
@@ -333,7 +334,7 @@ std::tuple<bool, Crypto::PublicKey>
             return input.keyImage == keyImage;
         });
 
-        if (it != subWallet.m_unspentInputs.end())
+        if (it != subWallet.m_lockedInputs.end())
         {
             return {true, subWallet.m_publicSpendKey};
         }
@@ -543,7 +544,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
 
 /* Gets the primary address, which is the first address created with the
    wallet */
-std::string SubWallets::getDefaultChangeAddress() const
+std::string SubWallets::getPrimaryAddress() const
 {
     std::scoped_lock lock(m_mutex);
 
@@ -828,10 +829,48 @@ void SubWallets::reset(const uint64_t scanHeight)
         return tx.blockHeight >= scanHeight;
     });
 
-    m_transactions.erase(it);
+    if (it != m_transactions.end())
+    {
+        m_transactions.erase(it);
+    }
 
     for (auto &[pubKey, subWallet] : m_subWallets)
     {
         subWallet.reset(scanHeight);
     }
+}
+
+std::vector<Crypto::SecretKey> SubWallets::getPrivateSpendKeys() const
+{
+    std::vector<Crypto::SecretKey> spendKeys;
+
+    for (const auto [pubKey, subWallet] : m_subWallets)
+    {
+        spendKeys.push_back(subWallet.m_privateSpendKey);
+    }
+
+    return spendKeys;
+}
+
+Crypto::SecretKey SubWallets::getPrimaryPrivateSpendKey() const
+{
+    std::scoped_lock lock(m_mutex);
+
+    const auto it = 
+    std::find_if(m_subWallets.begin(), m_subWallets.end(), [](const auto subWallet)
+    {
+        return subWallet.second.m_isPrimaryAddress;
+    });
+
+    if (it == m_subWallets.end())
+    {
+        throw std::runtime_error("This container has no primary address!");
+    }
+
+    return it->second.m_privateSpendKey;
+}
+
+std::vector<WalletTypes::Transaction> SubWallets::getTransactions() const
+{
+    return m_transactions;
 }

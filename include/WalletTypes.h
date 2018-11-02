@@ -179,54 +179,108 @@ namespace WalletTypes
         Crypto::SecretKey ownerPrivateSpendKey;
     };
 
-    struct Transaction
+    class Transaction
     {
-        Transaction() {};
+        public:
 
-        Transaction(
-            const std::unordered_map<Crypto::PublicKey, int64_t> transfers,
-            const Crypto::Hash hash,
-            const uint64_t fee,
-            const uint64_t timestamp,
-            const uint64_t blockHeight,
-            const std::string paymentID,
-            const uint64_t unlockTime) :
+            //////////////////
+            /* Constructors */
+            //////////////////
 
-            transfers(transfers),
-            hash(hash),
-            fee(fee),
-            timestamp(timestamp),
-            blockHeight(blockHeight),
-            paymentID(paymentID),
-            unlockTime(unlockTime)
-        {
-        }
+            Transaction() {};
 
-        /* A map of public keys to amounts, since one transaction can go to
-           multiple addresses. These can be positive or negative, for example
-           one address might have sent 10,000 TRTL (-10000) to two recipients
-           (+5000), (+5000) 
-           
-           All the public keys in this map, are ones that the wallet container
-           owns, it won't store amounts belonging to random people */
-        std::unordered_map<Crypto::PublicKey, int64_t> transfers;
+            Transaction(
+                const std::unordered_map<Crypto::PublicKey, int64_t> transfers,
+                const Crypto::Hash hash,
+                const uint64_t fee,
+                const uint64_t timestamp,
+                const uint64_t blockHeight,
+                const std::string paymentID,
+                const uint64_t unlockTime,
+                const bool isCoinbaseTransaction) :
 
-        /* The hash of the transaction */
-        Crypto::Hash hash;
+                transfers(transfers),
+                hash(hash),
+                fee(fee),
+                timestamp(timestamp),
+                blockHeight(blockHeight),
+                paymentID(paymentID),
+                unlockTime(unlockTime),
+                isCoinbaseTransaction(isCoinbaseTransaction)
+            {
+            }
 
-        /* The fee the transaction was sent with (always positive) */
-        uint64_t fee;
+            /////////////////////////////
+            /* Public member functions */
+            /////////////////////////////
 
-        /* The blockheight this transaction is in */
-        uint64_t blockHeight;
+            int64_t totalAmount() const
+            {
+                int64_t sum = 0;
 
-        /* The timestamp of this transaction (taken from the block timestamp) */
-        uint64_t timestamp;
+                for (const auto [pubKey, amount] : transfers)
+                {
+                    sum += amount;
+                }
 
-        /* The paymentID of this transaction (will be an empty string if no pid) */
-        std::string paymentID;
+                return sum;
+            }
 
-        /* When does the transaction unlock */
-        uint64_t unlockTime;
+            bool isFusionTransaction() const
+            {
+                return fee == 0 && !isCoinbaseTransaction;
+            }
+
+            /////////////////////////////
+            /* Public member variables */
+            /////////////////////////////
+
+            /* A map of public keys to amounts, since one transaction can go to
+               multiple addresses. These can be positive or negative, for example
+               one address might have sent 10,000 TRTL (-10000) to two recipients
+               (+5000), (+5000) 
+               
+               All the public keys in this map, are ones that the wallet container
+               owns, it won't store amounts belonging to random people */
+            std::unordered_map<Crypto::PublicKey, int64_t> transfers;
+
+            /* The hash of the transaction */
+            Crypto::Hash hash;
+
+            /* The fee the transaction was sent with (always positive) */
+            uint64_t fee;
+
+            /* The blockheight this transaction is in */
+            uint64_t blockHeight;
+
+            /* The timestamp of this transaction (taken from the block timestamp) */
+            uint64_t timestamp;
+
+            /* The paymentID of this transaction (will be an empty string if no pid) */
+            std::string paymentID;
+
+            /* When does the transaction unlock */
+            uint64_t unlockTime;
+
+            /* Was this transaction a miner reward / coinbase transaction */
+            bool isCoinbaseTransaction;
+    };
+
+    struct WalletStatus
+    {
+        /* The amount of blocks the wallet has synced */
+        uint64_t walletBlockCount;
+
+        /* The amount of blocks the daemon we are connected to has synced */
+        uint64_t localDaemonBlockCount;
+
+        /* The amount of blocks the daemons on the network have */
+        uint64_t networkBlockCount;
+
+        /* The amount of peers the node is connected to */
+        uint32_t peerCount;
+
+        /* The hashrate (based on the last block the daemon has synced) */
+        uint64_t lastKnownHashrate;
     };
 }

@@ -1354,8 +1354,7 @@ uint32_t DatabaseBlockchainCache::getTimestampLowerBoundBlockIndex(uint64_t time
     }
 
     if (!dbRes.first) {
-      midnight -= 60 * 60 * 24;
-      continue;
+      return 0;
     }
 
     return *dbRes.first;

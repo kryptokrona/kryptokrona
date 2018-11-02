@@ -27,7 +27,7 @@ file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 file(GLOB_RECURSE service WalletService/*)
 file(GLOB_RECURSE zedwallet zedwallet/*)
 file(GLOB_RECURSE CryptoTest CryptoTest/*)
-file(GLOB_RECURSE zedwallet2 zedwallet2/*)
+file(GLOB_RECURSE zedwallet++ zedwallet++/*)
 
 if(MSVC)
 file(GLOB_RECURSE System System/* Platform/Windows/System/*)
@@ -40,7 +40,7 @@ endif()
 # This appears to be an IDE thing, to group files together.
 # https://cmake.org/cmake/help/v3.0/command/source_group.html
 # Probably not what you need to be looking at if something isn't building
-source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TurtleCoind} ${JsonRpcServer} ${Http} ${Logging} ${miner} ${Mnemonics} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletBackend} ${zedwallet} ${zedwallet2} ${CryptoTest})
+source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${TurtleCoind} ${JsonRpcServer} ${Http} ${Logging} ${miner} ${Mnemonics} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletBackend} ${zedwallet} ${zedwallet++} ${CryptoTest})
 
 add_library(BlockchainExplorer ${BlockchainExplorer})
 add_library(Common ${Common})
@@ -80,7 +80,7 @@ endif()
 
 add_executable(TurtleCoind ${TurtleCoind} ${DAEMON_SOURCES_OS})
 add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
-add_executable(zedwallet2 ${zedwallet2} ${ZED_WALLET_SOURCES_OS})
+add_executable(zedwallet++ ${zedwallet++} ${ZED_WALLET_SOURCES_OS})
 add_executable(service ${service} ${PG_SOURCES_OS})
 add_executable(miner ${miner} ${MINER_SOURCES_OS})
 add_executable(cryptotest ${CryptoTest} ${CT_SOURCES_OS})
@@ -118,7 +118,7 @@ else()
     target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static stdc++fs)
 endif()
 
-target_link_libraries(zedwallet2 WalletBackend)
+target_link_libraries(zedwallet++ WalletBackend)
 
 # Add dependencies means we have to build the latter before we build the former
 # In this case it's because we need to have the current version name rather
@@ -129,7 +129,6 @@ add_dependencies(miner version)
 add_dependencies(Rpc version)
 add_dependencies(TurtleCoind version)
 add_dependencies(zedwallet version)
-add_dependencies(zedwallet2 version)
 add_dependencies(service version)
 add_dependencies(P2P version)
 add_dependencies(cryptotest version)
@@ -137,7 +136,7 @@ add_dependencies(cryptotest version)
 # Finally build the binaries
 set_property(TARGET TurtleCoind PROPERTY OUTPUT_NAME "TurtleCoind")
 set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "zedwallet")
-set_property(TARGET zedwallet2 PROPERTY OUTPUT_NAME "zedwallet2")
+set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "zedwallet++")
 set_property(TARGET service PROPERTY OUTPUT_NAME "turtle-service")
 set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
 set_property(TARGET cryptotest PROPERTY OUTPUT_NAME "cryptotest")

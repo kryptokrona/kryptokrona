@@ -93,6 +93,10 @@ WalletSynchronizer::~WalletSynchronizer()
    and if we do any inheritance, things don't go awry. */
 void WalletSynchronizer::start()
 {
+    /* Call stop first, so if we reassign any threads, they have been correctly
+       stopped */
+    stop();
+
     /* Reinit any vars which may have changed if we previously called stop() */
     m_shouldStop = false;
 
@@ -118,35 +122,29 @@ void WalletSynchronizer::start()
 
 void WalletSynchronizer::stop()
 {
-    /* If either of the threads are running (and not detached) */
-    if (m_blockDownloaderThread.joinable() || 
-        m_transactionSynchronizerThread.joinable() ||
-        m_poolWatcherThread.joinable())
+    /* Tell the threads to stop */
+    m_shouldStop = true;
+
+    /* Stop the block processing queue so the threads don't hang trying
+       to push/pull from the queue */
+    m_blockProcessingQueue.stop();
+
+    /* Wait for the block downloader thread to finish (if applicable) */
+    if (m_blockDownloaderThread.joinable())
     {
-        /* Tell the threads to stop */
-        m_shouldStop = true;
+        m_blockDownloaderThread.join();
+    }
 
-        /* Stop the block processing queue so the threads don't hang trying
-           to push/pull from the queue */
-        m_blockProcessingQueue.stop();
+    /* Wait for the transaction synchronizer thread to finish (if applicable) */
+    if (m_transactionSynchronizerThread.joinable())
+    {
+        m_transactionSynchronizerThread.join();
+    }
 
-        /* Wait for the block downloader thread to finish (if applicable) */
-        if (m_blockDownloaderThread.joinable())
-        {
-            m_blockDownloaderThread.join();
-        }
-
-        /* Wait for the transaction synchronizer thread to finish (if applicable) */
-        if (m_transactionSynchronizerThread.joinable())
-        {
-            m_transactionSynchronizerThread.join();
-        }
-
-        /* Wait for the pool watcher thread to finish (if applicable) */
-        if (m_poolWatcherThread.joinable())
-        {
-            m_poolWatcherThread.join();
-        }
+    /* Wait for the pool watcher thread to finish (if applicable) */
+    if (m_poolWatcherThread.joinable())
+    {
+        m_poolWatcherThread.join();
     }
 }
 
@@ -397,10 +395,12 @@ void WalletSynchronizer::processCoinbaseTransaction(
         /* Coinbase transactions can't have payment ID's */
         const std::string paymentID;
 
+        const bool isCoinbaseTransaction = true;
+
         /* Form the actual transaction */
         WalletTypes::Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight, paymentID,
-            rawTX.unlockTime
+            rawTX.unlockTime, isCoinbaseTransaction
         );
 
         /* Store the transaction */
@@ -444,10 +444,12 @@ void WalletSynchronizer::processTransaction(
         /* Fee is the difference between inputs and outputs */
         const uint64_t fee = sumOfInputs - sumOfOutputs;
 
+        const bool isCoinbaseTransaction = false;
+
         /* Form the actual transaction */
         const WalletTypes::Transaction tx(
             transfers, rawTX.hash, fee, blockTimestamp, blockHeight,
-            rawTX.paymentID, rawTX.unlockTime
+            rawTX.paymentID, rawTX.unlockTime, isCoinbaseTransaction
         );
 
         /* Store the transaction */
@@ -588,6 +590,48 @@ void WalletSynchronizer::downloadBlocks()
     /* While we haven't been told to stop */
     while (!m_shouldStop)
     {
+        const uint64_t localDaemonBlockCount = m_daemon->getLastLocalBlockHeight();
+
+        const uint64_t walletBlockCount = m_blockDownloaderStatus.getHeight();
+
+        /* Local daemon not initialized, possibly just started up, make a
+           small sleep */
+        if (localDaemonBlockCount == 0)
+        {
+            Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
+            continue;
+        }
+        /* Local daemon has less blocks than the wallet:
+
+        With the get wallet sync data call, we give a height or a timestamp to
+        start at, and an array of block hashes of the last known blocks we
+        know about.
+        
+        If the daemon can find the hashes, it returns the next one it knows
+        about, so if we give a start height of 200,000, and a hash of
+        block 300,000, it will return block 300,001 and above.
+        
+        This works well, since if the chain forks at 300,000, it won't have the
+        hash of 300,000, so it will return the next hash we gave it,
+        in this case probably 299,999.
+        
+        On the wallet side, we'll detect a block lower than our last known
+        block, and handle the fork.
+
+        However, if we're syncing our wallet with an unsynced daemon,
+        lets say our wallet is at height 600,000, and the daemon is at 300,000.
+        If our start height was at 200,000, then since it won't have any block
+        hashes around 600,000, it will start returning blocks from
+        200,000 and up, discarding our current progress.
+
+        Therefore, we should wait until the local daemon has more blocks than
+        us to prevent discarding sync data. */
+        else if (localDaemonBlockCount < walletBlockCount) 
+        {
+            Utilities::sleepUnlessStopping(std::chrono::seconds(30), m_shouldStop);
+            continue;
+        }
+
         /* Re-assign promise (can't reuse) */
         errorPromise = std::promise<std::error_code>();
 
@@ -623,9 +667,6 @@ void WalletSynchronizer::downloadBlocks()
 
         if (err)
         {
-            std::cout << "Failed to download blocks from daemon: " << err << ", "
-                      << err.message() << std::endl;
-
             Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
         }
         else
@@ -637,9 +678,6 @@ void WalletSynchronizer::downloadBlocks()
                 Utilities::sleepUnlessStopping(std::chrono::seconds(30), m_shouldStop);
                 continue;
             }
-
-            std::cout << "Syncing blocks: " << newBlocks.back().blockHeight
-                      << std::endl;
 
             for (const auto &block : newBlocks)
             {

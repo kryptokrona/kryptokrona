@@ -137,7 +137,10 @@ void SubWallet::reset(const uint64_t scanHeight)
         return input.blockHeight >= scanHeight;
     });
 
-    m_unspentInputs.erase(it);
+    if (it != m_unspentInputs.end())
+    {
+        m_unspentInputs.erase(it);
+    }
 
     it = std::remove_if(m_spentInputs.begin(), m_spentInputs.end(),
     [&scanHeight, this](auto &input)
@@ -162,5 +165,8 @@ void SubWallet::reset(const uint64_t scanHeight)
         return false;
     });
 
-    m_spentInputs.erase(it);
+    if (it != m_spentInputs.end())
+    {
+        m_spentInputs.erase(it);
+    }
 }
