@@ -17,7 +17,8 @@ matrix:
           - gcc-8
     env:
     - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
-    - LABEL="linux-g++-8"
+    - LABEL="linux"
+    - _DEPLOYABLE="true"
     - STRIP="strip"
 
   # Ubuntu, g++-7
@@ -77,7 +78,8 @@ matrix:
     env:
     # Need to uninstall oclint to get newer gcc installed https://github.com/travis-ci/travis-ci/issues/8826
     - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
-    - LABEL="osx-g++-8"
+    - LABEL="osx"
+    - _DEPLOYABLE="true"
     - STRIP="strip"
 
   # OSX, g++-7
@@ -103,6 +105,7 @@ matrix:
     env:
     - MATRIX_EVAL="CC=aarch64-linux-gnu-gcc && CXX=aarch64-linux-gnu-g++"
     - LABEL="aarch64"
+    - _DEPLOYABLE="true"
     - STRIP="aarch64-linux-gnu-strip"
 
 before_install:
@@ -110,10 +113,10 @@ before_install:
 
 install:
 # Need to uninstall oclint to get newer gcc installed https://github.com/travis-ci/travis-ci/issues/8826
-- if [[ "${LABEL:0:4}" == "osx-" ]]; then brew cask uninstall --force oclint || true ; fi
+- if [[ "${LABEL:0:3}" == "osx" ]]; then brew cask uninstall --force oclint || true ; fi
 
 # Install the correct gcc version
-- if [[ "$LABEL" == "osx-g++-8" ]]; then brew install gcc@8 ; fi
+- if [[ "$LABEL" == "osx" ]]; then brew install gcc@8 ; fi
 - if [[ "$LABEL" == "osx-g++-7" ]]; then brew install gcc@7 ; fi
 
 - if [[ "$LABEL" == "aarch64" ]]; then export BASEDIR=`pwd` ; fi
@@ -161,6 +164,7 @@ deploy:
     on:
       repo: turtlecoin/turtlecoin
       tags: true
+      condition: "$_DEPLOYABLE = true"
 
   - provider: s3
     access_key_id:
@@ -176,3 +180,4 @@ deploy:
     on:
       repo: turtlecoin/turtlecoin
       all_branches: true
+      condition: "$_DEPLOYABLE = true"
