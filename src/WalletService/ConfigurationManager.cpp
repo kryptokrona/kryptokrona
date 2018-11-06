@@ -24,8 +24,6 @@ ConfigurationManager::ConfigurationManager() {
 
 bool ConfigurationManager::init(int argc, char** argv)
 {
-  WalletServiceConfiguration serviceConfig;
-
   // Load in the initial CLI options
   handleSettings(argc, argv, serviceConfig);
 
