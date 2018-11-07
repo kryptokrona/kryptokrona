@@ -671,6 +671,19 @@ int CryptoNoteProtocolHandler::handleRequestTxPool(int command, NOTIFY_REQUEST_T
   return 1;
 }
 
+int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command,
+                                                            CryptoNote::NOTIFY_NEW_LITE_BLOCK::request &arg,
+                                                            CryptoNote::CryptoNoteConnectionContext &context) {
+  // TODO: Implement Lite Blocks Relay
+  return 1;
+}
+
+int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, CryptoNote::NOTIFY_MISSING_TXS::request &arg,
+                                                         CryptoNote::CryptoNoteConnectionContext &context) {
+  // TODO: Implement Missing Transactions Relay
+  return 1;
+}
+
 
 void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
   auto buf = LevinProtocol::encode(arg);
