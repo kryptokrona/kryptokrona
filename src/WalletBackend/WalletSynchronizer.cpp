@@ -594,13 +594,6 @@ void WalletSynchronizer::downloadBlocks()
 
         const uint64_t walletBlockCount = m_blockDownloaderStatus.getHeight();
 
-        /* Local daemon not initialized, possibly just started up, make a
-           small sleep */
-        if (localDaemonBlockCount == 0)
-        {
-            Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
-            continue;
-        }
         /* Local daemon has less blocks than the wallet:
 
         With the get wallet sync data call, we give a height or a timestamp to
@@ -626,9 +619,9 @@ void WalletSynchronizer::downloadBlocks()
 
         Therefore, we should wait until the local daemon has more blocks than
         us to prevent discarding sync data. */
-        else if (localDaemonBlockCount < walletBlockCount) 
+        if (localDaemonBlockCount < walletBlockCount) 
         {
-            Utilities::sleepUnlessStopping(std::chrono::seconds(30), m_shouldStop);
+            Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
             continue;
         }
 
@@ -675,7 +668,7 @@ void WalletSynchronizer::downloadBlocks()
                don't spam the daemon. */
             if (newBlocks.empty())
             {
-                Utilities::sleepUnlessStopping(std::chrono::seconds(30), m_shouldStop);
+                Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
                 continue;
             }
 

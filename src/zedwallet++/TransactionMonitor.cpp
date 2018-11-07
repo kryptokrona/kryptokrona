@@ -44,7 +44,7 @@ void TransactionMonitor::start()
             /* Write out the prompt after every transfer. This prevents the
                wallet being in a 'ready' state, waiting for input, but looking
                like it's not. */
-            std::cout << prompt;
+            std::cout << InformationMsg(prompt) << std::flush;
         }
     }
 
