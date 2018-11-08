@@ -148,6 +148,8 @@ public:
 
   virtual size_t getKeyOutputsCountForAmount(uint64_t amount, uint32_t blockIndex) const = 0;
 
+  virtual std::tuple<bool, uint64_t> getBlockHeightForTimestamp(uint64_t timestamp) const = 0;
+
   virtual uint32_t getTimestampLowerBoundBlockIndex(uint64_t timestamp) const = 0;
 
   //NOTE: shouldn't be recursive otherwise we'll get quadratic complexity

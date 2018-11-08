@@ -577,19 +577,19 @@ bool Core::getWalletSyncData(
         /* Current height */
         uint64_t currentIndex = mainChain->getTopBlockIndex();
 
-        /* If a height was given, start from there, else convert the timestamp
-           to a block */
-        uint64_t firstBlockHeight = startHeight == 0 ?
-                                    mainChain->getTimestampLowerBoundBlockIndex(startTimestamp) :
-                                    startHeight;
+        const auto [success, timestampBlockHeight] = mainChain->getBlockHeightForTimestamp(startTimestamp);
 
         /* If we couldn't get the first block timestamp, then the node is
            synced less than the current height, so return no blocks till we're
            synced. */
-        if (startTimestamp != 0 && firstBlockHeight == 0)
+        if (startTimestamp != 0 && !success)
         {
             return true;
         }
+
+        /* If a height was given, start from there, else convert the timestamp
+           to a block */
+        uint64_t firstBlockHeight = startHeight == 0 ? timestampBlockHeight : startHeight;
 
         /* Start returning either from the start height, or the height of the
            last block we know about, whichever is higher */

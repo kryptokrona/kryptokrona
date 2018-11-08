@@ -1343,6 +1343,28 @@ size_t DatabaseBlockchainCache::getKeyOutputsCountForAmount(uint64_t amount, uin
   return result;
 }
 
+std::tuple<bool, uint64_t> DatabaseBlockchainCache::getBlockHeightForTimestamp(uint64_t timestamp) const
+{
+    const auto midnight = roundToMidnight(timestamp);
+
+    const auto [blockHeight, success] = requestClosestBlockIndexByTimestamp(midnight, database);
+
+    /* Failed to read from DB */
+    if (!success)
+    {
+        logger(Logging::DEBUGGING) << "getTimestampLowerBoundBlockIndex failed: failed to read database";
+        throw std::runtime_error("Couldn't get closest to timestamp block index");
+    }
+
+    /* Failed to find the block height with this timestamp */
+    if (!blockHeight)
+    {
+        return {false, 0};
+    }
+
+    return {true, *blockHeight};
+}
+
 uint32_t DatabaseBlockchainCache::getTimestampLowerBoundBlockIndex(uint64_t timestamp) const {
   auto midnight = roundToMidnight(timestamp);
 
@@ -1354,7 +1376,8 @@ uint32_t DatabaseBlockchainCache::getTimestampLowerBoundBlockIndex(uint64_t time
     }
 
     if (!dbRes.first) {
-      return 0;
+      midnight -= 60 * 60 * 24;
+      continue;
     }
 
     return *dbRes.first;

@@ -116,6 +116,8 @@ public:
   virtual uint32_t getStartBlockIndex() const override;
 
   virtual size_t getKeyOutputsCountForAmount(uint64_t amount, uint32_t blockIndex) const override;
+  
+  std::tuple<bool, uint64_t> getBlockHeightForTimestamp(uint64_t timestamp) const override;
 
   virtual uint32_t getTimestampLowerBoundBlockIndex(uint64_t timestamp) const override;
 
