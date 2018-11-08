@@ -97,6 +97,29 @@ static inline void serialize(NOTIFY_RESPONSE_GET_OBJECTS_request& request, ISeri
   s(request.current_blockchain_height, "current_blockchain_height");
 }
 
+static inline void serialize(NOTIFY_NEW_LITE_BLOCK_request& request, ISerializer& s) {
+    s(request.b, "b");
+    s(request.current_blockchain_height, "current_blockchain_height");
+    s(request.hop, "hop");
+}
+
+static inline void serialize(NOTIFY_MISSING_TXS_request& request, ISerializer& s) {
+    std::vector<std::string> missing_txs;
+    if (s.type() == ISerializer::INPUT) {
+      s(missing_txs, "missing_txs");
+      request.missing_txs.reserve(missing_txs.size());
+      std::transform(missing_txs.begin(), missing_txs.end(), std::back_inserter(request.missing_txs), [] (const std::string& s) {
+        return BinaryArray(s.begin(), s.end());
+      });
+    } else {
+      missing_txs.reserve(request.missing_txs.size());
+      std::transform(request.missing_txs.begin(), request.missing_txs.end(), std::back_inserter(missing_txs), [] (const BinaryArray& s) {
+        return std::string(s.begin(),s.end());
+      });
+      s(missing_txs, "missing_txs");
+    }
+}
+
 CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, Logging::ILogger& log) :
   m_dispatcher(dispatcher),
   m_currency(currency),
@@ -242,7 +265,7 @@ bool CryptoNoteProtocolHandler::process_payload_sync_data(const CORE_SYNC_DATA& 
     ss << "the current peer you're connected to. Slow and steady wins the race! ";
 
     auto logLevel = Logging::TRACE;
-    /* Log at different levels depending upon if we're ahead, behind, and if it's 
+    /* Log at different levels depending upon if we're ahead, behind, and if it's
       a newly formed connection */
     if (diff >= 0)
     {
@@ -252,7 +275,7 @@ bool CryptoNoteProtocolHandler::process_payload_sync_data(const CORE_SYNC_DATA& 
         }
         else
         {
-            logLevel = Logging::DEBUGGING;    
+            logLevel = Logging::DEBUGGING;
         }
     }
     logger(logLevel, Logging::BRIGHT_GREEN) << context << ss.str();
