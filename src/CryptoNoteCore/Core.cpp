@@ -836,6 +836,18 @@ std::error_code Core::addBlock(RawBlock&& rawBlock) {
   return addBlock(cachedBlock, std::move(rawBlock));
 }
 
+std::error_code Core::addLiteBlock(RawBlock&& rawLiteBlock) {
+  throwIfNotInitialized();
+
+  BlockTemplate blockTemplate;
+  bool result = fromBinaryArray(blockTemplate, rawLiteBlock.block);
+  if (!result) {
+    return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
+  }
+
+  return addBlock(RawBlock{ rawLiteBlock.block, rawLiteBlock.transactions });
+}
+
 std::error_code Core::submitBlock(BinaryArray&& rawBlockTemplate) {
   throwIfNotInitialized();
 

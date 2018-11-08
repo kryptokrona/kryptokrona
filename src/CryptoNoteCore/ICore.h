@@ -75,6 +75,7 @@ public:
 
   virtual std::error_code addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlock) = 0;
   virtual std::error_code addBlock(RawBlock&& rawBlock) = 0;
+  virtual std::error_code addLiteBlock(RawBlock&& rawLiteBlock) = 0;
 
   virtual std::error_code submitBlock(BinaryArray&& rawBlockTemplate) = 0;
 

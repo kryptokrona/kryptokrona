@@ -67,6 +67,7 @@ public:
 
   virtual std::error_code addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlock) override;
   virtual std::error_code addBlock(RawBlock&& rawBlock) override;
+  virtual std::error_code addLiteBlock(RawBlock&& rawLiteBlock) override;
 
   virtual std::error_code submitBlock(BinaryArray&& rawBlockTemplate) override;
 
