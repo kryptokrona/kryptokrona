@@ -309,6 +309,8 @@ int CryptoNoteProtocolHandler::handleCommand(bool is_notify, int command, const 
     HANDLE_NOTIFY(NOTIFY_REQUEST_CHAIN, handle_request_chain)
     HANDLE_NOTIFY(NOTIFY_RESPONSE_CHAIN_ENTRY, handle_response_chain_entry)
     HANDLE_NOTIFY(NOTIFY_REQUEST_TX_POOL, handleRequestTxPool)
+    HANDLE_NOTIFY(NOTIFY_NEW_LITE_BLOCK, handle_notify_new_lite_block)
+    HANDLE_NOTIFY(NOTIFY_MISSING_TXS,handle_notify_missing_txs)
 
   default:
     handled = false;
