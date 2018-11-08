@@ -1617,6 +1617,11 @@ std::vector<RawBlock> DatabaseBlockchainCache::getBlocksByHeight(
     
     std::vector<RawBlock> orderedBlocks;
 
+    std::cout << "\nDatabase blockchain cache:\nStart height: " << startHeight
+              << "\nEnd height: " << endHeight
+              << "\nRaw blocks size: " << rawBlocks.size()
+              << "\n\n";
+
     /* Order, and convert from map, to vector */
     for (uint64_t height = startHeight; height < startHeight + rawBlocks.size(); height++)
     {

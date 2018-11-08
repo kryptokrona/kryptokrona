@@ -62,12 +62,10 @@ void transfer(
 
     if (address.length() == WalletConfig::standardAddressLength)
     {
-        const bool printWarning = true;
-
         paymentID = getPaymentID(
             "What payment ID do you want to use?\n"
             "These are usually used for sending to exchanges.",
-            printWarning, cancelAllowed
+            cancelAllowed
         );
 
         if (paymentID == "cancel")
@@ -155,6 +153,13 @@ void sendTransaction(
 
     if (error == TOO_MANY_INPUTS_TO_FIT_IN_BLOCK)
     {
+        std::cout << WarningMsg("Your transaction is too large to be accepted "
+                                "by the network!\n")
+                  << InformationMsg("We're attempting to optimize your wallet,\n"
+                                    "which hopefully make the transaction small "
+                                    "enough to fit in a block.\n"
+                                    "Please wait, this will take some time...\n\n");
+
         /* Try and perform some fusion transactions to make our inputs bigger */
         optimize(walletBackend);
 
@@ -189,13 +194,13 @@ void splitTX(
     const uint64_t amount,
     const std::string paymentID)
 {
-    std::cout << "Transaction is still too large to send, splitting into "
-              << "multiple chunks.\n" 
-              << "It will slightly raise the fee you have to pay,\n"
-              << "and hence reduce the total amount you can send if\n"
-              << "your balance cannot cover it.\n"
-              << "If the node you are using charges a fee, you will have to "
-              << "pay this fee for each transction.\n";
+    std::cout << InformationMsg("Transaction is still too large to send, splitting into "
+                                "multiple chunks.\n\n")
+              << WarningMsg("It will slightly raise the fee you have to pay,\n"
+                            "and hence reduce the total amount you can send if\n"
+                            "your balance cannot cover it.\n\n"
+                            "If the node you are using charges a fee,\nyou will "
+                            "have to pay this fee for each transction.\n");
 
     if (!ZedUtilities::confirm("Is this OK?"))
     {
@@ -219,7 +224,7 @@ void splitTX(
 
     while (true)
     {
-        uint64_t splitAmount = totalAmount / amountDivider;
+        uint64_t splitAmount = remainder / amountDivider;
 
         /* If we have odd numbers, we can have an amount that is smaller
            than the remainder to send, but the remainder is less than
@@ -239,7 +244,7 @@ void splitTX(
            as we can (deduct fees which will be added later) */
         if (totalNeeded > unlockedBalance)
         {
-            totalNeeded = unlockedBalance + WalletConfig::minimumFee + nodeFee;
+            totalNeeded = unlockedBalance - WalletConfig::minimumFee - nodeFee;
             splitAmount = totalNeeded - WalletConfig::minimumFee + nodeFee;
         }
 
@@ -267,7 +272,7 @@ void splitTX(
         /* Still too big, reduce amount */
         if (error == TOO_MANY_INPUTS_TO_FIT_IN_BLOCK)
         {
-            amountDivider++;
+            amountDivider *= 2;
 
             /* This can take quite a long time getting mixins each time
                so let them know it's not frozen */
@@ -275,11 +280,18 @@ void splitTX(
 
             continue;
         }
+        else if (error)
+        {
+            std::cout << WarningMsg("Failed to send transaction: ")
+                      << error << "\nAborting, sorry...";
+            return;
+        }
 
         std::stringstream stream;
 
         stream << "Transaction number " << txNumber << " has been sent!\nHash: "
-               << hash << "\nAmount: " << splitAmount << "\n\n";
+               << hash << "\nAmount: " << ZedUtilities::formatAmount(splitAmount)
+               << "\n\n";
 
         std::cout << SuccessMsg(stream.str()) << std::endl;
 
@@ -299,7 +311,7 @@ void splitTX(
             return;
         }
 
-        /* Went well, lets restart, trying to send the max amount */
+        /* Went well, revert to original divider */
         amountDivider = 1;
     }
 }

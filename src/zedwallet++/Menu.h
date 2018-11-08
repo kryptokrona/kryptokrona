@@ -53,7 +53,7 @@ std::string parseCommand(
                           << WarningMsg("or number from ")
                           << InformationMsg("1")
                           << WarningMsg(" to ")
-                          << InformationMsg(std::to_string(numCommands))
+                          << InformationMsg(numCommands)
                           << std::endl;
 
                 /* Print the available commands again if the input is bad */
@@ -62,7 +62,7 @@ std::string parseCommand(
                 continue;
             }
 
-            selection = availableCommands[selectionNum].commandName;
+            return availableCommands[selectionNum].commandName;
         }
         /* Input ain't a number */
         catch (const std::invalid_argument &)
@@ -101,7 +101,7 @@ void printCommands(const std::vector<T> &commands, size_t offset = 0)
     for (const auto &command : commands)
     {
         std::cout << InformationMsg(" ")
-                  << InformationMsg(std::to_string(i))
+                  << InformationMsg(i)
                   << "\t"
                   << SuccessMsg(command.commandName, 25) /* Pad to 25 chars */
                   << command.description << std::endl;

@@ -80,6 +80,7 @@ std::string getInput(
 
     bool quit = linenoise::Readline(promptMsg.c_str(), command);
     
+    /* User entered ctrl+c or similar */
     if (quit)
     {
         return "exit";
@@ -111,6 +112,12 @@ std::string getAddress(
 
         ZedUtilities::trim(address);
 
+        /* \n == no-op */
+        if (address == "")
+        {
+            continue;
+        }
+
         if (address == "cancel" && cancelAllowed)
         {
             return address;
@@ -130,20 +137,14 @@ std::string getAddress(
 
 std::string getPaymentID(
     const std::string msg,
-    const bool printWarning,
     const bool cancelAllowed)
 {
     while (true)
     {
-        std::cout << InformationMsg(msg);
-
-        if (printWarning)
-        {
-            std::cout << WarningMsg("\nWarning: If you were given a payment ID,\n"
-                                    "you MUST use it, or your funds may be lost!\n");
-        }
-
-        std::cout << "Hit enter for the default of no payment ID: ";
+        std::cout << InformationMsg(msg)
+                  << WarningMsg("\nWarning: If you were given a payment ID,\n"
+                                "you MUST use it, or your funds may be lost!\n")
+                  << "Hit enter for the default of no payment ID: ";
 
         std::string paymentID;
 
@@ -186,6 +187,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
 
         std::getline(std::cin, amountString);
 
+        /* \n == no-op */
         if (amountString == "")
         {
             continue;

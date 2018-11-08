@@ -599,15 +599,28 @@ bool Core::getWalletSyncData(
             firstBlockHeight
         );
 
+        /* If we're fully synced, then the start index will be greater than our
+           current block. */
+        if (currentIndex < startIndex)
+        {
+            return true;
+        }
+
         /* Difference between the start and end */
-        uint64_t blockDifference = currentIndex - startIndex + 1;
+        uint64_t blockDifference = currentIndex - startIndex;
 
         /* Sync BLOCKS_SYNCHRONIZING_DEFAULT_COUNT or the amount of blocks between
            start and end, whichever is smaller */
         uint64_t endIndex = std::min(
             static_cast<uint64_t>(BLOCKS_SYNCHRONIZING_DEFAULT_COUNT),
-            blockDifference
+            blockDifference + 1
         ) + startIndex;
+
+        std::cout << "Current index: " << currentIndex << std::endl;
+        std::cout << "First block height: " << firstBlockHeight << std::endl;
+        std::cout << "Start index: " << startIndex << std::endl;
+        std::cout << "Block difference: " << blockDifference << std::endl;
+        std::cout << "End index: " << endIndex << std::endl;
 
         std::vector<RawBlock> rawBlocks = mainChain->getBlocksByHeight(startIndex, endIndex);
 

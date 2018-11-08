@@ -143,6 +143,11 @@ class SubWallets
 
         std::vector<WalletTypes::Transaction> getTransactions() const;
 
+        /* Note that this DOES NOT return incoming transactions in the pool. It only
+           returns outgoing transactions which we sent but have not encountered in a
+           block yet. */
+        std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////

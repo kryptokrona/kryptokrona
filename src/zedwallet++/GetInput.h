@@ -21,7 +21,6 @@ std::string getAddress(
 
 std::string getPaymentID(
     const std::string msg,
-    const bool printWarning,
     const bool cancelAllowed);
 
 std::tuple<bool, uint64_t> getAmountToAtomic(

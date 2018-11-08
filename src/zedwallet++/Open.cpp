@@ -65,7 +65,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
     const std::string msg = "Give your new wallet a password: ";
 
-    const bool verifyPassword = false;
+    const bool verifyPassword = true;
 
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 

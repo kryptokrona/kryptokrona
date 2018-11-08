@@ -46,76 +46,6 @@ const std::string getAddressBookName(const std::vector<AddressBookEntry> address
     }
 }
 
-const std::string getAddressBookPaymentID()
-{
-    while (true)
-    {
-        std::string paymentID;
-
-        std::cout << InformationMsg("\nDoes this address book entry have a "
-                                    "payment ID associated with it?\n")
-                  << WarningMsg("Warning: If you were given a payment ID,\n")
-                  << WarningMsg("you MUST use it, or your funds may be lost!\n")
-                  << "Hit enter for the default of no payment ID: ";
-
-        std::getline(std::cin, paymentID);
-
-        ZedUtilities::trim(paymentID);
-
-        if (paymentID == "")
-        {
-            return std::string();
-        }
-
-        if (paymentID == "cancel")
-        {
-            return "cancel";
-        }
-
-        /* Validate the payment ID */
-        if (WalletError error = validatePaymentID(paymentID); error != SUCCESS)
-        {
-            std::cout << WarningMsg("Invalid payment ID: ")
-                      << WarningMsg(error) << std::endl;
-        }
-        else
-        {
-            return paymentID;
-        }
-    }
-}
-
-const std::string getAddressBookAddress()
-{
-    while (true)
-    {
-        std::cout << InformationMsg("\nWhat address does this user have?: ");
-
-        std::string address;
-
-        std::getline(std::cin, address);
-
-        ZedUtilities::trim(address);
-
-        const bool integratedAddressesAllowed = true;
-
-        if (address == "cancel")
-        {
-            return "cancel";
-        }
-
-        if (WalletError error = validateAddresses({address}, integratedAddressesAllowed); error != SUCCESS)
-        {
-            std::cout << WarningMsg("Invalid address: ")
-                      << WarningMsg(error) << std::endl;
-        }
-        else
-        {
-            return address;
-        }
-    }
-}
-
 void addToAddressBook()
 {
     std::cout << InformationMsg("Note: You can type cancel at any time to "
@@ -133,7 +63,12 @@ void addToAddressBook()
         return;
     }
 
-    const std::string address = getAddressBookAddress();
+    const bool integratedAddressesAllowed(true), cancelAllowed(true);
+
+    const std::string address = getAddress(
+        "\nWhat address does this user have?: ", integratedAddressesAllowed,
+        cancelAllowed
+    );
 
     if (address == "cancel")
     {
@@ -144,12 +79,15 @@ void addToAddressBook()
 
     std::string paymentID;
 
-    const bool isIntegratedAddress = address.length() == WalletConfig::integratedAddressLength;
-
     /* Don't prompt for a payment ID if we have an integrated address */
-    if (!isIntegratedAddress)
+    if (address.length() == WalletConfig::standardAddressLength)
     {
-        paymentID = getAddressBookPaymentID();
+        const bool cancelAllowed = true;
+
+        paymentID = getPaymentID(
+            "\nDoes this address book entry have a payment ID associated "
+            "with it?\n", cancelAllowed
+        );
 
         if (paymentID == "cancel")
         {
@@ -183,25 +121,54 @@ const std::tuple<bool, AddressBookEntry> getAddressBookEntry(
 
         ZedUtilities::trim(friendlyName);
 
+        /* \n == no-op */
+        if (friendlyName == "")
+        {
+            continue;
+        }
+
         if (friendlyName == "cancel")
         {
             return {true, AddressBookEntry()};
         }
 
-        /* TODO: number based indexing */
-        const auto it = std::find(addressBook.begin(), addressBook.end(),
-                                  AddressBookEntry(friendlyName));
-
-        if (it != addressBook.end())
+        try
         {
-            return {false, *it};
-        }
+            const int selectionNum = std::stoi(friendlyName) - 1;
 
-        std::cout << std::endl
-                  << WarningMsg("Could not find a user with the name of ")
-                  << InformationMsg(friendlyName)
-                  << WarningMsg(" in your address book!")
-                  << std::endl << std::endl;
+            const int numCommands = static_cast<int>(addressBook.size());
+
+            if (selectionNum < 0 || selectionNum >= numCommands)
+            {
+                std::cout << WarningMsg("Bad input, expected a friendly name, ")
+                          << WarningMsg("or number from ")
+                          << InformationMsg("1")
+                          << WarningMsg(" to ")
+                          << InformationMsg(numCommands)
+                          << "\n\n";
+
+                continue;
+            }
+
+            return {false, addressBook[selectionNum]};
+        }
+        /* Input isn't a number */
+        catch (const std::invalid_argument &)
+        {
+            const auto it = std::find(addressBook.begin(), addressBook.end(),
+                                      AddressBookEntry(friendlyName));
+
+            if (it != addressBook.end())
+            {
+                return {false, *it};
+            }
+
+            std::cout << std::endl
+                      << WarningMsg("Could not find a user with the name of ")
+                      << InformationMsg(friendlyName)
+                      << WarningMsg(" in your address book!")
+                      << std::endl << std::endl;
+        }
 
         const bool list = ZedUtilities::confirm(
             "Would you like to list everyone in your address book?"
@@ -334,35 +301,34 @@ void deleteFromAddressBook()
 
 void listAddressBook()
 {
-    auto addressBook = getAddressBook();
+    const std::vector<AddressBookEntry> addressBook = getAddressBook();
 
     if (isAddressBookEmpty(addressBook))
     {
         return;
     }
 
-    int index = 1;
+    size_t i = 1;
 
-    for (const auto &i : addressBook)
+    for (const auto entry : addressBook)
     {
-        std::cout << InformationMsg("Address Book Entry #")
-                  << InformationMsg(index)
-                  << InformationMsg(":\n\nFriendly Name:\n")
-                  << SuccessMsg(i.friendlyName)
-                  << InformationMsg("\n\nAddress:\n")
-                  << SuccessMsg(i.address) << "\n\n";
+        std::cout << InformationMsg("Address Book Entry: ")
+                  << InformationMsg(i) << InformationMsg(" | ")
+                  << SuccessMsg(entry.friendlyName) << "\n"
+                  << InformationMsg("Address: ")
+                  << SuccessMsg(entry.address) << "\n";
 
-        if (i.paymentID != "")
+        if (entry.paymentID != "")
         {
-            std::cout << InformationMsg("Payment ID:\n")
-                      << SuccessMsg(i.paymentID) << "\n\n\n";
+            std::cout << InformationMsg("Payment ID: ")
+                      << SuccessMsg(entry.paymentID) << "\n\n";
         }
         else
         {
-            std::cout << std::endl;
+            std::cout << "\n";
         }
 
-        index++;
+        i++;
     }
 }
 

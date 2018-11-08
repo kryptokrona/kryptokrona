@@ -874,3 +874,11 @@ std::vector<WalletTypes::Transaction> SubWallets::getTransactions() const
 {
     return m_transactions;
 }
+
+/* Note that this DOES NOT return incoming transactions in the pool. It only
+   returns outgoing transactions which we sent but have not encountered in a
+   block yet. */
+std::vector<WalletTypes::Transaction> SubWallets::getUnconfirmedTransactions() const
+{
+    return m_lockedTransactions;
+}

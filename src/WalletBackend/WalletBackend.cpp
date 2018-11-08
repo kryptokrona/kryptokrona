@@ -995,6 +995,11 @@ std::vector<WalletTypes::Transaction> WalletBackend::getTransactions() const
     return m_subWallets->getTransactions();
 }
 
+std::vector<WalletTypes::Transaction> WalletBackend::getUnconfirmedTransactions() const
+{
+    return m_subWallets->getUnconfirmedTransactions();
+}
+
 WalletTypes::WalletStatus WalletBackend::getStatus() const
 {
     const auto [walletBlockCount, localDaemonBlockCount, networkBlockCount]

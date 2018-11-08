@@ -43,7 +43,10 @@ namespace {
     if (!lock.owns_lock()) {
       return;
     }
-    m_handler();
+
+    if (m_handler) {
+      m_handler();
+    }
   }
 
 
@@ -100,6 +103,10 @@ namespace Tools {
     m_handler = t;
     return true;
 #endif
+  }
+
+  void SignalHandler::uninstall() {
+    m_handler = {};
   }
 
 }

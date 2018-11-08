@@ -104,16 +104,14 @@ void balance(const std::shared_ptr<WalletBackend> walletBackend)
               << "Locked (unconfirmed) balance: "
               << WarningMsg(ZedUtilities::formatAmount(lockedBalance))
               << "\nTotal balance: "
-              << InformationMsg(ZedUtilities::formatAmount(totalBalance)) << std::endl;
+              << InformationMsg(ZedUtilities::formatAmount(totalBalance)) << "\n";
 
     if (walletBackend->isViewWallet())
     {
-        std::cout << std::endl 
-                  << InformationMsg("Please note that view only wallets "
-                                    "can only track incoming transactions,")
-                  << std::endl
+        std::cout << InformationMsg("\nPlease note that view only wallets "
+                                    "can only track incoming transactions,\n")
                   << InformationMsg("and so your wallet balance may appear "
-                                    "inflated.") << std::endl;
+                                    "inflated.\n");
     }
 
     const auto [walletBlockCount, localDaemonBlockCount, networkBlockCount]
@@ -121,23 +119,18 @@ void balance(const std::shared_ptr<WalletBackend> walletBackend)
 
     if (localDaemonBlockCount < networkBlockCount)
     {
-        std::cout << std::endl
-                  << InformationMsg("Your daemon is not fully synced with "
-                                    "the network!")
-                  << std::endl
+        std::cout << InformationMsg("\nYour daemon is not fully synced with "
+                                    "the network!\n")
                   << "Your balance may be incorrect until you are fully "
-                  << "synced!" << std::endl;
+                  << "synced!\n";
     }
     /* Small buffer because wallet height doesn't update instantly like node
        height does */
     else if (walletBlockCount + 1000 < networkBlockCount)
     {
-        std::cout << std::endl
-                  << InformationMsg("The blockchain is still being scanned for "
-                                    "your transactions.")
-                  << std::endl
-                  << "Balances might be incorrect whilst this is ongoing."
-                  << std::endl;
+        std::cout << InformationMsg("\nThe blockchain is still being scanned for "
+                                    "your transactions.\n")
+                  << "Balances might be incorrect whilst this is ongoing.\n";
     }
 }
 
@@ -155,26 +148,26 @@ void printHeights(
        height does */
     if (walletBlockCount + 1000 > networkBlockCount)
     {
-        std::cout << SuccessMsg(std::to_string(walletBlockCount));
+        std::cout << SuccessMsg(walletBlockCount);
     }
     else
     {
-        std::cout << WarningMsg(std::to_string(walletBlockCount));
+        std::cout << WarningMsg(walletBlockCount);
     }
 
-    std::cout << std::endl << "Local blockchain height: ";
+    std::cout << "\nLocal blockchain height: ";
 
     if (localDaemonBlockCount == networkBlockCount)
     {
-        std::cout << SuccessMsg(std::to_string(localDaemonBlockCount));
+        std::cout << SuccessMsg(localDaemonBlockCount);
     }
     else
     {
-        std::cout << WarningMsg(std::to_string(localDaemonBlockCount));
+        std::cout << WarningMsg(localDaemonBlockCount);
     }
 
-    std::cout << std::endl << "Network blockchain height: "
-              << SuccessMsg(std::to_string(networkBlockCount)) << std::endl;
+    std::cout << "\nNetwork blockchain height: "
+              << SuccessMsg(networkBlockCount) << "\n";
 }
 
 void printSyncStatus(
@@ -383,10 +376,16 @@ void printOutgoingTransfer(const WalletTypes::Transaction tx)
 
     const int64_t amount = std::abs(tx.totalAmount());
 
-    stream << "Outgoing transfer:\nHash: " << tx.hash << "\n"
-           << "Block height: " << tx.blockHeight << "\n"
-           << "Timestamp: " << ZedUtilities::unixTimeToDate(tx.timestamp) << "\n"
-           << "Spent: " << ZedUtilities::formatAmount(amount - tx.fee) << "\n"
+    stream << "Outgoing transfer:\nHash: " << tx.hash << "\n";
+
+    /* These will not be initialized for outgoing, unconfirmed transactions */
+    if (tx.blockHeight != 0 && tx.timestamp != 0)
+    {
+        stream << "Block height: " << tx.blockHeight << "\n"
+               << "Timestamp: " << ZedUtilities::unixTimeToDate(tx.timestamp) << "\n";
+    }
+
+    stream << "Spent: " << ZedUtilities::formatAmount(amount - tx.fee) << "\n"
            << "Fee: " << ZedUtilities::formatAmount(tx.fee) << "\n"
            << "Total Spent: " << ZedUtilities::formatAmount(amount) << "\n";
 
@@ -428,7 +427,17 @@ void listTransfers(
     uint64_t numIncomingTransactions = 0;
     uint64_t numOutgoingTransactions = 0;
 
-    for (const auto tx : walletBackend->getTransactions())
+    /* Grab confirmed transactions */
+    std::vector<WalletTypes::Transaction> transactions = walletBackend->getTransactions();
+
+    /* Grab any outgoing transactions still in the pool */
+    const auto unconfirmedTransactions = walletBackend->getUnconfirmedTransactions();
+
+    /* Append them, unconfirmed transactions last */
+    transactions.insert(transactions.end(), unconfirmedTransactions.begin(),
+                        unconfirmedTransactions.end());
+
+    for (const auto tx : transactions) 
     {
         /* Is a fusion transaction (on a view only wallet). It appears to have
            an incoming amount, because we can't detract the outputs (can't

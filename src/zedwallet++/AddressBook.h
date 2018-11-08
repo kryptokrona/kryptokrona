@@ -51,10 +51,6 @@ void deleteFromAddressBook();
 
 void listAddressBook();
 
-const std::string getAddressBookPaymentID();
-
-const std::string getAddressBookAddress();
-
 const std::tuple<bool, AddressBookEntry> getAddressBookEntry(
     const std::vector<AddressBookEntry> addressBook);
 

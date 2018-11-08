@@ -212,6 +212,8 @@ class WalletBackend
         /* Get all transactions */
         std::vector<WalletTypes::Transaction> getTransactions() const;
 
+        std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
+
         /* Get sync heights, hashrate, peer count */
         WalletTypes::WalletStatus getStatus() const;
 

@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <Common/SignalHandler.h>
+
 #include <config/CliHeader.h>
 
 #include <zedwallet++/ColouredMsg.h>
@@ -23,6 +25,18 @@ int main(int argc, char **argv)
 
         if (!quit)
         {
+            /* Save sync progress and exit if we ctrl+c */
+            Tools::SignalHandler::install([&walletBackend = walletBackend]
+            {
+                std::cout << InformationMsg("\nSaving and shutting down...\n");
+
+                walletBackend->save();
+
+                std::cout << "Thanks for stopping by..." << std::endl;
+
+                exit(0);
+            });
+
             /* Init the transaction monitor */
             TransactionMonitor txMonitor(walletBackend);
 
