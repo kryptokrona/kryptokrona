@@ -9,7 +9,7 @@
 #include <NodeRpcProxy/NodeRpcProxy.h>
 
 #include <WalletBackend/EventHandler.h>
-#include <WalletBackend/MultiThreadedDeque.h>
+#include <WalletBackend/ThreadSafeQueue.h>
 #include <WalletBackend/SubWallets.h>
 #include <WalletBackend/SynchronizationStatus.h>
 
@@ -156,7 +156,7 @@ class WalletSynchronizer
 
         /* Blocks to be processed are added to the front, and are removed
            from the back */
-        MultiThreadedDeque<WalletTypes::WalletBlockInfo> m_blockProcessingQueue;
+        ThreadSafeQueue<WalletTypes::WalletBlockInfo> m_blockProcessingQueue;
 
         /* The timestamp to start scanning downloading block data from */
         uint64_t m_startTimestamp;

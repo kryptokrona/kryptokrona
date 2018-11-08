@@ -108,7 +108,7 @@ namespace WalletTypes
         uint64_t unlockTime;
 
         /* The transaction hash of the transaction that contains this input */
-        Crypto::Hash hashOfContainingTransaction;
+        Crypto::Hash parentTransactionHash;
 
         bool operator==(const TransactionInput &other)
         {
@@ -150,7 +150,7 @@ namespace WalletTypes
         uint64_t amount;
     };
 
-    struct GlobalIndexToKey
+    struct GlobalIndexKey
     {
         uint64_t index;
         Crypto::PublicKey key;
@@ -159,7 +159,7 @@ namespace WalletTypes
     struct ObscuredInput
     {
         /* The outputs, including our real output, and the fake mixin outputs */
-        std::vector<GlobalIndexToKey> outputs;
+        std::vector<GlobalIndexKey> outputs;
 
         /* The index of the real output in the outputs vector */
         uint64_t realOutput;
@@ -190,6 +190,8 @@ namespace WalletTypes
             Transaction() {};
 
             Transaction(
+                /* Mapping of public key to transaction amount, can be multiple
+                   if one transaction sends to multiple subwallets */
                 const std::unordered_map<Crypto::PublicKey, int64_t> transfers,
                 const Crypto::Hash hash,
                 const uint64_t fee,
@@ -226,6 +228,12 @@ namespace WalletTypes
                 return sum;
             }
 
+            /* It's worth noting that this isn't a conclusive check for if a
+               transaction is a fusion transaction - there are some requirements
+               it has to meet - but we don't need to check them, as the daemon
+               will handle that for us - Any transactions that come to the
+               wallet (assuming a non malicious daemon) that are zero and not
+               a coinbase, is a fusion transaction */
             bool isFusionTransaction() const
             {
                 return fee == 0 && !isCoinbaseTransaction;

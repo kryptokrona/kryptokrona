@@ -314,7 +314,7 @@ namespace WalletTypes
             {"key", t.key},
             {"spendHeight", t.spendHeight},
             {"unlockTime", t.unlockTime},
-            {"hashOfContainingTransaction", t.hashOfContainingTransaction},
+            {"parentTransactionHash", t.parentTransactionHash},
         };
     }
 
@@ -329,7 +329,7 @@ namespace WalletTypes
         t.key = j.at("key").get<Crypto::PublicKey>();
         t.spendHeight = j.at("spendHeight").get<uint64_t>();
         t.unlockTime = j.at("unlockTime").get<uint64_t>();
-        t.hashOfContainingTransaction = j.at("hashOfContainingTransaction").get<Crypto::Hash>();
+        t.parentTransactionHash = j.at("parentTransactionHash").get<Crypto::Hash>();
     }
 
     //////////////////////////////

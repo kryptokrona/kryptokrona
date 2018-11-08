@@ -59,18 +59,18 @@ void SynchronizationStatus::storeBlockHash(
    that block every time. */
 std::vector<Crypto::Hash> SynchronizationStatus::getBlockHashCheckpoints() const
 {
-    std::vector<Crypto::Hash> result;
+    std::vector<Crypto::Hash> results;
 
     /* Copy the contents of m_lastKnownBlockHashes to result, these are the
        last 100 known block hashes we have synced. For example, if the top
        block we know about is 110, this contains [110, 109, 108.. 10]. */
     std::copy(m_lastKnownBlockHashes.begin(), m_lastKnownBlockHashes.end(),
-              back_inserter(result));
+              back_inserter(results));
 
     /* Append the contents of m_blockHashCheckpoints to result, these are the
        checkpoints we make every 5k blocks in case of deep forks */
     std::copy(m_blockHashCheckpoints.begin(), m_blockHashCheckpoints.end(),
-              back_inserter(result));
+              back_inserter(results));
 
-    return result;
+    return results;
 }

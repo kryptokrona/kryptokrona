@@ -5,7 +5,7 @@
 #pragma once
 
 #include <WalletBackend/WalletBackend.h>
-#include <WalletBackend/MultiThreadedDeque.h>
+#include <WalletBackend/ThreadSafeQueue.h>
 
 class TransactionMonitor
 {
@@ -28,7 +28,7 @@ class TransactionMonitor
 
         std::shared_ptr<WalletBackend> m_walletBackend;
 
-        MultiThreadedDeque<WalletTypes::Transaction> m_queuedTransactions;
+        ThreadSafeQueue<WalletTypes::Transaction> m_queuedTransactions;
 
         std::shared_ptr<std::mutex> m_mutex = std::make_shared<std::mutex>();
 };

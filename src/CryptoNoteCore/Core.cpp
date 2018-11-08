@@ -735,13 +735,15 @@ Crypto::PublicKey Core::getPubKeyFromExtra(const std::vector<uint8_t> &extra)
 {
     Crypto::PublicKey publicKey;
 
+    const int TX_EXTRA_PUBKEY_IDENTIFIER = 0x01;
+
     const int pubKeySize = 32;
 
     for (size_t i = 0; i < extra.size(); i++)
     {
         /* If the following data is the transaction public key, this is
            indicated by the preceding value being 0x01. */
-        if (extra[i] == 0x01)
+        if (extra[i] == TX_EXTRA_PUBKEY_IDENTIFIER)
         {
             /* The amount of data remaining in the vector (minus one because
                we start reading the public key from the next character) */
@@ -778,10 +780,13 @@ std::string Core::getPaymentIDFromExtra(const std::vector<uint8_t> &extra)
 {
     const int paymentIDSize = 32;
 
+    const int TX_EXTRA_PAYMENT_ID_IDENTIFIER = 0x00;
+    const int TX_EXTRA_NONCE_IDENTIFIER = 0x02;
+
     for (size_t i = 0; i < extra.size(); i++)
     {
         /* Extra nonce tag found */
-        if (extra[i] == 0x02)
+        if (extra[i] == TX_EXTRA_NONCE_IDENTIFIER)
         {
             /* Skip the extra nonce tag */
             size_t dataRemaining = extra.size() - i - 1;
@@ -796,9 +801,9 @@ std::string Core::getPaymentIDFromExtra(const std::vector<uint8_t> &extra)
             }
             
             /* Payment ID in extra nonce */
-            if (extra[i+2] == 0x00)
+            if (extra[i+2] == TX_EXTRA_PAYMENT_ID_IDENTIFIER)
             {
-                /* Plus two to skip the two 0x02 0x00 tags and the size value */
+                /* Plus three to skip the two 0x02 0x00 tags and the size value */
                 const auto dataBegin = extra.begin() + i + 3;
                 const auto dataEnd = dataBegin + paymentIDSize;
 

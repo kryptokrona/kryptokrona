@@ -13,10 +13,10 @@
 #include <WalletBackend/Constants.h>
 
 template <typename T>
-class MultiThreadedDeque
+class ThreadSafeQueue
 {
     public:
-        MultiThreadedDeque() :
+        ThreadSafeQueue() :
             m_shouldStop(false)
         {
         }

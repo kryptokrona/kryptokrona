@@ -28,7 +28,7 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionBasic(
     const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
     const std::shared_ptr<SubWallets> subWallets)
 {
-    const uint64_t mixin = CryptoNote::Mixins::getDefaultMixin(
+    const auto [minMixin, maxMixin, defaultMixin] = CryptoNote::Mixins::getMixinAllowableRange(
         daemon->getLastKnownBlockHeight()
     );
 
@@ -37,7 +37,7 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionBasic(
     const std::string defaultAddress = subWallets->getPrimaryAddress();
 
     return sendFusionTransactionAdvanced(
-        mixin, {}, defaultAddress, daemon, subWallets
+        defaultMixin, {}, defaultAddress, daemon, subWallets
     );
 }
 
@@ -207,7 +207,7 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionBasic(
         {destination, amount}
     };
 
-    const uint64_t mixin = CryptoNote::Mixins::getDefaultMixin(
+    const auto [minMixin, maxMixin, defaultMixin] = CryptoNote::Mixins::getMixinAllowableRange(
         daemon->getLastKnownBlockHeight()
     );
 
@@ -218,7 +218,7 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionBasic(
     const std::string changeAddress = subWallets->getPrimaryAddress();
 
     return sendTransactionAdvanced(
-        destinations, mixin, fee, paymentID, {}, changeAddress, daemon,
+        destinations, defaultMixin, fee, paymentID, {}, changeAddress, daemon,
         subWallets
     );
 }
@@ -300,7 +300,7 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
         mixin, daemon, ourInputs, paymentID, destinations, subWallets
     );
 
-    error = isTransactionTooBig(tx, daemon->getLastKnownBlockHeight());
+    error = isTransactionPayloadTooBig(tx, daemon->getLastKnownBlockHeight());
 
     if (error)
     {
@@ -331,7 +331,7 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
     return {SUCCESS, txHash};
 }
 
-WalletError isTransactionTooBig(
+WalletError isTransactionPayloadTooBig(
     const CryptoNote::Transaction tx,
     const uint64_t currentHeight)
 {
@@ -551,7 +551,7 @@ std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> setupFakeInputs
 
     for (const auto walletAmount : sources)
     {
-        WalletTypes::GlobalIndexToKey realOutput {
+        WalletTypes::GlobalIndexKey realOutput {
             walletAmount.input.globalOutputIndex,
             walletAmount.input.key
         };

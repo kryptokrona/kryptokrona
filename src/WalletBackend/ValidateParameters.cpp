@@ -158,7 +158,7 @@ WalletError validatePaymentID(const std::string paymentID)
 
 WalletError validateMixin(const uint64_t mixin, const uint64_t height)
 {
-    const auto [minMixin, maxMixin] = CryptoNote::Mixins::getMixinAllowableRange(height);
+    const auto [minMixin, maxMixin, defaultMixin] = CryptoNote::Mixins::getMixinAllowableRange(height);
 
     if (mixin < minMixin)
     {

@@ -298,7 +298,7 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
             input.key = tx.keyOutputs[outputIndex].key;
             input.spendHeight = 0;
             input.unlockTime = tx.unlockTime;
-            input.hashOfContainingTransaction = tx.hash;
+            input.parentTransactionHash = tx.hash;
 
             /* Note: If we're using a view wallet, this just stores the input,
                since we can't generate the key images */

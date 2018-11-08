@@ -759,7 +759,7 @@ void SubWallets::removeCancelledTransactions(
         const auto it = std::remove_if(locked.begin(), locked.end(),
         [&cancelledTransactions, &subWallet = subWallet](auto &input)
         {
-            if (cancelledTransactions.find(input.hashOfContainingTransaction) != cancelledTransactions.end())
+            if (cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end())
             {
                 input.spendHeight = 0;
 

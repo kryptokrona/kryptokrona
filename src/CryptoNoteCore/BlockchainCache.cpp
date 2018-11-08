@@ -515,7 +515,7 @@ std::tuple<bool, uint64_t> BlockchainCache::getBlockHeightForTimestamp(uint64_t 
     }
 
     /* Timestamp is in this segment */
-    if (index.front().timestamp > timestamp)
+    if (index.front().timestamp >= timestamp)
     {
         const auto bound = std::lower_bound(index.begin(), index.end(), timestamp,
         [](const auto &blockInfo, uint64_t value)
