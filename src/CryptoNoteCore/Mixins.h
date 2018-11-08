@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <Common/StringTools.h>
-
 #include <config/CryptoNoteConfig.h>
 
 #include <CryptoNoteCore/CachedTransaction.h>
@@ -125,13 +123,13 @@ namespace CryptoNote
         std::stringstream str;
 
         if (mixin > maxMixin) {
-          str << "Transaction " << Common::podToHex(transaction.getTransactionHash())
+          str << "Transaction " << transaction.getTransactionHash()
             << " is not valid. Reason: transaction mixin is too large (" << mixin
             << "). Maximum mixin allowed is " << maxMixin;
 
           return {false, str.str()};
         } else if (mixin < minMixin) {
-          str << "Transaction " << Common::podToHex(transaction.getTransactionHash())
+          str << "Transaction " << transaction.getTransactionHash()
             << " is not valid. Reason: transaction mixin is too small (" << mixin
             << "). Minimum mixin allowed is " << minMixin;
 
