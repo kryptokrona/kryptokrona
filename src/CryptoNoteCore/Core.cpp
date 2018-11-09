@@ -845,7 +845,9 @@ std::error_code Core::addLiteBlock(RawBlock&& rawLiteBlock) {
     return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
   }
 
-  return addBlock(RawBlock{ rawLiteBlock.block, rawLiteBlock.transactions });
+  RawBlock rawBlock;
+
+  return addBlock(RawBlock{ rawBlock.block, rawBlock.transactions });
 }
 
 std::error_code Core::submitBlock(BinaryArray&& rawBlockTemplate) {
