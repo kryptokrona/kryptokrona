@@ -22,7 +22,7 @@ You will need the following packages: boost, cmake (3.8 or higher), make, and gi
 
 You will also need either GCC/G++, or Clang.
 
-If you are using GCC, you will need GCC-6.0 or higher.
+If you are using GCC, you will need GCC-7.0 or higher.
 
 If you are using Clang, you will need Clang 6.0 or higher. You will also need libstdc++\-6.0 or higher.
 
