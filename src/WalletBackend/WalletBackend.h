@@ -154,7 +154,7 @@ class WalletBackend
             const std::vector<std::string> subWalletsToTakeFrom,
             const std::string destinationAddress);
 
-        /* Get the balance for one subwallet */
+        /* Get the balance for one subwallet (error, unlocked, locked) */
         std::tuple<WalletError, uint64_t, uint64_t> getBalance(
             const std::string address) const;
 

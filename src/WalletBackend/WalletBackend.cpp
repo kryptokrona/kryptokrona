@@ -708,6 +708,7 @@ WalletError WalletBackend::unsafeSave() const
     return SUCCESS;
 }
 
+/* Get the balance for one subwallet (error, unlocked, locked) */
 std::tuple<WalletError, uint64_t, uint64_t> WalletBackend::getBalance(
     const std::string address) const
 {

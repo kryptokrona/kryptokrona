@@ -50,7 +50,7 @@ namespace SendTransaction
         const uint64_t changeRequired,
         const std::string changeAddress);
 
-    std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> setupFakeInputs(
+    std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> prepareRingParticipants(
         std::vector<WalletTypes::TxInputAndOwner> sources,
         const uint64_t mixin,
         const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon);
@@ -77,7 +77,7 @@ namespace SendTransaction
 
     Crypto::Hash getTransactionHash(CryptoNote::Transaction tx);
 
-    std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getFakeOuts(
+    std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getRingParticipants(
         const uint64_t mixin,
         const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
         const std::vector<WalletTypes::TxInputAndOwner> sources);

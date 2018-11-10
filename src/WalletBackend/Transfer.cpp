@@ -461,7 +461,7 @@ std::vector<WalletTypes::TransactionDestination> setupDestinations(
     return destinations;
 }
 
-std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getFakeOuts(
+std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getRingParticipants(
     const uint64_t mixin,
     const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
     const std::vector<WalletTypes::TxInputAndOwner> sources)
@@ -526,7 +526,7 @@ std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getFakeOuts(
 }
 
 /* Take our inputs and pad them with fake inputs, based on our mixin value */
-std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> setupFakeInputs(
+std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> prepareRingParticipants(
     std::vector<WalletTypes::TxInputAndOwner> sources,
     const uint64_t mixin,
     const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon)
@@ -540,7 +540,7 @@ std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> setupFakeInputs
 
     std::vector<WalletTypes::ObscuredInput> result;
 
-    const auto [error, fakeOuts] = getFakeOuts(mixin, daemon, sources);
+    const auto [error, fakeOuts] = getRingParticipants(mixin, daemon, sources);
 
     if (error)
     {
@@ -873,7 +873,7 @@ std::tuple<WalletError, CryptoNote::Transaction> makeTransaction(
     const std::shared_ptr<SubWallets> subWallets)
 {
     /* Mix our inputs with fake ones from the network to hide who we are */
-    const auto [mixinError, inputsAndFakes] = setupFakeInputs(
+    const auto [mixinError, inputsAndFakes] = prepareRingParticipants(
         ourInputs, mixin, daemon
     );
 
