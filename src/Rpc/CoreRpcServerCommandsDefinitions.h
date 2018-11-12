@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2018, The TurtleCoin Developers
 // Copyright (c) 2018, The Karai Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #pragma once
@@ -54,7 +54,7 @@ struct COMMAND_RPC_GET_BLOCKS_FAST {
 
   struct request {
     std::vector<Crypto::Hash> block_ids; //*first 10 blocks id goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block */
-    
+
     void serialize(ISerializer &s) {
       KV_MEMBER(block_ids);
     }
@@ -85,7 +85,7 @@ struct COMMAND_RPC_GET_TRANSACTIONS {
     void serialize(ISerializer &s) {
       KV_MEMBER(txs_as_hex)
       KV_MEMBER(missed_tx)
-      KV_MEMBER(status)    
+      KV_MEMBER(status)
     }
   };
 };
@@ -144,7 +144,7 @@ struct COMMAND_RPC_GET_POOL_CHANGES_LITE {
 
 //-----------------------------------------------
 struct COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES {
-  
+
   struct request {
     Crypto::Hash txid;
 
@@ -178,7 +178,7 @@ struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request {
 struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_out_entry {
   uint32_t global_amount_index;
   Crypto::PublicKey out_key;
-  
+
   void serialize(ISerializer &s) {
     KV_MEMBER(global_amount_index)
     KV_MEMBER(out_key);
@@ -516,7 +516,7 @@ struct f_block_short_response {
 
 struct f_block_details_response {
   uint8_t major_version;
-  uint8_t minor_version;  
+  uint8_t minor_version;
   uint64_t timestamp;
   std::string prev_hash;
   uint32_t nonce;
@@ -723,6 +723,34 @@ struct COMMAND_RPC_QUERY_BLOCKS_LITE {
   };
 };
 
+struct COMMAND_RPC_QUERY_BLOCKS_DETAILED {
+  struct request {
+    std::vector<Crypto::Hash> blockIds;
+    uint64_t timestamp;
+
+    void serialize(ISerializer &s) {
+      KV_MEMBER(blockIds);
+      KV_MEMBER(timestamp)
+    }
+  };
+
+  struct response {
+    std::string status;
+    uint64_t startHeight;
+    uint64_t currentHeight;
+    uint64_t fullOffset;
+    std::vector<BlockDetails> blocks;
+
+    void serialize(ISerializer &s) {
+      KV_MEMBER(status)
+      KV_MEMBER(startHeight)
+      KV_MEMBER(currentHeight)
+      KV_MEMBER(fullOffset)
+      KV_MEMBER(blocks)
+    }
+  };
+};
+
 struct COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HEIGHTS {
   struct request {
     std::vector<uint32_t> blockHeights;
@@ -846,7 +874,7 @@ struct COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASHES {
 };
 
 struct COMMAND_RPC_GET_PEERS {
-  // TODO: rename peers to white_peers - do at v1 
+  // TODO: rename peers to white_peers - do at v1
   typedef EMPTY_STRUCT request;
 
   struct response {
