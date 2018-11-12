@@ -845,9 +845,13 @@ std::error_code Core::addLiteBlock(RawBlock&& rawLiteBlock) {
     return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
   }
 
-  RawBlock rawBlock;
+  std::vector<Crypto::Hash> missing_txs;
+  getTransactions(blockTemplate.transactionHashes, rawLiteBlock.transactions, missing_txs);
+  if (!missing_txs.empty()) {
+    // TODO: Request Missing Transactions
+  }
 
-  return addBlock(RawBlock{ rawBlock.block, rawBlock.transactions });
+  return addBlock(RawBlock{ rawLiteBlock.block, rawLiteBlock.transactions });
 }
 
 std::error_code Core::submitBlock(BinaryArray&& rawBlockTemplate) {
