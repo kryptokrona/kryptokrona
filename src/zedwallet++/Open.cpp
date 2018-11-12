@@ -266,7 +266,7 @@ std::shared_ptr<WalletBackend> openWallet(const Config &config)
         }
         else if (error)
         {
-            std::cout << WarningMsg("Failed to create wallet: " + error.getErrorMessage())
+            std::cout << WarningMsg("Failed to open wallet: " + error.getErrorMessage())
                       << std::endl;
 
             return nullptr;

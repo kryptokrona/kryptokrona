@@ -16,10 +16,6 @@
 /* CONSTRUCTORS / DECONSTRUCTORS */
 ///////////////////////////////////
 
-SubWallet::SubWallet()
-{
-}
-
 /* Makes a view only subwallet */
 SubWallet::SubWallet(
     const Crypto::PublicKey publicSpendKey,

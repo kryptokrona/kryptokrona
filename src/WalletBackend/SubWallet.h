@@ -28,7 +28,7 @@ class SubWallet
         /* Constructors */
         //////////////////
 
-        SubWallet();
+        SubWallet() = default;
 
         SubWallet(
             const Crypto::PublicKey publicSpendKey,

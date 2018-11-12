@@ -48,29 +48,26 @@ namespace {
 
 /* Check data has the magic indicator from first : last, and remove it if
    it does. Else, return an error depending on where we failed */
-template <class Iterator, class Buffer>
-WalletError hasMagicIdentifier(Buffer &data, Iterator first, Iterator last,
-                               WalletError tooSmallError,
-                               WalletError wrongIdentifierError)
+template <class Buffer, class Identifier>
+WalletError hasMagicIdentifier(
+    Buffer &data,
+    const Identifier &identifier,
+    const WalletError tooSmallError,
+    const WalletError wrongIdentifierError)
 {
-    size_t identifierSize = std::distance(first, last);
-
     /* Check we've got space for the identifier */
-    if (data.size() < identifierSize)
+    if (data.size() < identifier.size())
     {
         return tooSmallError;
     }
 
-    for (size_t i = 0; i < identifierSize; i++)
+    if (!std::equal(identifier.begin(), identifier.end(), data.begin()))
     {
-        if ((int)data[i] != *(first + i))
-        {
-            return wrongIdentifierError;
-        }
+        return wrongIdentifierError;
     }
 
     /* Remove the identifier from the string */
-    data.erase(data.begin(), data.begin() + identifierSize);
+    data.erase(data.begin(), data.begin() + identifier.size());
 
     return SUCCESS;
 }
@@ -415,6 +412,9 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
     /* Open in binary mode, since we have encrypted data */
     std::ifstream file(filename, std::ios::binary);
 
+    /* Stop eating white space in binary mode!!! :(((( */
+    file.unsetf(std::ios::skipws);
+
     /* Check we successfully opened the file */
     if (!file)
     {
@@ -422,14 +422,13 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
     }
 
     /* Read file into a buffer */
-    std::vector<char> buffer((std::istreambuf_iterator<char>(file)),
-                             (std::istreambuf_iterator<char>()));
+    std::vector<unsigned char> buffer((std::istream_iterator<unsigned char>(file)),
+                                      (std::istream_iterator<unsigned char>()));
 
     /* Check that the decrypted data has the 'isAWallet' identifier,
        and remove it it does. If it doesn't, return an error. */
     WalletError error = hasMagicIdentifier(
-        buffer, Constants::IS_A_WALLET_IDENTIFIER.begin(),
-        Constants::IS_A_WALLET_IDENTIFIER.end(),
+        buffer, Constants::IS_A_WALLET_IDENTIFIER,
         NOT_A_WALLET_FILE, NOT_A_WALLET_FILE
     );
 
@@ -454,7 +453,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
     buffer.erase(buffer.begin(), buffer.begin() + sizeof(salt));
 
     /* The key we use for AES decryption, generated with PBKDF2 */
-    CryptoPP::byte key[32];
+    CryptoPP::byte key[16];
 
     /* Using SHA256 as the algorithm */
     CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;
@@ -500,9 +499,8 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
     /* Check that the decrypted data has the 'isCorrectPassword' identifier,
        and remove it it does. If it doesn't, return an error. */
     error = hasMagicIdentifier(
-        decryptedData, Constants::IS_CORRECT_PASSWORD_IDENTIFIER.begin(),
-        Constants::IS_CORRECT_PASSWORD_IDENTIFIER.end(), WALLET_FILE_CORRUPTED,
-        WRONG_PASSWORD
+        decryptedData, Constants::IS_CORRECT_PASSWORD_IDENTIFIER,
+        WALLET_FILE_CORRUPTED, WRONG_PASSWORD
     );
 
     if (error)
@@ -639,7 +637,7 @@ WalletError WalletBackend::unsafeSave() const
     std::string walletData = identiferAsString + walletJson.dump();
 
     /* The key we use for AES encryption, generated with PBKDF2 */
-    CryptoPP::byte key[32];
+    CryptoPP::byte key[16];
 
     /* The salt we use for both PBKDF2, and AES Encryption */
     CryptoPP::byte salt[16];
@@ -678,32 +676,29 @@ WalletError WalletBackend::unsafeSave() const
 
     stfEncryptor.MessageEnd();
 
-    std::ofstream file(m_filename);
+    std::ofstream file(m_filename, std::ios::binary);
 
     if (!file)
     {
         return INVALID_WALLET_FILENAME;
     }
 
-    /* Get the isAWalletIdentifier array as a string */
-    std::string walletPrefix = std::string(
-        Constants::IS_A_WALLET_IDENTIFIER.begin(),
-        Constants::IS_A_WALLET_IDENTIFIER.end()
-    );
-
-    /* Get the salt array as a string */
     std::string saltString = std::string(salt, salt + sizeof(salt));
 
     /* Write the isAWalletIdentifier to the file, so when we open it we can
        verify that it is a wallet file */
-    file << walletPrefix;
+    std::copy(Constants::IS_A_WALLET_IDENTIFIER.begin(),
+              Constants::IS_A_WALLET_IDENTIFIER.end(),
+              std::ostream_iterator<unsigned char>(file));
 
     /* Write the salt to the file, so we can use it to unencrypt the file
        later. Note that the salt is unencrypted. */
-    file << saltString;
+    std::copy(std::begin(salt), std::end(salt),
+              std::ostream_iterator<unsigned char>(file));
 
     /* Write the encrypted wallet data to the file */
-    file << encryptedData;
+    std::copy(encryptedData.begin(), encryptedData.end(),
+              std::ostream_iterator<unsigned char>(file));
 
     return SUCCESS;
 }
