@@ -14,11 +14,22 @@
 #include <zedwallet++/Sync.h>
 #include <zedwallet++/TransactionMonitor.h>
 
-void shutdown(std::atomic<bool> &ctrl_c, std::shared_ptr<WalletBackend> walletBackend)
+void shutdown(
+    const std::atomic<bool> &ctrl_c,
+    const std::atomic<bool> &stop,
+    const std::shared_ptr<WalletBackend> walletBackend)
 {
-    while (!ctrl_c)
+    while (!ctrl_c && !stop)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    /* Return if we're exiting normally, not via ctrl-c
+       We could just detach this thread, but then walletBackend will never
+       have the destructor called, since it is still running in this thread */
+    if (stop)
+    {
+        return;
     }
 
     if (walletBackend != nullptr)
@@ -35,8 +46,6 @@ void shutdown(std::atomic<bool> &ctrl_c, std::shared_ptr<WalletBackend> walletBa
            we're exiting right now. */
         walletBackend->~WalletBackend();
     }
-
-    std::cout << "Thanks for stopping by..." << std::endl;
 
     exit(0);
 }
@@ -58,10 +67,12 @@ int main(int argc, char **argv)
         }
 
         /* Atomic bool to signal if ctrl_c is used */
-        std::atomic<bool> ctrl_c(false);
+        std::atomic<bool> ctrl_c(false), stop(false);
 
         /* Launch the thread which watches for the shutdown signal */
-        std::thread(shutdown, std::ref(ctrl_c), std::ref(walletBackend)).detach();
+        std::thread ctrlCWatcher(
+            shutdown, std::ref(ctrl_c), std::ref(stop), std::ref(walletBackend)
+        );
 
         /* Trigger the shutdown signal if ctrl+c is used
            We do the actual handling in a separate thread to handle stuff not
@@ -92,7 +103,18 @@ int main(int argc, char **argv)
             txMonitorThread.join();
         }
 
-        std::cout << "Thanks for stopping by..." << std::endl;
+        /* Signal the ctrlCWatcher to stop */
+        stop = true;
+
+        /* Wait for the ctrlCWatcher to stop */
+        if (ctrlCWatcher.joinable())
+        {
+            ctrlCWatcher.join();
+        }
+
+        std::cout << InformationMsg("\nSaving and shutting down...\n");
+
+        /* Wallet backend destructor gets called here, which saves */
     }
     catch (const std::exception &e)
     {
@@ -105,4 +127,6 @@ int main(int argc, char **argv)
 
         getchar();
     }
+        
+    std::cout << "Thanks for stopping by..." << std::endl;
 }

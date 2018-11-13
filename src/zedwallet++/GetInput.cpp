@@ -108,7 +108,11 @@ std::string getAddress(
 
         std::cout << InformationMsg(msg);
 
-        std::getline(std::cin, address);
+        /* Fixes infinite looping when someone does a ctrl + c */
+        if (!std::getline(std::cin, address))
+        {
+            return "cancel";
+        }
 
         ZedUtilities::trim(address);
 
@@ -148,7 +152,11 @@ std::string getPaymentID(
 
         std::string paymentID;
 
-        std::getline(std::cin, paymentID);
+        /* Fixes infinite looping when someone does a ctrl + c */
+        if (!std::getline(std::cin, paymentID))
+        {
+            return "cancel";
+        }
 
         ZedUtilities::trim(paymentID);
 
@@ -185,7 +193,11 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
 
         std::string amountString;
 
-        std::getline(std::cin, amountString);
+        /* Fixes infinite looping when someone does a ctrl + c */
+        if (!std::getline(std::cin, amountString))
+        {
+            return {false, 0};
+        }
 
         /* \n == no-op */
         if (amountString == "")

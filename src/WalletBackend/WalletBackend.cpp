@@ -110,7 +110,7 @@ WalletBackend::WalletBackend()
 
     m_eventHandler = std::make_shared<EventHandler>();
 
-    /* Remember to call initializeAfterLoad() to initialize the daemon - 
+    /* Remember to correctly initialize the daemon - 
     we can't do it here since we don't have the host/port, and the json
     serialization uses the default constructor */
 }
