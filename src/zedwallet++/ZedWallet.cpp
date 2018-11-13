@@ -14,6 +14,33 @@
 #include <zedwallet++/Sync.h>
 #include <zedwallet++/TransactionMonitor.h>
 
+void shutdown(std::atomic<bool> &ctrl_c, std::shared_ptr<WalletBackend> walletBackend)
+{
+    while (!ctrl_c)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    if (walletBackend != nullptr)
+    {
+        std::cout << InformationMsg("\nSaving and shutting down...\n");
+
+        /* Delete the walletbackend - this will call the deconstructor,
+           which will set the appropriate m_shouldStop flag. Since this
+           function gets triggered from a signal handler, we can't just call
+           save() - The data may be in an invalid state. 
+           
+           Obviously, calling delete on a shared pointer is undefined
+           behaviour if we continue using it in another thread - fortunately,
+           we're exiting right now. */
+        walletBackend->~WalletBackend();
+    }
+
+    std::cout << "Thanks for stopping by..." << std::endl;
+
+    exit(0);
+}
+
 int main(int argc, char **argv)
 {
     Config config = parseArguments(argc, argv);
@@ -24,45 +51,45 @@ int main(int argc, char **argv)
     {
         const auto [quit, sync, walletBackend] = selectionScreen(config);
 
-        /* Save sync progress and exit if we ctrl+c */
-        Tools::SignalHandler::install([&walletBackend = walletBackend]
+        if (quit)
         {
-            if (walletBackend != nullptr)
-            {
-                std::cout << InformationMsg("\nSaving and shutting down...\n");
-
-                walletBackend->save();
-            }
-
             std::cout << "Thanks for stopping by..." << std::endl;
+            return 0;
+        }
 
-            exit(0);
-        });
+        /* Atomic bool to signal if ctrl_c is used */
+        std::atomic<bool> ctrl_c(false);
 
-        if (!quit)
+        /* Launch the thread which watches for the shutdown signal */
+        std::thread(shutdown, std::ref(ctrl_c), std::ref(walletBackend)).detach();
+
+        /* Trigger the shutdown signal if ctrl+c is used
+           We do the actual handling in a separate thread to handle stuff not
+           being re-entrant. */
+        Tools::SignalHandler::install([&ctrl_c] { ctrl_c = true; });
+
+        /* Don't explicitly sync in foreground if it's a new wallet */
+        if (sync)
         {
-            if (sync)
-            {
-                syncWallet(walletBackend);
-            }
+            syncWallet(walletBackend);
+        }
 
-            /* Init the transaction monitor */
-            TransactionMonitor txMonitor(walletBackend);
+        /* Init the transaction monitor */
+        TransactionMonitor txMonitor(walletBackend);
 
-            /* Launch the transaction monitor in another thread */
-            std::thread txMonitorThread(&TransactionMonitor::start, &txMonitor);
+        /* Launch the transaction monitor in another thread */
+        std::thread txMonitorThread(&TransactionMonitor::start, &txMonitor);
 
-            /* Launch the wallet interface */
-            mainLoop(walletBackend, txMonitor.getMutex());
+        /* Launch the wallet interface */
+        mainLoop(walletBackend, txMonitor.getMutex());
 
-            /* Stop the transaction monitor */
-            txMonitor.stop();
+        /* Stop the transaction monitor */
+        txMonitor.stop();
 
-            /* Wait for the transaction monitor to stop */
-            if (txMonitorThread.joinable())
-            {
-                txMonitorThread.join();
-            }
+        /* Wait for the transaction monitor to stop */
+        if (txMonitorThread.joinable())
+        {
+            txMonitorThread.join();
         }
 
         std::cout << "Thanks for stopping by..." << std::endl;

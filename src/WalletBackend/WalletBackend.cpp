@@ -460,7 +460,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
 
     /* Generate the AES Key using pbkdf2 */
     pbkdf2.DeriveKey(
-        key, sizeof(key), 0, (CryptoPP::byte *)password.data(),
+        key, sizeof(key), 0, (CryptoPP::byte *)password.c_str(),
         password.size(), salt, sizeof(salt), Constants::PBKDF2_ITERATIONS
     );
 
@@ -650,7 +650,7 @@ WalletError WalletBackend::unsafeSave() const
 
     /* Generate the AES Key using pbkdf2 */
     pbkdf2.DeriveKey(
-        key, sizeof(key), 0, (CryptoPP::byte *)m_password.data(),
+        key, sizeof(key), 0, (CryptoPP::byte *)m_password.c_str(),
         m_password.size(), salt, sizeof(salt), Constants::PBKDF2_ITERATIONS
     );
 
