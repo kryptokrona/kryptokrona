@@ -9,7 +9,7 @@
 #include <zedwallet++/ColouredMsg.h>
 #include <zedwallet++/ParseArguments.h>
 
-std::tuple<bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &config);
+std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &config);
 
 bool checkNodeStatus(const std::shared_ptr<WalletBackend> walletBackend);
 

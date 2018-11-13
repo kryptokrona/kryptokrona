@@ -56,18 +56,6 @@ void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
         std::cout << InformationMsg(stream.str());
     }
 
-    /* Save sync progress and exit if we ctrl+c */
-    Tools::SignalHandler::install([&walletBackend]
-    {
-        std::cout << InformationMsg("\nSaving and shutting down...\n");
-
-        walletBackend->save();
-
-        std::cout << "Thanks for stopping by..." << std::endl;
-
-        exit(0);
-    });
-
     uint64_t lastSavedBlock = walletBlockCount;
 
     /* Amount of times we have looped without getting any new blocks */
@@ -138,7 +126,4 @@ void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
 
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
-
-    /* Deregister the signal handler */
-    Tools::SignalHandler::uninstall();
 }

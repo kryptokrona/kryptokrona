@@ -11,9 +11,8 @@
 #include <zedwallet++/CommandDispatcher.h>
 #include <zedwallet++/Commands.h>
 #include <zedwallet++/GetInput.h>
-#include <zedwallet++/Sync.h>
 
-std::tuple<bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &config)
+std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &config)
 {
     while (true)
     {
@@ -23,7 +22,9 @@ std::tuple<bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &c
         /* User wants to exit */
         if (launchCommand == "exit")
         {
-            return {true, nullptr};
+            const bool exit(true), sync(false);
+
+            return {exit, sync, nullptr};
         }
 
         /* Handle the user input */
@@ -43,9 +44,11 @@ std::tuple<bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &c
         /* Node is down, user wants to exit */
         if (!checkNodeStatus(walletBackend))
         {
-            return {true, nullptr};
+            const bool exit(true), sync(false);
+
+            return {exit, sync, nullptr};
         }
-    
+
         /* If we're creating a wallet, don't print the lengthy sync process */
         if (launchCommand == "create")
         {
@@ -60,14 +63,16 @@ std::tuple<bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &c
                 << std::endl;
 
             std::cout << InformationMsg(str.str());
-        }
-        else
-        {
-            syncWallet(walletBackend);
+
+            const bool exit(false), sync(false);
+
+            return {exit, sync, walletBackend};
         }
 
+        const bool exit(false), sync(true);
+    
         /* Return the wallet info */
-        return {false, walletBackend};
+        return {exit, sync, walletBackend};
     }
 }
 

@@ -11,6 +11,7 @@
 #include <zedwallet++/ColouredMsg.h>
 #include <zedwallet++/Menu.h>
 #include <zedwallet++/ParseArguments.h>
+#include <zedwallet++/Sync.h>
 #include <zedwallet++/TransactionMonitor.h>
 
 int main(int argc, char **argv)
@@ -21,21 +22,29 @@ int main(int argc, char **argv)
 
     try
     {
-        auto [quit, walletBackend] = selectionScreen(config);
+        const auto [quit, sync, walletBackend] = selectionScreen(config);
 
-        if (!quit)
+        /* Save sync progress and exit if we ctrl+c */
+        Tools::SignalHandler::install([&walletBackend = walletBackend]
         {
-            /* Save sync progress and exit if we ctrl+c */
-            Tools::SignalHandler::install([&walletBackend = walletBackend]
+            if (walletBackend != nullptr)
             {
                 std::cout << InformationMsg("\nSaving and shutting down...\n");
 
                 walletBackend->save();
+            }
 
-                std::cout << "Thanks for stopping by..." << std::endl;
+            std::cout << "Thanks for stopping by..." << std::endl;
 
-                exit(0);
-            });
+            exit(0);
+        });
+
+        if (!quit)
+        {
+            if (sync)
+            {
+                syncWallet(walletBackend);
+            }
 
             /* Init the transaction monitor */
             TransactionMonitor txMonitor(walletBackend);
