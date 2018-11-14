@@ -25,7 +25,7 @@ class ThreadSafeQueue
         {
             /* Aquire the lock */
             std::unique_lock<std::mutex> lock(m_mutex);
-
+			
             /* Stopping, don't push data */
             if (m_shouldStop)
             {
@@ -56,7 +56,7 @@ class ThreadSafeQueue
             lock.unlock();
 
             /* Notify the consumer that we have some data */
-            m_haveData.notify_one();
+            m_haveData.notify_all();
         }
 
         /* Take an item from the front of the queue */
@@ -64,7 +64,7 @@ class ThreadSafeQueue
         {
             /* Aquire the lock */
             std::unique_lock<std::mutex> lock(m_mutex);
-
+			
             T item;
 
             /* Stopping, don't return data */
@@ -102,8 +102,8 @@ class ThreadSafeQueue
                waking up */
             lock.unlock();
 
-            m_consumedBlock.notify_one();
-
+            m_consumedBlock.notify_all();
+			
             /* Return the item */
             return item;
         }
@@ -115,13 +115,13 @@ class ThreadSafeQueue
             /* Make sure the queue knows to return */
             m_shouldStop = true;
 
-            /* Unlock the mutex so things stop waiting */
-            m_mutex.unlock();
-
             /* Wake up anything waiting on data */
-            m_haveData.notify_one();
+            m_haveData.notify_all();
 
-            m_consumedBlock.notify_one();
+	    /* Make sure not to call .unlock() on the mutex here - it's
+	       undefined behaviour if it isn't locked. */
+
+            m_consumedBlock.notify_all();
         }
 
         void start()

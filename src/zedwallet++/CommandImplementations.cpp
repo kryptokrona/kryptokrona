@@ -195,7 +195,7 @@ void printSyncStatus(
     std::cout << "Wallet sync status: ";
     
     /* Small buffer because wallet height is not always completely accurate */
-    if (walletBlockCount + 1000 > networkBlockCount)
+    if (walletBlockCount + 10 > networkBlockCount)
     {
         std::cout << SuccessMsg(walletSyncPercentage) << std::endl;
     }

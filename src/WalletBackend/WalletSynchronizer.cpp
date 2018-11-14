@@ -124,23 +124,23 @@ void WalletSynchronizer::stop()
 {
     /* Tell the threads to stop */
     m_shouldStop = true;
-
+	
     /* Stop the block processing queue so the threads don't hang trying
        to push/pull from the queue */
     m_blockProcessingQueue.stop();
-
+	
     /* Wait for the block downloader thread to finish (if applicable) */
     if (m_blockDownloaderThread.joinable())
     {
         m_blockDownloaderThread.join();
     }
-
+	
     /* Wait for the transaction synchronizer thread to finish (if applicable) */
     if (m_transactionSynchronizerThread.joinable())
     {
         m_transactionSynchronizerThread.join();
     }
-
+	
     /* Wait for the pool watcher thread to finish (if applicable) */
     if (m_poolWatcherThread.joinable())
     {
@@ -463,14 +463,14 @@ void WalletSynchronizer::findTransactionsInBlocks()
 {
     while (!m_shouldStop)
     {
-        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.pop();
-
+        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.pop();		
+		
         /* Could have stopped between entering the loop and getting a block */
         if (m_shouldStop)
         {
             return;
         }
-
+		
         /* Chain forked, invalidate previous transactions */
         if (m_transactionSynchronizerStatus.getHeight() >= b.blockHeight)
         {
@@ -577,15 +577,7 @@ void WalletSynchronizer::monitorLockedTransactions()
 void WalletSynchronizer::downloadBlocks()
 {
     /* Stores the results from the getWalletSyncData call */
-    std::vector<WalletTypes::WalletBlockInfo> newBlocks;
-
-    std::promise<std::error_code> errorPromise;
-
-    /* Once the function is complete, set the error value from the promise */
-    auto callback = [&errorPromise](std::error_code e)
-    {
-        errorPromise.set_value(e);
-    };
+    std::vector<WalletTypes::WalletBlockInfo> newBlocks;    
 
     /* While we haven't been told to stop */
     while (!m_shouldStop)
@@ -625,8 +617,13 @@ void WalletSynchronizer::downloadBlocks()
             continue;
         }
 
-        /* Re-assign promise (can't reuse) */
-        errorPromise = std::promise<std::error_code>();
+        std::promise<std::error_code> errorPromise;
+
+        /* Once the function is complete, set the error value from the promise */
+        auto callback = [&errorPromise](std::error_code e)
+        {
+            errorPromise.set_value(e);
+        };
 
         /* Get the std::future */
         auto error = errorPromise.get_future();
@@ -656,9 +653,7 @@ void WalletSynchronizer::downloadBlocks()
             }
         }
 
-        auto err = error.get();
-
-        if (err)
+        if (error.get())
         {
             Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
         }
@@ -671,13 +666,13 @@ void WalletSynchronizer::downloadBlocks()
                 Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
                 continue;
             }
-
+			
             for (const auto &block : newBlocks)
             {
                 /* Store that we've downloaded the block */
                 m_blockDownloaderStatus.storeBlockHash(block.blockHash,
                                                        block.blockHeight);
-
+													   
                 /* Add the block to the queue for processing */
                 m_blockProcessingQueue.push(block);
             }

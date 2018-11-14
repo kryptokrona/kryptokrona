@@ -490,7 +490,7 @@ std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getRingParticipants
     });
 
     daemon->getRandomOutsByAmounts(
-        std::move(amounts), requestedOuts, fakeOuts, callback
+        std::move(amounts), static_cast<uint16_t>(requestedOuts), fakeOuts, callback
     );
 
     /* Wait for the call to complete */
@@ -684,7 +684,7 @@ std::tuple<WalletError, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::S
         std::transform(input.outputs.begin(), input.outputs.end(), std::back_inserter(keyInput.outputIndexes),
         [](const auto output)
         {
-            return output.index;
+	     return static_cast<uint32_t>(output.index);
         });
         
         /* Convert our indexes to relative indexes - for example, if we

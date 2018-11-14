@@ -368,7 +368,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::createWal
     {
         return {error, nullptr};
     }
-
+	
     CryptoNote::KeyPair spendKey;
     Crypto::SecretKey privateViewKey;
     Crypto::PublicKey publicViewKey;
@@ -390,15 +390,15 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::createWal
         filename, password, spendKey.secretKey, privateViewKey,
         scanHeight, newWallet, daemonHost, daemonPort
     ));
-
+	
     if (WalletError error = wallet->init(); error != SUCCESS)
     {
         return {error, nullptr};
     }
-
+	
     /* Save to disk */
     WalletError error = wallet->save();
-
+	
     return {error, wallet};
 }
 
@@ -410,10 +410,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
     const uint16_t daemonPort)
 {
     /* Open in binary mode, since we have encrypted data */
-    std::ifstream file(filename, std::ios::binary);
-
-    /* Stop eating white space in binary mode!!! :(((( */
-    file.unsetf(std::ios::skipws);
+    std::ifstream file(filename, std::ios_base::binary);
 
     /* Check we successfully opened the file */
     if (!file)
@@ -422,8 +419,8 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
     }
 
     /* Read file into a buffer */
-    std::vector<unsigned char> buffer((std::istream_iterator<unsigned char>(file)),
-                                      (std::istream_iterator<unsigned char>()));
+    std::vector<char> buffer((std::istreambuf_iterator<char>(file)),
+                             (std::istreambuf_iterator<char>()));
 
     /* Check that the decrypted data has the 'isAWallet' identifier,
        and remove it it does. If it doesn't, return an error. */
@@ -676,7 +673,7 @@ WalletError WalletBackend::unsafeSave() const
 
     stfEncryptor.MessageEnd();
 
-    std::ofstream file(m_filename, std::ios::binary);
+    std::ofstream file(m_filename, std::ios_base::binary);
 
     if (!file)
     {
@@ -689,16 +686,16 @@ WalletError WalletBackend::unsafeSave() const
        verify that it is a wallet file */
     std::copy(Constants::IS_A_WALLET_IDENTIFIER.begin(),
               Constants::IS_A_WALLET_IDENTIFIER.end(),
-              std::ostream_iterator<unsigned char>(file));
+              std::ostreambuf_iterator<char>(file));
 
     /* Write the salt to the file, so we can use it to unencrypt the file
        later. Note that the salt is unencrypted. */
     std::copy(std::begin(salt), std::end(salt),
-              std::ostream_iterator<unsigned char>(file));
+              std::ostreambuf_iterator<char>(file));
 
     /* Write the encrypted wallet data to the file */
     std::copy(encryptedData.begin(), encryptedData.end(),
-              std::ostream_iterator<unsigned char>(file));
+              std::ostreambuf_iterator<char>(file));
 
     return SUCCESS;
 }
@@ -1007,7 +1004,7 @@ WalletTypes::WalletStatus WalletBackend::getStatus() const
     status.localDaemonBlockCount = localDaemonBlockCount;
     status.networkBlockCount = networkBlockCount;
 
-    status.peerCount = m_daemon->getPeerCount();
+    status.peerCount = static_cast<uint32_t>(m_daemon->getPeerCount());
 
     uint64_t difficulty = m_daemon->getLastLocalBlockHeaderInfo().difficulty;
 

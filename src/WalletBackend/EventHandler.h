@@ -55,7 +55,7 @@ class Event
 class EventHandler
 {
     public:
-        Event<int> onSynced;
+        Event<uint64_t> onSynced;
 
         Event<WalletTypes::Transaction> onTransaction;
 };
