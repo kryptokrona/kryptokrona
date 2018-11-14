@@ -498,29 +498,36 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
         return {error, nullptr}; 
     }
 
-    /* Parse the json */
-    const json walletJson = json::parse(decryptedData);
-
-    /* Make our wallet object */
-    const auto wallet = std::make_shared<WalletBackend>();
-
-    /* Initialize it from the json (We could do this in less steps, but it
-       requires a move/copy constructor) */
-    error = wallet->fromJson(
-        walletJson, filename, password, daemonHost, daemonPort
-    );
-
-    const bool dumpJson = true;
-
-    /* For debugging purposes */
-    if (dumpJson)
+    try
     {
-        std::ofstream o("walletData.json");
+        /* Parse the json */
+        const json walletJson = json::parse(decryptedData);
 
-        o << std::setw(4) << walletJson << std::endl;
+        /* Make our wallet object */
+        const auto wallet = std::make_shared<WalletBackend>();
+
+        /* Initialize it from the json (We could do this in less steps, but it
+           requires a move/copy constructor) */
+        error = wallet->fromJson(
+            walletJson, filename, password, daemonHost, daemonPort
+        );
+
+        const bool dumpJson = false;
+
+        /* For debugging purposes */
+        if (dumpJson)
+        {
+            std::ofstream o("walletData.json");
+
+            o << std::setw(4) << walletJson << std::endl;
+        }
+
+        return {error, wallet};
     }
-
-    return {error, wallet};
+    catch (const json::parse_error &)
+    {
+        return {WALLET_FILE_CORRUPTED, nullptr};
+    }
 }
 
 /////////////////////
