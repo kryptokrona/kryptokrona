@@ -619,15 +619,15 @@ void WalletSynchronizer::downloadBlocks()
 
         std::promise<std::error_code> errorPromise;
 
+	/* Get the std::future */
+        auto error = errorPromise.get_future();
+
         /* Once the function is complete, set the error value from the promise */
         auto callback = [&errorPromise](std::error_code e)
         {
             errorPromise.set_value(e);
         };
-
-        /* Get the std::future */
-        auto error = errorPromise.get_future();
-
+        
         /* The block hashes to try begin syncing from */
         auto blockCheckpoints = m_blockDownloaderStatus.getBlockHashCheckpoints();
 
@@ -643,6 +643,10 @@ void WalletSynchronizer::downloadBlocks()
 
             if (m_shouldStop)
             {
+                /* Need to wait for the future to complete here before
+                   returning. Otherwise, it can be set after it's gone out
+                   of scope, which causes crashes. */
+                error.get();
                 return;
             }
             
@@ -653,7 +657,9 @@ void WalletSynchronizer::downloadBlocks()
             }
         }
 
-        if (error.get())
+        const auto err = error.get();
+
+        if (err)
         {
             Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
         }
