@@ -365,32 +365,34 @@ std::string getExistingWalletFileName(const Config &config)
 
         const std::string walletFileName = walletName + ".wallet";
 
-        if (walletName == "")
+        try
         {
-            std::cout << std::endl
-                      << WarningMsg("Wallet name can't be blank! Try again.")
-                      << std::endl << std::endl;
+            if (walletName == "")
+            {
+                std::cout << WarningMsg("\nWallet name can't be blank! Try again.\n\n");
+            }
+            /* Allow people to enter wallet name with or without file extension */
+            else if (fs::exists(walletName))
+            {
+                return walletName;
+            }
+            else if (fs::exists(walletFileName))
+            {
+                return walletFileName;
+            }
+            else
+            {
+                std::cout << WarningMsg("\nA wallet with the filename ")
+                          << InformationMsg(walletName)
+                          << WarningMsg(" or ")
+                          << InformationMsg(walletFileName)
+                          << WarningMsg(" doesn't exist!z\n")
+                          << "Ensure you entered your wallet name correctly.\n\n";
+            }
         }
-        /* Allow people to enter wallet name with or without file extension */
-        else if (fs::exists(walletName))
+        catch (const fs::filesystem_error &)
         {
-            return walletName;
-        }
-        else if (fs::exists(walletFileName))
-        {
-            return walletFileName;
-        }
-        else
-        {
-            std::cout << std::endl
-                      << WarningMsg("A wallet with the filename ")
-                      << InformationMsg(walletName)
-                      << WarningMsg(" or ")
-                      << InformationMsg(walletFileName)
-                      << WarningMsg(" doesn't exist!")
-                      << std::endl
-                      << "Ensure you entered your wallet name correctly."
-                      << std::endl << std::endl;
+            std::cout << WarningMsg("\nInvalid wallet filename! Try again.\n\n");
         }
     }
 }
@@ -408,24 +410,31 @@ std::string getNewWalletFileName()
 
         const std::string walletFileName = walletName + ".wallet";
 
-        if (fs::exists(walletFileName))
+        try
         {
-            std::cout << std::endl
-                      << WarningMsg("A wallet with the filename " )
-                      << InformationMsg(walletFileName)
-                      << WarningMsg(" already exists!")
-                      << std::endl
-                      << "Try another name." << std::endl << std::endl;
+            if (fs::exists(walletFileName))
+            {
+                std::cout << std::endl
+                          << WarningMsg("A wallet with the filename " )
+                          << InformationMsg(walletFileName)
+                          << WarningMsg(" already exists!")
+                          << std::endl
+                          << "Try another name." << std::endl << std::endl;
+            }
+            else if (walletName == "")
+            {
+                std::cout << std::endl
+                          << WarningMsg("Wallet name can't be blank! Try again.")
+                          << std::endl << std::endl;
+            }
+            else
+            {
+                return walletFileName;
+            }
         }
-        else if (walletName == "")
+        catch (const fs::filesystem_error &)
         {
-            std::cout << std::endl
-                      << WarningMsg("Wallet name can't be blank! Try again.")
-                      << std::endl << std::endl;
-        }
-        else
-        {
-            return walletFileName;
+            std::cout << WarningMsg("\nInvalid wallet filename! Try again.\n\n");
         }
     }
 }
