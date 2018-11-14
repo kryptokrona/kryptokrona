@@ -86,6 +86,8 @@ void balance(const std::shared_ptr<WalletBackend> walletBackend)
        See https://github.com/turtlecoin/turtlecoin/issues/531 */
     if (walletBackend->isViewWallet())
     {
+        unlockedBalance = 0;
+
         const auto transactions = walletBackend->getTransactions();
 
         for (const auto tx : transactions)
