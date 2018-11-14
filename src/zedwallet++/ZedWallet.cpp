@@ -123,7 +123,7 @@ int main(int argc, char **argv)
                   << "Please report this error, and what you were doing to "
                   << "cause it." << std::endl;
 
-        std::cout << "Hit any key to exit: ";
+        std::cout << "Hit enter to exit: ";
 
         getchar();
     }
