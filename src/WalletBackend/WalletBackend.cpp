@@ -434,8 +434,10 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
         return {error, nullptr}; 
     }
 
+    using namespace CryptoPP;
+
     /* The salt we use for both PBKDF2, and AES decryption */
-    CryptoPP::byte salt[16];
+    byte salt[16];
 
     /* Check the file is large enough for the salt */
     if (buffer.size() < sizeof(salt))
@@ -450,40 +452,31 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
     buffer.erase(buffer.begin(), buffer.begin() + sizeof(salt));
 
     /* The key we use for AES decryption, generated with PBKDF2 */
-    CryptoPP::byte key[16];
+    byte key[16];
 
     /* Using SHA256 as the algorithm */
-    CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;
+    PKCS5_PBKDF2_HMAC<SHA256> pbkdf2;
 
     /* Generate the AES Key using pbkdf2 */
     pbkdf2.DeriveKey(
-        key, sizeof(key), 0, (CryptoPP::byte *)password.c_str(),
+        key, sizeof(key), 0, (byte *)password.c_str(),
         password.size(), salt, sizeof(salt), Constants::PBKDF2_ITERATIONS
     );
 
-    /* Intialize aesDecryption with the AES Key */
-    CryptoPP::AES::Decryption aesDecryption(key, sizeof(key));
+    CBC_Mode<AES>::Decryption cbcDecryption;
 
-    /* Using CBC encryption, pass in the salt */
-    CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(
-        aesDecryption, salt
-    );
+    /* Initialize our decrypter with the key and salt/iv */
+    cbcDecryption.SetKeyWithIV(key, sizeof(key), salt);
 
     /* This will store the decrypted data */
     std::string decryptedData;
 
-    /* Stream the decrypted data into the decryptedData string */
     try
     {
-        CryptoPP::StreamTransformationFilter stfDecryptor(
-            cbcDecryption, new CryptoPP::StringSink(decryptedData)
+        /* Decrypt, handling padding */
+        StringSource((byte *)buffer.data(), buffer.size(), true, new StreamTransformationFilter(
+            cbcDecryption, new StringSink(decryptedData))
         );
-
-        /* Write the data to the AES decryptor stream */
-        stfDecryptor.Put(reinterpret_cast<const CryptoPP::byte *>(buffer.data()),
-                         buffer.size());
-
-        stfDecryptor.MessageEnd();
     }
     /* do NOT report an alternate error for invalid padding. It allows them
        to do a padding oracle attack, I believe. Just report the wrong password
@@ -633,45 +626,38 @@ WalletError WalletBackend::unsafeSave() const
     /* Add magic identifier, and get json as a string */
     std::string walletData = identiferAsString + walletJson.dump();
 
+    using namespace CryptoPP;
+
     /* The key we use for AES encryption, generated with PBKDF2 */
-    CryptoPP::byte key[16];
+    byte key[16];
 
     /* The salt we use for both PBKDF2, and AES Encryption */
-    CryptoPP::byte salt[16];
+    byte salt[16];
 
     /* Generate 16 random bytes for the salt */
     Crypto::generate_random_bytes(16, salt);
 
     /* Using SHA256 as the algorithm */
-    CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;
+    PKCS5_PBKDF2_HMAC<SHA256> pbkdf2;
 
     /* Generate the AES Key using pbkdf2 */
     pbkdf2.DeriveKey(
-        key, sizeof(key), 0, (CryptoPP::byte *)m_password.c_str(),
+        key, sizeof(key), 0, (byte *)m_password.c_str(),
         m_password.size(), salt, sizeof(salt), Constants::PBKDF2_ITERATIONS
     );
 
-    CryptoPP::AES::Encryption aesEncryption(key, sizeof(key));
+    CBC_Mode<AES>::Encryption cbcEncryption;
 
-    /* Using the CBC mode of AES encryption */
-    CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(
-        aesEncryption, salt
-    );
+    /* Initialize our encryptor with the key and salt/iv */
+    cbcEncryption.SetKeyWithIV(key, sizeof(key), salt);
 
     /* This will store the encrypted data */
     std::string encryptedData;
 
-    CryptoPP::StreamTransformationFilter stfEncryptor(
-        cbcEncryption, new CryptoPP::StringSink(encryptedData)
+    /* Encrypt, and pad */
+    StringSource(walletData, true, new StreamTransformationFilter(
+        cbcEncryption, new StringSink(encryptedData))
     );
-
-    /* Write the data to the AES stream */
-    stfEncryptor.Put(
-        reinterpret_cast<const CryptoPP::byte *>(walletData.c_str()),
-        walletData.length()
-    );
-
-    stfEncryptor.MessageEnd();
 
     std::ofstream file(m_filename, std::ios_base::binary);
 
