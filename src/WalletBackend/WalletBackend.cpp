@@ -551,23 +551,12 @@ WalletError WalletBackend::init()
 
     m_daemon->init(callback);
 
-    std::future<WalletErrorCode> initDaemon = std::async(std::launch::async,
-    [&error]
-    {
-        if (error.get())
-        {
-            return FAILED_TO_INIT_DAEMON;
-        }
-        else
-        {
-            return SUCCESS;
-        }
-    });
-
-    /* Wait for the daemon to init */
     /* TODO: This can hang - can't do it in a std::future since that hangs
        when going of out scope */
-    WalletError result = initDaemon.get();
+    if (error.get())
+    {
+        return FAILED_TO_INIT_DAEMON;
+    }
 
     /* Init the wallet synchronizer if it hasn't been loaded from the wallet
        file */
@@ -594,7 +583,7 @@ WalletError WalletBackend::init()
     /* Launch the wallet sync process in a background thread */
     m_walletSynchronizer->start();
 
-    return result;
+    return SUCCESS;
 }
 
 WalletError WalletBackend::save() const

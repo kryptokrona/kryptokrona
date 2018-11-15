@@ -68,9 +68,43 @@ class SubWallet
 
         void reset(const uint64_t scanHeight);
 
+        bool isPrimaryAddress() const;
+
+        std::string address() const;
+
+        bool hasKeyImage(const Crypto::KeyImage keyImage) const;
+
+        Crypto::PublicKey publicSpendKey() const;
+        
+        Crypto::SecretKey privateSpendKey() const;
+
+        void markInputAsSpent(
+            const Crypto::KeyImage keyImage,
+            const uint64_t spendHeight);
+
+        void markInputAsLocked(const Crypto::KeyImage keyImage);
+
+        void removeForkedInputs(const uint64_t forkHeight);
+
+        void removeCancelledTransactions(const std::unordered_set<Crypto::Hash> cancelledTransactions);
+
+        std::vector<WalletTypes::TxInputAndOwner> getInputs() const;
+
+        std::vector<WalletTypes::TransactionInput> unspentInputs() const;
+
+        std::vector<WalletTypes::TransactionInput> lockedInputs() const;
+
+        std::vector<WalletTypes::TransactionInput> spentInput() const;
+
+        uint64_t syncStartHeight() const;
+
+        uint64_t syncStartTimestamp() const;
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////
+
+    private:
 
         /* A vector of the stored transaction input data, to be used for
            sending transactions later */
@@ -102,7 +136,4 @@ class SubWallet
         /* The wallet has one 'main' address which we will use by default
            when treating it as a single user wallet */
         bool m_isPrimaryAddress;
-
-    private:
-        /* TODO: Getters/setters */
 };

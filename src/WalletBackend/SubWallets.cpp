@@ -214,19 +214,19 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart() const
     auto minElementByTimestamp = *std::min_element(m_subWallets.begin(), m_subWallets.end(),
     [](const auto &lhs, const auto &rhs)
     {
-        return lhs.second.m_syncStartTimestamp < rhs.second.m_syncStartTimestamp;
+        return lhs.second.syncStartTimestamp() < rhs.second.syncStartTimestamp();
     });
 
-    const uint64_t minTimestamp = minElementByTimestamp.second.m_syncStartTimestamp;
+    const uint64_t minTimestamp = minElementByTimestamp.second.syncStartTimestamp();
 
     /* Get the smallest sub wallet (by height) */
     auto minElementByHeight = *std::min_element(m_subWallets.begin(), m_subWallets.end(),
     [](const auto &lhs, const auto &rhs)
     {
-        return lhs.second.m_syncStartHeight < rhs.second.m_syncStartHeight;
+        return lhs.second.syncStartHeight() < rhs.second.syncStartHeight();
     });
 
-    const uint64_t minHeight = minElementByHeight.second.m_syncStartHeight;
+    const uint64_t minHeight = minElementByHeight.second.syncStartHeight();
 
     /* One or both of the values are zero, caller will use whichever is non
        zero */
@@ -312,35 +312,10 @@ std::tuple<bool, Crypto::PublicKey>
 
     for (const auto & [publicKey, subWallet] : m_subWallets)
     {
-        /* See if the sub wallet contains the key image */
-        auto it = std::find_if(subWallet.m_unspentInputs.begin(),
-                               subWallet.m_unspentInputs.end(),
-        [&keyImage](const auto &input)
+        if (subWallet.hasKeyImage(keyImage))
         {
-            return input.keyImage == keyImage;
-        });
-
-        /* Found the key image */
-        if (it != subWallet.m_unspentInputs.end())
-        {
-            return {true, subWallet.m_publicSpendKey};
+            return {true, subWallet.publicSpendKey()};
         }
-
-        /* Didn't find it in unlocked inputs, check the locked inputs */
-        it = std::find_if(subWallet.m_lockedInputs.begin(),
-                          subWallet.m_lockedInputs.end(),
-        [&keyImage](const auto &input)
-        {
-            return input.keyImage == keyImage;
-        });
-
-        if (it != subWallet.m_lockedInputs.end())
-        {
-            return {true, subWallet.m_publicSpendKey};
-        }
-
-        /* Note: We don't need to check the spent inputs - it should never show
-           up there, as the same key image can only be used once */
     }
 
     return {false, Crypto::PublicKey()};
@@ -382,12 +357,9 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
     {
-        for (const auto input : subWallet.m_unspentInputs)
-        {
-            availableInputs.emplace_back(
-                input, subWallet.m_publicSpendKey, subWallet.m_privateSpendKey
-            );
-        }
+        const auto moreInputs = subWallet.getInputs();
+
+        availableInputs.insert(availableInputs.end(), moreInputs.begin(), moreInputs.end());
     }
 
     /* Shuffle the inputs */
@@ -449,12 +421,9 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
     {
-        for (const auto input : subWallet.m_unspentInputs)
-        {
-            availableInputs.emplace_back(
-                input, subWallet.m_publicSpendKey, subWallet.m_privateSpendKey
-            );
-        }
+        const auto moreInputs = subWallet.getInputs();
+
+        availableInputs.insert(availableInputs.end(), moreInputs.begin(), moreInputs.end());
     }
 
     /* Get an approximation of the max amount of inputs we can include in this
@@ -551,7 +520,7 @@ std::string SubWallets::getPrimaryAddress() const
     const auto it = 
     std::find_if(m_subWallets.begin(), m_subWallets.end(), [](const auto subWallet)
     {
-        return subWallet.second.m_isPrimaryAddress;
+        return subWallet.second.isPrimaryAddress();
     });
 
     if (it == m_subWallets.end())
@@ -559,7 +528,7 @@ std::string SubWallets::getPrimaryAddress() const
         throw std::runtime_error("This container has no primary address!");
     }
 
-    return it->second.m_address;
+    return it->second.address();
 }
 
 /* Will throw if the public keys given don't exist */
@@ -581,7 +550,6 @@ std::tuple<uint64_t, uint64_t> SubWallets::getBalance(
 
     uint64_t lockedBalance = 0;
 
-    /* TODO: Overflow */
     for (const auto pubKey : subWalletsToTakeFrom)
     {
         const auto [unlocked, locked] = m_subWallets.at(pubKey).getBalance(currentHeight);
@@ -605,54 +573,7 @@ void SubWallets::markInputAsSpent(
 
     std::scoped_lock lock(m_mutex);
 
-    /* Grab a reference to the transaction inputs so we don't have to type
-       this each time */
-    auto &unspent = m_subWallets.at(publicKey).m_unspentInputs;
-    auto &locked = m_subWallets.at(publicKey).m_lockedInputs;
-    auto &spent = m_subWallets.at(publicKey).m_spentInputs;
-
-    /* Find the input */
-    auto it = std::find_if(unspent.begin(), unspent.end(), [&keyImage](const auto x)
-    {
-        return x.keyImage == keyImage;
-    });
-
-    if (it != unspent.end())
-    {
-        /* Set the spend height */
-        it->spendHeight = spendHeight;
-
-        /* Add to the spent inputs vector */
-        spent.push_back(*it);
-
-        /* Remove from the unspent vector */
-        unspent.erase(it);
-
-        return;
-    }
-
-    /* Didn't find it, lets try in the locked inputs */
-    it = std::find_if(locked.begin(), locked.end(), [&keyImage](const auto x)
-    {
-        return x.keyImage == keyImage;
-    });
-
-    if (it != locked.end())
-    {
-        /* Set the spend height */
-        it->spendHeight = spendHeight;
-
-        /* Add to the spent inputs vector */
-        spent.push_back(*it);
-
-        /* Remove from the locked vector */
-        locked.erase(it);
-
-        return;
-    }
-    
-    /* Shouldn't happen */
-    throw std::runtime_error("Could not find key image to remove!");
+    m_subWallets.at(publicKey).markInputAsSpent(keyImage, spendHeight);
 }
 
 /* Mark a key image as locked, can no longer be used in transactions till it
@@ -667,27 +588,7 @@ void SubWallets::markInputAsLocked(
 
     std::scoped_lock lock(m_mutex);
 
-    /* Grab a reference to the transaction inputs so we don't have to type
-       this each time */
-    auto &inputs = m_subWallets.at(publicKey).m_unspentInputs;
-
-    /* Find the input */
-    auto it = std::find_if(inputs.begin(), inputs.end(), [&keyImage](const auto x)
-    {
-        return x.keyImage == keyImage;
-    });
-
-    /* Shouldn't happen */
-    if (it == inputs.end())
-    {
-        throw std::runtime_error("Could not find key image to lock!");
-    }
-
-    /* Add to the locked vector */
-    m_subWallets.at(publicKey).m_lockedInputs.push_back(*it);
-
-    /* Remove from the unspent vector */
-    inputs.erase(it);
+    m_subWallets.at(publicKey).markInputAsLocked(keyImage);
 }
 
 /* Remove transactions and key images that occured on a forked chain */
@@ -695,41 +596,22 @@ void SubWallets::removeForkedTransactions(uint64_t forkHeight)
 {
     std::scoped_lock lock(m_mutex);
 
-    /* std::remove_if doesn't actually remove anything, it just moves the
-       removed items to the end, and gives an iterator to the 'new' end.
-       We then call std::erase(newEnd, oldEnd) to remove the items */
-    auto newEnd = std::remove_if(m_transactions.begin(), m_transactions.end(),
+    const auto it = std::remove_if(m_transactions.begin(), m_transactions.end(),
     [forkHeight](auto tx)
     {
         /* Remove the transaction if it's height is >= than the fork height */
         return tx.blockHeight >= forkHeight;
     });
 
-    m_transactions.erase(newEnd);
+    if (it != m_transactions.end())
+    {
+        m_transactions.erase(it);
+    }
 
     /* Loop through each subwallet */
     for (auto & [publicKey, subWallet] : m_subWallets)
     {
-        const auto it = 
-        std::remove_if(subWallet.m_spentInputs.begin(), subWallet.m_spentInputs.end(),
-        [&forkHeight, &subWallet = subWallet](auto &input)
-        {
-            if (input.spendHeight >= forkHeight)
-            {
-                /* Reset spend height */
-                input.spendHeight = 0;
-
-                /* Readd to the unspent vector */
-                subWallet.m_unspentInputs.push_back(input);
-
-                return true;
-            }
-
-            return false;
-        });
-
-        /* Remove any inputs which are no longer spent */
-        subWallet.m_spentInputs.erase(it);
+        subWallet.removeForkedInputs(forkHeight);
     }
 }
 
@@ -742,39 +624,21 @@ void SubWallets::removeCancelledTransactions(
     std::scoped_lock lock(m_mutex);
 
     /* Find any cancelled transactions */
-    const auto newEnd = std::remove_if(m_lockedTransactions.begin(), m_lockedTransactions.end(),
+    const auto it = std::remove_if(m_lockedTransactions.begin(), m_lockedTransactions.end(),
     [&cancelledTransactions](const auto &tx)
     {
         return cancelledTransactions.find(tx.hash) != cancelledTransactions.end();
     });
 
-    /* Remove the cancelled transactions */
-    m_lockedTransactions.erase(newEnd);
+    if (it != m_lockedTransactions.end())
+    {
+        /* Remove the cancelled transactions */
+        m_lockedTransactions.erase(it);
+    }
 
     for (auto &[pubKey, subWallet] : m_subWallets)
     {
-        std::vector<WalletTypes::TransactionInput> &locked = subWallet.m_lockedInputs;
-
-        /* Find the inputs used in the cancelled transactions */
-        const auto it = std::remove_if(locked.begin(), locked.end(),
-        [&cancelledTransactions, &subWallet = subWallet](auto &input)
-        {
-            if (cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end())
-            {
-                input.spendHeight = 0;
-
-                /* Re-add the input to the unspent vector now it has been returned
-                   to our wallet */
-                subWallet.m_unspentInputs.push_back(input);
-
-                return true;
-            }
-
-            return false;
-        });
-
-        /* Remove the inputs used in the cancelled tranactions */
-        locked.erase(it);
+        subWallet.removeCancelledTransactions(cancelledTransactions);
     }
 }
 
@@ -846,7 +710,7 @@ std::vector<Crypto::SecretKey> SubWallets::getPrivateSpendKeys() const
 
     for (const auto [pubKey, subWallet] : m_subWallets)
     {
-        spendKeys.push_back(subWallet.m_privateSpendKey);
+        spendKeys.push_back(subWallet.privateSpendKey());
     }
 
     return spendKeys;
@@ -859,7 +723,7 @@ Crypto::SecretKey SubWallets::getPrimaryPrivateSpendKey() const
     const auto it = 
     std::find_if(m_subWallets.begin(), m_subWallets.end(), [](const auto subWallet)
     {
-        return subWallet.second.m_isPrimaryAddress;
+        return subWallet.second.isPrimaryAddress();
     });
 
     if (it == m_subWallets.end())
@@ -867,7 +731,7 @@ Crypto::SecretKey SubWallets::getPrimaryPrivateSpendKey() const
         throw std::runtime_error("This container has no primary address!");
     }
 
-    return it->second.m_privateSpendKey;
+    return it->second.privateSpendKey();
 }
 
 std::vector<WalletTypes::Transaction> SubWallets::getTransactions() const
