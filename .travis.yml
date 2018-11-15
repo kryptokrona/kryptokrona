@@ -129,10 +129,10 @@ script:
 before_deploy:
 - if [[ "${TRAVIS_TAG}" == "" ]]; then export TRAVIS_TAG=${TRAVIS_COMMIT} ; fi
 - cd src
-- ${STRIP} TurtleCoind miner zedwallet turtle-service zedwallet++
+- ${STRIP} TurtleCoind miner zedwallet turtle-service zedwallet-beta
 - rm -rf turtlecoin-${TRAVIS_TAG} 
 - mkdir turtlecoin-${TRAVIS_TAG}
-- cp TurtleCoind miner zedwallet turtle-service zedwallet++ turtlecoin-${TRAVIS_TAG}/
+- cp TurtleCoind miner zedwallet turtle-service zedwallet-beta turtlecoin-${TRAVIS_TAG}/
 - cp ../../LICENSE turtlecoin-${TRAVIS_TAG}/
 - tar cvfz turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz turtlecoin-${TRAVIS_TAG}/
 - mkdir builds
