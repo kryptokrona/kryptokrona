@@ -286,24 +286,22 @@ namespace CryptoNote {
     const auto& input = boost::get<KeyInput>(getInputChecked(transaction, index, TransactionTypes::InputType::Key));
     Hash prefixHash = getTransactionPrefixHash();
 
-    std::vector<Signature> signatures;
-    std::vector<const PublicKey*> keysPtrs;
+    std::vector<PublicKey> publicKeys;
 
     for (const auto& o : info.outputs) {
-      keysPtrs.push_back(reinterpret_cast<const PublicKey*>(&o.targetKey));
+        publicKeys.push_back(o.targetKey);
     }
 
-    signatures.resize(keysPtrs.size());
-
-    generate_ring_signature(
-      reinterpret_cast<const Hash&>(prefixHash),
-      reinterpret_cast<const KeyImage&>(input.keyImage),
-      keysPtrs,
-      reinterpret_cast<const SecretKey&>(ephKeys.secretKey),
-      info.realOutput.transactionIndex,
-      signatures.data());
+    const auto [success, signatures] = crypto_ops::generateRingSignatures(
+        prefixHash,
+        input.keyImage,
+        publicKeys,
+        ephKeys.secretKey,
+        info.realOutput.transactionIndex
+    );
 
     getSignatures(index) = signatures;
+
     invalidateHash();
   }
 

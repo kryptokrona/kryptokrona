@@ -28,6 +28,8 @@
 
 #include <System/ContextGroup.h>
 
+#include <WalletTypes.h>
+
 namespace CryptoNote {
 
 class Core : public ICore, public ICoreInformation {
@@ -61,6 +63,18 @@ public:
   virtual bool queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes, uint64_t timestamp,
     uint32_t& startIndex, uint32_t& currentIndex, uint32_t& fullOffset, std::vector<BlockDetails>& entries) const override;
 
+  virtual bool getWalletSyncData(
+    const std::vector<Crypto::Hash> &knownBlockHashes,
+    const uint64_t startHeight,
+    const uint64_t startTimestamp,
+    std::vector<WalletTypes::WalletBlockInfo> &walletBlocks) const override;
+
+  virtual bool getTransactionsStatus(
+    std::unordered_set<Crypto::Hash> transactionHashes,
+    std::unordered_set<Crypto::Hash> &transactionsInPool,
+    std::unordered_set<Crypto::Hash> &transactionsInBlock,
+    std::unordered_set<Crypto::Hash> &transactionsUnknown) const override;
+
   virtual bool hasTransaction(const Crypto::Hash& transactionHash) const override;
   virtual void getTransactions(const std::vector<Crypto::Hash>& transactionHashes, std::vector<BinaryArray>& transactions, std::vector<Crypto::Hash>& missedHashes) const override;
 
@@ -74,6 +88,11 @@ public:
 
   virtual bool getTransactionGlobalIndexes(const Crypto::Hash& transactionHash, std::vector<uint32_t>& globalIndexes) const override;
   virtual bool getRandomOutputs(uint64_t amount, uint16_t count, std::vector<uint32_t>& globalIndexes, std::vector<Crypto::PublicKey>& publicKeys) const override;
+
+  virtual bool getGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes) const override;
 
   virtual bool addTransactionToPool(const BinaryArray& transactionBinaryArray) override;
 
@@ -197,6 +216,16 @@ private:
   void cutSegment(IBlockchainCache& segment, uint32_t startIndex);
 
   void switchMainChainStorage(uint32_t splitBlockIndex, IBlockchainCache& newChain);
+
+  static WalletTypes::RawCoinbaseTransaction getRawCoinbaseTransaction(
+    const CryptoNote::Transaction &t);
+
+  static WalletTypes::RawTransaction getRawTransaction(
+    const std::vector<uint8_t> &rawTX);
+
+  static Crypto::PublicKey getPubKeyFromExtra(const std::vector<uint8_t> &extra);
+
+  static std::string getPaymentIDFromExtra(const std::vector<uint8_t> &extra);
 };
 
 }

@@ -53,6 +53,39 @@ void serialize(BlockShortInfo& blockShortInfo, ISerializer& s) {
   KV_MEMBER(blockShortInfo.txPrefixes);
 }
 
+void serialize(WalletTypes::WalletBlockInfo &walletBlockInfo, ISerializer &s)
+{
+    KV_MEMBER(walletBlockInfo.coinbaseTransaction);
+    KV_MEMBER(walletBlockInfo.transactions);
+    KV_MEMBER(walletBlockInfo.blockHeight);
+    KV_MEMBER(walletBlockInfo.blockHash);
+    KV_MEMBER(walletBlockInfo.blockTimestamp);
+}
+
+void serialize(WalletTypes::RawTransaction &rawTransaction, ISerializer &s)
+{
+    KV_MEMBER(rawTransaction.keyInputs);
+    KV_MEMBER(rawTransaction.paymentID);
+    KV_MEMBER(rawTransaction.keyOutputs);
+    KV_MEMBER(rawTransaction.hash);
+    KV_MEMBER(rawTransaction.transactionPublicKey);
+    KV_MEMBER(rawTransaction.unlockTime);
+}
+
+void serialize(WalletTypes::RawCoinbaseTransaction &rawCoinbaseTransaction, ISerializer &s)
+{
+    KV_MEMBER(rawCoinbaseTransaction.keyOutputs);
+    KV_MEMBER(rawCoinbaseTransaction.hash);
+    KV_MEMBER(rawCoinbaseTransaction.transactionPublicKey);
+    KV_MEMBER(rawCoinbaseTransaction.unlockTime);
+}
+
+void serialize(WalletTypes::KeyOutput &keyOutput, ISerializer &s)
+{
+    KV_MEMBER(keyOutput.key);
+    KV_MEMBER(keyOutput.amount);
+}
+
 namespace {
 
 template <typename Command>
@@ -99,6 +132,7 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/queryblocks", { jsonMethod<COMMAND_RPC_QUERY_BLOCKS>(&RpcServer::on_query_blocks), false } },
   { "/queryblockslite", { jsonMethod<COMMAND_RPC_QUERY_BLOCKS_LITE>(&RpcServer::on_query_blocks_lite), false } },
   { "/queryblocksdetailed", { jsonMethod<COMMAND_RPC_QUERY_BLOCKS_DETAILED>(&RpcServer::on_query_blocks_detailed), false } },
+  { "/getwalletsyncdata", { jsonMethod<COMMAND_RPC_GET_WALLET_SYNC_DATA>(&RpcServer::on_get_wallet_sync_data), false} },
   { "/get_o_indexes", { jsonMethod<COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES>(&RpcServer::on_get_indexes), false } },
   { "/getrandom_outs", { jsonMethod<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS>(&RpcServer::on_get_random_outs), false } },
   { "/get_pool_changes", { jsonMethod<COMMAND_RPC_GET_POOL_CHANGES>(&RpcServer::onGetPoolChanges), false } },
@@ -109,6 +143,8 @@ std::unordered_map<std::string, RpcServer::RpcHandler<RpcServer::HandlerFunction
   { "/get_blocks_hashes_by_timestamps", { jsonMethod<COMMAND_RPC_GET_BLOCKS_HASHES_BY_TIMESTAMPS>(&RpcServer::onGetBlocksHashesByTimestamps), false } },
   { "/get_transaction_details_by_hashes", { jsonMethod<COMMAND_RPC_GET_TRANSACTION_DETAILS_BY_HASHES>(&RpcServer::onGetTransactionDetailsByHashes), false } },
   { "/get_transaction_hashes_by_payment_id", { jsonMethod<COMMAND_RPC_GET_TRANSACTION_HASHES_BY_PAYMENT_ID>(&RpcServer::onGetTransactionHashesByPaymentId), false } },
+  { "/get_global_indexes_for_range", { jsonMethod<COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE>(&RpcServer::onGetGlobalIndexesForRange), false} },
+  { "/get_transactions_status", { jsonMethod<COMMAND_RPC_GET_TRANSACTIONS_STATUS>(&RpcServer::onGetTransactionsStatus), false} },
 
   // json rpc
   { "/json_rpc", { std::bind(&RpcServer::processJsonRpcRequest, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), true } }
@@ -298,6 +334,34 @@ bool RpcServer::on_query_blocks_detailed(const COMMAND_RPC_QUERY_BLOCKS_DETAILED
   return true;
 }
 
+bool RpcServer::on_get_wallet_sync_data(const COMMAND_RPC_GET_WALLET_SYNC_DATA::request &req, COMMAND_RPC_GET_WALLET_SYNC_DATA::response &res)
+{
+    if (!m_core.getWalletSyncData(req.blockIds, req.startHeight, req.startTimestamp, res.items))
+    {
+        res.status = "Failed to perform query";
+        return false;
+    }
+
+    res.status = CORE_RPC_STATUS_OK;
+
+    return true;
+}
+
+bool RpcServer::onGetTransactionsStatus(
+    const COMMAND_RPC_GET_TRANSACTIONS_STATUS::request &req,
+    COMMAND_RPC_GET_TRANSACTIONS_STATUS::response &res)
+{
+    if (!m_core.getTransactionsStatus(req.transactionHashes, res.transactionsInPool, res.transactionsInBlock, res.transactionsUnknown))
+    {
+        res.status = "Failed to perform query";
+        return false;
+    }
+
+    res.status = CORE_RPC_STATUS_OK;
+
+    return true;
+}
+
 bool RpcServer::on_get_indexes(const COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::request& req, COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::response& res) {
   std::vector<uint32_t> outputIndexes;
   if (!m_core.getTransactionGlobalIndexes(req.txid, outputIndexes)) {
@@ -311,6 +375,21 @@ bool RpcServer::on_get_indexes(const COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES::
   return true;
 }
 
+bool RpcServer::onGetGlobalIndexesForRange(
+    const COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::request &req,
+    COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::response &res)
+{
+    if (!m_core.getGlobalIndexesForRange(req.startHeight, req.endHeight, res.indexes))
+    {
+        res.status = "Failed";
+        return true;
+    }
+
+    res.status = CORE_RPC_STATUS_OK;
+
+    return true;
+}
+
 bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::request& req, COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::response& res) {
   res.status = "Failed";
 
@@ -322,7 +401,7 @@ bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOU
     }
 
     assert(globalIndexes.size() == publicKeys.size());
-    res.outs.emplace_back(COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_outs_for_amount{amount, {}});
+    res.outs.push_back({amount, {}});
     for (size_t i = 0; i < globalIndexes.size(); ++i) {
       res.outs.back().outs.push_back({globalIndexes[i], publicKeys[i]});
     }
@@ -331,15 +410,13 @@ bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOU
   res.status = CORE_RPC_STATUS_OK;
 
   std::stringstream ss;
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount outs_for_amount;
-  typedef COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::out_entry out_entry;
 
-  std::for_each(res.outs.begin(), res.outs.end(), [&](outs_for_amount& ofa)  {
+  std::for_each(res.outs.begin(), res.outs.end(), [&](auto& ofa)  {
     ss << "[" << ofa.amount << "]:";
 
     assert(ofa.outs.size() && "internal error: ofa.outs.size() is empty");
 
-    std::for_each(ofa.outs.begin(), ofa.outs.end(), [&](out_entry& oe)
+    std::for_each(ofa.outs.begin(), ofa.outs.end(), [&](auto& oe)
     {
       ss << oe.global_amount_index << " ";
     });

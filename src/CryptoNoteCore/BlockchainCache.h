@@ -155,6 +155,8 @@ public:
 
   virtual size_t getKeyOutputsCountForAmount(uint64_t amount, uint32_t blockIndex) const override;
 
+  std::tuple<bool, uint64_t> getBlockHeightForTimestamp(uint64_t timestamp) const override;
+
   virtual uint32_t getTimestampLowerBoundBlockIndex(uint64_t timestamp) const override;
   virtual bool getTransactionGlobalIndexes(const Crypto::Hash& transactionHash, std::vector<uint32_t>& globalIndexes) const override;
   virtual size_t getTransactionCount() const override;
@@ -173,6 +175,10 @@ public:
   void getRawTransactions(const std::vector<Crypto::Hash> &transactions,
     std::vector<BinaryArray> &foundTransactions,
     std::vector<Crypto::Hash> &missedTransactions) const override;
+
+  virtual std::unordered_map<Crypto::Hash, std::vector<uint64_t>> getGlobalIndexes(
+    const std::vector<Crypto::Hash> transactionHashes) const override;
+
   virtual RawBlock getBlockByIndex(uint32_t index) const override;
   virtual BinaryArray getRawTransaction(uint32_t blockIndex, uint32_t transactionIndex) const override;
   virtual std::vector<Crypto::Hash> getTransactionHashes() const override;
@@ -183,6 +189,10 @@ public:
 
   virtual std::vector<Crypto::Hash> getTransactionHashesByPaymentId(const Crypto::Hash& paymentId) const override;
   virtual std::vector<Crypto::Hash> getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const override;
+  
+  virtual std::vector<RawBlock> getBlocksByHeight(
+    const uint64_t startHeight,
+    const uint64_t endHeight) const override;
 
 private:
 

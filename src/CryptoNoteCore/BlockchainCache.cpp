@@ -504,6 +504,40 @@ size_t BlockchainCache::getKeyOutputsCountForAmount(uint64_t amount, uint32_t bl
   return it->second.startIndex + static_cast<size_t>(std::distance(it->second.outputs.begin(), lowerBound));
 }
 
+std::tuple<bool, uint64_t> BlockchainCache::getBlockHeightForTimestamp(uint64_t timestamp) const
+{
+    const auto& index = blockInfos.get<BlockIndexTag>();
+
+    /* Timestamp is too great for this segment */
+    if (index.back().timestamp < timestamp)
+    {
+        return {false, 0};
+    }
+
+    /* Timestamp is in this segment */
+    if (index.front().timestamp >= timestamp)
+    {
+        const auto bound = std::lower_bound(index.begin(), index.end(), timestamp,
+        [](const auto &blockInfo, uint64_t value)
+        {
+            return blockInfo.timestamp < value;
+        });
+
+        uint64_t result = startIndex + std::distance(index.begin(), bound);
+
+        return {true, result};
+    }
+
+    /* No parent, we're at the start of the chain */
+    if (parent == nullptr)
+    {
+        return {false, 0};
+    }
+
+    /* Try the parent */
+    return parent->getBlockHeightForTimestamp(timestamp);
+}
+
 uint32_t BlockchainCache::getTimestampLowerBoundBlockIndex(uint64_t timestamp) const {
   assert(!blockInfos.empty());
 
@@ -558,6 +592,69 @@ size_t BlockchainCache::getTransactionCount() const {
 
   count += transactions.size();
   return count;
+}
+
+std::vector<RawBlock> BlockchainCache::getBlocksByHeight(
+    const uint64_t startHeight, const uint64_t endHeight) const
+{
+    if (endHeight < startIndex)
+    {
+        return parent->getBlocksByHeight(startHeight, endHeight);
+    }
+
+    std::vector<RawBlock> blocks;
+
+    if (startHeight < startIndex)
+    {
+        blocks = parent->getBlocksByHeight(startHeight, startIndex - 1);
+    }
+
+    uint64_t startOffset = std::max(startHeight, static_cast<uint64_t>(startIndex));
+
+    for (uint64_t i = startOffset; i <= endHeight; i++)
+    {
+        blocks.push_back(storage->getBlockByIndex(i - startIndex));
+    }
+
+    return blocks;
+}
+
+std::unordered_map<Crypto::Hash, std::vector<uint64_t>> BlockchainCache::getGlobalIndexes(
+    const std::vector<Crypto::Hash> transactionHashes) const
+{
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
+
+    auto &availableTransactions = transactions.get<TransactionHashTag>();
+
+    std::vector<Crypto::Hash> remainingTransactions;
+
+    for (const auto hash : transactionHashes)
+    {
+        const auto tx = availableTransactions.find(hash);
+
+        /* Found the transaction, pop it in the result */
+        if (tx != availableTransactions.end())
+        {
+            indexes[hash].assign(tx->globalIndexes.begin(), tx->globalIndexes.end());
+        }
+        /* Couldn't find, query the parent for it */
+        else
+        {
+            remainingTransactions.push_back(hash);
+        }
+    }
+
+    /* Didn't find all the transactions in this segment, query parent */
+    if (!remainingTransactions.empty())
+    {
+        /* Query the parent for the transactions we couldn't find */
+        auto parentResult = parent->getGlobalIndexes(remainingTransactions);
+
+        /* Insert the transactions we found from the parent */
+        indexes.insert(parentResult.begin(), parentResult.end());
+    }
+
+    return indexes;
 }
 
 RawBlock BlockchainCache::getBlockByIndex(uint32_t index) const {

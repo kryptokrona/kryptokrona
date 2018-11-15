@@ -1526,8 +1526,7 @@ void WalletGreen::prepareTransaction(std::vector<WalletOuts>&& wallets,
     throw std::system_error(make_error_code(error::WRONG_AMOUNT), "Not enough money");
   }
 
-  typedef CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount outs_for_amount;
-  std::vector<outs_for_amount> mixinResult;
+  std::vector<RandomOuts> mixinResult;
 
   if (mixIn != 0) {
     requestMixinOuts(selectedTransfers, mixIn, mixinResult);
@@ -1567,11 +1566,14 @@ void WalletGreen::validateSourceAddresses(const std::vector<std::string>& source
   }
 }
 
-void WalletGreen::checkIfEnoughMixins(std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult, uint16_t mixIn) const {
+void WalletGreen::checkIfEnoughMixins(std::vector<RandomOuts>& mixinResult, uint16_t mixIn) const {
   assert(mixIn != 0);
 
   auto notEnoughIt = std::find_if(mixinResult.begin(), mixinResult.end(),
-    [mixIn](const CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount& ofa) { return ofa.outs.size() < mixIn; });
+  [mixIn](const auto ofa)
+  {
+      return ofa.outs.size() < mixIn;
+  });
 
   if (notEnoughIt != mixinResult.end()) {
     m_logger(ERROR, BRIGHT_RED) << "Mixin is too big: " << mixIn;
@@ -2396,7 +2398,7 @@ AccountKeys WalletGreen::makeAccountKeys(const WalletRecord& wallet) const {
 void WalletGreen::requestMixinOuts(
   const std::vector<OutputToTransfer>& selectedTransfers,
   uint16_t mixIn,
-  std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult) {
+  std::vector<CryptoNote::RandomOuts>& mixinResult) {
 
   std::vector<uint64_t> amounts;
   for (const auto& out: selectedTransfers) {
@@ -2544,11 +2546,9 @@ CryptoNote::WalletGreen::ReceiverAmounts WalletGreen::splitAmount(
 
 void WalletGreen::prepareInputs(
   const std::vector<OutputToTransfer>& selectedTransfers,
-  std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult,
+  std::vector<CryptoNote::RandomOuts>& mixinResult,
   uint16_t mixIn,
   std::vector<InputInfo>& keysInfo) {
-
-  typedef CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::out_entry out_entry;
 
   size_t i = 0;
   for (const auto& input: selectedTransfers) {
@@ -2557,7 +2557,7 @@ void WalletGreen::prepareInputs(
 
     if(mixinResult.size()) {
       std::sort(mixinResult[i].outs.begin(), mixinResult[i].outs.end(),
-        [] (const out_entry& a, const out_entry& b) { return a.global_amount_index < b.global_amount_index; });
+        [] (const auto& a, const auto& b) { return a.global_amount_index < b.global_amount_index; });
       for (auto& fakeOut: mixinResult[i].outs) {
 
         if (input.out.globalOutputIndex == fakeOut.global_amount_index) {
@@ -3227,8 +3227,7 @@ size_t WalletGreen::createFusionTransaction(uint64_t threshold, uint16_t mixin,
     return WALLET_INVALID_TRANSACTION_ID;
   }
 
-  typedef CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount outs_for_amount;
-  std::vector<outs_for_amount> mixinResult;
+  std::vector<RandomOuts> mixinResult;
   if (mixin != 0) {
     requestMixinOuts(fusionInputs, mixin, mixinResult);
   }

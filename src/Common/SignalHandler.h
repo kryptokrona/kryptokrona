@@ -25,5 +25,6 @@ namespace Tools {
   {
   public:
     static bool install(std::function<void(void)> t);
+    static void uninstall();
   };
 }

@@ -4,6 +4,9 @@
 // Please see the included LICENSE file for more information.
 
 #pragma once
+
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <CryptoNote.h>
 
@@ -56,6 +59,15 @@ public:
                               uint32_t& startIndex, uint32_t& currentIndex, uint32_t& fullOffset,
                               std::vector<BlockDetails>& entries) const = 0;
 
+  virtual bool getWalletSyncData(const std::vector<Crypto::Hash> &knownBlockHashes, uint64_t startHeight,
+                                 uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo> &blocks) const = 0;
+
+  virtual bool getTransactionsStatus(
+    std::unordered_set<Crypto::Hash> transactionHashes,
+    std::unordered_set<Crypto::Hash> &transactionsInPool,
+    std::unordered_set<Crypto::Hash> &transactionsInBlock,
+    std::unordered_set<Crypto::Hash> &transactionsUnknown) const = 0;
+
   virtual bool hasTransaction(const Crypto::Hash& transactionHash) const = 0;
   virtual void getTransactions(const std::vector<Crypto::Hash>& transactionHashes,
                                std::vector<BinaryArray>& transactions,
@@ -73,6 +85,11 @@ public:
                                            std::vector<uint32_t>& globalIndexes) const = 0;
   virtual bool getRandomOutputs(uint64_t amount, uint16_t count, std::vector<uint32_t>& globalIndexes,
                                 std::vector<Crypto::PublicKey>& publicKeys) const = 0;
+
+  virtual bool getGlobalIndexesForRange(
+    const uint64_t startHeight,
+    const uint64_t endHeight,
+    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes) const = 0;
 
   virtual bool addTransactionToPool(const BinaryArray& transactionBinaryArray) = 0;
 

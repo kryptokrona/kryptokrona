@@ -254,7 +254,7 @@ protected:
 
   size_t doTransfer(const TransactionParameters& transactionParameters);
 
-  void checkIfEnoughMixins(std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult, uint16_t mixIn) const;
+  void checkIfEnoughMixins(std::vector<CryptoNote::RandomOuts>& mixinResult, uint16_t mixIn) const;
   std::vector<WalletTransfer> convertOrdersToTransfers(const std::vector<WalletOrder>& orders) const;
   uint64_t countNeededMoney(const std::vector<CryptoNote::WalletTransfer>& destinations, uint64_t fee) const;
   CryptoNote::AccountPublicAddress parseAccountAddressString(const std::string& addressString) const;
@@ -267,10 +267,10 @@ protected:
 
   void requestMixinOuts(const std::vector<OutputToTransfer>& selectedTransfers,
     uint16_t mixIn,
-    std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult);
+    std::vector<CryptoNote::RandomOuts>& mixinResult);
 
   void prepareInputs(const std::vector<OutputToTransfer>& selectedTransfers,
-    std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult,
+    std::vector<CryptoNote::RandomOuts>& mixinResult,
     uint16_t mixIn,
     std::vector<InputInfo>& keysInfo);
 

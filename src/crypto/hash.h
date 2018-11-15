@@ -10,7 +10,6 @@
 #include <stddef.h>
 
 #include <CryptoTypes.h>
-#include "generic-ops.h"
 
 // Standard Cryptonight Definitions
 #define CN_PAGE_SIZE                    2097152
@@ -136,5 +135,3 @@ namespace Crypto {
     tree_hash_from_branch(reinterpret_cast<const char (*)[HASH_SIZE]>(branch), depth, reinterpret_cast<const char *>(&leaf), path, reinterpret_cast<char *>(&root_hash));
   }
 }
-
-CRYPTO_MAKE_HASHABLE(Hash)
