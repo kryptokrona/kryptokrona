@@ -118,7 +118,7 @@ class WalletBackend
         json toJson() const;
 
         /* Initializes the class from a json string */
-        void fromJson(const json &j);
+        WalletError fromJson(const json &j);
 
         /* Initializes the class from a json string, and inits the stuff we
            can't init from the json */

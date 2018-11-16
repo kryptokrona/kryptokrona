@@ -219,6 +219,11 @@ std::string WalletError::getErrorMessage() const
         {
             return "This function can only be used when using a view wallet.";
         }
+        case WILL_OVERFLOW:
+        {
+            return "This operation will cause integer overflow. Please decrease "
+                   "the amounts you are sending.";
+        }
 
         /* No default case so the compiler warns us if we missed one */
     }

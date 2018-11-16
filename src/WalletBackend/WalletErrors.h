@@ -168,6 +168,9 @@ enum WalletErrorCode
 
     /* Cannot perform this operation when using a non view wallet */
     ILLEGAL_NON_VIEW_WALLET_OPERATION = 40,
+
+    /* Operation will cause int overflow */
+    WILL_OVERFLOW = 41,
 };
 
 class WalletError

@@ -76,7 +76,6 @@ uint64_t getTransactionSum(const std::vector<std::pair<std::string, uint64_t>> d
 {
     uint64_t amountSum = 0;
 
-    /* TODO: Overflow */
     for (const auto & [destination, amount] : destinations)
     {
         amountSum += amount;

@@ -125,18 +125,13 @@ json WalletBackend::toJson() const
     };
 }
 
-void WalletBackend::fromJson(const json &j)
+WalletError WalletBackend::fromJson(const json &j)
 {
     uint16_t version = j.at("walletFileFormatVersion").get<uint16_t>();
 
     if (version != Constants::WALLET_FILE_FORMAT_VERSION)
     {
-        /* TODO: This should probably be a custom type, throwing an actual
-           error we can catch upstream? */
-        throw std::invalid_argument(
-            "Wallet file format version is not supported by this version of "
-            "the software!"
-        );
+        return UNSUPPORTED_WALLET_FILE_FORMAT_VERSION;
     }
 
     m_subWallets = std::make_shared<SubWallets>(
@@ -146,6 +141,8 @@ void WalletBackend::fromJson(const json &j)
     m_walletSynchronizer = std::make_shared<WalletSynchronizer>(
         j.at("walletSynchronizer").get<WalletSynchronizer>()
     );
+
+    return SUCCESS;
 }
 
 WalletError WalletBackend::fromJson(
@@ -155,7 +152,10 @@ WalletError WalletBackend::fromJson(
     const std::string daemonHost,
     const uint16_t daemonPort)
 {
-    fromJson(j);
+    if (WalletError error = fromJson(j); error != SUCCESS)
+    {
+        return error;
+    }
 
     m_filename = filename;
     m_password = password;
@@ -446,7 +446,7 @@ std::unordered_map<Crypto::PublicKey, SubWallet> vectorToSubWallets(std::vector<
 
     for (const auto &s : vector)
     {
-        transfers[s.m_publicSpendKey] = s;
+        transfers[s.publicSpendKey()] = s;
     }
 
     return transfers;

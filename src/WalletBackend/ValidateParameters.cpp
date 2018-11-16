@@ -205,6 +205,20 @@ WalletError validateAmount(
     /* Get the total amount of the transaction */
     uint64_t totalAmount = Utilities::getTransactionSum(destinations) + fee;
 
+    std::vector<uint64_t> amounts { fee };
+
+    std::transform(destinations.begin(), destinations.end(), std::back_inserter(amounts),
+    [](const auto destination)
+    {
+        return destination.second;
+    });
+
+    /* Check the total amount we're sending is not >= uint64_t */
+    if (Utilities::sumWillOverflow(amounts))
+    {
+        return WILL_OVERFLOW;
+    }
+
     if (totalAmount > availableBalance)
     {
         return NOT_ENOUGH_BALANCE;
