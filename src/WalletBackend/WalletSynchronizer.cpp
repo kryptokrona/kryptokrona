@@ -247,7 +247,8 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
         if (!Crypto::underive_public_key(
             derivation, outputIndex, tx.keyOutputs[outputIndex].key, spendKey))
         {
-            return {false, 0};
+            /* Not our output */
+            continue;
         }
 
         const auto spendKeys = m_subWallets->m_publicSpendKeys;
