@@ -450,8 +450,8 @@ bool Core::queryBlocksLite(const std::vector<Crypto::Hash>& knownBlockHashes, ui
   }
 }
 
-bool Core::queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes, uint64_t timestamp, uint32_t& startIndex,
-                           uint32_t& currentIndex, uint32_t& fullOffset, std::vector<BlockDetails>& entries) const {
+bool Core::queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes, uint64_t timestamp, uint64_t& startIndex,
+                           uint64_t& currentIndex, uint64_t& fullOffset, std::vector<BlockDetails>& entries, uint32_t blockCount) const {
   assert(entries.empty());
   assert(!chainsLeaves.empty());
   assert(!chainsStorage.empty());
@@ -459,6 +459,24 @@ bool Core::queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes
   throwIfNotInitialized();
 
   try {
+    if (blockCount == 0)
+    {
+      blockCount = BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT;
+    }
+    else if (blockCount == 1)
+    {
+      /* If we only ever request one block at a time then any attempt to sync
+       via this method will not proceed */
+      blockCount = 2;
+    }
+    else if (blockCount > BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT)
+    {
+      /* If we request more than the maximum defined here, chances are we are
+         going to timeout or otherwise fail whether we meant it to or not as
+         this is a VERY resource heavy RPC call */
+      blockCount = BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT;
+    }
+
     IBlockchainCache* mainChain = chainsLeaves[0];
     currentIndex = mainChain->getTopBlockIndex();
 
@@ -482,13 +500,13 @@ bool Core::queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes
       fullOffset = startIndex;
     }
 
-    size_t hashesPushed = pushBlockHashes(startIndex, fullOffset, BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT, entries);
+    size_t hashesPushed = pushBlockHashes(startIndex, fullOffset, blockCount, entries);
 
     if (startIndex + static_cast<uint32_t>(hashesPushed) != fullOffset) {
       return true;
     }
 
-    fillQueryBlockDetails(fullOffset, currentIndex, BLOCKS_SYNCHRONIZING_DEFAULT_COUNT, entries);
+    fillQueryBlockDetails(fullOffset, currentIndex, blockCount, entries);
 
     return true;
   } catch (std::exception& e) {
@@ -699,7 +717,7 @@ WalletTypes::RawTransaction Core::getRawTransaction(
     transaction.paymentID = getPaymentIDFromExtra(t.extra);
 
     transaction.unlockTime = t.unlockTime;
-    
+
     /* Simplify the outputs */
     for (const auto &output : t.outputs)
     {
@@ -793,7 +811,7 @@ std::string Core::getPaymentIDFromExtra(const std::vector<uint8_t> &extra)
             {
                 return std::string();
             }
-            
+
             /* Payment ID in extra nonce */
             if (extra[i+2] == TX_EXTRA_PAYMENT_ID_IDENTIFIER)
             {
@@ -1328,7 +1346,7 @@ bool Core::getGlobalIndexesForRange(
                 getBinaryArrayHash(toBinaryArray(block.baseTransaction))
             );
         }
-        
+
         indexes = mainChain->getGlobalIndexes(transactionHashes);
 
         return true;

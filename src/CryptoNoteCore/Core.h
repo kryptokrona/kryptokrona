@@ -61,7 +61,7 @@ public:
   virtual bool queryBlocksLite(const std::vector<Crypto::Hash>& knownBlockHashes, uint64_t timestamp,
     uint32_t& startIndex, uint32_t& currentIndex, uint32_t& fullOffset, std::vector<BlockShortInfo>& entries) const override;
   virtual bool queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes, uint64_t timestamp,
-    uint32_t& startIndex, uint32_t& currentIndex, uint32_t& fullOffset, std::vector<BlockDetails>& entries) const override;
+    uint64_t& startIndex, uint64_t& currentIndex, uint64_t& fullOffset, std::vector<BlockDetails>& entries, uint32_t blockCount) const override;
 
   virtual bool getWalletSyncData(
     const std::vector<Crypto::Hash> &knownBlockHashes,

@@ -316,11 +316,11 @@ bool RpcServer::on_query_blocks_lite(const COMMAND_RPC_QUERY_BLOCKS_LITE::reques
 }
 
 bool RpcServer::on_query_blocks_detailed(const COMMAND_RPC_QUERY_BLOCKS_DETAILED::request& req, COMMAND_RPC_QUERY_BLOCKS_DETAILED::response& res) {
-  uint32_t startIndex;
-  uint32_t currentIndex;
-  uint32_t fullOffset;
+  uint64_t startIndex;
+  uint64_t currentIndex;
+  uint64_t fullOffset;
 
-  if (!m_core.queryBlocksDetailed(req.blockIds, req.timestamp, startIndex, currentIndex, fullOffset, res.blocks))
+  if (!m_core.queryBlocksDetailed(req.blockIds, req.timestamp, startIndex, currentIndex, fullOffset, res.blocks, req.blockCount))
   {
     res.status = "Failed to perform query";
     return false;
