@@ -128,6 +128,19 @@ bool checkNodeStatus(const std::shared_ptr<WalletBackend> walletBackend)
         {
             return true;
         }
+        /* User wants to try a different node */
+        else if (command == "swap_node")
+        {
+            const auto [host, port] = getDaemonAddress();
+
+            std::cout << InformationMsg("\nSwapping node, this may take some time...\n");
+
+            walletBackend->swapNode(host, port);
+
+            std::cout << SuccessMsg("Node swap complete.\n\n");
+
+            continue;
+        }
     }
 
     return true;

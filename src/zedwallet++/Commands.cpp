@@ -29,6 +29,7 @@ std::vector<Command> nodeDownCommands()
     {
         Command("try_again", "Try to connect to the node again"),
         Command("continue", "Continue to the wallet interface regardless"),
+        Command("swap_node", "Specify a new daemon address/port to connect to"),
         Command("exit", "Exit the program"),
     };
 }
@@ -62,6 +63,7 @@ std::vector<AdvancedCommand> allCommands()
         AdvancedCommand("save_csv", "Save all wallet transactions to a CSV file", true, true),
         AdvancedCommand("send_all", "Send all your balance to someone", false, true),
         AdvancedCommand("status", "Display sync status and network hashrate", true, true),
+        AdvancedCommand("swap_node", "Specify a new daemon address/port to sync from", true, true),
     };
 }
 

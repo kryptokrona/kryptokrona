@@ -10,7 +10,6 @@
 class TransactionMonitor
 {
     public:
-
         TransactionMonitor(
             const std::shared_ptr<WalletBackend> walletBackend) :
             m_walletBackend(walletBackend),

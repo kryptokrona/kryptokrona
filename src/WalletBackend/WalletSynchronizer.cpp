@@ -698,3 +698,8 @@ uint64_t WalletSynchronizer::getCurrentScanHeight() const
 {
     return m_transactionSynchronizerStatus.getHeight();
 }
+
+void WalletSynchronizer::swapNode(const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon)
+{
+    m_daemon = daemon;
+}
