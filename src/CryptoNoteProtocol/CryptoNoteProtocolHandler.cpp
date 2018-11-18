@@ -104,6 +104,8 @@ static inline void serialize(NOTIFY_NEW_LITE_BLOCK_request& request, ISerializer
 }
 
 static inline void serialize(NOTIFY_MISSING_TXS_request& request, ISerializer& s) {
+    s(request.current_blockchain_height, "current_blockchain_height");
+    s(request.blockHash, "blockHash");
     std::vector<std::string> missing_txs;
     if (s.type() == ISerializer::INPUT) {
       s(missing_txs, "missing_txs");
@@ -710,6 +712,21 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
     std::vector<BinaryArray> have_txs;
     std::vector<Crypto::Hash> need_txs;
 
+    if (!arg.b.transactions.empty()) {
+      for (BinaryArray txBlob: arg.b.transactions) {
+        CachedTransaction cachedTransaction(txBlob);
+        if (!m_core.hasTransaction(cachedTransaction.getTransactionHash())) {
+          logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
+                                     << " not present, adding to pool";
+          if(!m_core.addTransactionToPool(txBlob)) {
+            logger(Logging::ERROR) << "Transaction verification failed, dropping connection";
+            context.m_state = CryptoNoteConnectionContext::state_shutdown;
+            return 1;
+          }
+        }
+      }
+    }
+
     for (auto transactionHash: newBlockTemplate.transactionHashes) {
       BinaryArray transactionBlob;
       if (m_core.getPoolTransaction(transactionBlob, transactionHash)){
@@ -757,7 +774,11 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
       }
     }
     else {
+      CachedBlock temp(newBlockTemplate);
+
       NOTIFY_MISSING_TXS::request req;
+      req.current_blockchain_height = arg.current_blockchain_height;
+      req.blockHash = temp.getBlockHash();
       req.missing_txs = std::move(need_txs);
 
       post_notify<NOTIFY_MISSING_TXS>(*m_p2p, req, context);
@@ -773,7 +794,36 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
 
 int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MISSING_TXS::request& arg,
                                                      CryptoNoteConnectionContext& context) {
-  // TODO: Implement Missing Transactions Relay
+  logger(Logging::TRACE) << context << "NOTIFY_MISSING_TXS" ;
+
+  try {
+    BlockTemplate b = m_core.getBlockByHash(arg.blockHash);
+
+    NOTIFY_NEW_LITE_BLOCK::request req;
+    req.b.block = toBinaryArray(b);
+    req.current_blockchain_height = arg.current_blockchain_height;
+
+    std::vector<BinaryArray> txs;
+    std::vector<Crypto::Hash> missedHashes;
+    m_core.getTransactions(arg.missing_txs, txs, missedHashes);
+    if (!missedHashes.empty() || txs.size() != arg.missing_txs.size()) {
+      logger(Logging::ERROR) << "Failed to Handle NOTIFY_MISSING_TXS, Unable to retrieve requested transactions, Dropping Connection";
+      context.m_state = CryptoNoteConnectionContext::state_shutdown;
+    }
+    else {
+      req.b.transactions = std::move(txs);
+    }
+
+    logger(Logging::DEBUGGING) << "--> NOTIFY_RESPONSE_MISSING_TXS: "
+                               << "txs.size() = " << req.b.transactions.size()
+                               << "response.current_blockchain_height = " << req.current_blockchain_height;
+
+    post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, req, context);
+  }
+  catch(...) {
+    logger(Logging::DEBUGGING) << "Failed to find block with blockHash " << arg.blockHash << " Dropping Connection" ;
+    context.m_state = CryptoNoteConnectionContext::state_shutdown;
+  }
   return 1;
 }
 

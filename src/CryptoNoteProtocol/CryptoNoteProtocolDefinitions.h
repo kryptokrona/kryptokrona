@@ -159,6 +159,8 @@ namespace CryptoNote
   };
 
   struct NOTIFY_MISSING_TXS_request {
+    Crypto::Hash blockHash;
+    uint32_t current_blockchain_height;
     std::vector<Crypto::Hash> missing_txs;
   };
 
