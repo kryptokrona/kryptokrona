@@ -224,6 +224,10 @@ std::string WalletError::getErrorMessage() const
             return "This operation will cause integer overflow. Please decrease "
                    "the amounts you are sending.";
         }
+        case DAEMON_INIT_TIMEOUT:
+        {
+            return "Timed out initializing the daemon. Syncing may fail.";
+        }
 
         /* No default case so the compiler warns us if we missed one */
     }
