@@ -755,10 +755,12 @@ struct COMMAND_RPC_QUERY_BLOCKS_DETAILED {
   struct request {
     std::vector<Crypto::Hash> blockIds;
     uint64_t timestamp;
+    uint32_t blockCount;
 
     void serialize(ISerializer &s) {
       KV_MEMBER(blockIds);
       KV_MEMBER(timestamp)
+      KV_MEMBER(blockCount)
     }
   };
 
@@ -825,7 +827,7 @@ struct COMMAND_RPC_GET_TRANSACTIONS_STATUS
 
         /* These transactions are in a block */
         std::unordered_set<Crypto::Hash> transactionsInBlock;
-        
+
         /* We don't know anything about these hashes */
         std::unordered_set<Crypto::Hash> transactionsUnknown;
 
