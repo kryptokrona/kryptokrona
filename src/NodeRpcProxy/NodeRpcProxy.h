@@ -186,6 +186,6 @@ private:
 
   bool m_connected;
   std::string m_fee_address;
-  uint32_t m_fee_amount;
+  uint32_t m_fee_amount = 0;
 };
 }

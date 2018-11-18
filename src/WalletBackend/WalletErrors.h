@@ -171,6 +171,9 @@ enum WalletErrorCode
 
     /* Operation will cause int overflow */
     WILL_OVERFLOW = 41,
+
+    /* Timed out initializing the daemon */
+    DAEMON_INIT_TIMEOUT = 42,
 };
 
 class WalletError

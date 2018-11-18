@@ -136,11 +136,23 @@ void NodeRpcProxy::workerThread(const INode::Callback& initialized_callback) {
       m_cv_initialized.notify_all();
     }
 
+    std::future<void> init = std::async(std::launch::async, [this]
+    {
+        updateNodeStatus();
+    });
+
+    /* Init succeeded */
+    if (init.wait_for(std::chrono::seconds(10)) == std::future_status::ready) {
+        initialized_callback(std::error_code());
+    /* Timed out initting */
+    } else {
+        initialized_callback(make_error_code(NodeError::TIMEOUT));
+    }
+
+    /* Wait for the init to actually complete so we're not doing stuff twice */
+    init.get();
+
     getFeeInfo();
-
-    updateNodeStatus();
-
-    initialized_callback(std::error_code());
 
     contextGroup.spawn([this]() {
       Timer pullTimer(*m_dispatcher);

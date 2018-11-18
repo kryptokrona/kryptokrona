@@ -76,7 +76,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
         config.host, config.port
     );
 
-    if (error)
+    if (error && error != DAEMON_INIT_TIMEOUT)
     {
         std::cout << WarningMsg("Failed to import wallet: " + error.getErrorMessage());
 
@@ -119,7 +119,7 @@ std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
         scanHeight, config.host, config.port
     );
 
-    if (error)
+    if (error && error != DAEMON_INIT_TIMEOUT)
     {
         std::cout << WarningMsg("Failed to import wallet: " + error.getErrorMessage());
 
@@ -176,7 +176,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
         config.host, config.port
     );
 
-    if (error)
+    if (error && error != DAEMON_INIT_TIMEOUT)
     {
         std::cout << WarningMsg("Failed to import wallet: " + error.getErrorMessage());
 
@@ -207,7 +207,7 @@ std::shared_ptr<WalletBackend> createWallet(const Config &config)
         walletFileName, walletPass, config.host, config.port
     );
 
-    if (error)
+    if (error && error != DAEMON_INIT_TIMEOUT)
     {
         std::cout << WarningMsg("Failed to create wallet: " + error.getErrorMessage())
                   << std::endl;
@@ -264,7 +264,7 @@ std::shared_ptr<WalletBackend> openWallet(const Config &config)
 
             continue;
         }
-        else if (error)
+        else if (error && error != DAEMON_INIT_TIMEOUT)
         {
             std::cout << WarningMsg("Failed to open wallet: " + error.getErrorMessage())
                       << std::endl;
