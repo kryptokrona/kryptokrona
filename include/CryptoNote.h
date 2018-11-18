@@ -108,4 +108,9 @@ struct RawBlock {
   std::vector<BinaryArray> transactions;
 };
 
+struct LiteBlock {
+  BinaryArray block;
+  std::vector<BinaryArray> transactions;
+}
+
 }

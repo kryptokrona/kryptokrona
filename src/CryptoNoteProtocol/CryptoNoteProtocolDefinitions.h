@@ -148,7 +148,7 @@ namespace CryptoNote
   /*                                                                      */
   /************************************************************************/
   struct NOTIFY_NEW_LITE_BLOCK_request {
-    RawBlock b;
+    LiteBlock b;
     uint32_t current_blockchain_height;
     uint32_t hop;
   };
@@ -159,7 +159,7 @@ namespace CryptoNote
   };
 
   struct NOTIFY_MISSING_TXS_request {
-    std::vector<BinaryArray> missing_txs;
+    std::vector<Crypto::Hash> missing_txs;
   };
 
   struct NOTIFY_MISSING_TXS {

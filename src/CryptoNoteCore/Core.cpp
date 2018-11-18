@@ -836,24 +836,6 @@ std::error_code Core::addBlock(RawBlock&& rawBlock) {
   return addBlock(cachedBlock, std::move(rawBlock));
 }
 
-std::error_code Core::addLiteBlock(RawBlock&& rawLiteBlock) {
-  throwIfNotInitialized();
-
-  BlockTemplate blockTemplate;
-  bool result = fromBinaryArray(blockTemplate, rawLiteBlock.block);
-  if (!result) {
-    return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
-  }
-
-  std::vector<Crypto::Hash> missing_txs;
-  getTransactions(blockTemplate.transactionHashes, rawLiteBlock.transactions, missing_txs);
-  if (!missing_txs.empty()) {
-    // TODO: Request Missing Transactions
-  }
-
-  return addBlock(RawBlock{ rawLiteBlock.block, rawLiteBlock.transactions });
-}
-
 std::error_code Core::submitBlock(BinaryArray&& rawBlockTemplate) {
   throwIfNotInitialized();
 
@@ -1021,6 +1003,17 @@ std::vector<Crypto::Hash> Core::getPoolTransactionHashes() const {
   throwIfNotInitialized();
 
   return transactionPool->getTransactionHashes();
+}
+
+bool Core::getPoolTransaction(BinaryArray& transactionBlob, const Crypto::Hash& transactionHash) const {
+  if (transactionPool->checkIfTransactionPresent(transactionHash)) {
+    auto& cachedTransaction = transactionPool->getTransaction(transactionHash);
+    toBinaryArray(cachedTransaction, transactionBlob);
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 bool Core::getPoolChanges(const Crypto::Hash& lastBlockHash, const std::vector<Crypto::Hash>& knownHashes,

@@ -67,7 +67,6 @@ public:
 
   virtual std::error_code addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlock) override;
   virtual std::error_code addBlock(RawBlock&& rawBlock) override;
-  virtual std::error_code addLiteBlock(RawBlock&& rawLiteBlock) override;
 
   virtual std::error_code submitBlock(BinaryArray&& rawBlockTemplate) override;
 
@@ -77,6 +76,7 @@ public:
   virtual bool addTransactionToPool(const BinaryArray& transactionBinaryArray) override;
 
   virtual std::vector<Crypto::Hash> getPoolTransactionHashes() const override;
+  virtual bool getPoolTransaction(BinaryArray& transactionBlob, const Crypto::Hash& transactionHash) const override;
   virtual bool getPoolChanges(const Crypto::Hash& lastBlockHash, const std::vector<Crypto::Hash>& knownHashes, std::vector<BinaryArray>& addedTransactions,
     std::vector<Crypto::Hash>& deletedTransactions) const override;
   virtual bool getPoolChangesLite(const Crypto::Hash& lastBlockHash, const std::vector<Crypto::Hash>& knownHashes, std::vector<TransactionPrefixInfo>& addedTransactions,
