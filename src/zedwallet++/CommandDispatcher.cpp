@@ -137,6 +137,10 @@ bool handleCommand(
     {
         status(walletBackend);
     }
+    else if (command == "swap_node")
+    {
+        swapNode(walletBackend);
+    }
     /* This should never happen */
     else
     {

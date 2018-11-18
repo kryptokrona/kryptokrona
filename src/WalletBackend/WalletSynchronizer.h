@@ -68,6 +68,8 @@ class WalletSynchronizer
 
         uint64_t getCurrentScanHeight() const;
 
+        void swapNode(const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon);
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////

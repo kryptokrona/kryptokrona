@@ -1019,3 +1019,38 @@ std::tuple<uint64_t, std::string> WalletBackend::getNodeFee() const
 {
     return NodeFee::getNodeFee(m_daemon);
 }
+
+WalletError WalletBackend::swapNode(std::string daemonHost, uint16_t daemonPort)
+{
+    /* Stop the wallet synchronizer, since we're replacing the daemon it uses */
+    m_walletSynchronizer->stop();
+
+    /* Reinit proxy with new daemon */
+    m_daemon = std::make_shared<CryptoNote::NodeRpcProxy>(
+        daemonHost, daemonPort, m_logger->getLogger()
+    );
+
+    std::promise<std::error_code> errorPromise;
+    std::future<std::error_code> error = errorPromise.get_future();
+
+    auto callback = [&errorPromise](std::error_code e) 
+    {
+        errorPromise.set_value(e);
+    };
+
+    /* Init new daemon */
+    m_daemon->init(callback);
+
+    /* Give the synchronizer the new daemon */
+    m_walletSynchronizer->swapNode(m_daemon);
+
+    if (error.get())
+    {
+        return FAILED_TO_INIT_DAEMON;
+    }
+    
+    /* Continue syncing */
+    m_walletSynchronizer->start();
+
+    return SUCCESS;
+}
