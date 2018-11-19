@@ -36,23 +36,17 @@ int main(int argc, char **argv)
 
     std::cout << InformationMsg(CryptoNote::getProjectCLIHeader()) << std::endl;
 
-    Logging::LoggerManager logManager;
-
-    /* We'd like these lines to be in the below if(), but because some genius
-       thought it was a good idea to pass everything by reference and then
-       use them after the functions lifetime they go out of scope and break
-       stuff */
-    logManager.setMaxLevel(Logging::DEBUGGING);
-
-    Logging::FileLogger fileLogger;
+    const auto logManager = std::make_shared<Logging::LoggerManager>();
 
     if (config.debug)
     {
-        fileLogger.init(WalletConfig::walletName + ".log");
-        logManager.addLogger(fileLogger);
-    }
+        logManager->setMaxLevel(Logging::DEBUGGING);
 
-    Logging::LoggerRef logger(logManager, WalletConfig::walletName);
+        Logging::FileLogger fileLogger;
+
+        fileLogger.init(WalletConfig::walletName + ".log");
+        logManager->addLogger(fileLogger);
+    }
 
     /* Currency contains our coin parameters, such as decimal places, supply */
     const CryptoNote::Currency currency 
@@ -63,8 +57,8 @@ int main(int argc, char **argv)
 
     /* Our connection to turtlecoind */
     std::unique_ptr<CryptoNote::INode> node(
-        new CryptoNote::NodeRpcProxy(config.host, config.port, 
-                                     logger.getLogger()));
+        new CryptoNote::NodeRpcProxy(config.host, config.port, logManager)
+    );
 
     std::promise<std::error_code> errorPromise;
 
@@ -123,8 +117,7 @@ int main(int argc, char **argv)
     }
 
     /* Create the wallet instance */
-    CryptoNote::WalletGreen wallet(*dispatcher, currency, *node, 
-                                   logger.getLogger());
+    CryptoNote::WalletGreen wallet(*dispatcher, currency, *node, logManager);
 
     /* Run the interactive wallet interface */
     run(wallet, *node, config);

@@ -6,6 +6,8 @@
 #include <zedwallet++/Fusion.h>
 ///////////////////////////////
 
+#include <iostream>
+
 #include <WalletBackend/WalletBackend.h>
 
 #include <zedwallet++/ColouredMsg.h>

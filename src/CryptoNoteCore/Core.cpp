@@ -183,7 +183,7 @@ const std::chrono::seconds OUTDATED_TRANSACTION_POLLING_INTERVAL = std::chrono::
 
 }
 
-Core::Core(const Currency& currency, Logging::ILogger& logger, Checkpoints&& checkpoints, System::Dispatcher& dispatcher,
+Core::Core(const Currency& currency, std::shared_ptr<Logging::ILogger> logger, Checkpoints&& checkpoints, System::Dispatcher& dispatcher,
            std::unique_ptr<IBlockchainCacheFactory>&& blockchainCacheFactory, std::unique_ptr<IMainChainStorage>&& mainchainStorage)
     : currency(currency), dispatcher(dispatcher), contextGroup(dispatcher), logger(logger, "Core"), checkpoints(std::move(checkpoints)),
       upgradeManager(new UpgradeManager()), blockchainCacheFactory(std::move(blockchainCacheFactory)),
@@ -634,32 +634,47 @@ bool Core::getWalletSyncData(
             blockDifference + 1
         ) + startIndex;
 
-        std::vector<RawBlock> rawBlocks = mainChain->getBlocksByHeight(startIndex, endIndex);
-
-        for (const auto rawBlock : rawBlocks)
+        try
         {
-            BlockTemplate block;
+            std::vector<RawBlock> rawBlocks = mainChain->getBlocksByHeight(startIndex, endIndex);
 
-            fromBinaryArray(block, rawBlock.block);
-
-            WalletTypes::WalletBlockInfo walletBlock;
-
-            walletBlock.blockHeight = startIndex++;
-            walletBlock.blockHash = CachedBlock(block).getBlockHash();
-            walletBlock.blockTimestamp = block.timestamp;
-
-            walletBlock.coinbaseTransaction = getRawCoinbaseTransaction(
-                block.baseTransaction
-            );
-
-            for (const auto &transaction : rawBlock.transactions)
+            for (const auto rawBlock : rawBlocks)
             {
-                walletBlock.transactions.push_back(
-                    getRawTransaction(transaction)
-                );
-            }
+                BlockTemplate block;
 
-            walletBlocks.push_back(walletBlock);
+                fromBinaryArray(block, rawBlock.block);
+
+                WalletTypes::WalletBlockInfo walletBlock;
+
+                walletBlock.blockHeight = startIndex++;
+                walletBlock.blockHash = CachedBlock(block).getBlockHash();
+                walletBlock.blockTimestamp = block.timestamp;
+
+                walletBlock.coinbaseTransaction = getRawCoinbaseTransaction(
+                    block.baseTransaction
+                );
+
+                for (const auto &transaction : rawBlock.transactions)
+                {
+                    walletBlock.transactions.push_back(
+                        getRawTransaction(transaction)
+                    );
+                }
+
+                walletBlocks.push_back(walletBlock);
+            }
+        }
+        catch (const std::bad_alloc &e)
+        {
+            std::cout << "============ Caught std::bad_alloc ==============\n"
+                      << "Current index: " << currentIndex
+                      << "\nTimestamp block height: " << timestampBlockHeight
+                      << "\nFirst block height: " << firstBlockHeight
+                      << "\nStart index: " << startIndex
+                      << "\nBlock difference: " << blockDifference
+                      << "\nEnd index: " << endIndex << "\n\n";
+
+            return false;
         }
 
         return true;

@@ -102,9 +102,10 @@ int main(int argc, char **argv)
         }
 
         /* Launch the thread which watches for the shutdown signal */
-        ctrlCWatcher = std::thread(
-            shutdown, std::ref(ctrl_c), std::ref(stop), std::ref(walletBackend)
-        );
+        ctrlCWatcher = std::thread([&ctrl_c, &stop, &walletBackend = walletBackend]
+        {
+            shutdown(ctrl_c, stop, walletBackend);
+        });
 
         /* Trigger the shutdown signal if ctrl+c is used
            We do the actual handling in a separate thread to handle stuff not

@@ -19,7 +19,7 @@
 
 namespace Logging {
 
-LoggerMessage::LoggerMessage(ILogger& logger, const std::string& category, Level level, const std::string& color)
+LoggerMessage::LoggerMessage(std::shared_ptr<ILogger> logger, const std::string& category, Level level, const std::string& color)
   : std::ostream(this)
   , std::streambuf()
   , logger(logger)
@@ -99,7 +99,7 @@ LoggerMessage::LoggerMessage(LoggerMessage&& other)
 #endif
 
 int LoggerMessage::sync() {
-  logger(category, logLevel, timestamp, message);
+  (*logger)(category, logLevel, timestamp, message);
   gotText = false;
   message = DEFAULT;
   return 0;

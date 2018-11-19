@@ -8,15 +8,13 @@
 
 #include "json.hpp"
 
-#include <Logging/LoggerManager.h>
-
-#include <NodeRpcProxy/NodeRpcProxy.h>
-
 #include <string>
 
 #include <tuple>
 
 #include <vector>
+
+#include <Nigel/Nigel.h>
 
 #include <WalletBackend/SubWallets.h>
 #include <WalletBackend/WalletErrors.h>
@@ -226,7 +224,9 @@ class WalletBackend
         std::tuple<uint64_t, std::string> getNodeFee() const;
 
         /* Swap to a different daemon node */
-        WalletError swapNode(std::string daemonHost, uint16_t daemonPort);
+        void swapNode(std::string daemonHost, uint16_t daemonPort);
+
+        bool daemonOnline() const;
         
         /////////////////////////////
         /* Public member variables */
@@ -267,7 +267,7 @@ class WalletBackend
 
         WalletError unsafeSave() const;
 
-        WalletError init();
+        void init();
 
         //////////////////////////////
         /* Private member variables */
@@ -284,15 +284,7 @@ class WalletBackend
         std::shared_ptr<SubWallets> m_subWallets;
 
         /* The daemon connection */
-        std::shared_ptr<CryptoNote::NodeRpcProxy> m_daemon;
-
-        /* The log manager */
-        std::shared_ptr<Logging::LoggerManager> m_logManager;
-
-        /* The logger instance (Need to keep around because the daemon
-           constructor takes a reference to the variable, so if it goes out
-           of scope we segfault... :facepalm: */
-        std::shared_ptr<Logging::LoggerRef> m_logger;
+        std::shared_ptr<Nigel> m_daemon = nullptr;
 
         /* We use a shared pointer here, because we start the thread in the
            class, with the class as a context, hence, when we go to move the

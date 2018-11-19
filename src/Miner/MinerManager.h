@@ -25,7 +25,7 @@ namespace Miner {
 
 class MinerManager {
 public:
-  MinerManager(System::Dispatcher& dispatcher, const CryptoNote::MiningConfig& config, Logging::ILogger& logger);
+  MinerManager(System::Dispatcher& dispatcher, const CryptoNote::MiningConfig& config, std::shared_ptr<Logging::ILogger> logger);
   ~MinerManager();
 
   void start();

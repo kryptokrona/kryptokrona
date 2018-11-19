@@ -27,7 +27,7 @@ struct BlockMiningParameters {
 
 class Miner {
 public:
-  Miner(System::Dispatcher& dispatcher, Logging::ILogger& logger);
+  Miner(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> logger);
   ~Miner();
 
   BlockTemplate mine(const BlockMiningParameters& blockMiningParameters, size_t threadCount);

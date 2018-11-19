@@ -88,6 +88,21 @@ void SubWallet::completeAndStoreTransactionInput(
         );
 
         input.keyImage = keyImage;
+
+        /* See if we already stored this input, for example if we sent an
+           outgoing transaction. - No need to check with a view wallet */
+        auto it = std::find_if(m_unspentInputs.begin(), m_unspentInputs.end(),
+        [&input](const auto storedInput)
+        {
+            return storedInput.keyImage == input.keyImage;
+        });
+
+        /* Already inserted it, replace with the new data */
+        if (it != m_unspentInputs.end())
+        {
+            *it = input;
+            return;
+        }
     }
 
     m_unspentInputs.push_back(input);

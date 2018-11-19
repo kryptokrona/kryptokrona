@@ -370,7 +370,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     std::vector<WalletTypes::TxInputAndOwner> inputsToUse;
 
     /* Loop through each input */
-    for (const auto &walletAmount : availableInputs)
+    for (const auto walletAmount : availableInputs)
     {
         /* Add each input */
         inputsToUse.push_back(walletAmount);

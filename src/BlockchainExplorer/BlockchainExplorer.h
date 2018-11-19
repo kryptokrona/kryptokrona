@@ -41,7 +41,7 @@ enum State {
 
 class BlockchainExplorer : public IBlockchainExplorer, public INodeObserver {
 public:
-  BlockchainExplorer(INode& node, Logging::ILogger& logger);
+  BlockchainExplorer(INode& node, std::shared_ptr<Logging::ILogger> logger);
 
   BlockchainExplorer(const BlockchainExplorer&) = delete;
   BlockchainExplorer(BlockchainExplorer&&) = delete;

@@ -31,7 +31,7 @@ namespace CryptoNote {
 
 class JsonRpcServer : HttpServer {
 public:
-  JsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, Logging::ILogger& loggerGroup, PaymentService::ConfigurationManager& config);
+  JsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config);
   JsonRpcServer(const JsonRpcServer&) = delete;
 
   void start(const std::string& bindAddress, uint16_t bindPort);

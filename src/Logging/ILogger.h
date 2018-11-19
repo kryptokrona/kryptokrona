@@ -52,6 +52,8 @@ extern const std::string DEFAULT;
 
 class ILogger {
 public:
+  virtual ~ILogger() {};
+
   const static char COLOR_DELIMETER;
 
   const static std::array<std::string, 6> LEVEL_NAMES;

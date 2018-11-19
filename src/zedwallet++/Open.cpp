@@ -10,6 +10,8 @@
 
 #include <config/WalletConfig.h>
 
+#include <iostream>
+
 #include <Mnemonics/Mnemonics.h>
 
 #include <WalletBackend/ValidateParameters.h>
@@ -76,7 +78,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
         config.host, config.port
     );
 
-    if (error && error != DAEMON_INIT_TIMEOUT)
+    if (error)
     {
         std::cout << WarningMsg("Failed to import wallet: " + error.getErrorMessage());
 
@@ -119,7 +121,7 @@ std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
         scanHeight, config.host, config.port
     );
 
-    if (error && error != DAEMON_INIT_TIMEOUT)
+    if (error)
     {
         std::cout << WarningMsg("Failed to import wallet: " + error.getErrorMessage());
 
@@ -176,7 +178,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
         config.host, config.port
     );
 
-    if (error && error != DAEMON_INIT_TIMEOUT)
+    if (error)
     {
         std::cout << WarningMsg("Failed to import wallet: " + error.getErrorMessage());
 
@@ -207,7 +209,7 @@ std::shared_ptr<WalletBackend> createWallet(const Config &config)
         walletFileName, walletPass, config.host, config.port
     );
 
-    if (error && error != DAEMON_INIT_TIMEOUT)
+    if (error)
     {
         std::cout << WarningMsg("Failed to create wallet: " + error.getErrorMessage())
                   << std::endl;
@@ -264,7 +266,7 @@ std::shared_ptr<WalletBackend> openWallet(const Config &config)
 
             continue;
         }
-        else if (error && error != DAEMON_INIT_TIMEOUT)
+        else if (error)
         {
             std::cout << WarningMsg("Failed to open wallet: " + error.getErrorMessage())
                       << std::endl;
@@ -386,7 +388,7 @@ std::string getExistingWalletFileName(const Config &config)
                           << InformationMsg(walletName)
                           << WarningMsg(" or ")
                           << InformationMsg(walletFileName)
-                          << WarningMsg(" doesn't exist!z\n")
+                          << WarningMsg(" doesn't exist!\n")
                           << "Ensure you entered your wallet name correctly.\n\n";
             }
         }

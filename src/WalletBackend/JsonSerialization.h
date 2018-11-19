@@ -32,24 +32,9 @@ void from_json(const json &j, SubWallet &s);
 void to_json(json &j, const WalletBackend &w);
 void from_json(const json &j, WalletBackend &w);
 
-/* Crypto::SecretKey */
-void to_json(json &j, const Crypto::SecretKey &s);
-
-/* Crypto::PublicKey */
-void to_json(json &j, const Crypto::PublicKey &s);
-
-/* Crypto::Hash */
-void to_json(json &j, const Crypto::Hash &s);
-
-/* Crypto::KeyImage */
-void to_json(json &j, const Crypto::KeyImage &s);
-
 /* CryptoNote::WalletTransaction */
 void to_json(json &j, const CryptoNote::WalletTransaction &t);
 void from_json(const json &j, CryptoNote::WalletTransaction &t);
-
-/* Crypto::Hash */
-void to_json(json &j, const Crypto::Hash &h);
 
 /* WalletSynchronizer */
 void to_json(json &j, const WalletSynchronizer &w);

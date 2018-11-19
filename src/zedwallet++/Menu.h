@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include <WalletBackend/WalletBackend.h>
 
 #include <zedwallet++/ColouredMsg.h>

@@ -6,9 +6,9 @@
 #include <WalletBackend/JsonSerialization.h>
 ////////////////////////////////////////////
 
-#include <tuple>
-
 #include <Common/StringTools.h>
+
+#include <tuple>
 
 #include <WalletBackend/Constants.h>
 #include <WalletBackend/SubWallet.h>
@@ -160,72 +160,11 @@ WalletError WalletBackend::fromJson(
     m_filename = filename;
     m_password = password;
 
-    m_daemon = std::make_shared<CryptoNote::NodeRpcProxy>(
-        daemonHost, daemonPort, m_logger->getLogger()
-    );
+    m_daemon = std::make_shared<Nigel>(daemonHost, daemonPort);
 
-    return init();
-}
+    init();
 
-/* Declaration of to_json and from_json have to be in the same namespace as
-   the type itself was declared in */
-namespace Crypto
-{
-    ///////////////////////
-    /* Crypto::SecretKey */
-    ///////////////////////
-
-    void to_json(json &j, const SecretKey &s)
-    {
-        j = Common::podToHex(s);
-    }
-
-    void from_json(const json &j, SecretKey &s)
-    {
-        Common::podFromHex(j.get<std::string>(), s.data);
-    }
-
-    ///////////////////////
-    /* Crypto::PublicKey */
-    ///////////////////////
-
-    void to_json(json &j, const PublicKey &p)
-    {
-        j = Common::podToHex(p);
-    }
-
-    void from_json(const json &j, PublicKey &p)
-    {
-        Common::podFromHex(j.get<std::string>(), p.data);
-    }
-
-    //////////////////
-    /* Crypto::Hash */
-    //////////////////
-
-    void to_json(json &j, const Hash &h)
-    {
-        j = Common::podToHex(h);
-    }
-
-    void from_json(const json &j, Hash &h)
-    {
-        Common::podFromHex(j.get<std::string>(), h.data);
-    }
-
-    //////////////////////
-    /* Crypto::KeyImage */
-    //////////////////////
-
-    void to_json(json &j, const KeyImage &k)
-    {
-        j = Common::podToHex(k);
-    }
-
-    void from_json(const json &j, KeyImage &k)
-    {
-        Common::podFromHex(j.get<std::string>(), k.data);
-    }
+    return SUCCESS;
 }
 
 ////////////////////////

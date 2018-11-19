@@ -25,6 +25,8 @@
 
 #include <iterator>
 
+#include "json.hpp"
+
 namespace Crypto
 {
     struct Hash
@@ -67,7 +69,7 @@ namespace Crypto
         {
             return !(*this == other);
         }
-
+        
         uint8_t data[32];
     };
 
@@ -94,7 +96,7 @@ namespace Crypto
         {
             return !(*this == other);
         }
-
+        
         uint8_t data[32];
     };
 
@@ -204,6 +206,56 @@ namespace Crypto
     {
         return reinterpret_cast<const size_t &>(keyImage);
     } 
+
+    inline void to_json(nlohmann::json &j, const Hash &h)
+    {
+        j = Common::podToHex(h);
+    }
+
+    inline void from_json(const nlohmann::json &j, Hash &h)
+    {
+        Common::podFromHex(j.get<std::string>(), h.data);
+    }
+
+    inline void to_json(nlohmann::json &j, const PublicKey &p)
+    {
+        j = Common::podToHex(p);
+    }
+
+    inline void to_json(nlohmann::json &j, const SecretKey &s)
+    {
+        j = Common::podToHex(s);
+    }
+
+    inline void from_json(const nlohmann::json &j, SecretKey &s)
+    {
+        Common::podFromHex(j.get<std::string>(), s.data);
+    }
+
+    inline void from_json(const nlohmann::json &j, PublicKey &p)
+    {
+        Common::podFromHex(j.get<std::string>(), p.data);
+    }
+
+    inline void to_json(nlohmann::json &j, const KeyDerivation &k)
+    {
+        j = Common::podToHex(k);
+    }
+
+    inline void from_json(const nlohmann::json &j, KeyDerivation &k)
+    {
+        Common::podFromHex(j.get<std::string>(), k.data);
+    }
+
+    inline void to_json(nlohmann::json &j, const KeyImage &k)
+    {
+        j = Common::podToHex(k);
+    }
+
+    inline void from_json(const nlohmann::json &j, KeyImage &k)
+    {
+        Common::podFromHex(j.get<std::string>(), k.data);
+    }
 }
 
 namespace std

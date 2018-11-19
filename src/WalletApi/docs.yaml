@@ -1,0 +1,233 @@
+swagger: "2.0"
+info:
+  description: API Docs for using the TurtleCoin wallet-api program
+  version: 1.0.0
+  title: WalletAPI
+  contact:
+    url: http://chat.turtlecoin.lol
+  license:
+    name: GNU GPLv3
+    url: https://github.com/turtlecoin/turtlecoin/blob/master/LICENSE
+    
+tags:
+  - name: wallet
+    description: Opening and creating wallets
+  - name: addresses
+    description: Creating addresses, getting transactions for an address, etc
+  - name: node
+    description: Get node details, swap node
+  - name: keys
+    description: Get private keys or mnemonic seed
+  - name: transaction
+    description: Get a transaction details, send a transaction, etc
+    
+paths:
+  /wallet/open:
+    post:
+      tags:
+        - wallet
+      summary: Opens an already existing wallet
+      responses:
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        400:
+          description: Invalid input
+        403:
+          $ref: '#/responses/AlreadyOpen'
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Wallet"
+        
+  /wallet/keyimport:
+    post:
+      tags:
+        - wallet
+      summary: Imports a wallet with a private spend and view key
+      responses:
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        400:
+          description: Invalid input
+        403:
+          $ref: '#/responses/AlreadyOpen'
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          required:
+          - "privateSpendKey"
+          - "privateViewKey"
+          allOf:
+            - $ref: "#/definitions/WalletImport"
+            - properties:
+                privateViewKey:
+                  description: "64 char hex private view key"
+                  type: "string"
+                  example: >-
+                    493f522e1f46b5c07f753ed28dc2db9da5f571f28c2fa54f4c9a0a7941b09d0b
+                  
+                privateSpendKey:
+                  description: "64 char hex private spend key"
+                  type: "string"
+                  example: >-
+                    5c703d9bde0b7cd5ff3e19ea826a44066534661a7322c85e854e73f06e49cd06
+        
+  /wallet/seedimport:
+    post:
+      tags:
+        - wallet
+      summary: Imports a wallet using a mnemonic seed
+      responses:
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        400:
+          description: Invalid input
+        403:
+          $ref: '#/responses/AlreadyOpen'
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          required:
+          - "mnemonicSeed"
+          allOf:
+            - $ref: "#/definitions/WalletImport"
+            - properties:
+                mnemonicSeed:
+                  description: "The 25 words mnemonic seed"
+                  type: "string"
+                  example: >-
+                    cynical waveform sixteen husband zebra ritual vexed jaws
+                    eccentric jewels toenail having nabbing wept nozzle grunt
+                    tipsy flying pegs feel upright lower racetrack sapling sapling
+        
+  /wallet/viewkeyimport:
+    post:
+      tags:
+        - wallet
+      summary: Imports a view only wallet with a private view key and public address
+      description: >-
+        Note that view only wallets can only see incoming transactions, so
+        balance may be inflated, and they cannot send transactions.
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          required:
+          - "privateViewKey"
+          - "address"
+          allOf:
+            - $ref: "#/definitions/WalletImport"
+            - properties:
+                privateViewKey:
+                  description: "64 char hex private view key"
+                  type: "string"
+                  example: >-
+                    493f522e1f46b5c07f753ed28dc2db9da5f571f28c2fa54f4c9a0a7941b09d0b
+                  
+                address:
+                  description: "99 char public TRTL address"
+                  type: "string"
+                  example: >-
+                    TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+      responses:
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        400:
+          description: Invalid input
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        
+  /wallet/create:
+    post:
+      tags:
+        - wallet
+      summary: Creates a new wallet
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Wallet"
+      responses:
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        400:
+          description: Invalid input
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        
+  /wallet:
+    delete:
+      tags:
+        - wallet
+      summary: Closes and saves the current wallet, allowing a new one to be opened/imported
+      responses:
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          description: No wallet is currently open
+          
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "X-API-KEY"
+    in: "header"
+    description: >-
+        Your rpc password, hashed with PBKDF2, with 10,000 iterations, and a 16
+        byte IV of all zeros. Api key should be formatted as hex, and be 32
+        characters long (16 bytes). Prevents brute forcing.
+        
+responses:
+  UnauthorizedError:
+    description: "API key is missing or invalid"
+  AlreadyOpen:
+    description: "A wallet is already open. Call DELETE on /wallet first, to close it."
+        
+security:
+  - api_key: []
+  
+definitions:
+        
+  Wallet:
+    type: object
+    required:
+      - filename
+      - password
+    properties:
+      filename:
+        description: The filename to store/load the wallet from. Note that this is relative to where turtle-wallet-api was launched from - it is recommended you use an absolute path.
+        type: string
+        example: mywallet.wallet
+      password:
+        description: The password used to open the wallet
+        type: string
+        example: supersecretpassword
+      daemonHost:
+        description: The daemon host to sync the wallet with
+        type: string
+        example: public.turtlenode.io
+        default: 127.0.0.1
+      daemonPort:
+        description: The daemon port to sync the wallet with
+        type: integer
+        format: uint16
+        default: 8070
+        example: 8070
+          
+  WalletImport:
+    allOf:
+      - $ref: '#/definitions/Wallet'
+      - properties:
+          scanHeight:
+            description: The daemon port to sync the wallet with
+            type: integer
+            example: 300000
+            default: 0
+            format: int64

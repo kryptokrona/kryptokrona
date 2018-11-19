@@ -80,11 +80,7 @@ bool checkNodeStatus(const std::shared_ptr<WalletBackend> walletBackend)
 {
     while (true)
     {
-        const auto [walletBlockCount, localDaemonBlockCount, networkBlockCount]
-            = walletBackend->getSyncStatus();
-
-        /* Daemon is online */
-        if (networkBlockCount != 0 || localDaemonBlockCount != 0)
+        if (walletBackend->daemonOnline())
         {
             break;
         }

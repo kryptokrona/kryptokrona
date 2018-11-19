@@ -57,13 +57,6 @@ std::string WalletError::getErrorMessage() const
             return "The wallet file you are attempting to create already "
                    "exists. Please delete it first.";
         }
-        /* NOTE: This is NOT the same as the daemon not being open /
-           not existing. It is likely because an exception was thrown whilst
-           attempting to init, I have not seen it in practice. */
-        case FAILED_TO_INIT_DAEMON:
-        {
-            return "Failed to initialize daemon connection.";
-        }
         case ADDRESS_NOT_IN_WALLET:
         {
             return "The address given does not exist in the wallet container, "
@@ -224,11 +217,12 @@ std::string WalletError::getErrorMessage() const
             return "This operation will cause integer overflow. Please decrease "
                    "the amounts you are sending.";
         }
-        case DAEMON_INIT_TIMEOUT:
-        {
-            return "Timed out initializing the daemon. Syncing may fail.";
-        }
 
         /* No default case so the compiler warns us if we missed one */
     }
+}
+
+WalletErrorCode WalletError::getErrorCode() const
+{
+    return m_errorCode;
 }
