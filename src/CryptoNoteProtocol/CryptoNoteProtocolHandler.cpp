@@ -106,20 +106,7 @@ static inline void serialize(NOTIFY_NEW_LITE_BLOCK_request& request, ISerializer
 static inline void serialize(NOTIFY_MISSING_TXS_request& request, ISerializer& s) {
     s(request.current_blockchain_height, "current_blockchain_height");
     s(request.blockHash, "blockHash");
-    std::vector<std::string> missing_txs;
-    if (s.type() == ISerializer::INPUT) {
-      s(missing_txs, "missing_txs");
-      request.missing_txs.reserve(missing_txs.size());
-      std::transform(missing_txs.begin(), missing_txs.end(), std::back_inserter(request.missing_txs), [] (const std::string& s) {
-        return BinaryArray(s.begin(), s.end());
-      });
-    } else {
-      missing_txs.reserve(request.missing_txs.size());
-      std::transform(request.missing_txs.begin(), request.missing_txs.end(), std::back_inserter(missing_txs), [] (const BinaryArray& s) {
-        return std::string(s.begin(),s.end());
-      });
-      s(missing_txs, "missing_txs");
-    }
+    serializeAsBinary(request.missing_txs, "missing_txs", s);
 }
 
 CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, Logging::ILogger& log) :

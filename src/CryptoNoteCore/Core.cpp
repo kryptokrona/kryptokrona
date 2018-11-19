@@ -1008,7 +1008,7 @@ std::vector<Crypto::Hash> Core::getPoolTransactionHashes() const {
 bool Core::getPoolTransaction(BinaryArray& transactionBlob, const Crypto::Hash& transactionHash) const {
   if (transactionPool->checkIfTransactionPresent(transactionHash)) {
     auto& cachedTransaction = transactionPool->getTransaction(transactionHash);
-    toBinaryArray(cachedTransaction, transactionBlob);
+    transactionBlob = cachedTransaction.getTransactionBinaryArray();
     return true;
   }
   else {
