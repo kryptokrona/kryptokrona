@@ -310,19 +310,6 @@ uint32_t NodeRpcProxy::feeAmount() {
   return m_fee_amount;
 }
 
-std::string NodeRpcProxy::getInfo() {
-  CryptoNote::COMMAND_RPC_GET_INFO::request ireq;
-  CryptoNote::COMMAND_RPC_GET_INFO::response iresp;
-
-  std::error_code ec = jsonCommand("/getinfo", ireq, iresp);
-
-  if (ec || iresp.status != CORE_RPC_STATUS_OK) {
-    return std::string("Problem retrieving information from RPC server.");
-  }
-
-  return Common::get_status_string(iresp);
-}
-
 std::vector<Crypto::Hash> NodeRpcProxy::getKnownTxsVector() const {
   return std::vector<Crypto::Hash>(m_knownTxs.begin(), m_knownTxs.end());
 }
@@ -367,11 +354,6 @@ uint32_t NodeRpcProxy::getKnownBlockCount() const {
 
 uint64_t NodeRpcProxy::getNodeHeight() const {
   return m_nodeHeight.load(std::memory_order_relaxed);
-}
-
-uint64_t NodeRpcProxy::getLastLocalBlockTimestamp() const {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  return lastLocalBlockHeaderInfo.timestamp;
 }
 
 BlockHeaderInfo NodeRpcProxy::getLastLocalBlockHeaderInfo() const {
@@ -436,20 +418,6 @@ void NodeRpcProxy::getRandomOutsByAmounts(std::vector<uint64_t>&& amounts, uint1
 
   scheduleRequest(std::bind(&NodeRpcProxy::doGetRandomOutsByAmounts, this, std::move(amounts), outsCount, std::ref(outs)),
     callback);
-}
-
-void NodeRpcProxy::getNewBlocks(std::vector<Crypto::Hash>&& knownBlockIds,
-                                std::vector<CryptoNote::RawBlock>& newBlocks,
-                                uint32_t& startHeight,
-                                const Callback& callback) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (m_state != STATE_INITIALIZED) {
-    callback(make_error_code(NodeError::NOT_INITIALIZED));
-    return;
-  }
-
-  scheduleRequest(std::bind(&NodeRpcProxy::doGetNewBlocks, this, std::move(knownBlockIds), std::ref(newBlocks),
-    std::ref(startHeight)), callback);
 }
 
 void NodeRpcProxy::getTransactionOutsGlobalIndices(const Crypto::Hash& transactionHash,
@@ -613,33 +581,6 @@ std::error_code NodeRpcProxy::doGetRandomOutsByAmounts(std::vector<uint64_t>& am
     outs = std::move(rsp.outs);
   } else {
     m_logger(TRACE) << "getrandom_outs failed: " << ec << ", " << ec.message();
-  }
-
-  return ec;
-}
-
-static inline void serialize(COMMAND_RPC_GET_BLOCKS_FAST::response& response, ISerializer &s) {
-  KV_MEMBER(response.blocks)
-  KV_MEMBER(response.start_height)
-  KV_MEMBER(response.current_height)
-  KV_MEMBER(response.status)
-}
-
-std::error_code NodeRpcProxy::doGetNewBlocks(std::vector<Crypto::Hash>& knownBlockIds,
-                                             std::vector<CryptoNote::RawBlock>& newBlocks,
-                                             uint32_t& startHeight) {
-  CryptoNote::COMMAND_RPC_GET_BLOCKS_FAST::request req = AUTO_VAL_INIT(req);
-  CryptoNote::COMMAND_RPC_GET_BLOCKS_FAST::response rsp = AUTO_VAL_INIT(rsp);
-  req.block_ids = std::move(knownBlockIds);
-
-  m_logger(TRACE) << "Send getblocks request";
-  std::error_code ec = jsonCommand("/getblocks", req, rsp);
-  if (!ec) {
-    m_logger(TRACE) << "getblocks complete, start_height " << rsp.start_height << ", block count " << rsp.blocks.size();
-    newBlocks = std::move(rsp.blocks);
-    startHeight = static_cast<uint32_t>(rsp.start_height);
-  } else {
-    m_logger(TRACE) << "getblocks failed: " << ec << ", " << ec.message();
   }
 
   return ec;

@@ -105,16 +105,4 @@ int LoggerMessage::sync() {
   return 0;
 }
 
-std::streamsize LoggerMessage::xsputn(const char* s, std::streamsize n) {
-  gotText = true;
-  message.append(s, n);
-  return n;
-}
-
-int LoggerMessage::overflow(int c) {
-  gotText = true;
-  message += static_cast<char>(c);
-  return 0;
-}
-
 }

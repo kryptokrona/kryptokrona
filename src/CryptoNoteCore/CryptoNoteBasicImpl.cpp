@@ -69,18 +69,6 @@ namespace CryptoNote {
     return Tools::Base58::encode_addr(prefix, Common::asString(ba));
   }
   //-----------------------------------------------------------------------
-  bool is_coinbase(const Transaction& tx) {
-    if(tx.inputs.size() != 1) {
-      return false;
-    }
-
-    if(tx.inputs[0].type() != typeid(BaseInput)) {
-      return false;
-    }
-
-    return true;
-  }
-  //-----------------------------------------------------------------------
   bool parseAccountAddressString(uint64_t& prefix, AccountPublicAddress& adr, const std::string& str) {
     std::string data;
 

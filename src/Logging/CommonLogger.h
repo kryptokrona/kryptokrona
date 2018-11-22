@@ -28,7 +28,6 @@ public:
   virtual ~CommonLogger() {};
 
   virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
-  virtual void enableCategory(const std::string& category);
   virtual void disableCategory(const std::string& category);
   virtual void setMaxLevel(Level level);
 

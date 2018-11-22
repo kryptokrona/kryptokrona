@@ -24,7 +24,6 @@ namespace Common {
   class MemoryInputStream : public IInputStream {
   public:
     MemoryInputStream(const void* buffer, uint64_t bufferSize);
-    uint64_t getPosition() const;
     bool endOfStream() const;
     
     // IInputStream

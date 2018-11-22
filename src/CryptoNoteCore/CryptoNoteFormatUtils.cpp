@@ -143,10 +143,6 @@ bool checkOutsValid(const TransactionPrefix& tx, std::string* error) {
   return true;
 }
 
-bool checkMoneyOverflow(const TransactionPrefix &tx) {
-  return checkInputsOverflow(tx) && checkOutsOverflow(tx);
-}
-
 bool checkInputsOverflow(const TransactionPrefix &tx) {
   uint64_t money = 0;
 

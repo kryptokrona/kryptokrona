@@ -91,7 +91,19 @@ if(MSVC)
   target_link_libraries(service Rpcrt4)
 endif ()
 
+# A bit of hackery so we don't have to do the if/else/ for every target that
+# wants to use filesystem
+add_library(__filesystem INTERFACE)
+
+# Windows works out of the box
+if (APPLE)
+    target_link_libraries(__filesystem INTERFACE /usr/local/opt/llvm/lib/libc++fs.a)
+elseif (UNIX)
+    target_link_libraries(__filesystem INTERFACE stdc++fs)
+endif()
+
 # Add the dependencies we need
+target_link_libraries(Common __filesystem)
 target_link_libraries(CryptoNoteCore Common Logging Crypto P2P Rpc Http Serialization System ${Boost_LIBRARIES})
 target_link_libraries(CryptoNoteCore Common Crypto Logging Serialization)
 target_link_libraries(P2P CryptoNoteCore Logging ${Boost_LIBRARIES} upnpc-static)
@@ -110,14 +122,7 @@ target_link_libraries(Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Se
 target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(cryptotest Crypto Common)
 
-if (MSVC)
-    target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static)
-elseif (APPLE)
-    target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static /usr/local/opt/llvm/lib/libc++fs.a) 
-else()
-    target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static stdc++fs)
-endif()
-
+target_link_libraries(WalletBackend Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common ${Boost_LIBRARIES} cryptopp-static __filesystem)
 target_link_libraries(zedwallet++ WalletBackend)
 
 # Add dependencies means we have to build the latter before we build the former

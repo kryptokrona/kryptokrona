@@ -89,7 +89,6 @@ public:
     IncludeDefault = IncludeKeyUnlocked
   };
 
-  virtual size_t transfersCount() const = 0;
   virtual size_t transactionsCount() const = 0;
   virtual uint64_t balance(uint32_t flags = IncludeDefault) const = 0;
   virtual void getOutputs(std::vector<TransactionOutputInformation>& transfers, uint32_t flags = IncludeDefault) const = 0;
@@ -99,7 +98,6 @@ public:
   //only type flags are feasible for this function
   virtual std::vector<TransactionOutputInformation> getTransactionInputs(const Crypto::Hash& transactionHash, uint32_t flags) const = 0;
   virtual void getUnconfirmedTransactions(std::vector<Crypto::Hash>& transactions) const = 0;
-  virtual std::vector<TransactionSpentOutputInformation> getSpentOutputs() const = 0;
 };
 
 }

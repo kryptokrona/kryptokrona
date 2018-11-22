@@ -63,15 +63,8 @@ public:
   virtual size_t getRequiredSignaturesCount(size_t inputIndex) const override;
   virtual bool findOutputsToAccount(const AccountPublicAddress& addr, const SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const override;
 
-  // various checks
-  virtual bool validateInputs() const override;
-  virtual bool validateOutputs() const override;
-  virtual bool validateSignatures() const override;
-
   // serialized transaction
   virtual BinaryArray getTransactionData() const override;
-
-  virtual bool getTransactionSecretKey(SecretKey& key) const override;
 
 private:
   TransactionPrefix m_txPrefix;
@@ -180,31 +173,9 @@ bool TransactionPrefixImpl::findOutputsToAccount(const AccountPublicAddress& add
   return ::CryptoNote::findOutputsToAccount(m_txPrefix, addr, viewSecretKey, outs, outputAmount);
 }
 
-bool TransactionPrefixImpl::validateInputs() const {
-  return
-    checkInputTypesSupported(m_txPrefix) &&
-    checkInputsOverflow(m_txPrefix) &&
-    checkInputsKeyimagesDiff(m_txPrefix);
-}
-
-bool TransactionPrefixImpl::validateOutputs() const {
-  return
-    checkOutsValid(m_txPrefix) &&
-    checkOutsOverflow(m_txPrefix);
-}
-
-bool TransactionPrefixImpl::validateSignatures() const {
-  throw std::system_error(std::make_error_code(std::errc::function_not_supported), "Validating signatures is not supported for transaction prefix");
-}
-
 BinaryArray TransactionPrefixImpl::getTransactionData() const {
   return toBinaryArray(m_txPrefix);
 }
-
-bool TransactionPrefixImpl::getTransactionSecretKey(SecretKey& key) const {
-  return false;
-}
-
 
 std::unique_ptr<ITransactionReader> createTransactionPrefix(const TransactionPrefix& prefix, const Hash& transactionHash) {
   return std::unique_ptr<ITransactionReader> (new TransactionPrefixImpl(prefix, transactionHash));

@@ -71,11 +71,6 @@ bool StringView::isEmpty() const {
   return size == 0;
 }
 
-bool StringView::isNil() const {
-  assert(data != nullptr || size == 0);
-  return data == nullptr;
-}
-
 const StringView::Object& StringView::operator[](Size index) const {
   assert(data != nullptr || size == 0);
   assert(index < size);
@@ -157,33 +152,6 @@ bool StringView::operator>=(StringView other) const {
   return !(*this < other);
 }
 
-bool StringView::beginsWith(const Object& object) const {
-  assert(data != nullptr || size == 0);
-  if (size == 0) {
-    return false;
-  }
-
-  return *data == object;
-}
-
-bool StringView::beginsWith(StringView other) const {
-  assert(data != nullptr || size == 0);
-  assert(other.data != nullptr || other.size == 0);
-  if (size >= other.size) {
-    for (Size i = 0;; ++i) {
-      if (i == other.size) {
-        return true;
-      }
-
-      if (!(*(data + i) == *(other.data + i))) {
-        break;
-      }
-    }
-  }
-
-  return false;
-}
-
 bool StringView::contains(const Object& object) const {
   assert(data != nullptr || size == 0);
   for (Size i = 0; i < size; ++i) {
@@ -216,34 +184,6 @@ bool StringView::contains(StringView other) const {
   return false;
 }
 
-bool StringView::endsWith(const Object& object) const {
-  assert(data != nullptr || size == 0);
-  if (size == 0) {
-    return false;
-  }
-
-  return *(data + (size - 1)) == object;
-}
-
-bool StringView::endsWith(StringView other) const {
-  assert(data != nullptr || size == 0);
-  assert(other.data != nullptr || other.size == 0);
-  if (size >= other.size) {
-    Size i = size - other.size;
-    for (Size j = 0;; ++j) {
-      if (j == other.size) {
-        return true;
-      }
-
-      if (!(*(data + i + j) == *(other.data + j))) {
-        break;
-      }
-    }
-  }
-
-  return false;
-}
-
 StringView::Size StringView::find(const Object& object) const {
   assert(data != nullptr || size == 0);
   for (Size i = 0; i < size; ++i) {
@@ -267,38 +207,6 @@ StringView::Size StringView::find(StringView other) const {
         }
 
         if (!(*(data + j + k) == *(other.data + k))) {
-          break;
-        }
-      }
-    }
-  }
-
-  return INVALID;
-}
-
-StringView::Size StringView::findLast(const Object& object) const {
-  assert(data != nullptr || size == 0);
-  for (Size i = 0; i < size; ++i) {
-    if (*(data + (size - 1 - i)) == object) {
-      return size - 1 - i;
-    }
-  }
-
-  return INVALID;
-}
-
-StringView::Size StringView::findLast(StringView other) const {
-  assert(data != nullptr || size == 0);
-  assert(other.data != nullptr || other.size == 0);
-  if (size >= other.size) {
-    Size i = size - other.size;
-    for (Size j = 0; !(i < j); ++j) {
-      for (Size k = 0;; ++k) {
-        if (k == other.size) {
-          return i - j;
-        }
-
-        if (!(*(data + (i - j + k)) == *(other.data + k))) {
           break;
         }
       }

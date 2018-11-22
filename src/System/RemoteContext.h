@@ -18,9 +18,11 @@
 #pragma once
 
 #include <cassert>
+
+#include <future>
+
 #include <System/Dispatcher.h>
 #include <System/Event.h>
-#include <System/Future.h>
 #include <System/InterruptedException.h>
 
 namespace System {
@@ -29,7 +31,7 @@ template<class T = void> class RemoteContext {
 public:
   // Start a thread, execute operation in it, continue execution of current context.
   RemoteContext(Dispatcher& d, std::function<T()>&& operation)
-      : dispatcher(d), event(d), procedure(std::move(operation)), future(System::Detail::async<T>([this] { return asyncProcedure(); })), interrupted(false) {
+      : dispatcher(d), event(d), procedure(std::move(operation)), future(std::async(std::launch::async, [this] { return asyncProcedure(); })), interrupted(false) {
   }
 
   // Run other task on dispatcher until future is ready, then return lambda's result, or rethrow exception. UB if called more than once.
@@ -95,7 +97,7 @@ private:
   Dispatcher& dispatcher;
   mutable Event event;
   std::function<T()> procedure;
-  mutable System::Detail::Future<T> future;
+  mutable std::future<T> future;
   mutable bool interrupted;
 };
 

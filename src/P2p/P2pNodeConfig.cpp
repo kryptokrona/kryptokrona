@@ -84,46 +84,4 @@ size_t P2pNodeConfig::getPeerListGetTryCount() const {
   return peerListGetTryCount;
 }
 
-// setters
-
-void P2pNodeConfig::setTimedSyncInterval(std::chrono::nanoseconds interval) {
-  timedSyncInterval = interval;
-}
-
-void P2pNodeConfig::setHandshakeTimeout(std::chrono::nanoseconds timeout) {
-  handshakeTimeout = timeout;
-}
-
-void P2pNodeConfig::setConnectInterval(std::chrono::nanoseconds interval) {
-  connectInterval = interval;
-}
-
-void P2pNodeConfig::setConnectTimeout(std::chrono::nanoseconds timeout) {
-  connectTimeout = timeout;
-}
-
-void P2pNodeConfig::setExpectedOutgoingConnectionsCount(size_t count) {
-  expectedOutgoingConnectionsCount = count;
-}
-
-void P2pNodeConfig::setWhiteListConnectionsPercent(size_t percent) {
-  if (percent > 100) {
-    throw std::invalid_argument("whiteListConnectionsPercent cannot be greater than 100");
-  }
-
-  whiteListConnectionsPercent = percent;
-}
-
-void P2pNodeConfig::setNetworkId(const boost::uuids::uuid& id) {
-  networkId = id;
-}
-
-void P2pNodeConfig::setPeerListConnectRange(size_t range) {
-  peerListConnectRange = range;
-}
-
-void P2pNodeConfig::setPeerListGetTryCount(size_t count) {
-  peerListGetTryCount = count;
-}
-
 }

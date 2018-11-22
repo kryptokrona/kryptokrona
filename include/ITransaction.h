@@ -61,7 +61,6 @@ public:
   virtual Crypto::Hash getTransactionHash() const = 0;
   virtual Crypto::Hash getTransactionPrefixHash() const = 0;
   virtual Crypto::PublicKey getTransactionPublicKey() const = 0;
-  virtual bool getTransactionSecretKey(Crypto::SecretKey& key) const = 0;
   virtual uint64_t getUnlockTime() const = 0;
 
   // extra
@@ -85,11 +84,6 @@ public:
   virtual size_t getRequiredSignaturesCount(size_t inputIndex) const = 0;
   virtual bool findOutputsToAccount(const AccountPublicAddress& addr, const Crypto::SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const = 0;
 
-  // various checks
-  virtual bool validateInputs() const = 0;
-  virtual bool validateOutputs() const = 0;
-  virtual bool validateSignatures() const = 0;
-
   // serialized transaction
   virtual BinaryArray getTransactionData() const = 0;
 };
@@ -106,7 +100,6 @@ public:
   virtual void setUnlockTime(uint64_t unlockTime) = 0;
 
   // extra
-  virtual void setPaymentId(const Crypto::Hash& paymentId) = 0;
   virtual void setExtraNonce(const BinaryArray& nonce) = 0;
   virtual void appendExtra(const BinaryArray& extraData) = 0;
 
@@ -116,9 +109,6 @@ public:
 
   virtual size_t addOutput(uint64_t amount, const AccountPublicAddress& to) = 0;
   virtual size_t addOutput(uint64_t amount, const KeyOutput& out) = 0;
-
-  // transaction info
-  virtual void setTransactionSecretKey(const Crypto::SecretKey& key) = 0;
 
   // signing
   virtual void signInputKey(size_t input, const TransactionTypes::InputKeyInfo& info, const KeyPair& ephKeys) = 0;

@@ -89,10 +89,6 @@ void P2pConnectionProxy::write(const P2pMessage &message) {
   }
 }
 
-void P2pConnectionProxy::ban() {
-  // not implemented
-}
-
 void P2pConnectionProxy::stop() {
   m_context.stop();
 }

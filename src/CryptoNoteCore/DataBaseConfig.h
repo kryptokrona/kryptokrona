@@ -24,14 +24,6 @@ public:
   uint64_t getReadCacheSize() const; //Bytes
   bool getTestnet() const;
 
-  void setConfigFolderDefaulted(bool defaulted);
-  void setDataDir(const std::string& dataDir);
-  void setBackgroundThreadsCount(uint16_t backgroundThreadsCount);
-  void setMaxOpenFiles(uint32_t maxOpenFiles);
-  void setWriteBufferSize(uint64_t writeBufferSize); //Bytes
-  void setReadCacheSize(uint64_t readCacheSize); //Bytes
-  void setTestnet(bool testnet);
-
 private:
   bool configFolderDefaulted;
   std::string dataDir;

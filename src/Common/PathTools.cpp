@@ -63,33 +63,12 @@ std::string GetPathDirectory(const std::string& path) {
   return path.substr(0, slashPos);
 }
 
-std::string GetPathFilename(const std::string& path) {
-  auto slashPos = path.rfind(GENERIC_PATH_SEPARATOR);
-  if (slashPos == std::string::npos) {
-    return path;
-  }
-  return path.substr(slashPos + 1);
-}
-
-void SplitPath(const std::string& path, std::string& directory, std::string& filename) {
-  directory = GetPathDirectory(path);
-  filename = GetPathFilename(path);
-}
-
 std::string CombinePath(const std::string& path1, const std::string& path2) {
   return path1 + GENERIC_PATH_SEPARATOR + path2;
 }
 
 std::string ReplaceExtenstion(const std::string& path, const std::string& extension) {
   return RemoveExtension(path) + extension;
-}
-
-std::string GetExtension(const std::string& path) {
-  auto pos = findExtensionPosition(path);
-  if (pos != std::string::npos) {
-    return path.substr(pos);
-  }
-  return std::string();
 }
 
 std::string RemoveExtension(const std::string& filename) { 

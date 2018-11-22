@@ -55,11 +55,4 @@ DeleteTransaction TransactionPoolMessage::getDeleteTransaction() const {
   return deleteTransaction;
 }
 
-TransactionPoolMessage makeAddTransaction(const Crypto::Hash& hash) {
-  return TransactionPoolMessage{AddTransaction{hash}};
-}
-
-TransactionPoolMessage makeDelTransaction(const Crypto::Hash& hash) {
-  return TransactionPoolMessage{DeleteTransaction{hash}};
-}
 }
