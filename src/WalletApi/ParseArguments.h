@@ -16,6 +16,9 @@ struct Config
 
     /* Password the user must supply with each request */
     std::string rpcPassword;
+
+    /* The value to use with the 'Access-Control-Allow-Origin' header */
+    std::string corsHeader;
 };
 
 Config parseArguments(int argc, char **argv);

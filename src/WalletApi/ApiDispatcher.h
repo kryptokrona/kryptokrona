@@ -18,7 +18,8 @@ class ApiDispatcher
         ApiDispatcher(
             const uint16_t bindPort,
             const bool acceptExternalRequests,
-            const std::string rpcPassword);
+            const std::string rpcPassword,
+            std::string corsHeader);
 
         /////////////////////////////
         /* Public member functions */
@@ -76,6 +77,11 @@ class ApiDispatcher
             const nlohmann::json body,
             httplib::Response &res);
 
+        /* Handles an OPTIONS request */
+        void handleOptions(
+            const httplib::Request &req,
+            httplib::Response &res) const;
+
         /* Extracts {host, port, filename, password}, from body */
         std::tuple<std::string, uint16_t, std::string, std::string>
             getDefaultWalletParams(const nlohmann::json body) const;
@@ -107,4 +113,8 @@ class ApiDispatcher
 
         /* The server port */
         uint16_t m_port;
+
+        /* The header to use with 'Access-Control-Allow-Origin'. If empty string,
+           header is not added. */
+        std::string m_corsHeader;
 };

@@ -487,7 +487,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
 
         return {error, wallet};
     }
-    catch (const json::parse_error &)
+    catch (const json::exception &)
     {
         return {WALLET_FILE_CORRUPTED, nullptr};
     }

@@ -34,7 +34,8 @@ int main(int argc, char **argv)
 
         /* Init the API */
         api = std::make_shared<ApiDispatcher>(
-            config.port, config.acceptExternalRequests, config.rpcPassword
+            config.port, config.acceptExternalRequests, config.rpcPassword,
+            config.corsHeader
         );
 
         /* Launch the API */

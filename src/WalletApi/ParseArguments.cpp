@@ -32,9 +32,13 @@ Config parseArguments(int argc, char **argv)
         cxxopts::value<uint16_t>(config.port)->default_value(std::to_string(CryptoNote::SERVICE_DEFAULT_PORT)), "<port>")
 
         ("a,accept-external-requests", "Should we listen for requests from outside this machine",
-        cxxopts::value<bool>(config.acceptExternalRequests)->default_value("false"))
+        cxxopts::value<bool>(config.acceptExternalRequests)->default_value("false"));
 
-        ("r,rpc-password", "The password to supply with API requests", cxxopts::value<std::string>(config.rpcPassword));
+    options.add_options("RPC")
+        ("enable-cors", "Adds header 'Access-Control-Allow-Origin' to the RPC responses. Uses the value specified as the domain. Use * for all.",
+        cxxopts::value<std::string>(config.corsHeader), "<domain>")
+
+        ("r,rpc-password", "Specify the <password> to access the RPC server.", cxxopts::value<std::string>(config.rpcPassword), "<password>");
 
     try
     {

@@ -25,8 +25,10 @@ using namespace httplib;
 ApiDispatcher::ApiDispatcher(
     const uint16_t bindPort,
     const bool acceptExternalRequests,
-    const std::string rpcPassword) :
-    m_port(bindPort)
+    const std::string rpcPassword,
+    const std::string corsHeader) :
+    m_port(bindPort),
+    m_corsHeader(corsHeader)
 {
     m_host = acceptExternalRequests ? "0.0.0.0" : "127.0.0.1";
 
@@ -68,7 +70,12 @@ ApiDispatcher::ApiDispatcher(
             .Post("/wallet/seedimport", router(&ApiDispatcher::seedImportWallet))
             .Post("/wallet/viewkeyimport", router(&ApiDispatcher::importViewWallet))
             .Post("/wallet/create", router(&ApiDispatcher::createWallet))
-            .Delete("/wallet", router(&ApiDispatcher::closeWallet));
+
+            .Delete("/wallet", router(&ApiDispatcher::closeWallet))
+
+            /* Note: not passing through middleware */
+            /* Matches everything */
+            .Options(".*", [this](auto &req, auto &res){ handleOptions(req, res); });
 }
 
 void ApiDispatcher::start()
@@ -96,9 +103,15 @@ void ApiDispatcher::middleware(
         body = json::parse(req.body);
         std::cout << "Body:\n" << std::setw(4) << body << std::endl;
     }
-    catch (const json::parse_error &)
+    catch (const json::exception &)
     {
         /* Not neccessarily an error if body isn't needed */
+    }
+
+    /* Add the cors header if not empty string */
+    if (m_corsHeader != "")
+    {
+        res.set_header("Access-Control-Allow-Origin", m_corsHeader.c_str());
     }
 
     /* TODO: Uncomment
@@ -107,25 +120,41 @@ void ApiDispatcher::middleware(
         return;
     }
     */
-
-    const auto [error, statusCode] = handler(body, res);
-
-    if (error)
+    
+    try
     {
-        /* Bad request */
-        res.status = 400;
+        const auto [error, statusCode] = handler(body, res);
 
-        nlohmann::json j {
-            {"errorCode", error.getErrorCode()},
-            {"errorMessage", error.getErrorMessage()}
-        };
+        if (error)
+        {
+            /* Bad request */
+            res.status = 400;
 
-        /* Pretty print ;o */
-        res.set_content(j.dump(4) + "\n", "application/json");
+            nlohmann::json j {
+                {"errorCode", error.getErrorCode()},
+                {"errorMessage", error.getErrorMessage()}
+            };
+
+            /* Pretty print ;o */
+            res.set_content(j.dump(4) + "\n", "application/json");
+        }
+        else
+        {
+            res.status = statusCode;
+        }
     }
-    else
+    /* Most likely a key was missing. Do the error handling here to make the
+       rest of the code simpler */
+    catch (const json::exception &e)
     {
-        res.status = statusCode;
+        std::cout << "Caught JSON exception, likely missing required "
+                     "json parameter: " << e.what() << std::endl;
+        res.status = 400;
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "Caught unexpected exception: " << e.what() << std::endl;
+        res.status = 500;
     }
 }
 
@@ -313,6 +342,35 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::closeWallet(
     m_walletBackend = nullptr;
 
     return {error, 200};
+}
+
+void ApiDispatcher::handleOptions(
+    const Request &req,
+    Response &res) const
+{
+    /* Add the cors header if not empty string */
+    if (m_corsHeader != "")
+    {
+        res.set_header("Access-Control-Allow-Origin", m_corsHeader.c_str());
+    }
+
+    std::string supported = "OPTIONS, GET, POST, PUT, DELETE";
+
+    if (m_corsHeader == "")
+    {
+        supported = "";
+    }
+
+    if (req.has_header("Access-Control-Request-Method"))
+    {
+        res.set_header("Access-Control-Allow-Methods", supported.c_str());
+    }
+    else
+    {
+        res.set_header("Allow", supported.c_str()); 
+    }
+
+    res.status = 200;
 }
 
 std::tuple<std::string, uint16_t, std::string, std::string>
