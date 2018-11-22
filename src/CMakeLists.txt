@@ -129,7 +129,6 @@ target_link_libraries(service WalletService JsonRpcServer Wallet NodeRpcProxy Tr
 target_link_libraries(Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
 target_link_libraries(cryptotest Crypto Common)
-target_link_libraries(Nigel cpprest)
 
 target_link_libraries(WalletBackend Mnemonics CryptoNoteCore Nigel cryptopp-static __filesystem)
 target_link_libraries(zedwallet++ WalletBackend)
