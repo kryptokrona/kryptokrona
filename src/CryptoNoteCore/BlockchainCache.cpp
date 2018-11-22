@@ -597,14 +597,8 @@ size_t BlockchainCache::getTransactionCount() const {
 std::vector<RawBlock> BlockchainCache::getBlocksByHeight(
     const uint64_t startHeight, const uint64_t endHeight) const
 {
-    std::cout << "Using in memory cache..." << std::endl;
-    std::cout << "Start height: " << startHeight << std::endl;
-    std::cout << "End height: " << endHeight << std::endl;
-    std::cout << "Start index: " << startIndex << std::endl;
-
     if (endHeight < startIndex)
     {
-        std::cout << "Recursing" << std::endl;
         return parent->getBlocksByHeight(startHeight, endHeight);
     }
 
@@ -612,17 +606,13 @@ std::vector<RawBlock> BlockchainCache::getBlocksByHeight(
 
     if (startHeight < startIndex)
     {
-        std::cout << "Getting from parent" << std::endl;
         blocks = parent->getBlocksByHeight(startHeight, startIndex - 1);
     }
 
     uint64_t startOffset = std::max(startHeight, static_cast<uint64_t>(startIndex));
 
-    std::cout << "Start offset - " << startOffset << std::endl;
-
-    for (uint64_t i = startOffset; i <= endHeight; i++)
+    for (uint64_t i = startOffset; i < endHeight; i++)
     {
-        std::cout << "block index: " << i - startIndex << std::endl;
         blocks.push_back(storage->getBlockByIndex(i - startIndex));
     }
 

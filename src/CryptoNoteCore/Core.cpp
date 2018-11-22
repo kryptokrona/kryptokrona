@@ -634,47 +634,32 @@ bool Core::getWalletSyncData(
             blockDifference + 1
         ) + startIndex;
 
-        try
-        {
-            std::vector<RawBlock> rawBlocks = mainChain->getBlocksByHeight(startIndex, endIndex);
+        std::vector<RawBlock> rawBlocks = mainChain->getBlocksByHeight(startIndex, endIndex);
 
-            for (const auto rawBlock : rawBlocks)
+        for (const auto rawBlock : rawBlocks)
+        {
+            BlockTemplate block;
+
+            fromBinaryArray(block, rawBlock.block);
+
+            WalletTypes::WalletBlockInfo walletBlock;
+
+            walletBlock.blockHeight = startIndex++;
+            walletBlock.blockHash = CachedBlock(block).getBlockHash();
+            walletBlock.blockTimestamp = block.timestamp;
+
+            walletBlock.coinbaseTransaction = getRawCoinbaseTransaction(
+                block.baseTransaction
+            );
+
+            for (const auto &transaction : rawBlock.transactions)
             {
-                BlockTemplate block;
-
-                fromBinaryArray(block, rawBlock.block);
-
-                WalletTypes::WalletBlockInfo walletBlock;
-
-                walletBlock.blockHeight = startIndex++;
-                walletBlock.blockHash = CachedBlock(block).getBlockHash();
-                walletBlock.blockTimestamp = block.timestamp;
-
-                walletBlock.coinbaseTransaction = getRawCoinbaseTransaction(
-                    block.baseTransaction
+                walletBlock.transactions.push_back(
+                    getRawTransaction(transaction)
                 );
-
-                for (const auto &transaction : rawBlock.transactions)
-                {
-                    walletBlock.transactions.push_back(
-                        getRawTransaction(transaction)
-                    );
-                }
-
-                walletBlocks.push_back(walletBlock);
             }
-        }
-        catch (const std::bad_alloc &e)
-        {
-            std::cout << "============ Caught std::bad_alloc ==============\n"
-                      << "Current index: " << currentIndex
-                      << "\nTimestamp block height: " << timestampBlockHeight
-                      << "\nFirst block height: " << firstBlockHeight
-                      << "\nStart index: " << startIndex
-                      << "\nBlock difference: " << blockDifference
-                      << "\nEnd index: " << endIndex << "\n\n";
 
-            return false;
+            walletBlocks.push_back(walletBlock);
         }
 
         return true;
