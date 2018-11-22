@@ -344,8 +344,8 @@ void SubWallet::removeForkedInputs(const uint64_t forkHeight)
 void SubWallet::removeCancelledTransactions(const std::unordered_set<Crypto::Hash> cancelledTransactions)
 {
     /* Find the inputs used in the cancelled transactions */
-    const auto it = std::remove_if(m_lockedInputs.begin(), m_lockedInputs.end(),
-    [&](auto &input)
+    auto it = std::remove_if(m_lockedInputs.begin(), m_lockedInputs.end(),
+    [&cancelledTransactions, this](auto &input)
     {
         if (cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end())
         {
@@ -365,6 +365,20 @@ void SubWallet::removeCancelledTransactions(const std::unordered_set<Crypto::Has
     if (it != m_lockedInputs.end())
     {
         m_spentInputs.erase(it);
+    }
+
+    /* Find inputs that we 'received' in outgoing transfers (scanning our
+       own sent transfer) and remove them */
+    it = std::remove_if(m_unspentInputs.begin(), m_unspentInputs.end(),
+    [&cancelledTransactions](auto &input)
+    {
+        return cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end();
+    });
+
+    /* Remove the cancelled incoming inputs */
+    if (it != m_unspentInputs.end())
+    {
+        m_unspentInputs.erase(it);
     }
 }
 
