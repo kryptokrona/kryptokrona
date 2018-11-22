@@ -31,6 +31,8 @@ Nigel::Nigel(
     const uint16_t daemonPort,
     const std::chrono::seconds timeout) :
     m_timeout(timeout),
+    m_daemonHost(daemonHost),
+    m_daemonPort(daemonPort),
     m_httpClient(std::make_shared<httplib::Client>(daemonHost.c_str(), daemonPort, timeout.count()))
 {
 }
@@ -52,6 +54,9 @@ void Nigel::swapNode(const std::string daemonHost, const uint16_t daemonPort)
     m_networkBlockCount = 0;
     m_peerCount = 0;
     m_lastKnownHashrate = 0;
+
+    m_daemonHost = daemonHost;
+    m_daemonPort = daemonPort;
 
     m_httpClient = std::make_shared<httplib::Client>(
         daemonHost.c_str(), daemonPort, m_timeout.count()
@@ -240,6 +245,11 @@ uint64_t Nigel::hashrate() const
 std::tuple<uint64_t, std::string> Nigel::nodeFee() const
 {
     return {m_nodeFeeAmount, m_nodeFeeAddress};
+}
+
+std::tuple<std::string, uint16_t> Nigel::nodeAddress() const
+{
+    return {m_daemonHost, m_daemonPort};
 }
 
 bool Nigel::getTransactionsStatus(

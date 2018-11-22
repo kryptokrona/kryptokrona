@@ -58,6 +58,8 @@ class Nigel
 
         std::tuple<uint64_t, std::string> nodeFee() const;
 
+        std::tuple<std::string, uint16_t> nodeAddress() const;
+
         std::tuple<bool, std::vector<WalletTypes::WalletBlockInfo>> getWalletSyncData(
             const std::vector<Crypto::Hash> blockHashCheckpoints,
             uint64_t startHeight,
@@ -131,4 +133,10 @@ class Nigel
 
         /* The timeout on requests */
         std::chrono::seconds m_timeout;
+
+        /* The daemon hostname */
+        std::string m_daemonHost;
+
+        /* The daemon port */
+        uint16_t m_daemonPort;
 };

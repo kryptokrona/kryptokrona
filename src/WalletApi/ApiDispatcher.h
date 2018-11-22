@@ -50,37 +50,85 @@ class ApiDispatcher
         bool checkAuthenticated(
             const httplib::Request &req,
             httplib::Response &res) const;
+
+        ///////////////////
+        /* POST REQUESTS */
+        ///////////////////
         
         /* Opens a wallet */
         std::tuple<WalletError, uint16_t> openWallet(
             const nlohmann::json body,
             httplib::Response &res);
 
+        /* Imports a wallet using a private spend + private view key */
         std::tuple<WalletError, uint16_t> keyImportWallet(
             const nlohmann::json body,
             httplib::Response &res);
 
+        /* Imports a wallet using a mnemonic seed */
         std::tuple<WalletError, uint16_t> seedImportWallet(
             const nlohmann::json body,
             httplib::Response &res);
 
+        /* Imports a view only wallet using a private view key + address */
         std::tuple<WalletError, uint16_t> importViewWallet(
             const nlohmann::json body,
             httplib::Response &res);
 
+        /* Creates a new wallet, which will be a deterministic wallet */
         std::tuple<WalletError, uint16_t> createWallet(
             const nlohmann::json body,
             httplib::Response &res);
+
+        /////////////////////
+        /* DELETE REQUESTS */
+        /////////////////////
 
         /* Close and save the wallet */
         std::tuple<WalletError, uint16_t> closeWallet(
             const nlohmann::json body,
             httplib::Response &res);
 
+        //////////////////
+        /* PUT REQUESTS */
+        //////////////////
+
+        /* Saves the wallet (Note - interrupts syncing for a short time) */
+        std::tuple<WalletError, uint16_t> saveWallet(
+            const nlohmann::json body,
+            httplib::Response &res) const;
+
+        /* Resets and saves the wallet */
+        std::tuple<WalletError, uint16_t> resetWallet(
+            const nlohmann::json body,
+            httplib::Response &res);
+
+        /* Sets the daemon node and port */
+        std::tuple<WalletError, uint16_t> setNodeInfo(
+            const nlohmann::json body,
+            httplib::Response &res);
+
+        //////////////////
+        /* GET REQUESTS */
+        //////////////////
+
+        /* Gets the node we are currently connected to, and its fee */
+        std::tuple<WalletError, uint16_t> getNodeInfo(
+            const nlohmann::json body,
+            httplib::Response &res) const;
+
+        //////////////////////
+        /* OPTIONS REQUESTS */
+        //////////////////////
+
         /* Handles an OPTIONS request */
         void handleOptions(
             const httplib::Request &req,
             httplib::Response &res) const;
+
+        //////////////////////////
+        /* END OF API FUNCTIONS */
+        //////////////////////////
 
         /* Extracts {host, port, filename, password}, from body */
         std::tuple<std::string, uint16_t, std::string, std::string>
@@ -104,9 +152,9 @@ class ApiDispatcher
         /* The --rpc-password hashed with pbkdf2 */
         std::string m_hashedPassword;
 
-        /* Need a mutex when opening / closing wallet, so we can't open two
-           at once or something */
-        std::mutex m_mutex;
+        /* Need a mutex for some actions, mainly mutating actions, like opening
+           wallets, sending transfers, etc */
+        mutable std::mutex m_mutex;
 
         /* The server host */
         std::string m_host;

@@ -28,12 +28,16 @@ paths:
         - wallet
       summary: Opens an already existing wallet
       responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
-        400:
-          description: Invalid input
         403:
           $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
       parameters:
       - in: "body"
         name: "body"
@@ -47,12 +51,16 @@ paths:
         - wallet
       summary: Imports a wallet with a private spend and view key
       responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
-        400:
-          description: Invalid input
         403:
           $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
       parameters:
       - in: "body"
         name: "body"
@@ -82,12 +90,16 @@ paths:
         - wallet
       summary: Imports a wallet using a mnemonic seed
       responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
-        400:
-          description: Invalid input
         403:
           $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
       parameters:
       - in: "body"
         name: "body"
@@ -137,12 +149,16 @@ paths:
                   example: >-
                     TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
       responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
-        400:
-          description: Invalid input
         403:
           $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
         
   /wallet/create:
     post:
@@ -156,12 +172,16 @@ paths:
         schema:
           $ref: "#/definitions/Wallet"
       responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
-        400:
-          description: Invalid input
         403:
           $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
         
   /wallet:
     delete:
@@ -169,10 +189,110 @@ paths:
         - wallet
       summary: Closes and saves the current wallet, allowing a new one to be opened/imported
       responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
         403:
-          description: No wallet is currently open
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /save:
+    put:
+      tags:
+        - wallet
+      summary: Saves the wallet state
+      responses:
+        200:
+          $ref: '#/responses/Success'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /reset:
+    put:
+      tags:
+        - wallet
+      summary: Resets and saves the wallet, beginning scanning from height given, if any
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: object
+          properties:
+            scanHeight:
+              description: The daemon port to sync the wallet with
+              type: integer
+              example: 300000
+              default: 0
+              format: int64
+            
+      responses:
+        200:
+          $ref: '#/responses/Success'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /node:
+    get:
+      tags:
+        - node
+      summary: Gets the node address, port, fee, and fee address
+      
+      responses:
+        '200':
+          description: The operation completed successfully.
+          schema:
+            allOf:
+              - $ref: '#/definitions/Node'
+              - properties:
+                  nodeFee:
+                    type: integer
+                    description: The fee the node you are connected to on each transaction (in atomic units)
+                    example: 1000
+                  nodeAddress:
+                    type: string
+                    description: The address the node fee gets sent to, if non zero
+                    example: >-
+                      TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+                
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+    put:
+      tags:
+        - node
+      summary: Sets the node address and port
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: '#/definitions/Node'
+      responses:
+        200:
+          $ref: '#/responses/Success'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
           
 securityDefinitions:
   api_key:
@@ -181,14 +301,40 @@ securityDefinitions:
     in: "header"
     description: >-
         Your rpc password, hashed with PBKDF2, with 10,000 iterations, and a 16
-        byte IV of all zeros. Api key should be formatted as hex, and be 32
+        byte salt of all zeros. Api key should be formatted as hex, and be 32
         characters long (16 bytes). Prevents brute forcing.
         
 responses:
   UnauthorizedError:
-    description: "API key is missing or invalid"
+    description: "API key is missing or invalid."
   AlreadyOpen:
     description: "A wallet is already open. Call DELETE on /wallet first, to close it."
+  Success:
+    description: "The operation completed successfully."
+  BadRequest:
+    description: "A parse error occured, or an error occured processing your request."
+    schema:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: >-
+            A numeric code representing the error, for programmatic use.
+            Error code mappings can be found here -
+            https://github.com/turtlecoin/turtlecoin/blob/development/src/WalletBackend/WalletErrors.h
+            We will endeavour to not change these mappings.
+          example: 5
+        errorMessage:
+          type: string
+          description: >-
+            A human readable error message, for displaying to the user.
+            It is suggested for programmers to not pattern match on these, and instead use the errorCode.
+          example: The password given for this wallet is incorrect.
+      
+  NotOpen:
+    description: "This operation requires a wallet to be open, and one has not been opened."
+  InternalError:
+    description: "An exception was thrown whilst processing the request. See the console for logs."
         
 security:
   - api_key: []
@@ -196,30 +342,20 @@ security:
 definitions:
         
   Wallet:
-    type: object
     required:
-      - filename
-      - password
-    properties:
-      filename:
-        description: The filename to store/load the wallet from. Note that this is relative to where turtle-wallet-api was launched from - it is recommended you use an absolute path.
-        type: string
-        example: mywallet.wallet
-      password:
-        description: The password used to open the wallet
-        type: string
-        example: supersecretpassword
-      daemonHost:
-        description: The daemon host to sync the wallet with
-        type: string
-        example: public.turtlenode.io
-        default: 127.0.0.1
-      daemonPort:
-        description: The daemon port to sync the wallet with
-        type: integer
-        format: uint16
-        default: 8070
-        example: 8070
+    - filename
+    - password
+    allOf:
+    - properties:
+        filename:
+          description: The filename to store/load the wallet from. Note that this is relative to where turtle-wallet-api was launched from - it is recommended you use an absolute path.
+          type: string
+          example: mywallet.wallet
+        password:
+          description: The password used to open the wallet
+          type: string
+          example: supersecretpassword
+    - $ref: '#/definitions/Node'
           
   WalletImport:
     allOf:
@@ -231,3 +367,20 @@ definitions:
             example: 300000
             default: 0
             format: int64
+            
+  Node:
+    type: object
+    properties: 
+      daemonHost:
+        description: The daemon host to sync the wallet with
+        type: string
+        example: public.turtlenode.io
+        default: 127.0.0.1
+      daemonPort:
+        description: The daemon port to sync the wallet with
+        type: integer
+        format: uint16
+        default: 11898
+        example: 11898
+        
+host: "127.0.0.1:8070"

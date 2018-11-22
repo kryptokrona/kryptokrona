@@ -223,6 +223,9 @@ class WalletBackend
         /* Get the node fee and address ({0, ""} if empty) */
         std::tuple<uint64_t, std::string> getNodeFee() const;
 
+        /* Returns the node host and port */
+        std::tuple<std::string, uint16_t> getNodeAddress() const;
+
         /* Swap to a different daemon node */
         void swapNode(std::string daemonHost, uint16_t daemonPort);
 

@@ -962,6 +962,11 @@ std::tuple<uint64_t, std::string> WalletBackend::getNodeFee() const
     return m_daemon->nodeFee();
 }
 
+std::tuple<std::string, uint16_t> WalletBackend::getNodeAddress() const
+{
+    return m_daemon->nodeAddress();
+}
+
 void WalletBackend::swapNode(std::string daemonHost, uint16_t daemonPort)
 {
     /* Stop the wallet synchronizer, since we're replacing the daemon it uses */
