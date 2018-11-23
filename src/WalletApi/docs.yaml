@@ -20,6 +20,8 @@ tags:
     description: Get private keys or mnemonic seed
   - name: transaction
     description: Get a transaction details, send a transaction, etc
+  - name: misc
+    description: Miscellaneous operations, such as saving, getting status, etc
     
 paths:
   /wallet/open:
@@ -203,7 +205,7 @@ paths:
   /save:
     put:
       tags:
-        - wallet
+        - misc
       summary: Saves the wallet state
       responses:
         200:
@@ -218,7 +220,7 @@ paths:
   /reset:
     put:
       tags:
-        - wallet
+        - misc
       summary: Resets and saves the wallet, beginning scanning from height given, if any
       parameters:
       - in: "body"
@@ -370,6 +372,53 @@ paths:
                   leech lifestyle newt tarnished vials weavers decay nerves buying taken sample after jailed cupcake token pavements welders gifts ferry keep humid abbey emails entrance leech
         400:
           $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /status:
+    get:
+      tags:
+        - misc
+      summary: Get the wallet sync status, peer count, and hashrate
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              walletBlockCount:
+                type: integer
+                format: uint64
+                description: The amount of blocks the wallet has scanned
+                example: 100000
+              localDaemonBlockCount:
+                type: integer
+                format: uint64
+                description: The amount of blocks the daemon the wallet is connected to has synced
+                example: 800000
+              networkBlockCount:
+                type: integer
+                format: uint64
+                description: The amount of blocks the network has
+                example: 900000
+              peerCount:
+                type: integer
+                format: uint32
+                description: The amount of peers (incoming + outgoing) peers the daemon has
+                example: 20
+              hashrate:
+                type: integer
+                format: uint64
+                description: The hashrate the last local block the daemon knows about has
+                example: 123456789
+              isViewWallet:
+                type: boolean
+                description: Whether this wallet is a view only wallet. Certain operations are illegal on a view only wallet, such as transferring.
+                example: false
         401:
           $ref: '#/responses/UnauthorizedError'
         403:

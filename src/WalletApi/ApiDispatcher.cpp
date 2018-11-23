@@ -83,6 +83,7 @@ ApiDispatcher::ApiDispatcher(
             .Get("/keys", router(&ApiDispatcher::getPrivateViewKey))
             .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys))
             .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed))
+            .Get("/status", router(&ApiDispatcher::getStatus))
 
             /* Matches everything */
             .Options(".*", router(&ApiDispatcher::handleOptions));
@@ -557,6 +558,32 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getMnemonicSeed(
 
     nlohmann::json j {
         {"mnemonicSeed", mnemonicSeed}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getStatus(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    if (!assertWalletOpen())
+    {
+        return {SUCCESS, 403};
+    }
+
+    const WalletTypes::WalletStatus status = m_walletBackend->getStatus();
+
+    nlohmann::json j {
+        {"walletBlockCount", status.walletBlockCount},
+        {"localDaemonBlockCount", status.localDaemonBlockCount},
+        {"networkBlockCount", status.networkBlockCount},
+        {"peerCount", status.peerCount},
+        {"hashrate", status.lastKnownHashrate},
+        {"isViewWallet", m_walletBackend->isViewWallet()}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");

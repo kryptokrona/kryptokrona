@@ -147,6 +147,12 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body) const;
 
+        /* Returns sync status, peer count, etc */
+        std::tuple<WalletError, uint16_t> getStatus(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
         //////////////////////
         /* OPTIONS REQUESTS */
         //////////////////////
