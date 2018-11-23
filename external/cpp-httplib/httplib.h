@@ -1643,12 +1643,16 @@ inline void Server::write_response(Stream& strm, bool last_connection, const Req
         res.set_header("Connection", "Keep-Alive");
     }
 
-    /* Set length even if it's empty - connections sometimes hang if no length
-       given with an empty response */
-    auto length = std::to_string(res.body.size());
-    res.set_header("Content-Length", length.c_str());
-
-    if (!res.body.empty()) {
+    if (res.body.empty()) {
+        if (!res.has_header("Content-Length")) {
+            if (res.streamcb) {
+                // Streamed response
+                res.set_header("Transfer-Encoding", "chunked");
+            } else {
+                res.set_header("Content-Length", "0");
+            }
+        }
+    } else {
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
         // TODO: 'Accpet-Encoding' has gzip, not gzip;q=0
         const auto& encodings = req.get_header_value("Accept-Encoding");
@@ -1662,11 +1666,9 @@ inline void Server::write_response(Stream& strm, bool last_connection, const Req
         if (!res.has_header("Content-Type")) {
             res.set_header("Content-Type", "text/plain");
         }
-    } else if (res.streamcb) {
-        // Streamed response
-        bool chunked_response = !res.has_header("Content-Length");
-        if (chunked_response)
-            res.set_header("Transfer-Encoding", "chunked");
+
+        auto length = std::to_string(res.body.size());
+        res.set_header("Content-Length", length.c_str());
     }
 
     detail::write_headers(strm, res);
