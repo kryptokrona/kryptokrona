@@ -99,7 +99,11 @@ class SubWallets
         std::tuple<bool, Crypto::PublicKey> getKeyImageOwner(
             const Crypto::KeyImage keyImage) const;
 
+        /* Gets the primary address (normally first created) address */
         std::string getPrimaryAddress() const;
+
+        /* Gets all the addresses in the subwallets container */
+        std::vector<std::string> getAddresses() const;
 
         /* Get the sum of the balance of the subwallets pointed to. If
            takeFromAll, get the total balance from all subwallets. */

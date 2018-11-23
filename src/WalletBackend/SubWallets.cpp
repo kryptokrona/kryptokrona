@@ -531,6 +531,18 @@ std::string SubWallets::getPrimaryAddress() const
     return it->second.address();
 }
 
+std::vector<std::string> SubWallets::getAddresses() const
+{
+    std::vector<std::string> addresses;
+
+    for (const auto [pubKey, subWallet] : m_subWallets)
+    {
+        addresses.push_back(subWallet.address());
+    }
+
+    return addresses;
+}
+
 /* Will throw if the public keys given don't exist */
 std::tuple<uint64_t, uint64_t> SubWallets::getBalance(
     std::vector<Crypto::PublicKey> subWalletsToTakeFrom,

@@ -188,6 +188,9 @@ class WalletBackend
         /* Get the primary address */
         std::string getPrimaryAddress() const;
 
+        /* Get a list of all addresses in the wallet */
+        std::vector<std::string> getAddresses() const;
+
         /* wallet sync height, local blockchain sync height,
            remote blockchain sync height */
         std::tuple<uint64_t, uint64_t, uint64_t> getSyncStatus() const;

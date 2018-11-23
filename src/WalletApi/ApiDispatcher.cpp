@@ -84,6 +84,7 @@ ApiDispatcher::ApiDispatcher(
             .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys))
             .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed))
             .Get("/status", router(&ApiDispatcher::getStatus))
+            .Get("/addresses", router(&ApiDispatcher::getAddresses))
 
             /* Matches everything */
             .Options(".*", router(&ApiDispatcher::handleOptions));
@@ -584,6 +585,25 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getStatus(
         {"peerCount", status.peerCount},
         {"hashrate", status.lastKnownHashrate},
         {"isViewWallet", m_walletBackend->isViewWallet()}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getAddresses(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    if (!assertWalletOpen())
+    {
+        return {SUCCESS, 403};
+    }
+
+    nlohmann::json j {
+        {"addresses", m_walletBackend->getAddresses()}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");

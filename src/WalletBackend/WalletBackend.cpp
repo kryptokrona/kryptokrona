@@ -846,6 +846,11 @@ std::string WalletBackend::getPrimaryAddress() const
     return m_subWallets->getPrimaryAddress();
 }
 
+std::vector<std::string> WalletBackend::getAddresses() const
+{
+    return m_subWallets->getAddresses();
+}
+
 std::tuple<uint64_t, uint64_t, uint64_t> WalletBackend::getSyncStatus() const
 {
     /* The last block the wallet has synced */

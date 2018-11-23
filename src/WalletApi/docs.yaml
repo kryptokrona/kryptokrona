@@ -426,6 +426,30 @@ paths:
         500:
           $ref: '#/responses/InternalError'
           
+  /addresses:
+    get:
+      tags:
+        - addresses
+      summary: Gets a list of all addresses in the wallet container
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              addresses:
+                type: array
+                items:
+                  type: string
+                description: Whether this wallet is a view only wallet. Certain operations are illegal on a view only wallet, such as transferring.
+                example: ["TRTLv2cT32cZbF6KvnU69LNxptYFBMCKs3yqLmCAVjPW4rNTExpB7RpGKGJEkD1E9MVmM8SUUJfUh42Ajo1Hgz5wUN6budvzaq"]
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
 securityDefinitions:
   api_key:
     type: "apiKey"
