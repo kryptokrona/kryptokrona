@@ -217,6 +217,11 @@ std::string WalletError::getErrorMessage() const
             return "This operation will cause integer overflow. Please decrease "
                    "the amounts you are sending.";
         }
+        case KEYS_NOT_DETERMINISTIC:
+        {
+            return "You cannot get a mnemonic seed for this address, as the "
+                   "view key is derived in terms of the spend key.";
+        }
 
         /* No default case so the compiler warns us if we missed one */
     }

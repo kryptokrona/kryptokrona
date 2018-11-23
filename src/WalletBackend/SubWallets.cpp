@@ -647,6 +647,21 @@ Crypto::SecretKey SubWallets::getPrivateViewKey() const
     return m_privateViewKey;
 }
 
+std::tuple<WalletError, Crypto::SecretKey> SubWallets::getPrivateSpendKey(
+    const Crypto::PublicKey publicSpendKey) const
+{
+    throwIfViewWallet();
+
+    const auto it = m_subWallets.find(publicSpendKey);
+
+    if (it == m_subWallets.end())
+    {
+        return {ADDRESS_NOT_IN_WALLET, Crypto::SecretKey()};
+    }
+
+    return {SUCCESS, it->second.privateSpendKey()};
+}
+
 std::unordered_set<Crypto::Hash> SubWallets::getLockedTransactionsHashes() const
 {
     /* Can't have locked transactions in a view wallet (can't spend) */

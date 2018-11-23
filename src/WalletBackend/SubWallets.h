@@ -119,6 +119,10 @@ class SubWallets
 
         Crypto::SecretKey getPrivateViewKey() const;
 
+        /* Gets the private spend key for the given public spend, if it exists */
+        std::tuple<WalletError, Crypto::SecretKey> getPrivateSpendKey(
+            const Crypto::PublicKey publicSpendKey) const;
+
         std::vector<Crypto::SecretKey> getPrivateSpendKeys() const;
 
         Crypto::SecretKey getPrimaryPrivateSpendKey() const;

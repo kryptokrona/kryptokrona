@@ -20,6 +20,8 @@
 
 #include <WalletApi/Constants.h>
 
+#include <WalletBackend/ValidateParameters.h>
+
 using namespace httplib;
 
 ApiDispatcher::ApiDispatcher(
@@ -61,7 +63,7 @@ ApiDispatcher::ApiDispatcher(
         {
             /* Pass the inputted function with the arguments passed through
                to middleware */
-            middleware(req, res, std::bind(function, this, _1, _2));
+            middleware(req, res, std::bind(function, this, _1, _2, _3));
         };
     };
 
@@ -78,15 +80,17 @@ ApiDispatcher::ApiDispatcher(
             .Put("/node", router(&ApiDispatcher::setNodeInfo))
 
             .Get("/node", router(&ApiDispatcher::getNodeInfo))
+            .Get("/keys", router(&ApiDispatcher::getPrivateViewKey))
+            .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys))
+            .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed))
 
-            /* Note: not passing through middleware */
             /* Matches everything */
-            .Options(".*", [this](auto &req, auto &res){ handleOptions(req, res); });
+            .Options(".*", router(&ApiDispatcher::handleOptions));
 }
 
 void ApiDispatcher::start()
 {
-    m_server.listen(m_host.c_str(), m_port);
+    m_server.listen(m_host, m_port);
 }
 
 void ApiDispatcher::stop()
@@ -98,7 +102,9 @@ void ApiDispatcher::middleware(
     const Request &req,
     Response &res,
     std::function<std::tuple<WalletError, uint16_t>
-        (const nlohmann::json body, Response &res)> handler)
+        (const Request &req,
+         Response &res,
+         const nlohmann::json &body)> handler)
 {
     std::cout << "Incoming " << req.method << " request: " << req.path << std::endl;
 
@@ -117,11 +123,11 @@ void ApiDispatcher::middleware(
     /* Add the cors header if not empty string */
     if (m_corsHeader != "")
     {
-        res.set_header("Access-Control-Allow-Origin", m_corsHeader.c_str());
+        res.set_header("Access-Control-Allow-Origin", m_corsHeader);
     }
 
     /* TODO: Uncomment
-    if (!checkAuthenticated(req))
+    if (!checkAuthenticated(req, res))
     {
         return;
     }
@@ -129,7 +135,7 @@ void ApiDispatcher::middleware(
     
     try
     {
-        const auto [error, statusCode] = handler(body, res);
+        const auto [error, statusCode] = handler(req, res, body);
 
         if (error)
         {
@@ -196,8 +202,9 @@ bool ApiDispatcher::checkAuthenticated(const Request &req, Response &res) const
 ///////////////////
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::openWallet(
-    const nlohmann::json body,
-    Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -218,8 +225,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::openWallet(
 }
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::keyImportWallet(
-    const nlohmann::json body,
-    Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -251,8 +259,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::keyImportWallet(
 }
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::seedImportWallet(
-    const nlohmann::json body,
-    Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -282,8 +291,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::seedImportWallet(
 }
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::importViewWallet(
-    const nlohmann::json body,
-    Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -315,8 +325,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::importViewWallet(
 }
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::createWallet(
-    const nlohmann::json body,
-    Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -341,8 +352,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::createWallet(
 /////////////////////
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::closeWallet(
-    const nlohmann::json,
-    Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -361,8 +373,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::closeWallet(
 //////////////////
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::saveWallet(
-    const nlohmann::json body,
-    httplib::Response &res) const
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
 {
     std::scoped_lock lock(m_mutex);
 
@@ -377,8 +390,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::saveWallet(
 }
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::resetWallet(
-    const nlohmann::json body,
-    httplib::Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -401,8 +415,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::resetWallet(
 }
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::setNodeInfo(
-    const nlohmann::json body,
-    httplib::Response &res)
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -416,7 +431,7 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::setNodeInfo(
 
     m_walletBackend->swapNode(daemonHost, daemonPort);
 
-    return {SUCCESS, 200};
+    return {SUCCESS, 202};
 }
 
 //////////////////
@@ -424,8 +439,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::setNodeInfo(
 //////////////////
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::getNodeInfo(
-    const nlohmann::json body,
-    httplib::Response &res) const
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
 {
     if (!assertWalletOpen())
     {
@@ -448,20 +464,115 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getNodeInfo(
     return {SUCCESS, 200};
 }
 
+std::tuple<WalletError, uint16_t> ApiDispatcher::getPrivateViewKey(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    if (!assertWalletOpen())
+    {
+        return {SUCCESS, 403};
+    }
+
+    nlohmann::json j {
+        {"privateViewKey", m_walletBackend->getPrivateViewKey()}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+/* Gets the spend keys for the given address */
+std::tuple<WalletError, uint16_t> ApiDispatcher::getSpendKeys(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    if (!assertWalletOpen())
+    {
+        return {SUCCESS, 403};
+    }
+
+    if (!assertIsNotViewWallet())
+    {
+        return {ILLEGAL_VIEW_WALLET_OPERATION, 400};
+    }
+
+    /* Remove the keys prefix to get the address */
+    std::string address = req.path.substr(std::string("/keys/").size());
+
+    if (WalletError error = validateAddresses({address}, false); error != SUCCESS)
+    {
+        return {error, 400};
+    }
+
+    const auto [error, publicSpendKey, privateSpendKey] = m_walletBackend->getSpendKeys(address);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"publicSpendKey", publicSpendKey},
+        {"privateSpendKey", privateSpendKey}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+/* Gets the mnemonic seed for the given address (if possible) */
+std::tuple<WalletError, uint16_t> ApiDispatcher::getMnemonicSeed(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    if (!assertWalletOpen())
+    {
+        return {SUCCESS, 403};
+    }
+
+    if (!assertIsNotViewWallet())
+    {
+        return {ILLEGAL_VIEW_WALLET_OPERATION, 400};
+    }
+
+    /* Remove the keys prefix to get the address */
+    std::string address = req.path.substr(std::string("/keys/mnemonic/").size());
+
+    if (WalletError error = validateAddresses({address}, false); error != SUCCESS)
+    {
+        return {error, 400};
+    }
+
+    const auto [error, mnemonicSeed] = m_walletBackend->getMnemonicSeedForAddress(address);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"mnemonicSeed", mnemonicSeed}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
 //////////////////////
 /* OPTIONS REQUESTS */
 //////////////////////
 
-void ApiDispatcher::handleOptions(
+std::tuple<WalletError, uint16_t> ApiDispatcher::handleOptions(
     const Request &req,
-    Response &res) const
+    Response &res,
+    const nlohmann::json &body) const
 {
-    /* Add the cors header if not empty string */
-    if (m_corsHeader != "")
-    {
-        res.set_header("Access-Control-Allow-Origin", m_corsHeader.c_str());
-    }
-
     std::string supported = "OPTIONS, GET, POST, PUT, DELETE";
 
     if (m_corsHeader == "")
@@ -471,14 +582,14 @@ void ApiDispatcher::handleOptions(
 
     if (req.has_header("Access-Control-Request-Method"))
     {
-        res.set_header("Access-Control-Allow-Methods", supported.c_str());
+        res.set_header("Access-Control-Allow-Methods", supported);
     }
     else
     {
-        res.set_header("Allow", supported.c_str()); 
+        res.set_header("Allow", supported); 
     }
 
-    res.status = 200;
+    return {SUCCESS, 200};
 }
 
 std::tuple<std::string, uint16_t, std::string, std::string>
@@ -506,6 +617,18 @@ std::tuple<std::string, uint16_t, std::string, std::string>
 //////////////////////////
 /* END OF API FUNCTIONS */
 //////////////////////////
+
+bool ApiDispatcher::assertIsNotViewWallet() const
+{
+    if (m_walletBackend->isViewWallet())
+    {
+        std::cout << "Client requested to perform an operation which requires "
+                     "a non view wallet, but wallet is a view wallet" << std::endl;
+        return false;
+    }
+
+    return true;
+}
 
 bool ApiDispatcher::assertWalletClosed() const
 {

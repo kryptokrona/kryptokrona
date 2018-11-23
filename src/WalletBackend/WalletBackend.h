@@ -198,14 +198,22 @@ class WalletBackend
         /* Change the wallet password and save the wallet with the new password */
         WalletError changePassword(const std::string newPassword);
 
-        /* Get all private spend keys, and private view key */
-        std::tuple<std::vector<Crypto::SecretKey>, Crypto::SecretKey> getAllPrivateKeys() const;
+        /* Gets the shared private view key */
+        Crypto::SecretKey getPrivateViewKey() const;
+
+        /* Gets the public and private spend key for the given address */
+        std::tuple<WalletError, Crypto::PublicKey, Crypto::SecretKey>
+            getSpendKeys(const std::string &address) const;
 
         /* Get the private spend and private view for the primary address */
         std::tuple<Crypto::SecretKey, Crypto::SecretKey> getPrimaryAddressPrivateKeys() const;
 
         /* Get the primary address mnemonic seed, if possible */
-        std::tuple<bool, std::string> getMnemonicSeed() const;
+        std::tuple<WalletError, std::string> getMnemonicSeed() const;
+
+        /* Gets the mnemonic seed for the given address, if possible */
+        std::tuple<WalletError, std::string> getMnemonicSeedForAddress(
+            const std::string &address) const;
 
         /* Get all transactions */
         std::vector<WalletTypes::Transaction> getTransactions() const;

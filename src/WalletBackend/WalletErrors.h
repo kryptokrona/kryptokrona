@@ -46,7 +46,7 @@ enum WalletErrorCode
     WALLET_FILE_ALREADY_EXISTS = 8,
 
     /* Operation will cause int overflow */
-    WILL_OVERFLOW = 41,
+    WILL_OVERFLOW = 9,
 
     /* The address given does not exist in this container, and it's required,
        for example you specified it as the address to get the balance from */
@@ -168,6 +168,9 @@ enum WalletErrorCode
 
     /* Cannot perform this operation when using a non view wallet */
     ILLEGAL_NON_VIEW_WALLET_OPERATION = 40,
+
+    /* View key is not derived from spend key for this address */
+    KEYS_NOT_DETERMINISTIC = 41,
 };
 
 class WalletError

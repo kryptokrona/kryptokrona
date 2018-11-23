@@ -131,15 +131,15 @@ struct Request {
 
     Progress       progress;
 
-    bool has_header(const char* key) const;
-    std::string get_header_value(const char* key) const;
-    void set_header(const char* key, const char* val);
+    bool has_header(const std::string &key) const;
+    std::string get_header_value(const std::string &key) const;
+    void set_header(const std::string &key, const std::string &val);
 
-    bool has_param(const char* key) const;
-    std::string get_param_value(const char* key) const;
+    bool has_param(const std::string &key) const;
+    std::string get_param_value(const std::string &key) const;
 
-    bool has_file(const char* key) const;
-    MultipartFile get_file_value(const char* key) const;
+    bool has_file(const std::string &key) const;
+    MultipartFile get_file_value(const std::string &key) const;
 };
 
 struct Response {
@@ -149,13 +149,13 @@ struct Response {
     std::string body;
     std::function<std::string (uint64_t offset)> streamcb;
 
-    bool has_header(const char* key) const;
-    std::string get_header_value(const char* key) const;
-    void set_header(const char* key, const char* val);
+    bool has_header(const std::string &key) const;
+    std::string get_header_value(const std::string &key) const;
+    void set_header(const std::string &key, const std::string &val);
 
-    void set_redirect(const char* uri);
-    void set_content(const char* s, size_t n, const char* content_type);
-    void set_content(const std::string& s, const char* content_type);
+    void set_redirect(const std::string &uri);
+    void set_content(const std::string &s, size_t n, const std::string &content_type);
+    void set_content(const std::string &s, const std::string &content_type);
 
     Response() : status(-1) {}
 };
@@ -213,24 +213,24 @@ public:
 
     virtual bool is_valid() const;
 
-    Server& Get(const char* pattern, Handler handler);
-    Server& Post(const char* pattern, Handler handler);
+    Server& Get(const std::string &pattern, Handler handler);
+    Server& Post(const std::string &pattern, Handler handler);
 
-    Server& Put(const char* pattern, Handler handler);
-    Server& Delete(const char* pattern, Handler handler);
-    Server& Options(const char* pattern, Handler handler);
+    Server& Put(const std::string &pattern, Handler handler);
+    Server& Delete(const std::string &pattern, Handler handler);
+    Server& Options(const std::string &pattern, Handler handler);
 
-    bool set_base_dir(const char* path);
+    bool set_base_dir(const std::string &path);
 
     void set_error_handler(Handler handler);
     void set_logger(Logger logger);
 
     void set_keep_alive_max_count(size_t count);
 
-    int bind_to_any_port(const char* host, int socket_flags = 0);
+    int bind_to_any_port(const std::string &host, int socket_flags = 0);
     bool listen_after_bind();
 
-    bool listen(const char* host, int port, int socket_flags = 0);
+    bool listen(const std::string &host, int port, int socket_flags = 0);
 
     bool is_running() const;
     void stop();
@@ -283,26 +283,26 @@ public:
 
     virtual bool is_valid() const;
 
-    std::shared_ptr<Response> Get(const char* path, Progress progress = nullptr);
-    std::shared_ptr<Response> Get(const char* path, const Headers& headers, Progress progress = nullptr);
+    std::shared_ptr<Response> Get(const std::string &path, Progress progress = nullptr);
+    std::shared_ptr<Response> Get(const std::string &path, const Headers& headers, Progress progress = nullptr);
 
-    std::shared_ptr<Response> Head(const char* path);
-    std::shared_ptr<Response> Head(const char* path, const Headers& headers);
+    std::shared_ptr<Response> Head(const std::string &path);
+    std::shared_ptr<Response> Head(const std::string &path, const Headers& headers);
 
-    std::shared_ptr<Response> Post(const char* path, const std::string& body, const char* content_type);
-    std::shared_ptr<Response> Post(const char* path, const Headers& headers, const std::string& body, const char* content_type);
+    std::shared_ptr<Response> Post(const std::string &path, const std::string& body, const std::string& content_type);
+    std::shared_ptr<Response> Post(const std::string &path, const Headers& headers, const std::string& body, const std::string &content_type);
 
-    std::shared_ptr<Response> Post(const char* path, const Params& params);
-    std::shared_ptr<Response> Post(const char* path, const Headers& headers, const Params& params);
+    std::shared_ptr<Response> Post(const std::string &path, const Params& params);
+    std::shared_ptr<Response> Post(const std::string &path, const Headers& headers, const Params& params);
 
-    std::shared_ptr<Response> Put(const char* path, const std::string& body, const char* content_type);
-    std::shared_ptr<Response> Put(const char* path, const Headers& headers, const std::string& body, const char* content_type);
+    std::shared_ptr<Response> Put(const std::string &path, const std::string& body, const std::string &content_type);
+    std::shared_ptr<Response> Put(const std::string &path, const Headers& headers, const std::string& body, const std::string &content_type);
 
-    std::shared_ptr<Response> Delete(const char* path);
-    std::shared_ptr<Response> Delete(const char* path, const Headers& headers);
+    std::shared_ptr<Response> Delete(const std::string &path);
+    std::shared_ptr<Response> Delete(const std::string &path, const Headers& headers);
 
-    std::shared_ptr<Response> Options(const char* path);
-    std::shared_ptr<Response> Options(const char* path, const Headers& headers);
+    std::shared_ptr<Response> Options(const std::string &path);
+    std::shared_ptr<Response> Options(const std::string &path, const Headers& headers);
 
     bool send(Request& req, Response& res);
 
@@ -763,13 +763,13 @@ inline const char* status_message(int status)
     }
 }
 
-inline bool has_header(const Headers& headers, const char* key)
+inline bool has_header(const Headers& headers, const std::string &key)
 {
     return headers.find(key) != headers.end();
 }
 
 inline const char* get_header_value(
-    const Headers& headers, const char* key, const char* def = nullptr)
+    const Headers& headers, const std::string &key, const char* def = nullptr)
 {
     auto it = headers.find(key);
     if (it != headers.end()) {
@@ -1326,27 +1326,27 @@ inline std::pair<std::string, std::string> make_range_header(uint64_t value, Arg
 }
 
 // Request implementation
-inline bool Request::has_header(const char* key) const
+inline bool Request::has_header(const std::string &key) const
 {
     return detail::has_header(headers, key);
 }
 
-inline std::string Request::get_header_value(const char* key) const
+inline std::string Request::get_header_value(const std::string &key) const
 {
     return detail::get_header_value(headers, key, "");
 }
 
-inline void Request::set_header(const char* key, const char* val)
+inline void Request::set_header(const std::string &key, const std::string &val)
 {
     headers.emplace(key, val);
 }
 
-inline bool Request::has_param(const char* key) const
+inline bool Request::has_param(const std::string &key) const
 {
     return params.find(key) != params.end();
 }
 
-inline std::string Request::get_param_value(const char* key) const
+inline std::string Request::get_param_value(const std::string &key) const
 {
     auto it = params.find(key);
     if (it != params.end()) {
@@ -1355,12 +1355,12 @@ inline std::string Request::get_param_value(const char* key) const
     return std::string();
 }
 
-inline bool Request::has_file(const char* key) const
+inline bool Request::has_file(const std::string &key) const
 {
     return files.find(key) != files.end();
 }
 
-inline MultipartFile Request::get_file_value(const char* key) const
+inline MultipartFile Request::get_file_value(const std::string &key) const
 {
     auto it = files.find(key);
     if (it != files.end()) {
@@ -1370,34 +1370,34 @@ inline MultipartFile Request::get_file_value(const char* key) const
 }
 
 // Response implementation
-inline bool Response::has_header(const char* key) const
+inline bool Response::has_header(const std::string &key) const
 {
     return headers.find(key) != headers.end();
 }
 
-inline std::string Response::get_header_value(const char* key) const
+inline std::string Response::get_header_value(const std::string &key) const
 {
     return detail::get_header_value(headers, key, "");
 }
 
-inline void Response::set_header(const char* key, const char* val)
+inline void Response::set_header(const std::string &key, const std::string &val)
 {
     headers.emplace(key, val);
 }
 
-inline void Response::set_redirect(const char* url)
+inline void Response::set_redirect(const std::string &url)
 {
     set_header("Location", url);
     status = 302;
 }
 
-inline void Response::set_content(const char* s, size_t n, const char* content_type)
+inline void Response::set_content(const std::string &s, size_t n, const std::string &content_type)
 {
     body.assign(s, n);
     set_header("Content-Type", content_type);
 }
 
-inline void Response::set_content(const std::string& s, const char* content_type)
+inline void Response::set_content(const std::string& s, const std::string &content_type)
 {
     body = s;
     set_header("Content-Type", content_type);
@@ -1510,37 +1510,37 @@ inline Server::~Server()
 {
 }
 
-inline Server& Server::Get(const char* pattern, Handler handler)
+inline Server& Server::Get(const std::string &pattern, Handler handler)
 {
     get_handlers_.push_back(std::make_pair(std::regex(pattern), handler));
     return *this;
 }
 
-inline Server& Server::Post(const char* pattern, Handler handler)
+inline Server& Server::Post(const std::string &pattern, Handler handler)
 {
     post_handlers_.push_back(std::make_pair(std::regex(pattern), handler));
     return *this;
 }
 
-inline Server& Server::Put(const char* pattern, Handler handler)
+inline Server& Server::Put(const std::string &pattern, Handler handler)
 {
     put_handlers_.push_back(std::make_pair(std::regex(pattern), handler));
     return *this;
 }
 
-inline Server& Server::Delete(const char* pattern, Handler handler)
+inline Server& Server::Delete(const std::string &pattern, Handler handler)
 {
     delete_handlers_.push_back(std::make_pair(std::regex(pattern), handler));
     return *this;
 }
 
-inline Server& Server::Options(const char* pattern, Handler handler)
+inline Server& Server::Options(const std::string &pattern, Handler handler)
 {
     options_handlers_.push_back(std::make_pair(std::regex(pattern), handler));
     return *this;
 }
 
-inline bool Server::set_base_dir(const char* path)
+inline bool Server::set_base_dir(const std::string &path)
 {
     if (detail::is_dir(path)) {
         base_dir_ = path;
@@ -1564,18 +1564,18 @@ inline void Server::set_keep_alive_max_count(size_t count)
     keep_alive_max_count_ = count;
 }
 
-inline int Server::bind_to_any_port(const char* host, int socket_flags)
+inline int Server::bind_to_any_port(const std::string &host, int socket_flags)
 {
-    return bind_internal(host, 0, socket_flags);
+    return bind_internal(host.c_str(), 0, socket_flags);
 }
 
 inline bool Server::listen_after_bind() {
     return listen_internal();
 }
 
-inline bool Server::listen(const char* host, int port, int socket_flags)
+inline bool Server::listen(const std::string &host, int port, int socket_flags)
 {
-    if (bind_internal(host, port, socket_flags) < 0)
+    if (bind_internal(host.c_str(), port, socket_flags) < 0)
         return false;
     return listen_internal();
 }
@@ -2123,12 +2123,12 @@ inline bool Client::read_and_close_socket(socket_t sock, Request& req, Response&
         });
 }
 
-inline std::shared_ptr<Response> Client::Get(const char* path, Progress progress)
+inline std::shared_ptr<Response> Client::Get(const std::string &path, Progress progress)
 {
     return Get(path, Headers(), progress);
 }
 
-inline std::shared_ptr<Response> Client::Get(const char* path, const Headers& headers, Progress progress)
+inline std::shared_ptr<Response> Client::Get(const std::string &path, const Headers& headers, Progress progress)
 {
     Request req;
     req.method = "GET";
@@ -2141,12 +2141,12 @@ inline std::shared_ptr<Response> Client::Get(const char* path, const Headers& he
     return send(req, *res) ? res : nullptr;
 }
 
-inline std::shared_ptr<Response> Client::Head(const char* path)
+inline std::shared_ptr<Response> Client::Head(const std::string &path)
 {
     return Head(path, Headers());
 }
 
-inline std::shared_ptr<Response> Client::Head(const char* path, const Headers& headers)
+inline std::shared_ptr<Response> Client::Head(const std::string &path, const Headers& headers)
 {
     Request req;
     req.method = "HEAD";
@@ -2159,13 +2159,13 @@ inline std::shared_ptr<Response> Client::Head(const char* path, const Headers& h
 }
 
 inline std::shared_ptr<Response> Client::Post(
-    const char* path, const std::string& body, const char* content_type)
+    const std::string &path, const std::string& body, const std::string &content_type)
 {
     return Post(path, Headers(), body, content_type);
 }
 
 inline std::shared_ptr<Response> Client::Post(
-    const char* path, const Headers& headers, const std::string& body, const char* content_type)
+    const std::string &path, const Headers& headers, const std::string& body, const std::string &content_type)
 {
     Request req;
     req.method = "POST";
@@ -2180,12 +2180,12 @@ inline std::shared_ptr<Response> Client::Post(
     return send(req, *res) ? res : nullptr;
 }
 
-inline std::shared_ptr<Response> Client::Post(const char* path, const Params& params)
+inline std::shared_ptr<Response> Client::Post(const std::string &path, const Params& params)
 {
     return Post(path, Headers(), params);
 }
 
-inline std::shared_ptr<Response> Client::Post(const char* path, const Headers& headers, const Params& params)
+inline std::shared_ptr<Response> Client::Post(const std::string &path, const Headers& headers, const Params& params)
 {
     std::string query;
     for (auto it = params.begin(); it != params.end(); ++it) {
@@ -2201,13 +2201,13 @@ inline std::shared_ptr<Response> Client::Post(const char* path, const Headers& h
 }
 
 inline std::shared_ptr<Response> Client::Put(
-    const char* path, const std::string& body, const char* content_type)
+    const std::string &path, const std::string& body, const std::string &content_type)
 {
     return Put(path, Headers(), body, content_type);
 }
 
 inline std::shared_ptr<Response> Client::Put(
-    const char* path, const Headers& headers, const std::string& body, const char* content_type)
+    const std::string &path, const Headers& headers, const std::string& body, const std::string &content_type)
 {
     Request req;
     req.method = "PUT";
@@ -2222,12 +2222,12 @@ inline std::shared_ptr<Response> Client::Put(
     return send(req, *res) ? res : nullptr;
 }
 
-inline std::shared_ptr<Response> Client::Delete(const char* path)
+inline std::shared_ptr<Response> Client::Delete(const std::string &path)
 {
     return Delete(path, Headers());
 }
 
-inline std::shared_ptr<Response> Client::Delete(const char* path, const Headers& headers)
+inline std::shared_ptr<Response> Client::Delete(const std::string &path, const Headers& headers)
 {
     Request req;
     req.method = "DELETE";
@@ -2239,12 +2239,12 @@ inline std::shared_ptr<Response> Client::Delete(const char* path, const Headers&
     return send(req, *res) ? res : nullptr;
 }
 
-inline std::shared_ptr<Response> Client::Options(const char* path)
+inline std::shared_ptr<Response> Client::Options(const std::string &path)
 {
     return Options(path, Headers());
 }
 
-inline std::shared_ptr<Response> Client::Options(const char* path, const Headers& headers)
+inline std::shared_ptr<Response> Client::Options(const std::string &path, const Headers& headers)
 {
     Request req;
     req.method = "OPTIONS";

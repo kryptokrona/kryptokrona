@@ -879,10 +879,19 @@ WalletError WalletBackend::changePassword(const std::string newPassword)
     return save();
 }
 
-/* Returns all the private spend keys, and the single private view key */
-std::tuple<std::vector<Crypto::SecretKey>, Crypto::SecretKey> WalletBackend::getAllPrivateKeys() const
+std::tuple<WalletError, Crypto::PublicKey, Crypto::SecretKey>
+    WalletBackend::getSpendKeys(const std::string &address) const
 {
-    return {m_subWallets->getPrivateSpendKeys(), m_subWallets->getPrivateViewKey()};
+    const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
+
+    const auto [success, privateSpendKey] = m_subWallets->getPrivateSpendKey(publicSpendKey);
+
+    return {success, publicSpendKey, privateSpendKey};
+}
+
+Crypto::SecretKey WalletBackend::getPrivateViewKey() const
+{
+    return m_subWallets->getPrivateViewKey();
 }
 
 /* Returns the private spend key for the primary address, and the shared private view key */
@@ -891,9 +900,21 @@ std::tuple<Crypto::SecretKey, Crypto::SecretKey> WalletBackend::getPrimaryAddres
     return {m_subWallets->getPrimaryPrivateSpendKey(), m_subWallets->getPrivateViewKey()};
 }
 
-std::tuple<bool, std::string> WalletBackend::getMnemonicSeed() const
+std::tuple<WalletError, std::string> WalletBackend::getMnemonicSeed() const
 {
-    const auto [privateSpendKey, privateViewKey] = getPrimaryAddressPrivateKeys();
+    return getMnemonicSeedForAddress(getPrimaryAddress());
+}
+
+std::tuple<WalletError, std::string> WalletBackend::getMnemonicSeedForAddress(
+    const std::string &address) const
+{
+    const auto privateViewKey = getPrivateViewKey();
+    const auto [error, publicSpendKey, privateSpendKey] = getSpendKeys(address);
+
+    if (error)
+    {
+        return {error, std::string()};
+    }
 
     Crypto::SecretKey derivedPrivateViewKey;
 
@@ -906,10 +927,10 @@ std::tuple<bool, std::string> WalletBackend::getMnemonicSeed() const
 
     if (derivedPrivateViewKey != privateViewKey)
     {
-        return {false, std::string()};
+        return {KEYS_NOT_DETERMINISTIC, std::string()};
     }
 
-    return {true, Mnemonics::PrivateKeyToMnemonic(privateSpendKey)};
+    return {SUCCESS, Mnemonics::PrivateKeyToMnemonic(privateSpendKey)};
 }
 
 std::vector<WalletTypes::Transaction> WalletBackend::getTransactions() const
