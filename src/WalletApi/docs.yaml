@@ -45,7 +45,7 @@ paths:
         schema:
           $ref: "#/definitions/Wallet"
         
-  /wallet/keyimport:
+  /wallet/import/key:
     post:
       tags:
         - wallet
@@ -84,7 +84,7 @@ paths:
                   example: >-
                     5c703d9bde0b7cd5ff3e19ea826a44066534661a7322c85e854e73f06e49cd06
         
-  /wallet/seedimport:
+  /wallet/import/seed:
     post:
       tags:
         - wallet
@@ -118,7 +118,7 @@ paths:
                     eccentric jewels toenail having nabbing wept nozzle grunt
                     tipsy flying pegs feel upright lower racetrack sapling sapling
         
-  /wallet/viewkeyimport:
+  /wallet/import/view:
     post:
       tags:
         - wallet

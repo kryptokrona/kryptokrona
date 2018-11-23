@@ -68,9 +68,9 @@ ApiDispatcher::ApiDispatcher(
     };
 
     m_server.Post("/wallet/open", router(&ApiDispatcher::openWallet))
-            .Post("/wallet/keyimport", router(&ApiDispatcher::keyImportWallet))
-            .Post("/wallet/seedimport", router(&ApiDispatcher::seedImportWallet))
-            .Post("/wallet/viewkeyimport", router(&ApiDispatcher::importViewWallet))
+            .Post("/wallet/import/key", router(&ApiDispatcher::keyImportWallet))
+            .Post("/wallet/import/seed", router(&ApiDispatcher::seedImportWallet))
+            .Post("/wallet/import/view", router(&ApiDispatcher::importViewWallet))
             .Post("/wallet/create", router(&ApiDispatcher::createWallet))
 
             .Delete("/wallet", router(&ApiDispatcher::closeWallet))
