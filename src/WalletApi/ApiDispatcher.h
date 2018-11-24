@@ -42,6 +42,8 @@ class ApiDispatcher
         void middleware(
             const httplib::Request &req,
             httplib::Response &res,
+            const bool walletMustBeOpen,
+            const bool viewWalletsPermitted,
             std::function<std::tuple<WalletError, uint16_t>
                 (const httplib::Request &req,
                  httplib::Response &res,
@@ -163,10 +165,9 @@ class ApiDispatcher
         //////////////////////
 
         /* Handles an OPTIONS request */
-        std::tuple<WalletError, uint16_t> handleOptions(
+        void handleOptions(
             const httplib::Request &req,
-            httplib::Response &res,
-            const nlohmann::json &body) const;
+            httplib::Response &res) const;
 
         //////////////////////////
         /* END OF API FUNCTIONS */

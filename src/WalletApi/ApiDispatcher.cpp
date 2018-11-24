@@ -57,37 +57,72 @@ ApiDispatcher::ApiDispatcher(
 
     /* Route the request through our middleware function, before forwarding
        to the specified function */
-    const auto router = [this](const auto function)
+    const auto router = [this](const auto function,
+                               const bool walletMustBeOpen,
+                               const bool viewWalletPermitted)
     {
-        return [this, function](const Request &req, Response &res)
+        return [=](const Request &req, Response &res)
         {
             /* Pass the inputted function with the arguments passed through
                to middleware */
-            middleware(req, res, std::bind(function, this, _1, _2, _3));
+            middleware(
+                req, res, walletMustBeOpen, viewWalletPermitted,
+                std::bind(function, this, _1, _2, _3)
+            );
         };
     };
 
-    m_server.Post("/wallet/open", router(&ApiDispatcher::openWallet))
-            .Post("/wallet/import/key", router(&ApiDispatcher::keyImportWallet))
-            .Post("/wallet/import/seed", router(&ApiDispatcher::seedImportWallet))
-            .Post("/wallet/import/view", router(&ApiDispatcher::importViewWallet))
-            .Post("/wallet/create", router(&ApiDispatcher::createWallet))
+    /* Makes the below router function easier to parse */
+    const bool walletMustBeOpen = true;
 
-            .Delete("/wallet", router(&ApiDispatcher::closeWallet))
+    const bool walletMustBeClosed = false;
 
-            .Put("/save", router(&ApiDispatcher::saveWallet))
-            .Put("/reset", router(&ApiDispatcher::resetWallet))
-            .Put("/node", router(&ApiDispatcher::setNodeInfo))
+    const bool viewWalletsAllowed = true;
 
-            .Get("/node", router(&ApiDispatcher::getNodeInfo))
-            .Get("/keys", router(&ApiDispatcher::getPrivateViewKey))
-            .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys))
-            .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed))
-            .Get("/status", router(&ApiDispatcher::getStatus))
-            .Get("/addresses", router(&ApiDispatcher::getAddresses))
+    const bool viewWalletsBanned = false;
+
+    /* POST */
+    m_server.Post("/wallet/open", router(&ApiDispatcher::openWallet, walletMustBeClosed, viewWalletsAllowed))
+
+            .Post("/wallet/import/key", router(&ApiDispatcher::keyImportWallet, walletMustBeClosed, viewWalletsAllowed))
+
+            .Post("/wallet/import/seed", router(&ApiDispatcher::seedImportWallet, walletMustBeClosed, viewWalletsAllowed))
+
+            .Post("/wallet/import/view", router(&ApiDispatcher::importViewWallet, walletMustBeClosed, viewWalletsAllowed))
+
+            .Post("/wallet/create", router(&ApiDispatcher::createWallet, walletMustBeClosed, viewWalletsAllowed))
+
+    /* DELETE */
+
+            .Delete("/wallet", router(&ApiDispatcher::closeWallet, walletMustBeOpen, viewWalletsAllowed))
+
+    /* PUT */
+
+            .Put("/save", router(&ApiDispatcher::saveWallet, walletMustBeOpen, viewWalletsAllowed))
+
+            .Put("/reset", router(&ApiDispatcher::resetWallet, walletMustBeOpen, viewWalletsAllowed))
+
+            .Put("/node", router(&ApiDispatcher::setNodeInfo, walletMustBeOpen, viewWalletsAllowed))
+
+    /* GET */
+
+            .Get("/node", router(&ApiDispatcher::getNodeInfo, walletMustBeOpen, viewWalletsAllowed))
+
+            .Get("/keys", router(&ApiDispatcher::getPrivateViewKey, walletMustBeOpen, viewWalletsAllowed))
+
+            .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys, walletMustBeOpen, viewWalletsBanned))
+
+            .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed, walletMustBeOpen, viewWalletsBanned))
+
+            .Get("/status", router(&ApiDispatcher::getStatus, walletMustBeOpen, viewWalletsAllowed))
+
+            .Get("/addresses", router(&ApiDispatcher::getAddresses, walletMustBeOpen, viewWalletsAllowed))
+
+    /* OPTIONS */
 
             /* Matches everything */
-            .Options(".*", router(&ApiDispatcher::handleOptions));
+            /* NOTE: Not passing through middleware */
+            .Options(".*", [this](auto req, auto res) { handleOptions(req, res); });
 }
 
 void ApiDispatcher::start()
@@ -103,6 +138,8 @@ void ApiDispatcher::stop()
 void ApiDispatcher::middleware(
     const Request &req,
     Response &res,
+    const bool walletMustBeOpen,
+    const bool viewWalletPermitted,
     std::function<std::tuple<WalletError, uint16_t>
         (const Request &req,
          Response &res,
@@ -134,7 +171,40 @@ void ApiDispatcher::middleware(
         return;
     }
     */
-    
+
+    /* Wallet must be open for this operation, and it is not */
+    if (walletMustBeOpen && !assertWalletOpen())
+    {
+        res.status = 403;
+        return;
+    }
+    /* Wallet must not be open for this operation, and it is */
+    else if (!walletMustBeOpen && !assertWalletClosed())
+    {
+        res.status = 403;
+        return;
+    }
+
+    /* We have a wallet open, view wallets are not permitted, and the wallet is
+       a view wallet (wew!) */
+    if (m_walletBackend != nullptr && !viewWalletPermitted && !assertIsNotViewWallet())
+    {
+       /* Bad request */
+       res.status = 400;
+
+       WalletError error = ILLEGAL_VIEW_WALLET_OPERATION;
+
+       nlohmann::json j {
+            {"errorCode", error.getErrorCode()},
+            {"errorMessage", error.getErrorMessage()}
+        };
+
+       /* Pretty print ;o */
+       res.set_content(j.dump(4) + "\n", "application/json");
+
+       return;
+    }
+
     try
     {
         const auto [error, statusCode] = handler(req, res, body);
@@ -210,11 +280,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::openWallet(
 {
     std::scoped_lock lock(m_mutex);
 
-    if (!assertWalletClosed())
-    {
-        return {SUCCESS, 403};
-    }
-
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
     WalletError error;
@@ -232,11 +297,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::keyImportWallet(
     const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
-
-    if (!assertWalletClosed())
-    {
-        return {SUCCESS, 403};
-    }
 
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
@@ -267,11 +327,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::seedImportWallet(
 {
     std::scoped_lock lock(m_mutex);
 
-    if (!assertWalletClosed())
-    {
-        return {SUCCESS, 403};
-    }
-
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
     std::string mnemonicSeed = body.at("mnemonicSeed").get<std::string>();
@@ -298,11 +353,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::importViewWallet(
     const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
-
-    if (!assertWalletClosed())
-    {
-        return {SUCCESS, 403};
-    }
 
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
@@ -333,11 +383,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::createWallet(
 {
     std::scoped_lock lock(m_mutex);
 
-    if (!assertWalletClosed())
-    {
-        return {SUCCESS, 403};
-    }
-
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
     WalletError error;
@@ -360,11 +405,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::closeWallet(
 {
     std::scoped_lock lock(m_mutex);
 
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
     m_walletBackend = nullptr;
 
     return {SUCCESS, 200};
@@ -381,11 +421,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::saveWallet(
 {
     std::scoped_lock lock(m_mutex);
 
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
     m_walletBackend->save();
 
     return {SUCCESS, 200};
@@ -397,11 +432,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::resetWallet(
     const nlohmann::json &body)
 {
     std::scoped_lock lock(m_mutex);
-
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
 
     uint64_t scanHeight = 0;
     uint64_t timestamp = 0;
@@ -423,11 +453,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::setNodeInfo(
 {
     std::scoped_lock lock(m_mutex);
 
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
     std::string daemonHost = body.at("daemonHost").get<std::string>();
     uint16_t daemonPort = body.at("daemonPort").get<uint16_t>();
 
@@ -445,11 +470,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getNodeInfo(
     Response &res,
     const nlohmann::json &body) const
 {
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
     const auto [daemonHost, daemonPort] = m_walletBackend->getNodeAddress();
 
     const auto [nodeFee, nodeAddress] = m_walletBackend->getNodeFee();
@@ -471,11 +491,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getPrivateViewKey(
     Response &res,
     const nlohmann::json &body) const
 {
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
     nlohmann::json j {
         {"privateViewKey", m_walletBackend->getPrivateViewKey()}
     };
@@ -491,16 +506,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getSpendKeys(
     Response &res,
     const nlohmann::json &body) const
 {
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
-    if (!assertIsNotViewWallet())
-    {
-        return {ILLEGAL_VIEW_WALLET_OPERATION, 400};
-    }
-
     /* Remove the keys prefix to get the address */
     std::string address = req.path.substr(std::string("/keys/").size());
 
@@ -532,16 +537,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getMnemonicSeed(
     Response &res,
     const nlohmann::json &body) const
 {
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
-    if (!assertIsNotViewWallet())
-    {
-        return {ILLEGAL_VIEW_WALLET_OPERATION, 400};
-    }
-
     /* Remove the keys prefix to get the address */
     std::string address = req.path.substr(std::string("/keys/mnemonic/").size());
 
@@ -571,11 +566,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getStatus(
     Response &res,
     const nlohmann::json &body) const
 {
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
     const WalletTypes::WalletStatus status = m_walletBackend->getStatus();
 
     nlohmann::json j {
@@ -597,11 +587,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getAddresses(
     Response &res,
     const nlohmann::json &body) const
 {
-    if (!assertWalletOpen())
-    {
-        return {SUCCESS, 403};
-    }
-
     nlohmann::json j {
         {"addresses", m_walletBackend->getAddresses()}
     };
@@ -615,10 +600,9 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getAddresses(
 /* OPTIONS REQUESTS */
 //////////////////////
 
-std::tuple<WalletError, uint16_t> ApiDispatcher::handleOptions(
+void ApiDispatcher::handleOptions(
     const Request &req,
-    Response &res,
-    const nlohmann::json &body) const
+    Response &res) const
 {
     std::string supported = "OPTIONS, GET, POST, PUT, DELETE";
 
@@ -636,7 +620,13 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::handleOptions(
         res.set_header("Allow", supported); 
     }
 
-    return {SUCCESS, 200};
+    /* Add the cors header if not empty string */
+    if (m_corsHeader != "")
+    {
+        res.set_header("Access-Control-Allow-Origin", m_corsHeader);
+    }
+
+    res.status = 200;
 }
 
 std::tuple<std::string, uint16_t, std::string, std::string>
