@@ -89,10 +89,6 @@ void addPortMapping(Logging::LoggerRef& logger, uint32_t port) {
   }
 }
 
-bool parse_peer_from_string(NetworkAddress& pe, const std::string& node_addr) {
-  return Common::parseIpAddressAndPort(pe.ip, pe.port, node_addr);
-}
-
 }
 
 
@@ -1190,13 +1186,6 @@ std::string print_peerlist_to_string(const std::list<PeerlistEntry>& pl) {
   {
     logger(TRACE) << context << "CLOSE CONNECTION";
     m_payload_handler.onConnectionClosed(context);
-  }
-
-  bool NodeServer::is_priority_node(const NetworkAddress& na)
-  {
-    return
-      (std::find(m_priority_peers.begin(), m_priority_peers.end(), na) != m_priority_peers.end()) ||
-      (std::find(m_exclusive_peers.begin(), m_exclusive_peers.end(), na) != m_exclusive_peers.end());
   }
 
   bool NodeServer::connect_to_peerlist(const std::vector<NetworkAddress>& peers)

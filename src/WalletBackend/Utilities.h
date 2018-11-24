@@ -20,8 +20,6 @@
 
 namespace Utilities
 {
-    std::vector<Crypto::PublicKey> addressesToViewKeys(const std::vector<std::string> addresses);
-
     std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses);
 
     uint64_t getTransactionSum(const std::vector<std::pair<std::string, uint64_t>> destinations);

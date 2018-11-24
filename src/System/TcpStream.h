@@ -37,9 +37,7 @@ private:
   std::array<char, 4096> readBuf;
   std::array<uint8_t, 1024> writeBuf;
 
-  std::streambuf::int_type overflow(std::streambuf::int_type ch) override;
   int sync() override;
-  std::streambuf::int_type underflow() override;
   bool dumpBuffer(bool finalize);
 };
 

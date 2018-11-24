@@ -39,7 +39,6 @@ uint64_t get_tx_fee(const Transaction& tx);
 bool generate_key_image_helper(const AccountKeys& ack, const Crypto::PublicKey& tx_public_key, size_t real_output_index, KeyPair& in_ephemeral, Crypto::KeyImage& ki);
 bool checkInputTypesSupported(const TransactionPrefix& tx);
 bool checkOutsValid(const TransactionPrefix& tx, std::string* error = nullptr);
-bool checkMoneyOverflow(const TransactionPrefix &tx);
 bool checkInputsOverflow(const TransactionPrefix &tx);
 bool checkOutsOverflow(const TransactionPrefix& tx);
 

@@ -104,9 +104,4 @@ namespace Tools {
     return true;
 #endif
   }
-
-  void SignalHandler::uninstall() {
-    m_handler = {};
-  }
-
 }

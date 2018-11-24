@@ -34,19 +34,6 @@ public:
   bool getHideMyPort() const;
   std::string getConfigFolder() const;
 
-  void setP2pStateFilename(const std::string& filename);
-  void setTestnet(bool isTestnet);
-  void setBindIp(const std::string& ip);
-  void setBindPort(uint16_t port);
-  void setExternalPort(uint16_t port);
-  void setAllowLocalIp(bool allow);
-  void setPeers(const std::vector<PeerlistEntry>& peerList);
-  void setPriorityNodes(const std::vector<NetworkAddress>& addresses);
-  void setExclusiveNodes(const std::vector<NetworkAddress>& addresses);
-  void setSeedNodes(const std::vector<NetworkAddress>& addresses);
-  void setHideMyPort(bool hide);
-  void setConfigFolder(const std::string& folder);
-
 private:
   std::string bindIp;
   uint16_t bindPort;

@@ -31,7 +31,6 @@ public:
   virtual void lastKnownBlockHeightUpdated(uint32_t height) {}
   virtual void poolChanged() {}
   virtual void blockchainSynchronized(uint32_t topHeight) {}
-  virtual void chainSwitched(uint32_t newTopIndex, uint32_t commonRoot, const std::vector<Crypto::Hash>& hashes) {}
 };
 
 struct OutEntry {
@@ -89,10 +88,8 @@ public:
   virtual uint32_t getLastKnownBlockHeight() const = 0;
   virtual uint32_t getLocalBlockCount() const = 0;
   virtual uint32_t getKnownBlockCount() const = 0;
-  virtual uint64_t getLastLocalBlockTimestamp() const = 0;
   virtual uint64_t getNodeHeight() const = 0;
 
-  virtual std::string getInfo() = 0;
   virtual void getFeeInfo() = 0;
 
   virtual void getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount, std::vector<Crypto::Hash>& blockHashes, const Callback& callback) = 0;
@@ -102,7 +99,6 @@ public:
 
   virtual void relayTransaction(const Transaction& transaction, const Callback& callback) = 0;
   virtual void getRandomOutsByAmounts(std::vector<uint64_t>&& amounts, uint16_t outsCount, std::vector<RandomOuts>& result, const Callback& callback) = 0;
-  virtual void getNewBlocks(std::vector<Crypto::Hash>&& knownBlockIds, std::vector<RawBlock>& newBlocks, uint32_t& startHeight, const Callback& callback) = 0;
   virtual void getTransactionOutsGlobalIndices(const Crypto::Hash& transactionHash, std::vector<uint32_t>& outsGlobalIndices, const Callback& callback) = 0;
 
   virtual void getGlobalIndexesForRange(

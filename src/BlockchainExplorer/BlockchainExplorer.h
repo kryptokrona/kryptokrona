@@ -64,9 +64,6 @@ public:
   virtual bool getTransactionsByPaymentId(const Crypto::Hash& paymentId, std::vector<TransactionDetails>& transactions) override;
   virtual bool getPoolState(const std::vector<Crypto::Hash>& knownPoolTransactionHashes, Crypto::Hash knownBlockchainTop, bool& isBlockchainActual, std::vector<TransactionDetails>& newTransactions, std::vector<Crypto::Hash>& removedTransactions) override;
 
-  virtual uint64_t getRewardBlocksWindow() override;
-  virtual uint64_t getFullRewardMaxBlockSize(uint8_t majorVersion) override;
-
   virtual bool isSynchronized() override;
 
   virtual void init() override;
@@ -75,7 +72,6 @@ public:
   virtual void poolChanged() override;
   virtual void blockchainSynchronized(uint32_t topIndex) override;
   virtual void localBlockchainUpdated(uint32_t index) override;
-  virtual void chainSwitched(uint32_t newTopIndex, uint32_t commonRoot, const std::vector<Crypto::Hash>& hashes) override;
 
   typedef WalletAsyncContextCounter AsyncContextCounter;
 

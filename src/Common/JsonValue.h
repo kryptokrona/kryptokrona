@@ -94,21 +94,15 @@ public:
   }
 
   bool isArray() const;
-  bool isBool() const;
   bool isInteger() const;
-  bool isNil() const;
   bool isObject() const;
-  bool isReal() const;
   bool isString() const;
 
   Type getType() const;
-  Array& getArray();
-  const Array& getArray() const;
   Bool getBool() const;
   Integer getInteger() const;
   Object& getObject();
   const Object& getObject() const;
-  Real getReal() const;
   String& getString();
   const String& getString() const;
 

@@ -160,16 +160,6 @@ BlockchainWriteBatch& BlockchainWriteBatch::removeTimestamp(uint64_t timestamp) 
   return *this;
 }
 
-BlockchainWriteBatch& BlockchainWriteBatch::removeKeyOutputAmounts(uint32_t keyOutputAmountsToRemoveCount, uint32_t totalKeyOutputAmountsCount) {
-  rawKeysToRemove.reserve(rawKeysToRemove.size() + keyOutputAmountsToRemoveCount);
-  rawDataToInsert.emplace_back(DB::serialize(DB::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX, DB::KEY_OUTPUT_AMOUNTS_COUNT_KEY, totalKeyOutputAmountsCount));
-  for (uint32_t i = 0; i < keyOutputAmountsToRemoveCount; ++i) {
-    rawKeysToRemove.emplace_back(DB::serializeKey(DB::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX, totalKeyOutputAmountsCount + i));
-  }
-
-  return *this;
-}
-
 BlockchainWriteBatch&BlockchainWriteBatch::removeKeyOutputInfo(IBlockchainCache::Amount amount, IBlockchainCache::GlobalOutputIndex globalIndex) {
   rawKeysToRemove.emplace_back(DB::serializeKey(DB::KEY_OUTPUT_KEY_PREFIX, std::make_pair(amount, globalIndex)));
   return *this;

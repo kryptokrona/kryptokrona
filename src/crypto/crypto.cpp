@@ -349,12 +349,6 @@ namespace Crypto {
     ge_tobytes(reinterpret_cast<unsigned char*>(&image), &point2);
   }
   
-  void crypto_ops::generate_incomplete_key_image(const PublicKey &pub, EllipticCurvePoint &incomplete_key_image) {
-    ge_p3 point;
-    hash_to_ec(pub, point);
-    ge_p3_tobytes(reinterpret_cast<unsigned char*>(&incomplete_key_image), &point);
-  }
-
 #ifdef _MSC_VER
 #pragma warning(disable: 4200)
 #endif

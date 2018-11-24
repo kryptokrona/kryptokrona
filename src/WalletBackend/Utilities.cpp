@@ -25,19 +25,6 @@ namespace Utilities
    
    Please note this function does not accept integrated addresses. Please
    extract the payment ID from them before calling this function. */
-std::vector<Crypto::PublicKey> addressesToViewKeys(const std::vector<std::string> addresses)
-{
-    std::vector<Crypto::PublicKey> viewKeys;
-
-    for (const auto &address : addresses)
-    {
-        const auto [spendKey, viewKey] = addressToKeys(address);
-        viewKeys.push_back(viewKey);
-    }
-
-    return viewKeys;
-}
-
 std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses)
 {
     std::vector<Crypto::PublicKey> spendKeys;

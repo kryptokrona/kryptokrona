@@ -58,8 +58,6 @@ struct EllipticCurveScalar {
     //hack for pg
     static bool underive_public_key_and_get_scalar(const KeyDerivation &, std::size_t, const PublicKey &, PublicKey &, EllipticCurveScalar &);
     friend bool underive_public_key_and_get_scalar(const KeyDerivation &, std::size_t, const PublicKey &, PublicKey &, EllipticCurveScalar &);
-    static void generate_incomplete_key_image(const PublicKey &, EllipticCurvePoint &);
-    friend void generate_incomplete_key_image(const PublicKey &, EllipticCurvePoint &);
     //
     static void derive_secret_key(const KeyDerivation &, size_t, const SecretKey &, SecretKey &);
     friend void derive_secret_key(const KeyDerivation &, size_t, const SecretKey &, SecretKey &);
