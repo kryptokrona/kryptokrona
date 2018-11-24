@@ -69,8 +69,8 @@ paths:
         required: true
         schema:
           required:
-          - "privateSpendKey"
-          - "privateViewKey"
+          - privateSpendKey
+          - privateViewKey
           allOf:
             - $ref: "#/definitions/WalletImport"
             - properties:
@@ -108,7 +108,7 @@ paths:
         required: true
         schema:
           required:
-          - "mnemonicSeed"
+          - mnemonicSeed
           allOf:
             - $ref: "#/definitions/WalletImport"
             - properties:
@@ -134,8 +134,8 @@ paths:
         required: true
         schema:
           required:
-          - "privateViewKey"
-          - "address"
+          - privateViewKey
+          - address
           allOf:
             - $ref: "#/definitions/WalletImport"
             - properties:
@@ -450,6 +450,105 @@ paths:
         500:
           $ref: '#/responses/InternalError'
           
+  /addresses/create:
+    post:
+      tags:
+        - addresses
+      summary: Creates a new, random address in the wallet container
+      responses:
+        201:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /addresses/import:
+    post:
+      tags:
+        - addresses
+      summary: Imports a subwallet with the given private spend key
+      description: >-
+        It is HIGHLY recommended you provide a scan height with this operation - wallet syncing will have to
+        begin again from the scan height given (defaults to zero) if the scan height is less than the height
+        of the current wallet sync status.
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          required:
+          - privateSpendKey
+          properties:
+            scanHeight:
+              description: The daemon port to sync the wallet with
+              type: integer
+              example: 300000
+              default: 0
+              format: uint64
+            privateSpendKey:
+              description: "64 char hex private spend key"
+              type: "string"
+              example: >-
+                5c703d9bde0b7cd5ff3e19ea826a44066534661a7322c85e854e73f06e49cd06
+            
+      responses:
+        201:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /addresses/import/view:
+    post:
+      tags:
+        - addresses
+      summary: Imports a view only subwallet with the given publicSpendKey
+      description: >-
+        It is HIGHLY recommended you provide a scan height with this operation - wallet syncing will have to
+        begin again from the scan height given (defaults to zero) if the scan height is less than the height
+        of the current wallet sync status.
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          required:
+          - publicSpendKey
+          properties:
+            scanHeight:
+              description: The daemon port to sync the wallet with
+              type: integer
+              example: 300000
+              default: 0
+              format: uint64
+            privateSpendKey:
+              description: "64 char hex public spend key"
+              type: "string"
+              example: >-
+                5c703d9bde0b7cd5ff3e19ea826a44066534661a7322c85e854e73f06e49cd06
+            
+      responses:
+        201:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
 securityDefinitions:
   api_key:
     type: "apiKey"
@@ -522,7 +621,7 @@ definitions:
             type: integer
             example: 300000
             default: 0
-            format: int64
+            format: uint64
             
   Node:
     type: object

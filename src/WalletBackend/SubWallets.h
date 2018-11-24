@@ -46,14 +46,12 @@ class SubWallets
         /* Imports a sub wallet with the given private spend key */
         WalletError importSubWallet(
             const Crypto::SecretKey privateSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
 
         /* Imports a sub view only wallet with the given public spend key */
         WalletError importViewSubWallet(
             const Crypto::PublicKey privateSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
 
         /* Returns (height, timestamp) to begin syncing at. Only one (if any)
            of the values will be non zero */

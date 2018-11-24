@@ -120,8 +120,7 @@ WalletError SubWallets::addSubWallet()
 
 WalletError SubWallets::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
-    const uint64_t scanHeight,
-    const bool newWallet)
+    const uint64_t scanHeight)
 {
     /* Can't add a private spend key to a view wallet */
     if (m_isViewWallet)
@@ -135,7 +134,7 @@ WalletError SubWallets::importSubWallet(
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
 
-    uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
+    uint64_t timestamp = 0;
 
     const std::string address = Utilities::privateKeysToAddress(
         privateSpendKey, m_privateViewKey
@@ -160,8 +159,7 @@ WalletError SubWallets::importSubWallet(
 
 WalletError SubWallets::importViewSubWallet(
     const Crypto::PublicKey publicSpendKey,
-    const uint64_t scanHeight,
-    const bool newWallet)
+    const uint64_t scanHeight)
 {
     /* Can't have view/non view wallets in one container */
     if (!m_isViewWallet)
@@ -176,7 +174,7 @@ WalletError SubWallets::importViewSubWallet(
         return SUBWALLET_ALREADY_EXISTS;
     }
 
-    uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
+    uint64_t timestamp = 0;
 
     Crypto::PublicKey publicViewKey;
 

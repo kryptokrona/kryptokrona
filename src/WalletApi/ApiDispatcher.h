@@ -89,6 +89,24 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body);
 
+        /* Create a new random address */
+        std::tuple<WalletError, uint16_t> createAddress(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
+        /* Imports an address with a private spend key */
+        std::tuple<WalletError, uint16_t> importAddress(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
+        /* Imports a view only address with a public spend key */
+        std::tuple<WalletError, uint16_t> importViewAddress(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
         /////////////////////
         /* DELETE REQUESTS */
         /////////////////////
@@ -179,6 +197,9 @@ class ApiDispatcher
 
         /* Assert the wallet is not a view only wallet */
         bool assertIsNotViewWallet() const;
+
+        /* Assert the wallet is a view wallet */
+        bool assertIsViewWallet() const;
 
         /* Assert the wallet is closed */
         bool assertWalletClosed() const;

@@ -214,12 +214,31 @@ namespace Crypto
 
     inline void from_json(const nlohmann::json &j, Hash &h)
     {
-        Common::podFromHex(j.get<std::string>(), h.data);
+        if (!Common::podFromHex(j.get<std::string>(), h.data))
+        {
+            const auto err = nlohmann::detail::parse_error::create(
+                100, 0, "Wrong length or not hex!"
+            );
+
+            throw nlohmann::json::parse_error(err);
+        }
     }
 
     inline void to_json(nlohmann::json &j, const PublicKey &p)
     {
         j = Common::podToHex(p);
+    }
+
+    inline void from_json(const nlohmann::json &j, PublicKey &p)
+    {
+        if (!Common::podFromHex(j.get<std::string>(), p.data))
+        {
+            const auto err = nlohmann::detail::parse_error::create(
+                100, 0, "Wrong length or not hex!"
+            );
+
+            throw nlohmann::json::parse_error(err);
+        }
     }
 
     inline void to_json(nlohmann::json &j, const SecretKey &s)
@@ -229,14 +248,16 @@ namespace Crypto
 
     inline void from_json(const nlohmann::json &j, SecretKey &s)
     {
-        Common::podFromHex(j.get<std::string>(), s.data);
-    }
+        if (!Common::podFromHex(j.get<std::string>(), s.data))
+        {
+            const auto err = nlohmann::detail::parse_error::create(
+                100, 0, "Wrong length or not hex!"
+            );
 
-    inline void from_json(const nlohmann::json &j, PublicKey &p)
-    {
-        Common::podFromHex(j.get<std::string>(), p.data);
+            throw nlohmann::json::parse_error(err);
+        }
     }
-
+    
     inline void to_json(nlohmann::json &j, const KeyDerivation &k)
     {
         j = Common::podToHex(k);
@@ -244,7 +265,14 @@ namespace Crypto
 
     inline void from_json(const nlohmann::json &j, KeyDerivation &k)
     {
-        Common::podFromHex(j.get<std::string>(), k.data);
+        if (!Common::podFromHex(j.get<std::string>(), k.data))
+        {
+            const auto err = nlohmann::detail::parse_error::create(
+                100, 0, "Wrong length or not hex!"
+            );
+
+            throw nlohmann::json::parse_error(err);
+        }
     }
 
     inline void to_json(nlohmann::json &j, const KeyImage &k)
@@ -254,7 +282,14 @@ namespace Crypto
 
     inline void from_json(const nlohmann::json &j, KeyImage &k)
     {
-        Common::podFromHex(j.get<std::string>(), k.data);
+        if (!Common::podFromHex(j.get<std::string>(), k.data))
+        {
+            const auto err = nlohmann::detail::parse_error::create(
+                100, 0, "Wrong length or not hex!"
+            );
+
+            throw nlohmann::json::parse_error(err);
+        }
     }
 }
 

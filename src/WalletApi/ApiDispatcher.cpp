@@ -84,13 +84,26 @@ ApiDispatcher::ApiDispatcher(
     /* POST */
     m_server.Post("/wallet/open", router(&ApiDispatcher::openWallet, walletMustBeClosed, viewWalletsAllowed))
 
+            /* Import wallet with keys */
             .Post("/wallet/import/key", router(&ApiDispatcher::keyImportWallet, walletMustBeClosed, viewWalletsAllowed))
 
+            /* Import wallet with seed */
             .Post("/wallet/import/seed", router(&ApiDispatcher::seedImportWallet, walletMustBeClosed, viewWalletsAllowed))
 
+            /* Import view wallet */
             .Post("/wallet/import/view", router(&ApiDispatcher::importViewWallet, walletMustBeClosed, viewWalletsAllowed))
 
+            /* Create wallet */
             .Post("/wallet/create", router(&ApiDispatcher::createWallet, walletMustBeClosed, viewWalletsAllowed))
+
+            /* Create a random address */
+            .Post("/addresses/create", router(&ApiDispatcher::createAddress, walletMustBeOpen, viewWalletsBanned))
+
+            /* Import an address with a spend secret key */
+            .Post("/addresses/import", router(&ApiDispatcher::importAddress, walletMustBeOpen, viewWalletsBanned))
+
+            /* Import a view only address with a public spend key */
+            .Post("/addresses/import/view", router(&ApiDispatcher::importViewAddress, walletMustBeOpen, viewWalletsAllowed))
 
     /* DELETE */
 
@@ -394,6 +407,68 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::createWallet(
     return {error, 200};
 }
 
+std::tuple<WalletError, uint16_t> ApiDispatcher::createAddress(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    m_walletBackend->addSubWallet();
+
+    return {SUCCESS, 201};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::importAddress(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    uint64_t scanHeight = 0;
+
+    /* Strongly suggested to supply a scan height. Wallet syncing will have to
+       begin again from zero if none is given */
+    if (body.find("scanHeight") != body.end())
+    {
+        scanHeight = body.at("scanHeight").get<uint64_t>();
+    }
+
+    Crypto::SecretKey privateSpendKey = body.at("privateSpendKey").get<Crypto::SecretKey>();
+
+    WalletError error = m_walletBackend->importSubWallet(privateSpendKey, scanHeight);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    return {SUCCESS, 201};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::importViewAddress(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    uint64_t scanHeight = 0;
+
+    /* Strongly suggested to supply a scan height. Wallet syncing will have to
+       begin again from zero if none is given */
+    if (body.find("scanHeight") != body.end())
+    {
+        scanHeight = body.at("scanHeight").get<uint64_t>();
+    }
+
+    Crypto::PublicKey publicSpendKey = body.at("publicSpendKey").get<Crypto::PublicKey>();
+
+    WalletError error = m_walletBackend->importViewSubWallet(publicSpendKey, scanHeight);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    return {SUCCESS, 201};
+}
+
 /////////////////////
 /* DELETE REQUESTS */
 /////////////////////
@@ -661,6 +736,18 @@ bool ApiDispatcher::assertIsNotViewWallet() const
     {
         std::cout << "Client requested to perform an operation which requires "
                      "a non view wallet, but wallet is a view wallet" << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool ApiDispatcher::assertIsViewWallet() const
+{
+    if (!m_walletBackend->isViewWallet())
+    {
+        std::cout << "Client requested to perform an operation which requires "
+                     "a view wallet, but wallet is a non view wallet" << std::endl;
         return false;
     }
 

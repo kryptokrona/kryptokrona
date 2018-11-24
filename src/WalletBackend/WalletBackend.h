@@ -167,14 +167,12 @@ class WalletBackend
         /* Import a sub wallet with the given privateSpendKey */
         WalletError importSubWallet(
             const Crypto::SecretKey privateSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
 
         /* Import a view only sub wallet with the given publicSpendKey */
         WalletError importViewSubWallet(
             const Crypto::PublicKey publicSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
 
         /* Scan the blockchain, starting from scanHeight / timestamp */
         void reset(uint64_t scanHeight, uint64_t timestamp);
@@ -221,6 +219,7 @@ class WalletBackend
         /* Get all transactions */
         std::vector<WalletTypes::Transaction> getTransactions() const;
 
+        /* Get all unconfirmed (outgoing, sent) transactions */
         std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
 
         /* Get sync heights, hashrate, peer count */
@@ -240,6 +239,7 @@ class WalletBackend
         /* Swap to a different daemon node */
         void swapNode(std::string daemonHost, uint16_t daemonPort);
 
+        /* Whether we have recieved info from the daemon at some point */
         bool daemonOnline() const;
         
         /////////////////////////////
