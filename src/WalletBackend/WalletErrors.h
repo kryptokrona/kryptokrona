@@ -171,6 +171,9 @@ enum WalletErrorCode
 
     /* View key is not derived from spend key for this address */
     KEYS_NOT_DETERMINISTIC = 41,
+
+    /* The primary address cannot be deleted */
+    CANNOT_DELETE_PRIMARY_ADDRESS = 42,
 };
 
 class WalletError

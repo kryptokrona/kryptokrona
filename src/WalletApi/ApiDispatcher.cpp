@@ -109,6 +109,8 @@ ApiDispatcher::ApiDispatcher(
 
             .Delete("/wallet", router(&ApiDispatcher::closeWallet, walletMustBeOpen, viewWalletsAllowed))
 
+            .Delete("/addresses/" + ApiConstants::addressRegex, router(&ApiDispatcher::deleteAddress, walletMustBeOpen, viewWalletsAllowed))
+
     /* PUT */
 
             .Put("/save", router(&ApiDispatcher::saveWallet, walletMustBeOpen, viewWalletsAllowed))
@@ -130,6 +132,8 @@ ApiDispatcher::ApiDispatcher(
             .Get("/status", router(&ApiDispatcher::getStatus, walletMustBeOpen, viewWalletsAllowed))
 
             .Get("/addresses", router(&ApiDispatcher::getAddresses, walletMustBeOpen, viewWalletsAllowed))
+
+            .Get("/addresses/primary", router(&ApiDispatcher::getPrimaryAddress, walletMustBeOpen, viewWalletsAllowed))
 
     /* OPTIONS */
 
@@ -485,6 +489,29 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::closeWallet(
     return {SUCCESS, 200};
 }
 
+std::tuple<WalletError, uint16_t> ApiDispatcher::deleteAddress(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    /* Remove the addresses prefix to get the address */
+    std::string address = req.path.substr(std::string("/addresses/").size());
+
+    if (WalletError error = validateAddresses({address}, false); error != SUCCESS)
+    {
+        return {error, 400};
+    }
+
+    WalletError error = m_walletBackend->deleteSubWallet(address);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    return {SUCCESS, 200};
+}
+
 //////////////////
 /* PUT REQUESTS */
 //////////////////
@@ -664,6 +691,20 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getAddresses(
 {
     nlohmann::json j {
         {"addresses", m_walletBackend->getAddresses()}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getPrimaryAddress(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    nlohmann::json j {
+        {"address", m_walletBackend->getPrimaryAddress()}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");

@@ -174,6 +174,8 @@ class WalletBackend
             const Crypto::PublicKey publicSpendKey,
             const uint64_t scanHeight);
 
+        WalletError deleteSubWallet(const std::string address);
+
         /* Scan the blockchain, starting from scanHeight / timestamp */
         void reset(uint64_t scanHeight, uint64_t timestamp);
 

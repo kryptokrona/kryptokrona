@@ -195,6 +195,67 @@ WalletError SubWallets::importViewSubWallet(
     return SUCCESS;
 }
 
+WalletError SubWallets::deleteSubWallet(const std::string address)
+{
+    std::scoped_lock lock(m_mutex);
+
+    const auto [spendKey, viewKey] = Utilities::addressToKeys(address);
+
+    const auto it = m_subWallets.find(spendKey);
+
+    if (it == m_subWallets.end())
+    {
+        return ADDRESS_NOT_IN_WALLET;
+    }
+
+    /* We can't delete the primary address */
+    if (it->second.isPrimaryAddress())
+    {
+        return CANNOT_DELETE_PRIMARY_ADDRESS;
+    }
+
+    m_subWallets.erase(it);
+
+    /* Remove or update the transactions */
+    deleteAddressTransactions(m_transactions, spendKey);
+    deleteAddressTransactions(m_lockedTransactions, spendKey);
+
+    return SUCCESS;
+}
+
+void SubWallets::deleteAddressTransactions(
+    std::vector<WalletTypes::Transaction> &txs,
+    const Crypto::PublicKey spendKey)
+{
+    const auto it = std::remove_if(txs.begin(), txs.end(), [spendKey](auto &tx)
+    {
+        /* See if this transaction contains the subwallet we're deleting */
+        const auto key = tx.transfers.find(spendKey);
+
+        /* OK, it does */
+        if (key != tx.transfers.end())
+        {
+            /* It's the only element, delete the transaction */
+            if (tx.transfers.size() == 1)
+            {
+                return true;
+            }
+            /* Otherwise just delete the transfer in the transaction */
+            else
+            {
+                tx.transfers.erase(key);
+            }
+        }
+
+        return false;
+    });
+
+    if (it != txs.end())
+    {
+        txs.erase(it);
+    }
+}
+
 /* Gets the starting height, and timestamp to begin the sync from. Only one of
    these will be non zero, which will the the lowest one (ignoring null values).
 

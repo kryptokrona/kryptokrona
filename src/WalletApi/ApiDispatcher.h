@@ -117,6 +117,11 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body);
 
+        std::tuple<WalletError, uint16_t> deleteAddress(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
         //////////////////
         /* PUT REQUESTS */
         //////////////////
@@ -174,6 +179,11 @@ class ApiDispatcher
             const nlohmann::json &body) const;
 
         std::tuple<WalletError, uint16_t> getAddresses(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
+        std::tuple<WalletError, uint16_t> getPrimaryAddress(
             const httplib::Request &req,
             httplib::Response &res,
             const nlohmann::json &body) const;

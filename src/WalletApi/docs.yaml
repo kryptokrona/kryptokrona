@@ -449,6 +449,45 @@ paths:
           $ref: '#/responses/NotOpen'
         500:
           $ref: '#/responses/InternalError'
+    delete:
+      tags:
+        - addresses
+      summary: Deletes the given subwallet from the container
+      description: Note that you cannot delete the 'primary' address, the first address created in the wallet.
+      responses:
+        200:
+          $ref: '#/responses/Success'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /addresses/primary:
+    get:
+      tags:
+        - addresses
+      summary: Gets the 'primary' address
+      description: The primary address is the first wallet created, and the one used as the change address if not specified.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              address:
+                type: string
+                description: The primary address
+                example: "TRTLv2cT32cZbF6KvnU69LNxptYFBMCKs3yqLmCAVjPW4rNTExpB7RpGKGJEkD1E9MVmM8SUUJfUh42Ajo1Hgz5wUN6budvzaq"
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
           
   /addresses/create:
     post:

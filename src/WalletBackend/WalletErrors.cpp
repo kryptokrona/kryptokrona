@@ -222,6 +222,11 @@ std::string WalletError::getErrorMessage() const
             return "You cannot get a mnemonic seed for this address, as the "
                    "view key is derived in terms of the spend key.";
         }
+        case CANNOT_DELETE_PRIMARY_ADDRESS:
+        {
+            return "Each wallet has a primary address when created, this address "
+                   "cannot be removed.";
+        }
 
         /* No default case so the compiler warns us if we missed one */
     }

@@ -53,6 +53,8 @@ class SubWallets
             const Crypto::PublicKey privateSpendKey,
             const uint64_t scanHeight);
 
+        WalletError deleteSubWallet(const std::string address);
+
         /* Returns (height, timestamp) to begin syncing at. Only one (if any)
            of the values will be non zero */
         std::tuple<uint64_t, uint64_t> getMinInitialSyncStart() const;
@@ -169,6 +171,13 @@ class SubWallets
         //////////////////////////////
 
         void throwIfViewWallet() const;
+
+        /* Deletes any transactions containing the given spend key, or just
+           removes from the transfers array if there are multiple transfers
+           in the tx */
+        void deleteAddressTransactions(
+            std::vector<WalletTypes::Transaction> &txs,
+            const Crypto::PublicKey spendKey);
 
         //////////////////////////////
         /* Private member variables */
