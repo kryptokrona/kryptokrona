@@ -832,3 +832,16 @@ std::vector<WalletTypes::Transaction> SubWallets::getUnconfirmedTransactions() c
 {
     return m_lockedTransactions;
 }
+
+std::tuple<WalletError, std::string> SubWallets::getAddress(
+    const Crypto::PublicKey spendKey) const
+{
+    const auto it = m_subWallets.find(spendKey);
+
+    if (it != m_subWallets.end())
+    {
+        return {SUCCESS, it->second.address()};
+    }
+
+    return {ADDRESS_NOT_IN_WALLET, std::string()};
+}

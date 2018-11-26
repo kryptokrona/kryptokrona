@@ -20,6 +20,7 @@
 
 #include <WalletApi/Constants.h>
 
+#include <WalletBackend/JsonSerialization.h>
 #include <WalletBackend/ValidateParameters.h>
 
 using namespace httplib;
@@ -121,19 +122,38 @@ ApiDispatcher::ApiDispatcher(
 
     /* GET */
 
+            /* Get node details */
             .Get("/node", router(&ApiDispatcher::getNodeInfo, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get the shared private view key */
             .Get("/keys", router(&ApiDispatcher::getPrivateViewKey, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get the spend keys for the given address */
             .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys, walletMustBeOpen, viewWalletsBanned))
 
+            /* Get the mnemonic seed for the given address */
             .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed, walletMustBeOpen, viewWalletsBanned))
 
+            /* Get the wallet status */
             .Get("/status", router(&ApiDispatcher::getStatus, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get a list of all addresses */
             .Get("/addresses", router(&ApiDispatcher::getAddresses, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get the primary address */
             .Get("/addresses/primary", router(&ApiDispatcher::getPrimaryAddress, walletMustBeOpen, viewWalletsAllowed))
+
+            /* Get all transactions */
+            .Get("/transactions", router(&ApiDispatcher::getTransactions, walletMustBeOpen, viewWalletsAllowed))
+
+            /* Get all (outgoing) unconfirmed transactions */
+            .Get("/transactions/unconfirmed", router(&ApiDispatcher::getUnconfirmedTransactions, walletMustBeOpen, viewWalletsAllowed))
+
+            /* Get the transactions starting at the given block, for 1000 blocks */
+            .Get("/transactions/\\d+", router(&ApiDispatcher::getTransactionsFromHeight, walletMustBeOpen, viewWalletsAllowed))
+
+            /* Get the transactions starting at the given block, and ending at the given block */
+            .Get("/transactions/\\d+/\\d+", router(&ApiDispatcher::getTransactionsFromHeightToHeight, walletMustBeOpen, viewWalletsAllowed))
 
     /* OPTIONS */
 
@@ -712,6 +732,122 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getPrimaryAddress(
     return {SUCCESS, 200};
 }
 
+std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactions(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    nlohmann::json j {
+        {"transactions", m_walletBackend->getTransactions()}
+    };
+
+    publicKeysToAddresses(j);
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getUnconfirmedTransactions(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    nlohmann::json j {
+        {"transactions", m_walletBackend->getUnconfirmedTransactions()}
+    };
+
+    publicKeysToAddresses(j);
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeight(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    std::string startHeightStr = req.path.substr(std::string("/transactions/").size());
+
+    try
+    {
+        uint64_t startHeight = std::stoi(startHeightStr);
+
+        const auto txs = m_walletBackend->getTransactionsRange(
+            startHeight, startHeight + 1000
+        );
+
+        nlohmann::json j {
+            {"transactions", txs}
+        };
+
+        publicKeysToAddresses(j);
+
+        res.set_content(j.dump(4) + "\n", "application/json");
+
+        return {SUCCESS, 200};
+    }
+    catch (const std::invalid_argument &e)
+    {
+        std::cout << "Failed to parse parameter as height: " << e.what() << std::endl;
+        return {SUCCESS, 400};
+    }
+
+    return {SUCCESS, 200};
+}
+            
+std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeight(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    std::string stripped = req.path.substr(std::string("/transactions/").size());
+
+    uint64_t splitPos = stripped.find_first_of("/");
+
+    /* Take all the chars before the "/", this is our start height */
+    std::string startHeightStr = stripped.substr(0, splitPos);
+
+    /* Take all the chars after the "/", this is our end height */
+    std::string endHeightStr = stripped.substr(splitPos + 1);
+
+    try
+    {
+        uint64_t startHeight = std::stoi(startHeightStr);
+
+        uint64_t endHeight = std::stoi(endHeightStr);
+
+        if (startHeight >= endHeight)
+        {
+            std::cout << "Start height must be < end height..." << std::endl;
+            return {SUCCESS, 400};
+        }
+
+        const auto txs = m_walletBackend->getTransactionsRange(
+            startHeight, endHeight
+        );
+
+        nlohmann::json j {
+            {"transactions", txs}
+        };
+
+        publicKeysToAddresses(j);
+
+        res.set_content(j.dump(4) + "\n", "application/json");
+
+        return {SUCCESS, 200};
+    }
+    catch (const std::invalid_argument &)
+    {
+        std::cout << "Failed to parse parameter as height...\n";
+        return {SUCCESS, 400};
+    }
+
+    return {SUCCESS, 200};
+}
+
 //////////////////////
 /* OPTIONS REQUESTS */
 //////////////////////
@@ -815,4 +951,26 @@ bool ApiDispatcher::assertWalletOpen() const
     }
 
     return true;
+}
+
+void ApiDispatcher::publicKeysToAddresses(nlohmann::json &j) const
+{
+    for (auto &item : j.at("transactions"))
+    {
+        /* Replace publicKey with address for ease of use */
+        for (auto &tx : item.at("transfers"))
+        {
+            /* Get the spend key */
+            Crypto::PublicKey spendKey = tx.at("publicKey").get<Crypto::PublicKey>();
+
+            /* Get the address it belongs to */
+            const auto [error, address] = m_walletBackend->getAddress(spendKey);
+
+            /* Add the address to the json */
+            tx["address"] = address;
+
+            /* Remove the spend key */
+            tx.erase("publicKey");
+        }
+    }
 }

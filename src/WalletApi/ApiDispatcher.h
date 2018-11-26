@@ -188,6 +188,26 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body) const;
 
+        std::tuple<WalletError, uint16_t> getTransactions(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
+        std::tuple<WalletError, uint16_t> getUnconfirmedTransactions(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
+        std::tuple<WalletError, uint16_t> getTransactionsFromHeight(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+            
+        std::tuple<WalletError, uint16_t> getTransactionsFromHeightToHeight(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
         //////////////////////
         /* OPTIONS REQUESTS */
         //////////////////////
@@ -216,6 +236,9 @@ class ApiDispatcher
 
         /* Assert the wallet is open */
         bool assertWalletOpen() const;
+
+        /* Converts a public spend key to an address in a transactions json */
+        void publicKeysToAddresses(nlohmann::json &j) const;
         
         //////////////////////////////
         /* Private member variables */

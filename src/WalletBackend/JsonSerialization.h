@@ -48,13 +48,16 @@ void from_json(const json &j, SynchronizationStatus &s);
 void to_json(json &j, const Transfer &t);
 void from_json(const json &j, Transfer &t);
 
-/* TransactionInput */
-void to_json(json &j, const WalletTypes::TransactionInput &t);
-void from_json(const json &j, WalletTypes::TransactionInput &t);
+namespace WalletTypes
+{
+    /* TransactionInput */
+    void to_json(json &j, const WalletTypes::TransactionInput &t);
+    void from_json(const json &j, WalletTypes::TransactionInput &t);
 
-/* WalletTypes::Transaction */
-void to_json(json &j, const WalletTypes::Transaction &t);
-void from_json(const json &j, WalletTypes::Transaction &t);
+    /* WalletTypes::Transaction */
+    void to_json(json &j, const WalletTypes::Transaction &t);
+    void from_json(const json &j, WalletTypes::Transaction &t);
+}
 
 std::vector<Transfer> transfersToVector(std::unordered_map<Crypto::PublicKey, int64_t> transfers);
 

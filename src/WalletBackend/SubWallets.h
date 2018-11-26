@@ -156,6 +156,9 @@ class SubWallets
            block yet. */
         std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
 
+        std::tuple<WalletError, std::string> getAddress(
+            const Crypto::PublicKey spendKey) const;
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////

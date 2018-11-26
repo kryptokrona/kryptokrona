@@ -1029,3 +1029,9 @@ bool WalletBackend::daemonOnline() const
 {
     return m_daemon->isOnline();
 }
+
+std::tuple<WalletError, std::string> WalletBackend::getAddress(
+    const Crypto::PublicKey spendKey) const
+{
+    return m_subWallets->getAddress(spendKey);
+}
