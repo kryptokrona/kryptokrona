@@ -155,6 +155,16 @@ ApiDispatcher::ApiDispatcher(
             /* Get the transactions starting at the given block, and ending at the given block */
             .Get("/transactions/\\d+/\\d+", router(&ApiDispatcher::getTransactionsFromHeightToHeight, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get the transactions starting at the given block, for 1000 blocks */
+            .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+", router(
+                &ApiDispatcher::getTransactionsFromHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
+            )
+
+            /* Get the transactions starting at the given block, and ending at the given block */
+            .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
+                &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
+            )
+
     /* OPTIONS */
 
             /* Matches everything */
@@ -794,8 +804,6 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeight(
         std::cout << "Failed to parse parameter as height: " << e.what() << std::endl;
         return {SUCCESS, 400};
     }
-
-    return {SUCCESS, 200};
 }
             
 std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeight(
@@ -844,8 +852,147 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeig
         std::cout << "Failed to parse parameter as height...\n";
         return {SUCCESS, 400};
     }
+}
 
-    return {SUCCESS, 200};
+std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightWithAddress(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    std::string stripped = req.path.substr(std::string("/transactions/").size());
+
+    uint64_t splitPos = stripped.find_first_of("/");
+
+    std::string address = stripped.substr(0, splitPos);
+
+    if (WalletError error = validateAddresses({address}, false); error != SUCCESS)
+    {
+        return {error, 400};
+    }
+
+    /* Skip the address */
+    std::string startHeightStr = stripped.substr(splitPos + 1);
+
+    try
+    {
+        uint64_t startHeight = std::stoi(startHeightStr);
+
+        const auto txs = m_walletBackend->getTransactionsRange(
+            startHeight, startHeight + 1000
+        );
+
+        std::vector<WalletTypes::Transaction> result;
+
+        std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
+        [address, this](const auto tx)
+        {
+            for (const auto [key, transfer] : tx.transfers)
+            {
+                const auto [error, actualAddress] = m_walletBackend->getAddress(key);
+
+                /* If the transfer contains our address, keep it, else skip */
+                if (actualAddress == address)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        nlohmann::json j {
+            {"transactions", result}
+        };
+
+        publicKeysToAddresses(j);
+
+        res.set_content(j.dump(4) + "\n", "application/json");
+
+        return {SUCCESS, 200};
+    }
+    catch (const std::invalid_argument &)
+    {
+        std::cout << "Failed to parse parameter as height...\n";
+        return {SUCCESS, 400};
+    }
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeightWithAddress(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    std::string stripped = req.path.substr(std::string("/transactions/").size());
+
+    uint64_t splitPos = stripped.find_first_of("/");
+
+    std::string address = stripped.substr(0, splitPos);
+
+    if (WalletError error = validateAddresses({address}, false); error != SUCCESS)
+    {
+        return {error, 400};
+    }
+
+    stripped = stripped.substr(splitPos + 1);
+
+    splitPos = stripped.find_first_of("/");
+
+    /* Take all the chars before the "/", this is our start height */
+    std::string startHeightStr = stripped.substr(0, splitPos);
+
+    /* Take all the chars after the "/", this is our end height */
+    std::string endHeightStr = stripped.substr(splitPos + 1);
+
+    try
+    {
+        uint64_t startHeight = std::stoi(startHeightStr);
+
+        uint64_t endHeight = std::stoi(endHeightStr);
+
+        if (startHeight >= endHeight)
+        {
+            std::cout << "Start height must be < end height..." << std::endl;
+            return {SUCCESS, 400};
+        }
+
+        const auto txs = m_walletBackend->getTransactionsRange(
+            startHeight, endHeight
+        );
+
+        std::vector<WalletTypes::Transaction> result;
+
+        std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
+        [address, this](const auto tx)
+        {
+            for (const auto [key, transfer] : tx.transfers)
+            {
+                const auto [error, actualAddress] = m_walletBackend->getAddress(key);
+
+                /* If the transfer contains our address, keep it, else skip */
+                if (actualAddress == address)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        nlohmann::json j {
+            {"transactions", result}
+        };
+
+        publicKeysToAddresses(j);
+
+        res.set_content(j.dump(4) + "\n", "application/json");
+
+        return {SUCCESS, 200};
+    }
+    catch (const std::invalid_argument &)
+    {
+        std::cout << "Failed to parse parameter as height...\n";
+        return {SUCCESS, 400};
+    }
 }
 
 //////////////////////
