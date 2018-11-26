@@ -18,7 +18,7 @@ tags:
     description: Get node details, swap node
   - name: keys
     description: Get private keys or mnemonic seed
-  - name: transaction
+  - name: transactions
     description: Get a transaction details, send a transaction, etc
   - name: misc
     description: Miscellaneous operations, such as saving, getting status, etc
@@ -441,7 +441,6 @@ paths:
                 type: array
                 items:
                   type: string
-                description: Whether this wallet is a view only wallet. Certain operations are illegal on a view only wallet, such as transferring.
                 example: ["TRTLv2cT32cZbF6KvnU69LNxptYFBMCKs3yqLmCAVjPW4rNTExpB7RpGKGJEkD1E9MVmM8SUUJfUh42Ajo1Hgz5wUN6budvzaq"]
         401:
           $ref: '#/responses/UnauthorizedError'
@@ -588,6 +587,96 @@ paths:
         500:
           $ref: '#/responses/InternalError'
           
+  /transactions:
+    get:
+      tags:
+        - transactions
+      summary: Gets a list of all transactions in the wallet container
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  $ref: '#/definitions/Transaction'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /transactions/unconfirmed:
+    get:
+      tags:
+        - transactions
+      summary: Gets a list of all unconfirmed, outgoing transactions in the wallet container
+      description: Note that this DOES NOT include incoming transactions in the pool. This only applies to transactions that have been sent by this wallet file, and have not been added to a block yet.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  $ref: '#/definitions/Transaction'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /transactions/[start height]:
+    get:
+      tags:
+        - transactions
+      summary: Returns transactions for the wallet starting at start height for 1,000 blocks
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  $ref: '#/definitions/Transaction'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /transactions/[start height]/[end height]:
+    get:
+      tags:
+        - transactions
+      summary: Returns transactions for the wallet starting at start height until end height
+      description: Note that start height must be < end height
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  $ref: '#/definitions/Transaction'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
 securityDefinitions:
   api_key:
     type: "apiKey"
@@ -676,5 +765,53 @@ definitions:
         format: uint16
         default: 11898
         example: 11898
+        
+  Transaction:
+    type: object
+    properties:
+      blockHeight:
+        type: number
+        format: uint64
+        example: 800000
+        description: The block this transaction is contained in.
+      fee:
+        type: number
+        format: uint64
+        example: 10
+        description: The amount the sender paid in miner fees for this transaction. In atomic units.
+      hash:
+        type: string
+        example: 8e2dc89659409ea9c34a2e28f7350cefba304159c04cc4926acd12035a8b2379
+        description: The hash of this transaction
+      isCoinbaseTransaction:
+        type: boolean
+        example: false
+        description: Whether this transaction is a miner reward or a normal transaction.
+      paymentID:
+        type: string
+        example: 7fe73bd90ef05dea0b5c15fc78696619c50dd5f2ba628f2fd16a2e3445b1922f
+        description: An identifier supplied by the sender. May be "" (empty string)
+      timestamp:
+        type: number
+        format: uint64
+        example: 1543222082
+        description: The unix timestamp of the block this transaction is contained in.
+      unlockTime:
+        type: number
+        format: uint64
+        example: 0
+        description: When this transaction unlocks for spending. If >= 50000000, treated as a timestamp. Normally zero.
+      transfers:
+        type: object
+        properties:
+          address:
+            type: string
+            example: TRTLv3ErzkY2CiAj6DL8isYELmTec8Z9BK56oL1KMhjMRSMyfwYaogKg17hQKC23CHPBcHqrHHGzdRYUk3HGqkMwXbHg3Dy2rH
+            description: The receiving address of this transfer, or the sending address if the amount is negative
+          amount:
+            type: number
+            format: int64
+            example: 1234
+            description: The amount of this transfer, in atomic units
         
 host: "127.0.0.1:8070"

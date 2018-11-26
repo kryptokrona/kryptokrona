@@ -244,7 +244,8 @@ class WalletBackend
         /* Whether we have recieved info from the daemon at some point */
         bool daemonOnline() const;
 
-        std::tuple<WalletError, std::string> getAddress(const Crypto::PublicKey spendKey) const;
+        std::tuple<WalletError, std::string> getAddress(
+            const Crypto::PublicKey spendKey) const;
         
         /////////////////////////////
         /* Public member variables */
