@@ -1393,7 +1393,7 @@ inline void Response::set_redirect(const std::string &url)
 
 inline void Response::set_content(const std::string &s, size_t n, const std::string &content_type)
 {
-    body.assign(s, n);
+    body.assign(s.c_str(), n);
     set_header("Content-Type", content_type);
 }
 
