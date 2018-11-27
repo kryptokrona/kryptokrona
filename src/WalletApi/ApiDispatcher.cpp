@@ -250,12 +250,10 @@ void ApiDispatcher::middleware(
         res.set_header("Access-Control-Allow-Origin", m_corsHeader);
     }
 
-    /* TODO: Uncomment
     if (!checkAuthenticated(req, res))
     {
         return;
     }
-    */
 
     /* Wallet must be open for this operation, and it is not */
     if (walletMustBeOpen && !assertWalletOpen())
