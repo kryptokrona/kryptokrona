@@ -159,18 +159,23 @@ ApiDispatcher::ApiDispatcher(
             /* Get all (outgoing) unconfirmed transactions */
             .Get("/transactions/unconfirmed", router(&ApiDispatcher::getUnconfirmedTransactions, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get all (outgoing) unconfirmed transactions, belonging to the given address */
+            .Get("/transactions/unconfirmed/" + ApiConstants::addressRegex, router(
+                &ApiDispatcher::getUnconfirmedTransactionsForAddress, walletMustBeOpen, viewWalletsAllowed)
+            )
+
             /* Get the transactions starting at the given block, for 1000 blocks */
             .Get("/transactions/\\d+", router(&ApiDispatcher::getTransactionsFromHeight, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get the transactions starting at the given block, and ending at the given block */
             .Get("/transactions/\\d+/\\d+", router(&ApiDispatcher::getTransactionsFromHeightToHeight, walletMustBeOpen, viewWalletsAllowed))
 
-            /* Get the transactions starting at the given block, for 1000 blocks */
+            /* Get the transactions starting at the given block, for 1000 blocks, belonging to the given address */
             .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
-            /* Get the transactions starting at the given block, and ending at the given block */
+            /* Get the transactions starting at the given block, and ending at the given block, belonging to the given address */
             .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
@@ -811,6 +816,45 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getUnconfirmedTransactions(
 {
     nlohmann::json j {
         {"transactions", m_walletBackend->getUnconfirmedTransactions()}
+    };
+
+    publicKeysToAddresses(j);
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getUnconfirmedTransactionsForAddress(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    std::string address = req.path.substr(std::string("/transactions/unconfirmed").size());
+
+    const auto txs = m_walletBackend->getUnconfirmedTransactions();
+
+    std::vector<WalletTypes::Transaction> result;
+
+    std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
+    [address, this](const auto tx)
+    {
+        for (const auto [key, transfer] : tx.transfers)
+        {
+            const auto [error, actualAddress] = m_walletBackend->getAddress(key);
+
+            /* If the transfer contains our address, keep it, else skip */
+            if (actualAddress == address)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    });
+
+    nlohmann::json j {
+        {"transactions", result}
     };
 
     publicKeysToAddresses(j);
