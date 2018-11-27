@@ -108,16 +108,21 @@ ApiDispatcher::ApiDispatcher(
 
     /* DELETE */
 
+            /* Close the current wallet */
             .Delete("/wallet", router(&ApiDispatcher::closeWallet, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Delete the given address */
             .Delete("/addresses/" + ApiConstants::addressRegex, router(&ApiDispatcher::deleteAddress, walletMustBeOpen, viewWalletsAllowed))
 
     /* PUT */
 
+            /* Save the wallet */
             .Put("/save", router(&ApiDispatcher::saveWallet, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Reset the wallet from zero, or given scan height */
             .Put("/reset", router(&ApiDispatcher::resetWallet, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Swap node details */
             .Put("/node", router(&ApiDispatcher::setNodeInfo, walletMustBeOpen, viewWalletsAllowed))
 
     /* GET */
@@ -169,6 +174,12 @@ ApiDispatcher::ApiDispatcher(
             .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
+
+            /* Get balance for the wallet */
+            .Get("/balance", router(&ApiDispatcher::getBalance, walletMustBeOpen, viewWalletsAllowed))
+
+            /* Get balance for a specific address */
+            .Get("/balance/" + ApiConstants::addressRegex, router(&ApiDispatcher::getBalanceForAddress, walletMustBeOpen, viewWalletsAllowed))
 
     /* OPTIONS */
 
@@ -1028,6 +1039,47 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeig
         std::cout << "Failed to parse parameter as height...\n";
         return {SUCCESS, 400};
     }
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getBalance(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    const auto [unlocked, locked] = m_walletBackend->getTotalBalance();
+
+    nlohmann::json j {
+        {"unlocked", unlocked},
+        {"locked", locked}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getBalanceForAddress(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    std::string address = req.path.substr(std::string("/balance/").size());
+
+    const auto [error, unlocked, locked] = m_walletBackend->getBalance(address);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"unlocked", unlocked},
+        {"locked", locked}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
 }
 
 //////////////////////

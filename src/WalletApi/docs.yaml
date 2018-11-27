@@ -20,6 +20,8 @@ tags:
     description: Get private keys or mnemonic seed
   - name: transactions
     description: Get a list of transactions, send a transaction
+  - name: balance
+    description: Get a wallets or an addresses balance
   - name: misc
     description: Miscellaneous operations, such as saving, getting status, etc
     
@@ -747,6 +749,64 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Transaction'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /balance:
+    get:
+      tags:
+        - balance
+      summary: Get the balance for the entire wallet container
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              unlocked:
+                type: number
+                format: uint64
+                description: Unlocked, spendable balance. In atomic units.
+                example: 1234
+              locked:
+                type: number
+                format: uint64
+                description: Locked, unspendable balance. Possibly unconfirmed change, or a transaction with an unlock time specified. In atomic units.
+                example: 123
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /balance/[address]:
+    get:
+      tags:
+        - balance
+      summary: Get the balance for a specific address
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              unlocked:
+                type: number
+                format: uint64
+                description: Unlocked, spendable balance. In atomic units.
+                example: 1234
+              locked:
+                type: number
+                format: uint64
+                description: Locked, unspendable balance. Possibly unconfirmed change, or a transaction with an unlock time specified. In atomic units.
+                example: 123
         400:
           $ref: '#/responses/BadRequest'
         401:
