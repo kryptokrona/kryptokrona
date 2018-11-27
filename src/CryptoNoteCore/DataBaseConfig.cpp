@@ -22,7 +22,8 @@ DataBaseConfig::DataBaseConfig() :
   maxOpenFiles(DATABASE_DEFAULT_MAX_OPEN_FILES),
   writeBufferSize(DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE * MEGABYTE),
   readCacheSize(DATABASE_READ_BUFFER_MB_DEFAULT_SIZE * MEGABYTE),
-  testnet(false) {
+  testnet(false),
+  configFolderDefaulted(false) {
 }
 
 bool DataBaseConfig::init(const std::string dataDirectory, const int backgroundThreads, const int openFiles, const int writeBufferMB, const int readCacheMB)

@@ -172,7 +172,6 @@ bool Currency::getBlockReward(uint8_t blockMajorVersion, size_t medianSize, size
   uint64_t baseReward = (m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactor;
   if (alreadyGeneratedCoins == 0 && m_genesisBlockReward != 0) {
     baseReward = m_genesisBlockReward;
-    std::cout << "Genesis block reward: " << baseReward << std::endl;
   }
 
   size_t blockGrantedFullRewardZone = blockGrantedFullRewardZoneByBlockVersion(blockMajorVersion);
@@ -801,7 +800,6 @@ Transaction CurrencyBuilder::generateGenesisTransaction() {
       tk.key = outEphemeralPubKey;
       TransactionOutput out;
       out.amount = (i == 0) ? first_target_amount : target_amount;
-      std::cout << "outs: " << std::to_string(out.amount) << std::endl;
       out.target = tk;
       tx.outputs.push_back(out);
     }

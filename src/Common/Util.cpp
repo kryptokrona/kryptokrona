@@ -333,7 +333,8 @@ std::string get_nix_version_display_string()
   bool create_directories_if_necessary(const std::string& path)
   {
       std::error_code e;
-      return fs::create_directories(path, e);
+      fs::create_directories(path, e);
+      return e.value() == 0;
   }
 
   bool directoryExists(const std::string &path)
