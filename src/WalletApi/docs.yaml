@@ -13,13 +13,13 @@ tags:
   - name: wallet
     description: Opening and creating wallets
   - name: addresses
-    description: Creating addresses, getting transactions for an address, etc
+    description: Creating addresses, importing addresses
   - name: node
     description: Get node details, swap node
   - name: keys
     description: Get private keys or mnemonic seed
   - name: transactions
-    description: Get a transaction details, send a transaction, etc
+    description: Get a list of transactions, send a transaction
   - name: misc
     description: Miscellaneous operations, such as saving, getting status, etc
     
@@ -587,6 +587,31 @@ paths:
         500:
           $ref: '#/responses/InternalError'
           
+  /addresses/[address]/[payment ID]:
+    get:
+      tags:
+        - addresses
+      summary: Creates an integrated address from an address and payment ID
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              integratedAddress:
+                type: string
+                description: The integrated address
+                example: >-
+                  TRTLuxiNXhy96RNDkv2jx29jL7GdTWYBmA4r7K8KRpDWA4hJJnTZEgFHFzxqvmBLtz94oF4uPokQdHbV9j2g7S6LA4hKPvjZEFS2CiAj6DL8isYELmTec8Z9BK56oL1KMhjMRSMyfwYaogKg17hQKC23CHPBcHqrHHGzdRYUk3HGqkMwXbHg3BoCpXD
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
   /transactions:
     get:
       tags:
@@ -647,6 +672,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Transaction'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
         403:
@@ -670,6 +697,58 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Transaction'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /transactions/[address]/[start height]:
+    get:
+      tags:
+        - transactions
+      summary: Returns transactions for the wallet starting at start height for 1,000 blocks, that belong to the given address
+      description: Note that the transfers array will still contain transfers to other addresses, if present
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  $ref: '#/definitions/Transaction'
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /transactions/[address]/[start height]/[end height]:
+    get:
+      tags:
+        - transactions
+      summary: Returns transactions for the wallet starting at start height until end height, that belong to the given address
+      description: Note that start height must be < end height. Also note that the transfers array will still contain transfers to other addresses, if present.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  $ref: '#/definitions/Transaction'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
         403:

@@ -143,6 +143,11 @@ ApiDispatcher::ApiDispatcher(
             /* Get the primary address */
             .Get("/addresses/primary", router(&ApiDispatcher::getPrimaryAddress, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Creates an integrated address from the given address and payment ID */
+            .Get("/addresses/" + ApiConstants::addressRegex + "/" + ApiConstants::paymentIDRegex, router(
+                &ApiDispatcher::createIntegratedAddress, walletMustBeOpen, viewWalletsAllowed)
+            )
+
             /* Get all transactions */
             .Get("/transactions", router(&ApiDispatcher::getTransactions, walletMustBeOpen, viewWalletsAllowed))
 
@@ -735,6 +740,36 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getPrimaryAddress(
 {
     nlohmann::json j {
         {"address", m_walletBackend->getPrimaryAddress()}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::createIntegratedAddress(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body) const
+{
+    std::string stripped = req.path.substr(std::string("/addresses/").size());
+
+    uint64_t splitPos = stripped.find_first_of("/");
+
+    std::string address = stripped.substr(0, splitPos);
+
+    /* Skip the address */
+    std::string paymentID = stripped.substr(splitPos + 1);
+
+    const auto [error, integratedAddress] = WalletBackend::createIntegratedAddress(address, paymentID);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"integratedAddress", integratedAddress}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");

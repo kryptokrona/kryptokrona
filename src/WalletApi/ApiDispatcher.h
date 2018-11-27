@@ -188,6 +188,11 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body) const;
 
+        std::tuple<WalletError, uint16_t> createIntegratedAddress(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
         std::tuple<WalletError, uint16_t> getTransactions(
             const httplib::Request &req,
             httplib::Response &res,

@@ -20,4 +20,7 @@ namespace ApiConstants
     const std::string addressRegex
         = std::string(WalletConfig::addressPrefix) + "[a-zA-Z0-9]{" 
         + std::to_string(addressBodyLength) + "}";
+
+    /* 64 char, hex */
+    const std::string paymentIDRegex = "[a-fA-F0-9]{64}";
 }
