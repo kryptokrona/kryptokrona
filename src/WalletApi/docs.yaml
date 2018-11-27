@@ -639,7 +639,7 @@ paths:
   /transactions/[hash]:
     get:
       tags:
-        - transaction
+        - transactions
       summary: Gets details on the given transaction, if found
       description: Note that the transaction must be contained in this wallet, and must not be unconfirmed. E.g, you must get this hash back when calling /transactions 
       responses:
@@ -806,6 +806,188 @@ paths:
         500:
           $ref: '#/responses/InternalError'
           
+  /transactions/send/basic:
+    post:
+      tags:
+        - transactions
+      summary: Sends a transaction
+      description: This method will take funds from all subwallets as needed, and will use the primary address as the change address. It also uses a default fee, and default mixin. If this is not acceptable, please use the /advanced call instead.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactionHash:
+                type: string
+                example: 396e2a782c9ce9993982c6f93e305b05306d0e5794f57157fbac78581443c55f
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          required:
+          - address
+          - amount
+          properties:
+            destination:
+              type: string
+              description: The address to send funds to
+              example: >-
+                TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+            amount:
+              type: number
+              format: uint64
+              description: The amount of TRTL to send (in atomic units)
+              example: 1234
+            paymentID:
+              type: string
+              description: The payment ID to use
+              example: 38a8224a4c8bc5f060555cf9e89551dcd0cbb1c587a52b63e98f71280c362ee4
+              
+  /transactions/send/advanced:
+    post:
+      tags:
+        - transactions
+      summary: Sends a transaction
+      description: Note that every parameters sans destinations is optional.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactionHash:
+                type: string
+                example: 396e2a782c9ce9993982c6f93e305b05306d0e5794f57157fbac78581443c55f
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          required:
+          - destinations
+          properties:
+            destinations:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                    description: The address to send to
+                    example: TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+                  amount:
+                    type: number
+                    format: uint64
+                    description: The amount of TRTL to send (in atomic units)
+                    example: 1234
+            mixin:
+              type: number
+              description: The mixin level to use
+              example: 3
+            fee:
+              type: number
+              description: The fee to use with this transaction (in atomic units)
+              example: 10
+            sourceAddresses:
+              type: array
+              items:
+                type: string
+                example: TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+              description: The addresses to draw funds for the transaction from (must be an address in this container). Defaults to every address.
+            paymentID:
+              type: string
+              description: The payment ID to use
+              example: 38a8224a4c8bc5f060555cf9e89551dcd0cbb1c587a52b63e98f71280c362ee4
+            changeAddress:
+              type: string
+              description: The address in this wallet to return any 'change' to if we have to spend more than the requested amount. Defaults to primary address.
+              example: TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+              
+  /transactions/send/fusion/basic:
+    post:
+      tags:
+        - transactions
+      summary: Sends a fusion transaction
+      description: Fusion transactions are zero fee, and seek to combine small inputs into larger ones, to allow for larger transactions. Many fusions may be required to fully optimize a wallet.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactionHash:
+                type: string
+                example: 396e2a782c9ce9993982c6f93e305b05306d0e5794f57157fbac78581443c55f
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /transactions/send/fusion/advanced:
+    post:
+      tags:
+        - transactions
+      summary: Sends a fusion transaction
+      description: Fusion transactions are zero fee, and seek to combine small inputs into larger ones, to allow for larger transactions. Many fusions may be required to fully optimize a wallet.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactionHash:
+                type: string
+                example: 396e2a782c9ce9993982c6f93e305b05306d0e5794f57157fbac78581443c55f
+        400:
+          $ref: '#/responses/BadRequest'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/AlreadyOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+    parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          properties:
+            mixin:
+              type: number
+              description: The mixin level to use
+              example: 3
+            sourceAddresses:
+              type: array
+              items:
+                type: string
+                example: TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+              description: The addresses to draw funds for the transaction from (must be an address in this container)
+            destination:
+              type: string
+              description: The destination address to send funds to. Must exist in this wallet.
+              example: TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
+              
   /balance:
     get:
       tags:

@@ -8,6 +8,8 @@
 
 #include <config/CryptoNoteConfig.h>
 
+#include <CryptoNoteCore/Mixins.h>
+
 #include <cryptopp/modes.h>
 #include <cryptopp/sha.h>
 #include <cryptopp/pwdbased.h>
@@ -105,6 +107,18 @@ ApiDispatcher::ApiDispatcher(
 
             /* Import a view only address with a public spend key */
             .Post("/addresses/import/view", router(&ApiDispatcher::importViewAddress, walletMustBeOpen, viewWalletsAllowed))
+
+            /* Send a transaction */
+            .Post("/transactions/send/basic", router(&ApiDispatcher::sendBasicTransaction, walletMustBeOpen, viewWalletsBanned))
+
+            /* Send a transaction, more parameters specified */
+            .Post("/transactions/send/advanced", router(&ApiDispatcher::sendAdvancedTransaction, walletMustBeOpen, viewWalletsBanned))
+
+            /* Send a fusion transaction */
+            .Post("/transactions/send/fusion/basic", router(&ApiDispatcher::sendBasicFusionTransaction, walletMustBeOpen, viewWalletsBanned))
+
+            /* Send a fusion transaction, more parameters specified */
+            .Post("/transactions/send/fusion/advanced", router(&ApiDispatcher::sendAdvancedFusionTransaction, walletMustBeOpen, viewWalletsBanned))
 
     /* DELETE */
 
@@ -523,6 +537,174 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::importViewAddress(
     {
         return {error, 400};
     }
+
+    return {SUCCESS, 201};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::sendBasicTransaction(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    std::string address = body.at("destination").get<std::string>();
+
+    uint64_t amount = body.at("amount").get<uint64_t>();
+
+    std::string paymentID;
+
+    if (body.find("paymentID") != body.end())
+    {
+        paymentID = body.at("paymentID").get<std::string>();
+    }
+
+    auto [error, hash] = m_walletBackend->sendTransactionBasic(
+        address, amount, paymentID
+    );
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"transactionHash", hash}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 201};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::sendAdvancedTransaction(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    auto destinations = body.at("destinations").get<std::vector<std::pair<std::string, uint64_t>>>();
+
+    uint64_t mixin;
+
+    if (body.find("mixin") != body.end())
+    {
+        mixin = body.at("mixin").get<uint64_t>();
+    }
+    else
+    {
+        /* Get the default mixin */
+        std::tie(std::ignore, std::ignore, mixin) = CryptoNote::Mixins::getMixinAllowableRange(
+            m_walletBackend->getStatus().networkBlockCount
+        );
+    }
+
+    uint64_t fee = WalletConfig::defaultFee;
+
+    if (body.find("fee") != body.end())
+    {
+        fee = body.at("fee").get<uint64_t>();
+    }
+
+    std::vector<std::string> subWalletsToTakeFrom = {};
+
+    if (body.find("sourceAddresses") != body.end())
+    {
+        subWalletsToTakeFrom = body.at("sourceAddresses").get<std::vector<std::string>>();
+    }
+
+    std::string paymentID;
+
+    if (body.find("paymentID") != body.end())
+    {
+        paymentID = body.at("paymentID").get<std::string>();
+    }
+
+    std::string changeAddress;
+
+    if (body.find("changeAddress") != body.end())
+    {
+        changeAddress = body.at("changeAddress").get<std::string>();
+    }
+
+    auto [error, hash] = m_walletBackend->sendTransactionAdvanced(
+        destinations, mixin, fee, paymentID, subWalletsToTakeFrom, changeAddress
+    );
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"transactionHash", hash}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::sendBasicFusionTransaction(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    auto [error, hash] = m_walletBackend->sendFusionTransactionBasic();
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"transactionHash", hash}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 201};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::sendAdvancedFusionTransaction(
+    const Request &req,
+    Response &res,
+    const nlohmann::json &body)
+{
+    std::string destination = body.at("destination").get<std::string>();
+
+    uint64_t mixin;
+
+    if (body.find("mixin") != body.end())
+    {
+        mixin = body.at("mixin").get<uint64_t>();
+    }
+    else
+    {
+        /* Get the default mixin */
+        std::tie(std::ignore, std::ignore, mixin) = CryptoNote::Mixins::getMixinAllowableRange(
+            m_walletBackend->getStatus().networkBlockCount
+        );
+    }
+
+    std::vector<std::string> subWalletsToTakeFrom = {};
+
+    if (body.find("sourceAddresses") != body.end())
+    {
+        subWalletsToTakeFrom = body.at("sourceAddresses").get<std::vector<std::string>>();
+    }
+
+    auto [error, hash] = m_walletBackend->sendFusionTransactionAdvanced(
+        mixin, subWalletsToTakeFrom, destination
+    );
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"transactionHash", hash}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
 
     return {SUCCESS, 201};
 }

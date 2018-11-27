@@ -107,6 +107,26 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body);
 
+        std::tuple<WalletError, uint16_t> sendBasicTransaction(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
+        std::tuple<WalletError, uint16_t> sendAdvancedTransaction(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
+        std::tuple<WalletError, uint16_t> sendBasicFusionTransaction(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
+        std::tuple<WalletError, uint16_t> sendAdvancedFusionTransaction(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body);
+
         /////////////////////
         /* DELETE REQUESTS */
         /////////////////////
