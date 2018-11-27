@@ -32,6 +32,8 @@ public:
 
 private:
   int sync() override;
+  std::streamsize xsputn(const char* s, std::streamsize n) override;
+  int overflow(int c) override;
 
   std::string message;
   const std::string category;
