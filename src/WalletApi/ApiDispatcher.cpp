@@ -149,7 +149,7 @@ ApiDispatcher::ApiDispatcher(
             .Get("/addresses/primary", router(&ApiDispatcher::getPrimaryAddress, walletMustBeOpen, viewWalletsAllowed))
 
             /* Creates an integrated address from the given address and payment ID */
-            .Get("/addresses/" + ApiConstants::addressRegex + "/" + ApiConstants::paymentIDRegex, router(
+            .Get("/addresses/" + ApiConstants::addressRegex + "/" + ApiConstants::hashRegex, router(
                 &ApiDispatcher::createIntegratedAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
@@ -179,6 +179,9 @@ ApiDispatcher::ApiDispatcher(
             .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
+
+            /* Get details for the given transaction hash, if known */
+            .Get("/transactions/" + ApiConstants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get balance for the wallet */
             .Get("/balance", router(&ApiDispatcher::getBalance, walletMustBeOpen, viewWalletsAllowed))
@@ -1083,6 +1086,35 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeig
         std::cout << "Failed to parse parameter as height...\n";
         return {SUCCESS, 400};
     }
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionDetails(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    std::string hashStr = req.path.substr(std::string("/transactions/").size());
+
+    Crypto::Hash hash;
+
+    Common::podFromHex(hashStr, hash.data);
+
+    for (const auto tx : m_walletBackend->getTransactions())
+    {
+        if (tx.hash == hash)
+        {
+            nlohmann::json j {
+                {"transaction", tx}
+            };
+
+            res.set_content(j.dump(4) + "\n", "application/json");
+
+            return {SUCCESS, 200};
+        }
+    }
+
+    /* Not found */
+    return {SUCCESS, 404};
 }
 
 std::tuple<WalletError, uint16_t> ApiDispatcher::getBalance(

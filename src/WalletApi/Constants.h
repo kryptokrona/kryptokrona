@@ -22,5 +22,5 @@ namespace ApiConstants
         + std::to_string(addressBodyLength) + "}";
 
     /* 64 char, hex */
-    const std::string paymentIDRegex = "[a-fA-F0-9]{64}";
+    const std::string hashRegex = "[a-fA-F0-9]{64}";
 }

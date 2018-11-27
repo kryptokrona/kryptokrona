@@ -228,6 +228,11 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body) const;
 
+        std::tuple<WalletError, uint16_t> getTransactionDetails(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
         std::tuple<WalletError, uint16_t> getBalance(
             const httplib::Request &req,
             httplib::Response &res,

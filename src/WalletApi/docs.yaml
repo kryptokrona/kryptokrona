@@ -636,6 +636,29 @@ paths:
         500:
           $ref: '#/responses/InternalError'
           
+  /transactions/[hash]:
+    get:
+      tags:
+        - transaction
+      summary: Gets details on the given transaction, if found
+      description: Note that the transaction must be contained in this wallet, and must not be unconfirmed. E.g, you must get this hash back when calling /transactions 
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                $ref: '#/definitions/Transaction'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        404:
+          description: The transaction hash was not found.
+        500:
+          $ref: '#/responses/InternalError'
+          
   /transactions/unconfirmed:
     get:
       tags:
@@ -652,6 +675,31 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Transaction'
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+          
+  /transactions/unconfirmed/[address]:
+    get:
+      tags:
+        - transactions
+      summary: Gets a list of unconfirmed, outgoing transactions, for the given address
+      description: Note that this DOES NOT include incoming transactions in the pool. This only applies to transactions that have been sent by this wallet file, and have not been added to a block yet.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactions:
+                type: array
+                items:
+                  $ref: '#/definitions/Transaction'
+        400:
+          $ref: '#/responses/BadRequest'
         401:
           $ref: '#/responses/UnauthorizedError'
         403:
