@@ -823,11 +823,6 @@ WalletError WalletBackend::deleteSubWallet(const std::string address)
 
     WalletError error = m_subWallets->deleteSubWallet(address);
 
-    if (!error)
-    {
-        unsafeSave();
-    }
-
     m_walletSynchronizer->start();
 
     return error;
