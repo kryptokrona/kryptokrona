@@ -41,15 +41,15 @@ class SubWallets
         /////////////////////////////
 
         /* Adds a sub wallet with a random spend key */
-        WalletError addSubWallet();
+        std::tuple<WalletError, std::string> addSubWallet();
 
         /* Imports a sub wallet with the given private spend key */
-        WalletError importSubWallet(
+        std::tuple<WalletError, std::string> importSubWallet(
             const Crypto::SecretKey privateSpendKey,
             const uint64_t scanHeight);
 
         /* Imports a sub view only wallet with the given public spend key */
-        WalletError importViewSubWallet(
+        std::tuple<WalletError, std::string> importViewSubWallet(
             const Crypto::PublicKey privateSpendKey,
             const uint64_t scanHeight);
 

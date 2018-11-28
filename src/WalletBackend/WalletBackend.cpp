@@ -733,28 +733,21 @@ void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
     m_walletSynchronizer->start();
 }
 
-WalletError WalletBackend::addSubWallet()
+std::tuple<WalletError, std::string> WalletBackend::addSubWallet()
 {
     /* Stop the wallet synchronizer, so we're not in an invalid state */
     m_walletSynchronizer->stop();
 
     /* Add the sub wallet */
-    WalletError error = m_subWallets->addSubWallet(); 
-
-    if (!error)
-    {
-        /* Don't need to use the safe save that stops the synchronizer since
-           we've done it ourselves */
-        unsafeSave();
-    }
+    const auto [error, address] = m_subWallets->addSubWallet(); 
 
     /* Continue syncing, syncing the new wallet as well now */
     m_walletSynchronizer->start();
 
-    return error;
+    return {error, address};
 }
 
-WalletError WalletBackend::importSubWallet(
+std::tuple<WalletError, std::string> WalletBackend::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
     const uint64_t scanHeight)
 {
@@ -762,7 +755,7 @@ WalletError WalletBackend::importSubWallet(
     m_walletSynchronizer->stop();
 
     /* Add the sub wallet */
-    WalletError error = m_subWallets->importSubWallet(
+    const auto [error, address] = m_subWallets->importSubWallet(
         privateSpendKey, scanHeight
     ); 
 
@@ -781,19 +774,15 @@ WalletError WalletBackend::importSubWallet(
             /* Reset transactions, inputs, etc */
             m_subWallets->reset(scanHeight);
         }
-
-        /* Don't need to use the safe save that stops the synchronizer since
-           we've done it ourselves */
-        unsafeSave();
     }
 
     /* Continue syncing, syncing the new wallet as well now */
     m_walletSynchronizer->start();
 
-    return error;
+    return {error, address};
 }
 
-WalletError WalletBackend::importViewSubWallet(
+std::tuple<WalletError, std::string> WalletBackend::importViewSubWallet(
     const Crypto::PublicKey publicSpendKey,
     const uint64_t scanHeight)
 {
@@ -801,7 +790,7 @@ WalletError WalletBackend::importViewSubWallet(
     m_walletSynchronizer->stop();
 
     /* Add the sub wallet */
-    WalletError error = m_subWallets->importViewSubWallet(
+    const auto [error, address] = m_subWallets->importViewSubWallet(
         publicSpendKey, scanHeight
     ); 
 
@@ -820,16 +809,12 @@ WalletError WalletBackend::importViewSubWallet(
             /* Reset transactions, inputs, etc */
             m_subWallets->reset(scanHeight);
         }
-
-        /* Don't need to use the safe save that stops the synchronizer since
-           we've done it ourselves */
-        unsafeSave();
     }
 
     /* Continue syncing, syncing the new wallet as well now */
     m_walletSynchronizer->start();
 
-    return error;
+    return {error, address};
 }
 
 WalletError WalletBackend::deleteSubWallet(const std::string address)

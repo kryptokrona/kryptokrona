@@ -87,12 +87,12 @@ SubWallets::SubWallets(const SubWallets &other) :
 /* CLASS FUNCTIONS */
 /////////////////////
 
-WalletError SubWallets::addSubWallet()
+std::tuple<WalletError, std::string> SubWallets::addSubWallet()
 {
     /* This generates a private spend key - incompatible with view wallets */
     if (m_isViewWallet)
     {
-        return ILLEGAL_VIEW_WALLET_OPERATION;
+        return {ILLEGAL_VIEW_WALLET_OPERATION, std::string()};
     }
 
     std::scoped_lock lock(m_mutex);
@@ -115,17 +115,17 @@ WalletError SubWallets::addSubWallet()
         Utilities::getCurrentTimestampAdjusted(), isPrimaryAddress
     );
 
-    return SUCCESS;
+    return {SUCCESS, address};
 }
 
-WalletError SubWallets::importSubWallet(
+std::tuple<WalletError, std::string> SubWallets::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
     const uint64_t scanHeight)
 {
     /* Can't add a private spend key to a view wallet */
     if (m_isViewWallet)
     {
-        return ILLEGAL_VIEW_WALLET_OPERATION;
+        return {ILLEGAL_VIEW_WALLET_OPERATION, std::string()};
     }
 
     std::scoped_lock lock(m_mutex);
@@ -144,7 +144,7 @@ WalletError SubWallets::importSubWallet(
 
     if (m_subWallets.find(publicSpendKey) != m_subWallets.end())
     {
-        return SUBWALLET_ALREADY_EXISTS;
+        return {SUBWALLET_ALREADY_EXISTS, std::string()};
     }
 
     m_subWallets[publicSpendKey] = SubWallet(
@@ -154,24 +154,24 @@ WalletError SubWallets::importSubWallet(
 
     m_publicSpendKeys.push_back(publicSpendKey);
 
-    return SUCCESS;
+    return {SUCCESS, address};
 }
 
-WalletError SubWallets::importViewSubWallet(
+std::tuple<WalletError, std::string> SubWallets::importViewSubWallet(
     const Crypto::PublicKey publicSpendKey,
     const uint64_t scanHeight)
 {
     /* Can't have view/non view wallets in one container */
     if (!m_isViewWallet)
     {
-        return ILLEGAL_NON_VIEW_WALLET_OPERATION;
+        return {ILLEGAL_NON_VIEW_WALLET_OPERATION, std::string()};
     }
 
     std::scoped_lock lock(m_mutex);
 
     if (m_subWallets.find(publicSpendKey) != m_subWallets.end())
     {
-        return SUBWALLET_ALREADY_EXISTS;
+        return {SUBWALLET_ALREADY_EXISTS, std::string()};
     }
 
     uint64_t timestamp = 0;
@@ -192,7 +192,7 @@ WalletError SubWallets::importViewSubWallet(
 
     m_publicSpendKeys.push_back(publicSpendKey);
 
-    return SUCCESS;
+    return {SUCCESS, address};
 }
 
 WalletError SubWallets::deleteSubWallet(const std::string address)

@@ -482,7 +482,13 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::createAddress(
     Response &res,
     const nlohmann::json &body)
 {
-    m_walletBackend->addSubWallet();
+    const auto [error, address] = m_walletBackend->addSubWallet();
+
+    nlohmann::json j {
+        {"address", address}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
 
     return {SUCCESS, 201};
 }
@@ -503,12 +509,20 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::importAddress(
 
     Crypto::SecretKey privateSpendKey = body.at("privateSpendKey").get<Crypto::SecretKey>();
 
-    WalletError error = m_walletBackend->importSubWallet(privateSpendKey, scanHeight);
+    const auto [error, address] = m_walletBackend->importSubWallet(
+        privateSpendKey, scanHeight
+    );
 
     if (error)
     {
         return {error, 400};
     }
+
+    nlohmann::json j {
+        {"address", address}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
 
     return {SUCCESS, 201};
 }
@@ -529,12 +543,20 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::importViewAddress(
 
     Crypto::PublicKey publicSpendKey = body.at("publicSpendKey").get<Crypto::PublicKey>();
 
-    WalletError error = m_walletBackend->importViewSubWallet(publicSpendKey, scanHeight);
+    const auto [error, address] = m_walletBackend->importViewSubWallet(
+        publicSpendKey, scanHeight
+    );
 
     if (error)
     {
         return {error, 400};
     }
+
+    nlohmann::json j {
+        {"address", address}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
 
     return {SUCCESS, 201};
 }

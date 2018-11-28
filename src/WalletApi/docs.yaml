@@ -497,7 +497,14 @@ paths:
       summary: Creates a new, random address in the wallet container
       responses:
         201:
-          $ref: '#/responses/Success'
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              address:
+                type: string
+                description: The created address
+                example: "TRTLv2cT32cZbF6KvnU69LNxptYFBMCKs3yqLmCAVjPW4rNTExpB7RpGKGJEkD1E9MVmM8SUUJfUh42Ajo1Hgz5wUN6budvzaq"
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -538,7 +545,14 @@ paths:
             
       responses:
         201:
-          $ref: '#/responses/Success'
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              address:
+                type: string
+                description: The created address
+                example: "TRTLv2cT32cZbF6KvnU69LNxptYFBMCKs3yqLmCAVjPW4rNTExpB7RpGKGJEkD1E9MVmM8SUUJfUh42Ajo1Hgz5wUN6budvzaq"
         400:
           $ref: '#/responses/BadRequest'
         401:
@@ -579,7 +593,14 @@ paths:
             
       responses:
         201:
-          $ref: '#/responses/Success'
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              address:
+                type: string
+                description: The created address
+                example: "TRTLv2cT32cZbF6KvnU69LNxptYFBMCKs3yqLmCAVjPW4rNTExpB7RpGKGJEkD1E9MVmM8SUUJfUh42Ajo1Hgz5wUN6budvzaq"
         400:
           $ref: '#/responses/BadRequest'
         401:
