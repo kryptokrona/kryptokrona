@@ -1095,10 +1095,7 @@ securityDefinitions:
     type: "apiKey"
     name: "X-API-KEY"
     in: "header"
-    description: >-
-        Your rpc password, hashed with PBKDF2, with 10,000 iterations, and a 16
-        byte salt of all zeros. Api key should be formatted as hex, and be 32
-        characters long (16 bytes). Prevents brute forcing.
+    description: Your rpc password that you supplied on starting the wallet API.
         
 responses:
   UnauthorizedError:

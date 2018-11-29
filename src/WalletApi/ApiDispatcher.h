@@ -33,6 +33,12 @@ class ApiDispatcher
         
     private:
 
+        //////////////////////
+        /* Static functions */
+        //////////////////////
+
+        static std::string hashPassword(const std::string password);
+
         //////////////////////////////
         /* Private member functions */
         //////////////////////////////
@@ -311,6 +317,9 @@ class ApiDispatcher
 
         /* The --rpc-password hashed with pbkdf2 */
         std::string m_hashedPassword;
+
+        /* The rpc password - only stored to help indicate invalid passwords */
+        std::string m_rpcPassword;
 
         /* Need a mutex for some actions, mainly mutating actions, like opening
            wallets, sending transfers, etc */

@@ -33,28 +33,11 @@ ApiDispatcher::ApiDispatcher(
     const std::string rpcPassword,
     const std::string corsHeader) :
     m_port(bindPort),
-    m_corsHeader(corsHeader)
+    m_corsHeader(corsHeader),
+    m_hashedPassword(hashPassword(rpcPassword)),
+    m_rpcPassword(rpcPassword)
 {
     m_host = acceptExternalRequests ? "0.0.0.0" : "127.0.0.1";
-
-    using namespace CryptoPP;
-
-    /* Using SHA256 as the algorithm */
-    CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;
-
-    /* Salt of all zeros (this is bad...) */
-    byte salt[16] = {};
-
-    byte key[16];
-
-    /* Hash the password with pbkdf2 */
-    pbkdf2.DeriveKey(
-        key, sizeof(key), 0, (byte *)rpcPassword.c_str(),
-        rpcPassword.size(), salt, sizeof(salt), ApiConstants::PBKDF2_ITERATIONS
-    );
-
-    /* Store this later for rpc requests */
-    m_hashedPassword = Common::podToHex(key);
 
     using namespace std::placeholders;
 
@@ -343,13 +326,13 @@ bool ApiDispatcher::checkAuthenticated(const Request &req, Response &res) const
 
     std::string apiKey = req.get_header_value("X-API-KEY");
 
-    if (apiKey == m_hashedPassword)
+    if (hashPassword(apiKey) == m_hashedPassword)
     {
         return true;
     }
 
     std::cout << "Rejecting unauthorized request: X-API-KEY is incorrect.\n"
-                 "Expected: " << m_hashedPassword
+                 "Expected: " << m_rpcPassword
               << "\nActual: " << apiKey << std::endl;
 
     res.status = 401;
@@ -1517,4 +1500,25 @@ void ApiDispatcher::publicKeysToAddresses(nlohmann::json &j) const
             tx.erase("publicKey");
         }
     }
+}
+
+std::string ApiDispatcher::hashPassword(const std::string password)
+{
+    using namespace CryptoPP;
+
+    /* Using SHA256 as the algorithm */
+    CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;
+
+    /* Salt of all zeros (this is bad...) */
+    byte salt[16] = {};
+
+    byte key[16];
+
+    /* Hash the password with pbkdf2 */
+    pbkdf2.DeriveKey(
+        key, sizeof(key), 0, (byte *)password.c_str(),
+        password.size(), salt, sizeof(salt), ApiConstants::PBKDF2_ITERATIONS
+    );
+
+    return Common::podToHex(key);
 }
