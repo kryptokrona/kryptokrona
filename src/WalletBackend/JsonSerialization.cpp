@@ -88,6 +88,7 @@ json SubWallets::toJson() const
         {"lockedTransactions", m_lockedTransactions},
         {"privateViewKey", m_privateViewKey},
         {"isViewWallet", m_isViewWallet},
+        {"txPrivateKeys", txPrivateKeysToVector(m_transactionPrivateKeys)}
     };
 }
 
@@ -99,6 +100,7 @@ void SubWallets::fromJson(const json &j)
     m_lockedTransactions = j.at("lockedTransactions").get<std::vector<WalletTypes::Transaction>>();
     m_privateViewKey = j.at("privateViewKey").get<Crypto::SecretKey>();
     m_isViewWallet = j.at("isViewWallet").get<bool>();
+    m_transactionPrivateKeys = vectorToTxPrivateKeys(j.at("txPrivateKeys").get<std::vector<TxPrivateKey>>());
 }
 
 ///////////////////
@@ -320,6 +322,20 @@ void from_json(const json &j, Transfer &t)
     t.amount = j.at("amount").get<int64_t>();
 }
 
+void to_json(json &j, const TxPrivateKey &t)
+{
+    j = {
+        {"transactionHash", t.txHash},
+        {"txPrivateKey", t.txPrivateKey}
+    };
+}
+
+void from_json(const json &j, TxPrivateKey &t)
+{
+    t.txHash = j.at("transactionHash").get<Crypto::Hash>();
+    t.txPrivateKey = j.at("txPrivateKey").get<Crypto::SecretKey>();
+}
+
 /* std::map / std::unordered_map don't work great in json - they get serialized
    like this for example: 
 
@@ -339,7 +355,8 @@ So, lets instead convert to a vector of structs when converting to json, to
 make it easier for people using the wallet file in different languages to
 use */
 
-std::vector<Transfer> transfersToVector(std::unordered_map<Crypto::PublicKey, int64_t> transfers)
+std::vector<Transfer> transfersToVector(
+    const std::unordered_map<Crypto::PublicKey, int64_t> transfers)
 {
     std::vector<Transfer> vector;
 
@@ -355,7 +372,8 @@ std::vector<Transfer> transfersToVector(std::unordered_map<Crypto::PublicKey, in
     return vector;
 }
 
-std::unordered_map<Crypto::PublicKey, int64_t> vectorToTransfers(std::vector<Transfer> vector)
+std::unordered_map<Crypto::PublicKey, int64_t> vectorToTransfers(
+    const std::vector<Transfer> vector)
 {
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
@@ -367,7 +385,8 @@ std::unordered_map<Crypto::PublicKey, int64_t> vectorToTransfers(std::vector<Tra
     return transfers;
 }
 
-std::vector<SubWallet> subWalletsToVector(std::unordered_map<Crypto::PublicKey, SubWallet> subWallets)
+std::vector<SubWallet> subWalletsToVector(
+    const std::unordered_map<Crypto::PublicKey, SubWallet> subWallets)
 {
     std::vector<SubWallet> vector;
 
@@ -379,7 +398,8 @@ std::vector<SubWallet> subWalletsToVector(std::unordered_map<Crypto::PublicKey, 
     return vector;
 }
 
-std::unordered_map<Crypto::PublicKey, SubWallet> vectorToSubWallets(std::vector<SubWallet> vector)
+std::unordered_map<Crypto::PublicKey, SubWallet> vectorToSubWallets(
+    const std::vector<SubWallet> vector)
 {
     std::unordered_map<Crypto::PublicKey, SubWallet> transfers;
 
@@ -389,4 +409,30 @@ std::unordered_map<Crypto::PublicKey, SubWallet> vectorToSubWallets(std::vector<
     }
 
     return transfers;
+}
+
+std::vector<TxPrivateKey> txPrivateKeysToVector(
+    const std::unordered_map<Crypto::Hash, Crypto::SecretKey> txPrivateKeys)
+{
+    std::vector<TxPrivateKey> vector;
+
+    for (const auto [txHash, txPrivateKey] : txPrivateKeys)
+    {
+        vector.push_back({txHash, txPrivateKey});
+    }
+
+    return vector;
+}
+
+std::unordered_map<Crypto::Hash, Crypto::SecretKey> vectorToTxPrivateKeys(
+    const std::vector<TxPrivateKey> vector)
+{
+    std::unordered_map<Crypto::Hash, Crypto::SecretKey> txPrivateKeys;
+
+    for (const auto t : vector)
+    {
+        txPrivateKeys[t.txHash] = t.txPrivateKey;
+    }
+
+    return txPrivateKeys;
 }

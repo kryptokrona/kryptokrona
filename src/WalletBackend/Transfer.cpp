@@ -85,7 +85,7 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
 
     std::vector<WalletTypes::KeyOutput> transactionOutputs;
 
-    Crypto::PublicKey txPublicKey;
+    CryptoNote::KeyPair txKeyPair;
 
     while (true)
     {
@@ -128,15 +128,17 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
             continue;
         }
 
-        WalletError creationError;
-
-        std::tie(creationError, tx, transactionOutputs, txPublicKey) = makeTransaction(
+        TransactionResult txResult = makeTransaction(
             mixin, daemon, ourInputs, paymentID, destinations, subWallets
         );
 
-        if (creationError)
+        tx = txResult.transaction;
+        transactionOutputs = txResult.outputs;
+        txKeyPair = txResult.txKeyPair;
+
+        if (txResult.error)
         {
-            return {creationError, Crypto::Hash()};
+            return {txResult.error, Crypto::Hash()};
         }
 
         const uint64_t txSize = CryptoNote::toBinaryArray(tx).size();
@@ -176,8 +178,10 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
 
     /* Update our locked balance with the incoming funds */
     storeUnconfirmedIncomingInputs(
-        subWallets, transactionOutputs, txPublicKey, txHash
+        subWallets, transactionOutputs, txKeyPair.publicKey, txHash
     );
+
+    subWallets->storeTxPrivateKey(txKeyPair.secretKey, txHash);
 
     /* Lock the input for spending till it is confirmed as spent in a block */
     for (const auto input : ourInputs)
@@ -305,18 +309,27 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
         addressesAndAmounts, changeRequired, changeAddress
     );
 
-    const auto [creationError, tx, transactionOutputs, txPublicKey] = makeTransaction(
+    TransactionResult txResult = makeTransaction(
         mixin, daemon, ourInputs, paymentID, destinations, subWallets
     );
 
-    error = isTransactionPayloadTooBig(tx, daemon->networkBlockCount());
+    if (txResult.error)
+    {
+        return {txResult.error, Crypto::Hash()};
+    }
+
+    error = isTransactionPayloadTooBig(
+        txResult.transaction, daemon->networkBlockCount()
+    );
 
     if (error)
     {
         return {error, Crypto::Hash()};
     }
 
-    const auto [sendError, txHash] = relayTransaction(tx, daemon);
+    const auto [sendError, txHash] = relayTransaction(
+        txResult.transaction, daemon
+    );
 
     if (sendError)
     {
@@ -331,8 +344,10 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
 
     /* Update our locked balance with the incoming funds */
     storeUnconfirmedIncomingInputs(
-        subWallets, transactionOutputs, txPublicKey, txHash
+        subWallets, txResult.outputs, txResult.txKeyPair.publicKey, txHash
     );
+
+    subWallets->storeTxPrivateKey(txResult.txKeyPair.secretKey, txHash);
 
     /* Lock the input for spending till it is confirmed as spent in a block */
     for (const auto input : ourInputs)
@@ -770,7 +785,7 @@ std::tuple<WalletError, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::S
     return {SUCCESS, inputs, tmpSecretKeys};
 }
 
-std::tuple<std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> setupOutputs(
+std::tuple<std::vector<WalletTypes::KeyOutput>, CryptoNote::KeyPair> setupOutputs(
     std::vector<WalletTypes::TransactionDestination> destinations)
 {
     /* Sort the destinations by amount. Helps obscure which output belongs to
@@ -815,7 +830,7 @@ std::tuple<std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> setupOutputs(
         outputIndex++;
     }
 
-    return {outputs, randomTxKey.publicKey};
+    return {outputs, randomTxKey};
 }
 
 std::tuple<WalletError, CryptoNote::Transaction> generateRingSignatures(
@@ -934,8 +949,7 @@ Crypto::Hash getTransactionHash(CryptoNote::Transaction tx)
     return Crypto::cn_fast_hash(data.data(), data.size());
 }
 
-std::tuple<WalletError, CryptoNote::Transaction,
-    std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> makeTransaction(
+TransactionResult makeTransaction(
     const uint64_t mixin,
     const std::shared_ptr<Nigel> daemon,
     const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
@@ -948,9 +962,12 @@ std::tuple<WalletError, CryptoNote::Transaction,
         ourInputs, mixin, daemon
     );
 
+    TransactionResult result;
+
     if (mixinError)
     {
-        return {mixinError, CryptoNote::Transaction(), {}, Crypto::PublicKey()};
+        result.error = mixinError;
+        return result;
     }
 
     /* Setup the transaction inputs */
@@ -960,11 +977,12 @@ std::tuple<WalletError, CryptoNote::Transaction,
 
     if (inputError)
     {
-        return {inputError, CryptoNote::Transaction(), {}, Crypto::PublicKey()};
+        result.error = inputError;
+        return result;
     }
 
     /* Setup the transaction outputs */
-    const auto [transactionOutputs, transactionPublicKey] = setupOutputs(destinations);
+    std::tie(result.outputs, result.txKeyPair) = setupOutputs(destinations);
 
     std::vector<uint8_t> extra;
 
@@ -975,7 +993,7 @@ std::tuple<WalletError, CryptoNote::Transaction,
 
     /* Append the transaction public key we generated earlier to the extra
        data */
-    CryptoNote::addTransactionPublicKeyToExtra(extra, transactionPublicKey);
+    CryptoNote::addTransactionPublicKeyToExtra(extra, result.txKeyPair.publicKey);
 
     CryptoNote::Transaction setupTX;
 
@@ -989,7 +1007,7 @@ std::tuple<WalletError, CryptoNote::Transaction,
     /* We can't really remove boost from here yet and simplify our data types
        since we take a hash of the transaction prefix. Once we've got this
        working, maybe we can work some magic. TODO */
-    setupTX.outputs = keyOutputToTransactionOutput(transactionOutputs);
+    setupTX.outputs = keyOutputToTransactionOutput(result.outputs);
 
     /* Pubkey, payment ID */
     setupTX.extra = extra;
@@ -997,13 +1015,11 @@ std::tuple<WalletError, CryptoNote::Transaction,
     /* Fill in the transaction signatures */
     /* NOTE: Do not modify the transaction after this, or the ring signatures
        will be invalidated */
-    const auto [error, tx] = generateRingSignatures(
+    std::tie(result.error, result.transaction) = generateRingSignatures(
         setupTX, inputsAndFakes, tmpSecretKeys
     );
 
-    /* Need the outputs + pubkey so we can store the incoming inputs that we
-       sent to ourself */
-    return {error, tx, transactionOutputs, transactionPublicKey};
+    return result;
 }
 
 } // namespace SendTransaction

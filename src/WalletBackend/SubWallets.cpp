@@ -79,7 +79,8 @@ SubWallets::SubWallets(const SubWallets &other) :
     m_lockedTransactions(other.m_lockedTransactions),
     m_privateViewKey(other.m_privateViewKey),
     m_isViewWallet(other.m_isViewWallet),
-    m_publicSpendKeys(other.m_publicSpendKeys)
+    m_publicSpendKeys(other.m_publicSpendKeys),
+    m_transactionPrivateKeys(other.m_transactionPrivateKeys)
 {
 }
 
@@ -844,4 +845,24 @@ std::tuple<WalletError, std::string> SubWallets::getAddress(
     }
 
     return {ADDRESS_NOT_IN_WALLET, std::string()};
+}
+
+void SubWallets::storeTxPrivateKey(
+    const Crypto::SecretKey txPrivateKey,
+    const Crypto::Hash txHash)
+{
+    m_transactionPrivateKeys[txHash] = txPrivateKey;
+}
+
+std::tuple<bool, Crypto::SecretKey> SubWallets::getTxPrivateKey(
+    const Crypto::Hash txHash) const
+{
+    const auto it = m_transactionPrivateKeys.find(txHash);
+
+    if (it != m_transactionPrivateKeys.end())
+    {
+        return {true, it->second};
+    }
+
+    return {false, Crypto::SecretKey()};
 }

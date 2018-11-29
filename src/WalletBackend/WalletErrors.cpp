@@ -227,6 +227,13 @@ std::string WalletError::getErrorMessage() const
             return "Each wallet has a primary address when created, this address "
                    "cannot be removed.";
         }
+        case TX_PRIVATE_KEY_NOT_FOUND:
+        {
+            return "Couldn't find the private key for this transaction. The "
+                   "transaction must exist, and have been sent by this program. "
+                   "Transaction private keys cannot be found upon rescanning/"
+                   "reimporting.";
+        }
 
         /* No default case so the compiler warns us if we missed one */
     }

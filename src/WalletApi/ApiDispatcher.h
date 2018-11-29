@@ -263,6 +263,11 @@ class ApiDispatcher
             httplib::Response &res,
             const nlohmann::json &body) const;
 
+        std::tuple<WalletError, uint16_t> getTxPrivateKey(
+            const httplib::Request &req,
+            httplib::Response &res,
+            const nlohmann::json &body) const;
+
         //////////////////////
         /* OPTIONS REQUESTS */
         //////////////////////

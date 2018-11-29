@@ -1015,3 +1015,16 @@ std::tuple<WalletError, std::string> WalletBackend::getAddress(
 {
     return m_subWallets->getAddress(spendKey);
 }
+
+std::tuple<WalletError, Crypto::SecretKey> WalletBackend::getTxPrivateKey(
+    const Crypto::Hash txHash) const
+{
+    const auto [success, key] = m_subWallets->getTxPrivateKey(txHash);
+
+    if (success)
+    {
+        return {SUCCESS, key};
+    }
+
+    return {TX_PRIVATE_KEY_NOT_FOUND, key};
+}

@@ -174,6 +174,9 @@ enum WalletErrorCode
 
     /* The primary address cannot be deleted */
     CANNOT_DELETE_PRIMARY_ADDRESS = 42,
+
+    /* Couldn't find the private key for this hash */
+    TX_PRIVATE_KEY_NOT_FOUND = 43,
 };
 
 class WalletError

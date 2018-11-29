@@ -246,6 +246,9 @@ class WalletBackend
 
         std::tuple<WalletError, std::string> getAddress(
             const Crypto::PublicKey spendKey) const;
+
+        std::tuple<WalletError, Crypto::SecretKey> getTxPrivateKey(
+            const Crypto::Hash txHash) const;
         
         /////////////////////////////
         /* Public member variables */

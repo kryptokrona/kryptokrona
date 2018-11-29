@@ -59,7 +59,7 @@ namespace SendTransaction
         const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
         const Crypto::SecretKey privateViewKey);
 
-    std::tuple<std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> setupOutputs(
+    std::tuple<std::vector<WalletTypes::KeyOutput>, CryptoNote::KeyPair> setupOutputs(
         std::vector<WalletTypes::TransactionDestination> destinations);
 
     std::tuple<WalletError, CryptoNote::Transaction> generateRingSignatures(
@@ -82,8 +82,23 @@ namespace SendTransaction
         const std::shared_ptr<Nigel> daemon,
         const std::vector<WalletTypes::TxInputAndOwner> sources);
 
-    std::tuple<WalletError, CryptoNote::Transaction,
-        std::vector<WalletTypes::KeyOutput>, Crypto::PublicKey> makeTransaction(
+    struct TransactionResult
+    {
+        /* The error, if any */
+        WalletError error;
+
+        /* The raw transaction */
+        CryptoNote::Transaction transaction;
+
+        /* The transaction outputs, before converted into boost uglyness, used
+           for determining key inputs from the tx that belong to us */
+        std::vector<WalletTypes::KeyOutput> outputs;
+        
+        /* The random key pair we generated */
+        CryptoNote::KeyPair txKeyPair;
+    };
+
+    TransactionResult makeTransaction(
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon,
         const std::vector<WalletTypes::TxInputAndOwner> ourInputs,

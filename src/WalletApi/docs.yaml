@@ -1009,6 +1009,29 @@ paths:
               description: The destination address to send funds to. Must exist in this wallet.
               example: TRTLv2Fyavy8CXG8BPEbNeCHFZ1fuDCYCZ3vW5H5LXN4K2M2MHUpTENip9bbavpHvvPwb4NDkBWrNgURAd5DB38FHXWZyoBh4wW
               
+  /transactions/privatekey/[hash]:
+    get:
+      tags:
+        - transactions
+      summary: Gets the transaction private key of the given transaction. This can be used to audit a transaction.
+      description: The transaction must have been sent by this wallet container. If the wallet container has been reimported, it will not be present.
+      responses:
+        200:
+          description: The operation completed successfully.
+          schema:
+            type: object
+            properties:
+              transactionPrivateKey:
+                type: string
+                example: 199c0b9c40e192f1917a2f317c72fb6684081c744c3286793e6d63b5d3f6930a
+                description: The transaction private key
+        401:
+          $ref: '#/responses/UnauthorizedError'
+        403:
+          $ref: '#/responses/NotOpen'
+        500:
+          $ref: '#/responses/InternalError'
+              
   /balance:
     get:
       tags:

@@ -159,6 +159,15 @@ class SubWallets
         std::tuple<WalletError, std::string> getAddress(
             const Crypto::PublicKey spendKey) const;
 
+        /* Store the private key used to create a transaction - can be used
+           for auditing transactions */
+        void storeTxPrivateKey(
+            const Crypto::SecretKey txPrivateKey,
+            const Crypto::Hash txHash);
+
+        std::tuple<bool, Crypto::SecretKey> getTxPrivateKey(
+            const Crypto::Hash txHash) const;
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////
@@ -198,6 +207,9 @@ class SubWallets
         Crypto::SecretKey m_privateViewKey;
 
         bool m_isViewWallet;
+
+        /* Transaction private keys of sent transactions, used for auditing */
+        std::unordered_map<Crypto::Hash, Crypto::SecretKey> m_transactionPrivateKeys;
 
         /* Need a mutex for accessing inputs, transactions, and locked
            transactions, etc as these are modified on multiple threads */

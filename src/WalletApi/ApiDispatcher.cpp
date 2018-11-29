@@ -194,6 +194,11 @@ ApiDispatcher::ApiDispatcher(
                 &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
+            /* Get the transaction private key for the given hash */
+            .Get("/transactions/privatekey/" + ApiConstants::hashRegex, router(
+                &ApiDispatcher::getTxPrivateKey, walletMustBeOpen, viewWalletsBanned)
+            )
+
             /* Get details for the given transaction hash, if known */
             .Get("/transactions/" + ApiConstants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
 
@@ -1353,6 +1358,33 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getBalanceForAddress(
     nlohmann::json j {
         {"unlocked", unlocked},
         {"locked", locked}
+    };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<WalletError, uint16_t> ApiDispatcher::getTxPrivateKey(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    std::string txHashStr = req.path.substr(std::string("/transactions/privatekey/").size());
+
+    Crypto::Hash txHash;
+
+    Common::podFromHex(txHashStr, txHash.data);
+
+    const auto [error, key] = m_walletBackend->getTxPrivateKey(txHash);
+
+    if (error)
+    {
+        return {error, 400};
+    }
+
+    nlohmann::json j {
+        {"transactionPrivateKey", key}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");

@@ -24,6 +24,13 @@ struct Transfer
     int64_t amount;
 };
 
+/* As above */
+struct TxPrivateKey
+{
+    Crypto::Hash txHash;
+    Crypto::SecretKey txPrivateKey;
+};
+
 /* SubWallet */
 void to_json(json &j, const SubWallet &s);
 void from_json(const json &j, SubWallet &s);
@@ -48,6 +55,9 @@ void from_json(const json &j, SynchronizationStatus &s);
 void to_json(json &j, const Transfer &t);
 void from_json(const json &j, Transfer &t);
 
+void to_json(json &j, const TxPrivateKey &t);
+void from_json(const json &j, TxPrivateKey &t);
+
 namespace WalletTypes
 {
     /* TransactionInput */
@@ -59,10 +69,20 @@ namespace WalletTypes
     void from_json(const json &j, WalletTypes::Transaction &t);
 }
 
-std::vector<Transfer> transfersToVector(std::unordered_map<Crypto::PublicKey, int64_t> transfers);
+std::vector<Transfer> transfersToVector(
+    const std::unordered_map<Crypto::PublicKey, int64_t> transfers);
 
-std::unordered_map<Crypto::PublicKey, int64_t> vectorToTransfers(std::vector<Transfer> vector);
+std::unordered_map<Crypto::PublicKey, int64_t> vectorToTransfers(
+    const std::vector<Transfer> vector);
 
-std::vector<SubWallet> subWalletsToVector(std::unordered_map<Crypto::PublicKey, SubWallet> subWallets);
+std::vector<SubWallet> subWalletsToVector(
+    const std::unordered_map<Crypto::PublicKey, SubWallet> subWallets);
 
-std::unordered_map<Crypto::PublicKey, SubWallet> vectorToSubWallets(std::vector<SubWallet> vector);
+std::unordered_map<Crypto::PublicKey, SubWallet> vectorToSubWallets(
+    const std::vector<SubWallet> vector);
+
+std::vector<TxPrivateKey> txPrivateKeysToVector(
+    const std::unordered_map<Crypto::Hash, Crypto::SecretKey> txPrivateKeys);
+
+std::unordered_map<Crypto::Hash, Crypto::SecretKey> vectorToTxPrivateKeys(
+    const std::vector<TxPrivateKey> vector);
