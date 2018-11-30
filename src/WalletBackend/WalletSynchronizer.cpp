@@ -459,7 +459,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
         {
             return;
         }
-		
+
         /* Chain forked, invalidate previous transactions */
         if (m_transactionSynchronizerStatus.getHeight() >= b.blockHeight)
         {
@@ -618,12 +618,21 @@ void WalletSynchronizer::downloadBlocks()
         
         for (const auto &block : blocks)
         {
+            /* Add the block to the queue for processing */
+            bool success = m_blockProcessingQueue.push(block);
+
+            /* Need to ensure we don't store that we've downloaded blocks we
+               haven't. If we're stopping (this occurs on startup, sometimes)
+               we could push empty blocks, and some blocks get skipped, on
+               the block processer side */
+            if (!success)
+            {
+                return;
+            }
+
             /* Store that we've downloaded the block */
             m_blockDownloaderStatus.storeBlockHash(block.blockHash,
                                                    block.blockHeight);
-                                                   
-            /* Add the block to the queue for processing */
-            m_blockProcessingQueue.push(block);
         }
     }
 }
