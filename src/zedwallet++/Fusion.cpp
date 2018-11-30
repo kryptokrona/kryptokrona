@@ -61,7 +61,7 @@ bool optimizeRound(const std::shared_ptr<WalletBackend> walletBackend)
 
             std::stringstream stream;
 
-            stream << "Failed to send fusion transction: " << error << "\n";
+            stream << "Failed to send fusion transaction: " << error << "\n";
 
             std::cout << WarningMsg(stream.str());
         }
