@@ -98,15 +98,15 @@ static inline void serialize(NOTIFY_RESPONSE_GET_OBJECTS_request& request, ISeri
 }
 
 static inline void serialize(NOTIFY_NEW_LITE_BLOCK_request& request, ISerializer& s) {
-    s(request.b, "b");
-    s(request.current_blockchain_height, "current_blockchain_height");
-    s(request.hop, "hop");
+  s(request.b, "b");
+  s(request.current_blockchain_height, "current_blockchain_height");
+  s(request.hop, "hop");
 }
 
 static inline void serialize(NOTIFY_MISSING_TXS_request& request, ISerializer& s) {
-    s(request.current_blockchain_height, "current_blockchain_height");
-    s(request.blockHash, "blockHash");
-    serializeAsBinary(request.missing_txs, "missing_txs", s);
+  s(request.current_blockchain_height, "current_blockchain_height");
+  s(request.blockHash, "blockHash");
+  serializeAsBinary(request.missing_txs, "missing_txs", s);
 }
 
 CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, Logging::ILogger& log) :
@@ -700,7 +700,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
     std::vector<Crypto::Hash> need_txs;
 
     if (!arg.b.transactions.empty()) {
-      for (BinaryArray txBlob: arg.b.transactions) {
+      for (const BinaryArray& txBlob: arg.b.transactions) {
         CachedTransaction cachedTransaction(txBlob);
         if (!m_core.hasTransaction(cachedTransaction.getTransactionHash())) {
           logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
@@ -731,18 +731,16 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
 
       auto result = m_core.addBlock(RawBlock{newBlock.block, newBlock.transactions});
       if (result == error::AddBlockErrorCondition::BLOCK_ADDED) {
-        NOTIFY_NEW_BLOCK::request req;
-        req.b = newBlock;
-        req.current_blockchain_height = arg.current_blockchain_height;
-        req.hop = arg.hop++;
         if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED) {
+          ++arg.hop;
           //TODO: Add here announce protocol usage
-          relay_post_notify<NOTIFY_NEW_BLOCK>(*m_p2p, req, &context.m_connection_id);
+          relay_post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, arg, &context.m_connection_id);
           // relay_block(arg, context);
           requestMissingPoolTransactions(context);
         } else if (result == error::AddBlockErrorCode::ADDED_TO_MAIN) {
+          ++arg.hop;
           //TODO: Add here announce protocol usage
-          relay_post_notify<NOTIFY_NEW_BLOCK>(*m_p2p, req, &context.m_connection_id);
+          relay_post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, arg, &context.m_connection_id);
           // relay_block(arg, context);
         } else if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE) {
           logger(Logging::TRACE) << context << "Block added as alternative";
@@ -817,7 +815,26 @@ int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MIS
 
 void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
   auto buf = LevinProtocol::encode(arg);
-  m_p2p->externalRelayNotifyToAll(NOTIFY_NEW_BLOCK::ID, buf, nullptr);
+
+  std::vector<BinaryArray> txs;
+  NOTIFY_NEW_LITE_BLOCK::request lite_arg;
+  lite_arg.current_blockchain_height = arg.current_blockchain_height;
+  lite_arg.b = arg.b;
+  lite_arg.hop = arg.hop;
+  lite_arg.b.transactions = txs;
+
+  auto lite_buf = LevinProtocol::encode(lite_arg);
+
+  m_p2p->for_each_connection([&](const CryptoNoteConnectionContext& ctx, uint64_t peerId){
+    if (ctx.version >= P2P_LITE_BLOCKS_PROPOGATION_VERSION) {
+        logger(Logging::DEBUGGING)<<"Peer supports lite-blocks... relaying new lite block";
+        m_p2p->invoke_notify_to_peer(NOTIFY_NEW_LITE_BLOCK::ID, lite_buf, ctx);
+    }
+    else {
+        logger(Logging::DEBUGGING)<<"Peer doesn't support lite-blocks... relaying new normal block";
+        m_p2p->invoke_notify_to_peer(NOTIFY_NEW_BLOCK::ID, buf, ctx);
+    }
+  });
 }
 
 void CryptoNoteProtocolHandler::relayTransactions(const std::vector<BinaryArray>& transactions) {
