@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #include "CachedBlock.h"
@@ -56,10 +56,14 @@ const Crypto::Hash& CachedBlock::getBlockLongHash() const {
       const auto& rawHashingBlock = getParentBlockHashingBinaryArray(true);
       blockLongHash = Hash();
       cn_slow_hash_v0(rawHashingBlock.data(), rawHashingBlock.size(), blockLongHash.get());
-    } else if (block.majorVersion >= BLOCK_MAJOR_VERSION_4) {
+    } else if (block.majorVersion == BLOCK_MAJOR_VERSION_4) {
       const auto& rawHashingBlock = getParentBlockHashingBinaryArray(true);
       blockLongHash = Hash();
       cn_lite_slow_hash_v1(rawHashingBlock.data(), rawHashingBlock.size(), blockLongHash.get());
+    } else if (block.majorVersion >= BLOCK_MAJOR_VERSION_5) {
+      const auto& rawHashingBlock = getParentBlockHashingBinaryArray(true);
+      blockLongHash = Hash();
+      cn_turtle_slow_hash_v2(rawHashingBlock.data(), rawHashingBlock.size(), blockLongHash.get());
     } else {
       throw std::runtime_error("Unknown block major version.");
     }
