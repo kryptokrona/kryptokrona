@@ -33,6 +33,10 @@ const std::string CN_LITE_SLOW_HASH_V0 = "28a22bad3f93d1408fca472eb5ad1cbe75f21d
 const std::string CN_LITE_SLOW_HASH_V1 = "87c4e570653eb4c2b42b7a0d546559452dfab573b82ec52f152b7ff98e79446f";
 const std::string CN_LITE_SLOW_HASH_V2 = "b7e78fab22eb19cb8c9c3afe034fb53390321511bab6ab4915cd538a630c3c62";
 
+const std::string CN_TURTLE_SLOW_HASH_V0 = "102771dd318a6bf07b0219f37af8a102244c710fd36021d363a8a0624a06759c";
+const std::string CN_TURTLE_SLOW_HASH_V1 = "e3e606a2a9b2e45581e873acbd799d33ae88f7011d2e30e5d8b8c45e2860dee7";
+const std::string CN_TURTLE_SLOW_HASH_V2 = "276a8ff5626b10f16c7b050bb93b20fcb357a23fd598a5e442773b2d1696c941";
+
 const std::string CN_SOFT_SHELL_V0[] = {
   "5e1891a15d5d85c09baf4a3bbe33675cfa3f77229c8ad66c01779e590528d6d3",
   "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
@@ -191,6 +195,20 @@ int main(int argc, char** argv) {
 
       std::cout << std::endl;
 
+      cn_turtle_slow_hash_v0(rawData.data(), rawData.size(), hash);
+      std::cout << "cn_turtle_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      assert(CompareHashes(hash, CN_TURTLE_SLOW_HASH_V0));
+
+      cn_turtle_slow_hash_v1(rawData.data(), rawData.size(), hash);
+      std::cout << "cn_turtle_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      assert(CompareHashes(hash, CN_TURTLE_SLOW_HASH_V1));
+
+      cn_turtle_slow_hash_v2(rawData.data(), rawData.size(), hash);
+      std::cout << "cn_turtle_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      assert(CompareHashes(hash, CN_TURTLE_SLOW_HASH_V2));
+
+      std::cout << std::endl;
+
       for (uint32_t height = 0; height <= 8192; height = height + 512)
       {
         cn_soft_shell_slow_hash_v0(rawData.data(), rawData.size(), hash, height);
@@ -273,6 +291,33 @@ int main(int argc, char** argv) {
         }
         elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
         std::cout << "cn_lite_slow_hash_v2: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+      }
+
+      startTimer = std::chrono::high_resolution_clock::now();
+      for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+      {
+        cn_turtle_slow_hash_v0(rawData.data(), rawData.size(), hash);
+      }
+      elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+      std::cout << "cn_turtle_slow_hash_v0: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+
+      if (rawData.size() >= 43)
+      {
+        startTimer = std::chrono::high_resolution_clock::now();
+        for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+        {
+          cn_turtle_slow_hash_v1(rawData.data(), rawData.size(), hash);
+        }
+        elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+        std::cout << "cn_turtle_slow_hash_v1: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
+
+        startTimer = std::chrono::high_resolution_clock::now();
+        for (auto i = 0; i < PERFORMANCE_ITERATIONS; i++)
+        {
+          cn_turtle_slow_hash_v2(rawData.data(), rawData.size(), hash);
+        }
+        elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+        std::cout << "cn_turtle_slow_hash_v2: " << (PERFORMANCE_ITERATIONS / std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count()) << " H/s\n";
       }
     }
   }
