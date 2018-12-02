@@ -132,7 +132,7 @@ before_deploy:
 - ${STRIP} TurtleCoind miner zedwallet turtle-service zedwallet-beta
 - rm -rf turtlecoin-${TRAVIS_TAG} 
 - mkdir turtlecoin-${TRAVIS_TAG}
-- cp TurtleCoind miner zedwallet turtle-service zedwallet-beta turtlecoin-${TRAVIS_TAG}/
+- cp TurtleCoind miner zedwallet turtle-service zedwallet-beta cryptotest turtlecoin-${TRAVIS_TAG}/
 - cp ../../LICENSE turtlecoin-${TRAVIS_TAG}/
 - tar cvfz turtlecoin-${TRAVIS_TAG}-${LABEL}.tar.gz turtlecoin-${TRAVIS_TAG}/
 - rm -rf builds
