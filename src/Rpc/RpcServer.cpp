@@ -966,7 +966,7 @@ bool RpcServer::on_submitblock(const COMMAND_RPC_SUBMITBLOCK::request& req, COMM
   if (submitResult == error::AddBlockErrorCode::ADDED_TO_MAIN
       || submitResult == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED) {
     NOTIFY_NEW_BLOCK::request newBlockMessage;
-    newBlockMessage.b = prepareRawBlock(std::move(blockToSend));
+    newBlockMessage.b = prepareRawBlockLegacy(std::move(blockToSend));
     newBlockMessage.hop = 0;
     newBlockMessage.current_blockchain_height = m_core.getTopBlockIndex() + 1; //+1 because previous version of core sent m_blocks.size()
 
@@ -977,13 +977,13 @@ bool RpcServer::on_submitblock(const COMMAND_RPC_SUBMITBLOCK::request& req, COMM
   return true;
 }
 
-RawBlock RpcServer::prepareRawBlock(BinaryArray&& blockBlob) {
+RawBlockLegacy RpcServer::prepareRawBlockLegacy(BinaryArray&& blockBlob) {
   BlockTemplate blockTemplate;
   bool result = fromBinaryArray(blockTemplate, blockBlob);
   if (result) {}
   assert(result);
 
-  RawBlock rawBlock;
+  RawBlockLegacy rawBlock;
   rawBlock.block = std::move(blockBlob);
 
   if (blockTemplate.transactionHashes.empty()) {

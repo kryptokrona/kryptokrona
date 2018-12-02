@@ -39,10 +39,32 @@ void relay_post_notify(IP2pEndpoint& p2p, typename t_parametr::request& arg, con
   p2p.externalRelayNotifyToAll(t_parametr::ID, LevinProtocol::encode(arg), excludeConnection);
 }
 
+std::vector<RawBlockLegacy> convertRawBlockstoRawBlocksLegacy(const std::vector<RawBlock>& rawBlocks) {
+  std::vector<RawBlockLegacy> legacy;
+  legacy.reserve(rawBlocks.size());
+
+  for (const auto& rawBlock: rawBlocks) {
+    legacy.emplace_back(RawBlockLegacy{rawBlock.block, rawBlock.transactions});
+  }
+
+  return legacy;
+}
+
+std::vector<RawBlock> convertRawBlocksLegacytoRawBlocks(const std::vector<RawBlockLegacy>& legacy) {
+  std::vector<RawBlock> rawBlocks;
+  rawBlocks.reserve(legacy.size());
+
+  for (const auto& legacyBlock: legacy) {
+    rawBlocks.emplace_back(RawBlock{legacyBlock.block, legacyBlock.transactions});
+  }
+
+  return rawBlocks;
+}
+
 }
 
 // unpack to strings to maintain protocol compatibility with older versions
-static inline void serialize(RawBlock& rawBlock, ISerializer& serializer) {
+static inline void serialize(RawBlockLegacy& rawBlock, ISerializer& serializer) {
   std::string block;
   std::vector<std::string> transactions;
   if (serializer.type() == ISerializer::INPUT) {
@@ -411,7 +433,7 @@ int CryptoNoteProtocolHandler::handle_request_get_objects(int command, NOTIFY_RE
     logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << context << "NOTIFY_RESPONSE_GET_OBJECTS: request.txs.empty() != true";
   }
 
-  rsp.blocks = rawBlocks;
+  rsp.blocks = convertRawBlockstoRawBlocksLegacy(rawBlocks);
 
   logger(Logging::TRACE) << context << "-->>NOTIFY_RESPONSE_GET_OBJECTS: blocks.size()=" << rsp.blocks.size() << ", txs.size()=" << rsp.txs.size()
     << ", rsp.m_current_blockchain_height=" << rsp.current_blockchain_height << ", missed_ids.size()=" << rsp.missed_ids.size();
@@ -436,7 +458,7 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(int command, NOTIFY_R
   blockTemplates.resize(arg.blocks.size());
   cachedBlocks.reserve(arg.blocks.size());
 
-  std::vector<RawBlock> rawBlocks = arg.blocks;
+  std::vector<RawBlock> rawBlocks = convertRawBlocksLegacytoRawBlocks(arg.blocks);
 
   for (size_t index = 0; index < rawBlocks.size(); ++index) {
     if (!fromBinaryArray(blockTemplates[index], rawBlocks[index].block)) {

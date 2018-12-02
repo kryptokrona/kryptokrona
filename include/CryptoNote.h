@@ -108,6 +108,4 @@ struct RawBlock {
   std::vector<BinaryArray> transactions;
 };
 
-typedef RawBlock LiteBlock;
-
 }
