@@ -60,8 +60,7 @@ matrix:
     compiler: gcc
     env:
     - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
-    - LABEL="osx"
-    - _DEPLOYABLE="true"
+    - LABEL="osx-g++-8"
     - STRIP="strip"
 
   # OSX, g++-7
@@ -79,7 +78,8 @@ matrix:
     compiler: clang
     env:
     - MATRIX_EVAL="CC=/usr/local/opt/llvm/bin/clang && CXX=/usr/local/opt/llvm/bin/clang++"
-    - LABEL="osx-clang"
+    - LABEL="osx"
+    - _DEPLOYABLE="true"
     - STRIP="strip"
 
   # Arm (aarch64) cross compile
@@ -101,7 +101,7 @@ install:
 - if [[ "${LABEL:0:3}" == "osx" ]]; then brew install llvm || brew upgrade llvm ; fi
 
 # Install the correct gcc version
-- if [[ "$LABEL" == "osx" ]]; then brew install gcc@8 ; fi
+- if [[ "$LABEL" == "osx-g++-8" ]]; then brew install gcc@8 ; fi
 - if [[ "$LABEL" == "osx-g++-7" ]]; then brew install gcc@7 ; fi
 
 - if [[ "$LABEL" == "aarch64" ]]; then export BASEDIR=`pwd` ; fi
