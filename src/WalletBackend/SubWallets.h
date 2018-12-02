@@ -87,13 +87,15 @@ class SubWallets
                 getTransactionInputsForAmount(
             const uint64_t amount,
             const bool takeFromAll,
-            std::vector<Crypto::PublicKey> subWalletsToTakeFrom) const;
+            std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
+            const uint64_t height) const;
 
         std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
                 getFusionTransactionInputs(
             const bool takeFromAll,
             std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
-            const uint64_t mixin) const;
+            const uint64_t mixin,
+            const uint64_t height) const;
 
         /* Get the owner of the key image, if any */
         std::tuple<bool, Crypto::PublicKey> getKeyImageOwner(
@@ -175,6 +177,10 @@ class SubWallets
         /* The public spend keys, used for verifying if a transaction is
            ours */
         std::vector<Crypto::PublicKey> m_publicSpendKeys;
+
+        void storeUnconfirmedIncomingInput(
+            const WalletTypes::UnconfirmedInput input,
+            const Crypto::PublicKey publicSpendKey);
 
     private:
 

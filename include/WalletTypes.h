@@ -292,6 +292,21 @@ namespace WalletTypes
         uint64_t lastKnownHashrate;
     };
 
+    /* A structure just used to display locked balance, due to change from
+       sent transactions. We just need the amount and a unique identifier
+       (hash+key), since we can't spend it, we don't need all the other stuff */
+    struct UnconfirmedInput
+    {
+        /* The amount of the input */
+        uint64_t amount;
+
+        /* The transaction key we took from the key outputs */
+        Crypto::PublicKey key;
+
+        /* The transaction hash of the transaction that contains this input */
+        Crypto::Hash parentTransactionHash;
+    };
+
     inline void to_json(nlohmann::json &j, const WalletBlockInfo &w)
     {
         j = {
@@ -364,5 +379,21 @@ namespace WalletTypes
     {
         k.key = j.at("key").get<Crypto::PublicKey>();
         k.amount = j.at("amount").get<uint64_t>();
+    }
+
+    inline void to_json(nlohmann::json &j, const UnconfirmedInput &u)
+    {
+        j = {
+            {"amount", u.amount},
+            {"key", u.key},
+            {"parentTransactionHash", u.parentTransactionHash}
+        };
+    }
+
+    inline void from_json(const nlohmann::json &j, UnconfirmedInput &u)
+    {
+        u.amount = j.at("amount").get<uint64_t>();
+        u.key = j.at("key").get<Crypto::PublicKey>();
+        u.parentTransactionHash = j.at("parentTransactionHash").get<Crypto::Hash>();
     }
 }

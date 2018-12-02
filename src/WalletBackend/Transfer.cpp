@@ -68,7 +68,8 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
 
     /* Grab inputs for our fusion transaction */
     auto [ourInputs, maxFusionInputs, foundMoney] = subWallets->getFusionTransactionInputs(
-        takeFromAllSubWallets, subWalletsToTakeFrom, mixin
+        takeFromAllSubWallets, subWalletsToTakeFrom, mixin,
+        daemon->networkBlockCount()
     );
 
     /* Mixin is too large to get enough outputs whilst remaining in the size
@@ -297,7 +298,8 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
        the amount we want to send, so we need to send some back to ourselves
        as change. */
     auto [ourInputs, sumOfInputs] = subWallets->getTransactionInputsForAmount(
-        totalAmount, takeFromAllSubWallets, subWalletsToTakeFrom
+        totalAmount, takeFromAllSubWallets, subWalletsToTakeFrom,
+        daemon->networkBlockCount()
     );
 
     /* If the sum of inputs is > total amount, we need to send some back to
@@ -424,35 +426,15 @@ void storeUnconfirmedIncomingInputs(
             continue;
         }
 
-        const Crypto::PublicKey ourSpendKey = *it;
+        Crypto::PublicKey ourSpendKey = *it;
 
-        WalletTypes::TransactionInput input;
+        WalletTypes::UnconfirmedInput input;
 
         input.amount = keyOutputs[outputIndex].amount;
-
-        /* Can't fill this in */
-        input.blockHeight = 0;
-
-        input.transactionPublicKey = txPublicKey;
-        input.transactionIndex = outputIndex;
-
-        /* Can't fill this in */
-        input.globalOutputIndex = 0;
-
         input.key = keyOutputs[outputIndex].key;
-        input.spendHeight = 0;
-
-        /* Since this isn't in a block yet, lets make it a very large number for
-           unlock time. It will get set correctly when we find it in an incoming
-           transaction. */
-        input.unlockTime = CryptoNote::parameters::CRYPTONOTE_MAX_BLOCK_NUMBER - 1;
-
         input.parentTransactionHash = txHash;
 
-        /* Fill in the key image */
-        subWallets->completeAndStoreTransactionInput(
-            ourSpendKey, derivation, outputIndex, input
-        );
+        subWallets->storeUnconfirmedIncomingInput(input, ourSpendKey);
     }
 }
 

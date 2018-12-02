@@ -390,7 +390,8 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
         SubWallets::getTransactionInputsForAmount(
     const uint64_t amount,
     const bool takeFromAll,
-    std::vector<Crypto::PublicKey> subWalletsToTakeFrom) const
+    std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
+    const uint64_t height) const
 {
     /* Can't send transactions with a view wallet */
     throwIfViewWallet();
@@ -417,7 +418,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
     {
-        const auto moreInputs = subWallet.getInputs();
+        const auto moreInputs = subWallet.getSpendableInputs(height);
 
         availableInputs.insert(availableInputs.end(), moreInputs.begin(), moreInputs.end());
     }
@@ -454,7 +455,8 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
     SubWallets::getFusionTransactionInputs(
     const bool takeFromAll,
     std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
-    const uint64_t mixin) const
+    const uint64_t mixin,
+    const uint64_t height) const
 {
     /* Can't send transactions with a view wallet */
     throwIfViewWallet();
@@ -481,7 +483,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
     {
-        const auto moreInputs = subWallet.getInputs();
+        const auto moreInputs = subWallet.getSpendableInputs(height);
 
         availableInputs.insert(availableInputs.end(), moreInputs.begin(), moreInputs.end());
     }
@@ -865,4 +867,18 @@ std::tuple<bool, Crypto::SecretKey> SubWallets::getTxPrivateKey(
     }
 
     return {false, Crypto::SecretKey()};
+}
+
+void SubWallets::storeUnconfirmedIncomingInput(
+    const WalletTypes::UnconfirmedInput input,
+    const Crypto::PublicKey publicSpendKey)
+{
+    std::scoped_lock lock(m_mutex);
+
+    const auto it = m_subWallets.find(publicSpendKey);
+
+    if (it != m_subWallets.end())
+    {
+        it->second.storeUnconfirmedIncomingInput(input);
+    }
 }
