@@ -22,7 +22,7 @@
 #define CN_LITE_ITERATIONS              524288
 
 // Standard CryptoNight Turtle
-#define CN_TURTLE_PAGE_SIZE             2097152
+#define CN_TURTLE_PAGE_SIZE             524288
 #define CN_TURTLE_SCRATCHPAD            524288
 #define CN_TURTLE_ITERATIONS            262144
 
