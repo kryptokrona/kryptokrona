@@ -130,7 +130,7 @@ void Nigel::init()
 
 bool Nigel::getDaemonInfo()
 {
-    const auto res = m_httpClient->Get("/getinfo");
+    const auto res = m_httpClient->Get("/info");
 
     if (res && res->status == 200)
     {
@@ -174,7 +174,7 @@ bool Nigel::getDaemonInfo()
 
 bool Nigel::getFeeInfo()
 {
-    const auto res = m_httpClient->Get("/feeinfo");
+    const auto res = m_httpClient->Get("/fee");
 
     if (res && res->status == 200)
     {
