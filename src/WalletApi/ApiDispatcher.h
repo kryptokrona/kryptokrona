@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include "httplib.h"
+
 #include <WalletBackend/WalletBackend.h>
 
-#include "httplib.h"
+#include <cryptopp/modes.h>
 
 class ApiDispatcher
 {
@@ -32,12 +34,6 @@ class ApiDispatcher
         void stop();
         
     private:
-
-        //////////////////////
-        /* Static functions */
-        //////////////////////
-
-        static std::string hashPassword(const std::string password);
 
         //////////////////////////////
         /* Private member functions */
@@ -305,6 +301,8 @@ class ApiDispatcher
 
         /* Converts a public spend key to an address in a transactions json */
         void publicKeysToAddresses(nlohmann::json &j) const;
+
+        std::string hashPassword(const std::string password) const;
         
         //////////////////////////////
         /* Private member variables */
@@ -334,4 +332,7 @@ class ApiDispatcher
         /* The header to use with 'Access-Control-Allow-Origin'. If empty string,
            header is not added. */
         std::string m_corsHeader;
+
+        /* Used along with our password with pbkdf2 */
+        CryptoPP::byte m_salt[16];
 };

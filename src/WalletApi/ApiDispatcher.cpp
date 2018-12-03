@@ -34,9 +34,14 @@ ApiDispatcher::ApiDispatcher(
     const std::string corsHeader) :
     m_port(bindPort),
     m_corsHeader(corsHeader),
-    m_hashedPassword(hashPassword(rpcPassword)),
     m_rpcPassword(rpcPassword)
 {
+    /* Generate the salt used for pbkdf2 api authentication */
+    Crypto::generate_random_bytes(16, m_salt);
+
+    /* Make sure to do this after initializing the salt above! */
+    m_hashedPassword = hashPassword(rpcPassword);
+
     m_host = acceptExternalRequests ? "0.0.0.0" : "127.0.0.1";
 
     using namespace std::placeholders;
@@ -1502,22 +1507,19 @@ void ApiDispatcher::publicKeysToAddresses(nlohmann::json &j) const
     }
 }
 
-std::string ApiDispatcher::hashPassword(const std::string password)
+std::string ApiDispatcher::hashPassword(const std::string password) const
 {
     using namespace CryptoPP;
 
     /* Using SHA256 as the algorithm */
     CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;
 
-    /* Salt of all zeros (this is bad...) */
-    byte salt[16] = {};
-
     byte key[16];
 
     /* Hash the password with pbkdf2 */
     pbkdf2.DeriveKey(
         key, sizeof(key), 0, (byte *)password.c_str(),
-        password.size(), salt, sizeof(salt), ApiConstants::PBKDF2_ITERATIONS
+        password.size(), m_salt, sizeof(m_salt), ApiConstants::PBKDF2_ITERATIONS
     );
 
     return Common::podToHex(key);
