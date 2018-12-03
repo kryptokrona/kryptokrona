@@ -409,7 +409,7 @@ void WalletSynchronizer::processTransaction(
 {
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
-    /* Finds the sum of inputs, addds the amounts that belong to us to the
+    /* Finds the sum of inputs, adds the amounts that belong to us to the
        transfers map */
     const uint64_t sumOfInputs = processTransactionInputs(
         rawTX.keyInputs, transfers, blockHeight
