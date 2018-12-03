@@ -40,8 +40,6 @@ namespace CryptoNote
     std::vector<BinaryArray> transactions;
   };
 
-  typedef RawBlockLegacy LiteBlock;
-
   struct NOTIFY_NEW_BLOCK_request
   {
     RawBlockLegacy block;
@@ -156,7 +154,7 @@ namespace CryptoNote
   /*                                                                      */
   /************************************************************************/
   struct NOTIFY_NEW_LITE_BLOCK_request {
-    LiteBlock block;
+    BinaryArray blockTemplate;
     uint32_t current_blockchain_height;
     uint32_t hop;
   };
@@ -175,13 +173,5 @@ namespace CryptoNote
   struct NOTIFY_MISSING_TXS {
     const static int ID = BC_COMMANDS_POOL_BASE + 10;
     typedef NOTIFY_MISSING_TXS_request request;
-  };
-
-  struct NOTIFY_MISSING_TXS_RESPONSE_request {
-    std::vector<BinaryArray> txs;
-  };
-
-  struct NOTIFY_MISSING_TXS_RESPONSE {
-    const static int ID = BC_COMMANDS_POOL_BASE + 11;
   };
 }

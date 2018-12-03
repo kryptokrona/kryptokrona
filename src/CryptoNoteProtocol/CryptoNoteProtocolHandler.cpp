@@ -120,9 +120,18 @@ static inline void serialize(NOTIFY_RESPONSE_GET_OBJECTS_request& request, ISeri
 }
 
 static inline void serialize(NOTIFY_NEW_LITE_BLOCK_request& request, ISerializer& s) {
-  s(request.block, "block");
+  std::string blockTemplate;
+
   s(request.current_blockchain_height, "current_blockchain_height");
   s(request.hop, "hop");
+
+  if (s.type() == ISerializer::INPUT) {
+    s(blockTemplate, "blockTemplate");
+    std::copy(blockTemplate.begin(), blockTemplate.end(), std::back_inserter(request.blockTemplate));
+  } else {
+    std::copy(blockTemplate.begin(), blockTemplate.end(), std::back_inserter(request.blockTemplate));
+    s(blockTemplate, "blockTemplate");
+  }
 }
 
 static inline void serialize(NOTIFY_MISSING_TXS_request& request, ISerializer& s) {
@@ -717,33 +726,13 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
   }
 
   BlockTemplate newBlockTemplate;
-  if(!fromBinaryArray(newBlockTemplate, arg.block.blockTemplate)) { // deserialize blockTemplate
+  if(!fromBinaryArray(newBlockTemplate, arg.blockTemplate)) { // deserialize blockTemplate
     logger(Logging::WARNING) << context << "Deserialization of Block Template failed, dropping connection" ;
     context.m_state = CryptoNoteConnectionContext::state_shutdown;
   }
   else {
     std::vector<BinaryArray> have_txs;
     std::vector<Crypto::Hash> need_txs;
-
-    /*
-     * check for transaction data in the received lite-block..
-     * if present then we can assume that this is the response of our request of missing txs
-     * if not present then this is the first notify signal from the sender
-     */
-    if (!arg.block.transactions.empty()) {
-      for (const BinaryArray& txBlob: arg.block.transactions) {
-        CachedTransaction cachedTransaction(txBlob);
-          if (!m_core.hasTransaction(cachedTransaction.getTransactionHash())) {
-            logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
-                                       << " not present, adding to pool";
-              if(!m_core.addTransactionToPool(txBlob)) {
-                logger(Logging::ERROR) << "Transaction verification failed, dropping connection";
-                  context.m_state = CryptoNoteConnectionContext::state_shutdown;
-                    return 1;
-              }
-          }
-      }
-    }
 
     /*
      * here we are finding out which txs are
@@ -753,7 +742,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
       BinaryArray transactionBlob;
         bool result;
         std::tie(result, transactionBlob) = m_core.getPoolTransaction(transactionHash);
-        if (result){
+        if (result) {
           have_txs.push_back(transactionBlob);
         }
         else {
@@ -769,7 +758,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
      * of the lite-block request
      */
     if (need_txs.empty()) {
-      auto result = m_core.addBlock(RawBlock{arg.block.blockTemplate, have_txs});
+      auto result = m_core.addBlock(RawBlock{arg.blockTemplate, have_txs});
         if (result == error::AddBlockErrorCondition::BLOCK_ADDED) {
           if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED) {
             ++arg.hop;
@@ -830,6 +819,7 @@ int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MIS
   if (!missedHashes.empty() || txs.size() != arg.missing_txs.size()) {
     logger(Logging::ERROR) << "Failed to Handle NOTIFY_MISSING_TXS, Unable to retrieve requested transactions, Dropping Connection";
     context.m_state = CryptoNoteConnectionContext::state_shutdown;
+    return 1;
   }
   else {
     req.txs = std::move(txs);
@@ -844,17 +834,17 @@ int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MIS
   else {
     logger(Logging::DEBUGGING) << "Error while sending NOTIFY_MISSING_TXS response to peer";
   }
+
+  return 1;
 }
 
 void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
   auto buf = LevinProtocol::encode(arg);
 
-  std::vector<BinaryArray> txs;
   NOTIFY_NEW_LITE_BLOCK::request lite_arg;
   lite_arg.current_blockchain_height = arg.current_blockchain_height;
-  lite_arg.block = arg.block;
+  lite_arg.blockTemplate = arg.block.blockTemplate;
   lite_arg.hop = arg.hop;
-  lite_arg.block.transactions = txs;
 
   auto lite_buf = LevinProtocol::encode(lite_arg);
 
