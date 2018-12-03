@@ -876,7 +876,7 @@ void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
 
   auto lite_buf = LevinProtocol::encode(lite_arg);
 
-  m_p2p->for_each_connection([&](const CryptoNoteConnectionContext& ctx, uint64_t peerId){
+  m_p2p->for_each_connection([this, &lite_buf, &buf](const CryptoNoteConnectionContext& ctx, uint64_t peerId){
     if (ctx.version >= P2P_LITE_BLOCKS_PROPOGATION_VERSION) {
         logger(Logging::DEBUGGING)<<"Peer supports lite-blocks... relaying new lite block";
         m_p2p->invoke_notify_to_peer(NOTIFY_NEW_LITE_BLOCK::ID, lite_buf, ctx);

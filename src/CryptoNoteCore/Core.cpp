@@ -640,7 +640,7 @@ bool Core::getWalletSyncData(
         {
             BlockTemplate block;
 
-            fromBinaryArray(block, rawBlock.block);
+            fromBinaryArray(block, rawBlock.blockTemplate);
 
             WalletTypes::WalletBlockInfo walletBlock;
 
@@ -1340,7 +1340,7 @@ bool Core::getGlobalIndexesForRange(
 
             BlockTemplate block;
 
-            fromBinaryArray(block, rawBlock.block);
+            fromBinaryArray(block, rawBlock.blockTemplate);
 
             transactionHashes.push_back(
                 getBinaryArrayHash(toBinaryArray(block.baseTransaction))
@@ -1680,29 +1680,6 @@ size_t Core::getAlternativeBlockCount() const {
   return std::accumulate(chainsStorage.begin(), chainsStorage.end(), size_t(0), [&](size_t sum, const Ptr& ptr) {
     return mainChainSet.count(ptr.get()) == 0 ? sum + ptr->getBlockCount() : sum;
   });
-}
-
-uint64_t Core::getTotalGeneratedAmount() const {
-  assert(!chainsLeaves.empty());
-  throwIfNotInitialized();
-
-  return chainsLeaves[0]->getAlreadyGeneratedCoins();
-}
-
-std::vector<BlockTemplate> Core::getAlternativeBlocks() const {
-  throwIfNotInitialized();
-
-  std::vector<BlockTemplate> alternativeBlocks;
-  for (auto& cache : chainsStorage) {
-    if (mainChainSet.count(cache.get()))
-      continue;
-    for (auto index = cache->getStartBlockIndex(); index <= cache->getTopBlockIndex(); ++index) {
-      // TODO: optimize
-      alternativeBlocks.push_back(fromBinaryArray<BlockTemplate>(cache->getBlockByIndex(index).blockTemplate));
-    }
-  }
-
-  return alternativeBlocks;
 }
 
 std::vector<Transaction> Core::getPoolTransactions() const {
