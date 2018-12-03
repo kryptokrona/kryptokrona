@@ -128,21 +128,6 @@ P2pNode::~P2pNode() {
   assert(m_connectionQueue.empty());
 }
 
-std::unique_ptr<IP2pConnection> P2pNode::receiveConnection() {
-  while (m_connectionQueue.empty()) {
-    m_queueEvent.wait();
-    m_queueEvent.clear();
-    if (m_stopRequested) {
-      throw InterruptedException();
-    }
-  }
-
-  auto connection = std::move(m_connectionQueue.front());
-  m_connectionQueue.pop_front();
-
-  return connection;
-}
-
 void P2pNode::start() {
   workingContextGroup.spawn(std::bind(&P2pNode::acceptLoop, this));
   workingContextGroup.spawn(std::bind(&P2pNode::connectorLoop, this));

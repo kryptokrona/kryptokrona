@@ -392,24 +392,12 @@ bool JsonValue::isArray() const {
   return type == ARRAY;
 }
 
-bool JsonValue::isBool() const {
-  return type == BOOL;
-}
-
 bool JsonValue::isInteger() const {
   return type == INTEGER;
 }
 
-bool JsonValue::isNil() const {
-  return type == NIL;
-}
-
 bool JsonValue::isObject() const {
   return type == OBJECT;
-}
-
-bool JsonValue::isReal() const {
-  return type == REAL;
 }
 
 bool JsonValue::isString() const {
@@ -418,22 +406,6 @@ bool JsonValue::isString() const {
 
 JsonValue::Type JsonValue::getType() const {
   return type;
-}
-
-JsonValue::Array& JsonValue::getArray() {
-  if (type != ARRAY) {
-    throw std::runtime_error("JsonValue type is not ARRAY");
-  }
-
-  return *reinterpret_cast<Array*>(valueArray);
-}
-
-const JsonValue::Array& JsonValue::getArray() const {
-  if (type != ARRAY) {
-    throw std::runtime_error("JsonValue type is not ARRAY");
-  }
-
-  return *reinterpret_cast<const Array*>(valueArray);
 }
 
 JsonValue::Bool JsonValue::getBool() const {
@@ -466,14 +438,6 @@ const JsonValue::Object& JsonValue::getObject() const {
   }
 
   return *reinterpret_cast<const Object*>(valueObject);
-}
-
-JsonValue::Real JsonValue::getReal() const {
-  if (type != REAL) {
-    throw std::runtime_error("JsonValue type is not REAL");
-  }
-
-  return valueReal;
 }
 
 JsonValue::String& JsonValue::getString() {

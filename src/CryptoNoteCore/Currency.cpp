@@ -172,7 +172,6 @@ bool Currency::getBlockReward(uint8_t blockMajorVersion, size_t medianSize, size
   uint64_t baseReward = (m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactor;
   if (alreadyGeneratedCoins == 0 && m_genesisBlockReward != 0) {
     baseReward = m_genesisBlockReward;
-    std::cout << "Genesis block reward: " << baseReward << std::endl;
   }
 
   size_t blockGrantedFullRewardZone = blockGrantedFullRewardZoneByBlockVersion(blockMajorVersion);
@@ -629,7 +628,7 @@ bool Currency::checkProofOfWork(const CachedBlock& block, uint64_t currentDiffic
   return false;
 }
 
-size_t Currency::getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount) const {
+size_t Currency::getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount) {
   const size_t KEY_IMAGE_SIZE = sizeof(Crypto::KeyImage);
   const size_t OUTPUT_KEY_SIZE = sizeof(decltype(KeyOutput::key));
   const size_t AMOUNT_SIZE = sizeof(uint64_t) + 2; //varint
@@ -801,7 +800,6 @@ Transaction CurrencyBuilder::generateGenesisTransaction() {
       tk.key = outEphemeralPubKey;
       TransactionOutput out;
       out.amount = (i == 0) ? first_target_amount : target_amount;
-      std::cout << "outs: " << std::to_string(out.amount) << std::endl;
       out.target = tk;
       tx.outputs.push_back(out);
     }

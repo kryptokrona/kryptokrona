@@ -25,10 +25,6 @@ namespace Common {
 MemoryInputStream::MemoryInputStream(const void* buffer, uint64_t bufferSize) : 
 buffer(static_cast<const char*>(buffer)), bufferSize(bufferSize), position(0) {}
 
-uint64_t MemoryInputStream::getPosition() const {
-  return position;
-}
-
 bool MemoryInputStream::endOfStream() const {
   return position == bufferSize;
 }

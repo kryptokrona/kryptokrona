@@ -49,7 +49,6 @@ public:
   WalletGreen(System::Dispatcher& dispatcher, const Currency& currency, INode& node, Logging::ILogger& logger, uint32_t transactionSoftLockTime = 1);
   virtual ~WalletGreen();
 
-  virtual void initialize(const std::string& path, const std::string& password) override;
   virtual void initializeWithViewKey(const std::string& path, const std::string& password, const Crypto::SecretKey& viewSecretKey, const uint64_t scanHeight, const bool newAddress) override;
   virtual void load(const std::string& path, const std::string& password, std::string& extra) override;
   virtual void load(const std::string& path, const std::string& password) override;
@@ -81,8 +80,6 @@ public:
 
   virtual size_t getTransactionCount() const override;
   virtual WalletTransaction getTransaction(size_t transactionIndex) const override;
-  virtual size_t getTransactionTransferCount(size_t transactionIndex) const override;
-  virtual WalletTransfer getTransactionTransfer(size_t transactionIndex, size_t transferIndex) const override;
 
   virtual WalletTransactionWithTransfers getTransaction(const Crypto::Hash& transactionHash) const override;
   virtual std::vector<TransactionsInBlockInfo> getTransactions(const Crypto::Hash& blockHash, size_t count) const override;
@@ -105,7 +102,6 @@ public:
   PreparedTransaction formTransaction(const TransactionParameters &sendingTransaction);
   void updateInternalCache();
   void clearCaches(bool clearTransactions, bool clearCachedData);
-  void clearCacheAndShutdown();
   void createViewWallet(const std::string &path, const std::string &password,
                         const std::string address, 
                         const Crypto::SecretKey &viewSecretKey,
@@ -254,7 +250,7 @@ protected:
 
   size_t doTransfer(const TransactionParameters& transactionParameters);
 
-  void checkIfEnoughMixins(std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult, uint16_t mixIn) const;
+  void checkIfEnoughMixins(std::vector<CryptoNote::RandomOuts>& mixinResult, uint16_t mixIn) const;
   std::vector<WalletTransfer> convertOrdersToTransfers(const std::vector<WalletOrder>& orders) const;
   uint64_t countNeededMoney(const std::vector<CryptoNote::WalletTransfer>& destinations, uint64_t fee) const;
   CryptoNote::AccountPublicAddress parseAccountAddressString(const std::string& addressString) const;
@@ -267,10 +263,10 @@ protected:
 
   void requestMixinOuts(const std::vector<OutputToTransfer>& selectedTransfers,
     uint16_t mixIn,
-    std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult);
+    std::vector<CryptoNote::RandomOuts>& mixinResult);
 
   void prepareInputs(const std::vector<OutputToTransfer>& selectedTransfers,
-    std::vector<CryptoNote::COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::outs_for_amount>& mixinResult,
+    std::vector<CryptoNote::RandomOuts>& mixinResult,
     uint16_t mixIn,
     std::vector<InputInfo>& keysInfo);
 

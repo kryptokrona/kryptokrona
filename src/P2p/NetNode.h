@@ -180,7 +180,6 @@ namespace CryptoNote
     bool is_addr_connected(const NetworkAddress& peer);  
     bool try_ping(basic_node_data& node_data, P2pConnectionContext& context);
     bool make_expected_connections_count(bool white_list, size_t expected_connections);
-    bool is_priority_node(const NetworkAddress& na);
 
     bool connect_to_peerlist(const std::vector<NetworkAddress>& peers);
 

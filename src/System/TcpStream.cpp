@@ -33,13 +33,11 @@ std::streambuf::int_type TcpStreambuf::overflow(std::streambuf::int_type ch) {
   if (ch == traits_type::eof()) {
     return traits_type::eof();
   }
-
   if (pptr() == epptr()) {
     if (!dumpBuffer(false)) {
       return traits_type::eof();
     }
   }
-
   *pptr() = static_cast<char>(ch);
   pbump(1);
   return ch;
@@ -53,18 +51,15 @@ std::streambuf::int_type TcpStreambuf::underflow() {
   if (gptr() < egptr()) {
     return traits_type::to_int_type(*gptr());
   }
-
   size_t bytesRead;
   try {
     bytesRead = connection.read(reinterpret_cast<uint8_t*>(&readBuf.front()), readBuf.max_size());
   } catch (std::exception&) {
     return traits_type::eof();
   }
-
   if (bytesRead == 0) {
     return traits_type::eof();
   }
-
   setg(&readBuf.front(), &readBuf.front(), &readBuf.front() + bytesRead);
   return traits_type::to_int_type(*gptr());
 }

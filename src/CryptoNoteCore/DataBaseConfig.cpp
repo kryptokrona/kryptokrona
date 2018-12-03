@@ -22,7 +22,8 @@ DataBaseConfig::DataBaseConfig() :
   maxOpenFiles(DATABASE_DEFAULT_MAX_OPEN_FILES),
   writeBufferSize(DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE * MEGABYTE),
   readCacheSize(DATABASE_READ_BUFFER_MB_DEFAULT_SIZE * MEGABYTE),
-  testnet(false) {
+  testnet(false),
+  configFolderDefaulted(false) {
 }
 
 bool DataBaseConfig::init(const std::string dataDirectory, const int backgroundThreads, const int openFiles, const int writeBufferMB, const int readCacheMB)
@@ -67,32 +68,4 @@ uint64_t DataBaseConfig::getReadCacheSize() const {
 
 bool DataBaseConfig::getTestnet() const {
   return testnet;
-}
-
-void DataBaseConfig::setConfigFolderDefaulted(bool defaulted) {
-  configFolderDefaulted = defaulted;
-}
-
-void DataBaseConfig::setDataDir(const std::string& dataDir) {
-  this->dataDir = dataDir;
-}
-
-void DataBaseConfig::setBackgroundThreadsCount(uint16_t backgroundThreadsCount) {
-  this->backgroundThreadsCount = backgroundThreadsCount;
-}
-
-void DataBaseConfig::setMaxOpenFiles(uint32_t maxOpenFiles) {
-  this->maxOpenFiles = maxOpenFiles;
-}
-
-void DataBaseConfig::setWriteBufferSize(uint64_t writeBufferSize) {
-  this->writeBufferSize = writeBufferSize;
-}
-
-void DataBaseConfig::setReadCacheSize(uint64_t readCacheSize) {
-  this->readCacheSize = readCacheSize;
-}
-
-void DataBaseConfig::setTestnet(bool testnet) {
-  this->testnet = testnet;
 }

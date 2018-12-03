@@ -1,0 +1,113 @@
+// Copyright (c) 2018, The TurtleCoin Developers
+// 
+// Please see the included LICENSE file for more information.
+
+#pragma once
+
+#include <WalletBackend/WalletBackend.h>
+
+#include <zedwallet++/ColouredMsg.h>
+#include <zedwallet++/ParseArguments.h>
+
+std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &config);
+
+bool checkNodeStatus(const std::shared_ptr<WalletBackend> walletBackend);
+
+std::string getAction(const Config &config);
+
+void mainLoop(
+    const std::shared_ptr<WalletBackend> walletBackend,
+    const std::shared_ptr<std::mutex> mutex);
+
+template<typename T>
+std::string parseCommand(
+    const std::vector<T> &printableCommands,
+    const std::vector<T> &availableCommands,
+    const std::string prompt)
+{
+    while (true)
+    {
+        std::string selection = getInput(availableCommands, prompt);
+
+        /* Convert to lower case */
+        std::transform(selection.begin(), selection.end(), selection.begin(),
+                       ::tolower);
+
+        /* \n == no-op */
+        if (selection == "")
+        {
+            continue;
+        }
+
+        try
+        {
+            /* Input is in 1 based indexing, we need 0 based indexing */
+            const int selectionNum = std::stoi(selection) - 1;
+
+            const int numCommands = static_cast<int>(availableCommands.size());
+
+            /* Must be in the bounds of the vector */
+            if (selectionNum < 0 || selectionNum >= numCommands)
+            {
+                std::cout << WarningMsg("Bad input, expected a command name, ")
+                          << WarningMsg("or number from ")
+                          << InformationMsg("1")
+                          << WarningMsg(" to ")
+                          << InformationMsg(numCommands)
+                          << std::endl;
+
+                /* Print the available commands again if the input is bad */
+                printCommands(printableCommands);
+
+                continue;
+            }
+
+            return availableCommands[selectionNum].commandName;
+        }
+        /* Input ain't a number */
+        catch (const std::invalid_argument &)
+        {
+            /* Find the command by command name */
+            auto it = std::find_if(availableCommands.begin(), availableCommands.end(),
+            [&selection](const auto command)
+            {
+                return command.commandName == selection;
+            });
+
+            /* Command doesn't exist in availableCommands */
+            if (it == availableCommands.end())
+            {
+                std::cout << "Unknown command: " << WarningMsg(selection)
+                          << std::endl;
+
+                /* Print the available commands again if the input is bad */
+                printCommands(printableCommands);
+
+                continue;
+            }
+        }
+
+        return selection;
+    }
+}
+
+template<typename T>
+void printCommands(const std::vector<T> &commands, size_t offset = 0)
+{
+    size_t i = 1 + offset;
+
+    std::cout << "\n";
+
+    for (const auto &command : commands)
+    {
+        std::cout << InformationMsg(" ")
+                  << InformationMsg(i)
+                  << "\t"
+                  << SuccessMsg(command.commandName, 25) /* Pad to 25 chars */
+                  << command.description << std::endl;
+
+        i++;
+    }
+
+    std::cout << "\n";
+}

@@ -428,27 +428,6 @@ bool BlockchainExplorer::getPoolState(const std::vector<Hash>& knownPoolTransact
   return getTransactions(newTransactionsHashes, newTransactions);
 }
 
-uint64_t BlockchainExplorer::getRewardBlocksWindow() {
-  if (state.load() != INITIALIZED) {
-    throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
-  }
-  return parameters::CRYPTONOTE_REWARD_BLOCKS_WINDOW;
-}
-
-uint64_t BlockchainExplorer::getFullRewardMaxBlockSize(uint8_t majorVersion) {
-  if (state.load() != INITIALIZED) {
-    throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
-  }
-
-  if (majorVersion >= BLOCK_MAJOR_VERSION_3) {
-    return parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
-  } else if (majorVersion == BLOCK_MAJOR_VERSION_2) {
-    return parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
-  } else {
-    return parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
-  }
-}
-
 bool BlockchainExplorer::isSynchronized() {
   if (state.load() != INITIALIZED) {
     throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
@@ -664,45 +643,6 @@ void BlockchainExplorer::localBlockchainUpdated(uint32_t index) {
   }
 
   NodeRequest request([=](const INode::Callback& cb) { node.getBlocks(*blockIndexesPtr, *blocksPtr, cb); });
-
-  request.performAsync(asyncContextCounter,
-    [this, blockIndexesPtr, blocksPtr](std::error_code ec) {
-      if (ec) {
-        logger(ERROR) << "Can't send blockchainUpdated notification because can't get blocks by height: " << ec.message();
-        return;
-      }
-      assert(blocksPtr->size() == blockIndexesPtr->size());
-      handleBlockchainUpdatedNotification(*blocksPtr);
-    }
-  );
-}
-
-void BlockchainExplorer::chainSwitched(uint32_t newTopIndex, uint32_t commonRoot, const std::vector<Crypto::Hash>& hashes) {
-  assert(newTopIndex > commonRoot);
-  std::shared_ptr<std::vector<uint32_t>> blockIndexesPtr = std::make_shared<std::vector<uint32_t>>();
-  std::shared_ptr<std::vector<std::vector<BlockDetails>>> blocksPtr = std::make_shared<std::vector<std::vector<BlockDetails>>>();
-  blockIndexesPtr->reserve(newTopIndex - commonRoot);
-  blocksPtr->reserve(newTopIndex - commonRoot);
-
-  for (uint32_t i = commonRoot + 1; i <= newTopIndex; ++i) {
-    blockIndexesPtr->push_back(i);
-  }
-
-  NodeRequest request(
-    std::bind(
-      static_cast<
-        void(INode::*)(
-          const std::vector<uint32_t>&,
-          std::vector<std::vector<BlockDetails>>&,
-          const INode::Callback&
-        )
-      >(&INode::getBlocks),
-      std::ref(node),
-      std::cref(*blockIndexesPtr),
-      std::ref(*blocksPtr),
-      std::placeholders::_1
-    )
-  );
 
   request.performAsync(asyncContextCounter,
     [this, blockIndexesPtr, blocksPtr](std::error_code ec) {

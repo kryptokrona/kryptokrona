@@ -30,7 +30,7 @@ void AccountBase::generate() {
   m_creation_timestamp = time(NULL);
 
 }
-void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret, Crypto::PublicKey &viewPublic) {
+void AccountBase::generateViewFromSpend(const Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret, Crypto::PublicKey &viewPublic) {
   Crypto::SecretKey viewKeySeed;
 
   keccak((uint8_t *)&spend, sizeof(spend), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
@@ -38,7 +38,7 @@ void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::Secret
   Crypto::generate_deterministic_keys(viewPublic, viewSecret, viewKeySeed);
 }
 
-void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret) {
+void AccountBase::generateViewFromSpend(const Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret) {
   /* If we don't need the pub key */
   Crypto::PublicKey unused_dummy_variable;
   generateViewFromSpend(spend, viewSecret, unused_dummy_variable);
@@ -46,10 +46,6 @@ void AccountBase::generateViewFromSpend(Crypto::SecretKey &spend, Crypto::Secret
 //-----------------------------------------------------------------
 const AccountKeys &AccountBase::getAccountKeys() const {
   return m_keys;
-}
-
-void AccountBase::setAccountKeys(const AccountKeys &keys) {
-  m_keys = keys;
 }
 //-----------------------------------------------------------------
 

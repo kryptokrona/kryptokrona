@@ -104,10 +104,10 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
         auto [error, privateSpendKey]
             = Mnemonics::MnemonicToPrivateKey(mnemonicPhrase);
 
-        if (!error.empty())
+        if (error)
         {
             std::cout << std::endl
-                      << WarningMsg(error)
+                      << WarningMsg(error.getErrorMessage())
                       << std::endl << std::endl;
         }
         else

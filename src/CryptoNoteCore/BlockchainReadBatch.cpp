@@ -47,6 +47,16 @@ BlockchainReadBatch& BlockchainReadBatch::requestCachedTransaction(const Crypto:
   return *this;
 }
 
+BlockchainReadBatch& BlockchainReadBatch::requestCachedTransactions(const std::vector<Crypto::Hash> &transactions)
+{
+    for (const auto hash : transactions)
+    {
+        state.cachedTransactions.emplace(hash, ExtendedTransactionInfo());
+    }
+
+    return *this;
+}
+
 BlockchainReadBatch& BlockchainReadBatch::requestTransactionHashesByBlock(uint32_t blockIndex) {
   state.transactionHashesByBlocks.emplace(blockIndex, std::vector<Crypto::Hash>());
   return *this;
@@ -77,6 +87,16 @@ BlockchainReadBatch& BlockchainReadBatch::requestRawBlock(uint32_t blockIndex) {
   return *this;
 }
 
+BlockchainReadBatch& BlockchainReadBatch::requestRawBlocks(uint64_t startHeight, uint64_t endHeight)
+{
+    for (uint64_t i = startHeight; i < endHeight; i++)
+    {
+        state.rawBlocks.emplace(i, RawBlock());
+    }
+
+    return *this;
+}
+
 BlockchainReadBatch& BlockchainReadBatch::requestLastBlockIndex() {
   state.lastBlockIndex.second = true;
   return *this;
@@ -89,11 +109,6 @@ BlockchainReadBatch& BlockchainReadBatch::requestClosestTimestampBlockIndex(uint
 
 BlockchainReadBatch& BlockchainReadBatch::requestKeyOutputAmountsCount() {
   state.keyOutputAmountsCount.second = true;
-  return *this;
-}
-
-BlockchainReadBatch& BlockchainReadBatch::requestKeyOutputAmount(uint32_t index) {
-  state.keyOutputAmounts.emplace(index, 0);
   return *this;
 }
 
@@ -222,10 +237,6 @@ const std::unordered_map<uint64_t, uint32_t>& BlockchainReadResult::getClosestTi
 
 uint32_t BlockchainReadResult::getKeyOutputAmountsCount() const {
   return state.keyOutputAmountsCount.first;
-}
-
-const std::unordered_map<uint32_t, IBlockchainCache::Amount>& BlockchainReadResult::getKeyOutputAmounts() const {
-  return state.keyOutputAmounts;
 }
 
 const std::unordered_map<Crypto::Hash, uint32_t>& BlockchainReadResult::getTransactionCountByPaymentIds() const {

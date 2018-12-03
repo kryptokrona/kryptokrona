@@ -31,7 +31,6 @@ public:
   }
 
   virtual std::error_code write(IWriteBatch& batch) = 0;
-  virtual std::error_code writeSync(IWriteBatch& batch) = 0;
 
   virtual std::error_code read(IReadBatch& batch) = 0;
 };

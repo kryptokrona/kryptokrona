@@ -114,12 +114,6 @@ const TransactionOutput& getOutputChecked(const CryptoNote::TransactionPrefix& t
   return output;
 }
 
-bool isOutToKey(const Crypto::PublicKey& spendPublicKey, const Crypto::PublicKey& outKey, const Crypto::KeyDerivation& derivation, size_t keyIndex) {
-  Crypto::PublicKey pk;
-  derive_public_key(derivation, keyIndex, spendPublicKey, pk);
-  return pk == outKey;
-}
-
 bool findOutputsToAccount(const CryptoNote::TransactionPrefix& transaction, const AccountPublicAddress& addr,
                           const SecretKey& viewSecretKey, std::vector<uint32_t>& out, uint64_t& amount) {
   AccountKeys keys;
