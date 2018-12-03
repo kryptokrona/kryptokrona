@@ -120,7 +120,7 @@ static inline void serialize(NOTIFY_RESPONSE_GET_OBJECTS_request& request, ISeri
 }
 
 static inline void serialize(NOTIFY_NEW_LITE_BLOCK_request& request, ISerializer& s) {
-  s(request.block, "b");
+  s(request.block, "block");
   s(request.current_blockchain_height, "current_blockchain_height");
   s(request.hop, "hop");
 }
