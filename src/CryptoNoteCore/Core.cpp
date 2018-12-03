@@ -100,7 +100,7 @@ size_t getMaximumTransactionAllowedSize(size_t blockSizeMedian, const Currency& 
 
 BlockTemplate extractBlockTemplate(const RawBlock& block) {
   BlockTemplate blockTemplate;
-  if (!fromBinaryArray(blockTemplate, block.block)) {
+  if (!fromBinaryArray(blockTemplate, block.blockTemplate)) {
     throw std::system_error(make_error_code(error::AddBlockErrorCode::DESERIALIZATION_FAILED));
   }
 
@@ -827,7 +827,7 @@ std::error_code Core::addBlock(RawBlock&& rawBlock) {
   throwIfNotInitialized();
 
   BlockTemplate blockTemplate;
-  bool result = fromBinaryArray(blockTemplate, rawBlock.block);
+  bool result = fromBinaryArray(blockTemplate, rawBlock.blockTemplate);
   if (!result) {
     return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
   }
@@ -847,7 +847,7 @@ std::error_code Core::submitBlock(BinaryArray&& rawBlockTemplate) {
   }
 
   RawBlock rawBlock;
-  rawBlock.block = std::move(rawBlockTemplate);
+  rawBlock.blockTemplate = std::move(rawBlockTemplate);
 
   rawBlock.transactions.reserve(blockTemplate.transactionHashes.size());
   for (const auto& transactionHash : blockTemplate.transactionHashes) {
@@ -1005,14 +1005,13 @@ std::vector<Crypto::Hash> Core::getPoolTransactionHashes() const {
   return transactionPool->getTransactionHashes();
 }
 
-bool Core::getPoolTransaction(BinaryArray& transactionBlob, const Crypto::Hash& transactionHash) const {
+std::tuple<bool, CryptoNote::BinaryArray> Core::getPoolTransaction(const Crypto::Hash& transactionHash) const {
   if (transactionPool->checkIfTransactionPresent(transactionHash)) {
-    auto& cachedTransaction = transactionPool->getTransaction(transactionHash);
-    transactionBlob = cachedTransaction.getTransactionBinaryArray();
-    return true;
+    return std::make_tuple(true, transactionPool->getTransaction(transactionHash).getTransactionBinaryArray());
   }
   else {
-    return false;
+    BinaryArray temp;
+    return std::make_tuple(false, temp);
   }
 }
 
@@ -1267,7 +1266,7 @@ std::vector<BlockTemplate> Core::getAlternativeBlocks() const {
       continue;
     for (auto index = cache->getStartBlockIndex(); index <= cache->getTopBlockIndex(); ++index) {
       // TODO: optimize
-      alternativeBlocks.push_back(fromBinaryArray<BlockTemplate>(cache->getBlockByIndex(index).block));
+      alternativeBlocks.push_back(fromBinaryArray<BlockTemplate>(cache->getBlockByIndex(index).blockTemplate));
     }
   }
 
@@ -1718,7 +1717,7 @@ BlockTemplate Core::restoreBlockTemplate(IBlockchainCache* blockchainCache, uint
   RawBlock rawBlock = blockchainCache->getBlockByIndex(blockIndex);
 
   BlockTemplate block;
-  if (!fromBinaryArray(block, rawBlock.block)) {
+  if (!fromBinaryArray(block, rawBlock.blockTemplate)) {
     throw std::runtime_error("Coulnd't deserialize BlockTemplate");
   }
 
@@ -1827,7 +1826,7 @@ void Core::fillQueryBlockShortInfo(uint32_t fullOffset, uint32_t currentIndex, s
     RawBlock rawBlock = getRawBlock(segment, blockIndex);
 
     BlockShortInfo blockShortInfo;
-    blockShortInfo.block = std::move(rawBlock.block);
+    blockShortInfo.block = std::move(rawBlock.blockTemplate);
     blockShortInfo.blockId = segment->getBlockHash(blockIndex);
 
     blockShortInfo.txPrefixes.reserve(rawBlock.transactions.size());
@@ -2017,7 +2016,7 @@ void Core::mergeSegments(IBlockchainCache* acceptingSegment, IBlockchainCache* s
     PushedBlockInfo info = segment->getPushedBlockInfo(blockIndex);
 
     BlockTemplate block;
-    if (!fromBinaryArray(block, info.rawBlock.block)) {
+    if (!fromBinaryArray(block, info.rawBlock.blockTemplate)) {
       logger(Logging::WARNING) << "mergeSegments error: Couldn't deserialize block";
       throw std::runtime_error("Couldn't deserialize block");
     }

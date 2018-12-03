@@ -36,7 +36,7 @@ namespace CryptoNote
 
   //just to keep backward compatibility with BlockCompleteEntry serialization
   struct RawBlockLegacy {
-    BinaryArray block;
+    BinaryArray blockTemplate;
     std::vector<BinaryArray> transactions;
   };
 
@@ -44,7 +44,7 @@ namespace CryptoNote
 
   struct NOTIFY_NEW_BLOCK_request
   {
-    RawBlockLegacy b;
+    RawBlockLegacy block;
     uint32_t current_blockchain_height;
     uint32_t hop;
   };
@@ -156,7 +156,7 @@ namespace CryptoNote
   /*                                                                      */
   /************************************************************************/
   struct NOTIFY_NEW_LITE_BLOCK_request {
-    LiteBlock b;
+    LiteBlock block;
     uint32_t current_blockchain_height;
     uint32_t hop;
   };

@@ -570,7 +570,7 @@ BinaryArray BlockchainCache::getRawTransaction(uint32_t index, uint32_t transact
   } else {
     auto rawBlock = storage->getBlockByIndex(index - startIndex);
     if (transactionIndex == 0) {
-      auto block = fromBinaryArray<BlockTemplate>(rawBlock.block);
+      auto block = fromBinaryArray<BlockTemplate>(rawBlock.blockTemplate);
       return toBinaryArray(block.baseTransaction);
     }
 

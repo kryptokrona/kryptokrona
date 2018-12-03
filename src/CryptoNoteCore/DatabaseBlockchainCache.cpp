@@ -214,7 +214,7 @@ Transaction extractTransaction(const RawBlock& block, uint32_t transactionIndex)
   }
 
   BlockTemplate blockTemplate;
-  bool r = fromBinaryArray(blockTemplate, block.block);
+  bool r = fromBinaryArray(blockTemplate, block.blockTemplate);
   if (r) {}
   assert(r);
 
@@ -591,7 +591,7 @@ std::unique_ptr<IBlockchainCache> DatabaseBlockchainCache::split(uint32_t splitB
 //returns hash of pushed block
 Crypto::Hash DatabaseBlockchainCache::pushBlockToAnotherCache(IBlockchainCache& segment, PushedBlockInfo&& pushedBlockInfo) {
   BlockTemplate block;
-  bool br = fromBinaryArray(block, pushedBlockInfo.rawBlock.block);
+  bool br = fromBinaryArray(block, pushedBlockInfo.rawBlock.blockTemplate);
   if (br) {}
   assert(br);
 
@@ -1454,7 +1454,7 @@ void DatabaseBlockchainCache::getRawTransactions(const std::vector<Crypto::Hash>
     }
 
     if (transactionIt->second.transactionIndex == 0) {
-      auto block = fromBinaryArray<BlockTemplate>(blockIt->second.block);
+      auto block = fromBinaryArray<BlockTemplate>(blockIt->second.blockTemplate);
       foundTransactions.emplace_back(toBinaryArray(block.baseTransaction));
     } else {
       assert(blockIt->second.transactions.size() >= transactionIt->second.transactionIndex - 1);

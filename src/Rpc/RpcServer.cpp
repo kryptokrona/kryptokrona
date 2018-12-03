@@ -38,7 +38,7 @@ static inline void serialize(COMMAND_RPC_GET_BLOCKS_FAST::response& response, IS
 
 void serialize(BlockFullInfo& blockFullInfo, ISerializer& s) {
   KV_MEMBER(blockFullInfo.block_id);
-  KV_MEMBER(blockFullInfo.block);
+  KV_MEMBER(blockFullInfo.blockTemplate);
   s(blockFullInfo.transactions, "txs");
 }
 
@@ -966,7 +966,7 @@ bool RpcServer::on_submitblock(const COMMAND_RPC_SUBMITBLOCK::request& req, COMM
   if (submitResult == error::AddBlockErrorCode::ADDED_TO_MAIN
       || submitResult == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED) {
     NOTIFY_NEW_BLOCK::request newBlockMessage;
-    newBlockMessage.b = prepareRawBlockLegacy(std::move(blockToSend));
+    newBlockMessage.block = prepareRawBlockLegacy(std::move(blockToSend));
     newBlockMessage.hop = 0;
     newBlockMessage.current_blockchain_height = m_core.getTopBlockIndex() + 1; //+1 because previous version of core sent m_blocks.size()
 
@@ -984,7 +984,7 @@ RawBlockLegacy RpcServer::prepareRawBlockLegacy(BinaryArray&& blockBlob) {
   assert(result);
 
   RawBlockLegacy rawBlock;
-  rawBlock.block = std::move(blockBlob);
+  rawBlock.blockTemplate = std::move(blockBlob);
 
   if (blockTemplate.transactionHashes.empty()) {
     return rawBlock;

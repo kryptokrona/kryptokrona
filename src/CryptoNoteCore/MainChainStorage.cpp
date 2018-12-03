@@ -66,7 +66,7 @@ std::unique_ptr<IMainChainStorage> createSwappedMainChainStorage(const std::stri
   std::unique_ptr<IMainChainStorage> storage(new MainChainStorage(blocksFilename.string(), indexesFilename.string()));
   if (storage->getBlockCount() == 0) {
     RawBlock genesis;
-    genesis.block = toBinaryArray(currency.genesisBlock());
+    genesis.blockTemplate = toBinaryArray(currency.genesisBlock());
     storage->pushBlock(genesis);
   }
 

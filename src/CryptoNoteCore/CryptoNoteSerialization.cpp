@@ -442,13 +442,13 @@ void serialize(RawBlock& rawBlock, ISerializer& serializer) {
   if (serializer.type() == ISerializer::INPUT) {
     uint64_t blockSize;
     serializer(blockSize, "block_size");
-    rawBlock.block.resize(static_cast<uint64_t>(blockSize));
+    rawBlock.blockTemplate.resize(static_cast<uint64_t>(blockSize));
   } else {
-    uint64_t blockSize = rawBlock.block.size();
+    uint64_t blockSize = rawBlock.blockTemplate.size();
     serializer(blockSize, "block_size");
   }
 
-  serializer.binary(rawBlock.block.data(), rawBlock.block.size(), "block");
+  serializer.binary(rawBlock.blockTemplate.data(), rawBlock.blockTemplate.size(), "block");
 
   if (serializer.type() == ISerializer::INPUT) {
     uint64_t txCount;
