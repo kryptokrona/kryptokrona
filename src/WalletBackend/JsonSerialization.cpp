@@ -63,7 +63,7 @@ void SubWallet::fromJson(const json &j)
     m_spentInputs = j.at("spentInputs").get<std::vector<WalletTypes::TransactionInput>>();
     m_syncStartHeight = j.at("syncStartHeight").get<uint64_t>();
     m_isPrimaryAddress = j.at("isPrimaryAddress").get<bool>();
-    m_unconfirmedIncomingAmounts = j.at("unconfirmedIncomingAmounts").get<std::vector<WalletTypes::UnconfirmedInput>();
+    m_unconfirmedIncomingAmounts = j.at("unconfirmedIncomingAmounts").get<std::vector<WalletTypes::UnconfirmedInput>>();
 }
 
 ///////////////
