@@ -19,7 +19,7 @@ class ApiDispatcher
 
         ApiDispatcher(
             const uint16_t bindPort,
-            const bool acceptExternalRequests,
+            const std::string rpcBindIp,
             const std::string rpcPassword,
             std::string corsHeader);
 

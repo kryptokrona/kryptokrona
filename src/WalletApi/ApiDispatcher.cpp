@@ -29,10 +29,11 @@ using namespace httplib;
 
 ApiDispatcher::ApiDispatcher(
     const uint16_t bindPort,
-    const bool acceptExternalRequests,
+    const std::string rpcBindIp,
     const std::string rpcPassword,
     const std::string corsHeader) :
     m_port(bindPort),
+    m_host(rpcBindIp),
     m_corsHeader(corsHeader),
     m_rpcPassword(rpcPassword)
 {
@@ -41,8 +42,6 @@ ApiDispatcher::ApiDispatcher(
 
     /* Make sure to do this after initializing the salt above! */
     m_hashedPassword = hashPassword(rpcPassword);
-
-    m_host = acceptExternalRequests ? "0.0.0.0" : "127.0.0.1";
 
     using namespace std::placeholders;
 

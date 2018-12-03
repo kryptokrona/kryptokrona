@@ -34,16 +34,14 @@ int main(int argc, char **argv)
 
         /* Init the API */
         api = std::make_shared<ApiDispatcher>(
-            config.port, config.acceptExternalRequests, config.rpcPassword,
+            config.port, config.rpcBindIp, config.rpcPassword,
             config.corsHeader
         );
 
         /* Launch the API */
         apiThread = std::thread(&ApiDispatcher::start, api.get());
 
-        std::string host = config.acceptExternalRequests ? "0.0.0.0" : "127.0.0.1";
-
-        std::string address = "http://" + host + ":" + std::to_string(config.port);
+        std::string address = "http://" + config.rpcBindIp + ":" + std::to_string(config.port);
 
         std::cout << "The api has been launched on " << address
                   << ".\nType exit to save and shutdown." << std::endl;

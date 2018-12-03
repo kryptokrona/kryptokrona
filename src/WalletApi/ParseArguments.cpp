@@ -31,8 +31,8 @@ Config parseArguments(int argc, char **argv)
         ("p,port", "The port to listen on for http requests",
         cxxopts::value<uint16_t>(config.port)->default_value(std::to_string(CryptoNote::SERVICE_DEFAULT_PORT)), "<port>")
 
-        ("a,accept-external-requests", "Should we listen for requests from outside this machine",
-        cxxopts::value<bool>(config.acceptExternalRequests)->default_value("false"));
+        ("rpc-bind-ip", "Interface IP address for the RPC service",
+        cxxopts::value<std::string>(config.rpcBindIp)->default_value("127.0.0.1"));
 
     options.add_options("RPC")
         ("enable-cors", "Adds header 'Access-Control-Allow-Origin' to the RPC responses. Uses the value specified as the domain. Use * for all.",

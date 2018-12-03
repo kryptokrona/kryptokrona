@@ -8,8 +8,8 @@
 
 struct Config
 {
-    /* Should we listen for requests from other PC's (0.0.0.0 vs 127.0.0.1) */
-    bool acceptExternalRequests;
+    /* The IP to listen for requests on */
+    std::string rpcBindIp;
 
     /* What port should we listen on */
     uint16_t port;
