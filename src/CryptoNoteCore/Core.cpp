@@ -102,7 +102,7 @@ size_t getMaximumTransactionAllowedSize(size_t blockSizeMedian, const Currency& 
 
 BlockTemplate extractBlockTemplate(const RawBlock& block) {
   BlockTemplate blockTemplate;
-  if (!fromBinaryArray(blockTemplate, block.blockTemplate)) {
+  if (!fromBinaryArray(blockTemplate, block.block)) {
     throw std::system_error(make_error_code(error::AddBlockErrorCode::DESERIALIZATION_FAILED));
   }
 
@@ -640,7 +640,7 @@ bool Core::getWalletSyncData(
         {
             BlockTemplate block;
 
-            fromBinaryArray(block, rawBlock.blockTemplate);
+            fromBinaryArray(block, rawBlock.block);
 
             WalletTypes::WalletBlockInfo walletBlock;
 
@@ -1219,7 +1219,7 @@ std::error_code Core::addBlock(RawBlock&& rawBlock) {
   throwIfNotInitialized();
 
   BlockTemplate blockTemplate;
-  bool result = fromBinaryArray(blockTemplate, rawBlock.blockTemplate);
+  bool result = fromBinaryArray(blockTemplate, rawBlock.block);
   if (!result) {
     return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
   }
@@ -1239,7 +1239,7 @@ std::error_code Core::submitBlock(BinaryArray&& rawBlockTemplate) {
   }
 
   RawBlock rawBlock;
-  rawBlock.blockTemplate = std::move(rawBlockTemplate);
+  rawBlock.block = std::move(rawBlockTemplate);
 
   rawBlock.transactions.reserve(blockTemplate.transactionHashes.size());
   for (const auto& transactionHash : blockTemplate.transactionHashes) {
@@ -1340,7 +1340,7 @@ bool Core::getGlobalIndexesForRange(
 
             BlockTemplate block;
 
-            fromBinaryArray(block, rawBlock.blockTemplate);
+            fromBinaryArray(block, rawBlock.block);
 
             transactionHashes.push_back(
                 getBinaryArrayHash(toBinaryArray(block.baseTransaction))
@@ -1439,11 +1439,11 @@ std::vector<Crypto::Hash> Core::getPoolTransactionHashes() const {
 
 std::tuple<bool, CryptoNote::BinaryArray> Core::getPoolTransaction(const Crypto::Hash& transactionHash) const {
   if (transactionPool->checkIfTransactionPresent(transactionHash)) {
-    return std::make_tuple(true, transactionPool->getTransaction(transactionHash).getTransactionBinaryArray());
+    return {true, transactionPool->getTransaction(transactionHash).getTransactionBinaryArray()};
   }
   else {
     BinaryArray temp;
-    return std::make_tuple(false, temp);
+    return {false, temp};
   }
 }
 
@@ -2132,7 +2132,7 @@ BlockTemplate Core::restoreBlockTemplate(IBlockchainCache* blockchainCache, uint
   RawBlock rawBlock = blockchainCache->getBlockByIndex(blockIndex);
 
   BlockTemplate block;
-  if (!fromBinaryArray(block, rawBlock.blockTemplate)) {
+  if (!fromBinaryArray(block, rawBlock.block)) {
     throw std::runtime_error("Coulnd't deserialize BlockTemplate");
   }
 
@@ -2251,7 +2251,7 @@ void Core::fillQueryBlockShortInfo(uint32_t fullOffset, uint32_t currentIndex, s
     RawBlock rawBlock = getRawBlock(segment, blockIndex);
 
     BlockShortInfo blockShortInfo;
-    blockShortInfo.block = std::move(rawBlock.blockTemplate);
+    blockShortInfo.block = std::move(rawBlock.block);
     blockShortInfo.blockId = segment->getBlockHash(blockIndex);
 
     blockShortInfo.txPrefixes.reserve(rawBlock.transactions.size());
@@ -2456,7 +2456,7 @@ void Core::mergeSegments(IBlockchainCache* acceptingSegment, IBlockchainCache* s
     PushedBlockInfo info = segment->getPushedBlockInfo(blockIndex);
 
     BlockTemplate block;
-    if (!fromBinaryArray(block, info.rawBlock.blockTemplate)) {
+    if (!fromBinaryArray(block, info.rawBlock.block)) {
       logger(Logging::WARNING) << "mergeSegments error: Couldn't deserialize block";
       throw std::runtime_error("Couldn't deserialize block");
     }

@@ -38,7 +38,7 @@ static inline void serialize(COMMAND_RPC_GET_BLOCKS_FAST::response& response, IS
 
 void serialize(BlockFullInfo& blockFullInfo, ISerializer& s) {
   KV_MEMBER(blockFullInfo.block_id);
-  KV_MEMBER(blockFullInfo.blockTemplate);
+  KV_MEMBER(blockFullInfo.block);
   s(blockFullInfo.transactions, "txs");
 }
 

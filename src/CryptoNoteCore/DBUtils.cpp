@@ -29,7 +29,7 @@ namespace DB {
     Common::StdOutputStream stream(ss);
     CryptoNote::BinaryOutputStreamSerializer serializer(stream);
     
-    serializer(const_cast<RawBlock&>(value).blockTemplate, RAW_BLOCK_NAME);
+    serializer(const_cast<RawBlock&>(value).block, RAW_BLOCK_NAME);
     serializer(const_cast<RawBlock&>(value).transactions, RAW_TXS_NAME);
 
     return ss.str();
@@ -39,7 +39,7 @@ namespace DB {
     std::stringstream ss(serialized);
     Common::StdInputStream stream(ss);
     CryptoNote::BinaryInputStreamSerializer serializer(stream);
-    serializer(value.blockTemplate, RAW_BLOCK_NAME);
+    serializer(value.block, RAW_BLOCK_NAME);
     serializer(value.transactions, RAW_TXS_NAME);
   }
 }

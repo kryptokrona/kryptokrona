@@ -104,7 +104,7 @@ struct KeyPair {
 using BinaryArray = std::vector<uint8_t>;
 
 struct RawBlock {
-  BinaryArray blockTemplate; //BlockTemplate
+  BinaryArray block; //BlockTemplate
   std::vector<BinaryArray> transactions;
 };
 

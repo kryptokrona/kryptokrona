@@ -44,7 +44,7 @@ std::vector<RawBlockLegacy> convertRawBlocksToRawBlocksLegacy(const std::vector<
   legacy.reserve(rawBlocks.size());
 
   for (const auto& rawBlock: rawBlocks) {
-    legacy.emplace_back(RawBlockLegacy{rawBlock.blockTemplate, rawBlock.transactions});
+    legacy.emplace_back(RawBlockLegacy{rawBlock.block, rawBlock.transactions});
   }
 
   return legacy;
@@ -368,13 +368,13 @@ int CryptoNoteProtocolHandler::handle_notify_new_block(int command, NOTIFY_NEW_B
     if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED) {
       ++arg.hop;
       //TODO: Add here announce protocol usage
-      relay_post_notify<NOTIFY_NEW_BLOCK>(*m_p2p, arg, &context.m_connection_id);
+      relayBlock(arg);
       // relay_block(arg, context);
       requestMissingPoolTransactions(context);
     } else if (result == error::AddBlockErrorCode::ADDED_TO_MAIN) {
       ++arg.hop;
       //TODO: Add here announce protocol usage
-      relay_post_notify<NOTIFY_NEW_BLOCK>(*m_p2p, arg, &context.m_connection_id);
+      relayBlock(arg);
       // relay_block(arg, context);
     } else if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE) {
       logger(Logging::TRACE) << context << "Block added as alternative";
@@ -461,9 +461,9 @@ int CryptoNoteProtocolHandler::handle_response_get_objects(int command, NOTIFY_R
   std::vector<RawBlock> rawBlocks = convertRawBlocksLegacyToRawBlocks(arg.blocks);
 
   for (size_t index = 0; index < rawBlocks.size(); ++index) {
-    if (!fromBinaryArray(blockTemplates[index], rawBlocks[index].blockTemplate)) {
+    if (!fromBinaryArray(blockTemplates[index], rawBlocks[index].block)) {
       logger(Logging::ERROR) << context << "sent wrong block: failed to parse and validate block: \r\n"
-        << toHex(rawBlocks[index].blockTemplate) << "\r\n dropping connection";
+        << toHex(rawBlocks[index].block) << "\r\n dropping connection";
       context.m_state = CryptoNoteConnectionContext::state_shutdown;
       return 1;
     }
@@ -717,7 +717,11 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
   }
 
   BlockTemplate newBlockTemplate;
-  if(fromBinaryArray(newBlockTemplate, arg.block.blockTemplate)) { // deserialize blockTemplate
+  if(!fromBinaryArray(newBlockTemplate, arg.block.blockTemplate)) { // deserialize blockTemplate
+    logger(Logging::WARNING) << context << "Deserialization of Block Template failed, dropping connection" ;
+    context.m_state = CryptoNoteConnectionContext::state_shutdown;
+  }
+  else {
     std::vector<BinaryArray> have_txs;
     std::vector<Crypto::Hash> need_txs;
 
@@ -729,15 +733,15 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
     if (!arg.block.transactions.empty()) {
       for (const BinaryArray& txBlob: arg.block.transactions) {
         CachedTransaction cachedTransaction(txBlob);
-        if (!m_core.hasTransaction(cachedTransaction.getTransactionHash())) {
-          logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
-                                     << " not present, adding to pool";
-          if(!m_core.addTransactionToPool(txBlob)) {
-            logger(Logging::ERROR) << "Transaction verification failed, dropping connection";
-            context.m_state = CryptoNoteConnectionContext::state_shutdown;
-            return 1;
+          if (!m_core.hasTransaction(cachedTransaction.getTransactionHash())) {
+            logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
+                                       << " not present, adding to pool";
+              if(!m_core.addTransactionToPool(txBlob)) {
+                logger(Logging::ERROR) << "Transaction verification failed, dropping connection";
+                  context.m_state = CryptoNoteConnectionContext::state_shutdown;
+                    return 1;
+              }
           }
-        }
       }
     }
 
@@ -747,14 +751,14 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
      */
     for (auto transactionHash: newBlockTemplate.transactionHashes) {
       BinaryArray transactionBlob;
-      bool result;
-      std::tie(result, transactionBlob) = m_core.getPoolTransaction(transactionHash);
-      if (result){
-        have_txs.push_back(transactionBlob);
-      }
-      else {
-        need_txs.push_back(transactionHash);
-      }
+        bool result;
+        std::tie(result, transactionBlob) = m_core.getPoolTransaction(transactionHash);
+        if (result){
+          have_txs.push_back(transactionBlob);
+        }
+        else {
+          need_txs.push_back(transactionHash);
+        }
     }
 
     /*
@@ -765,38 +769,34 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
      * of the lite-block request
      */
     if (need_txs.empty()) {
-      RawBlock newBlock;
-      newBlock.blockTemplate = arg.block.blockTemplate;
-      newBlock.transactions = have_txs;
-
-      auto result = m_core.addBlock(RawBlock{newBlock.blockTemplate, newBlock.transactions});
-      if (result == error::AddBlockErrorCondition::BLOCK_ADDED) {
-        if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED) {
-          ++arg.hop;
-          //TODO: Add here announce protocol usage
-          relay_post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, arg, &context.m_connection_id);
-          // relay_block(arg, context);
-          requestMissingPoolTransactions(context);
-        } else if (result == error::AddBlockErrorCode::ADDED_TO_MAIN) {
-          ++arg.hop;
-          //TODO: Add here announce protocol usage
-          relay_post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, arg, &context.m_connection_id);
-          // relay_block(arg, context);
-        } else if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE) {
-          logger(Logging::TRACE) << context << "Block added as alternative";
+      auto result = m_core.addBlock(RawBlock{arg.block.blockTemplate, have_txs});
+        if (result == error::AddBlockErrorCondition::BLOCK_ADDED) {
+          if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED) {
+            ++arg.hop;
+            //TODO: Add here announce protocol usage
+            relay_post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, arg, &context.m_connection_id);
+            // relay_block(arg, context);
+            requestMissingPoolTransactions(context);
+          } else if (result == error::AddBlockErrorCode::ADDED_TO_MAIN) {
+              ++arg.hop;
+              //TODO: Add here announce protocol usage
+              relay_post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, arg, &context.m_connection_id);
+              // relay_block(arg, context);
+          } else if (result == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE) {
+              logger(Logging::TRACE) << context << "Block added as alternative";
+          } else {
+              logger(Logging::TRACE) << context << "Block already exists";
+          }
+        } else if (result == error::AddBlockErrorCondition::BLOCK_REJECTED) {
+            context.m_state = CryptoNoteConnectionContext::state_synchronizing;
+            NOTIFY_REQUEST_CHAIN::request r = boost::value_initialized<NOTIFY_REQUEST_CHAIN::request>();
+            r.block_ids = m_core.buildSparseChain();
+            logger(Logging::TRACE) << context << "-->>NOTIFY_REQUEST_CHAIN: m_block_ids.size()=" << r.block_ids.size();
+            post_notify<NOTIFY_REQUEST_CHAIN>(*m_p2p, r, context);
         } else {
-          logger(Logging::TRACE) << context << "Block already exists";
+            logger(Logging::DEBUGGING) << context << "Block verification failed, dropping connection: " << result.message();
+            context.m_state = CryptoNoteConnectionContext::state_shutdown;
         }
-      } else if (result == error::AddBlockErrorCondition::BLOCK_REJECTED) {
-        context.m_state = CryptoNoteConnectionContext::state_synchronizing;
-        NOTIFY_REQUEST_CHAIN::request r = boost::value_initialized<NOTIFY_REQUEST_CHAIN::request>();
-        r.block_ids = m_core.buildSparseChain();
-        logger(Logging::TRACE) << context << "-->>NOTIFY_REQUEST_CHAIN: m_block_ids.size()=" << r.block_ids.size();
-        post_notify<NOTIFY_REQUEST_CHAIN>(*m_p2p, r, context);
-      } else {
-        logger(Logging::DEBUGGING) << context << "Block verification failed, dropping connection: " << result.message();
-        context.m_state = CryptoNoteConnectionContext::state_shutdown;
-      }
     }
     else {
       CachedBlock temp(newBlockTemplate);
@@ -814,10 +814,6 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
       }
     }
   }
-  else {
-    logger(Logging::WARNING) << context << "Deserialization of Block Template failed, dropping connection" ;
-    context.m_state = CryptoNoteConnectionContext::state_shutdown;
-  }
 
   return 1;
 }
@@ -826,43 +822,29 @@ int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MIS
                                                      CryptoNoteConnectionContext& context) {
   logger(Logging::TRACE) << context << "NOTIFY_MISSING_TXS" ;
 
-  try {
-    BlockTemplate b = m_core.getBlockByHash(arg.blockHash);
+  NOTIFY_NEW_TRANSACTIONS::request req;
 
-    NOTIFY_NEW_LITE_BLOCK::request req;
-    req.block.blockTemplate = toBinaryArray(b);
-    req.current_blockchain_height = arg.current_blockchain_height;
-
-    std::vector<BinaryArray> txs;
-    std::vector<Crypto::Hash> missedHashes;
-    m_core.getTransactions(arg.missing_txs, txs, missedHashes);
-    if (!missedHashes.empty() || txs.size() != arg.missing_txs.size()) {
-      logger(Logging::ERROR) << "Failed to Handle NOTIFY_MISSING_TXS, Unable to retrieve requested transactions, Dropping Connection";
-      context.m_state = CryptoNoteConnectionContext::state_shutdown;
-    }
-    else {
-      req.block.transactions = std::move(txs);
-    }
-
-    logger(Logging::DEBUGGING) << "--> NOTIFY_RESPONSE_MISSING_TXS: "
-                               << "txs.size() = " << req.block.transactions.size()
-                               << "response.current_blockchain_height = " << req.current_blockchain_height;
-
-    if (post_notify<NOTIFY_NEW_LITE_BLOCK>(*m_p2p, req, context)) {
-      logger(Logging::DEBUGGING) << "NOTIFY_MISSING_TXS response sent to peer successfully";
-    }
-    else {
-      logger(Logging::DEBUGGING) << "Error while sending NOTIFY_MISSING_TXS response to peer";
-    }
-  }
-  catch (const std::exception &e) {
-    logger(Logging::DEBUGGING) << "Exception caught : " << e.what() ;
-    logger(Logging::DEBUGGING) << "Failed to find block with blockHash " << arg.blockHash << " Dropping Connection" ;
+  std::vector<BinaryArray> txs;
+  std::vector<Crypto::Hash> missedHashes;
+  m_core.getTransactions(arg.missing_txs, txs, missedHashes);
+  if (!missedHashes.empty() || txs.size() != arg.missing_txs.size()) {
+    logger(Logging::ERROR) << "Failed to Handle NOTIFY_MISSING_TXS, Unable to retrieve requested transactions, Dropping Connection";
     context.m_state = CryptoNoteConnectionContext::state_shutdown;
   }
-  return 1;
-}
+  else {
+    req.txs = std::move(txs);
+  }
 
+  logger(Logging::DEBUGGING) << "--> NOTIFY_RESPONSE_MISSING_TXS: "
+                             << "txs.size() = " << req.txs.size();
+
+  if (post_notify<NOTIFY_NEW_TRANSACTIONS>(*m_p2p, req, context)) {
+    logger(Logging::DEBUGGING) << "NOTIFY_MISSING_TXS response sent to peer successfully";
+  }
+  else {
+    logger(Logging::DEBUGGING) << "Error while sending NOTIFY_MISSING_TXS response to peer";
+  }
+}
 
 void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
   auto buf = LevinProtocol::encode(arg);
@@ -876,16 +858,26 @@ void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
 
   auto lite_buf = LevinProtocol::encode(lite_arg);
 
-  m_p2p->for_each_connection([this, &lite_buf, &buf](const CryptoNoteConnectionContext& ctx, uint64_t peerId){
+  std::list<boost::uuids::uuid> liteBlockConnections, normalBlockConnections;
+
+  m_p2p->for_each_connection([this, &liteBlockConnections, &normalBlockConnections](const CryptoNoteConnectionContext& ctx, uint64_t peerId){
     if (ctx.version >= P2P_LITE_BLOCKS_PROPOGATION_VERSION) {
-        logger(Logging::DEBUGGING)<<"Peer supports lite-blocks... relaying new lite block";
-        m_p2p->invoke_notify_to_peer(NOTIFY_NEW_LITE_BLOCK::ID, lite_buf, ctx);
+      logger(Logging::DEBUGGING) << ctx << "Peer supports lite-blocks... adding peer to lite block list";
+      liteBlockConnections.push_back(ctx.m_connection_id);
     }
     else {
-        logger(Logging::DEBUGGING)<<"Peer doesn't support lite-blocks... relaying new normal block";
-        m_p2p->invoke_notify_to_peer(NOTIFY_NEW_BLOCK::ID, buf, ctx);
+      logger(Logging::DEBUGGING) << ctx << "Peer doesn't support lite-blocks... adding peer to normal block list";
+      normalBlockConnections.push_back(ctx.m_connection_id);
     }
   });
+
+  if(!liteBlockConnections.empty()) {
+    m_p2p->externalRelayNotifyToList(NOTIFY_NEW_LITE_BLOCK::ID, lite_buf, liteBlockConnections);
+  }
+
+  if (!normalBlockConnections.empty()) {
+    m_p2p->externalRelayNotifyToList(NOTIFY_NEW_BLOCK::ID, buf, normalBlockConnections);
+  }
 }
 
 void CryptoNoteProtocolHandler::relayTransactions(const std::vector<BinaryArray>& transactions) {

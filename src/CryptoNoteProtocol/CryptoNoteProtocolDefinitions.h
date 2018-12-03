@@ -176,4 +176,12 @@ namespace CryptoNote
     const static int ID = BC_COMMANDS_POOL_BASE + 10;
     typedef NOTIFY_MISSING_TXS_request request;
   };
+
+  struct NOTIFY_MISSING_TXS_RESPONSE_request {
+    std::vector<BinaryArray> txs;
+  };
+
+  struct NOTIFY_MISSING_TXS_RESPONSE {
+    const static int ID = BC_COMMANDS_POOL_BASE + 11;
+  };
 }
