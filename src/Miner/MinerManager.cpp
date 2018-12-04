@@ -58,7 +58,7 @@ void adjustMergeMiningTag(BlockTemplate& blockTemplate) {
 
 }
 
-MinerManager::MinerManager(System::Dispatcher& dispatcher, const CryptoNote::MiningConfig& config, Logging::ILogger& logger) :
+MinerManager::MinerManager(System::Dispatcher& dispatcher, const CryptoNote::MiningConfig& config, std::shared_ptr<Logging::ILogger> logger) :
   m_dispatcher(dispatcher),
   m_logger(logger, "MinerManager"),
   m_contextGroup(dispatcher),

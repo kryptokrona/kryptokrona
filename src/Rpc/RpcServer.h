@@ -24,7 +24,7 @@ struct ICryptoNoteProtocolHandler;
 
 class RpcServer : public HttpServer {
 public:
-  RpcServer(System::Dispatcher& dispatcher, Logging::ILogger& log, Core& c, NodeServer& p2p, ICryptoNoteProtocolHandler& protocol);
+  RpcServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log, Core& c, NodeServer& p2p, ICryptoNoteProtocolHandler& protocol);
 
   typedef std::function<bool(RpcServer*, const HttpRequest& request, HttpResponse& response)> HandlerFunction;
   bool enableCors(const std::vector<std::string>  domains);

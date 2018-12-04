@@ -166,7 +166,7 @@ size_t difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion, uint32_t h
   static size_t getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount);
 
 private:
-  Currency(Logging::ILogger& log) : logger(log, "currency") {
+  Currency(std::shared_ptr<Logging::ILogger> log) : logger(log, "currency") {
   }
 
   bool init();
@@ -246,7 +246,7 @@ private:
 
 class CurrencyBuilder : boost::noncopyable {
 public:
-  CurrencyBuilder(Logging::ILogger& log);
+  CurrencyBuilder(std::shared_ptr<Logging::ILogger> log);
 
   Currency currency() {
     if (!m_currency.init()) {

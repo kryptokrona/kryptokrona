@@ -88,6 +88,20 @@ void SubWallet::completeAndStoreTransactionInput(
         );
 
         input.keyImage = keyImage;
+
+        /* Find the input in the unconfirmed incoming amounts - inputs we
+           sent ourselves, that are now returning as change. Remove from
+           vector if found. */
+        const auto it = std::remove_if(m_unconfirmedIncomingAmounts.begin(), m_unconfirmedIncomingAmounts.end(),
+        [&input](const auto storedInput)
+        {
+            return storedInput.key == input.key;
+        });
+
+        if (it != m_unconfirmedIncomingAmounts.end())
+        {
+            m_unconfirmedIncomingAmounts.erase(it);
+        }
     }
 
     m_unspentInputs.push_back(input);
@@ -113,6 +127,12 @@ std::tuple<uint64_t, uint64_t> SubWallet::getBalance(
         }
     }
 
+    /* Add the locked balance from incoming transactions */
+    for (const auto unconfirmedInput : m_unconfirmedIncomingAmounts)
+    {
+        lockedBalance += unconfirmedInput.amount;
+    }
+
     return {unlockedBalance, lockedBalance};
 }
 
@@ -125,6 +145,9 @@ void SubWallet::reset(const uint64_t scanHeight)
        top block. If it's returned and in an earlier block - too bad, you should
        have set your scan height lower! */
     m_lockedInputs.clear();
+
+    /* As above */
+    m_unconfirmedIncomingAmounts.clear();
 
     /* Remove inputs which are above the scan height */
     auto it = std::remove_if(m_unspentInputs.begin(), m_unspentInputs.end(),
@@ -177,21 +200,6 @@ std::string SubWallet::address() const
     return m_address;
 }
 
-std::vector<WalletTypes::TransactionInput> SubWallet::unspentInputs() const
-{
-    return m_unspentInputs;
-}
-
-std::vector<WalletTypes::TransactionInput> SubWallet::lockedInputs() const
-{
-    return m_lockedInputs;
-}
-
-std::vector<WalletTypes::TransactionInput> SubWallet::spentInput() const
-{
-    return m_spentInputs;
-}
-
 bool SubWallet::hasKeyImage(const Crypto::KeyImage keyImage) const
 {
     auto it = std::find_if(m_unspentInputs.begin(), m_unspentInputs.end(),
@@ -217,6 +225,8 @@ bool SubWallet::hasKeyImage(const Crypto::KeyImage keyImage) const
 
     /* Note: We don't need to check the spent inputs - it should never show
        up there, as the same key image can only be used once */
+
+    /* Also don't need to check unconfirmed inputs - we can't spend those yet */
 }
 
 Crypto::PublicKey SubWallet::publicSpendKey() const
@@ -303,7 +313,25 @@ void SubWallet::markInputAsLocked(const Crypto::KeyImage keyImage)
 
 void SubWallet::removeForkedInputs(const uint64_t forkHeight)
 {
-    const auto it = std::remove_if(m_spentInputs.begin(), m_spentInputs.end(),
+    /* Both of these will be resolved by the wallet in time */
+    m_lockedInputs.clear();
+    m_unconfirmedIncomingAmounts.clear();
+
+    /* Unspent inputs which we recieved in a block after the fork. Remove them. */
+    auto it = std::remove_if(m_unspentInputs.begin(), m_unspentInputs.end(),
+    [forkHeight](const auto input)
+    {
+        return input.blockHeight >= forkHeight;
+    });
+
+    if (it != m_unspentInputs.end())
+    {
+        m_unspentInputs.erase(it);
+    }
+
+    /* If the input was spent after the fork height, but received before the
+       fork height, then we keep it, but move it into the unspent vector */
+    it = std::remove_if(m_spentInputs.begin(), m_spentInputs.end(),
     [&forkHeight, this](auto &input)
     {
         if (input.spendHeight >= forkHeight)
@@ -326,11 +354,14 @@ void SubWallet::removeForkedInputs(const uint64_t forkHeight)
     }
 }
 
-void SubWallet::removeCancelledTransactions(const std::unordered_set<Crypto::Hash> cancelledTransactions)
+/* Cancelled transactions are transactions we sent, but got cancelled and not
+   included in a block for some reason */
+void SubWallet::removeCancelledTransactions(
+    const std::unordered_set<Crypto::Hash> cancelledTransactions)
 {
     /* Find the inputs used in the cancelled transactions */
-    const auto it = std::remove_if(m_lockedInputs.begin(), m_lockedInputs.end(),
-    [&](auto &input)
+    auto it = std::remove_if(m_lockedInputs.begin(), m_lockedInputs.end(),
+    [&cancelledTransactions, this](auto &input)
     {
         if (cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end())
         {
@@ -351,15 +382,32 @@ void SubWallet::removeCancelledTransactions(const std::unordered_set<Crypto::Has
     {
         m_spentInputs.erase(it);
     }
+
+    /* Find inputs that we 'received' in outgoing transfers (scanning our
+       own sent transfer) and remove them */
+    auto it2 = std::remove_if(m_unconfirmedIncomingAmounts.begin(), m_unconfirmedIncomingAmounts.end(),
+    [&cancelledTransactions](auto &input)
+    {
+        return cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end();
+    });
+
+    if (it2 != m_unconfirmedIncomingAmounts.end())
+    {
+        m_unconfirmedIncomingAmounts.erase(it2);
+    }
 }
 
-std::vector<WalletTypes::TxInputAndOwner> SubWallet::getInputs() const
+std::vector<WalletTypes::TxInputAndOwner> SubWallet::getSpendableInputs(
+    const uint64_t height) const
 {
     std::vector<WalletTypes::TxInputAndOwner> inputs;
 
     for (const auto input : m_unspentInputs)
     {
-        inputs.emplace_back(input, m_publicSpendKey, m_privateSpendKey);
+        if (Utilities::isInputUnlocked(input.unlockTime, height))
+        {
+            inputs.emplace_back(input, m_publicSpendKey, m_privateSpendKey);
+        }
     }
 
     return inputs;
@@ -373,4 +421,10 @@ uint64_t SubWallet::syncStartHeight() const
 uint64_t SubWallet::syncStartTimestamp() const
 {
     return m_syncStartTimestamp;
+}
+
+void SubWallet::storeUnconfirmedIncomingInput(
+    const WalletTypes::UnconfirmedInput input)
+{
+    m_unconfirmedIncomingAmounts.push_back(input);
 }

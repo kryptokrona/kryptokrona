@@ -119,7 +119,7 @@ static inline void serialize(NOTIFY_RESPONSE_GET_OBJECTS_request& request, ISeri
   s(request.current_blockchain_height, "current_blockchain_height");
 }
 
-CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, Logging::ILogger& log) :
+CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<Logging::ILogger> log) :
   m_dispatcher(dispatcher),
   m_currency(currency),
   m_core(rcore),

@@ -79,7 +79,8 @@ SubWallets::SubWallets(const SubWallets &other) :
     m_lockedTransactions(other.m_lockedTransactions),
     m_privateViewKey(other.m_privateViewKey),
     m_isViewWallet(other.m_isViewWallet),
-    m_publicSpendKeys(other.m_publicSpendKeys)
+    m_publicSpendKeys(other.m_publicSpendKeys),
+    m_transactionPrivateKeys(other.m_transactionPrivateKeys)
 {
 }
 
@@ -87,12 +88,12 @@ SubWallets::SubWallets(const SubWallets &other) :
 /* CLASS FUNCTIONS */
 /////////////////////
 
-WalletError SubWallets::addSubWallet()
+std::tuple<WalletError, std::string> SubWallets::addSubWallet()
 {
     /* This generates a private spend key - incompatible with view wallets */
     if (m_isViewWallet)
     {
-        return ILLEGAL_VIEW_WALLET_OPERATION;
+        return {ILLEGAL_VIEW_WALLET_OPERATION, std::string()};
     }
 
     std::scoped_lock lock(m_mutex);
@@ -115,18 +116,17 @@ WalletError SubWallets::addSubWallet()
         Utilities::getCurrentTimestampAdjusted(), isPrimaryAddress
     );
 
-    return SUCCESS;
+    return {SUCCESS, address};
 }
 
-WalletError SubWallets::importSubWallet(
+std::tuple<WalletError, std::string> SubWallets::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
-    const uint64_t scanHeight,
-    const bool newWallet)
+    const uint64_t scanHeight)
 {
     /* Can't add a private spend key to a view wallet */
     if (m_isViewWallet)
     {
-        return ILLEGAL_VIEW_WALLET_OPERATION;
+        return {ILLEGAL_VIEW_WALLET_OPERATION, std::string()};
     }
 
     std::scoped_lock lock(m_mutex);
@@ -135,7 +135,7 @@ WalletError SubWallets::importSubWallet(
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
 
-    uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
+    uint64_t timestamp = 0;
 
     const std::string address = Utilities::privateKeysToAddress(
         privateSpendKey, m_privateViewKey
@@ -145,7 +145,7 @@ WalletError SubWallets::importSubWallet(
 
     if (m_subWallets.find(publicSpendKey) != m_subWallets.end())
     {
-        return SUBWALLET_ALREADY_EXISTS;
+        return {SUBWALLET_ALREADY_EXISTS, std::string()};
     }
 
     m_subWallets[publicSpendKey] = SubWallet(
@@ -155,28 +155,27 @@ WalletError SubWallets::importSubWallet(
 
     m_publicSpendKeys.push_back(publicSpendKey);
 
-    return SUCCESS;
+    return {SUCCESS, address};
 }
 
-WalletError SubWallets::importViewSubWallet(
+std::tuple<WalletError, std::string> SubWallets::importViewSubWallet(
     const Crypto::PublicKey publicSpendKey,
-    const uint64_t scanHeight,
-    const bool newWallet)
+    const uint64_t scanHeight)
 {
     /* Can't have view/non view wallets in one container */
     if (!m_isViewWallet)
     {
-        return ILLEGAL_NON_VIEW_WALLET_OPERATION;
+        return {ILLEGAL_NON_VIEW_WALLET_OPERATION, std::string()};
     }
 
     std::scoped_lock lock(m_mutex);
 
     if (m_subWallets.find(publicSpendKey) != m_subWallets.end())
     {
-        return SUBWALLET_ALREADY_EXISTS;
+        return {SUBWALLET_ALREADY_EXISTS, std::string()};
     }
 
-    uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
+    uint64_t timestamp = 0;
 
     Crypto::PublicKey publicViewKey;
 
@@ -194,7 +193,68 @@ WalletError SubWallets::importViewSubWallet(
 
     m_publicSpendKeys.push_back(publicSpendKey);
 
+    return {SUCCESS, address};
+}
+
+WalletError SubWallets::deleteSubWallet(const std::string address)
+{
+    std::scoped_lock lock(m_mutex);
+
+    const auto [spendKey, viewKey] = Utilities::addressToKeys(address);
+
+    const auto it = m_subWallets.find(spendKey);
+
+    if (it == m_subWallets.end())
+    {
+        return ADDRESS_NOT_IN_WALLET;
+    }
+
+    /* We can't delete the primary address */
+    if (it->second.isPrimaryAddress())
+    {
+        return CANNOT_DELETE_PRIMARY_ADDRESS;
+    }
+
+    m_subWallets.erase(it);
+
+    /* Remove or update the transactions */
+    deleteAddressTransactions(m_transactions, spendKey);
+    deleteAddressTransactions(m_lockedTransactions, spendKey);
+
     return SUCCESS;
+}
+
+void SubWallets::deleteAddressTransactions(
+    std::vector<WalletTypes::Transaction> &txs,
+    const Crypto::PublicKey spendKey)
+{
+    const auto it = std::remove_if(txs.begin(), txs.end(), [spendKey](auto &tx)
+    {
+        /* See if this transaction contains the subwallet we're deleting */
+        const auto key = tx.transfers.find(spendKey);
+
+        /* OK, it does */
+        if (key != tx.transfers.end())
+        {
+            /* It's the only element, delete the transaction */
+            if (tx.transfers.size() == 1)
+            {
+                return true;
+            }
+            /* Otherwise just delete the transfer in the transaction */
+            else
+            {
+                tx.transfers.erase(key);
+            }
+        }
+
+        return false;
+    });
+
+    if (it != txs.end())
+    {
+        txs.erase(it);
+    }
 }
 
 /* Gets the starting height, and timestamp to begin the sync from. Only one of
@@ -330,7 +390,8 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
         SubWallets::getTransactionInputsForAmount(
     const uint64_t amount,
     const bool takeFromAll,
-    std::vector<Crypto::PublicKey> subWalletsToTakeFrom) const
+    std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
+    const uint64_t height) const
 {
     /* Can't send transactions with a view wallet */
     throwIfViewWallet();
@@ -357,7 +418,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
     {
-        const auto moreInputs = subWallet.getInputs();
+        const auto moreInputs = subWallet.getSpendableInputs(height);
 
         availableInputs.insert(availableInputs.end(), moreInputs.begin(), moreInputs.end());
     }
@@ -370,7 +431,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     std::vector<WalletTypes::TxInputAndOwner> inputsToUse;
 
     /* Loop through each input */
-    for (const auto &walletAmount : availableInputs)
+    for (const auto walletAmount : availableInputs)
     {
         /* Add each input */
         inputsToUse.push_back(walletAmount);
@@ -394,7 +455,8 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
     SubWallets::getFusionTransactionInputs(
     const bool takeFromAll,
     std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
-    const uint64_t mixin) const
+    const uint64_t mixin,
+    const uint64_t height) const
 {
     /* Can't send transactions with a view wallet */
     throwIfViewWallet();
@@ -421,7 +483,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
     {
-        const auto moreInputs = subWallet.getInputs();
+        const auto moreInputs = subWallet.getSpendableInputs(height);
 
         availableInputs.insert(availableInputs.end(), moreInputs.begin(), moreInputs.end());
     }
@@ -529,6 +591,18 @@ std::string SubWallets::getPrimaryAddress() const
     }
 
     return it->second.address();
+}
+
+std::vector<std::string> SubWallets::getAddresses() const
+{
+    std::vector<std::string> addresses;
+
+    for (const auto [pubKey, subWallet] : m_subWallets)
+    {
+        addresses.push_back(subWallet.address());
+    }
+
+    return addresses;
 }
 
 /* Will throw if the public keys given don't exist */
@@ -647,6 +721,21 @@ Crypto::SecretKey SubWallets::getPrivateViewKey() const
     return m_privateViewKey;
 }
 
+std::tuple<WalletError, Crypto::SecretKey> SubWallets::getPrivateSpendKey(
+    const Crypto::PublicKey publicSpendKey) const
+{
+    throwIfViewWallet();
+
+    const auto it = m_subWallets.find(publicSpendKey);
+
+    if (it == m_subWallets.end())
+    {
+        return {ADDRESS_NOT_IN_WALLET, Crypto::SecretKey()};
+    }
+
+    return {SUCCESS, it->second.privateSpendKey()};
+}
+
 std::unordered_set<Crypto::Hash> SubWallets::getLockedTransactionsHashes() const
 {
     /* Can't have locked transactions in a view wallet (can't spend) */
@@ -745,4 +834,51 @@ std::vector<WalletTypes::Transaction> SubWallets::getTransactions() const
 std::vector<WalletTypes::Transaction> SubWallets::getUnconfirmedTransactions() const
 {
     return m_lockedTransactions;
+}
+
+std::tuple<WalletError, std::string> SubWallets::getAddress(
+    const Crypto::PublicKey spendKey) const
+{
+    const auto it = m_subWallets.find(spendKey);
+
+    if (it != m_subWallets.end())
+    {
+        return {SUCCESS, it->second.address()};
+    }
+
+    return {ADDRESS_NOT_IN_WALLET, std::string()};
+}
+
+void SubWallets::storeTxPrivateKey(
+    const Crypto::SecretKey txPrivateKey,
+    const Crypto::Hash txHash)
+{
+    m_transactionPrivateKeys[txHash] = txPrivateKey;
+}
+
+std::tuple<bool, Crypto::SecretKey> SubWallets::getTxPrivateKey(
+    const Crypto::Hash txHash) const
+{
+    const auto it = m_transactionPrivateKeys.find(txHash);
+
+    if (it != m_transactionPrivateKeys.end())
+    {
+        return {true, it->second};
+    }
+
+    return {false, Crypto::SecretKey()};
+}
+
+void SubWallets::storeUnconfirmedIncomingInput(
+    const WalletTypes::UnconfirmedInput input,
+    const Crypto::PublicKey publicSpendKey)
+{
+    std::scoped_lock lock(m_mutex);
+
+    const auto it = m_subWallets.find(publicSpendKey);
+
+    if (it != m_subWallets.end())
+    {
+        it->second.storeUnconfirmedIncomingInput(input);
+    }
 }

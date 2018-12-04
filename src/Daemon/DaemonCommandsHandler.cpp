@@ -45,7 +45,7 @@ std::string printTransactionFullInfo(const CryptoNote::CachedTransaction& transa
 
 }
 
-DaemonCommandsHandler::DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, CryptoNote::RpcServer* prpc_server) :
+DaemonCommandsHandler::DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, std::shared_ptr<Logging::LoggerManager> log, CryptoNote::RpcServer* prpc_server) :
   m_core(core), m_srv(srv), logger(log, "daemon"), m_logManager(log), m_prpc_server(prpc_server) {
   m_consoleHandler.setHandler("exit", boost::bind(&DaemonCommandsHandler::exit, this, _1), "Shutdown the daemon");
   m_consoleHandler.setHandler("help", boost::bind(&DaemonCommandsHandler::help, this, _1), "Show this help");
@@ -184,7 +184,7 @@ bool DaemonCommandsHandler::set_log(const std::vector<std::string>& args)
     return true;
   }
 
-  m_logManager.setMaxLevel(static_cast<Logging::Level>(l));
+  m_logManager->setMaxLevel(static_cast<Logging::Level>(l));
   return true;
 }
 

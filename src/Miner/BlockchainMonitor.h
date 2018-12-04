@@ -27,7 +27,7 @@
 
 class BlockchainMonitor {
 public:
-  BlockchainMonitor(System::Dispatcher& dispatcher, const std::string& daemonHost, uint16_t daemonPort, size_t pollingInterval, Logging::ILogger& logger);
+  BlockchainMonitor(System::Dispatcher& dispatcher, const std::string& daemonHost, uint16_t daemonPort, size_t pollingInterval, std::shared_ptr<Logging::ILogger> logger);
 
   void waitBlockchainUpdate();
   void stop();

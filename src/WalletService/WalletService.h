@@ -38,14 +38,14 @@ struct WalletConfiguration {
   uint64_t scanHeight;
 };
 
-void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfiguration& conf, Logging::ILogger& logger, System::Dispatcher& dispatcher);
+void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfiguration& conf, std::shared_ptr<Logging::ILogger> logger, System::Dispatcher& dispatcher);
 
 struct TransactionsInBlockInfoFilter;
 
 class WalletService {
 public:
   WalletService(const CryptoNote::Currency& currency, System::Dispatcher& sys, CryptoNote::INode& node, CryptoNote::IWallet& wallet,
-    CryptoNote::IFusionManager& fusionManager, const WalletConfiguration& conf, Logging::ILogger& logger);
+    CryptoNote::IFusionManager& fusionManager, const WalletConfiguration& conf, std::shared_ptr<Logging::ILogger> logger);
   virtual ~WalletService();
 
   void init();

@@ -44,7 +44,7 @@ using namespace CryptoNote;
 using namespace Logging;
 using namespace DaemonConfig;
 
-void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const bool blockExplorerMode, LoggerManager& logManager)
+void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const bool blockExplorerMode, std::shared_ptr<LoggerManager> logManager)
 {
   std::vector<CryptoNote::AccountPublicAddress> rewardTargets;
 
@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
   _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-  LoggerManager logManager;
+  const auto logManager = std::make_shared<LoggerManager>();
   LoggerRef logger(logManager, "daemon");
 
   // Initial loading of CLI parameters
@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
     Level cfgLogLevel = static_cast<Level>(static_cast<int>(Logging::ERROR) + config.logLevel);
 
     // configure logging
-    logManager.configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile));
+    logManager->configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile));
 
     logger(INFO, BRIGHT_GREEN) << getProjectCLIHeader() << std::endl;
 

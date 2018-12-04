@@ -146,7 +146,7 @@ private:
   bool m_cancelled;
 };
 
-BlockchainExplorer::BlockchainExplorer(INode& node, Logging::ILogger& logger) :
+BlockchainExplorer::BlockchainExplorer(INode& node, std::shared_ptr<Logging::ILogger> logger) :
   node(node), 
   logger(logger, "BlockchainExplorer"),
   state(NOT_INITIALIZED), 

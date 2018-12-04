@@ -20,7 +20,7 @@ class WalletService;
 
 class PaymentServiceJsonRpcServer : public CryptoNote::JsonRpcServer {
 public:
-  PaymentServiceJsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, WalletService& service, Logging::ILogger& loggerGroup, PaymentService::ConfigurationManager& config);
+  PaymentServiceJsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, WalletService& service, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config);
   PaymentServiceJsonRpcServer(const PaymentServiceJsonRpcServer&) = delete;
 
 protected:

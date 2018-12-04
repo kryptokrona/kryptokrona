@@ -46,9 +46,9 @@ public:
    * BlockchainCache objects as children are supported.
    */
   DatabaseBlockchainCache(const Currency& currency, IDataBase& dataBase,
-                          IBlockchainCacheFactory& blockchainCacheFactory, Logging::ILogger& logger);
+                          IBlockchainCacheFactory& blockchainCacheFactory, std::shared_ptr<Logging::ILogger> logger);
 
-  static bool checkDBSchemeVersion(IDataBase& dataBase, Logging::ILogger& logger);
+  static bool checkDBSchemeVersion(IDataBase& dataBase, std::shared_ptr<Logging::ILogger> logger);
 
   /*
    * This methods splits cache, upper part (ie blocks with indexes larger than splitBlockIndex)

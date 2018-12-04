@@ -169,7 +169,7 @@ bool isInputUnlocked(
         return currentTimeAdjusted >= unlockTime;
     }
 
-    const uint64_t currentHeightAdjusted = unlockTime
+    const uint64_t currentHeightAdjusted = currentHeight
         + CryptoNote::parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
     return currentHeightAdjusted >= unlockTime;

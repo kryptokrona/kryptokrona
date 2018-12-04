@@ -23,7 +23,7 @@ using namespace Logging;
 
 namespace CryptoNote {
 //---------------------------------------------------------------------------
-Checkpoints::Checkpoints(Logging::ILogger &log) : logger(log, "checkpoints") {}
+Checkpoints::Checkpoints(std::shared_ptr<Logging::ILogger> log) : logger(log, "checkpoints") {}
 //---------------------------------------------------------------------------
 bool Checkpoints::addCheckpoint(uint32_t index, const std::string &hash_str) {
   Crypto::Hash h = NULL_HASH;
