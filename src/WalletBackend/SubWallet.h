@@ -88,17 +88,16 @@ class SubWallet
 
         void removeCancelledTransactions(const std::unordered_set<Crypto::Hash> cancelledTransactions);
 
-        std::vector<WalletTypes::TxInputAndOwner> getInputs() const;
-
-        std::vector<WalletTypes::TransactionInput> unspentInputs() const;
-
-        std::vector<WalletTypes::TransactionInput> lockedInputs() const;
-
-        std::vector<WalletTypes::TransactionInput> spentInput() const;
+        /* Gets inputs that are spendable at the given height */
+        std::vector<WalletTypes::TxInputAndOwner> getSpendableInputs(
+            const uint64_t height) const;
 
         uint64_t syncStartHeight() const;
 
         uint64_t syncStartTimestamp() const;
+
+        void storeUnconfirmedIncomingInput(
+            const WalletTypes::UnconfirmedInput input);
 
         /////////////////////////////
         /* Public member variables */
@@ -116,6 +115,11 @@ class SubWallet
 
         /* Inputs which have been spent in a transaction */
         std::vector<WalletTypes::TransactionInput> m_spentInputs;
+
+        /* Inputs which have come in from a transaction we sent - either from
+           change or from sending to ourself - we use this to display unlocked
+           balance correctly */
+        std::vector<WalletTypes::UnconfirmedInput> m_unconfirmedIncomingAmounts;
 
         /* This subwallet's public spend key */
         Crypto::PublicKey m_publicSpendKey;

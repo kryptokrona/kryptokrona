@@ -140,7 +140,7 @@ static inline void serialize(NOTIFY_MISSING_TXS_request& request, ISerializer& s
   serializeAsBinary(request.missing_txs, "missing_txs", s);
 }
 
-CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, Logging::ILogger& log) :
+CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<Logging::ILogger> log) :
   m_dispatcher(dispatcher),
   m_currency(currency),
   m_core(rcore),

@@ -425,7 +425,7 @@ struct DatabaseBlockchainCache::ExtendedPushedBlockInfo {
 };
 
 
-DatabaseBlockchainCache::DatabaseBlockchainCache(const Currency& curr, IDataBase& dataBase, IBlockchainCacheFactory& blockchainCacheFactory, Logging::ILogger& _logger)
+DatabaseBlockchainCache::DatabaseBlockchainCache(const Currency& curr, IDataBase& dataBase, IBlockchainCacheFactory& blockchainCacheFactory, std::shared_ptr<Logging::ILogger> _logger)
     : currency(curr), database(dataBase), blockchainCacheFactory(blockchainCacheFactory), logger(_logger, "DatabaseBlockchainCache") {
   DatabaseVersionReadBatch readBatch;
   auto ec = database.read(readBatch);
@@ -452,7 +452,7 @@ DatabaseBlockchainCache::DatabaseBlockchainCache(const Currency& curr, IDataBase
   }
 }
 
-bool DatabaseBlockchainCache::checkDBSchemeVersion(IDataBase& database, Logging::ILogger& _logger) {
+bool DatabaseBlockchainCache::checkDBSchemeVersion(IDataBase& database, std::shared_ptr<Logging::ILogger> _logger) {
   Logging::LoggerRef logger(_logger, "DatabaseBlockchainCache");
 
   DatabaseVersionReadBatch readBatch;

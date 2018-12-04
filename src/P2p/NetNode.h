@@ -73,7 +73,7 @@ namespace CryptoNote
     uint64_t peerId;
     System::TcpConnection connection;
 
-    P2pConnectionContext(System::Dispatcher& dispatcher, Logging::ILogger& log, System::TcpConnection&& conn) :
+    P2pConnectionContext(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log, System::TcpConnection&& conn) :
       context(nullptr),
       peerId(0),
       connection(std::move(conn)),
@@ -110,7 +110,7 @@ namespace CryptoNote
   class NodeServer :  public IP2pEndpoint
   {
   public:
-    NodeServer(System::Dispatcher& dispatcher, CryptoNote::CryptoNoteProtocolHandler& payload_handler, Logging::ILogger& log);
+    NodeServer(System::Dispatcher& dispatcher, CryptoNote::CryptoNoteProtocolHandler& payload_handler, std::shared_ptr<Logging::ILogger> log);
 
     bool run();
     bool init(const NetNodeConfig& config);

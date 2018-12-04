@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include <NodeRpcProxy/NodeRpcProxy.h>
+#include <Nigel/Nigel.h>
 
 #include <WalletBackend/EventHandler.h>
 #include <WalletBackend/ThreadSafeQueue.h>
@@ -27,7 +27,7 @@ class WalletSynchronizer
 
         /* Parameterized constructor */
         WalletSynchronizer(
-            const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+            const std::shared_ptr<Nigel> daemon,
             const uint64_t startTimestamp,
             const uint64_t startHeight,
             const Crypto::SecretKey privateViewKey,
@@ -61,14 +61,14 @@ class WalletSynchronizer
         void fromJson(const json &j);
 
         void initializeAfterLoad(
-            const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+            const std::shared_ptr<Nigel> daemon,
             const std::shared_ptr<EventHandler> eventHandler);
 
         void reset(uint64_t startHeight);
 
         uint64_t getCurrentScanHeight() const;
 
-        void swapNode(const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon);
+        void swapNode(const std::shared_ptr<Nigel> daemon);
 
         /////////////////////////////
         /* Public member variables */
@@ -173,7 +173,7 @@ class WalletSynchronizer
         std::shared_ptr<EventHandler> m_eventHandler;
 
         /* The daemon connection */
-        std::shared_ptr<CryptoNote::NodeRpcProxy> m_daemon;
+        std::shared_ptr<Nigel> m_daemon;
 
         /* Have we launched the pool watcher thread yet (we launched it when
            synced) */

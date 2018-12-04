@@ -702,7 +702,7 @@ cachedGenesisBlock(new CachedBlock(genesisBlockTemplate)),
 logger(currency.logger) {
 }
 
-CurrencyBuilder::CurrencyBuilder(Logging::ILogger& log) : m_currency(log) {
+CurrencyBuilder::CurrencyBuilder(std::shared_ptr<Logging::ILogger> log) : m_currency(log) {
   maxBlockNumber(parameters::CRYPTONOTE_MAX_BLOCK_NUMBER);
   maxBlockBlobSize(parameters::CRYPTONOTE_MAX_BLOCK_BLOB_SIZE);
   maxTxSize(parameters::CRYPTONOTE_MAX_TX_SIZE);

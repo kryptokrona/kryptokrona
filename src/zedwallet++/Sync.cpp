@@ -10,6 +10,8 @@
 
 #include <config/WalletConfig.h>
 
+#include <iostream>
+
 #include <thread>
 
 #include <zedwallet++/ColouredMsg.h>

@@ -6,6 +6,8 @@
 #include <zedwallet++/TransactionMonitor.h>
 ///////////////////////////////////////////
 
+#include <iostream>
+
 #include <zedwallet++/ColouredMsg.h>
 #include <zedwallet++/CommandImplementations.h>
 #include <zedwallet++/GetInput.h>

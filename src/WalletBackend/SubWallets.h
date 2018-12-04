@@ -41,19 +41,19 @@ class SubWallets
         /////////////////////////////
 
         /* Adds a sub wallet with a random spend key */
-        WalletError addSubWallet();
+        std::tuple<WalletError, std::string> addSubWallet();
 
         /* Imports a sub wallet with the given private spend key */
-        WalletError importSubWallet(
+        std::tuple<WalletError, std::string> importSubWallet(
             const Crypto::SecretKey privateSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
 
         /* Imports a sub view only wallet with the given public spend key */
-        WalletError importViewSubWallet(
+        std::tuple<WalletError, std::string> importViewSubWallet(
             const Crypto::PublicKey privateSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
+
+        WalletError deleteSubWallet(const std::string address);
 
         /* Returns (height, timestamp) to begin syncing at. Only one (if any)
            of the values will be non zero */
@@ -87,19 +87,25 @@ class SubWallets
                 getTransactionInputsForAmount(
             const uint64_t amount,
             const bool takeFromAll,
-            std::vector<Crypto::PublicKey> subWalletsToTakeFrom) const;
+            std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
+            const uint64_t height) const;
 
         std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
                 getFusionTransactionInputs(
             const bool takeFromAll,
             std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
-            const uint64_t mixin) const;
+            const uint64_t mixin,
+            const uint64_t height) const;
 
         /* Get the owner of the key image, if any */
         std::tuple<bool, Crypto::PublicKey> getKeyImageOwner(
             const Crypto::KeyImage keyImage) const;
 
+        /* Gets the primary address (normally first created) address */
         std::string getPrimaryAddress() const;
+
+        /* Gets all the addresses in the subwallets container */
+        std::vector<std::string> getAddresses() const;
 
         /* Get the sum of the balance of the subwallets pointed to. If
            takeFromAll, get the total balance from all subwallets. */
@@ -118,6 +124,10 @@ class SubWallets
         void removeForkedTransactions(uint64_t forkHeight);
 
         Crypto::SecretKey getPrivateViewKey() const;
+
+        /* Gets the private spend key for the given public spend, if it exists */
+        std::tuple<WalletError, Crypto::SecretKey> getPrivateSpendKey(
+            const Crypto::PublicKey publicSpendKey) const;
 
         std::vector<Crypto::SecretKey> getPrivateSpendKeys() const;
 
@@ -148,6 +158,18 @@ class SubWallets
            block yet. */
         std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
 
+        std::tuple<WalletError, std::string> getAddress(
+            const Crypto::PublicKey spendKey) const;
+
+        /* Store the private key used to create a transaction - can be used
+           for auditing transactions */
+        void storeTxPrivateKey(
+            const Crypto::SecretKey txPrivateKey,
+            const Crypto::Hash txHash);
+
+        std::tuple<bool, Crypto::SecretKey> getTxPrivateKey(
+            const Crypto::Hash txHash) const;
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////
@@ -156,6 +178,10 @@ class SubWallets
            ours */
         std::vector<Crypto::PublicKey> m_publicSpendKeys;
 
+        void storeUnconfirmedIncomingInput(
+            const WalletTypes::UnconfirmedInput input,
+            const Crypto::PublicKey publicSpendKey);
+
     private:
 
         //////////////////////////////
@@ -163,6 +189,13 @@ class SubWallets
         //////////////////////////////
 
         void throwIfViewWallet() const;
+
+        /* Deletes any transactions containing the given spend key, or just
+           removes from the transfers array if there are multiple transfers
+           in the tx */
+        void deleteAddressTransactions(
+            std::vector<WalletTypes::Transaction> &txs,
+            const Crypto::PublicKey spendKey);
 
         //////////////////////////////
         /* Private member variables */
@@ -180,6 +213,9 @@ class SubWallets
         Crypto::SecretKey m_privateViewKey;
 
         bool m_isViewWallet;
+
+        /* Transaction private keys of sent transactions, used for auditing */
+        std::unordered_map<Crypto::Hash, Crypto::SecretKey> m_transactionPrivateKeys;
 
         /* Need a mutex for accessing inputs, transactions, and locked
            transactions, etc as these are modified on multiple threads */

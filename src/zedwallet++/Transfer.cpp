@@ -6,6 +6,8 @@
 #include <zedwallet++/Transfer.h>
 /////////////////////////////////
 
+#include <iostream>
+
 #include <config/WalletConfig.h>
 
 #include <zedwallet++/ColouredMsg.h>

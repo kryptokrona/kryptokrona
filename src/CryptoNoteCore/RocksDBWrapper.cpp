@@ -32,7 +32,7 @@ namespace {
   const std::string TESTNET_DB_NAME = "testnet_DB";
 }
 
-RocksDBWrapper::RocksDBWrapper(Logging::ILogger& logger) : logger(logger, "RocksDBWrapper"), state(NOT_INITIALIZED){
+RocksDBWrapper::RocksDBWrapper(std::shared_ptr<Logging::ILogger> logger) : logger(logger, "RocksDBWrapper"), state(NOT_INITIALIZED){
 
 }
 

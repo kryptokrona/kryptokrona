@@ -21,7 +21,7 @@ class NodeServer;
 class DaemonCommandsHandler
 {
 public:
-  DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, CryptoNote::RpcServer* prpc_server);
+  DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, std::shared_ptr<Logging::LoggerManager> log, CryptoNote::RpcServer* prpc_server);
 
   bool start_handling() {
     m_consoleHandler.start();
@@ -38,7 +38,7 @@ private:
   CryptoNote::Core& m_core;
   CryptoNote::NodeServer& m_srv;
   Logging::LoggerRef logger;
-  Logging::LoggerManager& m_logManager;
+  std::shared_ptr<Logging::LoggerManager> m_logManager;
   CryptoNote::RpcServer* m_prpc_server;
 
   std::string get_commands_str();
