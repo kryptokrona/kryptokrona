@@ -1346,7 +1346,7 @@ bool Core::getGlobalIndexesForRange(
                 getBinaryArrayHash(toBinaryArray(block.baseTransaction))
             );
         }
-
+        
         indexes = mainChain->getGlobalIndexes(transactionHashes);
 
         return true;

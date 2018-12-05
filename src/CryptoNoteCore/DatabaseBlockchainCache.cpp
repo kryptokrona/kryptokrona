@@ -1631,7 +1631,7 @@ std::vector<Crypto::Hash> DatabaseBlockchainCache::getBlockHashesByTimestamps(ui
 }
 
 std::vector<RawBlock> DatabaseBlockchainCache::getBlocksByHeight(
-    const uint64_t startHeight, const uint64_t endHeight) const
+    const uint64_t startHeight, uint64_t endHeight) const
 {
     auto blockBatch = BlockchainReadBatch().requestRawBlocks(startHeight, endHeight);
 
