@@ -186,7 +186,7 @@ public:
 
   virtual std::vector<RawBlock> getBlocksByHeight(
     const uint64_t startHeight,
-    const uint64_t endHeight) const = 0;
+    uint64_t endHeight) const = 0;
 };
 
 }
