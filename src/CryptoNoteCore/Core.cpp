@@ -1442,8 +1442,7 @@ std::tuple<bool, CryptoNote::BinaryArray> Core::getPoolTransaction(const Crypto:
     return {true, transactionPool->getTransaction(transactionHash).getTransactionBinaryArray()};
   }
   else {
-    BinaryArray temp;
-    return {false, temp};
+    return {false, BinaryArray()};
   }
 }
 
