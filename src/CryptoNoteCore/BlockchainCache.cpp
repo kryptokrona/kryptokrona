@@ -98,7 +98,7 @@ bool serialize(PackedOutIndex& value, Common::StringView name, CryptoNote::ISeri
   return serializer(value.packedValue, name);
 }
 
-BlockchainCache::BlockchainCache(const std::string& filename, const Currency& currency, Logging::ILogger& logger_,
+BlockchainCache::BlockchainCache(const std::string& filename, const Currency& currency, std::shared_ptr<Logging::ILogger> logger_,
                                  IBlockchainCache* parent, uint32_t splitBlockIndex)
     : filename(filename), currency(currency), logger(logger_, "BlockchainCache"), parent(parent), storage(new BlockchainStorage(100)) {
   if (parent == nullptr) {
@@ -611,7 +611,7 @@ std::vector<RawBlock> BlockchainCache::getBlocksByHeight(
 
     uint64_t startOffset = std::max(startHeight, static_cast<uint64_t>(startIndex));
 
-    for (uint64_t i = startOffset; i <= endHeight; i++)
+    for (uint64_t i = startOffset; i < endHeight - 1; i++)
     {
         blocks.push_back(storage->getBlockByIndex(i - startIndex));
     }

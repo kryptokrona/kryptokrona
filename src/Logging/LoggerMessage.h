@@ -24,7 +24,7 @@ namespace Logging {
 
 class LoggerMessage : public std::ostream, std::streambuf {
 public:
-  LoggerMessage(ILogger& logger, const std::string& category, Level level, const std::string& color);
+  LoggerMessage(std::shared_ptr<ILogger> logger, const std::string& category, Level level, const std::string& color);
   ~LoggerMessage();
   LoggerMessage(const LoggerMessage&) = delete;
   LoggerMessage& operator=(const LoggerMessage&) = delete;
@@ -38,7 +38,7 @@ private:
   std::string message;
   const std::string category;
   Level logLevel;
-  ILogger& logger;
+  std::shared_ptr<ILogger> logger;
   boost::posix_time::ptime timestamp;
   bool gotText;
 };

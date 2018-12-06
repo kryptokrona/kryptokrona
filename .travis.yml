@@ -166,4 +166,3 @@ deploy:
     on:
       repo: turtlecoin/turtlecoin
       all_branches: true
-      condition: "$_DEPLOYABLE = true"

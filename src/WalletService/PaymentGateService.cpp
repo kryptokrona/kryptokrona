@@ -44,7 +44,7 @@ PaymentGateService::PaymentGateService() :
   stopEvent(nullptr),
   config(),
   service(nullptr),
-  logger(),
+  logger(std::make_shared<Logging::LoggerGroup>()),
   currencyBuilder(logger),
   fileLogger(Logging::TRACE),
   consoleLogger(Logging::INFO) {
@@ -57,14 +57,13 @@ bool PaymentGateService::init(int argc, char** argv) {
     return false;
   }
 
-  logger.setMaxLevel(static_cast<Logging::Level>(config.serviceConfig.logLevel));
-  logger.setPattern("%D %T %L ");
-  logger.addLogger(consoleLogger);
-
-  Logging::LoggerRef log(logger, "main");
+  logger->setMaxLevel(static_cast<Logging::Level>(config.serviceConfig.logLevel));
+  logger->setPattern("%D %T %L ");
+  logger->addLogger(consoleLogger);
 
   if (!config.serviceConfig.serverRoot.empty()) {
     changeDirectory(config.serviceConfig.serverRoot);
+    Logging::LoggerRef log(logger, "main");
     log(Logging::INFO) << "Current working directory now is " << config.serviceConfig.serverRoot;
   }
 
@@ -75,7 +74,7 @@ bool PaymentGateService::init(int argc, char** argv) {
   }
 
   fileLogger.attachToStream(fileStream);
-  logger.addLogger(fileLogger);
+  logger->addLogger(fileLogger);
 
   return true;
 }

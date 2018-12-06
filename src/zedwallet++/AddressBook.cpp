@@ -10,6 +10,8 @@
 
 #include <fstream>
 
+#include <iostream>
+
 #include <WalletBackend/ValidateParameters.h>
 
 #include <zedwallet++/ColouredMsg.h>

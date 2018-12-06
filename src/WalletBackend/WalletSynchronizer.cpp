@@ -29,7 +29,7 @@ WalletSynchronizer::WalletSynchronizer() :
 
 /* Parameterized constructor */
 WalletSynchronizer::WalletSynchronizer(
-    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const std::shared_ptr<Nigel> daemon,
     const uint64_t startHeight,
     const uint64_t startTimestamp,
     const Crypto::SecretKey privateViewKey,
@@ -337,20 +337,12 @@ std::vector<uint64_t> WalletSynchronizer::getGlobalIndexes(
 
     while (true)
     {
-        std::promise<std::error_code> errorPromise = std::promise<std::error_code>();
-
-        auto callback = [&errorPromise](auto e) { errorPromise.set_value(e); };
-
-        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
-
-        m_daemon->getGlobalIndexesForRange(
-            startHeight, endHeight, indexes, callback
+        const auto [success, indexes] = m_daemon->getGlobalIndexesForRange(
+            startHeight, endHeight
         );
 
-        auto error = errorPromise.get_future().get();
-
         /* Need to get the indexes, or we can't continue... */
-        if (error)
+        if (!success || indexes.empty())
         {
             Utilities::sleepUnlessStopping(std::chrono::seconds(1), m_shouldStop);
 
@@ -417,7 +409,7 @@ void WalletSynchronizer::processTransaction(
 {
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
-    /* Finds the sum of inputs, addds the amounts that belong to us to the
+    /* Finds the sum of inputs, adds the amounts that belong to us to the
        transfers map */
     const uint64_t sumOfInputs = processTransactionInputs(
         rawTX.keyInputs, transfers, blockHeight
@@ -467,7 +459,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
         {
             return;
         }
-		
+
         /* Chain forked, invalidate previous transactions */
         if (m_transactionSynchronizerStatus.getHeight() >= b.blockHeight)
         {
@@ -499,7 +491,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
             b.blockHash, b.blockHeight
         );
 
-        if (b.blockHeight >= m_daemon->getLastKnownBlockHeight())
+        if (b.blockHeight >= m_daemon->networkBlockCount())
         {
             m_eventHandler->onSynced.fire(b.blockHeight);
 
@@ -528,10 +520,6 @@ void WalletSynchronizer::monitorLockedTransactions()
 
         if (lockedTxHashes.size() != 0)
         {
-            std::promise<std::error_code> errorPromise = std::promise<std::error_code>();
-
-            auto callback = [&errorPromise](auto e) { errorPromise.set_value(e); };
-
             /* Transactions that are in the pool - we'll query these again
                next time to see if they have moved */
             std::unordered_set<Crypto::Hash> transactionsInPool;
@@ -545,13 +533,13 @@ void WalletSynchronizer::monitorLockedTransactions()
             std::unordered_set<Crypto::Hash> cancelledTransactions;
 
             /* Get the status of the locked transactions */
-            m_daemon->getTransactionsStatus(
+            bool success = m_daemon->getTransactionsStatus(
                 lockedTxHashes, transactionsInPool, transactionsInBlock,
-                cancelledTransactions, callback
+                cancelledTransactions
             );
 
             /* Couldn't get info from the daemon, try again later */
-            if (errorPromise.get_future().get())
+            if (!success)
             {
                 Utilities::sleepUnlessStopping(std::chrono::seconds(15), m_shouldStop);
 
@@ -573,13 +561,10 @@ void WalletSynchronizer::monitorLockedTransactions()
 
 void WalletSynchronizer::downloadBlocks()
 {
-    /* Stores the results from the getWalletSyncData call */
-    std::vector<WalletTypes::WalletBlockInfo> newBlocks;    
-
     /* While we haven't been told to stop */
     while (!m_shouldStop)
     {
-        const uint64_t localDaemonBlockCount = m_daemon->getLastLocalBlockHeight();
+        const uint64_t localDaemonBlockCount = m_daemon->localDaemonBlockCount();
 
         const uint64_t walletBlockCount = m_blockDownloaderStatus.getHeight();
 
@@ -614,80 +599,46 @@ void WalletSynchronizer::downloadBlocks()
             continue;
         }
 
-        std::promise<std::error_code> errorPromise;
-
-	/* Get the std::future */
-        auto error = errorPromise.get_future();
-
-        /* Once the function is complete, set the error value from the promise */
-        auto callback = [&errorPromise](std::error_code e)
-        {
-            errorPromise.set_value(e);
-        };
-        
         /* The block hashes to try begin syncing from */
         auto blockCheckpoints = m_blockDownloaderStatus.getBlockHashCheckpoints();
 
-        m_daemon->getWalletSyncData(
-            std::move(blockCheckpoints), m_startHeight, m_startTimestamp,
-            newBlocks, callback
+        /* Blocks the thread for up to 10 secs */
+        const auto [success, blocks] = m_daemon->getWalletSyncData(
+            std::move(blockCheckpoints), m_startHeight, m_startTimestamp
         );
 
-        while (true)
-        {
-            /* Don't hang if the daemon doesn't respond */
-            auto status = error.wait_for(std::chrono::seconds(1));
-
-            if (m_shouldStop)
-            {
-                /* Need to wait for the future to complete here before
-                   returning. Otherwise, it can be set after it's gone out
-                   of scope, which causes crashes. */
-                error.get();
-                return;
-            }
-            
-            /* queryBlocks() has returned */
-            if (status == std::future_status::ready)
-            {
-                break;
-            }
-        }
-
-        const auto err = error.get();
-
-        if (err)
+        /* If we get no blocks, we are fully synced.
+           (Or timed out/failed to get blocks)
+           Sleep a bit so we don't spam the daemon. */
+        if (!success || blocks.empty())
         {
             Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
+            continue;
         }
-        else
+        
+        for (const auto &block : blocks)
         {
-            /* If we get no blocks, we are fully synced. Sleep a bit so we
-               don't spam the daemon. */
-            if (newBlocks.empty())
+            /* Add the block to the queue for processing */
+            bool success = m_blockProcessingQueue.push(block);
+
+            /* Need to ensure we don't store that we've downloaded blocks we
+               haven't. If we're stopping (this occurs on startup, sometimes)
+               we could push empty blocks, and some blocks get skipped, on
+               the block processer side */
+            if (!success)
             {
-                Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
-                continue;
-            }
-			
-            for (const auto &block : newBlocks)
-            {
-                /* Store that we've downloaded the block */
-                m_blockDownloaderStatus.storeBlockHash(block.blockHash,
-                                                       block.blockHeight);
-													   
-                /* Add the block to the queue for processing */
-                m_blockProcessingQueue.push(block);
+                return;
             }
 
-            /* Empty the vector so we're not re-iterating the old ones */
-            newBlocks.clear();
+            /* Store that we've downloaded the block */
+            m_blockDownloaderStatus.storeBlockHash(block.blockHash,
+                                                   block.blockHeight);
         }
     }
 }
 
 void WalletSynchronizer::initializeAfterLoad(
-    const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon,
+    const std::shared_ptr<Nigel> daemon,
     const std::shared_ptr<EventHandler> eventHandler)
 {
     m_daemon = daemon;
@@ -699,7 +650,7 @@ uint64_t WalletSynchronizer::getCurrentScanHeight() const
     return m_transactionSynchronizerStatus.getHeight();
 }
 
-void WalletSynchronizer::swapNode(const std::shared_ptr<CryptoNote::NodeRpcProxy> daemon)
+void WalletSynchronizer::swapNode(const std::shared_ptr<Nigel> daemon)
 {
     m_daemon = daemon;
 }

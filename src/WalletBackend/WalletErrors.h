@@ -45,8 +45,8 @@ enum WalletErrorCode
     /* Trying to create a wallet file which already exists */
     WALLET_FILE_ALREADY_EXISTS = 8,
 
-    /* The call to NodeRpcProxy::init() failed */
-    FAILED_TO_INIT_DAEMON = 9,
+    /* Operation will cause int overflow */
+    WILL_OVERFLOW = 9,
 
     /* The address given does not exist in this container, and it's required,
        for example you specified it as the address to get the balance from */
@@ -169,11 +169,14 @@ enum WalletErrorCode
     /* Cannot perform this operation when using a non view wallet */
     ILLEGAL_NON_VIEW_WALLET_OPERATION = 40,
 
-    /* Operation will cause int overflow */
-    WILL_OVERFLOW = 41,
+    /* View key is not derived from spend key for this address */
+    KEYS_NOT_DETERMINISTIC = 41,
 
-    /* Timed out initializing the daemon */
-    DAEMON_INIT_TIMEOUT = 42,
+    /* The primary address cannot be deleted */
+    CANNOT_DELETE_PRIMARY_ADDRESS = 42,
+
+    /* Couldn't find the private key for this hash */
+    TX_PRIVATE_KEY_NOT_FOUND = 43,
 };
 
 class WalletError
@@ -195,6 +198,8 @@ class WalletError
             m_customMessage(customMessage) {};
 
         std::string getErrorMessage() const;
+
+        WalletErrorCode getErrorCode() const;
 
         bool operator==(const WalletErrorCode code) const
         {

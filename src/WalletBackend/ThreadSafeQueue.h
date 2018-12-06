@@ -21,7 +21,7 @@ class ThreadSafeQueue
         {
         }
 
-        void push(T item)
+        bool push(T item)
         {
             /* Aquire the lock */
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -29,7 +29,7 @@ class ThreadSafeQueue
             /* Stopping, don't push data */
             if (m_shouldStop)
             {
-                return;
+                return false;
             }
 
             if (m_queue.size() >= Constants::MAXIMUM_SYNC_QUEUE_SIZE)
@@ -57,6 +57,8 @@ class ThreadSafeQueue
 
             /* Notify the consumer that we have some data */
             m_haveData.notify_all();
+
+            return true;
         }
 
         /* Take an item from the front of the queue */

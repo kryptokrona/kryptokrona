@@ -19,7 +19,7 @@
 
 namespace CryptoNote {
 
-Miner::Miner(System::Dispatcher& dispatcher, Logging::ILogger& logger) :
+Miner::Miner(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> logger) :
   m_dispatcher(dispatcher),
   m_miningStopped(dispatcher),
   m_state(MiningState::MINING_STOPPED),

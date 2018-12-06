@@ -8,15 +8,13 @@
 
 #include "json.hpp"
 
-#include <Logging/LoggerManager.h>
-
-#include <NodeRpcProxy/NodeRpcProxy.h>
-
 #include <string>
 
 #include <tuple>
 
 #include <vector>
+
+#include <Nigel/Nigel.h>
 
 #include <WalletBackend/SubWallets.h>
 #include <WalletBackend/WalletErrors.h>
@@ -164,19 +162,19 @@ class WalletBackend
         uint64_t getTotalUnlockedBalance() const;
 
         /* Make a new sub wallet (gens a privateSpendKey) */
-        WalletError addSubWallet();
+        std::tuple<WalletError, std::string> addSubWallet();
 
         /* Import a sub wallet with the given privateSpendKey */
-        WalletError importSubWallet(
+        std::tuple<WalletError, std::string> importSubWallet(
             const Crypto::SecretKey privateSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
 
         /* Import a view only sub wallet with the given publicSpendKey */
-        WalletError importViewSubWallet(
+        std::tuple<WalletError, std::string> importViewSubWallet(
             const Crypto::PublicKey publicSpendKey,
-            const uint64_t scanHeight,
-            const bool newWallet);
+            const uint64_t scanHeight);
+
+        WalletError deleteSubWallet(const std::string address);
 
         /* Scan the blockchain, starting from scanHeight / timestamp */
         void reset(uint64_t scanHeight, uint64_t timestamp);
@@ -190,6 +188,9 @@ class WalletBackend
         /* Get the primary address */
         std::string getPrimaryAddress() const;
 
+        /* Get a list of all addresses in the wallet */
+        std::vector<std::string> getAddresses() const;
+
         /* wallet sync height, local blockchain sync height,
            remote blockchain sync height */
         std::tuple<uint64_t, uint64_t, uint64_t> getSyncStatus() const;
@@ -200,18 +201,27 @@ class WalletBackend
         /* Change the wallet password and save the wallet with the new password */
         WalletError changePassword(const std::string newPassword);
 
-        /* Get all private spend keys, and private view key */
-        std::tuple<std::vector<Crypto::SecretKey>, Crypto::SecretKey> getAllPrivateKeys() const;
+        /* Gets the shared private view key */
+        Crypto::SecretKey getPrivateViewKey() const;
+
+        /* Gets the public and private spend key for the given address */
+        std::tuple<WalletError, Crypto::PublicKey, Crypto::SecretKey>
+            getSpendKeys(const std::string &address) const;
 
         /* Get the private spend and private view for the primary address */
         std::tuple<Crypto::SecretKey, Crypto::SecretKey> getPrimaryAddressPrivateKeys() const;
 
         /* Get the primary address mnemonic seed, if possible */
-        std::tuple<bool, std::string> getMnemonicSeed() const;
+        std::tuple<WalletError, std::string> getMnemonicSeed() const;
+
+        /* Gets the mnemonic seed for the given address, if possible */
+        std::tuple<WalletError, std::string> getMnemonicSeedForAddress(
+            const std::string &address) const;
 
         /* Get all transactions */
         std::vector<WalletTypes::Transaction> getTransactions() const;
 
+        /* Get all unconfirmed (outgoing, sent) transactions */
         std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
 
         /* Get sync heights, hashrate, peer count */
@@ -225,8 +235,20 @@ class WalletBackend
         /* Get the node fee and address ({0, ""} if empty) */
         std::tuple<uint64_t, std::string> getNodeFee() const;
 
+        /* Returns the node host and port */
+        std::tuple<std::string, uint16_t> getNodeAddress() const;
+
         /* Swap to a different daemon node */
-        WalletError swapNode(std::string daemonHost, uint16_t daemonPort);
+        void swapNode(std::string daemonHost, uint16_t daemonPort);
+
+        /* Whether we have recieved info from the daemon at some point */
+        bool daemonOnline() const;
+
+        std::tuple<WalletError, std::string> getAddress(
+            const Crypto::PublicKey spendKey) const;
+
+        std::tuple<WalletError, Crypto::SecretKey> getTxPrivateKey(
+            const Crypto::Hash txHash) const;
         
         /////////////////////////////
         /* Public member variables */
@@ -267,7 +289,7 @@ class WalletBackend
 
         WalletError unsafeSave() const;
 
-        WalletError init();
+        void init();
 
         //////////////////////////////
         /* Private member variables */
@@ -284,15 +306,7 @@ class WalletBackend
         std::shared_ptr<SubWallets> m_subWallets;
 
         /* The daemon connection */
-        std::shared_ptr<CryptoNote::NodeRpcProxy> m_daemon;
-
-        /* The log manager */
-        std::shared_ptr<Logging::LoggerManager> m_logManager;
-
-        /* The logger instance (Need to keep around because the daemon
-           constructor takes a reference to the variable, so if it goes out
-           of scope we segfault... :facepalm: */
-        std::shared_ptr<Logging::LoggerRef> m_logger;
+        std::shared_ptr<Nigel> m_daemon = nullptr;
 
         /* We use a shared pointer here, because we start the thread in the
            class, with the class as a context, hence, when we go to move the

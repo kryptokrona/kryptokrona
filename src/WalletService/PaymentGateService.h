@@ -28,7 +28,7 @@ public:
   void run();
   void stop();
 
-  Logging::ILogger& getLogger() { return logger; }
+  std::shared_ptr<Logging::ILogger> getLogger() { return logger; }
 
 private:
 
@@ -43,7 +43,7 @@ private:
   PaymentService::WalletService* service;
   CryptoNote::CurrencyBuilder currencyBuilder;
 
-  Logging::LoggerGroup logger;
+  std::shared_ptr<Logging::LoggerGroup> logger = nullptr;
   std::ofstream fileStream;
   Logging::StreamLogger fileLogger;
   Logging::ConsoleLogger consoleLogger;

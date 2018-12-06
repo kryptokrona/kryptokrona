@@ -36,7 +36,7 @@ class HttpServer {
 
 public:
 
-  HttpServer(System::Dispatcher& dispatcher, Logging::ILogger& log);
+  HttpServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log);
 
   void start(const std::string& address, uint16_t port);
   void stop();

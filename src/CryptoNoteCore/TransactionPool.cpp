@@ -57,7 +57,7 @@ size_t TransactionPool::PaymentIdHasher::operator() (const boost::optional<Crypt
   return std::hash<Crypto::Hash>{}(*paymentId);
 }
 
-TransactionPool::TransactionPool(Logging::ILogger& logger) :
+TransactionPool::TransactionPool(std::shared_ptr<Logging::ILogger> logger) :
   transactionHashIndex(transactions.get<TransactionHashTag>()),
   transactionCostIndex(transactions.get<TransactionCostTag>()),
   paymentIdIndex(transactions.get<PaymentIdTag>()),

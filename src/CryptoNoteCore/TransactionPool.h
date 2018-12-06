@@ -36,7 +36,7 @@ namespace CryptoNote {
 
 class TransactionPool : public ITransactionPool {
 public:
-  TransactionPool(Logging::ILogger& logger);
+  TransactionPool(std::shared_ptr<Logging::ILogger> logger);
 
   virtual bool pushTransaction(CachedTransaction&& transaction, TransactionValidatorState&& transactionState) override;
   virtual const CachedTransaction& getTransaction(const Crypto::Hash& hash) const override;

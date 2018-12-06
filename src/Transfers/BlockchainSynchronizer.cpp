@@ -68,7 +68,7 @@ private:
 
 namespace CryptoNote {
 
-BlockchainSynchronizer::BlockchainSynchronizer(INode& node, Logging::ILogger& logger, const Hash& genesisBlockHash) :
+BlockchainSynchronizer::BlockchainSynchronizer(INode& node, std::shared_ptr<Logging::ILogger> logger, const Hash& genesisBlockHash) :
   m_logger(logger, "BlockchainSynchronizer"),
   m_node(node),
   m_genesisBlockHash(genesisBlockHash),

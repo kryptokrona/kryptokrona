@@ -32,7 +32,7 @@ namespace CryptoNote {
 
 class RocksDBWrapper : public IDataBase {
 public:
-  RocksDBWrapper(Logging::ILogger& logger);
+  RocksDBWrapper(std::shared_ptr<Logging::ILogger> logger);
   virtual ~RocksDBWrapper();
 
   RocksDBWrapper(const RocksDBWrapper&) = delete;

@@ -17,7 +17,7 @@ namespace CryptoNote {
 TransactionPoolCleanWrapper::TransactionPoolCleanWrapper(
   std::unique_ptr<ITransactionPool>&& transactionPool,
   std::unique_ptr<ITimeProvider>&& timeProvider,
-  Logging::ILogger& logger,
+  std::shared_ptr<Logging::ILogger> logger,
   uint64_t timeout)
   :
   transactionPool(std::move(transactionPool)),

@@ -24,12 +24,12 @@ namespace Logging {
 
 class LoggerRef {
 public:
-  LoggerRef(ILogger& logger, const std::string& category);
+  LoggerRef(std::shared_ptr<ILogger> logger, const std::string& category);
   LoggerMessage operator()(Level level = INFO, const std::string& color = DEFAULT) const;
-  ILogger& getLogger() const;
+  std::shared_ptr<ILogger> getLogger() const;
 
 private:
-  ILogger* logger;
+  std::shared_ptr<ILogger> logger;
   std::string category;
 };
 

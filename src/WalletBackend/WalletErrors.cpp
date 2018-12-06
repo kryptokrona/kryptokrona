@@ -57,13 +57,6 @@ std::string WalletError::getErrorMessage() const
             return "The wallet file you are attempting to create already "
                    "exists. Please delete it first.";
         }
-        /* NOTE: This is NOT the same as the daemon not being open /
-           not existing. It is likely because an exception was thrown whilst
-           attempting to init, I have not seen it in practice. */
-        case FAILED_TO_INIT_DAEMON:
-        {
-            return "Failed to initialize daemon connection.";
-        }
         case ADDRESS_NOT_IN_WALLET:
         {
             return "The address given does not exist in the wallet container, "
@@ -224,11 +217,29 @@ std::string WalletError::getErrorMessage() const
             return "This operation will cause integer overflow. Please decrease "
                    "the amounts you are sending.";
         }
-        case DAEMON_INIT_TIMEOUT:
+        case KEYS_NOT_DETERMINISTIC:
         {
-            return "Timed out initializing the daemon. Syncing may fail.";
+            return "You cannot get a mnemonic seed for this address, as the "
+                   "view key is derived in terms of the spend key.";
+        }
+        case CANNOT_DELETE_PRIMARY_ADDRESS:
+        {
+            return "Each wallet has a primary address when created, this address "
+                   "cannot be removed.";
+        }
+        case TX_PRIVATE_KEY_NOT_FOUND:
+        {
+            return "Couldn't find the private key for this transaction. The "
+                   "transaction must exist, and have been sent by this program. "
+                   "Transaction private keys cannot be found upon rescanning/"
+                   "reimporting.";
         }
 
         /* No default case so the compiler warns us if we missed one */
     }
+}
+
+WalletErrorCode WalletError::getErrorCode() const
+{
+    return m_errorCode;
 }
