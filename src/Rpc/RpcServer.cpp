@@ -4,22 +4,33 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "RpcServer.h"
-#include <future>
-#include <unordered_map>
-#include "math.h"
+//////////////////////////
+#include <Rpc/RpcServer.h>
+//////////////////////////
 
-// CryptoNote
-#include "Common/StringTools.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/Core.h"
-#include "CryptoNoteCore/TransactionExtra.h"
+#include <cmath>
+
+#include <Common/FormatTools.h>
+#include <Common/StringTools.h>
+
 #include <config/CryptoNoteConfig.h>
-#include "CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h"
-#include "P2p/NetNode.h"
-#include "CoreRpcServerErrorCodes.h"
-#include "JsonRpc.h"
+
+#include <CryptoNoteCore/Core.h>
+#include <CryptoNoteCore/CryptoNoteTools.h>
+#include <CryptoNoteCore/TransactionExtra.h>
+
+#include <CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h>
+
+#include <future>
+
+#include <P2p/NetNode.h>
+
+#include <Rpc/CoreRpcServerErrorCodes.h>
+#include <Rpc/JsonRpc.h>
+
 #include "version.h"
+
+#include <unordered_map>
 
 #undef ERROR
 
@@ -398,6 +409,18 @@ bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOU
     std::vector<Crypto::PublicKey> publicKeys;
     if (!m_core.getRandomOutputs(amount, static_cast<uint16_t>(req.outs_count), globalIndexes, publicKeys)) {
       return true;
+    }
+
+    if (globalIndexes.size() != req.outs_count)
+    {
+        logger(ERROR) << "Failed to get enough matching outputs for amount "
+                      << amount << " (" << Common::formatAmount(amount)
+                      << "). Requested outputs: " << req.outs_count
+                      << ", found outputs: " << globalIndexes.size()
+                      << ". Further explanation here: https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c"
+                      << std::endl
+                      << "Note: If you are a public node operator, you can safely ignore this message. "
+                      << "It is only relevant to the user sending the transaction.";
     }
 
     assert(globalIndexes.size() == publicKeys.size());

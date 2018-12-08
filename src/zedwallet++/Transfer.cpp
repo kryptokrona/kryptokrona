@@ -6,9 +6,11 @@
 #include <zedwallet++/Transfer.h>
 /////////////////////////////////
 
-#include <iostream>
+#include <Common/FormatTools.h>
 
 #include <config/WalletConfig.h>
+
+#include <iostream>
 
 #include <zedwallet++/ColouredMsg.h>
 #include <zedwallet++/Fusion.h>
@@ -39,9 +41,9 @@ void transfer(
         std::stringstream stream;
 
         stream << "The minimum send allowed is "
-               << ZedUtilities::formatAmount(WalletConfig::minimumSend)
+               << Common::formatAmount(WalletConfig::minimumSend)
                << ", but you have "
-               << ZedUtilities::formatAmount(unlockedBalance) << "!\n";
+               << Common::formatAmount(unlockedBalance) << "!\n";
 
         std::cout << WarningMsg(stream.str());
         
@@ -129,13 +131,13 @@ void sendTransaction(
         std::cout << WarningMsg("\nYou don't have enough funds to cover "
                                 "this transaction!\n\n")
                   << "Funds needed: "
-                  << InformationMsg(ZedUtilities::formatAmount(amount + fee + nodeFee))
+                  << InformationMsg(Common::formatAmount(amount + fee + nodeFee))
                   << " (Includes a network fee of "
-                  << InformationMsg(ZedUtilities::formatAmount(fee))
+                  << InformationMsg(Common::formatAmount(fee))
                   << " and a node fee of "
-                  << InformationMsg(ZedUtilities::formatAmount(nodeFee))
+                  << InformationMsg(Common::formatAmount(nodeFee))
                   << ")\nFunds available: "
-                  << SuccessMsg(ZedUtilities::formatAmount(unlockedBalance)) << "\n\n";
+                  << SuccessMsg(Common::formatAmount(unlockedBalance)) << "\n\n";
 
         return cancel();
     }
@@ -292,7 +294,7 @@ void splitTX(
         std::stringstream stream;
 
         stream << "Transaction number " << txNumber << " has been sent!\nHash: "
-               << hash << "\nAmount: " << ZedUtilities::formatAmount(splitAmount)
+               << hash << "\nAmount: " << Common::formatAmount(splitAmount)
                << "\n\n";
 
         std::cout << SuccessMsg(stream.str()) << std::endl;
@@ -328,11 +330,11 @@ bool confirmTransaction(
     std::cout << InformationMsg("\nConfirm Transaction?\n");
 
     std::cout << "You are sending "
-              << SuccessMsg(ZedUtilities::formatAmount(amount))
+              << SuccessMsg(Common::formatAmount(amount))
               << ", with a network fee of " 
-              << SuccessMsg(ZedUtilities::formatAmount(WalletConfig::defaultFee))
+              << SuccessMsg(Common::formatAmount(WalletConfig::defaultFee))
               << ",\nand a node fee of "
-              << SuccessMsg(ZedUtilities::formatAmount(nodeFee));
+              << SuccessMsg(Common::formatAmount(nodeFee));
 
     if (paymentID != "")
     {

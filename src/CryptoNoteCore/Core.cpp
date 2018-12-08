@@ -10,6 +10,7 @@
 #include <unordered_set>
 
 #include "Core.h"
+#include "Common/FormatTools.h"
 #include "Common/ShuffleGenerator.h"
 #include "Common/Math.h"
 #include "Common/MemoryInputStream.h"
@@ -1298,6 +1299,12 @@ bool Core::getRandomOutputs(uint64_t amount, uint16_t count, std::vector<uint32_
 
   globalIndexes = chainsLeaves[0]->getRandomOutsByAmount(amount, count, getTopBlockIndex());
   if (globalIndexes.empty()) {
+    logger(Logging::ERROR) << "Failed to get any matching outputs for amount "
+                           << amount << " (" << Common::formatAmount(amount)
+                           << "). Further explanation here: "
+                           << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c\n"
+                           << "Note: If you are a public node operator, you can safely ignore this message. "
+                           << "It is only relevant to the user sending the transaction.";
     return false;
   }
 

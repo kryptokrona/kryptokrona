@@ -6,6 +6,8 @@
 #include <zedwallet++/GetInput.h>
 /////////////////////////////////
 
+#include <Common/FormatTools.h>
+
 #include <config/WalletConfig.h>
 
 #include "linenoise.hpp"
@@ -250,7 +252,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
             if (amount < WalletConfig::minimumSend)
             {
                 std::cout << WarningMsg("The minimum send allowed is ")
-                          << WarningMsg(ZedUtilities::formatAmount(WalletConfig::minimumSend))
+                          << WarningMsg(Common::formatAmount(WalletConfig::minimumSend))
                           << WarningMsg("!\n");
             }
             else
