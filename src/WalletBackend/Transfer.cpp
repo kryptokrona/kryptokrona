@@ -6,6 +6,8 @@
 #include <WalletBackend/Transfer.h>
 ///////////////////////////////////
 
+#include <Common/FormatTools.h>
+
 #include <config/WalletConfig.h>
 
 #include <CryptoNoteCore/CryptoNoteTools.h>
@@ -566,17 +568,44 @@ std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getRingParticipants
         return {NOT_ENOUGH_FAKE_OUTPUTS, fakeOuts};
     }
 
-    /* Check we have at least mixin outputs for each fake out. We *may* need
-       mixin+1 outs for some, in case our real output gets included. This is
-       unlikely though, and so we will error out down the line instead of here. */
-    bool enoughOuts = std::all_of(fakeOuts.begin(), fakeOuts.end(), [&mixin](const auto fakeOut)
+    /* Verify outputs are sufficient */
+    for (const uint64_t amount : amounts)
     {
-        return fakeOut.outs.size() >= mixin;
-    });
+        const auto it = std::find_if(fakeOuts.begin(), fakeOuts.end(),
+        [amount](const auto output)
+        {
+            return output.amount == amount;
+        });
 
-    if (!enoughOuts)
-    {
-        return {NOT_ENOUGH_FAKE_OUTPUTS, fakeOuts};
+        /* Item is not present at all */
+        if (it == fakeOuts.end())
+        {
+            std::stringstream error;
+            
+            error << "Failed to get any matching outputs for amount "
+                  << amount << " (" << Common::formatAmount(amount)
+                  << "). Further explanation here: "
+                  << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c";
+
+            return {WalletError(NOT_ENOUGH_FAKE_OUTPUTS, error.str()), fakeOuts};
+        }
+
+        /* Check we have at least mixin outputs for each fake out. We *may* need
+           mixin+1 outs for some, in case our real output gets included. This is
+           unlikely though, and so we will error out down the line instead of here. */
+        if (it->outs.size() < mixin)
+        {
+            std::stringstream error;
+
+            error << "Failed to get enough matching outputs for amount "
+                  << amount << " (" << Common::formatAmount(amount)
+                  << "). Requested outputs: " << requestedOuts
+                  << ", found outputs: " << it->outs.size()
+                  << ". Further explanation here: "
+                  << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c";
+
+            return {WalletError(NOT_ENOUGH_FAKE_OUTPUTS, error.str()), fakeOuts};
+        }
     }
 
     for (auto fakeOut : fakeOuts)
@@ -660,7 +689,17 @@ std::tuple<WalletError, std::vector<WalletTypes::ObscuredInput>> prepareRingPart
         /* Didn't get enough fake outs to meet the mixin criteria */
         if (obscuredInput.outputs.size() < mixin)
         {
-            return {NOT_ENOUGH_FAKE_OUTPUTS, result};
+            std::stringstream error;
+
+            error << "Failed to get enough matching outputs for amount "
+                  << walletAmount.input.amount << " (" 
+                  << Common::formatAmount(walletAmount.input.amount)
+                  << "). Requested outputs: " << mixin 
+                  << ", found outputs: " << obscuredInput.outputs.size()
+                  << ". Further explanation here: "
+                  << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c";
+
+            return {WalletError(NOT_ENOUGH_FAKE_OUTPUTS, error.str()), result};
         }
 
         /* Find the position where our real input belongs, e.g. if the fake

@@ -103,11 +103,11 @@ void balance(const std::shared_ptr<WalletBackend> walletBackend)
     const uint64_t totalBalance = unlockedBalance + lockedBalance;
 
     std::cout << "Available balance: "
-              << SuccessMsg(ZedUtilities::formatAmount(unlockedBalance)) << "\n"
+              << SuccessMsg(Common::formatAmount(unlockedBalance)) << "\n"
               << "Locked (unconfirmed) balance: "
-              << WarningMsg(ZedUtilities::formatAmount(lockedBalance))
+              << WarningMsg(Common::formatAmount(lockedBalance))
               << "\nTotal balance: "
-              << InformationMsg(ZedUtilities::formatAmount(totalBalance)) << "\n";
+              << InformationMsg(Common::formatAmount(totalBalance)) << "\n";
 
     if (walletBackend->isViewWallet())
     {
@@ -355,7 +355,7 @@ void saveCSV(const std::shared_ptr<WalletBackend> walletBackend)
             continue;
         }
 
-        const std::string amount = ZedUtilities::formatAmountBasic(std::abs(tx.totalAmount()));
+        const std::string amount = Common::formatAmountBasic(std::abs(tx.totalAmount()));
 
         const std::string direction = tx.totalAmount() > 0 ? "IN" : "OUT";
 
@@ -388,9 +388,9 @@ void printOutgoingTransfer(const WalletTypes::Transaction tx)
                << "Timestamp: " << ZedUtilities::unixTimeToDate(tx.timestamp) << "\n";
     }
 
-    stream << "Spent: " << ZedUtilities::formatAmount(amount - tx.fee) << "\n"
-           << "Fee: " << ZedUtilities::formatAmount(tx.fee) << "\n"
-           << "Total Spent: " << ZedUtilities::formatAmount(amount) << "\n";
+    stream << "Spent: " << Common::formatAmount(amount - tx.fee) << "\n"
+           << "Fee: " << Common::formatAmount(tx.fee) << "\n"
+           << "Total Spent: " << Common::formatAmount(amount) << "\n";
 
     if (tx.paymentID != "")
     {
@@ -409,7 +409,7 @@ void printIncomingTransfer(const WalletTypes::Transaction tx)
     stream << "Incoming transfer:\nHash: " << tx.hash << "\n"
            << "Block height: " << tx.blockHeight << "\n"
            << "Timestamp: " << ZedUtilities::unixTimeToDate(tx.timestamp) << "\n"
-           << "Amount: " << ZedUtilities::formatAmount(amount) << "\n";
+           << "Amount: " << Common::formatAmount(amount) << "\n";
 
     if (tx.paymentID != "")
     {
@@ -474,7 +474,7 @@ void listTransfers(
     {
         std::cout << SuccessMsg(numIncomingTransactions)
                   << SuccessMsg(" incoming transactions, totalling ")
-                  << SuccessMsg(ZedUtilities::formatAmount(totalReceived))
+                  << SuccessMsg(Common::formatAmount(totalReceived))
                   << std::endl;
     }
 
@@ -482,7 +482,7 @@ void listTransfers(
     {
         std::cout << WarningMsg(numOutgoingTransactions)
                   << WarningMsg(" outgoing transactions, totalling ")
-                  << WarningMsg(ZedUtilities::formatAmount(totalSpent))
+                  << WarningMsg(Common::formatAmount(totalSpent))
                   << std::endl;
     }
 }

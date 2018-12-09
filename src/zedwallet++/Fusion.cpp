@@ -6,6 +6,8 @@
 #include <zedwallet++/Fusion.h>
 ///////////////////////////////
 
+#include <Common/FormatTools.h>
+
 #include <iostream>
 
 #include <WalletBackend/WalletBackend.h>
@@ -84,13 +86,13 @@ bool optimizeRound(const std::shared_ptr<WalletBackend> walletBackend)
     {
         std::cout << InformationMsg("Waiting for balance to return and unlock:\n"
                                     "\nTotal balance: ")
-                  << InformationMsg(ZedUtilities::formatAmount(initialBalance))
+                  << InformationMsg(Common::formatAmount(initialBalance))
 
                   << WarningMsg("\nLocked balance: ")
-                  << WarningMsg(ZedUtilities::formatAmount(initialBalance - currentBalance))
+                  << WarningMsg(Common::formatAmount(initialBalance - currentBalance))
 
                   << SuccessMsg("\nUnlocked balance: ")
-                  << SuccessMsg(ZedUtilities::formatAmount(currentBalance))
+                  << SuccessMsg(Common::formatAmount(currentBalance))
 
                   << InformationMsg("\nWill check again in 15 seconds...\n\n");
 
