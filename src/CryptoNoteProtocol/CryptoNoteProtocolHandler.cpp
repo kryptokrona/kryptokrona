@@ -803,7 +803,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_lite_block(int command, NOTIFY_
 
 int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MISSING_TXS::request& arg,
                                                      CryptoNoteConnectionContext& context) {
-  logger(Logging::TRACE) << context << "NOTIFY_MISSING_TXS" ;
+  logger(Logging::TRACE) << context << "NOTIFY_MISSING_TXS";
 
   NOTIFY_NEW_TRANSACTIONS::request req;
 
@@ -833,17 +833,24 @@ int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MIS
 }
 
 void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
-  auto buf = LevinProtocol::encode(arg);
 
+  // generate a lite block request from the received normal block.
   NOTIFY_NEW_LITE_BLOCK::request lite_arg;
   lite_arg.current_blockchain_height = arg.current_blockchain_height;
   lite_arg.blockTemplate = arg.block.blockTemplate;
   lite_arg.hop = arg.hop;
 
+  // encoding the request for sending the blocks to peers.
+  auto buf = LevinProtocol::encode(arg);
   auto lite_buf = LevinProtocol::encode(lite_arg);
+
+  // logging the msg size to see the difference in payload size.
+  logger(Logging::DEBUGGING) << "NOTIFY_NEW_BLOCK - MSG_SIZE = " << buf.size();
+  logger(Logging::DEBUGGING) << "NOTIFY_NEW_LITE_BLOCK - MSG_SIZE = " << lite_buf.size();
 
   std::list<boost::uuids::uuid> liteBlockConnections, normalBlockConnections;
 
+  // sort the peers into their support categories.
   m_p2p->for_each_connection([this, &liteBlockConnections, &normalBlockConnections](const CryptoNoteConnectionContext& ctx, uint64_t peerId){
     if (ctx.version >= P2P_LITE_BLOCKS_PROPOGATION_VERSION) {
       logger(Logging::DEBUGGING) << ctx << "Peer supports lite-blocks... adding peer to lite block list";
@@ -855,6 +862,7 @@ void CryptoNoteProtocolHandler::relayBlock(NOTIFY_NEW_BLOCK::request& arg) {
     }
   });
 
+  // first send lite one's.. coz they are faster
   if(!liteBlockConnections.empty()) {
     m_p2p->externalRelayNotifyToList(NOTIFY_NEW_LITE_BLOCK::ID, lite_buf, liteBlockConnections);
   }
