@@ -1,19 +1,8 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018, The TurtleCoin Developers
 //
-// This file is part of Bytecoin.
-//
-// Bytecoin is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Bytecoin is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// Please see the included LICENSE file for more information.
 
 #pragma once
 
@@ -36,13 +25,13 @@ namespace CryptoNote
 
   //just to keep backward compatibility with BlockCompleteEntry serialization
   struct RawBlockLegacy {
-    BinaryArray block;
+    BinaryArray blockTemplate;
     std::vector<BinaryArray> transactions;
   };
 
   struct NOTIFY_NEW_BLOCK_request
   {
-    RawBlockLegacy b;
+    RawBlockLegacy block;
     uint32_t current_blockchain_height;
     uint32_t hop;
   };
@@ -148,5 +137,30 @@ namespace CryptoNote
   struct NOTIFY_REQUEST_TX_POOL {
     const static int ID = BC_COMMANDS_POOL_BASE + 8;
     typedef NOTIFY_REQUEST_TX_POOL_request request;
+  };
+
+  /************************************************************************/
+  /*                                                                      */
+  /************************************************************************/
+  struct NOTIFY_NEW_LITE_BLOCK_request {
+    BinaryArray blockTemplate;
+    uint32_t current_blockchain_height;
+    uint32_t hop;
+  };
+
+  struct NOTIFY_NEW_LITE_BLOCK {
+    const static int ID = BC_COMMANDS_POOL_BASE + 9;
+    typedef NOTIFY_NEW_LITE_BLOCK_request request;
+  };
+
+  struct NOTIFY_MISSING_TXS_request {
+    Crypto::Hash blockHash;
+    uint32_t current_blockchain_height;
+    std::vector<Crypto::Hash> missing_txs;
+  };
+
+  struct NOTIFY_MISSING_TXS {
+    const static int ID = BC_COMMANDS_POOL_BASE + 10;
+    typedef NOTIFY_MISSING_TXS_request request;
   };
 }
