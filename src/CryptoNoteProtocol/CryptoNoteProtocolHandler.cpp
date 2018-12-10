@@ -127,9 +127,11 @@ static inline void serialize(NOTIFY_NEW_LITE_BLOCK_request& request, ISerializer
 
   if (s.type() == ISerializer::INPUT) {
     s(blockTemplate, "blockTemplate");
+    request.blockTemplate.reserve(blockTemplate.size());
     std::copy(blockTemplate.begin(), blockTemplate.end(), std::back_inserter(request.blockTemplate));
   } else {
-    std::copy(blockTemplate.begin(), blockTemplate.end(), std::back_inserter(request.blockTemplate));
+    blockTemplate.reserve(request.blockTemplate.size());
+    std::copy(request.blockTemplate.begin(), request.blockTemplate.end(), std::back_inserter(blockTemplate));
     s(blockTemplate, "blockTemplate");
   }
 }
