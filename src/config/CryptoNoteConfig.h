@@ -227,7 +227,7 @@ const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
 
 // P2P Network Configuration Section - This defines our current P2P network version
 // and the minimum version for communication between nodes
-const uint8_t  P2P_CURRENT_VERSION                           = 3;
+const uint8_t  P2P_CURRENT_VERSION                           = 4;
 const uint8_t  P2P_MINIMUM_VERSION                           = 2;
 
 // This defines the minimum P2P version required for lite blocks propogation
