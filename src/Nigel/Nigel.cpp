@@ -188,7 +188,9 @@ bool Nigel::getFeeInfo()
 
             const bool integratedAddressesAllowed = false;
 
-            if (validateAddresses({tmpAddress}, integratedAddressesAllowed))
+            WalletError error = validateAddresses({tmpAddress}, integratedAddressesAllowed);
+
+            if (!error)
             {
                 m_nodeFeeAddress = tmpAddress;
                 m_nodeFeeAmount = tmpFee;

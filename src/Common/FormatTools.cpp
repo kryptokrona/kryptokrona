@@ -28,7 +28,7 @@ std::string get_mining_speed(const uint64_t hashrate)
 {
     std::stringstream stream;
 
-    stream << std::setprecision(2);
+    stream << std::setprecision(2) << std::fixed;
 
     if (hashrate > 1e9)
     {
@@ -76,7 +76,7 @@ std::string get_sync_percentage(
 
     std::stringstream stream;
 
-    stream << std::setprecision(2) << percent;
+    stream << std::setprecision(2) << std::fixed << percent;
 
     return stream.str();
 }
@@ -156,7 +156,7 @@ std::string get_fork_time(
 
     std::stringstream stream;
 
-    stream << std::setprecision(2);
+    stream << std::setprecision(2) << std::fixed;
 
     if (height == next_fork)
     {
