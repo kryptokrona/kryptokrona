@@ -11,6 +11,7 @@
 
 #include "Core.h"
 #include "Common/FormatTools.h"
+#include "Common/LicenseCanary.h"
 #include "Common/ShuffleGenerator.h"
 #include "Common/Math.h"
 #include "Common/MemoryInputStream.h"
