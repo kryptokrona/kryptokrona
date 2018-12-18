@@ -116,6 +116,8 @@ std::tuple<WalletError, std::string> SubWallets::addSubWallet()
         Utilities::getCurrentTimestampAdjusted(), isPrimaryAddress
     );
 
+    m_publicSpendKeys.push_back(spendKey.publicKey);
+
     return {SUCCESS, address};
 }
 
@@ -220,6 +222,13 @@ WalletError SubWallets::deleteSubWallet(const std::string address)
     /* Remove or update the transactions */
     deleteAddressTransactions(m_transactions, spendKey);
     deleteAddressTransactions(m_lockedTransactions, spendKey);
+
+    const auto it2 = std::find(m_publicSpendKeys.begin(), m_publicSpendKeys.end(), spendKey);
+
+    if (it2 != m_publicSpendKeys.end())
+    {
+        m_publicSpendKeys.erase(it2);
+    }
 
     return SUCCESS;
 }

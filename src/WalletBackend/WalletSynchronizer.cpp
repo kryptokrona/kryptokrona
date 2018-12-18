@@ -233,6 +233,8 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
 
     std::vector<uint64_t> globalIndexes;
 
+    const auto spendKeys = m_subWallets->m_publicSpendKeys;
+
     for (size_t outputIndex = 0; outputIndex < tx.keyOutputs.size(); outputIndex++)
     {
         const uint64_t amount = tx.keyOutputs[outputIndex].amount;
@@ -250,8 +252,6 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
             /* Not our output */
             continue;
         }
-
-        const auto spendKeys = m_subWallets->m_publicSpendKeys;
 
         /* See if the derived spend key matches any of our spend keys */
         auto ourSpendKey = std::find(spendKeys.begin(), spendKeys.end(),
