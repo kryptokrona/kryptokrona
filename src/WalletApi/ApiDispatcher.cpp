@@ -172,12 +172,12 @@ ApiDispatcher::ApiDispatcher(
             .Get("/transactions/\\d+/\\d+", router(&ApiDispatcher::getTransactionsFromHeightToHeight, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get the transactions starting at the given block, for 1000 blocks, belonging to the given address */
-            .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+", router(
+            .Get("/transactions/address/" + ApiConstants::addressRegex + "/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
             /* Get the transactions starting at the given block, and ending at the given block, belonging to the given address */
-            .Get("/transactions/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
+            .Get("/transactions/address/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
@@ -187,7 +187,7 @@ ApiDispatcher::ApiDispatcher(
             )
 
             /* Get details for the given transaction hash, if known */
-            .Get("/transactions/" + ApiConstants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
+            .Get("/transactions/hash/" + ApiConstants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get balance for the wallet */
             .Get("/balance", router(&ApiDispatcher::getBalance, walletMustBeOpen, viewWalletsAllowed))
