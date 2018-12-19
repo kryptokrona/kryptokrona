@@ -1146,7 +1146,7 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightWithAd
     httplib::Response &res,
     const nlohmann::json &body) const
 {
-    std::string stripped = req.path.substr(std::string("/transactions/").size());
+    std::string stripped = req.path.substr(std::string("/transactions/address/").size());
 
     uint64_t splitPos = stripped.find_first_of("/");
 
@@ -1209,7 +1209,7 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeig
     httplib::Response &res,
     const nlohmann::json &body) const
 {
-    std::string stripped = req.path.substr(std::string("/transactions/").size());
+    std::string stripped = req.path.substr(std::string("/transactions/address/").size());
 
     uint64_t splitPos = stripped.find_first_of("/");
 
@@ -1287,7 +1287,7 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::getTransactionDetails(
     httplib::Response &res,
     const nlohmann::json &body) const
 {
-    std::string hashStr = req.path.substr(std::string("/transactions/").size());
+    std::string hashStr = req.path.substr(std::string("/transactions/hash/").size());
 
     Crypto::Hash hash;
 
