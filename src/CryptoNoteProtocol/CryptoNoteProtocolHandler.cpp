@@ -813,7 +813,7 @@ int CryptoNoteProtocolHandler::handle_notify_missing_txs(int command, NOTIFY_MIS
   std::vector<Crypto::Hash> missedHashes;
   m_core.getTransactions(arg.missing_txs, txs, missedHashes);
   if (!missedHashes.empty()) {
-    logger(Logging::ERROR) << "Failed to Handle NOTIFY_MISSING_TXS, Unable to retrieve requested transactions, Dropping Connection";
+    logger(Logging::DEBUGGING) << "Failed to Handle NOTIFY_MISSING_TXS, Unable to retrieve requested transactions, Dropping Connection";
     context.m_state = CryptoNoteConnectionContext::state_shutdown;
     return 1;
   }
