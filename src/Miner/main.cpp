@@ -3,34 +3,28 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "Common/SignalHandler.h"
-
-#include "Logging/LoggerGroup.h"
-#include "Logging/ConsoleLogger.h"
-#include "Logging/LoggerRef.h"
-
 #include "MinerManager.h"
 
 #include <System/Dispatcher.h>
 
-int main(int argc, char** argv) {
-  try {
-    CryptoNote::MiningConfig config;
-    config.parse(argc, argv);
+int main(int argc, char **argv)
+{
+    while (true)
+    {
+        CryptoNote::MiningConfig config;
+        config.parse(argc, argv);
 
-    const auto loggerGroup = std::make_shared<Logging::LoggerGroup>();
+        try
+        {
+            System::Dispatcher dispatcher;
+            Miner::MinerManager app(dispatcher, config);
 
-    Logging::ConsoleLogger consoleLogger(static_cast<Logging::Level>(config.logLevel));
-    loggerGroup->addLogger(consoleLogger);
-
-    System::Dispatcher dispatcher;
-    Miner::MinerManager app(dispatcher, config, loggerGroup);
-
-    app.start();
-  } catch (std::exception& e) {
-    std::cerr << "Fatal: " << e.what() << std::endl;
-    return 1;
-  }
-
-  return 0;
+            app.start();
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "Unhandled exception caught: " << e.what()
+                      << "\nAttempting to relaunch..." << std::endl;
+        }
+    }
 }
