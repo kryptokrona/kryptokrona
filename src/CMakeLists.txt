@@ -127,7 +127,7 @@ endif()
 target_link_libraries(zedwallet Mnemonics Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common WalletBackend)
 target_link_libraries(service WalletService JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto Rpc Http System Logging Common WalletBackend ${Boost_LIBRARIES})
 target_link_libraries(Wallet NodeRpcProxy Transfers Rpc P2P upnpc-static Http Serialization CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES})
-target_link_libraries(miner CryptoNoteCore Rpc Serialization System Http Logging Common Crypto ${Boost_LIBRARIES})
+target_link_libraries(miner CryptoNoteCore Rpc System Http Common Crypto WalletBackend)
 target_link_libraries(cryptotest Crypto Common)
 target_link_libraries(Nigel WalletBackend)
 

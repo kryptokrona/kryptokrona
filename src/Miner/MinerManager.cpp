@@ -12,6 +12,7 @@
 #include <thread>
 #include <chrono>
 
+#include "Common/FormatTools.h"
 #include "Common/StringTools.h"
 #include <config/CryptoNoteConfig.h>
 #include "CryptoNoteCore/CachedBlock.h"
@@ -21,267 +22,299 @@
 #include "Rpc/HttpClient.h"
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 #include "Rpc/JsonRpc.h"
-#include <Logging/LoggerManager.h>
+
+#include <zedwallet++/ColouredMsg.h>
 
 using namespace CryptoNote;
-using namespace Logging;
 
 namespace Miner {
 
 namespace {
 
-MinerEvent BlockMinedEvent() {
-  MinerEvent event;
-  event.type = MinerEventType::BLOCK_MINED;
-  return event;
+MinerEvent BlockMinedEvent()
+{
+    MinerEvent event;
+    event.type = MinerEventType::BLOCK_MINED;
+    return event;
 }
 
-MinerEvent BlockchainUpdatedEvent() {
-  MinerEvent event;
-  event.type = MinerEventType::BLOCKCHAIN_UPDATED;
-  return event;
+MinerEvent BlockchainUpdatedEvent()
+{
+    MinerEvent event;
+    event.type = MinerEventType::BLOCKCHAIN_UPDATED;
+    return event;
 }
 
-void adjustMergeMiningTag(BlockTemplate& blockTemplate) {
-  CachedBlock cachedBlock(blockTemplate);
-  if (blockTemplate.majorVersion >= BLOCK_MAJOR_VERSION_2) {
-    CryptoNote::TransactionExtraMergeMiningTag mmTag;
-    mmTag.depth = 0;
-    mmTag.merkleRoot = cachedBlock.getAuxiliaryBlockHeaderHash();
+void adjustMergeMiningTag(BlockTemplate& blockTemplate)
+{
+    CachedBlock cachedBlock(blockTemplate);
 
-    blockTemplate.parentBlock.baseTransaction.extra.clear();
-    if (!CryptoNote::appendMergeMiningTagToExtra(blockTemplate.parentBlock.baseTransaction.extra, mmTag)) {
-      throw std::runtime_error("Couldn't append merge mining tag");
-    }
-  }
-}
+    if (blockTemplate.majorVersion >= BLOCK_MAJOR_VERSION_2)
+    {
+        CryptoNote::TransactionExtraMergeMiningTag mmTag;
+        mmTag.depth = 0;
+        mmTag.merkleRoot = cachedBlock.getAuxiliaryBlockHeaderHash();
 
-}
-
-MinerManager::MinerManager(System::Dispatcher& dispatcher, const CryptoNote::MiningConfig& config, std::shared_ptr<Logging::ILogger> logger) :
-  m_dispatcher(dispatcher),
-  m_logger(logger, "MinerManager"),
-  m_contextGroup(dispatcher),
-  m_config(config),
-  m_miner(dispatcher, logger),
-  m_blockchainMonitor(dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.scanPeriod, logger),
-  m_eventOccurred(dispatcher),
-  m_httpEvent(dispatcher),
-  m_lastBlockTimestamp(0) {
-
-  m_httpEvent.set();
-}
-
-MinerManager::~MinerManager() {
-}
-
-void MinerManager::start() {
-  m_logger(Logging::DEBUGGING) << "starting";
-
-  BlockMiningParameters params;
-  for (;;) {
-    m_logger(Logging::INFO) << "requesting mining parameters";
-
-    try {
-      params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
-    } catch (ConnectException& e) {
-      m_logger(Logging::WARNING) << "Couldn't connect to daemon: " << e.what();
-      System::Timer timer(m_dispatcher);
-      timer.sleep(std::chrono::seconds(m_config.scanPeriod));
-      continue;
-    }
-
-    adjustBlockTemplate(params.blockTemplate);
-    break;
-  }
-
-  isRunning = true;
-
-  startBlockchainMonitoring();
-  std::thread reporter(std::bind(&MinerManager::printHashRate, this));
-  startMining(params);
-
-  eventLoop();
-  isRunning = false;
-}
-
-void MinerManager::printHashRate() {
-  uint64_t last_hash_count = m_miner.getHashCount();
-
-  while (isRunning) {
-    std::this_thread::sleep_for(std::chrono::seconds(60));
-    uint64_t current_hash_count = m_miner.getHashCount();
-    double hashes = static_cast<double>((current_hash_count - last_hash_count) / 60);
-    last_hash_count = current_hash_count;
-    m_logger(Logging::INFO, BRIGHT_GREEN) << "Mining at " << hashes << " H/s";
-  }
-}
-
-void MinerManager::eventLoop() {
-  size_t blocksMined = 0;
-
-  for (;;) {
-    m_logger(Logging::DEBUGGING) << "waiting for event";
-    MinerEvent event = waitEvent();
-
-    switch (event.type) {
-      case MinerEventType::BLOCK_MINED: {
-        m_logger(Logging::DEBUGGING) << "got BLOCK_MINED event";
-        stopBlockchainMonitoring();
-
-        if (submitBlock(m_minedBlock, m_config.daemonHost, m_config.daemonPort)) {
-          m_lastBlockTimestamp = m_minedBlock.timestamp;
-
-          if (m_config.blocksLimit != 0 && ++blocksMined == m_config.blocksLimit) {
-            m_logger(Logging::INFO) << "Miner mined requested " << m_config.blocksLimit << " blocks. Quitting";
-            return;
-          }
+        blockTemplate.parentBlock.baseTransaction.extra.clear();
+        if (!CryptoNote::appendMergeMiningTagToExtra(blockTemplate.parentBlock.baseTransaction.extra, mmTag))
+        {
+            throw std::runtime_error("Couldn't append merge mining tag");
         }
+    }
+}
 
-        BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
-        adjustBlockTemplate(params.blockTemplate);
+} // namespace
 
-        startBlockchainMonitoring();
-        startMining(params);
-        break;
-      }
+MinerManager::MinerManager(System::Dispatcher& dispatcher, const CryptoNote::MiningConfig& config) :
+    m_dispatcher(dispatcher),
+    m_contextGroup(dispatcher),
+    m_config(config),
+    m_miner(dispatcher),
+    m_blockchainMonitor(dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.scanPeriod),
+    m_eventOccurred(dispatcher),
+    m_httpEvent(dispatcher),
+    m_lastBlockTimestamp(0)
+{
+    m_httpEvent.set();
+}
 
-      case MinerEventType::BLOCKCHAIN_UPDATED: {
-        m_logger(Logging::DEBUGGING) << "got BLOCKCHAIN_UPDATED event";
-        stopMining();
-        stopBlockchainMonitoring();
-        BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
-        adjustBlockTemplate(params.blockTemplate);
+void MinerManager::start()
+{
+    BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
+    adjustBlockTemplate(params.blockTemplate);
 
-        startBlockchainMonitoring();
-        startMining(params);
-        break;
-      }
+    isRunning = true;
 
-      default:
-        assert(false);
+    startBlockchainMonitoring();
+    std::thread reporter(std::bind(&MinerManager::printHashRate, this));
+    startMining(params);
+
+    eventLoop();
+    isRunning = false;
+}
+
+void MinerManager::printHashRate()
+{
+    uint64_t last_hash_count = m_miner.getHashCount();
+
+    while (isRunning)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(60));
+
+        uint64_t current_hash_count = m_miner.getHashCount();
+
+        double hashes = static_cast<double>((current_hash_count - last_hash_count) / 60);
+
+        last_hash_count = current_hash_count;
+
+        std::cout << SuccessMsg("\nMining at ")
+                  << SuccessMsg(Common::get_mining_speed(hashes))
+                  << "\n\n";
+    }
+}
+
+void MinerManager::eventLoop()
+{
+    size_t blocksMined = 0;
+
+    while(true)
+    {
+        MinerEvent event = waitEvent();
+
+        switch (event.type)
+        {
+            case MinerEventType::BLOCK_MINED:
+            {
+                stopBlockchainMonitoring();
+
+                if (submitBlock(m_minedBlock, m_config.daemonHost, m_config.daemonPort))
+                {
+                    m_lastBlockTimestamp = m_minedBlock.timestamp;
+
+                    if (m_config.blocksLimit != 0 && ++blocksMined == m_config.blocksLimit)
+                    {
+                        std::cout << InformationMsg("Mined requested amount of blocks (")
+                                  << InformationMsg(m_config.blocksLimit)
+                                  << InformationMsg("). Quitting.\n");
+                        return;
+                    }
+                }
+
+                BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
+                adjustBlockTemplate(params.blockTemplate);
+
+                startBlockchainMonitoring();
+                startMining(params);
+                break;
+            }
+            case MinerEventType::BLOCKCHAIN_UPDATED:
+            {
+                stopMining();
+                stopBlockchainMonitoring();
+                BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
+                adjustBlockTemplate(params.blockTemplate);
+
+                startBlockchainMonitoring();
+                startMining(params);
+                break;
+            }
+        }
+    }
+}
+
+MinerEvent MinerManager::waitEvent()
+{
+    while(m_events.empty())
+    {
+        m_eventOccurred.wait();
+        m_eventOccurred.clear();
+    }
+
+    MinerEvent event = std::move(m_events.front());
+    m_events.pop();
+
+    return event;
+}
+
+void MinerManager::pushEvent(MinerEvent&& event)
+{
+    m_events.push(std::move(event));
+    m_eventOccurred.set();
+}
+
+void MinerManager::startMining(const CryptoNote::BlockMiningParameters& params)
+{
+    m_contextGroup.spawn([this, params] ()
+    {
+        try
+        {
+            m_minedBlock = m_miner.mine(params, m_config.threadCount);
+            pushEvent(BlockMinedEvent());
+        }
+        catch (const std::exception &)
+        {
+        }
+    });
+}
+
+void MinerManager::stopMining()
+{
+    m_miner.stop();
+}
+
+void MinerManager::startBlockchainMonitoring()
+{
+    m_contextGroup.spawn([this] ()
+    {
+        try
+        {
+            m_blockchainMonitor.waitBlockchainUpdate();
+            pushEvent(BlockchainUpdatedEvent());
+        }
+        catch (const std::exception &)
+        {
+        }
+    });
+}
+
+void MinerManager::stopBlockchainMonitoring()
+{
+    m_blockchainMonitor.stop();
+}
+
+bool MinerManager::submitBlock(const BlockTemplate& minedBlock, const std::string& daemonHost, uint16_t daemonPort)
+{
+    CachedBlock cachedBlock(minedBlock);
+
+    try
+    {
+        HttpClient client(m_dispatcher, daemonHost, daemonPort);
+
+        COMMAND_RPC_SUBMITBLOCK::request request;
+        request.emplace_back(Common::toHex(toBinaryArray(minedBlock)));
+
+        COMMAND_RPC_SUBMITBLOCK::response response;
+
+        System::EventLock lk(m_httpEvent);
+        JsonRpc::invokeJsonRpcCommand(client, "submitblock", request, response);
+
+        std::cout << SuccessMsg("\nBlock found! Hash: ")
+                  << SuccessMsg(cachedBlock.getBlockHash()) << "\n\n";
+
+        return true;
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << WarningMsg("Failed to submit block: ")
+                  << WarningMsg(e.what()) << std::endl;
+        return false;
+    }
+}
+
+BlockMiningParameters MinerManager::requestMiningParameters(System::Dispatcher& dispatcher, const std::string& daemonHost, uint16_t daemonPort, const std::string& miningAddress)
+{
+    while (true)
+    {
+        try
+        {
+            HttpClient client(dispatcher, daemonHost, daemonPort);
+
+            COMMAND_RPC_GETBLOCKTEMPLATE::request request;
+            request.wallet_address = miningAddress;
+            request.reserve_size = 0;
+
+            COMMAND_RPC_GETBLOCKTEMPLATE::response response;
+
+            System::EventLock lk(m_httpEvent);
+            JsonRpc::invokeJsonRpcCommand(client, "getblocktemplate", request, response);
+
+            if (response.status != CORE_RPC_STATUS_OK)
+            {
+                std::cout << WarningMsg("Couldn't get block template: " + response.status) << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                continue;
+            }
+
+            BlockMiningParameters params;
+            params.difficulty = response.difficulty;
+
+            if(!fromBinaryArray(params.blockTemplate, Common::fromHex(response.blocktemplate_blob)))
+            {
+                std::cout << WarningMsg("Couldn't parse block template") << std::endl;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                continue;
+            }
+
+            return params;
+        }
+        catch (const std::exception &e)
+        {
+            std::cout << WarningMsg("Couldn't get block template - Is your daemon open?\n")
+                      << "(Error message: " << e.what() << ")\n"; 
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            continue;
+        }
+    }
+}
+
+void MinerManager::adjustBlockTemplate(CryptoNote::BlockTemplate& blockTemplate) const
+{
+    adjustMergeMiningTag(blockTemplate);
+
+    if (m_config.firstBlockTimestamp == 0)
+    {
+        /* no need to fix timestamp */
         return;
     }
-  }
-}
 
-MinerEvent MinerManager::waitEvent() {
-  while(m_events.empty()) {
-    m_eventOccurred.wait();
-    m_eventOccurred.clear();
-  }
-
-  MinerEvent event = std::move(m_events.front());
-  m_events.pop();
-
-  return event;
-}
-
-void MinerManager::pushEvent(MinerEvent&& event) {
-  m_events.push(std::move(event));
-  m_eventOccurred.set();
-}
-
-void MinerManager::startMining(const CryptoNote::BlockMiningParameters& params) {
-  m_contextGroup.spawn([this, params] () {
-    try {
-      m_minedBlock = m_miner.mine(params, m_config.threadCount);
-      pushEvent(BlockMinedEvent());
-    } catch (System::InterruptedException&) {
-    } catch (std::exception& e) {
-      m_logger(Logging::ERROR) << "Miner context unexpectedly finished: " << e.what();
+    if (m_lastBlockTimestamp == 0)
+    {
+        blockTemplate.timestamp = m_config.firstBlockTimestamp;
     }
-  });
-}
-
-void MinerManager::stopMining() {
-  m_miner.stop();
-}
-
-void MinerManager::startBlockchainMonitoring() {
-  m_contextGroup.spawn([this] () {
-    try {
-      m_blockchainMonitor.waitBlockchainUpdate();
-      pushEvent(BlockchainUpdatedEvent());
-    } catch (System::InterruptedException&) {
-    } catch (std::exception& e) {
-      m_logger(Logging::ERROR) << "BlockchainMonitor context unexpectedly finished: " << e.what();
+    else if (m_lastBlockTimestamp != 0 && m_config.blockTimestampInterval != 0)
+    {
+        blockTemplate.timestamp = m_lastBlockTimestamp + m_config.blockTimestampInterval;
     }
-  });
-}
-
-void MinerManager::stopBlockchainMonitoring() {
-  m_blockchainMonitor.stop();
-}
-
-bool MinerManager::submitBlock(const BlockTemplate& minedBlock, const std::string& daemonHost, uint16_t daemonPort) {
-  CachedBlock cachedBlock(minedBlock);
-
-  try {
-    HttpClient client(m_dispatcher, daemonHost, daemonPort);
-
-    COMMAND_RPC_SUBMITBLOCK::request request;
-    request.emplace_back(Common::toHex(toBinaryArray(minedBlock)));
-
-    COMMAND_RPC_SUBMITBLOCK::response response;
-
-    System::EventLock lk(m_httpEvent);
-    JsonRpc::invokeJsonRpcCommand(client, "submitblock", request, response);
-
-    m_logger(Logging::INFO) << "Block has been successfully submitted. Block hash: " << Common::podToHex(cachedBlock.getBlockHash());
-    return true;
-  } catch (std::exception& e) {
-    m_logger(Logging::WARNING) << "Couldn't submit block: " << Common::podToHex(cachedBlock.getBlockHash()) << ", reason: " << e.what();
-    return false;
-  }
-}
-
-BlockMiningParameters MinerManager::requestMiningParameters(System::Dispatcher& dispatcher, const std::string& daemonHost, uint16_t daemonPort, const std::string& miningAddress) {
-  try {
-    HttpClient client(dispatcher, daemonHost, daemonPort);
-
-    COMMAND_RPC_GETBLOCKTEMPLATE::request request;
-    request.wallet_address = miningAddress;
-    request.reserve_size = 0;
-
-    COMMAND_RPC_GETBLOCKTEMPLATE::response response;
-
-    System::EventLock lk(m_httpEvent);
-    JsonRpc::invokeJsonRpcCommand(client, "getblocktemplate", request, response);
-
-    if (response.status != CORE_RPC_STATUS_OK) {
-      throw std::runtime_error("Core responded with wrong status: " + response.status);
-    }
-
-    BlockMiningParameters params;
-    params.difficulty = response.difficulty;
-
-    if(!fromBinaryArray(params.blockTemplate, Common::fromHex(response.blocktemplate_blob))) {
-      throw std::runtime_error("Couldn't deserialize block template");
-    }
-
-    m_logger(Logging::DEBUGGING) << "Requested block template with previous block hash: " << Common::podToHex(params.blockTemplate.previousBlockHash);
-    return params;
-  } catch (std::exception& e) {
-    m_logger(Logging::WARNING) << "Couldn't get block template: " << e.what();
-    throw;
-  }
-}
-
-
-void MinerManager::adjustBlockTemplate(CryptoNote::BlockTemplate& blockTemplate) const {
-  adjustMergeMiningTag(blockTemplate);
-
-  if (m_config.firstBlockTimestamp == 0) {
-    //no need to fix timestamp
-    return;
-  }
-
-  if (m_lastBlockTimestamp == 0) {
-    blockTemplate.timestamp = m_config.firstBlockTimestamp;
-  } else if (m_lastBlockTimestamp != 0 && m_config.blockTimestampInterval != 0) {
-    blockTemplate.timestamp = m_lastBlockTimestamp + m_config.blockTimestampInterval;
-  }
 }
 
 } //namespace Miner
