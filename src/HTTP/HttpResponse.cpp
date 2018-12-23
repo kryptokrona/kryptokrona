@@ -56,6 +56,7 @@ namespace CryptoNote {
 HttpResponse::HttpResponse() {
   status = STATUS_200;
   headers["Server"] = "CryptoNote-based HTTP server";
+  headers["Connection"] = "keep-alive";
 }
 
 void HttpResponse::setStatus(HTTP_STATUS s) {

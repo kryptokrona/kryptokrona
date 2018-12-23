@@ -48,7 +48,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
         std::getline(std::cin, address);
 
-        ZedUtilities::trim(address);
+        Common::trim(address);
 
         const bool integratedAddressesAllowed = false;
 
@@ -148,7 +148,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
 
         std::getline(std::cin, mnemonicSeed);
 
-        ZedUtilities::trim(mnemonicSeed);
+        Common::trim(mnemonicSeed);
         
         /* Just to check if it's valid */
         auto [error, privateSpendKey] = Mnemonics::MnemonicToPrivateKey(mnemonicSeed);
@@ -301,7 +301,7 @@ Crypto::SecretKey getPrivateKey(const std::string outputMsg)
 
         std::getline(std::cin, privateKeyString);
 
-        ZedUtilities::trim(privateKeyString);
+        Common::trim(privateKeyString);
 
         if (privateKeyString.length() != privateKeyLen)
         {

@@ -519,7 +519,7 @@ void createIntegratedAddress()
 
         std::getline(std::cin, address);
 
-        ZedUtilities::trim(address);
+        Common::trim(address);
 
         const bool integratedAddressesAllowed = false;
 
@@ -540,7 +540,7 @@ void createIntegratedAddress()
 
         std::getline(std::cin, paymentID);
 
-        ZedUtilities::trim(paymentID);
+        Common::trim(paymentID);
 
         /* Validate the payment ID */
         if (WalletError error = validatePaymentID(paymentID); error != SUCCESS)

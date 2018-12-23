@@ -13,27 +13,34 @@
 
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 #include "Rpc/JsonRpc.h"
-#include "Rpc/HttpClient.h"
 
 #include <zedwallet++/ColouredMsg.h>
 
-BlockchainMonitor::BlockchainMonitor(System::Dispatcher& dispatcher, const std::string& daemonHost, uint16_t daemonPort, size_t pollingInterval):
+using json = nlohmann::json;
+
+BlockchainMonitor::BlockchainMonitor(
+    System::Dispatcher& dispatcher,
+    const size_t pollingInterval,
+    const std::shared_ptr<httplib::Client> httpClient):
+
     m_dispatcher(dispatcher),
-    m_daemonHost(daemonHost),
-    m_daemonPort(daemonPort),
     m_pollingInterval(pollingInterval),
     m_stopped(false),
-    m_httpEvent(dispatcher),
-    m_sleepingContext(dispatcher)
+    m_sleepingContext(dispatcher),
+    m_httpClient(httpClient)
 {
-    m_httpEvent.set();
 }
 
 void BlockchainMonitor::waitBlockchainUpdate()
 {
     m_stopped = false;
 
-    Crypto::Hash lastBlockHash = requestLastBlockHash();
+    auto lastBlockHash = requestLastBlockHash();
+
+    while (!lastBlockHash && !m_stopped) {
+        std::this_thread::sleep_for(std::chrono::seconds(m_pollingInterval));
+        lastBlockHash = requestLastBlockHash();
+    }
 
     while(!m_stopped)
     {
@@ -45,7 +52,14 @@ void BlockchainMonitor::waitBlockchainUpdate()
 
         m_sleepingContext.wait();
 
-        if (lastBlockHash != requestLastBlockHash())
+        auto nextBlockHash = requestLastBlockHash();
+
+        while (!nextBlockHash && !m_stopped) {
+            std::this_thread::sleep_for(std::chrono::seconds(m_pollingInterval));
+            nextBlockHash = requestLastBlockHash();
+        }
+
+        if (lastBlockHash.value() != nextBlockHash.value())
         {
             break;
         }
@@ -65,49 +79,65 @@ void BlockchainMonitor::stop()
     m_sleepingContext.wait();
 }
 
-Crypto::Hash BlockchainMonitor::requestLastBlockHash()
+std::optional<Crypto::Hash> BlockchainMonitor::requestLastBlockHash()
 {
-    while (true)
+    json j = {
+        {"jsonrpc", "2.0"},
+        {"method", "getlastblockheader"},
+        {"params", {}}
+    };
+
+    auto res = m_httpClient->Post("/json_rpc", j.dump(), "application/json");
+
+    if (!res)
     {
-        try
+        std::cout << WarningMsg("Failed to get block hash - Is your daemon open?\n");
+
+        return std::nullopt;
+    }
+
+    if (res->status != 200)
+    {
+        std::stringstream stream;
+
+        stream << "Failed to get block hash - received unexpected http "
+               << "code from server: "
+               << res->status << std::endl;
+
+        std::cout << WarningMsg(stream.str()) << std::endl;
+
+        return std::nullopt;
+    }
+
+    try
+    {
+        json j = json::parse(res->body);
+
+        const std::string status = j.at("result").at("status").get<std::string>();
+
+        if (status != "OK")
         {
-            CryptoNote::HttpClient client(m_dispatcher, m_daemonHost, m_daemonPort);
+            std::stringstream stream;
 
-            CryptoNote::COMMAND_RPC_GET_LAST_BLOCK_HEADER::request request;
-            CryptoNote::COMMAND_RPC_GET_LAST_BLOCK_HEADER::response response;
+            stream << "Failed to get block hash from daemon. Response: "
+                   << status << std::endl;
 
-            System::EventLock lk(m_httpEvent);
-            CryptoNote::JsonRpc::invokeJsonRpcCommand(client, "getlastblockheader", request, response);
+            std::cout << WarningMsg(stream.str());
 
-            if (response.status != CORE_RPC_STATUS_OK)
-            {
-                std::cout << WarningMsg("Failed to get block hash - Is your daemon open?\n")
-                          << "(Error message: " << response.status << ")\n";
-
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                continue;
-            }
-
-            Crypto::Hash blockHash;
-
-            if (!Common::podFromHex(response.block_header.hash, blockHash))
-            {
-                std::cout << WarningMsg("Failed to parse block hash: " + response.block_header.hash)
-                          << std::endl;
-
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                continue;
-            }
-
-            return blockHash;
+            return std::nullopt;
         }
-        catch (const std::exception &e)
-        {
-            std::cout << WarningMsg("Failed to get block hash - Is your daemon open?\n")
-                      << "(Error message: " << e.what() << ")\n";
 
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            continue;
-        }
+        return j.at("result").at("block_header").at("hash").get<Crypto::Hash>();
+    }
+    catch (const json::exception &e)
+    {
+        std::stringstream stream;
+
+        stream << "Failed to parse block hash from daemon. Received data:\n"
+               << res->body << "\nParse error: " << e.what() << std::endl;
+
+        std::cout << WarningMsg(stream.str());
+
+        return std::nullopt;
     }
 }

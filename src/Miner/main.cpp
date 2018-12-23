@@ -17,7 +17,12 @@ int main(int argc, char **argv)
         try
         {
             System::Dispatcher dispatcher;
-            Miner::MinerManager app(dispatcher, config);
+
+            auto httpClient = std::make_shared<httplib::Client>(
+                config.daemonHost.c_str(), config.daemonPort, 10 /* 10 second timeout */
+            );
+
+            Miner::MinerManager app(dispatcher, config, httpClient);
 
             app.start();
         }

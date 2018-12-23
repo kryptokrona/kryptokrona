@@ -7,6 +7,8 @@
 
 #include "CryptoTypes.h"
 
+#include "httplib.h"
+
 #include <System/ContextGroup.h>
 #include <System/Dispatcher.h>
 #include <System/Event.h>
@@ -14,19 +16,21 @@
 class BlockchainMonitor
 {
     public:
-        BlockchainMonitor(System::Dispatcher& dispatcher, const std::string& daemonHost, uint16_t daemonPort, size_t pollingInterval);
+        BlockchainMonitor(
+            System::Dispatcher& dispatcher,
+            const size_t pollingInterval,
+            const std::shared_ptr<httplib::Client> httpClient);
 
         void waitBlockchainUpdate();
         void stop();
 
     private:
         System::Dispatcher& m_dispatcher;
-        std::string m_daemonHost;
-        uint16_t m_daemonPort;
         size_t m_pollingInterval;
         bool m_stopped;
-        System::Event m_httpEvent;
         System::ContextGroup m_sleepingContext;
 
-        Crypto::Hash requestLastBlockHash();
+        std::optional<Crypto::Hash> requestLastBlockHash();
+
+        std::shared_ptr<httplib::Client> m_httpClient = nullptr;
 };
