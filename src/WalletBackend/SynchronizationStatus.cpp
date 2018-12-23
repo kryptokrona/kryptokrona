@@ -24,6 +24,16 @@ void SynchronizationStatus::storeBlockHash(
     const Crypto::Hash hash,
     const uint64_t height)
 {
+    /* If it's not a fork and not the very first block */
+    if (height > m_lastKnownBlockHeight && m_lastKnownBlockHeight != 0)
+    {
+        /* Height should be one more than previous height */
+        if (height != m_lastKnownBlockHeight + 1)
+        {
+            throw std::runtime_error("Blocks were missed in syncing process! Terminating.");
+        }
+    }
+
     m_lastKnownBlockHeight = height;
 
     /* If we're at a checkpoint height, add the hash to the infrequent

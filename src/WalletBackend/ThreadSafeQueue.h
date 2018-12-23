@@ -61,8 +61,36 @@ class ThreadSafeQueue
             return true;
         }
 
-        /* Take an item from the front of the queue */
-        T pop()
+        /* Delete the front item from the queue */
+        void deleteFront()
+        {
+            /* Aquire the lock */
+            std::unique_lock<std::mutex> lock(m_mutex);
+
+            /* Whilst we could allow deleting from an empty queue, i.e, waiting
+               for an item, then removing it, this could cause us to be stuck
+               waiting on data to arrive when the queue is empty. We can't
+               really return without removing the item. We could return a bool
+               saying if we completed it, but then the user has no real way to
+               force a removal short of running it in a while loop.
+               Instead, if we just force the queue to have to have data in,
+               we can make sure a removal always suceeds. */
+            if (m_queue.empty())
+            {
+                throw std::runtime_error("Cannot remove from an empty queue!");
+            }
+
+            /* Remove the first item from the queue */
+            m_queue.pop();
+
+            /* Unlock the mutex before notifying, so it doesn't block after
+               waking up */
+            lock.unlock();
+
+            m_consumedBlock.notify_all();
+        }
+        
+        T getFirstItem(bool removeFromQueue)
         {
             /* Aquire the lock */
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -98,7 +126,10 @@ class ThreadSafeQueue
             item = m_queue.front();
 
             /* Remove the first item from the queue */
-            m_queue.pop();
+            if (removeFromQueue)
+            {
+                m_queue.pop();
+            }
 
             /* Unlock the mutex before notifying, so it doesn't block after
                waking up */
@@ -108,6 +139,20 @@ class ThreadSafeQueue
 			
             /* Return the item */
             return item;
+        }
+
+        /* Take an item from the front of the queue, and do NOT remove it */
+        T peek()
+        {
+            bool removeFromQueue = false;
+            return getFirstItem(removeFromQueue);
+        }
+
+        /* Take and remove an item from the front of the queue */
+        T pop()
+        {
+            bool removeFromQueue = true;
+            return getFirstItem(removeFromQueue);
         }
 
         /* Stop the queue if something is waiting on it, so we don't block
@@ -120,8 +165,8 @@ class ThreadSafeQueue
             /* Wake up anything waiting on data */
             m_haveData.notify_all();
 
-	    /* Make sure not to call .unlock() on the mutex here - it's
-	       undefined behaviour if it isn't locked. */
+            /* Make sure not to call .unlock() on the mutex here - it's
+               undefined behaviour if it isn't locked. */
 
             m_consumedBlock.notify_all();
         }

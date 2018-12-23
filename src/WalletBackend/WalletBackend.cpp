@@ -475,8 +475,6 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
             walletJson, filename, password, daemonHost, daemonPort
         );
 
-        const bool dumpJson = false;
-
         /* For debugging purposes */
         if (dumpJson)
         {
