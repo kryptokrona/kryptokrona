@@ -452,7 +452,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
 {
     while (!m_shouldStop)
     {
-        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.pop();		
+        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.peek();		
 		
         /* Could have stopped between entering the loop and getting a block */
         if (m_shouldStop)
@@ -483,6 +483,13 @@ void WalletSynchronizer::findTransactionsInBlocks()
         {
             return;
         }
+
+        /* We need to delete the item from the queue AFTER processing it.
+           Otherwise, if we are stopping, like above, the transaction may be
+           half or not processed, but we have removed it from the queue, so
+           it will be skipped. Only remove the tx from the queue if we have
+           fully processed it. */
+        m_blockProcessingQueue.deleteFront();
 
         /* Make sure to do this at the end, once the transactions are fully
            processed! Otherwise, we could miss a transaction depending upon
@@ -604,7 +611,7 @@ void WalletSynchronizer::downloadBlocks()
 
         /* Blocks the thread for up to 10 secs */
         const auto [success, blocks] = m_daemon->getWalletSyncData(
-            std::move(blockCheckpoints), m_startHeight, m_startTimestamp
+            blockCheckpoints, m_startHeight, m_startTimestamp
         );
 
         /* If we get no blocks, we are fully synced.
@@ -615,7 +622,29 @@ void WalletSynchronizer::downloadBlocks()
             Utilities::sleepUnlessStopping(std::chrono::seconds(5), m_shouldStop);
             continue;
         }
-        
+
+        /* If checkpoints are empty, this is the first sync request. */
+        if (blockCheckpoints.empty())
+        {
+            const uint64_t actualHeight = blocks.front().blockHeight;
+
+            /* Only check if a timestamp isn't given */
+            if (m_startTimestamp == 0)
+            {
+                /* The height we expect to get back from the daemon */
+                if (actualHeight != m_startHeight)
+                {
+                    std::stringstream stream;
+
+                    stream << "Received unexpected block height from daemon. "
+                           << "Expected " << m_startHeight << ", got "
+                           << actualHeight << ". Terminating.";
+
+                    throw std::runtime_error(stream.str());
+                }
+            }
+        }
+
         for (const auto &block : blocks)
         {
             /* Add the block to the queue for processing */

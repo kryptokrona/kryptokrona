@@ -100,7 +100,7 @@ void SubWallet::completeAndStoreTransactionInput(
 
         if (it != m_unconfirmedIncomingAmounts.end())
         {
-            m_unconfirmedIncomingAmounts.erase(it);
+            m_unconfirmedIncomingAmounts.erase(it, m_unconfirmedIncomingAmounts.end());
         }
     }
 
@@ -158,7 +158,7 @@ void SubWallet::reset(const uint64_t scanHeight)
 
     if (it != m_unspentInputs.end())
     {
-        m_unspentInputs.erase(it);
+        m_unspentInputs.erase(it, m_unspentInputs.end());
     }
 
     it = std::remove_if(m_spentInputs.begin(), m_spentInputs.end(),
@@ -186,7 +186,7 @@ void SubWallet::reset(const uint64_t scanHeight)
 
     if (it != m_spentInputs.end())
     {
-        m_spentInputs.erase(it);
+        m_spentInputs.erase(it, m_spentInputs.end());
     }
 }
 
@@ -326,7 +326,7 @@ void SubWallet::removeForkedInputs(const uint64_t forkHeight)
 
     if (it != m_unspentInputs.end())
     {
-        m_unspentInputs.erase(it);
+        m_unspentInputs.erase(it, m_unspentInputs.end());
     }
 
     /* If the input was spent after the fork height, but received before the
@@ -350,7 +350,7 @@ void SubWallet::removeForkedInputs(const uint64_t forkHeight)
 
     if (it != m_spentInputs.end())
     {
-        m_spentInputs.erase(it);
+        m_spentInputs.erase(it, m_spentInputs.end());
     }
 }
 
@@ -380,7 +380,7 @@ void SubWallet::removeCancelledTransactions(
     /* Remove the inputs used in the cancelled tranactions */
     if (it != m_lockedInputs.end())
     {
-        m_spentInputs.erase(it);
+        m_spentInputs.erase(it, m_spentInputs.end());
     }
 
     /* Find inputs that we 'received' in outgoing transfers (scanning our
@@ -393,7 +393,7 @@ void SubWallet::removeCancelledTransactions(
 
     if (it2 != m_unconfirmedIncomingAmounts.end())
     {
-        m_unconfirmedIncomingAmounts.erase(it2);
+        m_unconfirmedIncomingAmounts.erase(it2, m_unconfirmedIncomingAmounts.end());
     }
 }
 
