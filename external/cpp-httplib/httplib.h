@@ -5,17 +5,6 @@
 //  MIT License
 //
 
-/* send() on a closed socket will crash our program. MSG_NOSIGNAL disables this.
-   However, this is not available on windows (it doesn't crash our program),
-   so we can set it to 0. If it's not on osx, we can use SO_NOSIGPIPE instead */
-#ifndef MSG_NOSIGNAL
-    #ifdef SO_NOSIGPIPE
-        #define MSG_NOSIGNAL SO_NOSIGPIPE
-    #else
-        #define MSG_NOSIGNAL 0
-    #endif
-#endif
-
 #ifndef CPPHTTPLIB_HTTPLIB_H
 #define CPPHTTPLIB_HTTPLIB_H
 
@@ -84,6 +73,17 @@ typedef int socket_t;
 
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
 #include <zlib.h>
+#endif
+
+/* send() on a closed socket will crash our program. MSG_NOSIGNAL disables this.
+   However, this is not available on windows (it doesn't crash our program),
+   so we can set it to 0. If it's not on osx, we can use SO_NOSIGPIPE instead */
+#ifndef MSG_NOSIGNAL
+    #ifdef SO_NOSIGPIPE
+        #define MSG_NOSIGNAL SO_NOSIGPIPE
+    #else
+        #define MSG_NOSIGNAL 0
+    #endif
 #endif
 
 /*
