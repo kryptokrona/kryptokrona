@@ -9,6 +9,8 @@
 
 #include "httplib.h"
 
+#include <optional>
+
 #include <System/ContextGroup.h>
 #include <System/Dispatcher.h>
 #include <System/Event.h>
