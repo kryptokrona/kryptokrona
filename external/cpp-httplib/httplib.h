@@ -325,6 +325,8 @@ protected:
     time_t            timeout_sec_;
     const std::string host_and_port_;
     socket_t          opened_connection_ = INVALID_SOCKET;
+    /* So we don't perform two requests on the same socket */
+    std::mutex        request_mutex;
 
 private:
     socket_t create_client_socket(bool forceNewConnection);
@@ -1461,6 +1463,25 @@ inline SocketStream::~SocketStream()
 
 inline int SocketStream::read(char* ptr, size_t size)
 {
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(sock_, &fds);
+
+    timeval tv;
+    /* TODO: We really should pass these through from the client specified timeout...
+       but it's kind of a pain to get them all the way here */
+    tv.tv_sec = CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND;
+    tv.tv_usec = CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND;
+
+    /* See if we've got data to read */
+    auto rv = select(sock_ + 1, &fds, NULL, NULL, &tv);
+
+    /* Timeout */
+    if (rv == 0)
+    {
+        return 0;
+    }
+
     return recv(sock_, ptr, size, 0);
 }
 
@@ -2040,6 +2061,10 @@ inline bool Client::read_response_line(Stream& strm, Response& res)
 
 inline bool Client::send(Request& req, Response& res)
 {
+    /* TODO: Might be possible to block slightly less of the critical path.
+       I'm too tired to think it through right now. */
+    std::scoped_lock lock(request_mutex);
+
     if (req.path.empty()) {
         return false;
     }
@@ -2145,7 +2170,6 @@ inline bool Client::process_request(Stream& strm, Request& req, Response& res, b
         if (!detail::read_content(strm, res, req.progress)) {
             return false;
         }
-
         if (res.get_header_value("Content-Encoding") == "gzip") {
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
             detail::decompress(res.body);
