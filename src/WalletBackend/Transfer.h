@@ -132,4 +132,13 @@ namespace SendTransaction
         const std::vector<WalletTypes::KeyOutput> keyOutputs,
         const Crypto::PublicKey txPublicKey,
         const Crypto::Hash txHash);
+
+    /* Verify all amounts in the transaction given are PRETTY_AMOUNTS */
+    bool verifyAmounts(const CryptoNote::Transaction tx);
+
+    /* Verify all amounts given are PRETTY_AMOUNTS */
+    bool verifyAmounts(const std::vector<uint64_t> amounts);
+
+    /* Verify fee is as expected */
+    bool verifyTransactionFee(const uint64_t expectedFee, CryptoNote::Transaction tx);
 }

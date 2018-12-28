@@ -57,10 +57,15 @@ class SubWallet
 
         /* Generates a key image from the derivation, and stores the
            transaction input along with the key image filled in */
-        void completeAndStoreTransactionInput(
+        Crypto::KeyImage getTxInputKeyImage( 
             const Crypto::KeyDerivation derivation,
             const size_t outputIndex,
             WalletTypes::TransactionInput,
+            const bool isViewWallet);
+        
+        /* Store a transaction input */
+        void storeTransactionInput(
+            const WalletTypes::TransactionInput input,
             const bool isViewWallet);
 
         std::tuple<uint64_t, uint64_t> getBalance(

@@ -15,6 +15,22 @@
 
 #include <WalletTypes.h>
 
+/* Used to store the data we have accumulating when scanning a specific
+   block. We can't add the items directly, because we may stop midway
+   through. If so, we need to not add anything. */
+struct BlockScanTmpInfo
+{
+    /* Transactions that belong to us */
+    std::vector<WalletTypes::Transaction> transactionsToAdd;
+
+    /* The corresponding inputs to the transactions, indexed by public key
+       (i.e., the corresponding subwallet to add the input to) */
+    std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> inputsToAdd;
+
+    /* Need to mark these as spent so we don't include them later */
+    std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>> keyImagesToMarkSpent;
+};
+
 class WalletSynchronizer
 {
     public:
@@ -97,25 +113,29 @@ class WalletSynchronizer
         uint64_t processTransactionInputs(
             const std::vector<CryptoNote::KeyInput> keyInputs,
             std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
-            const uint64_t blockHeight);
+            const uint64_t blockHeight,
+            BlockScanTmpInfo &blockScanInfo);
 
         /* Process the transaction outputs to find incoming transactions */
         std::tuple<bool, uint64_t> processTransactionOutputs(
             const WalletTypes::RawCoinbaseTransaction &tx,
             std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
-            const uint64_t blockHeight);
+            const uint64_t blockHeight,
+            BlockScanTmpInfo &blockScanInfo);
 
         /* Process a coinbase transaction to see if it belongs to us */
-        void processCoinbaseTransaction(
+        BlockScanTmpInfo processCoinbaseTransaction(
             const WalletTypes::RawCoinbaseTransaction rawTX,
             const uint64_t blockTimestamp,
-            const uint64_t blockHeight);
+            const uint64_t blockHeight,
+            BlockScanTmpInfo blockScanInfo);
 
         /* Process a transaction to see if it belongs to us */
-        void processTransaction(
+        BlockScanTmpInfo processTransaction(
             const WalletTypes::RawTransaction rawTX,
             const uint64_t blockTimestamp,
-            const uint64_t blockHeight);
+            const uint64_t blockHeight,
+            BlockScanTmpInfo blockScanInfo);
 
         std::vector<uint64_t> getGlobalIndexes(
             const uint64_t blockHeight,
@@ -158,7 +178,8 @@ class WalletSynchronizer
 
         /* Blocks to be processed are added to the front, and are removed
            from the back */
-        ThreadSafeQueue<WalletTypes::WalletBlockInfo> m_blockProcessingQueue;
+        std::shared_ptr<ThreadSafeQueue<WalletTypes::WalletBlockInfo>>
+            m_blockProcessingQueue = std::make_shared<ThreadSafeQueue<WalletTypes::WalletBlockInfo>>();
 
         /* The timestamp to start scanning downloading block data from */
         uint64_t m_startTimestamp;

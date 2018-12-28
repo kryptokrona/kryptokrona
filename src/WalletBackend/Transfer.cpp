@@ -11,6 +11,7 @@
 #include <config/WalletConfig.h>
 
 #include <CryptoNoteCore/CryptoNoteTools.h>
+#include <CryptoNoteCore/Currency.h>
 #include <CryptoNoteCore/Mixins.h>
 #include <CryptoNoteCore/TransactionExtra.h>
 
@@ -160,6 +161,16 @@ std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
         }
         
         break;
+    }
+
+    if (!verifyAmounts(tx))
+    {
+        return {AMOUNTS_NOT_PRETTY, Crypto::Hash()};
+    }
+
+    if (!verifyTransactionFee(0, tx))
+    {
+        return {UNEXPECTED_FEE, Crypto::Hash()};
     }
 
     /* Try and send the transaction */
@@ -329,6 +340,16 @@ std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
     if (error)
     {
         return {error, Crypto::Hash()};
+    }
+
+    if (!verifyAmounts(txResult.transaction))
+    {
+        return {AMOUNTS_NOT_PRETTY, Crypto::Hash()};
+    }
+
+    if (!verifyTransactionFee(fee, txResult.transaction))
+    {
+        return {UNEXPECTED_FEE, Crypto::Hash()};
     }
 
     const auto [sendError, txHash] = relayTransaction(
@@ -562,11 +583,6 @@ std::tuple<WalletError, std::vector<CryptoNote::RandomOuts>> getRingParticipants
     {
         return {DAEMON_OFFLINE, fakeOuts};
     }
-    /* Should have the same amount of fake outs we requested */
-    else if (fakeOuts.size() != amounts.size())
-    {
-        return {NOT_ENOUGH_FAKE_OUTPUTS, fakeOuts};
-    }
 
     /* Verify outputs are sufficient */
     for (const uint64_t amount : amounts)
@@ -790,7 +806,7 @@ std::tuple<WalletError, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::S
         std::transform(input.outputs.begin(), input.outputs.end(), std::back_inserter(keyInput.outputIndexes),
         [](const auto output)
         {
-	     return static_cast<uint32_t>(output.index);
+            return static_cast<uint32_t>(output.index);
         });
         
         /* Convert our indexes to relative indexes - for example, if we
@@ -907,7 +923,7 @@ std::vector<uint64_t> splitAmountIntoDenominations(uint64_t amount)
 {
     std::vector<uint64_t> splitAmounts;
 
-    int multiplier = 1;
+    uint64_t multiplier = 1;
 
     while (amount > 0)
     {
@@ -1041,6 +1057,57 @@ TransactionResult makeTransaction(
     );
 
     return result;
+}
+
+bool verifyAmounts(const CryptoNote::Transaction tx)
+{
+    std::vector<uint64_t> amounts;
+
+    /* Note - not verifying inputs as it's possible to have received inputs
+       from another wallet which don't enforce this rule */
+    for (const auto output : tx.outputs)
+    {
+        amounts.push_back(output.amount);
+    }
+
+    return verifyAmounts(amounts);
+}
+
+/* Verify all amounts are valid amounts to send - that they are in PRETTY_AMOUNTS */
+bool verifyAmounts(const std::vector<uint64_t> amounts)
+{
+    /* yeah... i don't want to type that every time */
+    const auto prettyAmounts = CryptoNote::Currency::PRETTY_AMOUNTS;
+
+    for (const auto amount : amounts)
+    {
+        if (std::find(prettyAmounts.begin(), prettyAmounts.end(), amount) == prettyAmounts.end())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool verifyTransactionFee(const uint64_t expectedFee, const CryptoNote::Transaction tx)
+{
+    uint64_t inputTotal = 0;
+    uint64_t outputTotal = 0;
+
+    for (const auto input : tx.inputs)
+    {
+        inputTotal += boost::get<CryptoNote::KeyInput>(input).amount;
+    }
+
+    for (const auto output : tx.outputs)
+    {
+        outputTotal += output.amount;
+    }
+
+    uint64_t actualFee = inputTotal - outputTotal;
+
+    return expectedFee == actualFee;
 }
 
 } // namespace SendTransaction

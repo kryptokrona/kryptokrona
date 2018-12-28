@@ -21,6 +21,11 @@ class ThreadSafeQueue
         {
         }
 
+        ThreadSafeQueue(bool startStopped) :
+            m_shouldStop(startStopped)
+        {
+        }
+
         bool push(T item)
         {
             /* Aquire the lock */

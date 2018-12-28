@@ -177,6 +177,12 @@ enum WalletErrorCode
 
     /* Couldn't find the private key for this hash */
     TX_PRIVATE_KEY_NOT_FOUND = 43,
+
+    /* Amounts not a member of PRETTY_AMOUNTS */
+    AMOUNTS_NOT_PRETTY = 44,
+
+    /* Tx fee is not the same as specified fee */
+    UNEXPECTED_FEE = 45,
 };
 
 class WalletError

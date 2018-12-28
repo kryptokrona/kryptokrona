@@ -72,13 +72,17 @@ class SubWallets
         void addUnconfirmedTransaction(const WalletTypes::Transaction tx);
 
         /* Generates a key image using the public+private spend key of the
-           subwallet. Wallet must not be a view wallet (and must exist, but
-           the WalletSynchronizer already checks this) */
-        void completeAndStoreTransactionInput(
+           subwallet. Will return an uninitialized keyimage if a view wallet
+           (and must exist, but the WalletSynchronizer already checks this) */
+        Crypto::KeyImage getTxInputKeyImage(
             const Crypto::PublicKey publicSpendKey,
             const Crypto::KeyDerivation derivation,
             const size_t outputIndex,
             WalletTypes::TransactionInput input);
+
+        void storeTransactionInput(
+            const Crypto::PublicKey publicSpendKey,
+            const WalletTypes::TransactionInput input);
 
         /* Get key images + amounts for the specified transfer amount. We
            can either take from all subwallets, or from some subset

@@ -109,7 +109,7 @@ void WalletSynchronizer::start()
 
     /* Make sure to start the queue before the downloader, and the downloader
        before the synchronizer, to avoid data races */
-    m_blockProcessingQueue.start();
+    m_blockProcessingQueue->start();
 
     m_blockDownloaderThread = std::thread(
         &WalletSynchronizer::downloadBlocks, this
@@ -127,7 +127,7 @@ void WalletSynchronizer::stop()
 	
     /* Stop the block processing queue so the threads don't hang trying
        to push/pull from the queue */
-    m_blockProcessingQueue.stop();
+    m_blockProcessingQueue->stop();
 	
     /* Wait for the block downloader thread to finish (if applicable) */
     if (m_blockDownloaderThread.joinable())
@@ -156,6 +156,9 @@ void WalletSynchronizer::reset(uint64_t startHeight)
     m_startHeight = startHeight;
     m_startTimestamp = 0;
 
+    /* Empty the block processing queue (Start it in 'stopped' mode) */
+    m_blockProcessingQueue = std::make_shared<ThreadSafeQueue<WalletTypes::WalletBlockInfo>>(false);
+
     /* Discard sync progress */
     m_blockDownloaderStatus = SynchronizationStatus();
     m_transactionSynchronizerStatus = SynchronizationStatus();
@@ -175,7 +178,8 @@ void WalletSynchronizer::removeForkedTransactions(const uint64_t forkHeight)
 uint64_t WalletSynchronizer::processTransactionInputs(
     const std::vector<CryptoNote::KeyInput> keyInputs,
     std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
-    const uint64_t blockHeight)
+    const uint64_t blockHeight,
+    BlockScanTmpInfo &blockScanInfo)
 {
     uint64_t sumOfInputs = 0;
 
@@ -201,11 +205,7 @@ uint64_t WalletSynchronizer::processTransactionInputs(
                to the negative amount in that case */
             transfers[publicSpendKey] -= static_cast<int64_t>(keyInput.amount);
 
-            /* The transaction has been spent, discard the key image so we
-               don't double spend it */
-            m_subWallets->markInputAsSpent(
-                keyInput.keyImage, publicSpendKey, blockHeight
-            );
+            blockScanInfo.keyImagesToMarkSpent.emplace_back(publicSpendKey, keyInput.keyImage);
         }
     }
 
@@ -216,7 +216,8 @@ uint64_t WalletSynchronizer::processTransactionInputs(
 std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
     const WalletTypes::RawCoinbaseTransaction &tx,
     std::unordered_map<Crypto::PublicKey, int64_t> &transfers,
-    const uint64_t blockHeight)
+    const uint64_t blockHeight,
+    BlockScanTmpInfo &blockScanInfo)
 {
     Crypto::KeyDerivation derivation;
 
@@ -301,16 +302,18 @@ std::tuple<bool, uint64_t> WalletSynchronizer::processTransactionOutputs(
             input.unlockTime = tx.unlockTime;
             input.parentTransactionHash = tx.hash;
 
-            /* Note: If we're using a view wallet, this just stores the input,
-               since we can't generate the key images */
+            /* Note: If we're using a view wallet, this just returns an
+               uninitialized key image */
 
             /* We need to fill in the key image of the transaction input -
                we'll let the subwallet do this since we need the private spend
                key. We use the key images to detect outgoing transactions,
                and we use the transaction inputs to make transactions ourself */
-            m_subWallets->completeAndStoreTransactionInput(
+            input.keyImage = m_subWallets->getTxInputKeyImage(
                 *ourSpendKey, derivation, outputIndex, input
             );
+
+            blockScanInfo.inputsToAdd.emplace_back(*ourSpendKey, input);
         }
     }
 
@@ -368,14 +371,15 @@ std::vector<uint64_t> WalletSynchronizer::getGlobalIndexes(
     }
 }
 
-void WalletSynchronizer::processCoinbaseTransaction(
+BlockScanTmpInfo WalletSynchronizer::processCoinbaseTransaction(
     const WalletTypes::RawCoinbaseTransaction rawTX,
     const uint64_t blockTimestamp,
-    const uint64_t blockHeight)
+    const uint64_t blockHeight,
+    BlockScanTmpInfo blockScanInfo)
 {
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
-    processTransactionOutputs(rawTX, transfers, blockHeight);
+    processTransactionOutputs(rawTX, transfers, blockHeight, blockScanInfo);
 
     /* Process any transactions we found belonging to us */
     if (!transfers.empty())
@@ -394,37 +398,38 @@ void WalletSynchronizer::processCoinbaseTransaction(
             rawTX.unlockTime, isCoinbaseTransaction
         );
 
-        /* Store the transaction */
-        m_subWallets->addTransaction(tx);
-
-        m_eventHandler->onTransaction.fire(tx);
+        /* Store the transaction for adding later if everything else succeeds */
+        blockScanInfo.transactionsToAdd.push_back(tx);
     }
+
+    return blockScanInfo;
 }
 
 /* Find the inputs and outputs of a transaction that belong to us */
-void WalletSynchronizer::processTransaction(
+BlockScanTmpInfo WalletSynchronizer::processTransaction(
     const WalletTypes::RawTransaction rawTX,
     const uint64_t blockTimestamp,
-    const uint64_t blockHeight)
+    const uint64_t blockHeight,
+    BlockScanTmpInfo blockScanInfo)
 {
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
     /* Finds the sum of inputs, adds the amounts that belong to us to the
        transfers map */
     const uint64_t sumOfInputs = processTransactionInputs(
-        rawTX.keyInputs, transfers, blockHeight
+        rawTX.keyInputs, transfers, blockHeight, blockScanInfo
     );
 
     /* Finds the sum of outputs, adds the amounts that belong to us to the
        transfers map, and stores any key images that belong to us */
     const auto [success, sumOfOutputs] = processTransactionOutputs(
-        rawTX, transfers, blockHeight
+        rawTX, transfers, blockHeight, blockScanInfo
     );
 
     /* Failed to parse a key */
     if (!success)
     {
-        return;
+        return blockScanInfo;
     }
 
     /* Process any transactions we found belonging to us */
@@ -441,18 +446,18 @@ void WalletSynchronizer::processTransaction(
             rawTX.paymentID, rawTX.unlockTime, isCoinbaseTransaction
         );
 
-        /* Store the transaction */
-        m_subWallets->addTransaction(tx);
-
-        m_eventHandler->onTransaction.fire(tx);
+        /* Store the transaction for adding later if everything else succeeds */
+        blockScanInfo.transactionsToAdd.push_back(tx);
     }
+
+    return blockScanInfo;
 }
 
 void WalletSynchronizer::findTransactionsInBlocks()
 {
     while (!m_shouldStop)
     {
-        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue.peek();		
+        WalletTypes::WalletBlockInfo b = m_blockProcessingQueue->peek();		
 		
         /* Could have stopped between entering the loop and getting a block */
         if (m_shouldStop)
@@ -466,22 +471,44 @@ void WalletSynchronizer::findTransactionsInBlocks()
             removeForkedTransactions(b.blockHeight);
         }
 
+        BlockScanTmpInfo blockScanInfo;
+
         /* Process the coinbase transaction */
-        processCoinbaseTransaction(
-            b.coinbaseTransaction, b.blockTimestamp, b.blockHeight
+        blockScanInfo = processCoinbaseTransaction(
+            b.coinbaseTransaction, b.blockTimestamp, b.blockHeight, blockScanInfo
         );
 
         /* Process the rest of the transactions */
         for (const auto &tx : b.transactions)
         {
-            processTransaction(tx, b.blockTimestamp, b.blockHeight);
+            blockScanInfo = processTransaction(
+                tx, b.blockTimestamp, b.blockHeight, blockScanInfo
+            );
         }
 
-        /* Don't store the transaction if we're stopping - we might have had
-           to cancel out of an unfinished state. */
+        /* Have to check if we're stopping above/here - else we could infinite
+           loop in getGlobalIndexesForRange */
         if (m_shouldStop)
         {
             return;
+        }
+
+        for (const auto tx : blockScanInfo.transactionsToAdd)
+        {
+            m_subWallets->addTransaction(tx);
+            m_eventHandler->onTransaction.fire(tx);
+        }
+
+        for (const auto [publicKey, input] : blockScanInfo.inputsToAdd)
+        {
+            m_subWallets->storeTransactionInput(publicKey, input);
+        }
+
+        /* The input has been spent, discard the key image so we
+           don't double spend it */
+        for (const auto [publicKey, keyImage] : blockScanInfo.keyImagesToMarkSpent)
+        {
+            m_subWallets->markInputAsSpent(keyImage, publicKey, b.blockHeight);
         }
 
         /* We need to delete the item from the queue AFTER processing it.
@@ -489,7 +516,7 @@ void WalletSynchronizer::findTransactionsInBlocks()
            half or not processed, but we have removed it from the queue, so
            it will be skipped. Only remove the tx from the queue if we have
            fully processed it. */
-        m_blockProcessingQueue.deleteFront();
+        m_blockProcessingQueue->deleteFront();
 
         /* Make sure to do this at the end, once the transactions are fully
            processed! Otherwise, we could miss a transaction depending upon
@@ -648,7 +675,7 @@ void WalletSynchronizer::downloadBlocks()
         for (const auto &block : blocks)
         {
             /* Add the block to the queue for processing */
-            bool success = m_blockProcessingQueue.push(block);
+            bool success = m_blockProcessingQueue->push(block);
 
             /* Need to ensure we don't store that we've downloaded blocks we
                haven't. If we're stopping (this occurs on startup, sometimes)

@@ -55,7 +55,7 @@ SubWallet::SubWallet(
 /* CLASS FUNCTIONS */
 /////////////////////
 
-void SubWallet::completeAndStoreTransactionInput(
+Crypto::KeyImage SubWallet::getTxInputKeyImage(
     const Crypto::KeyDerivation derivation,
     const size_t outputIndex,
     WalletTypes::TransactionInput input,
@@ -87,8 +87,20 @@ void SubWallet::completeAndStoreTransactionInput(
             tmp.publicKey, tmp.secretKey, keyImage
         );
 
-        input.keyImage = keyImage;
+        return keyImage;
+    }
 
+    return Crypto::KeyImage();
+}
+
+void SubWallet::storeTransactionInput(
+    const WalletTypes::TransactionInput input,
+    const bool isViewWallet)
+{
+    /* Can't create a key image with a view wallet - but we still store the
+       input so we can calculate the balance */
+    if (!isViewWallet)
+    {
         /* Find the input in the unconfirmed incoming amounts - inputs we
            sent ourselves, that are now returning as change. Remove from
            vector if found. */
@@ -141,53 +153,10 @@ void SubWallet::reset(const uint64_t scanHeight)
     m_syncStartTimestamp = 0;
     m_syncStartHeight = scanHeight;
 
-    /* If the transaction is in the pool, we'll find it when we scan the next
-       top block. If it's returned and in an earlier block - too bad, you should
-       have set your scan height lower! */
     m_lockedInputs.clear();
-
-    /* As above */
     m_unconfirmedIncomingAmounts.clear();
-
-    /* Remove inputs which are above the scan height */
-    auto it = std::remove_if(m_unspentInputs.begin(), m_unspentInputs.end(),
-    [&scanHeight](const auto input)
-    {
-        return input.blockHeight >= scanHeight;
-    });
-
-    if (it != m_unspentInputs.end())
-    {
-        m_unspentInputs.erase(it, m_unspentInputs.end());
-    }
-
-    it = std::remove_if(m_spentInputs.begin(), m_spentInputs.end(),
-    [&scanHeight, this](auto &input)
-    {
-        /* Input was received after scan height, remove */
-        if (input.blockHeight >= scanHeight)
-        {
-            return true;
-        }
-
-        /* Input was received before scan height, but spent after - move back
-           into unspent inputs. */
-        if (input.spendHeight >= scanHeight)
-        {
-            input.spendHeight = 0;
-
-            m_unspentInputs.push_back(input);
-
-            return true;
-        }
-
-        return false;
-    });
-
-    if (it != m_spentInputs.end())
-    {
-        m_spentInputs.erase(it, m_spentInputs.end());
-    }
+    m_unspentInputs.clear();
+    m_spentInputs.clear();
 }
 
 bool SubWallet::isPrimaryAddress() const

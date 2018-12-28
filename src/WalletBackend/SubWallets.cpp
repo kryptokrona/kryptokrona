@@ -378,11 +378,11 @@ void SubWallets::addTransaction(const WalletTypes::Transaction tx)
     m_transactions.push_back(tx);
 }
 
-void SubWallets::completeAndStoreTransactionInput(
+Crypto::KeyImage SubWallets::getTxInputKeyImage(
     const Crypto::PublicKey publicSpendKey,
     const Crypto::KeyDerivation derivation,
     const size_t outputIndex,
-    WalletTypes::TransactionInput input)
+    const WalletTypes::TransactionInput input)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -392,10 +392,30 @@ void SubWallets::completeAndStoreTransactionInput(
     if (it != m_subWallets.end())
     {
         /* If we have a view wallet, don't attempt to derive the key image */
-        it->second.completeAndStoreTransactionInput(
+        return it->second.getTxInputKeyImage(
             derivation, outputIndex, input, m_isViewWallet
         );
     }
+
+    throw std::runtime_error("Subwallet not found!");
+}
+
+void SubWallets::storeTransactionInput(
+    const Crypto::PublicKey publicSpendKey,
+    const WalletTypes::TransactionInput input)
+{
+    std::scoped_lock lock(m_mutex);
+
+    const auto it = m_subWallets.find(publicSpendKey);
+
+    /* Check it exists */
+    if (it != m_subWallets.end())
+    {
+        /* If we have a view wallet, don't attempt to derive the key image */
+        return it->second.storeTransactionInput(input, m_isViewWallet);
+    }
+
+    throw std::runtime_error("Subwallet not found!");
 }
 
 std::tuple<bool, Crypto::PublicKey>
@@ -809,22 +829,9 @@ void SubWallets::reset(const uint64_t scanHeight)
 {
     std::scoped_lock lock(m_mutex);
 
-    /* If the transaction is in the pool, we'll find it when we scan the next
-       top block. If it's returned and in an earlier block - too bad, you should
-       have set your scan height lower! */
     m_lockedTransactions.clear();
-
-    /* Find transactions that are above the scan height, and remove them */
-    const auto it = std::remove_if(m_transactions.begin(), m_transactions.end(), 
-    [&scanHeight](const auto tx)
-    {
-        return tx.blockHeight >= scanHeight;
-    });
-
-    if (it != m_transactions.end())
-    {
-        m_transactions.erase(it, m_transactions.end());
-    }
+    m_transactions.clear();
+    m_transactionPrivateKeys.clear();
 
     for (auto &[pubKey, subWallet] : m_subWallets)
     {
