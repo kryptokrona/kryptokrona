@@ -199,7 +199,7 @@ ApiDispatcher::ApiDispatcher(
 
             /* Matches everything */
             /* NOTE: Not passing through middleware */
-            .Options(".*", [this](auto req, auto res) { handleOptions(req, res); });
+            .Options(".*", [this](auto &req, auto &res) { handleOptions(req, res); });
 }
 
 void ApiDispatcher::start()
@@ -1387,6 +1387,8 @@ void ApiDispatcher::handleOptions(
     const Request &req,
     Response &res) const
 {
+    std::cout << "Incoming " << req.method << " request: " << req.path << std::endl;
+
     std::string supported = "OPTIONS, GET, POST, PUT, DELETE";
 
     if (m_corsHeader == "")
@@ -1407,6 +1409,8 @@ void ApiDispatcher::handleOptions(
     if (m_corsHeader != "")
     {
         res.set_header("Access-Control-Allow-Origin", m_corsHeader);
+        res.set_header("Access-Control-Allow-Headers",
+                       "Origin, X-Requested-With, Content-Type, Accept, X-API-KEY");
     }
 
     res.status = 200;
