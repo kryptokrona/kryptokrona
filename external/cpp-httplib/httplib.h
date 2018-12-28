@@ -2,6 +2,7 @@
 //  httplib.h
 //
 //  Copyright (c) 2017 Yuji Hirose. All rights reserved.
+//  Copyright (c) 2018 The TurtleCoin Developers. All rights reserved.
 //  MIT License
 //
 
@@ -329,7 +330,7 @@ protected:
     std::mutex        request_mutex;
 
 private:
-    socket_t create_client_socket(bool forceNewConnection);
+    socket_t create_client_socket();
     bool read_response_line(Stream& strm, Response& res);
     bool write_request(Stream& strm, Request& req);
 
@@ -1468,6 +1469,7 @@ inline int SocketStream::read(char* ptr, size_t size)
     FD_SET(sock_, &fds);
 
     timeval tv;
+
     /* TODO: We really should pass these through from the client specified timeout...
        but it's kind of a pain to get them all the way here */
     tv.tv_sec = CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND;
@@ -1479,7 +1481,14 @@ inline int SocketStream::read(char* ptr, size_t size)
     /* Timeout */
     if (rv == 0)
     {
-        return 0;
+        /* Returning minus 1 to indicate failure, rather than end of stream.
+           Need to create a new socket, so we don't end up reading the data
+           we timed out on a different request. */
+        return -1;
+    }
+    else if (rv < 0)
+    {
+        return rv;
     }
 
     return recv(sock_, ptr, size, 0);
@@ -2009,10 +2018,10 @@ inline bool Client::is_valid() const
     return true;
 }
 
-inline socket_t Client::create_client_socket(bool forceNewConnection)
+inline socket_t Client::create_client_socket()
 {
     /* Already have a socket open, lets reuse it */
-    if (opened_connection_ != INVALID_SOCKET && !forceNewConnection)
+    if (opened_connection_ != INVALID_SOCKET)
     {
         return opened_connection_;
     }
@@ -2069,7 +2078,7 @@ inline bool Client::send(Request& req, Response& res)
         return false;
     }
 
-    auto sock = create_client_socket(false);
+    auto sock = create_client_socket();
 
     if (sock == INVALID_SOCKET) {
         return false;
@@ -2077,20 +2086,15 @@ inline bool Client::send(Request& req, Response& res)
 
     bool success = read_socket(sock, req, res);
 
-    /* Failed to send - possibly connection closed due to timeout. Try a new socket */
+    /* Failed to send - possibly connection closed due to timeout. Invalidate
+       the socket so we make a new one on next request.*/
     if (!success)
     {
-        sock = create_client_socket(true);
-
-        if (sock == INVALID_SOCKET)
-        {
-            return false;
-        }
-
-        return read_socket(sock, req, res);
+        opened_connection_ = INVALID_SOCKET;
+        return false;
     }
 
-    return success;
+    return true;
 }
 
 inline bool Client::write_request(Stream& strm, Request& req)
