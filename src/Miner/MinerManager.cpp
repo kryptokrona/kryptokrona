@@ -12,7 +12,6 @@
 #include <thread>
 #include <chrono>
 
-#include "Common/FormatTools.h"
 #include "Common/StringTools.h"
 #include <config/CryptoNoteConfig.h>
 #include "CryptoNoteCore/CachedBlock.h"
@@ -23,7 +22,9 @@
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 #include "Rpc/JsonRpc.h"
 
-#include <zedwallet++/ColouredMsg.h>
+#include <Utilities/FormatTools.h>
+
+#include <Utilities/ColouredMsg.h>
 
 using namespace CryptoNote;
 
@@ -112,7 +113,7 @@ void MinerManager::printHashRate()
         last_hash_count = current_hash_count;
 
         std::cout << SuccessMsg("\nMining at ")
-                  << SuccessMsg(Common::get_mining_speed(hashes))
+                  << SuccessMsg(Utilities::get_mining_speed(hashes))
                   << "\n\n";
     }
 }

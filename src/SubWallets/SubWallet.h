@@ -14,7 +14,7 @@
 
 #include <unordered_set>
 
-#include <WalletBackend/WalletErrors.h>
+#include <Errors/Errors.h>
 
 #include "WalletTypes.h"
 

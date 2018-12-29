@@ -6,9 +6,9 @@
 #include <zedwallet++/Menu.h>
 /////////////////////////////
 
-#include <Common/FormatTools.h>
-
 #include <config/WalletConfig.h>
+
+#include <Utilities/FormatTools.h>
 
 #include <zedwallet++/CommandDispatcher.h>
 #include <zedwallet++/Commands.h>
@@ -60,7 +60,7 @@ std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Con
             feemsg << "You have connected to a node that charges "
                       "a fee to send transactions.\n\n"
                       "The fee for sending transactions is: "
-                   << Common::formatAmount(feeAmount)
+                   << Utilities::formatAmount(feeAmount)
                    << " per transaction.\n\n"
                       "If you don't want to pay the node fee, please "
                       "relaunch "

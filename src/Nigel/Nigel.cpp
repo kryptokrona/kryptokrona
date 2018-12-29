@@ -10,8 +10,9 @@
 
 #include <CryptoNoteCore/CryptoNoteTools.h>
 
-#include <WalletBackend/Utilities.h>
-#include <WalletBackend/ValidateParameters.h>
+#include <Errors/ValidateParameters.h>
+
+#include <Utilities/Utilities.h>
 
 using json = nlohmann::json;
 
@@ -188,7 +189,7 @@ bool Nigel::getFeeInfo()
 
             const bool integratedAddressesAllowed = false;
 
-            WalletError error = validateAddresses({tmpAddress}, integratedAddressesAllowed);
+            Error error = validateAddresses({tmpAddress}, integratedAddressesAllowed);
 
             if (!error)
             {

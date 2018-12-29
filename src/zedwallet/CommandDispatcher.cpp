@@ -7,7 +7,7 @@
 ////////////////////////////////////////
 
 #include <zedwallet/AddressBook.h>
-#include <zedwallet/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 #include <zedwallet/CommandImplementations.h>
 #include <zedwallet/Fusion.h>
 #include <zedwallet/Open.h>

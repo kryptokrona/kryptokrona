@@ -156,37 +156,37 @@ int main(int argc, char** argv) {
     Hash hash = Hash();
 
     cn_fast_hash(rawData.data(), rawData.size(), hash);
-    std::cout << "cn_fast_hash: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+    std::cout << "cn_fast_hash: " << hash << std::endl;
     assert(CompareHashes(hash, CN_FAST_HASH));
 
     std::cout << std::endl;
 
     cn_slow_hash_v0(rawData.data(), rawData.size(), hash);
-    std::cout << "cn_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+    std::cout << "cn_slow_hash_v0: " << hash << std::endl;
     assert(CompareHashes(hash, CN_SLOW_HASH_V0));
 
     if (rawData.size() >= 43)
     {
       cn_slow_hash_v1(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      std::cout << "cn_slow_hash_v1: " << hash << std::endl;
       assert(CompareHashes(hash, CN_SLOW_HASH_V1));
 
       cn_slow_hash_v2(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      std::cout << "cn_slow_hash_v2: " << hash << std::endl;
       assert(CompareHashes(hash, CN_SLOW_HASH_V2));
 
       std::cout << std::endl;
 
       cn_lite_slow_hash_v0(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_lite_slow_hash_v0: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      std::cout << "cn_lite_slow_hash_v0: " << hash << std::endl;
       assert(CompareHashes(hash, CN_LITE_SLOW_HASH_V0));
 
       cn_lite_slow_hash_v1(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_lite_slow_hash_v1: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      std::cout << "cn_lite_slow_hash_v1: " << hash << std::endl;
       assert(CompareHashes(hash, CN_LITE_SLOW_HASH_V1));
 
       cn_lite_slow_hash_v2(rawData.data(), rawData.size(), hash);
-      std::cout << "cn_lite_slow_hash_v2: " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+      std::cout << "cn_lite_slow_hash_v2: " << hash << std::endl;
       assert(CompareHashes(hash, CN_LITE_SLOW_HASH_V2));
 
       std::cout << std::endl;
@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
       for (uint32_t height = 0; height <= 8192; height = height + 512)
       {
         cn_soft_shell_slow_hash_v0(rawData.data(), rawData.size(), hash, height);
-        std::cout << "cn_soft_shell_slow_hash_v0 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+        std::cout << "cn_soft_shell_slow_hash_v0 (" << height << "): " << hash << std::endl;
         assert(CompareHashes(hash, CN_SOFT_SHELL_V0[height / 512]));
       }
 
@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
       for (uint32_t height = 0; height <= 8192; height = height + 512)
       {
         cn_soft_shell_slow_hash_v1(rawData.data(), rawData.size(), hash, height);
-        std::cout << "cn_soft_shell_slow_hash_v1 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+        std::cout << "cn_soft_shell_slow_hash_v1 (" << height << "): " << hash << std::endl;
         assert(CompareHashes(hash, CN_SOFT_SHELL_V1[height / 512]));
       }
 
@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
       for (uint32_t height = 0; height <= 8192; height = height + 512)
       {
         cn_soft_shell_slow_hash_v2(rawData.data(), rawData.size(), hash, height);
-        std::cout << "cn_soft_shell_slow_hash_v2 (" << height << "): " << Common::toHex(&hash, sizeof(Hash)) << std::endl;
+        std::cout << "cn_soft_shell_slow_hash_v2 (" << height << "): " << hash << std::endl;
         assert(CompareHashes(hash, CN_SOFT_SHELL_V2[height / 512]));
       }
     }

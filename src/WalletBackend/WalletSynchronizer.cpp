@@ -12,8 +12,9 @@
 
 #include <future>
 
+#include <Utilities/Utilities.h>
+
 #include <WalletBackend/Constants.h>
-#include <WalletBackend/Utilities.h>
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */

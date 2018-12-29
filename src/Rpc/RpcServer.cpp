@@ -10,7 +10,6 @@
 
 #include <cmath>
 
-#include <Common/FormatTools.h>
 #include <Common/StringTools.h>
 
 #include <config/CryptoNoteConfig.h>
@@ -31,6 +30,8 @@
 #include "version.h"
 
 #include <unordered_map>
+
+#include <Utilities/FormatTools.h>
 
 #undef ERROR
 
@@ -414,7 +415,7 @@ bool RpcServer::on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOU
     if (globalIndexes.size() != req.outs_count)
     {
         logger(ERROR) << "Failed to get enough matching outputs for amount "
-                      << amount << " (" << Common::formatAmount(amount)
+                      << amount << " (" << Utilities::formatAmount(amount)
                       << "). Requested outputs: " << req.outs_count
                       << ", found outputs: " << globalIndexes.size()
                       << ". Further explanation here: https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c"

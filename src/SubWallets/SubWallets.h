@@ -6,7 +6,7 @@
 
 #include <crypto/crypto.h>
 
-#include <WalletBackend/SubWallet.h>
+#include <SubWallets/SubWallet.h>
 
 class SubWallets
 {
@@ -41,19 +41,19 @@ class SubWallets
         /////////////////////////////
 
         /* Adds a sub wallet with a random spend key */
-        std::tuple<WalletError, std::string> addSubWallet();
+        std::tuple<Error, std::string> addSubWallet();
 
         /* Imports a sub wallet with the given private spend key */
-        std::tuple<WalletError, std::string> importSubWallet(
+        std::tuple<Error, std::string> importSubWallet(
             const Crypto::SecretKey privateSpendKey,
             const uint64_t scanHeight);
 
         /* Imports a sub view only wallet with the given public spend key */
-        std::tuple<WalletError, std::string> importViewSubWallet(
+        std::tuple<Error, std::string> importViewSubWallet(
             const Crypto::PublicKey privateSpendKey,
             const uint64_t scanHeight);
 
-        WalletError deleteSubWallet(const std::string address);
+        Error deleteSubWallet(const std::string address);
 
         /* Returns (height, timestamp) to begin syncing at. Only one (if any)
            of the values will be non zero */
@@ -130,7 +130,7 @@ class SubWallets
         Crypto::SecretKey getPrivateViewKey() const;
 
         /* Gets the private spend key for the given public spend, if it exists */
-        std::tuple<WalletError, Crypto::SecretKey> getPrivateSpendKey(
+        std::tuple<Error, Crypto::SecretKey> getPrivateSpendKey(
             const Crypto::PublicKey publicSpendKey) const;
 
         std::vector<Crypto::SecretKey> getPrivateSpendKeys() const;
@@ -162,7 +162,7 @@ class SubWallets
            block yet. */
         std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
 
-        std::tuple<WalletError, std::string> getAddress(
+        std::tuple<Error, std::string> getAddress(
             const Crypto::PublicKey spendKey) const;
 
         /* Store the private key used to create a transaction - can be used

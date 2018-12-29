@@ -8,7 +8,7 @@
 
 #include <Common/SignalHandler.h>
 
-#include <zedwallet/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 #include <zedwallet/CommandDispatcher.h>
 #include <zedwallet/Commands.h>
 #include <zedwallet/GetInput.h>

@@ -8,9 +8,10 @@
 
 #include <Nigel/Nigel.h>
 
+#include <SubWallets/SubWallets.h>
+
 #include <WalletBackend/EventHandler.h>
 #include <WalletBackend/ThreadSafeQueue.h>
-#include <WalletBackend/SubWallets.h>
 #include <WalletBackend/SynchronizationStatus.h>
 
 #include <WalletTypes.h>

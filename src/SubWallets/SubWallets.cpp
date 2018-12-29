@@ -2,9 +2,9 @@
 // 
 // Please see the included LICENSE file for more information.
 
-/////////////////////////////////////
-#include <WalletBackend/SubWallets.h>
-/////////////////////////////////////
+//////////////////////////////////
+#include <SubWallets/SubWallets.h>
+//////////////////////////////////
 
 #include <config/CryptoNoteConfig.h>
 
@@ -16,7 +16,8 @@
 
 #include <random>
 
-#include <WalletBackend/Utilities.h>
+#include <Utilities/Addresses.h>
+#include <Utilities/Utilities.h>
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */
@@ -88,7 +89,7 @@ SubWallets::SubWallets(const SubWallets &other) :
 /* CLASS FUNCTIONS */
 /////////////////////
 
-std::tuple<WalletError, std::string> SubWallets::addSubWallet()
+std::tuple<Error, std::string> SubWallets::addSubWallet()
 {
     /* This generates a private spend key - incompatible with view wallets */
     if (m_isViewWallet)
@@ -121,7 +122,7 @@ std::tuple<WalletError, std::string> SubWallets::addSubWallet()
     return {SUCCESS, address};
 }
 
-std::tuple<WalletError, std::string> SubWallets::importSubWallet(
+std::tuple<Error, std::string> SubWallets::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
     const uint64_t scanHeight)
 {
@@ -160,7 +161,7 @@ std::tuple<WalletError, std::string> SubWallets::importSubWallet(
     return {SUCCESS, address};
 }
 
-std::tuple<WalletError, std::string> SubWallets::importViewSubWallet(
+std::tuple<Error, std::string> SubWallets::importViewSubWallet(
     const Crypto::PublicKey publicSpendKey,
     const uint64_t scanHeight)
 {
@@ -198,7 +199,7 @@ std::tuple<WalletError, std::string> SubWallets::importViewSubWallet(
     return {SUCCESS, address};
 }
 
-WalletError SubWallets::deleteSubWallet(const std::string address)
+Error SubWallets::deleteSubWallet(const std::string address)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -780,7 +781,7 @@ Crypto::SecretKey SubWallets::getPrivateViewKey() const
     return m_privateViewKey;
 }
 
-std::tuple<WalletError, Crypto::SecretKey> SubWallets::getPrivateSpendKey(
+std::tuple<Error, Crypto::SecretKey> SubWallets::getPrivateSpendKey(
     const Crypto::PublicKey publicSpendKey) const
 {
     throwIfViewWallet();
@@ -882,7 +883,7 @@ std::vector<WalletTypes::Transaction> SubWallets::getUnconfirmedTransactions() c
     return m_lockedTransactions;
 }
 
-std::tuple<WalletError, std::string> SubWallets::getAddress(
+std::tuple<Error, std::string> SubWallets::getAddress(
     const Crypto::PublicKey spendKey) const
 {
     const auto it = m_subWallets.find(spendKey);

@@ -4,23 +4,26 @@
 
 #pragma once
 
+#include <Errors/Errors.h>
+
+#include <memory>
+
 #include <string>
 
 #include <unordered_map>
 
 #include <vector>
 
-#include <WalletBackend/SubWallets.h>
-#include <WalletBackend/WalletErrors.h>
+#include <SubWallets/SubWallets.h>
 
-WalletError validateFusionTransaction(
+Error validateFusionTransaction(
     const uint64_t mixin,
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string destinationAddress,
     const std::shared_ptr<SubWallets> subWallets,
     const uint64_t currentHeight);
 
-WalletError validateTransaction(
+Error validateTransaction(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,
     const uint64_t fee,
@@ -30,28 +33,28 @@ WalletError validateTransaction(
     const std::shared_ptr<SubWallets> subWallets,
     const uint64_t currentHeight);
 
-WalletError validateIntegratedAddresses(
+Error validateIntegratedAddresses(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     std::string paymentID);
 
-WalletError validatePaymentID(const std::string paymentID);
+Error validatePaymentID(const std::string paymentID);
 
-WalletError validateMixin(const uint64_t mixin, const uint64_t height);
+Error validateMixin(const uint64_t mixin, const uint64_t height);
 
-WalletError validateAmount(
+Error validateAmount(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t fee,
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::shared_ptr<SubWallets> subWallets,
     const uint64_t currentHeight);
 
-WalletError validateDestinations(
+Error validateDestinations(
     const std::vector<std::pair<std::string, uint64_t>> destinations);
 
-WalletError validateAddresses(
+Error validateAddresses(
     std::vector<std::string> addresses,
     const bool integratedAddressesAllowed);
 
-WalletError validateOurAddresses(
+Error validateOurAddresses(
     const std::vector<std::string> addresses,
     const std::shared_ptr<SubWallets> subWallets);

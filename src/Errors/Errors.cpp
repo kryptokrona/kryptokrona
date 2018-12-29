@@ -2,11 +2,11 @@
 // 
 // Please see the included LICENSE file for more information.
 
-///////////////////////////////////////
-#include <WalletBackend/WalletErrors.h>
-///////////////////////////////////////
+//////////////////////////
+#include <Errors/Errors.h>
+//////////////////////////
 
-std::string WalletError::getErrorMessage() const
+std::string Error::getErrorMessage() const
 {
     /* Custom message being used, return that instead */
     if (m_customMessage != "")
@@ -251,7 +251,7 @@ std::string WalletError::getErrorMessage() const
     }
 }
 
-WalletErrorCode WalletError::getErrorCode() const
+ErrorCode Error::getErrorCode() const
 {
     return m_errorCode;
 }

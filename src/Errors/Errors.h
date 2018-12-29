@@ -9,7 +9,7 @@
 /* Note: Putting the number of the error is not needed, as they auto increment,
    however, it makes it easier to see at a glance what error you got, whilst
    developing */
-enum WalletErrorCode
+enum ErrorCode
 {
     /* No error, operation suceeded. */
     SUCCESS = 0,
@@ -185,34 +185,34 @@ enum WalletErrorCode
     UNEXPECTED_FEE = 45,
 };
 
-class WalletError
+class Error
 {
     public:
         /* Default constructor */
-        WalletError() : m_errorCode(SUCCESS) {};
+        Error() : m_errorCode(SUCCESS) {};
 
-        WalletError(const WalletErrorCode code) :
+        Error(const ErrorCode code) :
             m_errorCode(code) {};
 
         /* We can use a custom message instead of our standard message, for example,
            if the message depends upon the parameters. E.g: "Mnemonic seed should
            be 25 words, but it is 23 words" */
-        WalletError(
-            const WalletErrorCode code,
+        Error(
+            const ErrorCode code,
             const std::string customMessage) :
             m_errorCode(code),
             m_customMessage(customMessage) {};
 
         std::string getErrorMessage() const;
 
-        WalletErrorCode getErrorCode() const;
+        ErrorCode getErrorCode() const;
 
-        bool operator==(const WalletErrorCode code) const
+        bool operator==(const ErrorCode code) const
         {
             return code == m_errorCode;
         }
 
-        bool operator!=(const WalletErrorCode code) const
+        bool operator!=(const ErrorCode code) const
         {
             return !(code == m_errorCode);
         }
@@ -229,11 +229,11 @@ class WalletError
         /* May be empty */
         std::string m_customMessage;
 
-        WalletErrorCode m_errorCode;
+        ErrorCode m_errorCode;
 };
 
 /* Overloading the << operator */
-inline std::ostream &operator<<(std::ostream &os, const WalletError &error)
+inline std::ostream &operator<<(std::ostream &os, const Error &error)
 {
     os << error.getErrorMessage();
     return os;

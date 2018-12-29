@@ -12,7 +12,8 @@
 
 #include "json.hpp"
 
-#include <WalletBackend/SubWallet.h>
+#include <SubWallets/SubWallet.h>
+
 #include <WalletBackend/WalletBackend.h>
 
 using nlohmann::json;
