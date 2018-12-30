@@ -827,7 +827,7 @@ std::vector<uint32_t> BlockchainCache::getRandomOutsByAmount(Amount amount, size
         }
     }
 
-    const std::vector<PackedOutIndex> outs = it->second.outputs;
+    const std::vector<PackedOutIndex> &outs = it->second.outputs;
 
     /* Starting from the end of the outputs vector, return the first output
        that is unlocked */
