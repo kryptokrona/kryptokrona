@@ -2,6 +2,7 @@
 //  httplib.h
 //
 //  Copyright (c) 2017 Yuji Hirose. All rights reserved.
+//  Copyright (c) 2018 The TurtleCoin Developers. All rights reserved.
 //  MIT License
 //
 
@@ -73,6 +74,17 @@ typedef int socket_t;
 
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
 #include <zlib.h>
+#endif
+
+/* send() on a closed socket will crash our program. MSG_NOSIGNAL disables this.
+   However, this is not available on windows (it doesn't crash our program),
+   so we can set it to 0. If it's not on osx, we can use SO_NOSIGPIPE instead */
+#ifndef MSG_NOSIGNAL
+    #ifdef SO_NOSIGPIPE
+        #define MSG_NOSIGNAL SO_NOSIGPIPE
+    #else
+        #define MSG_NOSIGNAL 0
+    #endif
 #endif
 
 /*
@@ -254,7 +266,7 @@ private:
     bool parse_request_line(const char* s, Request& req);
     void write_response(Stream& strm, bool last_connection, const Request& req, Response& res);
 
-    virtual bool read_and_close_socket(socket_t sock);
+    virtual bool read_socket(socket_t sock);
 
     bool        is_running_;
     socket_t    svr_sock_;
@@ -313,13 +325,16 @@ protected:
     const int         port_;
     time_t            timeout_sec_;
     const std::string host_and_port_;
+    socket_t          opened_connection_ = INVALID_SOCKET;
+    /* So we don't perform two requests on the same socket */
+    std::mutex        request_mutex;
 
 private:
-    socket_t create_client_socket() const;
+    socket_t create_client_socket();
     bool read_response_line(Stream& strm, Response& res);
-    void write_request(Stream& strm, Request& req);
+    bool write_request(Stream& strm, Request& req);
 
-    virtual bool read_and_close_socket(socket_t sock, Request& req, Response& res);
+    virtual bool read_socket(socket_t sock, Request& req, Response& res);
 };
 
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
@@ -348,7 +363,7 @@ public:
     virtual bool is_valid() const;
 
 private:
-    virtual bool read_and_close_socket(socket_t sock);
+    virtual bool read_socket(socket_t sock);
 
     SSL_CTX* ctx_;
     std::mutex ctx_mutex_;
@@ -366,7 +381,7 @@ public:
     virtual bool is_valid() const;
 
 private:
-    virtual bool read_and_close_socket(socket_t sock, Request& req, Response& res);
+    virtual bool read_socket(socket_t sock, Request& req, Response& res);
 
     SSL_CTX* ctx_;
     std::mutex ctx_mutex_;
@@ -515,7 +530,7 @@ inline bool wait_until_socket_is_ready(socket_t sock, time_t sec, time_t usec)
 }
 
 template <typename T>
-inline bool read_and_close_socket(socket_t sock, size_t keep_alive_max_count, T callback)
+inline bool read_socket(socket_t sock, size_t keep_alive_max_count, T callback, bool close)
 {
     bool ret = false;
 
@@ -542,7 +557,11 @@ inline bool read_and_close_socket(socket_t sock, size_t keep_alive_max_count, T 
         ret = callback(strm, true, dummy_connection_close);
     }
 
-    close_socket(sock);
+    if (close)
+    {
+        close_socket(sock);
+    }
+
     return ret;
 }
 
@@ -1445,12 +1464,40 @@ inline SocketStream::~SocketStream()
 
 inline int SocketStream::read(char* ptr, size_t size)
 {
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(sock_, &fds);
+
+    timeval tv;
+
+    /* TODO: We really should pass these through from the client specified timeout...
+       but it's kind of a pain to get them all the way here */
+    tv.tv_sec = CPPHTTPLIB_KEEPALIVE_TIMEOUT_SECOND;
+    tv.tv_usec = CPPHTTPLIB_KEEPALIVE_TIMEOUT_USECOND;
+
+    /* See if we've got data to read */
+    auto rv = select(sock_ + 1, &fds, NULL, NULL, &tv);
+
+    /* Timeout */
+    if (rv == 0)
+    {
+        /* Returning minus 1 to indicate failure, rather than end of stream.
+           Need to create a new socket, so we don't end up reading the data
+           we timed out on a different request. */
+        return -1;
+    }
+    else if (rv < 0)
+    {
+        return rv;
+    }
+
     return recv(sock_, ptr, size, 0);
 }
 
 inline int SocketStream::write(const char* ptr, size_t size)
 {
-    return send(sock_, ptr, size, 0);
+    /* Don't crash our program if the pipe is closed! */
+    return send(sock_, ptr, size, MSG_NOSIGNAL);
 }
 
 inline int SocketStream::write(const char* ptr)
@@ -1802,7 +1849,7 @@ inline bool Server::listen_internal()
                 running_threads_++;
             }
 
-            read_and_close_socket(sock);
+            read_socket(sock);
 
             {
                 std::lock_guard<std::mutex> guard(running_threads_mutex_);
@@ -1939,14 +1986,17 @@ inline bool Server::is_valid() const
     return true;
 }
 
-inline bool Server::read_and_close_socket(socket_t sock)
+inline bool Server::read_socket(socket_t sock)
 {
-    return detail::read_and_close_socket(
+    bool close = true;
+
+    return detail::read_socket(
         sock,
         keep_alive_max_count_,
         [this](Stream& strm, bool last_connection, bool& connection_close) {
             return process_request(strm, last_connection, connection_close);
-        });
+        },
+        close);
 }
 
 // HTTP client implementation
@@ -1968,9 +2018,15 @@ inline bool Client::is_valid() const
     return true;
 }
 
-inline socket_t Client::create_client_socket() const
+inline socket_t Client::create_client_socket()
 {
-    return detail::create_socket(host_.c_str(), port_,
+    /* Already have a socket open, lets reuse it */
+    if (opened_connection_ != INVALID_SOCKET)
+    {
+        return opened_connection_;
+    }
+
+    opened_connection_ = detail::create_socket(host_.c_str(), port_,
         [=](socket_t sock, struct addrinfo& ai) -> bool {
             detail::set_nonblocking(sock, true);
 
@@ -1986,6 +2042,8 @@ inline socket_t Client::create_client_socket() const
             detail::set_nonblocking(sock, false);
             return true;
         });
+
+    return opened_connection_;
 }
 
 inline bool Client::read_response_line(Stream& strm, Response& res)
@@ -2012,19 +2070,34 @@ inline bool Client::read_response_line(Stream& strm, Response& res)
 
 inline bool Client::send(Request& req, Response& res)
 {
+    /* TODO: Might be possible to block slightly less of the critical path.
+       I'm too tired to think it through right now. */
+    std::scoped_lock lock(request_mutex);
+
     if (req.path.empty()) {
         return false;
     }
 
     auto sock = create_client_socket();
+
     if (sock == INVALID_SOCKET) {
         return false;
     }
 
-    return read_and_close_socket(sock, req, res);
+    bool success = read_socket(sock, req, res);
+
+    /* Failed to send - possibly connection closed due to timeout. Invalidate
+       the socket so we make a new one on next request.*/
+    if (!success)
+    {
+        opened_connection_ = INVALID_SOCKET;
+        return false;
+    }
+
+    return true;
 }
 
-inline void Client::write_request(Stream& strm, Request& req)
+inline bool Client::write_request(Stream& strm, Request& req)
 {
     BufferStream bstrm;
 
@@ -2045,11 +2118,6 @@ inline void Client::write_request(Stream& strm, Request& req)
     if (!req.has_header("User-Agent")) {
         req.set_header("User-Agent", "cpp-httplib/0.2");
     }
-
-    // TODO: Support KeepAlive connection
-    // if (!req.has_header("Connection")) {
-        req.set_header("Connection", "close");
-    // }
 
     if (req.body.empty()) {
         if (req.method == "POST" || req.method == "PUT") {
@@ -2078,13 +2146,19 @@ inline void Client::write_request(Stream& strm, Request& req)
 
     // Flush buffer
     auto& data = bstrm.get_buffer();
-    strm.write(data.data(), data.size());
+    int bytesWritten = strm.write(data.data(), data.size());
+
+    /* Socket closed or other error */
+    return bytesWritten != -1;
 }
 
 inline bool Client::process_request(Stream& strm, Request& req, Response& res, bool& connection_close)
 {
     // Send request
-    write_request(strm, req);
+    if (!write_request(strm, req))
+    {
+        return false;
+    }
 
     // Receive response and headers
     if (!read_response_line(strm, res) || !detail::read_headers(strm, res.headers)) {
@@ -2100,7 +2174,6 @@ inline bool Client::process_request(Stream& strm, Request& req, Response& res, b
         if (!detail::read_content(strm, res, req.progress)) {
             return false;
         }
-
         if (res.get_header_value("Content-Encoding") == "gzip") {
 #ifdef CPPHTTPLIB_ZLIB_SUPPORT
             detail::decompress(res.body);
@@ -2113,14 +2186,17 @@ inline bool Client::process_request(Stream& strm, Request& req, Response& res, b
     return true;
 }
 
-inline bool Client::read_and_close_socket(socket_t sock, Request& req, Response& res)
+inline bool Client::read_socket(socket_t sock, Request& req, Response& res)
 {
-    return detail::read_and_close_socket(
+    bool close = false;
+
+    return detail::read_socket(
         sock,
         0,
         [&](Stream& strm, bool /*last_connection*/, bool& connection_close) {
             return process_request(strm, req, res, connection_close);
-        });
+        },
+        close);
 }
 
 inline std::shared_ptr<Response> Client::Get(const std::string &path, Progress progress)
@@ -2263,13 +2339,14 @@ inline std::shared_ptr<Response> Client::Options(const std::string &path, const 
 namespace detail {
 
 template <typename U, typename V, typename T>
-inline bool read_and_close_socket_ssl(
+inline bool read_socket_ssl(
     socket_t sock, size_t keep_alive_max_count,
     // TODO: OpenSSL 1.0.2 occasionally crashes...
     // The upcoming 1.1.0 is going to be thread safe.
     SSL_CTX* ctx, std::mutex& ctx_mutex,
     U SSL_connect_or_accept, V setup,
-    T callback)
+    T callback,
+    bool close)
 {
     SSL* ssl = nullptr;
     {
@@ -2320,7 +2397,10 @@ inline bool read_and_close_socket_ssl(
         SSL_free(ssl);
     }
 
-    close_socket(sock);
+    if (close)
+    {
+        close_socket(sock);
+    }
 
     return ret;
 }
@@ -2401,9 +2481,11 @@ inline bool SSLServer::is_valid() const
     return ctx_;
 }
 
-inline bool SSLServer::read_and_close_socket(socket_t sock)
+inline bool SSLServer::read_socket(socket_t sock)
 {
-    return detail::read_and_close_socket_ssl(
+    bool close = true;
+
+    return detail::read_socket_ssl(
         sock,
         keep_alive_max_count_,
         ctx_, ctx_mutex_,
@@ -2411,7 +2493,8 @@ inline bool SSLServer::read_and_close_socket(socket_t sock)
         [](SSL* /*ssl*/) {},
         [this](Stream& strm, bool last_connection, bool& connection_close) {
             return process_request(strm, last_connection, connection_close);
-        });
+        },
+        close);
 }
 
 // SSL HTTP client implementation
@@ -2433,9 +2516,11 @@ inline bool SSLClient::is_valid() const
     return ctx_;
 }
 
-inline bool SSLClient::read_and_close_socket(socket_t sock, Request& req, Response& res)
+inline bool SSLClient::read_socket(socket_t sock, Request& req, Response& res)
 {
-    return is_valid() && detail::read_and_close_socket_ssl(
+    bool close = false;
+
+    return is_valid() && detail::read_socket_ssl(
         sock, 0,
         ctx_, ctx_mutex_,
         SSL_connect,
@@ -2444,7 +2529,8 @@ inline bool SSLClient::read_and_close_socket(socket_t sock, Request& req, Respon
         },
         [&](Stream& strm, bool /*last_connection*/, bool& connection_close) {
             return process_request(strm, req, res, connection_close);
-        });
+        },
+        close);
 }
 #endif
 

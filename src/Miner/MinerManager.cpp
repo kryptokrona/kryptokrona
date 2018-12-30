@@ -27,6 +27,8 @@
 
 using namespace CryptoNote;
 
+using json = nlohmann::json;
+
 namespace Miner {
 
 namespace {
@@ -65,22 +67,24 @@ void adjustMergeMiningTag(BlockTemplate& blockTemplate)
 
 } // namespace
 
-MinerManager::MinerManager(System::Dispatcher& dispatcher, const CryptoNote::MiningConfig& config) :
-    m_dispatcher(dispatcher),
+MinerManager::MinerManager(
+    System::Dispatcher& dispatcher,
+    const CryptoNote::MiningConfig& config,
+    const std::shared_ptr<httplib::Client> httpClient) :
+
     m_contextGroup(dispatcher),
     m_config(config),
     m_miner(dispatcher),
-    m_blockchainMonitor(dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.scanPeriod),
+    m_blockchainMonitor(dispatcher, m_config.scanPeriod, httpClient),
     m_eventOccurred(dispatcher),
-    m_httpEvent(dispatcher),
-    m_lastBlockTimestamp(0)
+    m_lastBlockTimestamp(0),
+    m_httpClient(httpClient)
 {
-    m_httpEvent.set();
 }
 
 void MinerManager::start()
 {
-    BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
+    BlockMiningParameters params = requestMiningParameters();
     adjustBlockTemplate(params.blockTemplate);
 
     isRunning = true;
@@ -127,7 +131,7 @@ void MinerManager::eventLoop()
             {
                 stopBlockchainMonitoring();
 
-                if (submitBlock(m_minedBlock, m_config.daemonHost, m_config.daemonPort))
+                if (submitBlock(m_minedBlock))
                 {
                     m_lastBlockTimestamp = m_minedBlock.timestamp;
 
@@ -140,7 +144,7 @@ void MinerManager::eventLoop()
                     }
                 }
 
-                BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
+                BlockMiningParameters params = requestMiningParameters();
                 adjustBlockTemplate(params.blockTemplate);
 
                 startBlockchainMonitoring();
@@ -151,9 +155,8 @@ void MinerManager::eventLoop()
             {
                 stopMining();
                 stopBlockchainMonitoring();
-                BlockMiningParameters params = requestMiningParameters(m_dispatcher, m_config.daemonHost, m_config.daemonPort, m_config.miningAddress);
+                BlockMiningParameters params = requestMiningParameters();
                 adjustBlockTemplate(params.blockTemplate);
-
                 startBlockchainMonitoring();
                 startMining(params);
                 break;
@@ -222,75 +225,114 @@ void MinerManager::stopBlockchainMonitoring()
     m_blockchainMonitor.stop();
 }
 
-bool MinerManager::submitBlock(const BlockTemplate& minedBlock, const std::string& daemonHost, uint16_t daemonPort)
+bool MinerManager::submitBlock(const BlockTemplate& minedBlock)
 {
     CachedBlock cachedBlock(minedBlock);
 
-    try
+    json j = {
+        {"jsonrpc", "2.0"},
+        {"method", "submitblock"},
+        {"params", {Common::toHex(toBinaryArray(minedBlock))}}
+    };
+
+    auto res = m_httpClient->Post("/json_rpc", j.dump(), "application/json");
+
+    if (!res || res->status == 200)
     {
-        HttpClient client(m_dispatcher, daemonHost, daemonPort);
-
-        COMMAND_RPC_SUBMITBLOCK::request request;
-        request.emplace_back(Common::toHex(toBinaryArray(minedBlock)));
-
-        COMMAND_RPC_SUBMITBLOCK::response response;
-
-        System::EventLock lk(m_httpEvent);
-        JsonRpc::invokeJsonRpcCommand(client, "submitblock", request, response);
-
         std::cout << SuccessMsg("\nBlock found! Hash: ")
                   << SuccessMsg(cachedBlock.getBlockHash()) << "\n\n";
 
         return true;
     }
-    catch (const std::exception &e)
+    else
     {
-        std::cout << WarningMsg("Failed to submit block: ")
-                  << WarningMsg(e.what()) << std::endl;
+        std::cout << WarningMsg("Failed to submit block, possibly daemon offline or syncing?\n");
         return false;
     }
 }
 
-BlockMiningParameters MinerManager::requestMiningParameters(System::Dispatcher& dispatcher, const std::string& daemonHost, uint16_t daemonPort, const std::string& miningAddress)
+BlockMiningParameters MinerManager::requestMiningParameters()
 {
     while (true)
     {
+        json j = {
+            {"jsonrpc", "2.0"},
+            {"method", "getblocktemplate"},
+            {"params", {
+                {"wallet_address", m_config.miningAddress},
+                {"reserve_size", 0}
+            }}
+        };
+
+        auto res = m_httpClient->Post("/json_rpc", j.dump(), "application/json");
+
+        if (!res)
+        {
+            std::cout << WarningMsg("Failed to get block template - Is your daemon open?\n");
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            continue;
+        }
+
+        if (res->status != 200)
+        {
+            std::stringstream stream;
+
+            stream << "Failed to get block template - received unexpected http "
+                   << "code from server: "
+                   << res->status << std::endl;
+
+            std::cout << WarningMsg(stream.str()) << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            continue;
+        }
+
         try
         {
-            HttpClient client(dispatcher, daemonHost, daemonPort);
+            json j = json::parse(res->body);
 
-            COMMAND_RPC_GETBLOCKTEMPLATE::request request;
-            request.wallet_address = miningAddress;
-            request.reserve_size = 0;
+            const std::string status = j.at("result").at("status").get<std::string>();
 
-            COMMAND_RPC_GETBLOCKTEMPLATE::response response;
-
-            System::EventLock lk(m_httpEvent);
-            JsonRpc::invokeJsonRpcCommand(client, "getblocktemplate", request, response);
-
-            if (response.status != CORE_RPC_STATUS_OK)
+            if (status != "OK")
             {
-                std::cout << WarningMsg("Couldn't get block template: " + response.status) << std::endl;
+                std::stringstream stream;
+
+                stream << "Failed to get block template from daemon. Response: "
+                       << status << std::endl;
+
+                std::cout << WarningMsg(stream.str());
+
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 continue;
             }
 
             BlockMiningParameters params;
-            params.difficulty = response.difficulty;
+            params.difficulty = j.at("result").at("difficulty").get<uint64_t>();
 
-            if(!fromBinaryArray(params.blockTemplate, Common::fromHex(response.blocktemplate_blob)))
+            std::vector<uint8_t> blob = Common::fromHex(
+                j.at("result").at("blocktemplate_blob").get<std::string>()
+            );
+
+            if(!fromBinaryArray(params.blockTemplate, blob))
             {
-                std::cout << WarningMsg("Couldn't parse block template") << std::endl;
+                std::cout << WarningMsg("Couldn't parse block template from daemon.") << std::endl;
+
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 continue;
             }
 
             return params;
         }
-        catch (const std::exception &e)
+        catch (const json::exception &e)
         {
-            std::cout << WarningMsg("Couldn't get block template - Is your daemon open?\n")
-                      << "(Error message: " << e.what() << ")\n"; 
+            std::stringstream stream;
+
+            stream << "Failed to parse block template from daemon. Received data:\n"
+                   << res->body << "\nParse error: " << e.what() << std::endl;
+
+            std::cout << WarningMsg(stream.str());
+
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }

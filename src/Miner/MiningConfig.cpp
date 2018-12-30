@@ -144,6 +144,7 @@ void MiningConfig::parse(int argc, char** argv)
 
         std::cout << InformationMsg("What address do you want to mine to?: ");
         std::getline(std::cin, miningAddress);
+        Common::trim(miningAddress);
 
         error = validateAddresses({miningAddress}, integratedAddressesAllowed);
     }

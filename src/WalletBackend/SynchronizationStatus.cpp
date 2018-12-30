@@ -2,12 +2,9 @@
 // 
 // Please see the included LICENSE file for more information.
 
-
 ////////////////////////////////////////////////
 #include <WalletBackend/SynchronizationStatus.h>
 ////////////////////////////////////////////////
-
-#include <crypto/crypto.h>
 
 #include <WalletBackend/Constants.h>
 
@@ -30,7 +27,7 @@ void SynchronizationStatus::storeBlockHash(
         /* Height should be one more than previous height */
         if (height != m_lastKnownBlockHeight + 1)
         {
-            throw std::runtime_error("Blocks were missed in syncing process! Terminating.");
+            throw std::runtime_error("Blocks were missed in syncing process! Possibly malicious daemon. Terminating.");
         }
     }
 
