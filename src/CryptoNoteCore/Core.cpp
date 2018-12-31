@@ -536,39 +536,24 @@ bool Core::getTransactionsStatus(
         /* Pop into a set for quicker .find() */
         std::unordered_set<Crypto::Hash> poolTransactions(txs.begin(), txs.end());
 
-        /* Loop through the inputted hashes */
-        for (auto it = transactionHashes.begin(); it != transactionHashes.end();)
+        for (const auto hash : transactionHashes)
         {
-            /* Transaction exists in the pool */
-            if (poolTransactions.find(*it) != poolTransactions.end())
+            if (poolTransactions.find(hash) != poolTransactions.end())
             {
-                transactionsInPool.insert(*it);
-
-                /* We have processed this transaction, remove it from the
-                   container, and update the iterators */
-                it = transactionHashes.erase(it);
+                /* It's in the pool */
+                transactionsInPool.insert(hash);
+            }
+            else if (findSegmentContainingTransaction(hash) != nullptr)
+            {
+                /* It's in a block */
+                transactionsInBlock.insert(hash);
             }
             else
             {
-                ++it;
+                /* We don't know anything about it */
+                transactionsUnknown.insert(hash);
             }
         }
-
-        for (auto it = transactionHashes.begin(); it != transactionHashes.end();)
-        {
-            /* The transaction is present in a block */
-            if (findSegmentContainingTransaction(*it) != nullptr)
-            {
-                transactionsInBlock.insert(*it);
-
-                /* We have processed this transaction, remove it from the container
-                   and update the iterators */
-                it = transactionHashes.erase(it);
-            }
-        }
-
-        /* Anything remaining, the daemon does not know about. */
-        transactionsUnknown = transactionHashes;
 
         return true;
     }
