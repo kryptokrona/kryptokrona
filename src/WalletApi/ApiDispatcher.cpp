@@ -592,7 +592,16 @@ std::tuple<WalletError, uint16_t> ApiDispatcher::sendAdvancedTransaction(
     Response &res,
     const nlohmann::json &body)
 {
-    auto destinations = body.at("destinations").get<std::vector<std::pair<std::string, uint64_t>>>();
+    json destinationsJSON = body.at("destinations");
+
+    std::vector<std::pair<std::string, uint64_t>> destinations;
+
+    for (const auto destination : destinationsJSON)
+    {
+        const std::string address = destination.at("address").get<std::string>();
+        const uint64_t amount = destination.at("amount").get<uint64_t>();
+        destinations.emplace_back(address, amount);
+    }
 
     uint64_t mixin;
 
