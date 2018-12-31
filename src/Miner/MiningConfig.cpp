@@ -23,9 +23,9 @@
 #include "Logging/ILogger.h"
 #include "version.h"
 
-#include <WalletBackend/ValidateParameters.h>
+#include <Errors/ValidateParameters.h>
 
-#include <zedwallet++/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 
 namespace CryptoNote {
 
@@ -130,7 +130,7 @@ void MiningConfig::parse(int argc, char** argv)
 
     const bool integratedAddressesAllowed = false;
 
-    WalletError error = validateAddresses({miningAddress}, integratedAddressesAllowed);
+    Error error = validateAddresses({miningAddress}, integratedAddressesAllowed);
 
     while (error != SUCCESS)
     {

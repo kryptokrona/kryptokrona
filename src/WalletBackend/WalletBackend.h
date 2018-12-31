@@ -6,6 +6,8 @@
 
 #include "CryptoTypes.h"
 
+#include <Errors/Errors.h>
+
 #include "json.hpp"
 
 #include <string>
@@ -16,8 +18,8 @@
 
 #include <Nigel/Nigel.h>
 
-#include <WalletBackend/SubWallets.h>
-#include <WalletBackend/WalletErrors.h>
+#include <SubWallets/SubWallets.h>
+
 #include <WalletBackend/WalletSynchronizer.h>
 
 using nlohmann::json;
@@ -56,7 +58,7 @@ class WalletBackend
 
         /* Imports a wallet from a mnemonic seed. Returns the wallet class,
            or an error. */
-        static std::tuple<WalletError, std::shared_ptr<WalletBackend>> importWalletFromSeed(
+        static std::tuple<Error, std::shared_ptr<WalletBackend>> importWalletFromSeed(
             const std::string mnemonicSeed,
             const std::string filename,
             const std::string password,
@@ -66,7 +68,7 @@ class WalletBackend
 
         /* Imports a wallet from a private spend key and a view key. Returns
            the wallet class, or an error. */
-        static std::tuple<WalletError, std::shared_ptr<WalletBackend>> importWalletFromKeys(
+        static std::tuple<Error, std::shared_ptr<WalletBackend>> importWalletFromKeys(
             const Crypto::SecretKey privateSpendKey,
             const Crypto::SecretKey privateViewKey,
             const std::string filename,
@@ -77,7 +79,7 @@ class WalletBackend
 
         /* Imports a view wallet from a private view key and an address.
            Returns the wallet class, or an error. */
-        static std::tuple<WalletError, std::shared_ptr<WalletBackend>> importViewWallet(
+        static std::tuple<Error, std::shared_ptr<WalletBackend>> importViewWallet(
             const Crypto::SecretKey privateViewKey,
             const std::string address,
             const std::string filename,
@@ -87,21 +89,21 @@ class WalletBackend
             const uint16_t daemonPort);
 
         /* Creates a new wallet with the given filename and password */
-        static std::tuple<WalletError, std::shared_ptr<WalletBackend>> createWallet(
+        static std::tuple<Error, std::shared_ptr<WalletBackend>> createWallet(
             const std::string filename,
             const std::string password,
             const std::string daemonHost,
             const uint16_t daemonPort);
 
         /* Opens a wallet already on disk with the given filename + password */
-        static std::tuple<WalletError, std::shared_ptr<WalletBackend>> openWallet(
+        static std::tuple<Error, std::shared_ptr<WalletBackend>> openWallet(
             const std::string filename,
             const std::string password,
             const std::string daemonHost,
             const uint16_t daemonPort);
 
         /* Create an integrated address from an address + paymentID */
-        static std::tuple<WalletError, std::string> createIntegratedAddress(
+        static std::tuple<Error, std::string> createIntegratedAddress(
             const std::string address,
             const std::string paymentID);
 
@@ -110,17 +112,17 @@ class WalletBackend
         /////////////////////////////
 
         /* Save the wallet to disk */
-        WalletError save() const;
+        Error save() const;
 
         /* Converts the class to a json object */
         json toJson() const;
 
         /* Initializes the class from a json string */
-        WalletError fromJson(const json &j);
+        Error fromJson(const json &j);
 
         /* Initializes the class from a json string, and inits the stuff we
            can't init from the json */
-        WalletError fromJson(
+        Error fromJson(
             const json &j,
             const std::string filename,
             const std::string password,
@@ -128,13 +130,13 @@ class WalletBackend
             const uint16_t daemonPort);
         
         /* Send a transaction of amount to destination with paymentID */
-        std::tuple<WalletError, Crypto::Hash> sendTransactionBasic(
+        std::tuple<Error, Crypto::Hash> sendTransactionBasic(
             const std::string destination,
             const uint64_t amount,
             const std::string paymentID);
 
         /* Advanced send transaction, specify mixin, change address, etc */
-        std::tuple<WalletError, Crypto::Hash> sendTransactionAdvanced(
+        std::tuple<Error, Crypto::Hash> sendTransactionAdvanced(
             const std::vector<std::pair<std::string, uint64_t>> destinations,
             const uint64_t mixin,
             const uint64_t fee,
@@ -144,16 +146,16 @@ class WalletBackend
 
         /* Send a fusion using default mixin, default destination, and
            taking from all subwallets */
-        std::tuple<WalletError, Crypto::Hash> sendFusionTransactionBasic();
+        std::tuple<Error, Crypto::Hash> sendFusionTransactionBasic();
 
         /* Send a fusion with advanced options */
-        std::tuple<WalletError, Crypto::Hash> sendFusionTransactionAdvanced(
+        std::tuple<Error, Crypto::Hash> sendFusionTransactionAdvanced(
             const uint64_t mixin,
             const std::vector<std::string> subWalletsToTakeFrom,
             const std::string destinationAddress);
 
         /* Get the balance for one subwallet (error, unlocked, locked) */
-        std::tuple<WalletError, uint64_t, uint64_t> getBalance(
+        std::tuple<Error, uint64_t, uint64_t> getBalance(
             const std::string address) const;
 
         /* Get the balance for all subwallets */
@@ -162,19 +164,19 @@ class WalletBackend
         uint64_t getTotalUnlockedBalance() const;
 
         /* Make a new sub wallet (gens a privateSpendKey) */
-        std::tuple<WalletError, std::string> addSubWallet();
+        std::tuple<Error, std::string> addSubWallet();
 
         /* Import a sub wallet with the given privateSpendKey */
-        std::tuple<WalletError, std::string> importSubWallet(
+        std::tuple<Error, std::string> importSubWallet(
             const Crypto::SecretKey privateSpendKey,
             const uint64_t scanHeight);
 
         /* Import a view only sub wallet with the given publicSpendKey */
-        std::tuple<WalletError, std::string> importViewSubWallet(
+        std::tuple<Error, std::string> importViewSubWallet(
             const Crypto::PublicKey publicSpendKey,
             const uint64_t scanHeight);
 
-        WalletError deleteSubWallet(const std::string address);
+        Error deleteSubWallet(const std::string address);
 
         /* Scan the blockchain, starting from scanHeight / timestamp */
         void reset(uint64_t scanHeight, uint64_t timestamp);
@@ -199,23 +201,23 @@ class WalletBackend
         std::string getWalletPassword() const;
 
         /* Change the wallet password and save the wallet with the new password */
-        WalletError changePassword(const std::string newPassword);
+        Error changePassword(const std::string newPassword);
 
         /* Gets the shared private view key */
         Crypto::SecretKey getPrivateViewKey() const;
 
         /* Gets the public and private spend key for the given address */
-        std::tuple<WalletError, Crypto::PublicKey, Crypto::SecretKey>
+        std::tuple<Error, Crypto::PublicKey, Crypto::SecretKey>
             getSpendKeys(const std::string &address) const;
 
         /* Get the private spend and private view for the primary address */
         std::tuple<Crypto::SecretKey, Crypto::SecretKey> getPrimaryAddressPrivateKeys() const;
 
         /* Get the primary address mnemonic seed, if possible */
-        std::tuple<WalletError, std::string> getMnemonicSeed() const;
+        std::tuple<Error, std::string> getMnemonicSeed() const;
 
         /* Gets the mnemonic seed for the given address, if possible */
-        std::tuple<WalletError, std::string> getMnemonicSeedForAddress(
+        std::tuple<Error, std::string> getMnemonicSeedForAddress(
             const std::string &address) const;
 
         /* Get all transactions */
@@ -244,10 +246,10 @@ class WalletBackend
         /* Whether we have recieved info from the daemon at some point */
         bool daemonOnline() const;
 
-        std::tuple<WalletError, std::string> getAddress(
+        std::tuple<Error, std::string> getAddress(
             const Crypto::PublicKey spendKey) const;
 
-        std::tuple<WalletError, Crypto::SecretKey> getTxPrivateKey(
+        std::tuple<Error, Crypto::SecretKey> getTxPrivateKey(
             const Crypto::Hash txHash) const;
         
         /////////////////////////////
@@ -287,7 +289,7 @@ class WalletBackend
         /* Private member functions */
         //////////////////////////////
 
-        WalletError unsafeSave() const;
+        Error unsafeSave() const;
 
         void init();
 

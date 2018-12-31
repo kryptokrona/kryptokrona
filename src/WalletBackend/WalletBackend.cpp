@@ -22,19 +22,24 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/pwdbased.h>
 
+#include <Errors/ValidateParameters.h>
+
 #include <fstream>
 
 #include <future>
+
+#include <iomanip>
 
 #include "json.hpp"
 
 #include <Mnemonics/Mnemonics.h>
 
+#include <Utilities/Addresses.h>
+#include <Utilities/Utilities.h>
+
 #include <WalletBackend/Constants.h>
 #include <WalletBackend/JsonSerialization.h>
 #include <WalletBackend/Transfer.h>
-#include <WalletBackend/Utilities.h>
-#include <WalletBackend/ValidateParameters.h>
 
 using json = nlohmann::json;
 
@@ -48,11 +53,11 @@ namespace {
 /* Check data has the magic indicator from first : last, and remove it if
    it does. Else, return an error depending on where we failed */
 template <class Buffer, class Identifier>
-WalletError hasMagicIdentifier(
+Error hasMagicIdentifier(
     Buffer &data,
     const Identifier &identifier,
-    const WalletError tooSmallError,
-    const WalletError wrongIdentifierError)
+    const Error tooSmallError,
+    const Error wrongIdentifierError)
 {
     /* Check we've got space for the identifier */
     if (data.size() < identifier.size())
@@ -72,7 +77,7 @@ WalletError hasMagicIdentifier(
 }
 
 /* Check the wallet filename for the new wallet to be created is valid */
-WalletError checkNewWalletFilename(std::string filename)
+Error checkNewWalletFilename(std::string filename)
 {
     /* Check the file doesn't exist */
     if (std::ifstream(filename))
@@ -173,18 +178,18 @@ WalletBackend::WalletBackend(
 /* STATIC FUNCTIONS */
 //////////////////////
 
-std::tuple<WalletError, std::string> WalletBackend::createIntegratedAddress(
+std::tuple<Error, std::string> WalletBackend::createIntegratedAddress(
     const std::string address,
     const std::string paymentID)
 {
-    if (WalletError error = validatePaymentID(paymentID); error != SUCCESS)
+    if (Error error = validatePaymentID(paymentID); error != SUCCESS)
     {
         return {error, std::string()};
     }
 
     const bool allowIntegratedAddresses = false;
 
-    if (WalletError error = validateAddresses({address}, allowIntegratedAddresses); error != SUCCESS)
+    if (Error error = validateAddresses({address}, allowIntegratedAddresses); error != SUCCESS)
     {
         return {error, std::string()};
     }
@@ -212,7 +217,7 @@ std::tuple<WalletError, std::string> WalletBackend::createIntegratedAddress(
 
 /* Imports a wallet from a mnemonic seed. Returns the wallet class,
    or an error. */
-std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFromSeed(
+std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFromSeed(
     const std::string mnemonicSeed,
     const std::string filename,
     const std::string password,
@@ -221,7 +226,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importWal
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
+    if (Error error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, nullptr}; 
     }
@@ -253,14 +258,14 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importWal
     wallet->init();
 
     /* Save to disk */
-    WalletError error = wallet->save();
+    Error error = wallet->save();
 
     return {error, wallet};
 }
 
 /* Imports a wallet from a private spend key and a view key. Returns
    the wallet class, or an error. */
-std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFromKeys(
+std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFromKeys(
     const Crypto::SecretKey privateSpendKey,
     const Crypto::SecretKey privateViewKey,
     const std::string filename,
@@ -270,7 +275,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importWal
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
+    if (Error error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, nullptr}; 
     }
@@ -287,14 +292,14 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importWal
     wallet->init();
 
     /* Save to disk */
-    WalletError error = wallet->save();
+    Error error = wallet->save();
 
     return {error, wallet};
 }
 
 /* Imports a view wallet from a private view key and an address.
    Returns the wallet class, or an error. */
-std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importViewWallet(
+std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importViewWallet(
     const Crypto::SecretKey privateViewKey,
     const std::string address,
     const std::string filename,
@@ -304,7 +309,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importVie
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
+    if (Error error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, nullptr}; 
     }
@@ -317,20 +322,20 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::importVie
     wallet->init();
 
     /* Save to disk */
-    WalletError error = wallet->save();
+    Error error = wallet->save();
 
     return {error, wallet};
 }
 
 /* Creates a new wallet with the given filename and password */
-std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::createWallet(
+std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::createWallet(
     const std::string filename,
     const std::string password,
     const std::string daemonHost,
     const uint16_t daemonPort)
 {
     /* Check the filename is valid */
-    if (WalletError error = checkNewWalletFilename(filename); error != SUCCESS)
+    if (Error error = checkNewWalletFilename(filename); error != SUCCESS)
     {
         return {error, nullptr};
     }
@@ -360,13 +365,13 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::createWal
     wallet->init();
 
     /* Save to disk */
-    WalletError error = wallet->save();
+    Error error = wallet->save();
 
     return {error, wallet};
 }
 
 /* Opens a wallet already on disk with the given filename + password */
-std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWallet(
+std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::openWallet(
     const std::string filename,
     const std::string password,
     const std::string daemonHost,
@@ -387,7 +392,7 @@ std::tuple<WalletError, std::shared_ptr<WalletBackend>> WalletBackend::openWalle
 
     /* Check that the decrypted data has the 'isAWallet' identifier,
        and remove it it does. If it doesn't, return an error. */
-    WalletError error = hasMagicIdentifier(
+    Error error = hasMagicIdentifier(
         buffer, Constants::IS_A_WALLET_IDENTIFIER,
         NOT_A_WALLET_FILE, NOT_A_WALLET_FILE
     );
@@ -532,7 +537,7 @@ void WalletBackend::init()
     m_walletSynchronizer->start();
 }
 
-WalletError WalletBackend::save() const
+Error WalletBackend::save() const
 {
     /* Stop the wallet synchronizer, so we're not in an invalid state */
     if (m_walletSynchronizer != nullptr)
@@ -540,7 +545,7 @@ WalletError WalletBackend::save() const
         m_walletSynchronizer->stop();
     }
 
-    WalletError error = unsafeSave();
+    Error error = unsafeSave();
 
     /* Continue syncing */
     if (m_walletSynchronizer != nullptr)
@@ -553,7 +558,7 @@ WalletError WalletBackend::save() const
 
 /* Unsafe because it doesn't lock any data structures - need to stop the
    blockchain synchronizer first (Call save()) */
-WalletError WalletBackend::unsafeSave() const
+Error WalletBackend::unsafeSave() const
 {
     /* Add an identifier to the start of the string so we can verify the wallet
        has been correctly decrypted */
@@ -629,11 +634,11 @@ WalletError WalletBackend::unsafeSave() const
 }
 
 /* Get the balance for one subwallet (error, unlocked, locked) */
-std::tuple<WalletError, uint64_t, uint64_t> WalletBackend::getBalance(
+std::tuple<Error, uint64_t, uint64_t> WalletBackend::getBalance(
     const std::string address) const
 {
     /* Verify the address is good, and one of our subwallets */
-    if (WalletError error = validateOurAddresses({address}, m_subWallets); error != SUCCESS)
+    if (Error error = validateOurAddresses({address}, m_subWallets); error != SUCCESS)
     {
         return {error, 0, 0};
     }
@@ -668,7 +673,7 @@ uint64_t WalletBackend::getTotalUnlockedBalance() const
 
 /* This is simply a wrapper for Transfer::sendTransactionBasic - we need to
    pass in the daemon and subwallets instance */
-std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionBasic(
+std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionBasic(
     const std::string destination,
     const uint64_t amount,
     const std::string paymentID)
@@ -678,7 +683,7 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionBasic(
     );
 }
 
-std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
+std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,
     const uint64_t fee,
@@ -692,12 +697,12 @@ std::tuple<WalletError, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
     );
 }
 
-std::tuple<WalletError, Crypto::Hash> WalletBackend::sendFusionTransactionBasic()
+std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionBasic()
 {
     return SendTransaction::sendFusionTransactionBasic(m_daemon, m_subWallets);
 }
 
-std::tuple<WalletError, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
+std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
     const uint64_t mixin,
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string destination)
@@ -733,7 +738,7 @@ void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
     m_walletSynchronizer->start();
 }
 
-std::tuple<WalletError, std::string> WalletBackend::addSubWallet()
+std::tuple<Error, std::string> WalletBackend::addSubWallet()
 {
     /* Stop the wallet synchronizer, so we're not in an invalid state */
     m_walletSynchronizer->stop();
@@ -747,7 +752,7 @@ std::tuple<WalletError, std::string> WalletBackend::addSubWallet()
     return {error, address};
 }
 
-std::tuple<WalletError, std::string> WalletBackend::importSubWallet(
+std::tuple<Error, std::string> WalletBackend::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
     const uint64_t scanHeight)
 {
@@ -782,7 +787,7 @@ std::tuple<WalletError, std::string> WalletBackend::importSubWallet(
     return {error, address};
 }
 
-std::tuple<WalletError, std::string> WalletBackend::importViewSubWallet(
+std::tuple<Error, std::string> WalletBackend::importViewSubWallet(
     const Crypto::PublicKey publicSpendKey,
     const uint64_t scanHeight)
 {
@@ -817,11 +822,11 @@ std::tuple<WalletError, std::string> WalletBackend::importViewSubWallet(
     return {error, address};
 }
 
-WalletError WalletBackend::deleteSubWallet(const std::string address)
+Error WalletBackend::deleteSubWallet(const std::string address)
 {
     m_walletSynchronizer->stop();
 
-    WalletError error = m_subWallets->deleteSubWallet(address);
+    Error error = m_subWallets->deleteSubWallet(address);
 
     m_walletSynchronizer->start();
 
@@ -867,7 +872,7 @@ std::string WalletBackend::getWalletPassword() const
     return m_password;
 }
 
-WalletError WalletBackend::changePassword(const std::string newPassword)
+Error WalletBackend::changePassword(const std::string newPassword)
 {
     /* Saving is a tad slow because of pbkdf2, might as well take the
        optimization here */
@@ -881,7 +886,7 @@ WalletError WalletBackend::changePassword(const std::string newPassword)
     return save();
 }
 
-std::tuple<WalletError, Crypto::PublicKey, Crypto::SecretKey>
+std::tuple<Error, Crypto::PublicKey, Crypto::SecretKey>
     WalletBackend::getSpendKeys(const std::string &address) const
 {
     const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
@@ -902,12 +907,12 @@ std::tuple<Crypto::SecretKey, Crypto::SecretKey> WalletBackend::getPrimaryAddres
     return {m_subWallets->getPrimaryPrivateSpendKey(), m_subWallets->getPrivateViewKey()};
 }
 
-std::tuple<WalletError, std::string> WalletBackend::getMnemonicSeed() const
+std::tuple<Error, std::string> WalletBackend::getMnemonicSeed() const
 {
     return getMnemonicSeedForAddress(getPrimaryAddress());
 }
 
-std::tuple<WalletError, std::string> WalletBackend::getMnemonicSeedForAddress(
+std::tuple<Error, std::string> WalletBackend::getMnemonicSeedForAddress(
     const std::string &address) const
 {
     const auto privateViewKey = getPrivateViewKey();
@@ -1010,13 +1015,13 @@ bool WalletBackend::daemonOnline() const
     return m_daemon->isOnline();
 }
 
-std::tuple<WalletError, std::string> WalletBackend::getAddress(
+std::tuple<Error, std::string> WalletBackend::getAddress(
     const Crypto::PublicKey spendKey) const
 {
     return m_subWallets->getAddress(spendKey);
 }
 
-std::tuple<WalletError, Crypto::SecretKey> WalletBackend::getTxPrivateKey(
+std::tuple<Error, Crypto::SecretKey> WalletBackend::getTxPrivateKey(
     const Crypto::Hash txHash) const
 {
     const auto [success, key] = m_subWallets->getTxPrivateKey(txHash);

@@ -9,13 +9,13 @@
 
 #include <vector>
 
-#include <WalletBackend/WalletErrors.h>
+#include <Errors/Errors.h>
 
 namespace Mnemonics
 {
-    std::tuple<WalletError, Crypto::SecretKey> MnemonicToPrivateKey(const std::string words);
+    std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::string words);
 
-    std::tuple<WalletError, Crypto::SecretKey> MnemonicToPrivateKey(const std::vector<std::string> words);
+    std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::vector<std::string> words);
 
     std::string PrivateKeyToMnemonic(const Crypto::SecretKey privateKey);
 

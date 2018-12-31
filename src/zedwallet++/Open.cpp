@@ -14,9 +14,9 @@
 
 #include <Mnemonics/Mnemonics.h>
 
-#include <WalletBackend/ValidateParameters.h>
+#include <Errors/ValidateParameters.h>
 
-#include <zedwallet++/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 #include <zedwallet++/CommandImplementations.h>
 #include <zedwallet++/PasswordContainer.h>
 #include <zedwallet++/Utilities.h>
@@ -52,7 +52,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
         const bool integratedAddressesAllowed = false;
 
-        if (WalletError error = validateAddresses({address}, integratedAddressesAllowed); error != SUCCESS)
+        if (Error error = validateAddresses({address}, integratedAddressesAllowed); error != SUCCESS)
         {
             std::cout << WarningMsg("Invalid address: ")
                       << WarningMsg(error) << std::endl;

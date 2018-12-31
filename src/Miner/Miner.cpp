@@ -19,7 +19,7 @@
 
 #include <System/InterruptedException.h>
 
-#include <zedwallet++/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 
 namespace CryptoNote {
 

@@ -9,7 +9,7 @@
 #include <string>
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 
-namespace Common
+namespace Utilities
 {
     std::string get_mining_speed(const uint64_t hashrate);
 
@@ -26,4 +26,6 @@ namespace Common
     std::string formatAmount(const uint64_t amount);
 
     std::string formatAmountBasic(const uint64_t amount);
+
+    std::string prettyPrintBytes(const uint64_t numBytes);
 }

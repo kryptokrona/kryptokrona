@@ -8,7 +8,7 @@
 
 #include <config/CliHeader.h>
 
-#include <zedwallet++/ColouredMsg.h>
+#include <Utilities/ColouredMsg.h>
 #include <zedwallet++/Menu.h>
 #include <zedwallet++/ParseArguments.h>
 #include <zedwallet++/Sync.h>

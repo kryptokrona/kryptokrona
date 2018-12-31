@@ -5,34 +5,39 @@
 // Please see the included LICENSE file for more information.
 
 #include <algorithm>
-#include <numeric>
-#include <set>
-#include <unordered_set>
 
-#include "Core.h"
-#include "Common/FormatTools.h"
-#include "Common/LicenseCanary.h"
-#include "Common/ShuffleGenerator.h"
-#include "Common/Math.h"
-#include "Common/MemoryInputStream.h"
-#include "CryptoNoteTools.h"
-#include "CryptoNoteFormatUtils.h"
-#include "BlockchainCache.h"
-#include "BlockchainStorage.h"
-#include "BlockchainUtils.h"
-#include "CryptoNoteCore/ITimeProvider.h"
-#include "CryptoNoteCore/CoreErrors.h"
-#include "CryptoNoteCore/MemoryBlockchainStorage.h"
-#include "CryptoNoteCore/TransactionExtra.h"
-#include "CryptoNoteCore/TransactionPool.h"
-#include "CryptoNoteCore/TransactionPoolCleaner.h"
-#include "CryptoNoteCore/UpgradeManager.h"
-#include "CryptoNoteCore/Mixins.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h"
+#include <numeric>
+
+#include <Common/ShuffleGenerator.h>
+#include <Common/Math.h>
+#include <Common/MemoryInputStream.h>
+
+#include <CryptoNoteCore/BlockchainCache.h>
+#include <CryptoNoteCore/BlockchainStorage.h>
+#include <CryptoNoteCore/BlockchainUtils.h>
+#include <CryptoNoteCore/Core.h>
+#include <CryptoNoteCore/CoreErrors.h>
+#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
+#include <CryptoNoteCore/CryptoNoteTools.h>
+#include <CryptoNoteCore/ITimeProvider.h>
+#include <CryptoNoteCore/MemoryBlockchainStorage.h>
+#include <CryptoNoteCore/Mixins.h>
+#include <CryptoNoteCore/TransactionApi.h>
+#include <CryptoNoteCore/TransactionExtra.h>
+#include <CryptoNoteCore/TransactionPool.h>
+#include <CryptoNoteCore/TransactionPoolCleaner.h>
+#include <CryptoNoteCore/UpgradeManager.h>
+
+#include <CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h>
+
+#include <set>
 
 #include <System/Timer.h>
 
-#include "TransactionApi.h"
+#include <Utilities/FormatTools.h>
+#include <Utilities/LicenseCanary.h>
+
+#include <unordered_set>
 
 #include <WalletTypes.h>
 
@@ -582,7 +587,15 @@ bool Core::getWalletSyncData(
         /* Current height */
         uint64_t currentIndex = mainChain->getTopBlockIndex();
 
-        const auto [success, timestampBlockHeight] = mainChain->getBlockHeightForTimestamp(startTimestamp);
+        auto [success, timestampBlockHeight] = mainChain->getBlockHeightForTimestamp(startTimestamp);
+
+        /* If no timestamp given, occasionaly the daemon returns a non zero
+           block height... for some reason. Set it back to zero if we didn't
+           give a timestamp to fix this. */
+        if (startTimestamp == 0)
+        {
+            timestampBlockHeight = 0;
+        }
 
         /* If we couldn't get the first block timestamp, then the node is
            synced less than the current height, so return no blocks till we're
@@ -617,6 +630,24 @@ bool Core::getWalletSyncData(
             static_cast<uint64_t>(BLOCKS_SYNCHRONIZING_DEFAULT_COUNT),
             blockDifference + 1
         ) + startIndex;
+
+        /* MAYBE THE DAMN THING CAN WORK */
+        logger(Logging::DEBUGGING)
+            << "\n\n"
+            << "\n============================================="
+            << "\n========= GetWalletSyncData summary ========="
+            << "\n* Known block hashes size: " << knownBlockHashes.size()
+            << "\n* Start height: " << startHeight
+            << "\n* Start timestamp: " << startTimestamp
+            << "\n* Current index: " << currentIndex
+            << "\n* Timestamp block height: " << timestampBlockHeight
+            << "\n* First block height: " << firstBlockHeight
+            << "\n* Last known block hash height: " << lastKnownBlockHashHeight
+            << "\n* Start index: " << startIndex
+            << "\n* Block difference: " << blockDifference
+            << "\n* End index: " << endIndex
+            << "\n============================================="
+            << "\n\n\n";
 
         /* If we're fully synced, then the start index will be greater than our
            current block. */
@@ -1290,7 +1321,7 @@ bool Core::getRandomOutputs(uint64_t amount, uint16_t count, std::vector<uint32_
   globalIndexes = chainsLeaves[0]->getRandomOutsByAmount(amount, count, getTopBlockIndex());
   if (globalIndexes.empty()) {
     logger(Logging::ERROR) << "Failed to get any matching outputs for amount "
-                           << amount << " (" << Common::formatAmount(amount)
+                           << amount << " (" << Utilities::formatAmount(amount)
                            << "). Further explanation here: "
                            << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c\n"
                            << "Note: If you are a public node operator, you can safely ignore this message. "

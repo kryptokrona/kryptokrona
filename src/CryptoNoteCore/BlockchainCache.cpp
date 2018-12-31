@@ -606,13 +606,13 @@ std::vector<RawBlock> BlockchainCache::getBlocksByHeight(
 
     if (startHeight < startIndex)
     {
-        blocks = parent->getBlocksByHeight(startHeight, startIndex - 1);
+        blocks = parent->getBlocksByHeight(startHeight, startIndex);
     }
 
     uint64_t startOffset = std::max(startHeight, static_cast<uint64_t>(startIndex));
 
     uint64_t blockCount = storage->getBlockCount();
-
+    
     /* Make sure we don't overflow the storage (for example, the block might
        not exist yet) */
     if (endHeight > startIndex + blockCount)
@@ -624,6 +624,18 @@ std::vector<RawBlock> BlockchainCache::getBlocksByHeight(
     {
         blocks.push_back(storage->getBlockByIndex(i - startIndex));
     }
+
+    logger(Logging::DEBUGGING)
+            << "\n\n"
+            << "\n============================================="
+            << "\n======= GetBlockByHeight (in memory) ========"
+            << "\n* Start height: " << startHeight
+            << "\n* End height: " << endHeight
+            << "\n* Start index: " << startIndex 
+            << "\n* Start offset: " << startIndex 
+            << "\n* Block count: " << startIndex 
+            << "\n============================================="
+            << "\n\n\n";
 
     return blocks;
 }

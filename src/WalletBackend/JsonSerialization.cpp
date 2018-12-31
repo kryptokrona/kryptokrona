@@ -10,9 +10,9 @@
 
 #include <tuple>
 
+#include <SubWallets/SubWallets.h>
+
 #include <WalletBackend/Constants.h>
-#include <WalletBackend/SubWallet.h>
-#include <WalletBackend/SubWallets.h>
 #include <WalletBackend/SynchronizationStatus.h>
 #include <WalletBackend/WalletBackend.h>
 #include <WalletBackend/WalletSynchronizer.h>
@@ -129,7 +129,7 @@ json WalletBackend::toJson() const
     };
 }
 
-WalletError WalletBackend::fromJson(const json &j)
+Error WalletBackend::fromJson(const json &j)
 {
     uint16_t version = j.at("walletFileFormatVersion").get<uint16_t>();
 
@@ -149,14 +149,14 @@ WalletError WalletBackend::fromJson(const json &j)
     return SUCCESS;
 }
 
-WalletError WalletBackend::fromJson(
+Error WalletBackend::fromJson(
     const json &j,
     const std::string filename,
     const std::string password,
     const std::string daemonHost,
     const uint16_t daemonPort)
 {
-    if (WalletError error = fromJson(j); error != SUCCESS)
+    if (Error error = fromJson(j); error != SUCCESS)
     {
         return error;
     }

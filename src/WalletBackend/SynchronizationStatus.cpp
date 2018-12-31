@@ -27,7 +27,13 @@ void SynchronizationStatus::storeBlockHash(
         /* Height should be one more than previous height */
         if (height != m_lastKnownBlockHeight + 1)
         {
-            throw std::runtime_error("Blocks were missed in syncing process! Possibly malicious daemon. Terminating.");
+            std::stringstream stream;
+
+            stream << "Blocks were missed in syncing process! Expected: "
+                   << m_lastKnownBlockHeight + 1 << ", Received: "
+                   << height << ".\nPossibly malicious daemon. Terminating.";
+
+            throw std::runtime_error(stream.str());
         }
     }
 

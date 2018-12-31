@@ -3,20 +3,27 @@
 // 
 // Please see the included LICENSE file for more information.
 
-#include "DaemonCommandsHandler.h"
+#include <boost/format.hpp>
 
 #include <ctime>
-#include "P2p/NetNode.h"
-#include "CryptoNoteCore/Core.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "Serialization/SerializationTools.h"
-#include "version.h"
 
-#include "Rpc/JsonRpc.h"
-#include "CryptoNoteCore/Currency.h"
-#include <boost/format.hpp>
-#include "Common/FormatTools.h"
+#include <CryptoNoteCore/Core.h>
+#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
+#include <CryptoNoteCore/Currency.h>
+
+#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
+
+#include <Daemon/DaemonCommandsHandler.h>
+
+#include <P2p/NetNode.h>
+
+#include <Rpc/JsonRpc.h>
+
+#include <Serialization/SerializationTools.h>
+
+#include <Utilities/FormatTools.h>
+
+#include "version.h"
 
 namespace {
 template <typename T>
@@ -305,7 +312,7 @@ bool DaemonCommandsHandler::status(const std::vector<std::string>& args)
     return false;
   } 
 
-  std::cout << Common::get_status_string(iresp) << std::endl;
+  std::cout << Utilities::get_status_string(iresp) << std::endl;
   
   return true;
 }
