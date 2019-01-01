@@ -1,6 +1,6 @@
 sudo: false
 language: cpp
-
+cache: ccache
 matrix:
   include:
 
@@ -100,6 +100,10 @@ install:
 # Need a newer version of llvm to link against to get std::filesystem / std::experimental::filesystem 
 - if [[ "${LABEL:0:3}" == "osx" ]]; then brew install llvm || brew upgrade llvm ; fi
 
+# Neeed to install ccache
+- if [[ "${LABEL:0:3}" == "osx" ]]; then brew install ccache ; fi
+- if [[ "${LABEL:0:3}" == "osx" ]]; then export PATH="/usr/local/opt/ccache/libexec:$PATH" ; fi
+
 # Install the correct gcc version
 - if [[ "$LABEL" == "osx-g++-8" ]]; then brew install gcc@8 ; fi
 - if [[ "$LABEL" == "osx-g++-7" ]]; then brew install gcc@7 ; fi
@@ -124,7 +128,8 @@ install:
 script:
 - eval $MATRIX_EVAL
 - mkdir build && cd build
-- cmake -DCMAKE_BUILD_TYPE=Release -DSTATIC=true .. ${CUSTOM_TOOLCHAIN} ${CUSTOM_BOOST_ROOT} && make -j2
+- cmake -DCMAKE_BUILD_TYPE=Release -DSTATIC=true .. ${CUSTOM_TOOLCHAIN} ${CUSTOM_BOOST_ROOT}
+- make -j2
 
 before_deploy:
 - if [[ "${TRAVIS_TAG}" == "" ]]; then export TRAVIS_TAG=${TRAVIS_COMMIT} ; fi

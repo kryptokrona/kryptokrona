@@ -33,6 +33,13 @@
 # 4. make -j
 
 cmake_minimum_required(VERSION 2.8.12)
+
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Found ccache package... Activating...")
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
 project(rocksdb)
 enable_language(CXX)
 enable_language(C)

@@ -5,6 +5,12 @@
 #   and a number of developer boards used for testing. To test your
 #   changes, please set up a Ubuntu 14.05 LTS system.
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Found ccache package... Activating...")
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
 if(NOT DEFINED cryptocpp_DISPLAY_CMAKE_SUPPORT_WARNING)
   set(cryptocpp_DISPLAY_CMAKE_SUPPORT_WARNING 1)
 endif()
