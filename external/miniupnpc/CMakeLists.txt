@@ -1,5 +1,11 @@
 cmake_minimum_required (VERSION 2.6)
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+  message(STATUS "Found ccache package... Activating...")
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
 project (miniupnpc C)
 set (MINIUPNPC_VERSION 1.9)
 set (MINIUPNPC_API_VERSION 10)
