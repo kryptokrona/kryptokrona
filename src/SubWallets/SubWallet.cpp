@@ -398,3 +398,14 @@ void SubWallet::storeUnconfirmedIncomingInput(
 {
     m_unconfirmedIncomingAmounts.push_back(input);
 }
+
+void SubWallet::convertSyncTimestampToHeight(
+    const uint64_t timestamp,
+    const uint64_t height)
+{
+    if (m_syncStartTimestamp != 0)
+    {
+        m_syncStartTimestamp = timestamp;
+        m_syncStartHeight = height;
+    }
+}

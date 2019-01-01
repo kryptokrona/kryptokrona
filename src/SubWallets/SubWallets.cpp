@@ -929,3 +929,15 @@ void SubWallets::storeUnconfirmedIncomingInput(
         it->second.storeUnconfirmedIncomingInput(input);
     }
 }
+
+void SubWallets::convertSyncTimestampToHeight(
+    const uint64_t timestamp,
+    const uint64_t height)
+{
+    std::scoped_lock lock(m_mutex);
+
+    for (auto [pubKey, subWallet] : m_subWallets)
+    {
+        subWallet.convertSyncTimestampToHeight(timestamp, height);
+    }
+}
