@@ -67,13 +67,6 @@ int main(int argc, char **argv)
                   << "\nPlease report this error, and what you were doing to "
                      "cause it.\n";
     }
-    catch (const boost::exception &e)
-    {
-        std::cout << "Unexpected error: "
-                  << dynamic_cast<std::exception const&>(e).what()
-                  << "\nPlease report this error, and what you were doing to "
-                     "cause it.\n";
-    }
 
     std::cout << ("\nSaving and shutting down...\n");
 
