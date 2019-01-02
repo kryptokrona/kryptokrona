@@ -685,22 +685,25 @@ std::tuple<Error, std::vector<WalletTypes::ObscuredInput>> prepareRingParticipan
 
         obscuredInput.ownerPrivateSpendKey = walletAmount.privateSpendKey;
 
-        /* Add the fake outputs to the transaction */
-        for (const auto fakeOut : fakeOuts[i].outs)
+        if (mixin != 0)
         {
-            /* This fake output is our output! Skip. */
-            if (walletAmount.input.globalOutputIndex == fakeOut.global_amount_index)
+            /* Add the fake outputs to the transaction */
+            for (const auto fakeOut : fakeOuts[i].outs)
             {
-                continue;
-            }
+                /* This fake output is our output! Skip. */
+                if (walletAmount.input.globalOutputIndex == fakeOut.global_amount_index)
+                {
+                    continue;
+                }
 
-            /* Add the fake output */
-            obscuredInput.outputs.push_back({fakeOut.global_amount_index, fakeOut.out_key});
+                /* Add the fake output */
+                obscuredInput.outputs.push_back({fakeOut.global_amount_index, fakeOut.out_key});
 
-            /* Found enough fake outputs, we're done */
-            if (obscuredInput.outputs.size() >= mixin)
-            {
-                break;
+                /* Found enough fake outputs, we're done */
+                if (obscuredInput.outputs.size() >= mixin)
+                {
+                    break;
+                }
             }
         }
 

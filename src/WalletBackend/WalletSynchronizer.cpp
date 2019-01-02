@@ -651,6 +651,15 @@ void WalletSynchronizer::downloadBlocks()
             continue;
         }
 
+        /* Timestamp is transient and can change - block height is constant. */
+        if (m_startTimestamp != 0)
+        {
+            m_startTimestamp = 0;
+            m_startHeight = blocks.front().blockHeight;
+
+            m_subWallets->convertSyncTimestampToHeight(m_startTimestamp, m_startHeight);
+        }
+
         /* If checkpoints are empty, this is the first sync request. */
         if (blockCheckpoints.empty())
         {

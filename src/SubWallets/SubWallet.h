@@ -104,6 +104,10 @@ class SubWallet
         void storeUnconfirmedIncomingInput(
             const WalletTypes::UnconfirmedInput input);
 
+        void convertSyncTimestampToHeight(
+            const uint64_t timestamp,
+            const uint64_t height);
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////

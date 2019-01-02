@@ -87,6 +87,8 @@ class WalletSynchronizer
 
         void swapNode(const std::shared_ptr<Nigel> daemon);
 
+        void setSyncStart(const uint64_t startTimestamp, const uint64_t startHeight);
+
         /////////////////////////////
         /* Public member variables */
         /////////////////////////////

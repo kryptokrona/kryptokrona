@@ -166,7 +166,7 @@ Error validateMixin(const uint64_t mixin, const uint64_t height)
         return Error(
             MIXIN_TOO_SMALL,
             "The mixin value given (" + std::to_string(mixin) + ") is lower "
-            "than the minimum mixin allowed (" + std::to_string(minMixin)
+            "than the minimum mixin allowed (" + std::to_string(minMixin) + ")"
         );
     }
 
@@ -175,7 +175,7 @@ Error validateMixin(const uint64_t mixin, const uint64_t height)
         return Error(
             MIXIN_TOO_BIG,
             "The mixin value given (" + std::to_string(mixin) + ") is greater "
-            "than the maximum mixin allowed (" + std::to_string(maxMixin)
+            "than the maximum mixin allowed (" + std::to_string(maxMixin) + ")"
         );
     }
 

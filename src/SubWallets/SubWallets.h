@@ -186,6 +186,10 @@ class SubWallets
             const WalletTypes::UnconfirmedInput input,
             const Crypto::PublicKey publicSpendKey);
 
+        void convertSyncTimestampToHeight(
+            const uint64_t timestamp,
+            const uint64_t height);
+
     private:
 
         //////////////////////////////
