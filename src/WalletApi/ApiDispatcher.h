@@ -10,6 +10,32 @@
 
 #include <cryptopp/modes.h>
 
+/* Functions the same as body.at(key).get<T>(), but gives better error messages */
+template<typename T>
+T tryGetJsonValue(const nlohmann::json &body, const std::string key)
+{
+    if (body.find(key) == body.end())
+    {
+        auto exception = json::type_error::create(304, "\nExpected json parameter '" + key + "' does not exist.");
+        throw exception;
+    }
+
+    /* Could exist, but be wrong format */
+    try
+    {
+        return body.at(key).get<T>();
+    }
+    catch (const json::exception &e)
+    {
+        std::string msg = "\nJson parameter '" + key + "' exists, but we failed to parse it.\n"
+                          "Possibly wrong type? (" + e.what() + ")";
+
+        auto exception = json::type_error::create(e.id, msg);
+
+        throw exception;
+    }
+}
+
 class ApiDispatcher
 {
     public:
