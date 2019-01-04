@@ -154,6 +154,19 @@ const std::tuple<bool, AddressBookEntry> getAddressBookEntry(
 
             return {false, addressBook[selectionNum]};
         }
+        catch (const std::out_of_range &)
+        {
+            const int numCommands = static_cast<int>(addressBook.size());
+
+            std::cout << WarningMsg("Bad input, expected a friendly name, ")
+                      << WarningMsg("or number from ")
+                      << InformationMsg("1")
+                      << WarningMsg(" to ")
+                      << InformationMsg(numCommands)
+                      << "\n\n";
+
+            continue;
+        }
         /* Input isn't a number */
         catch (const std::invalid_argument &)
         {

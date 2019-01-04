@@ -62,8 +62,8 @@ bool Checkpoints::loadCheckpointsFromFile(const std::string& filename)
     /* The hash this block has (as a string) */
     std::string hash;
 
-    /* The block index (as a uint32_t) */
-    uint32_t index;
+    /* The block index (as a uint64_t) */
+    uint64_t index;
 
     /* Checkpoints file has this format:
 
@@ -78,7 +78,12 @@ bool Checkpoints::loadCheckpointsFromFile(const std::string& filename)
         /* Try and parse the indexString as an int */
         try
         {
-            index = std::stoi(indexString);
+            index = std::stoull(indexString);
+        }
+        catch (const std::out_of_range &)
+        {
+            logger(ERROR, BRIGHT_RED) << "Invalid checkpoint file format - "
+                                      << "height is out of range of uint64_t";
         }
         catch (const std::invalid_argument &)
         {

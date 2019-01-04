@@ -63,6 +63,10 @@ bool parseDaemonAddressFromString(std::string& host, int& port, const std::strin
             port = std::stoi(parts.at(1));
             return true;
         }
+        catch (const std::out_of_range &)
+        {
+            return false;
+        }
         catch (const std::invalid_argument &)
         {
             return false;
