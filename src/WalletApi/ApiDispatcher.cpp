@@ -1088,7 +1088,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeight(
 
     try
     {
-        uint64_t startHeight = std::stoi(startHeightStr);
+        uint64_t startHeight = std::stoull(startHeightStr);
 
         const auto txs = m_walletBackend->getTransactionsRange(
             startHeight, startHeight + 1000
@@ -1103,6 +1103,11 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeight(
         res.set_content(j.dump(4) + "\n", "application/json");
 
         return {SUCCESS, 200};
+    }
+    catch (const std::out_of_range &)
+    {
+        std::cout << "Height parameter is too large or too small!" << std::endl;
+        return {SUCCESS, 400};
     }
     catch (const std::invalid_argument &e)
     {
@@ -1128,9 +1133,9 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeight(
 
     try
     {
-        uint64_t startHeight = std::stoi(startHeightStr);
+        uint64_t startHeight = std::stoull(startHeightStr);
 
-        uint64_t endHeight = std::stoi(endHeightStr);
+        uint64_t endHeight = std::stoull(endHeightStr);
 
         if (startHeight >= endHeight)
         {
@@ -1151,6 +1156,11 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeight(
         res.set_content(j.dump(4) + "\n", "application/json");
 
         return {SUCCESS, 200};
+    }
+    catch (const std::out_of_range &)
+    {
+        std::cout << "Height parameter is too large or too small!" << std::endl;
+        return {SUCCESS, 400};
     }
     catch (const std::invalid_argument &)
     {
@@ -1180,7 +1190,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightWithAddress(
 
     try
     {
-        uint64_t startHeight = std::stoi(startHeightStr);
+        uint64_t startHeight = std::stoull(startHeightStr);
 
         const auto txs = m_walletBackend->getTransactionsRange(
             startHeight, startHeight + 1000
@@ -1214,6 +1224,11 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightWithAddress(
         res.set_content(j.dump(4) + "\n", "application/json");
 
         return {SUCCESS, 200};
+    }
+    catch (const std::out_of_range &)
+    {
+        std::cout << "Height parameter is too large or too small!" << std::endl;
+        return {SUCCESS, 400};
     }
     catch (const std::invalid_argument &)
     {
@@ -1250,9 +1265,9 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeightWith
 
     try
     {
-        uint64_t startHeight = std::stoi(startHeightStr);
+        uint64_t startHeight = std::stoull(startHeightStr);
 
-        uint64_t endHeight = std::stoi(endHeightStr);
+        uint64_t endHeight = std::stoull(endHeightStr);
 
         if (startHeight >= endHeight)
         {
@@ -1292,6 +1307,11 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeightWith
         res.set_content(j.dump(4) + "\n", "application/json");
 
         return {SUCCESS, 200};
+    }
+    catch (const std::out_of_range &)
+    {
+        std::cout << "Height parameter is too large or too small!" << std::endl;
+        return {SUCCESS, 400};
     }
     catch (const std::invalid_argument &)
     {

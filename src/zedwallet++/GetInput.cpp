@@ -247,7 +247,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
 
         try
         {
-            uint64_t amount = std::stol(amountString);
+            unsigned long long amount = std::stoull(amountString);
 
             if (amount < WalletConfig::minimumSend)
             {
@@ -259,6 +259,10 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
             {
                 return {true, amount};
             }
+        }
+        catch (const std::out_of_range &)
+        {
+            std::cout << WarningMsg("Input is too large or too small!");
         }
         catch (const std::invalid_argument &)
         {
