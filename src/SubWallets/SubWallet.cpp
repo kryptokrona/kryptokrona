@@ -350,7 +350,7 @@ void SubWallet::removeCancelledTransactions(
     /* Remove the inputs used in the cancelled tranactions */
     if (it != m_lockedInputs.end())
     {
-        m_spentInputs.erase(it, m_spentInputs.end());
+        m_lockedInputs.erase(it, m_lockedInputs.end());
     }
 
     /* Find inputs that we 'received' in outgoing transfers (scanning our
