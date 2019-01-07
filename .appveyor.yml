@@ -1,17 +1,27 @@
 os: Visual Studio 2017
 
+cache: c:\users\appveyor\clcache
+
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_67_0
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_67_0\lib64-msvc-14
+
+init:
+  - set PATH=c:\Python37;c:\Python37\Scripts;%PATH%
+  - pip install clcache
+
+before_build:
+  - clcache -s
 
 build_script:
   - md build
   - cd build
   - cmake -G "Visual Studio 15 2017 Win64" ..
-  - MSBuild TurtleCoin.sln /p:Configuration=Release /m
+  - MSBuild TurtleCoin.sln /p:CLToolExe=clcache.exe /p:CLToolPath=c:\Python37\Scripts\ /p:Configuration=Release /m
   - src\Release\cryptotest.exe
 
 after_build:
+  - clcache -s
   - if not defined APPVEYOR_REPO_TAG_NAME (set APPVEYOR_REPO_TAG_NAME=%APPVEYOR_REPO_COMMIT%)
   - cd src\Release
   - mkdir turtlecoin-%APPVEYOR_REPO_TAG_NAME%
