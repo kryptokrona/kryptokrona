@@ -183,6 +183,22 @@ enum ErrorCode
 
     /* Tx fee is not the same as specified fee */
     UNEXPECTED_FEE = 45,
+
+    /* Value given is negative, but must be >= 0
+       NOTE: Not used in WalletBackend, only here to maintain API compatibility
+       with turtlecoin-wallet-backend (typescript) */
+    NEGATIVE_VALUE_GIVEN = 46,
+
+    /* Key is not 64 char hex 
+       NOTE: Not used in WalletBackend, only here to maintain API compatibility
+       with turtlecoin-wallet-backend (typescript) */
+    INVALID_KEY_FORMAT = 47,
+
+    /* Hash not 64 chars */
+    HASH_WRONG_LENGTH = 48,
+
+    /* Hash not hex */
+    HASH_INVALID = 49,
 };
 
 class Error

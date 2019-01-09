@@ -185,6 +185,43 @@ std::string getPaymentID(
     }
 }
 
+std::string getHash(
+    const std::string msg,
+    const bool cancelAllowed)
+{
+    while (true)
+    {
+        std::cout << InformationMsg(msg);
+
+        std::string hash;
+
+        /* Fixes infinite looping when someone does a ctrl + c */
+        if (!std::getline(std::cin, hash))
+        {
+            return "cancel";
+        }
+
+        Common::trim(hash);
+
+        if (hash == "cancel" && cancelAllowed)
+        {
+            return hash;
+        }
+
+        /* Validate the hash */
+        if (Error error = validateHash(hash); error != SUCCESS)
+        {
+            std::cout << WarningMsg("Invalid hash: ")
+                      << WarningMsg(error) << std::endl;
+        }
+        else
+        {
+            return hash;
+        }
+    }
+}
+
+
 std::tuple<bool, uint64_t> getAmountToAtomic(
     const std::string msg,
     const bool cancelAllowed)

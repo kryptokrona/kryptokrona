@@ -608,3 +608,31 @@ void swapNode(const std::shared_ptr<WalletBackend> walletBackend)
 
     std::cout << SuccessMsg("Node swap complete.\n\n");
 }
+
+void getTxPrivateKey(const std::shared_ptr<WalletBackend> walletBackend)
+{
+    const std::string txHash = getHash(
+        "What transaction hash do you want to get the private key of?: ", true
+    );
+
+    if (txHash == "cancel")
+    {
+        return;
+    }
+
+    Crypto::Hash hash;
+
+    Common::podFromHex(txHash, hash);
+
+    const auto [error, key] = walletBackend->getTxPrivateKey(hash);
+
+    if (error)
+    {
+        std::cout << WarningMsg(error) << std::endl;
+    }
+    else
+    {
+        std::cout << InformationMsg("Transaction private key: ")
+                  << SuccessMsg(key) << std::endl;
+    }
+}
