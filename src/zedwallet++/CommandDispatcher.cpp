@@ -77,6 +77,10 @@ bool handleCommand(
     {
         changePassword(walletBackend);
     }
+    else if (command == "get_tx_private_key")
+    {
+        getTxPrivateKey(walletBackend);
+    }
     else if (command == "make_integrated_address")
     {
         createIntegratedAddress();

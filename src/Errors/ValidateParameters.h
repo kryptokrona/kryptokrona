@@ -39,6 +39,8 @@ Error validateIntegratedAddresses(
 
 Error validatePaymentID(const std::string paymentID);
 
+Error validateHash(const std::string hash);
+
 Error validateMixin(const uint64_t mixin, const uint64_t height);
 
 Error validateAmount(
