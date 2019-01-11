@@ -98,15 +98,15 @@ install:
 - if [[ "${LABEL:0:3}" == "osx" ]]; then brew cask uninstall --force oclint || true ; fi
 
 # Need a newer version of llvm to link against to get std::filesystem / std::experimental::filesystem 
-- if [[ "${LABEL:0:3}" == "osx" ]]; then brew install llvm || brew upgrade llvm ; fi
+- if [[ "${LABEL:0:3}" == "osx" ]]; then travis_retry brew install llvm || travis_retry brew upgrade llvm ; fi
 
 # Neeed to install ccache
-- if [[ "${LABEL:0:3}" == "osx" ]]; then brew install ccache ; fi
+- if [[ "${LABEL:0:3}" == "osx" ]]; then travis_retry brew install ccache ; fi
 - if [[ "${LABEL:0:3}" == "osx" ]]; then export PATH="/usr/local/opt/ccache/libexec:$PATH" ; fi
 
 # Install the correct gcc version
-- if [[ "$LABEL" == "osx-g++-8" ]]; then brew install gcc@8 ; fi
-- if [[ "$LABEL" == "osx-g++-7" ]]; then brew install gcc@7 ; fi
+- if [[ "$LABEL" == "osx-g++-8" ]]; then travis_retry brew install gcc@8 ; fi
+- if [[ "$LABEL" == "osx-g++-7" ]]; then travis_retry brew install gcc@7 ; fi
 
 - if [[ "$LABEL" == "aarch64" ]]; then export BASEDIR=`pwd` ; fi
 - if [[ "$LABEL" == "aarch64" ]]; then cd $HOME ; fi
