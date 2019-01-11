@@ -32,6 +32,8 @@ public:
     m_consoleHandler.stop();
   }
 
+  bool exit(const std::vector<std::string>& args);
+
 private:
 
   Common::ConsoleHandler m_consoleHandler;
@@ -45,7 +47,6 @@ private:
   bool print_block_by_height(uint32_t height);
   bool print_block_by_hash(const std::string& arg);
 
-  bool exit(const std::vector<std::string>& args);
   bool help(const std::vector<std::string>& args);
   bool print_pl(const std::vector<std::string>& args);
   bool show_hr(const std::vector<std::string>& args);

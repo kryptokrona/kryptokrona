@@ -22,6 +22,7 @@
 #include <Serialization/SerializationTools.h>
 
 #include <Utilities/FormatTools.h>
+#include <Utilities/ColouredMsg.h>
 
 #include "version.h"
 
@@ -82,6 +83,13 @@ std::string DaemonCommandsHandler::get_commands_str()
 
 //--------------------------------------------------------------------------------
 bool DaemonCommandsHandler::exit(const std::vector<std::string>& args) {
+  std::cout << InformationMsg("================= EXITING ==================\n"
+                              "== PLEASE WAIT, THIS MAY TAKE A LONG TIME ==\n"
+                              "============================================\n");
+
+  /* Set log to max when exiting. Sometimes this takes a while, and it helps
+     to let users know the daemon is still doing stuff */
+  m_logManager->setMaxLevel(Logging::TRACE);
   m_consoleHandler.requestStop();
   m_srv.sendStopSignal();
   return true;

@@ -320,9 +320,9 @@ int main(int argc, char* argv[])
     rpcServer.start(config.rpcInterface, config.rpcPort);
     logger(INFO) << "Core rpc server started ok";
 
-    Tools::SignalHandler::install([&dch, &p2psrv] {
-      dch.stop_handling();
-      p2psrv.sendStopSignal();
+    Tools::SignalHandler::install([&dch] {
+       dch.exit({});
+       dch.stop_handling();
     });
 
     logger(INFO) << "Starting p2p net loop...";
