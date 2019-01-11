@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         apiThread = std::thread(&ApiDispatcher::start, api.get());
 
         std::cout << "Want documentation on how to use the wallet-api?\n"
-                     "See https://www.futuregadget.xyz/api-docs/\n\n";
+                     "See https://turtlecoin.github.io/wallet-api-docs/\n\n";
 
         std::string address = "http://" + config.rpcBindIp + ":" + std::to_string(config.port);
 
