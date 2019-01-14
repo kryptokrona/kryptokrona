@@ -250,7 +250,6 @@ void benchmarkGenerateKeyDerivation()
 
     auto startTimer = std::chrono::high_resolution_clock::now();
 
-    /* TODO: Will this get optimized out? */
     for (uint64_t i = 0; i < loopIterations; i++)
     {
         Crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
