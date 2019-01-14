@@ -201,6 +201,68 @@ void benchmark(T hashFunction, std::string hashFunctionName, uint64_t iterations
               << " H/s\n";
 }
 
+void benchmarkUnderivePublicKey()
+{
+    Crypto::KeyDerivation derivation;
+
+    Crypto::PublicKey txPublicKey;
+    Common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
+
+    Crypto::SecretKey privateViewKey;
+    Common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
+
+    Crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
+
+    const uint64_t loopIterations = 600000;
+
+    auto startTimer = std::chrono::high_resolution_clock::now();
+
+    Crypto::PublicKey spendKey;
+
+    Crypto::PublicKey outputKey;
+    Common::podFromHex("4a078e76cd41a3d3b534b83dc6f2ea2de500b653ca82273b7bfad8045d85a400", outputKey);
+
+    for (uint64_t i = 0; i < loopIterations; i++)
+    {
+        /* Use i as output index to prevent optimization */
+        Crypto::underive_public_key(derivation, i, outputKey, spendKey);
+    }
+
+    auto elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+
+    /* Need to use microseconds here then divide by 1000 - otherwise we'll just get '0' */
+    const auto timePerDerivation = std::chrono::duration_cast<std::chrono::microseconds>(elapsedTime).count() / loopIterations;
+
+    std::cout << "Time to perform underivePublicKey: " << timePerDerivation / 1000.0 << " ms" << std::endl;
+}
+
+void benchmarkGenerateKeyDerivation()
+{
+    Crypto::KeyDerivation derivation;
+
+    Crypto::PublicKey txPublicKey;
+    Common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
+
+    Crypto::SecretKey privateViewKey;
+    Common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
+
+    const uint64_t loopIterations = 60000;
+
+    auto startTimer = std::chrono::high_resolution_clock::now();
+
+    /* TODO: Will this get optimized out? */
+    for (uint64_t i = 0; i < loopIterations; i++)
+    {
+        Crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
+    }
+
+    auto elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
+
+    const auto timePerDerivation = std::chrono::duration_cast<std::chrono::microseconds>(elapsedTime).count() / loopIterations;
+
+    std::cout << "Time to perform generateKeyDerivation: " << timePerDerivation / 1000.0 << " ms" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
     bool o_help, o_version, o_benchmark;
@@ -311,6 +373,9 @@ int main(int argc, char** argv)
         if (o_benchmark)
         {
             std::cout <<  "\nPerformance Tests: Please wait, this may take a while depending on your system...\n\n";
+
+            benchmarkUnderivePublicKey();
+            benchmarkGenerateKeyDerivation();
 
             BENCHMARK(cn_slow_hash_v0, o_iterations);
             BENCHMARK(cn_slow_hash_v1, o_iterations);
