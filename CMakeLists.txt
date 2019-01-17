@@ -61,6 +61,32 @@ set(ENABLE_PTHREAD_MUTEX_ADAPTIVE_NP OFF CACHE STRING "Enable RocksDB PTHREAD_MU
 set(ENABLE_MALLOC_USABLE_SIZE OFF CACHE STRING "Enable RocksDB MALLOC_USABLE_SIZE support detection? Defaults to OFF")
 set(ENABLE_SCHED_GETCPU OFF CACHE STRING "Enable RocksDB SCHED_GETCPU support detection? Defaults to OFF")
 
+## This section is for settings found in the slow-hash routine(s) that may benefit some systems (mostly ARM)
+set(FORCE_USE_HEAP ON CACHE BOOL "Force the use of heap memory allocation")
+set(NO_AES OFF CACHE BOOL "Turn off Hardware AES instructions?")
+set(NO_OPTIMIZED_MULTIPLY_ON_ARM OFF CACHE BOOL "Turn off Optimized Multiplication on ARM?")
+
+if(FORCE_USE_HEAP)
+  add_definitions(-DFORCE_USE_HEAP)
+  message(STATUS "FORCE_USE_HEAP: ENABLED")
+else()
+  message(STATUS "FORCE_USE_HEAP: DISABLED")
+endif()
+
+if(NO_AES)
+  add_definitions(-DNO_AES)
+  message(STATUS "HW AES: DISABLED")
+else()
+  message(STATUS "HW AES: ENABLED")
+endif()
+
+if(NO_OPTIMIZED_MULTIPLY_ON_ARM)
+  add_definitions(-DNO_OPTIMIZED_MULTIPLY_ON_ARM)
+  message(STATUS "OPTIMIZED_ARM_MULTIPLICATION: DISABLED")
+else()
+  message(STATUS "OPTIMIZED_ARM_MULTIPLICATION: ENABLED")
+endif()
+
 # We need to set the label and import it into CMake if it exists
 set(LABEL "")
 if(DEFINED ENV{LABEL})
@@ -75,9 +101,6 @@ endif()
 
 ## We only build static binaries -- this is left here for our dependencies
 set(STATIC ON CACHE BOOL FORCE "Link libraries statically? Forced to ON")
-
-# This section helps us set up RocksDB for maximum portability
-set(ENABLE_AVX OFF CACHE STRING "Enable RocksDB AVX/AVX2 support detection? Defaults to OFF")
 
 ## This section helps us tag our builds with the git commit information
 set(COMMIT_ID_IN_VERSION ON CACHE BOOL "Include commit ID in version")
