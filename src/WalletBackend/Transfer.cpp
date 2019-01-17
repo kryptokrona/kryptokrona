@@ -626,8 +626,35 @@ std::tuple<Error, std::vector<CryptoNote::RandomOuts>> getRingParticipants(
         }
     }
 
+    if (fakeOuts.size() != amounts.size())
+    {
+        return {NOT_ENOUGH_FAKE_OUTPUTS, fakeOuts};
+    }
+
     for (auto fakeOut : fakeOuts)
     {
+        /* Do the same check as above here, again. The reason being that
+           we just find the first set of outputs matching the amount above,
+           and if we requests, say, outputs for the amount 100 twice, the
+           first set might be sufficient, but the second are not.
+           
+           We could just check here instead of checking above, but then we
+           might hit the length message first. Checking this way gives more
+           informative errors. */
+        if (fakeOut.outs.size() < mixin)
+        {
+            std::stringstream error;
+
+            error << "Failed to get enough matching outputs for amount "
+                  << fakeOut.amount << " (" << Utilities::formatAmount(fakeOut.amount)
+                  << "). Requested outputs: " << requestedOuts
+                  << ", found outputs: " << fakeOut.outs.size()
+                  << ". Further explanation here: "
+                  << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c";
+
+            return {Error(NOT_ENOUGH_FAKE_OUTPUTS, error.str()), fakeOuts};
+        }
+
         /* Sort the fake outputs by their indexes (don't want there to be an
            easy way to determine which output is the real one) */
         std::sort(fakeOut.outs.begin(), fakeOut.outs.end(), [](const auto &lhs, const auto &rhs)
@@ -915,6 +942,29 @@ std::tuple<Error, CryptoNote::Transaction> generateRingSignatures(
 
         /* Add the signatures to the transaction */
         tx.signatures.push_back(signatures);
+
+        i++;
+    }
+
+    i = 0;
+
+    for (const auto input: inputsAndFakes)
+    {
+        std::vector<Crypto::PublicKey> publicKeys;
+
+        for (const auto output : input.outputs)
+        {
+            publicKeys.push_back(output.key);
+        }
+
+        if (!Crypto::crypto_ops::checkRingSignature(
+                txPrefixHash,
+                boost::get<CryptoNote::KeyInput>(tx.inputs[i]).keyImage,
+                publicKeys,
+                tx.signatures[i]))
+        {
+            return {FAILED_TO_CREATE_RING_SIGNATURE, tx};
+        }
 
         i++;
     }
