@@ -193,7 +193,7 @@ Once you have a 64 bit image installed, setup proceeds the same as any Linux dis
 - `cd turtlecoin`
 - `mkdir build`
 - `cd build`
-- `cmake .. -DFORCE_USE_HEAP=1`
+- `cmake ..`
 - `make`
 
 The binaries will be in the `src` folder when you are complete.
