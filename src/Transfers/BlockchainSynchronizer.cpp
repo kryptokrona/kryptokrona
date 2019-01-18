@@ -538,9 +538,8 @@ void BlockchainSynchronizer::processBlocks(GetBlocksResponse& response) {
       if (m_node.getKnownBlockCount() != m_node.getLocalBlockCount()) {
         m_logger(DEBUGGING) << "Blockchain updated, resume blockchain synchronization";
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      } else {
-        break;
-      }
+      } 
+      break;
 
     case UpdateConsumersResult::addedNewBlocks:
       setFutureState(State::blockchainSync);
