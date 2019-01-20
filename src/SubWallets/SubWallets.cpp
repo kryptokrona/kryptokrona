@@ -941,3 +941,18 @@ void SubWallets::convertSyncTimestampToHeight(
         subWallet.convertSyncTimestampToHeight(timestamp, height);
     }
 }
+
+std::vector<std::tuple<std::string, uint64_t, uint64_t>> SubWallets::getBalances(
+    const uint64_t currentHeight) const
+{
+    std::vector<std::tuple<std::string, uint64_t, uint64_t>> balances;
+
+    for (auto [pubKey, subWallet] : m_subWallets)
+    {
+        const auto [unlocked, locked] = m_subWallets.at(pubKey).getBalance(currentHeight);
+
+        balances.emplace_back(subWallet.address(), unlocked, locked);
+    }
+
+    return balances;
+}
