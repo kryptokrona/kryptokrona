@@ -1033,3 +1033,8 @@ std::tuple<Error, Crypto::SecretKey> WalletBackend::getTxPrivateKey(
 
     return {TX_PRIVATE_KEY_NOT_FOUND, key};
 }
+
+std::vector<std::tuple<std::string, uint64_t, uint64_t>> WalletBackend::getBalances() const
+{
+    return m_subWallets->getBalances(m_daemon->networkBlockCount());
+}

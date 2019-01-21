@@ -196,6 +196,9 @@ ApiDispatcher::ApiDispatcher(
             /* Get balance for a specific address */
             .Get("/balance/" + ApiConstants::addressRegex, router(&ApiDispatcher::getBalanceForAddress, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get balances for each address */
+            .Get("/balances", router(&ApiDispatcher::getBalances, walletMustBeOpen, viewWalletsAllowed))
+
     /* OPTIONS */
 
             /* Matches everything */
@@ -1384,6 +1387,29 @@ std::tuple<Error, uint16_t> ApiDispatcher::getBalanceForAddress(
         {"unlocked", unlocked},
         {"locked", locked}
     };
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
+std::tuple<Error, uint16_t> ApiDispatcher::getBalances(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    const auto balances = m_walletBackend->getBalances();
+
+    nlohmann::json j;
+
+    for (const auto [address, unlocked, locked] : balances)
+    {
+        j.push_back({
+            {"address", address},
+            {"unlocked", unlocked},
+            {"locked", locked}
+        });
+    }
 
     res.set_content(j.dump(4) + "\n", "application/json");
 

@@ -251,6 +251,8 @@ class WalletBackend
 
         std::tuple<Error, Crypto::SecretKey> getTxPrivateKey(
             const Crypto::Hash txHash) const;
+
+        std::vector<std::tuple<std::string, uint64_t, uint64_t>> getBalances() const;
         
         /////////////////////////////
         /* Public member variables */

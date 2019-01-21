@@ -174,14 +174,6 @@ class SubWallets
         std::tuple<bool, Crypto::SecretKey> getTxPrivateKey(
             const Crypto::Hash txHash) const;
 
-        /////////////////////////////
-        /* Public member variables */
-        /////////////////////////////
-
-        /* The public spend keys, used for verifying if a transaction is
-           ours */
-        std::vector<Crypto::PublicKey> m_publicSpendKeys;
-
         void storeUnconfirmedIncomingInput(
             const WalletTypes::UnconfirmedInput input,
             const Crypto::PublicKey publicSpendKey);
@@ -190,6 +182,17 @@ class SubWallets
             const uint64_t timestamp,
             const uint64_t height);
 
+        std::vector<std::tuple<std::string, uint64_t, uint64_t>> getBalances(
+            const uint64_t currentHeight) const;
+
+        /////////////////////////////
+        /* Public member variables */
+        /////////////////////////////
+
+        /* The public spend keys, used for verifying if a transaction is
+           ours */
+        std::vector<Crypto::PublicKey> m_publicSpendKeys;
+        
     private:
 
         //////////////////////////////
