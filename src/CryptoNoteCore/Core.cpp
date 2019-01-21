@@ -1780,12 +1780,7 @@ auto error = validateSemantic(transaction, fee, blockIndex);
           return error::TransactionValidationError::INPUT_SPEND_LOCKED_OUT;
         }
 
-        std::vector<const Crypto::PublicKey*> outputKeyPointers;
-        outputKeyPointers.reserve(outputKeys.size());
-        std::for_each(outputKeys.begin(), outputKeys.end(), [&outputKeyPointers] (const Crypto::PublicKey& key) { outputKeyPointers.push_back(&key); });
-        if (!Crypto::check_ring_signature(cachedTransaction.getTransactionPrefixHash(), in.keyImage, outputKeyPointers.data(),
-                                          outputKeyPointers.size(), transaction.signatures[inputIndex].data(),
-                                          blockIndex > parameters::KEY_IMAGE_CHECKING_BLOCK_INDEX)) {
+        if (!Crypto::crypto_ops::checkRingSignature(cachedTransaction.getTransactionPrefixHash(), in.keyImage, outputKeys, transaction.signatures[inputIndex])) {
           return error::TransactionValidationError::INPUT_INVALID_SIGNATURES;
         }
       }
@@ -1851,10 +1846,10 @@ std::error_code Core::validateSemantic(const Transaction& transaction, uint64_t&
 
       // outputIndexes are packed here, first is absolute, others are offsets to previous,
       // so first can be zero, others can't
-  // Fix discovered by Monero Lab and suggested by "fluffypony" (bitcointalk.org)
-  if (!(scalarmultKey(in.keyImage, L) == I) && blockIndex > parameters::KEY_IMAGE_CHECKING_BLOCK_INDEX) {
-    return error::TransactionValidationError::INPUT_INVALID_DOMAIN_KEYIMAGES;
-  }
+      // Fix discovered by Monero Lab and suggested by "fluffypony" (bitcointalk.org)
+      if (!(scalarmultKey(in.keyImage, L) == I)) {
+        return error::TransactionValidationError::INPUT_INVALID_DOMAIN_KEYIMAGES;
+      }
 
       if (std::find(++std::begin(in.outputIndexes), std::end(in.outputIndexes), 0) != std::end(in.outputIndexes)) {
         return error::TransactionValidationError::INPUT_IDENTICAL_OUTPUT_INDEXES;
