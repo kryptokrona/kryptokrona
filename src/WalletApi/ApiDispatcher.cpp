@@ -1534,7 +1534,7 @@ bool ApiDispatcher::assertWalletClosed() const
 {
     if (m_walletBackend != nullptr)
     {
-        std::cout << "Client requested to open a wallet, whilst once is already open" << std::endl;
+        std::cout << "Client requested to open a wallet, whilst one is already open" << std::endl;
         return false;
     }
 
