@@ -689,11 +689,12 @@ std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
     const uint64_t fee,
     const std::string paymentID,
     const std::vector<std::string> subWalletsToTakeFrom,
-    const std::string changeAddress)
+    const std::string changeAddress,
+    const uint64_t unlockTime)
 {
     return SendTransaction::sendTransactionAdvanced(
         destinations, mixin, fee, paymentID, subWalletsToTakeFrom,
-        changeAddress, m_daemon, m_subWallets
+        changeAddress, m_daemon, m_subWallets, unlockTime
     );
 }
 

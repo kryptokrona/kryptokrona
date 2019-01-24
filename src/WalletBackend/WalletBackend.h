@@ -142,7 +142,8 @@ class WalletBackend
             const uint64_t fee,
             const std::string paymentID,
             const std::vector<std::string> subWalletsToTakeFrom,
-            const std::string changeAddress);
+            const std::string changeAddress,
+            const uint64_t unlockTime);
 
         /* Send a fusion using default mixin, default destination, and
            taking from all subwallets */
