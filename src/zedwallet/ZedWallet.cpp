@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 
     node->init(callback);
 
-    /* Connection took to long to remote node, let program continue regardless
+    /* Connection took too long to remote node, let program continue regardless
        as they could perform functions like export_keys without being
        connected */
     if (initNode.wait_for(std::chrono::seconds(20)) != std::future_status::ready)
