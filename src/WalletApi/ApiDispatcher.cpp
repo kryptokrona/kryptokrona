@@ -654,8 +654,16 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedTransaction(
         changeAddress = tryGetJsonValue<std::string>(body, "changeAddress");
     }
 
+    uint64_t unlockTime = 0;
+
+    if (body.find("unlockTime") != body.end())
+    {
+        unlockTime = tryGetJsonValue<uint64_t>(body, "unlockTime");
+    }
+
     auto [error, hash] = m_walletBackend->sendTransactionAdvanced(
-        destinations, mixin, fee, paymentID, subWalletsToTakeFrom, changeAddress
+        destinations, mixin, fee, paymentID, subWalletsToTakeFrom, changeAddress,
+        unlockTime
     );
 
     if (error)
