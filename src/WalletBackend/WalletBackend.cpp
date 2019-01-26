@@ -535,25 +535,17 @@ void WalletBackend::init()
 
     /* Launch the wallet sync process in a background thread */
     m_walletSynchronizer->start();
+
+    m_syncRAIIWrapper = std::make_shared<WalletSynchronizerRAIIWrapper>(
+        m_walletSynchronizer
+    );
 }
 
 Error WalletBackend::save() const
 {
-    /* Stop the wallet synchronizer, so we're not in an invalid state */
-    if (m_walletSynchronizer != nullptr)
-    {
-        m_walletSynchronizer->stop();
-    }
-
-    Error error = unsafeSave();
-
-    /* Continue syncing */
-    if (m_walletSynchronizer != nullptr)
-    {
-        m_walletSynchronizer->start();
-    }
-
-    return error;
+    return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([this](){
+        return unsafeSave();
+    });
 }
 
 /* Unsafe because it doesn't lock any data structures - need to stop the
@@ -714,123 +706,107 @@ std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
 
 void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
 {
-    /* Though the wallet synchronizer can support both a timestamp and a
-       scanheight, we need a fixed scan height to cut transactions from.
-       Since a transaction in block 10 could have a timestamp before a
-       transaction in block 9, we can't rely on timestamps to reset accurately. */
-    if (timestamp != 0)
-    {
-        scanHeight = Utilities::timestampToScanHeight(timestamp);
-        timestamp = 0;
-    }
+    m_syncRAIIWrapper->pauseSynchronizerToRunFunction(
+    [this, scanHeight, timestamp]() mutable {
+        /* Though the wallet synchronizer can support both a timestamp and a
+           scanheight, we need a fixed scan height to cut transactions from.
+           Since a transaction in block 10 could have a timestamp before a
+           transaction in block 9, we can't rely on timestamps to reset accurately. */
+        if (timestamp != 0)
+        {
+            scanHeight = Utilities::timestampToScanHeight(timestamp);
+            timestamp = 0;
+        }
 
-    /* Empty the sync status and reset the start height */
-    m_walletSynchronizer->reset(scanHeight);
+        /* Empty the sync status and reset the start height */
+        m_walletSynchronizer->reset(scanHeight);
 
-    /* Reset transactions, inputs, etc */
-    m_subWallets->reset(scanHeight);
+        /* Reset transactions, inputs, etc */
+        m_subWallets->reset(scanHeight);
 
-    /* Save the resetted wallet - don't need safe save, already stopped wallet
-       synchronizer */
-    unsafeSave();
+        /* Save the resetted wallet - don't need safe save, already stopped wallet
+           synchronizer */
+        unsafeSave();
 
-    /* Start the sync process back up */
-    m_walletSynchronizer->start();
+        return 0;
+    });
 }
 
 std::tuple<Error, std::string> WalletBackend::addSubWallet()
 {
-    /* Stop the wallet synchronizer, so we're not in an invalid state */
-    m_walletSynchronizer->stop();
-
-    /* Add the sub wallet */
-    const auto [error, address] = m_subWallets->addSubWallet(); 
-
-    /* Continue syncing, syncing the new wallet as well now */
-    m_walletSynchronizer->start();
-
-    return {error, address};
+    return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([this]() {
+        /* Add the sub wallet */
+        return m_subWallets->addSubWallet(); 
+    });
 }
 
 std::tuple<Error, std::string> WalletBackend::importSubWallet(
     const Crypto::SecretKey privateSpendKey,
     const uint64_t scanHeight)
 {
-    /* Stop the wallet synchronizer, so we're not in an invalid state */
-    m_walletSynchronizer->stop();
+    return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([&, this]() {
+        /* Add the sub wallet */
+        const auto [error, address] = m_subWallets->importSubWallet(
+            privateSpendKey, scanHeight
+        ); 
 
-    /* Add the sub wallet */
-    const auto [error, address] = m_subWallets->importSubWallet(
-        privateSpendKey, scanHeight
-    ); 
-
-    if (!error)
-    {
-        /* If we're not making a new wallet, check if we need to reset the scan
-           height of the wallet synchronizer, to pick up the new wallet data
-           from the requested height */
-        uint64_t currentHeight = m_walletSynchronizer->getCurrentScanHeight();
-
-        if (currentHeight >= scanHeight)
+        if (!error)
         {
-            /* Empty the sync status and reset the start height */
-            m_walletSynchronizer->reset(scanHeight);
+            /* If we're not making a new wallet, check if we need to reset the scan
+               height of the wallet synchronizer, to pick up the new wallet data
+               from the requested height */
+            uint64_t currentHeight = m_walletSynchronizer->getCurrentScanHeight();
 
-            /* Reset transactions, inputs, etc */
-            m_subWallets->reset(scanHeight);
+            if (currentHeight >= scanHeight)
+            {
+                /* Empty the sync status and reset the start height */
+                m_walletSynchronizer->reset(scanHeight);
+
+                /* Reset transactions, inputs, etc */
+                m_subWallets->reset(scanHeight);
+            }
         }
-    }
 
-    /* Continue syncing, syncing the new wallet as well now */
-    m_walletSynchronizer->start();
-
-    return {error, address};
+        return std::make_tuple(error, address);
+    });
 }
 
 std::tuple<Error, std::string> WalletBackend::importViewSubWallet(
     const Crypto::PublicKey publicSpendKey,
     const uint64_t scanHeight)
 {
-    /* Stop the wallet synchronizer, so we're not in an invalid state */
-    m_walletSynchronizer->stop();
+    return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([&, this]() {
+        /* Add the sub wallet */
+        const auto [error, address] = m_subWallets->importViewSubWallet(
+            publicSpendKey, scanHeight
+        ); 
 
-    /* Add the sub wallet */
-    const auto [error, address] = m_subWallets->importViewSubWallet(
-        publicSpendKey, scanHeight
-    ); 
-
-    if (!error)
-    {
-        /* If we're not making a new wallet, check if we need to reset the scan
-           height of the wallet synchronizer, to pick up the new wallet data
-           from the requested height */
-        uint64_t currentHeight = m_walletSynchronizer->getCurrentScanHeight();
-
-        if (currentHeight >= scanHeight)
+        if (!error)
         {
-            /* Empty the sync status and reset the start height */
-            m_walletSynchronizer->reset(scanHeight);
+            /* If we're not making a new wallet, check if we need to reset the scan
+               height of the wallet synchronizer, to pick up the new wallet data
+               from the requested height */
+            uint64_t currentHeight = m_walletSynchronizer->getCurrentScanHeight();
 
-            /* Reset transactions, inputs, etc */
-            m_subWallets->reset(scanHeight);
+            if (currentHeight >= scanHeight)
+            {
+                /* Empty the sync status and reset the start height */
+                m_walletSynchronizer->reset(scanHeight);
+
+                /* Reset transactions, inputs, etc */
+                m_subWallets->reset(scanHeight);
+            }
         }
-    }
 
-    /* Continue syncing, syncing the new wallet as well now */
-    m_walletSynchronizer->start();
-
-    return {error, address};
+        return std::make_tuple(error, address);
+    });
 }
 
 Error WalletBackend::deleteSubWallet(const std::string address)
 {
-    m_walletSynchronizer->stop();
-
-    Error error = m_subWallets->deleteSubWallet(address);
-
-    m_walletSynchronizer->start();
-
-    return error;
+    return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([&, this]() {
+        return m_subWallets->deleteSubWallet(address);
+    });
 }
 
 bool WalletBackend::isViewWallet() const
@@ -997,17 +973,15 @@ std::tuple<std::string, uint16_t> WalletBackend::getNodeAddress() const
 
 void WalletBackend::swapNode(std::string daemonHost, uint16_t daemonPort)
 {
-    /* Stop the wallet synchronizer, since we're replacing the daemon it uses */
-    m_walletSynchronizer->stop();
+    m_syncRAIIWrapper->pauseSynchronizerToRunFunction([&, this]() {
+        /* Swap and init the node */
+        m_daemon->swapNode(daemonHost, daemonPort);
 
-    /* Swap and init the node */
-    m_daemon->swapNode(daemonHost, daemonPort);
+        /* Give the synchronizer the new daemon */
+        m_walletSynchronizer->swapNode(m_daemon);
 
-    /* Give the synchronizer the new daemon */
-    m_walletSynchronizer->swapNode(m_daemon);
-
-    /* Continue syncing */
-    m_walletSynchronizer->start();
+        return 0;
+    });
 }
 
 bool WalletBackend::daemonOnline() const

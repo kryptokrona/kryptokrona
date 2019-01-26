@@ -21,6 +21,7 @@
 #include <SubWallets/SubWallets.h>
 
 #include <WalletBackend/WalletSynchronizer.h>
+#include <WalletBackend/WalletSynchronizerRAIIWrapper.h>
 
 using nlohmann::json;
 
@@ -327,4 +328,6 @@ class WalletBackend
            
            PS: I want to die */
         std::shared_ptr<WalletSynchronizer> m_walletSynchronizer;
+
+        std::shared_ptr<WalletSynchronizerRAIIWrapper> m_syncRAIIWrapper;
 };
