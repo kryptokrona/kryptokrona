@@ -164,7 +164,7 @@ class WalletBackend
         uint64_t getTotalUnlockedBalance() const;
 
         /* Make a new sub wallet (gens a privateSpendKey) */
-        std::tuple<Error, std::string> addSubWallet();
+        std::tuple<Error, std::string, Crypto::SecretKey> addSubWallet();
 
         /* Import a sub wallet with the given privateSpendKey */
         std::tuple<Error, std::string> importSubWallet(

@@ -738,18 +738,18 @@ void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
     m_walletSynchronizer->start();
 }
 
-std::tuple<Error, std::string> WalletBackend::addSubWallet()
+std::tuple<Error, std::string, Crypto::SecretKey> WalletBackend::addSubWallet()
 {
     /* Stop the wallet synchronizer, so we're not in an invalid state */
     m_walletSynchronizer->stop();
 
     /* Add the sub wallet */
-    const auto [error, address] = m_subWallets->addSubWallet(); 
+    const auto [error, address, privateSpendKey] = m_subWallets->addSubWallet(); 
 
     /* Continue syncing, syncing the new wallet as well now */
     m_walletSynchronizer->start();
 
-    return {error, address};
+    return {error, address, privateSpendKey};
 }
 
 std::tuple<Error, std::string> WalletBackend::importSubWallet(

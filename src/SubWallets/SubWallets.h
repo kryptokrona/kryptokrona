@@ -41,7 +41,7 @@ class SubWallets
         /////////////////////////////
 
         /* Adds a sub wallet with a random spend key */
-        std::tuple<Error, std::string> addSubWallet();
+        std::tuple<Error, std::string, Crypto::SecretKey> addSubWallet();
 
         /* Imports a sub wallet with the given private spend key */
         std::tuple<Error, std::string> importSubWallet(
