@@ -94,10 +94,6 @@ WalletSynchronizer::~WalletSynchronizer()
    and if we do any inheritance, things don't go awry. */
 void WalletSynchronizer::start()
 {
-    /* Call stop first, so if we reassign any threads, they have been correctly
-       stopped */
-    stop();
-
     /* Reinit any vars which may have changed if we previously called stop() */
     m_shouldStop = false;
 
@@ -151,8 +147,6 @@ void WalletSynchronizer::stop()
 
 void WalletSynchronizer::reset(uint64_t startHeight)
 {
-    stop();
-
     /* Reset start height / timestamp */
     m_startHeight = startHeight;
     m_startTimestamp = 0;
