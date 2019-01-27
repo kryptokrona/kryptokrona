@@ -134,8 +134,11 @@ std::tuple<Error, Crypto::Hash> sendFusionTransactionAdvanced(
             continue;
         }
 
+        const uint64_t unlockTime = 0;
+
         TransactionResult txResult = makeTransaction(
-            mixin, daemon, ourInputs, paymentID, destinations, subWallets
+            mixin, daemon, ourInputs, paymentID, destinations, subWallets,
+            unlockTime
         );
 
         tx = txResult.transaction;
@@ -241,9 +244,11 @@ std::tuple<Error, Crypto::Hash> sendTransactionBasic(
        as the static constructors were used */
     const std::string changeAddress = subWallets->getPrimaryAddress();
 
+    const uint64_t unlockTime = 0;
+
     return sendTransactionAdvanced(
         destinations, defaultMixin, fee, paymentID, {}, changeAddress, daemon,
-        subWallets
+        subWallets, unlockTime
     );
 }
 
@@ -255,7 +260,8 @@ std::tuple<Error, Crypto::Hash> sendTransactionAdvanced(
     const std::vector<std::string> addressesToTakeFrom,
     std::string changeAddress,
     const std::shared_ptr<Nigel> daemon,
-    const std::shared_ptr<SubWallets> subWallets)
+    const std::shared_ptr<SubWallets> subWallets,
+    const uint64_t unlockTime)
 {
     /* Append the fee transaction, if a fee is being used */
     const auto [feeAmount, feeAddress] = daemon->nodeFee();
@@ -327,7 +333,8 @@ std::tuple<Error, Crypto::Hash> sendTransactionAdvanced(
     );
 
     TransactionResult txResult = makeTransaction(
-        mixin, daemon, ourInputs, paymentID, destinations, subWallets
+        mixin, daemon, ourInputs, paymentID, destinations, subWallets,
+        unlockTime
     );
 
     if (txResult.error)
@@ -626,8 +633,35 @@ std::tuple<Error, std::vector<CryptoNote::RandomOuts>> getRingParticipants(
         }
     }
 
+    if (fakeOuts.size() != amounts.size())
+    {
+        return {NOT_ENOUGH_FAKE_OUTPUTS, fakeOuts};
+    }
+
     for (auto fakeOut : fakeOuts)
     {
+        /* Do the same check as above here, again. The reason being that
+           we just find the first set of outputs matching the amount above,
+           and if we requests, say, outputs for the amount 100 twice, the
+           first set might be sufficient, but the second are not.
+           
+           We could just check here instead of checking above, but then we
+           might hit the length message first. Checking this way gives more
+           informative errors. */
+        if (fakeOut.outs.size() < mixin)
+        {
+            std::stringstream error;
+
+            error << "Failed to get enough matching outputs for amount "
+                  << fakeOut.amount << " (" << Utilities::formatAmount(fakeOut.amount)
+                  << "). Requested outputs: " << requestedOuts
+                  << ", found outputs: " << fakeOut.outs.size()
+                  << ". Further explanation here: "
+                  << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c";
+
+            return {Error(NOT_ENOUGH_FAKE_OUTPUTS, error.str()), fakeOuts};
+        }
+
         /* Sort the fake outputs by their indexes (don't want there to be an
            easy way to determine which output is the real one) */
         std::sort(fakeOut.outs.begin(), fakeOut.outs.end(), [](const auto &lhs, const auto &rhs)
@@ -919,6 +953,29 @@ std::tuple<Error, CryptoNote::Transaction> generateRingSignatures(
         i++;
     }
 
+    i = 0;
+
+    for (const auto input: inputsAndFakes)
+    {
+        std::vector<Crypto::PublicKey> publicKeys;
+
+        for (const auto output : input.outputs)
+        {
+            publicKeys.push_back(output.key);
+        }
+
+        if (!Crypto::crypto_ops::checkRingSignature(
+                txPrefixHash,
+                boost::get<CryptoNote::KeyInput>(tx.inputs[i]).keyImage,
+                publicKeys,
+                tx.signatures[i]))
+        {
+            return {FAILED_TO_CREATE_RING_SIGNATURE, tx};
+        }
+
+        i++;
+    }
+
     return {SUCCESS, tx};
 }
 
@@ -997,7 +1054,8 @@ TransactionResult makeTransaction(
     const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
     const std::string paymentID,
     const std::vector<WalletTypes::TransactionDestination> destinations,
-    const std::shared_ptr<SubWallets> subWallets)
+    const std::shared_ptr<SubWallets> subWallets,
+    const uint64_t unlockTime)
 {
     /* Mix our inputs with fake ones from the network to hide who we are */
     const auto [mixinError, inputsAndFakes] = prepareRingParticipants(
@@ -1041,7 +1099,7 @@ TransactionResult makeTransaction(
 
     setupTX.version = CryptoNote::CURRENT_TRANSACTION_VERSION;
 
-    setupTX.unlockTime = 0;
+    setupTX.unlockTime = unlockTime;
 
     /* Convert from key inputs to the boost uglyness */
     setupTX.inputs = keyInputToTransactionInput(transactionInputs);

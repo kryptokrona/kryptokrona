@@ -196,6 +196,9 @@ ApiDispatcher::ApiDispatcher(
             /* Get balance for a specific address */
             .Get("/balance/" + ApiConstants::addressRegex, router(&ApiDispatcher::getBalanceForAddress, walletMustBeOpen, viewWalletsAllowed))
 
+            /* Get balances for each address */
+            .Get("/balances", router(&ApiDispatcher::getBalances, walletMustBeOpen, viewWalletsAllowed))
+
     /* OPTIONS */
 
             /* Matches everything */
@@ -655,8 +658,16 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedTransaction(
         changeAddress = tryGetJsonValue<std::string>(body, "changeAddress");
     }
 
+    uint64_t unlockTime = 0;
+
+    if (body.find("unlockTime") != body.end())
+    {
+        unlockTime = tryGetJsonValue<uint64_t>(body, "unlockTime");
+    }
+
     auto [error, hash] = m_walletBackend->sendTransactionAdvanced(
-        destinations, mixin, fee, paymentID, subWalletsToTakeFrom, changeAddress
+        destinations, mixin, fee, paymentID, subWalletsToTakeFrom, changeAddress,
+        unlockTime
     );
 
     if (error)
@@ -1391,6 +1402,29 @@ std::tuple<Error, uint16_t> ApiDispatcher::getBalanceForAddress(
     return {SUCCESS, 200};
 }
 
+std::tuple<Error, uint16_t> ApiDispatcher::getBalances(
+    const httplib::Request &req,
+    httplib::Response &res,
+    const nlohmann::json &body) const
+{
+    const auto balances = m_walletBackend->getBalances();
+
+    nlohmann::json j;
+
+    for (const auto [address, unlocked, locked] : balances)
+    {
+        j.push_back({
+            {"address", address},
+            {"unlocked", unlocked},
+            {"locked", locked}
+        });
+    }
+
+    res.set_content(j.dump(4) + "\n", "application/json");
+
+    return {SUCCESS, 200};
+}
+
 std::tuple<Error, uint16_t> ApiDispatcher::getTxPrivateKey(
     const httplib::Request &req,
     httplib::Response &res,
@@ -1509,7 +1543,7 @@ bool ApiDispatcher::assertWalletClosed() const
 {
     if (m_walletBackend != nullptr)
     {
-        std::cout << "Client requested to open a wallet, whilst once is already open" << std::endl;
+        std::cout << "Client requested to open a wallet, whilst one is already open" << std::endl;
         return false;
     }
 

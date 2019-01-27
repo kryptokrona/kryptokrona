@@ -77,10 +77,6 @@ struct EllipticCurveScalar {
     friend KeyImage scalarmultKey(const KeyImage & P, const KeyImage & a);
     static void hash_data_to_ec(const uint8_t*, std::size_t, PublicKey&);
     friend void hash_data_to_ec(const uint8_t*, std::size_t, PublicKey&);
-    static bool check_ring_signature(const Hash &, const KeyImage &,
-      const PublicKey *const *, size_t, const Signature *, bool);
-    friend bool check_ring_signature(const Hash &, const KeyImage &,
-      const PublicKey *const *, size_t, const Signature *, bool);
 
     public:
 
@@ -90,6 +86,12 @@ struct EllipticCurveScalar {
             const std::vector<PublicKey> publicKeys,
             const Crypto::SecretKey transactionSecretKey,
             uint64_t realOutput);
+
+        static bool checkRingSignature(
+            const Hash &prefix_hash,
+            const KeyImage &image,
+            const std::vector<PublicKey> pubs,
+            const std::vector<Signature> signatures);
   };
 
   /* Generate a value filled with random bytes.
@@ -222,19 +224,5 @@ struct EllipticCurveScalar {
 
   inline void hash_data_to_ec(const uint8_t* data, std::size_t len, PublicKey& key) {
     crypto_ops::hash_data_to_ec(data, len, key);
-  }
-
-  inline bool check_ring_signature(const Hash &prefix_hash, const KeyImage &image,
-    const PublicKey *const *pubs, size_t pubs_count,
-    const Signature *sig, bool checkKeyImage) {
-    return crypto_ops::check_ring_signature(prefix_hash, image, pubs, pubs_count, sig, checkKeyImage);
-  }
-
-  /* Variants with vector<const PublicKey *> parameters.
-   */
-  inline bool check_ring_signature(const Hash &prefix_hash, const KeyImage &image,
-    const std::vector<const PublicKey *> &pubs,
-    const Signature *sig, bool checkKeyImage) {
-    return check_ring_signature(prefix_hash, image, pubs.data(), pubs.size(), sig, checkKeyImage);
   }
 }

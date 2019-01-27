@@ -8,7 +8,7 @@ namespace Mnemonics
 {
     namespace WordList
     {
-        const std::vector<std::string> English =
+        const static std::vector<const char *> English =
         {
             "abbey",
             "abducts",

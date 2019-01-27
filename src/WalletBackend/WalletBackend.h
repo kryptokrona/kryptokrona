@@ -21,6 +21,7 @@
 #include <SubWallets/SubWallets.h>
 
 #include <WalletBackend/WalletSynchronizer.h>
+#include <WalletBackend/WalletSynchronizerRAIIWrapper.h>
 
 using nlohmann::json;
 
@@ -142,7 +143,8 @@ class WalletBackend
             const uint64_t fee,
             const std::string paymentID,
             const std::vector<std::string> subWalletsToTakeFrom,
-            const std::string changeAddress);
+            const std::string changeAddress,
+            const uint64_t unlockTime);
 
         /* Send a fusion using default mixin, default destination, and
            taking from all subwallets */
@@ -251,6 +253,8 @@ class WalletBackend
 
         std::tuple<Error, Crypto::SecretKey> getTxPrivateKey(
             const Crypto::Hash txHash) const;
+
+        std::vector<std::tuple<std::string, uint64_t, uint64_t>> getBalances() const;
         
         /////////////////////////////
         /* Public member variables */
@@ -327,4 +331,6 @@ class WalletBackend
            
            PS: I want to die */
         std::shared_ptr<WalletSynchronizer> m_walletSynchronizer;
+
+        std::shared_ptr<WalletSynchronizerRAIIWrapper> m_syncRAIIWrapper;
 };
