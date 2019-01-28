@@ -486,10 +486,11 @@ std::tuple<Error, uint16_t> ApiDispatcher::createAddress(
     Response &res,
     const nlohmann::json &body)
 {
-    const auto [error, address] = m_walletBackend->addSubWallet();
+    const auto [error, address, privateSpendKey] = m_walletBackend->addSubWallet();
 
     nlohmann::json j {
-        {"address", address}
+        {"address", address},
+        {"privateSpendKey", privateSpendKey}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");

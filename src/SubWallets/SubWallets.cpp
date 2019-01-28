@@ -89,12 +89,12 @@ SubWallets::SubWallets(const SubWallets &other) :
 /* CLASS FUNCTIONS */
 /////////////////////
 
-std::tuple<Error, std::string> SubWallets::addSubWallet()
+std::tuple<Error, std::string, Crypto::SecretKey> SubWallets::addSubWallet()
 {
     /* This generates a private spend key - incompatible with view wallets */
     if (m_isViewWallet)
     {
-        return {ILLEGAL_VIEW_WALLET_OPERATION, std::string()};
+        return {ILLEGAL_VIEW_WALLET_OPERATION, std::string(), Crypto::SecretKey()};
     }
 
     std::scoped_lock lock(m_mutex);
@@ -119,7 +119,7 @@ std::tuple<Error, std::string> SubWallets::addSubWallet()
 
     m_publicSpendKeys.push_back(spendKey.publicKey);
 
-    return {SUCCESS, address};
+    return {SUCCESS, address, spendKey.secretKey};
 }
 
 std::tuple<Error, std::string> SubWallets::importSubWallet(
