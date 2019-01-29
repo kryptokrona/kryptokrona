@@ -8,7 +8,7 @@
 
 #include <Errors/Errors.h>
 
-#include "json.hpp"
+#include "rapidjson/document.h"
 
 #include <string>
 
@@ -22,8 +22,6 @@
 
 #include <WalletBackend/WalletSynchronizer.h>
 #include <WalletBackend/WalletSynchronizerRAIIWrapper.h>
-
-using nlohmann::json;
 
 class WalletBackend
 {
@@ -115,16 +113,16 @@ class WalletBackend
         /* Save the wallet to disk */
         Error save() const;
 
-        /* Converts the class to a json object */
-        json toJson() const;
+        /* Converts the class to a json string */
+        std::string toJSON() const;
 
         /* Initializes the class from a json string */
-        Error fromJson(const json &j);
+        Error fromJSON(const rapidjson::Document &j);
 
         /* Initializes the class from a json string, and inits the stuff we
            can't init from the json */
-        Error fromJson(
-            const json &j,
+        Error fromJSON(
+            const rapidjson::Document &j,
             const std::string filename,
             const std::string password,
             const std::string daemonHost,
