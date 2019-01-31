@@ -208,7 +208,12 @@ ApiDispatcher::ApiDispatcher(
 
 void ApiDispatcher::start()
 {
-    m_server.listen(m_host, m_port);
+    if (!m_server.listen(m_host, m_port))
+    {
+      std::cout << "Could not bind service to " << m_host << ":" << m_port 
+                << "\nIs another service using this address and port?\n";
+      exit(1);
+    }
 }
 
 void ApiDispatcher::stop()
