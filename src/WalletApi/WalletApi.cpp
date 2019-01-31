@@ -42,6 +42,8 @@ int main(int argc, char **argv)
         /* Launch the API */
         apiThread = std::thread(&ApiDispatcher::start, api.get());
 
+        /* Give the underlying ApiDispatcher time to start and possibly
+           fail before continuing on and confusing users */
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
         std::cout << "Want documentation on how to use the wallet-api?\n"
