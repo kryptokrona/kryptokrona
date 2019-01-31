@@ -63,7 +63,6 @@ WalletSynchronizer & WalletSynchronizer::operator=(WalletSynchronizer && old)
     stop();
 
     m_syncThread = std::move(old.m_syncThread);
-    m_poolWatcherThread = std::move(old.m_poolWatcherThread);
 
     m_syncStatus = std::move(old.m_syncStatus);
 
@@ -75,8 +74,6 @@ WalletSynchronizer & WalletSynchronizer::operator=(WalletSynchronizer && old)
     m_eventHandler = std::move(old.m_eventHandler);
 
     m_daemon = std::move(old.m_daemon);
-
-    m_hasPoolWatcherThreadLaunched = std::move(old.m_hasPoolWatcherThreadLaunched);
 
     return *this;
 }
@@ -99,11 +96,19 @@ void WalletSynchronizer::mainLoop()
 
         if (blocks.empty())
         {
+            /* If we're synced, check any transactions that may be in the pool */
+            if (getCurrentScanHeight() >= m_daemon->localDaemonBlockCount())
+            {
+                checkLockedTransactions();
+            }
+
             std::this_thread::sleep_for(std::chrono::seconds(5));
             continue;
         }
-
-        processBlocks(blocks);
+        else
+        {
+            processBlocks(blocks);
+        }
     }
 }
 
@@ -179,9 +184,11 @@ std::vector<WalletTypes::WalletBlockInfo> WalletSynchronizer::downloadBlocks()
             /* The height we expect to get back from the daemon */
             if (actualHeight != m_startHeight)
             {
+                /* TODO: Log this message
                 std::cout << "Received unexpected block height from daemon. "
                        << "Expected " << m_startHeight << ", got "
                        << actualHeight << ". Not returning any blocks.";
+                */
 
                 return {};
             }
@@ -287,19 +294,6 @@ void WalletSynchronizer::processBlocks(const std::vector<WalletTypes::WalletBloc
         if (b.blockHeight >= m_daemon->networkBlockCount())
         {
             m_eventHandler->onSynced.fire(b.blockHeight);
-
-            /* We are synced, launch the pool watcher thread to watch for
-               locked transactions being spent or returning to the wallet.
-               No need to launch if we're using a view wallet - can't have
-               locked transactions in the pool */
-            if (!m_hasPoolWatcherThreadLaunched && !m_subWallets->isViewWallet())
-            {
-                m_poolWatcherThread = std::thread(
-                    &WalletSynchronizer::monitorLockedTransactions, this
-                );
-
-                m_hasPoolWatcherThreadLaunched = true;
-            }
         }
     }
 }
@@ -518,51 +512,43 @@ std::unordered_map<Crypto::Hash, std::vector<uint64_t>> WalletSynchronizer::getG
     return indexes;
 }
 
-void WalletSynchronizer::monitorLockedTransactions()
+void WalletSynchronizer::checkLockedTransactions()
 {
-    while (!m_shouldStop)
+    /* Get the hashes of any locked tx's we have */
+    const auto lockedTxHashes = m_subWallets->getLockedTransactionsHashes();
+
+    if (lockedTxHashes.size() != 0)
     {
-        /* Get the hashes of any locked tx's we have */
-        const auto lockedTxHashes = m_subWallets->getLockedTransactionsHashes();
+        /* Transactions that are in the pool - we'll query these again
+           next time to see if they have moved */
+        std::unordered_set<Crypto::Hash> transactionsInPool;
 
-        if (lockedTxHashes.size() != 0)
+        /* Transactions that are in a block - don't need to do anything,
+           when we get to the block they will be processed and unlocked. */
+        std::unordered_set<Crypto::Hash> transactionsInBlock;
+
+        /* Transactions that the daemon doesn't know about - returned to
+           our wallet for timeout or other reason */
+        std::unordered_set<Crypto::Hash> cancelledTransactions;
+
+        /* Get the status of the locked transactions */
+        bool success = m_daemon->getTransactionsStatus(
+            lockedTxHashes, transactionsInPool, transactionsInBlock,
+            cancelledTransactions
+        );
+
+        /* Couldn't get info from the daemon, try again later */
+        if (!success)
         {
-            /* Transactions that are in the pool - we'll query these again
-               next time to see if they have moved */
-            std::unordered_set<Crypto::Hash> transactionsInPool;
-
-            /* Transactions that are in a block - don't need to do anything,
-               when we get to the block they will be processed and unlocked. */
-            std::unordered_set<Crypto::Hash> transactionsInBlock;
-
-            /* Transactions that the daemon doesn't know about - returned to
-               our wallet for timeout or other reason */
-            std::unordered_set<Crypto::Hash> cancelledTransactions;
-
-            /* Get the status of the locked transactions */
-            bool success = m_daemon->getTransactionsStatus(
-                lockedTxHashes, transactionsInPool, transactionsInBlock,
-                cancelledTransactions
-            );
-
-            /* Couldn't get info from the daemon, try again later */
-            if (!success)
-            {
-                Utilities::sleepUnlessStopping(std::chrono::seconds(15), m_shouldStop);
-
-                continue;
-            }
-
-            /* If some transactions have been cancelled, remove them, and their
-               inputs */
-            if (cancelledTransactions.size() != 0)
-            {
-                m_subWallets->removeCancelledTransactions(cancelledTransactions);
-            }
+            return;
         }
 
-        /* Sleep for 15 seconds, unless we're exiting */
-        Utilities::sleepUnlessStopping(std::chrono::seconds(15), m_shouldStop);
+        /* If some transactions have been cancelled, remove them, and their
+           inputs */
+        if (cancelledTransactions.size() != 0)
+        {
+            m_subWallets->removeCancelledTransactions(cancelledTransactions);
+        }
     }
 }
 
@@ -573,8 +559,6 @@ void WalletSynchronizer::start()
 {
     /* Reinit any vars which may have changed if we previously called stop() */
     m_shouldStop = false;
-
-    m_hasPoolWatcherThreadLaunched = false;
 
     if (m_daemon == nullptr)
     {
@@ -593,12 +577,6 @@ void WalletSynchronizer::stop()
     if (m_syncThread.joinable())
     {
         m_syncThread.join();
-    }
-	
-    /* Wait for the pool watcher thread to finish (if applicable) */
-    if (m_poolWatcherThread.joinable())
-    {
-        m_poolWatcherThread.join();
     }
 }
 
@@ -643,11 +621,8 @@ void WalletSynchronizer::swapNode(const std::shared_ptr<Nigel> daemon)
 void WalletSynchronizer::fromJSON(const JSONObject &j)
 {
     m_syncStatus.fromJSON(getObjectFromJSON(j, "transactionSynchronizerStatus"));
-
     m_startTimestamp = getUint64FromJSON(j, "startTimestamp");
-
     m_startHeight = getUint64FromJSON(j, "startHeight");
-
     m_privateViewKey.fromString(getStringFromJSON(j, "privateViewKey"));
 }
 

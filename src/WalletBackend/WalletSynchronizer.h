@@ -135,7 +135,7 @@ class WalletSynchronizer
 
         void removeForkedTransactions(const uint64_t forkHeight);
 
-        void monitorLockedTransactions();
+        void checkLockedTransactions();
 
         //////////////////////////////
         /* Private member variables */
@@ -143,9 +143,6 @@ class WalletSynchronizer
 
         /* The thread ID of the block downloader thread */
         std::thread m_syncThread;
-
-        /* The thread ID of the pool watcher thread */
-        std::thread m_poolWatcherThread;
 
         /* An atomic bool to signal if we should stop the sync thread */
         std::atomic<bool> m_shouldStop;
@@ -166,8 +163,4 @@ class WalletSynchronizer
 
         /* The daemon connection */
         std::shared_ptr<Nigel> m_daemon;
-
-        /* Have we launched the pool watcher thread yet (we launched it when
-           synced) */
-        bool m_hasPoolWatcherThreadLaunched = false;
 };
