@@ -210,11 +210,9 @@ void ApiDispatcher::start()
 {
     if (!m_server.listen(m_host, m_port))
     {
-      std::ostringstream oss;
-      oss << "Could not bind service to " << m_host << ":" << m_port 
-          << std::endl << "Is another service using this address and port?";
-      std::cout << std::endl << oss.str() << std::endl << std::endl;
-      throw std::runtime_error(oss.str());
+      std::cout << "Could not bind service to " << m_host << ":" << m_port 
+                << "\nIs another service using this address and port?\n";
+      exit(1);
     }
 }
 
