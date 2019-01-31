@@ -18,7 +18,11 @@ namespace WalletTypes
     struct KeyOutput
     {
         Crypto::PublicKey key;
+
         uint64_t amount;
+
+        /* Daemon doesn't supply this, blockchain cache api does. */
+        std::optional<uint64_t> globalOutputIndex;
     };
 
     /* A coinbase transaction (i.e., a miner reward, there is one of these in
@@ -96,7 +100,7 @@ namespace WalletTypes
         uint64_t transactionIndex;
 
         /* The index of this output in the 'DB' */
-        uint64_t globalOutputIndex;
+        std::optional<uint64_t> globalOutputIndex;
 
         /* The transaction key we took from the key outputs */
         Crypto::PublicKey key;
@@ -141,7 +145,7 @@ namespace WalletTypes
             writer.Uint(transactionIndex);
 
             writer.Key("globalOutputIndex");
-            writer.Uint(globalOutputIndex);
+            writer.Uint(globalOutputIndex.value_or(0));
 
             writer.Key("key");
             key.toJSON(writer);

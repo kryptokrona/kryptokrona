@@ -436,37 +436,34 @@ void storeUnconfirmedIncomingInputs(
         txPublicKey, subWallets->getPrivateViewKey(), derivation
     );
 
-    for (size_t outputIndex = 0; outputIndex < keyOutputs.size(); outputIndex++)
+    uint64_t outputIndex = 0;
+
+    for (const auto output : keyOutputs)
     {
         Crypto::PublicKey spendKey;
 
         /* Not our output */
-        if (!Crypto::underive_public_key(
-            derivation, outputIndex, keyOutputs[outputIndex].key, spendKey))
-        {
-            continue;
-        }
+        Crypto::underive_public_key(derivation, outputIndex, output.key, spendKey);
 
         const auto spendKeys = subWallets->m_publicSpendKeys;
 
         /* See if the derived spend key is one of ours */
         const auto it = std::find(spendKeys.begin(), spendKeys.end(), spendKey);
 
-        /* Doesn't belong to us */
-        if (it == spendKeys.end())
+        if (it != spendKeys.end())
         {
-            continue;
+            Crypto::PublicKey ourSpendKey = *it;
+
+            WalletTypes::UnconfirmedInput input;
+
+            input.amount = keyOutputs[outputIndex].amount;
+            input.key = keyOutputs[outputIndex].key;
+            input.parentTransactionHash = txHash;
+
+            subWallets->storeUnconfirmedIncomingInput(input, ourSpendKey);
         }
 
-        Crypto::PublicKey ourSpendKey = *it;
-
-        WalletTypes::UnconfirmedInput input;
-
-        input.amount = keyOutputs[outputIndex].amount;
-        input.key = keyOutputs[outputIndex].key;
-        input.parentTransactionHash = txHash;
-
-        subWallets->storeUnconfirmedIncomingInput(input, ourSpendKey);
+        outputIndex++;
     }
 }
 
@@ -700,7 +697,7 @@ std::tuple<Error, std::vector<WalletTypes::ObscuredInput>> prepareRingParticipan
     for (const auto walletAmount : sources)
     {
         WalletTypes::GlobalIndexKey realOutput {
-            walletAmount.input.globalOutputIndex,
+            walletAmount.input.globalOutputIndex.value(),
             walletAmount.input.key
         };
 

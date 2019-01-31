@@ -382,8 +382,7 @@ void SubWallets::addTransaction(const WalletTypes::Transaction tx)
 Crypto::KeyImage SubWallets::getTxInputKeyImage(
     const Crypto::PublicKey publicSpendKey,
     const Crypto::KeyDerivation derivation,
-    const size_t outputIndex,
-    const WalletTypes::TransactionInput input)
+    const size_t outputIndex) const
 {
     std::scoped_lock lock(m_mutex);
 
@@ -394,7 +393,7 @@ Crypto::KeyImage SubWallets::getTxInputKeyImage(
     {
         /* If we have a view wallet, don't attempt to derive the key image */
         return it->second.getTxInputKeyImage(
-            derivation, outputIndex, input, m_isViewWallet
+            derivation, outputIndex, m_isViewWallet
         );
     }
 

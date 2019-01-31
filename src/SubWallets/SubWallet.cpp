@@ -59,8 +59,7 @@ SubWallet::SubWallet(
 Crypto::KeyImage SubWallet::getTxInputKeyImage(
     const Crypto::KeyDerivation derivation,
     const size_t outputIndex,
-    WalletTypes::TransactionInput input,
-    const bool isViewWallet)
+    const bool isViewWallet) const
 {
     /* Can't create a key image with a view wallet - but we still store the
        input so we can calculate the balance */
