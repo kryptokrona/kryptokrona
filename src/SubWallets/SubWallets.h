@@ -111,6 +111,9 @@ class SubWallets
         /* Gets all the addresses in the subwallets container */
         std::vector<std::string> getAddresses() const;
 
+        /* Gets the number of wallets in the container */
+        uint64_t getWalletCount() const;
+
         /* Get the sum of the balance of the subwallets pointed to. If
            takeFromAll, get the total balance from all subwallets. */
         std::tuple<uint64_t, uint64_t> getBalance(
