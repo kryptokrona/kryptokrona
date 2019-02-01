@@ -129,28 +129,28 @@ namespace WalletTypes
             keyImage.toJSON(writer);
 
             writer.Key("amount");
-            writer.Uint(amount);
+            writer.Uint64(amount);
 
             writer.Key("blockHeight");
-            writer.Uint(blockHeight);
+            writer.Uint64(blockHeight);
 
             writer.Key("transactionPublicKey");
             transactionPublicKey.toJSON(writer);
 
             writer.Key("transactionIndex");
-            writer.Uint(transactionIndex);
+            writer.Uint64(transactionIndex);
 
             writer.Key("globalOutputIndex");
-            writer.Uint(globalOutputIndex);
+            writer.Uint64(globalOutputIndex);
 
             writer.Key("key");
             key.toJSON(writer);
 
             writer.Key("spendHeight");
-            writer.Uint(spendHeight);
+            writer.Uint64(spendHeight);
 
             writer.Key("unlockTime");
-            writer.Uint(unlockTime);
+            writer.Uint64(unlockTime);
 
             writer.Key("parentTransactionHash");
             parentTransactionHash.toJSON(writer);
@@ -346,7 +346,7 @@ namespace WalletTypes
                     publicKey.toJSON(writer);
 
                     writer.Key("amount");
-                    writer.Int(amount);
+                    writer.Int64(amount);
 
                     writer.EndObject();
                 }
@@ -356,19 +356,19 @@ namespace WalletTypes
                 hash.toJSON(writer);
 
                 writer.Key("fee");
-                writer.Uint(fee);
+                writer.Uint64(fee);
 
                 writer.Key("blockHeight");
-                writer.Uint(blockHeight);
+                writer.Uint64(blockHeight);
 
                 writer.Key("timestamp");
-                writer.Uint(timestamp);
+                writer.Uint64(timestamp);
 
                 writer.Key("paymentID");
                 writer.String(paymentID);
 
                 writer.Key("unlockTime");
-                writer.Uint(unlockTime);
+                writer.Uint64(unlockTime);
 
                 writer.Key("isCoinbaseTransaction");
                 writer.Bool(isCoinbaseTransaction);
@@ -435,7 +435,7 @@ namespace WalletTypes
             writer.StartObject();
 
             writer.Key("amount");
-            writer.Uint(amount);
+            writer.Uint64(amount);
 
             writer.Key("key");
             key.toJSON(writer);
