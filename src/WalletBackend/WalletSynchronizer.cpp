@@ -634,10 +634,10 @@ void WalletSynchronizer::toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writ
     m_syncStatus.toJSON(writer);
 
     writer.Key("startTimestamp");
-    writer.Uint(m_startTimestamp);
+    writer.Uint64(m_startTimestamp);
 
     writer.Key("startHeight");
-    writer.Uint(m_startHeight);
+    writer.Uint64(m_startHeight);
 
     writer.Key("privateViewKey");
     m_privateViewKey.toJSON(writer);

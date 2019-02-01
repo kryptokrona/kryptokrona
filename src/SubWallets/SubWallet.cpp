@@ -466,7 +466,7 @@ void SubWallet::toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
     writer.String(m_address);
 
     writer.Key("syncStartTimestamp");
-    writer.Uint(m_syncStartTimestamp);
+    writer.Uint64(m_syncStartTimestamp);
 
     writer.Key("unspentInputs");
     writer.StartArray();
@@ -493,7 +493,7 @@ void SubWallet::toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
     writer.EndArray();
 
     writer.Key("syncStartHeight");
-    writer.Uint(m_syncStartHeight);
+    writer.Uint64(m_syncStartHeight);
 
     writer.Key("isPrimaryAddress");
     writer.Bool(m_isPrimaryAddress);

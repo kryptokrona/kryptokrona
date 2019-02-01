@@ -128,7 +128,7 @@ void SynchronizationStatus::toJSON(rapidjson::Writer<rapidjson::StringBuffer> &w
     writer.EndArray();
 
     writer.Key("lastKnownBlockHeight");
-    writer.Uint(m_lastKnownBlockHeight);
+    writer.Uint64(m_lastKnownBlockHeight);
 
     writer.EndObject();
 }
