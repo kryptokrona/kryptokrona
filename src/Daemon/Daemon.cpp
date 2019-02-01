@@ -14,6 +14,7 @@
 #include "Common/StdInputStream.h"
 #include "Common/PathTools.h"
 #include "Common/Util.h"
+#include "Common/FileSystemShim.h"
 #include "crypto/hash.h"
 #include "CryptoNoteCore/CryptoNoteTools.h"
 #include "CryptoNoteCore/Core.h"
@@ -37,6 +38,12 @@
 #include <io.h>
 #else
 #include <unistd.h>
+#endif
+
+#ifdef _WIN32
+const char NATIVE_PATH_SEPARATOR = '\\';
+#else
+const char NATIVE_PATH_SEPARATOR = '/';
 #endif
 
 using Common::JsonValue;
@@ -186,8 +193,9 @@ int main(int argc, char* argv[])
 
   try
   {
-    auto modulePath = Common::NativePathToGeneric(argv[0]);
-    auto cfgLogFile = Common::NativePathToGeneric(config.logFile);
+    std::string cwdPath = fs::current_path().string() + NATIVE_PATH_SEPARATOR;
+    auto modulePath = Common::NativePathToGeneric(cwdPath + argv[0]);
+    auto cfgLogFile = config.logFile;
 
     if (cfgLogFile.empty()) {
       cfgLogFile = Common::ReplaceExtenstion(modulePath, ".log");
@@ -204,7 +212,7 @@ int main(int argc, char* argv[])
 
     logger(INFO, BRIGHT_GREEN) << getProjectCLIHeader() << std::endl;
 
-    logger(INFO) << "Program Working Directory: " << argv[0];
+    logger(INFO) << "Program Working Directory: " << Common::NativePathToGeneric(cwdPath + "");
 
     //create objects and link them
     CryptoNote::CurrencyBuilder currencyBuilder(logManager);
