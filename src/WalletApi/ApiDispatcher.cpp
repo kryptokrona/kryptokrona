@@ -959,7 +959,8 @@ std::tuple<Error, uint16_t> ApiDispatcher::getStatus(
         {"networkBlockCount", status.networkBlockCount},
         {"peerCount", status.peerCount},
         {"hashrate", status.lastKnownHashrate},
-        {"isViewWallet", m_walletBackend->isViewWallet()}
+        {"isViewWallet", m_walletBackend->isViewWallet()},
+        {"subWalletCount", m_walletBackend->getWalletCount()}
     };
 
     res.set_content(j.dump(4) + "\n", "application/json");

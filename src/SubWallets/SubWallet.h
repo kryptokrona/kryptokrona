@@ -58,8 +58,7 @@ class SubWallet
         Crypto::KeyImage getTxInputKeyImage( 
             const Crypto::KeyDerivation derivation,
             const size_t outputIndex,
-            WalletTypes::TransactionInput,
-            const bool isViewWallet);
+            const bool isViewWallet) const;
         
         /* Store a transaction input */
         void storeTransactionInput(
