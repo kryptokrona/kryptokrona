@@ -77,8 +77,7 @@ class SubWallets
         Crypto::KeyImage getTxInputKeyImage(
             const Crypto::PublicKey publicSpendKey,
             const Crypto::KeyDerivation derivation,
-            const size_t outputIndex,
-            WalletTypes::TransactionInput input);
+            const size_t outputIndex) const;
 
         void storeTransactionInput(
             const Crypto::PublicKey publicSpendKey,
