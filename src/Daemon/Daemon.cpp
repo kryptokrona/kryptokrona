@@ -40,12 +40,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef _WIN32
-const char NATIVE_PATH_SEPARATOR = '\\';
-#else
-const char NATIVE_PATH_SEPARATOR = '/';
-#endif
-
 using Common::JsonValue;
 using namespace CryptoNote;
 using namespace Logging;
@@ -193,26 +187,26 @@ int main(int argc, char* argv[])
 
   try
   {
-    std::string cwdPath = fs::current_path().string() + NATIVE_PATH_SEPARATOR;
-    auto modulePath = Common::NativePathToGeneric(cwdPath + argv[0]);
-    auto cfgLogFile = config.logFile;
+    fs::path cwdPath = fs::current_path();
+    auto modulePath = cwdPath / argv[0];
+    auto cfgLogFile = fs::path(config.logFile);
 
     if (cfgLogFile.empty()) {
-      cfgLogFile = Common::ReplaceExtenstion(modulePath, ".log");
+      cfgLogFile = modulePath.replace_extension(".log");
     } else {
-      if (!Common::HasParentPath(cfgLogFile)) {
-  cfgLogFile = Common::CombinePath(Common::GetPathDirectory(modulePath), cfgLogFile);
+      if (!cfgLogFile.has_parent_path()) {
+        cfgLogFile = modulePath.parent_path() / cfgLogFile;
       }
     }
 
     Level cfgLogLevel = static_cast<Level>(static_cast<int>(Logging::ERROR) + config.logLevel);
 
     // configure logging
-    logManager->configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile));
+    logManager->configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile.string()));
 
     logger(INFO, BRIGHT_GREEN) << getProjectCLIHeader() << std::endl;
 
-    logger(INFO) << "Program Working Directory: " << Common::NativePathToGeneric(cwdPath + "");
+    logger(INFO) << "Program Working Directory: " << cwdPath;
 
     //create objects and link them
     CryptoNote::CurrencyBuilder currencyBuilder(logManager);
