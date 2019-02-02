@@ -111,7 +111,7 @@ JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
 int main(int argc, char* argv[])
 {
   fs::path temp = fs::path(argv[0]);
-  DaemonConfiguration config = initConfiguration(temp.filename().c_str());
+  DaemonConfiguration config = initConfiguration(temp.filename().string().c_str());
 
 #ifdef WIN32
   _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
