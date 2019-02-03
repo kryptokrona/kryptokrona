@@ -97,7 +97,8 @@ void WalletSynchronizer::mainLoop()
         if (blocks.empty())
         {
             /* If we're synced, check any transactions that may be in the pool */
-            if (getCurrentScanHeight() >= m_daemon->localDaemonBlockCount())
+            if (getCurrentScanHeight() >= m_daemon->localDaemonBlockCount() &&
+                !m_subWallets->isViewWallet())
             {
                 checkLockedTransactions();
             }
