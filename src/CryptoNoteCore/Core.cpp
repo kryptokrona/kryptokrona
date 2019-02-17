@@ -577,6 +577,7 @@ bool Core::getWalletSyncData(
     const std::vector<Crypto::Hash> &knownBlockHashes,
     const uint64_t startHeight,
     const uint64_t startTimestamp,
+    const uint64_t blockCount,
     std::vector<WalletTypes::WalletBlockInfo> &walletBlocks) const
 {
     throwIfNotInitialized();
@@ -587,6 +588,12 @@ bool Core::getWalletSyncData(
 
         /* Current height */
         uint64_t currentIndex = mainChain->getTopBlockIndex();
+
+        uint64_t actualBlockCount = std::min(BLOCKS_SYNCHRONIZING_DEFAULT_COUNT, blockCount);
+
+        if (actualBlockCount == 0) {
+            actualBlockCount = BLOCKS_SYNCHRONIZING_DEFAULT_COUNT;
+        }
 
         auto [success, timestampBlockHeight] = mainChain->getBlockHeightForTimestamp(startTimestamp);
 
@@ -625,19 +632,16 @@ bool Core::getWalletSyncData(
         /* Difference between the start and end */
         uint64_t blockDifference = currentIndex - startIndex;
 
-        /* Sync BLOCKS_SYNCHRONIZING_DEFAULT_COUNT or the amount of blocks between
+        /* Sync actualBlockCount or the amount of blocks between
            start and end, whichever is smaller */
-        uint64_t endIndex = std::min(
-            static_cast<uint64_t>(BLOCKS_SYNCHRONIZING_DEFAULT_COUNT),
-            blockDifference + 1
-        ) + startIndex;
+        uint64_t endIndex = std::min(actualBlockCount, blockDifference + 1) + startIndex;
 
-        /* MAYBE THE DAMN THING CAN WORK */
         logger(Logging::DEBUGGING)
             << "\n\n"
             << "\n============================================="
             << "\n========= GetWalletSyncData summary ========="
             << "\n* Known block hashes size: " << knownBlockHashes.size()
+            << "\n* Blocks requested: " << actualBlockCount
             << "\n* Start height: " << startHeight
             << "\n* Start timestamp: " << startTimestamp
             << "\n* Current index: " << currentIndex
