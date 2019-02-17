@@ -591,7 +591,7 @@ bool Core::getWalletSyncData(
 
         uint64_t actualBlockCount = std::min(BLOCKS_SYNCHRONIZING_DEFAULT_COUNT, blockCount);
 
-        if (actualBlockCount <= 0) {
+        if (actualBlockCount == 0) {
             actualBlockCount = BLOCKS_SYNCHRONIZING_DEFAULT_COUNT;
         }
 
