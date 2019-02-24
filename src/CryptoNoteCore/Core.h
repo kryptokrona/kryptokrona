@@ -191,7 +191,19 @@ private:
 
   uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
   size_t calculateCumulativeBlocksizeLimit(uint32_t height) const;
-  void fillBlockTemplate(BlockTemplate& block, size_t medianSize, size_t maxCumulativeSize, size_t& transactionsSize, uint64_t& fee) const;
+
+  bool validateBlockTemplateTransaction(
+    const CachedTransaction &cachedTransaction,
+    const uint64_t blockHeight) const;
+
+  void fillBlockTemplate(
+    BlockTemplate& block,
+    const size_t medianSize,
+    const size_t maxCumulativeSize,
+    const uint64_t height,
+    size_t& transactionsSize,
+    uint64_t& fee) const;
+
   void deleteAlternativeChains();
   void deleteLeaf(size_t leafIndex);
   void mergeMainChainSegments();
