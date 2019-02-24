@@ -1805,6 +1805,14 @@ std::error_code Core::validateSemantic(const Transaction& transaction, uint64_t&
     return error::TransactionValidationError::EMPTY_INPUTS;
   }
 
+  if (blockIndex >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2_HEIGHT)
+  {
+      if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
+      {
+          return error::TransactionValidationError::EXTRA_TOO_LARGE;
+      }
+  }
+
   uint64_t summaryOutputAmount = 0;
   for (const auto& output : transaction.outputs) {
     if (output.amount == 0) {
