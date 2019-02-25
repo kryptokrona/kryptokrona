@@ -1437,6 +1437,15 @@ bool Core::isTransactionValidForPool(const CachedTransaction& cachedTransaction,
       return false;
   }
 
+  if (cachedTransaction.getTransaction().extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
+  {
+      logger(Logging::TRACE) << "Not adding transaction "
+                             << cachedTransaction.getTransactionHash()
+                             << " to pool, extra too large.";
+
+      return false;
+  }
+
   uint64_t fee;
 
   if (auto validationResult = validateTransaction(cachedTransaction, validatorState, chainsLeaves[0], fee, getTopBlockIndex())) {
@@ -2376,15 +2385,12 @@ bool Core::validateBlockTemplateTransaction(
 {
     const auto &transaction = cachedTransaction.getTransaction();
 
-    if (blockHeight >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2_HEIGHT)
+    if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
     {
-        if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
-        {
-            logger(Logging::TRACE) << "Not adding transaction "
-                                   << cachedTransaction.getTransactionHash()
-                                   << " to block template, extra too large.";
-            return false;
-        }
+        logger(Logging::TRACE) << "Not adding transaction "
+                               << cachedTransaction.getTransactionHash()
+                               << " to block template, extra too large.";
+        return false;
     }
 
     auto [success, error] = Mixins::validate({cachedTransaction}, blockHeight);
