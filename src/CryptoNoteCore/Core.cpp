@@ -2427,6 +2427,7 @@ void Core::fillBlockTemplate(
 
     if (!validateBlockTemplateTransaction(transaction, height))
     {
+        transactionPool->removeTransaction(transaction.getTransactionHash());
         continue;
     }
 
@@ -2446,6 +2447,7 @@ void Core::fillBlockTemplate(
 
     if (!validateBlockTemplateTransaction(cachedTransaction, height))
     {
+        transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
         continue;
     }
 
