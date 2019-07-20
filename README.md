@@ -1,4 +1,4 @@
-![image](https://kryptokrona.se/wp-content/uploads/2019/07/kkrlogo.png)
+![image](https://kryptokrona.se/wp-content/uploads/2019/07/xkr-logo-black-text.png)
 
 ### Installing
 
