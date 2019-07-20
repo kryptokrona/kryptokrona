@@ -1,4 +1,4 @@
-![image](https://user-images.githubusercontent.com/3246908/56092551-c47f0780-5ebd-11e9-84b1-858abee26512.png)
+![image](https://kryptokrona.se/wp-content/uploads/2019/07/kkrlogo.png)
 
 ### Installing
 
