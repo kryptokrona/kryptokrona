@@ -13,7 +13,7 @@ namespace WalletConfig
     const std::string_view addressPrefix = "SEKR";
 
     /* Your coins 'Ticker', e.g. Monero = XMR, Bitcoin = BTC */
-    const std::string ticker = "KKR";
+    const std::string ticker = "XKR";
 
     /* The filename to output the CSV to in save_csv */
     const std::string csvFilename = "transactions.csv";
@@ -26,7 +26,7 @@ namespace WalletConfig
     const std::string daemonName = "kryptokronad";
 
     /* The name to call this wallet */
-    const std::string walletName = "kkrwallet";
+    const std::string walletName = "xkrwallet";
 
     /* The name of service/walletd, the programmatic rpc interface to a
        wallet */
