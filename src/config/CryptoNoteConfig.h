@@ -257,8 +257,8 @@ const uint64_t DATABASE_READ_BUFFER_MB_DEFAULT_SIZE          = 10;
 const uint32_t DATABASE_DEFAULT_MAX_OPEN_FILES               = 100;
 const uint16_t DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT     = 2;
 
-const char     LATEST_VERSION_URL[]                          = "https://github.com/fruktstav/Kryptokrona";
-const std::string LICENSE_URL                                = "https://github.com/fruktstav/Kryptokrona/blob/master/LICENSE";
+const char     LATEST_VERSION_URL[]                          = "https://github.com/kryptokrona/kryptokrona";
+const std::string LICENSE_URL                                = "https://github.com/kryptokrona/kryptokrona/blob/master/LICENSE";
 const static   boost::uuids::uuid CRYPTONOTE_NETWORK         =
 {
     {  0xf1, 0x4b, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc  }

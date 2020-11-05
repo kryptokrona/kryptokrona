@@ -3,20 +3,29 @@
 //
 // Please see the included LICENSE file for more information.
 
+#include <boost/format.hpp>
+
+#include <ctime>
+
+#include <CryptoNoteCore/Core.h>
+#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
+#include <CryptoNoteCore/Currency.h>
+
+#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
+
+#include <Daemon/DaemonCommandsHandler.h>
+
+#include <P2p/NetNode.h>
+
+#include <Rpc/JsonRpc.h>
+
+#include <Serialization/SerializationTools.h>
+
+#include <Utilities/FormatTools.h>
+#include <Utilities/ColouredMsg.h>
+
 #include "version.h"
 
-#include <boost/format.hpp>
-#include <cryptonotecore/Core.h>
-#include <cryptonotecore/CryptoNoteFormatUtils.h>
-#include <cryptonotecore/Currency.h>
-#include <cryptonoteprotocol/CryptoNoteProtocolHandler.h>
-#include <ctime>
-#include <daemon/DaemonCommandsHandler.h>
-#include <p2p/NetNode.h>
-#include <rpc/JsonRpc.h>
-#include <serialization/SerializationTools.h>
-#include <utilities/ColouredMsg.h>
-#include <utilities/FormatTools.h>
 
 namespace
 {
