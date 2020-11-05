@@ -83,7 +83,7 @@ const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1  = 10000;
 const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_CURRENT = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE;
 const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE        = 600;
 
-const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 2;
+const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 5;
 
 const uint64_t MINIMUM_FEE                                   = UINT64_C(10);
 
@@ -257,15 +257,16 @@ const uint64_t DATABASE_READ_BUFFER_MB_DEFAULT_SIZE          = 10;
 const uint32_t DATABASE_DEFAULT_MAX_OPEN_FILES               = 100;
 const uint16_t DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT     = 2;
 
-const char     LATEST_VERSION_URL[]                          = "https://github.com/fruktstav/Kryptokrona";
-const std::string LICENSE_URL                                = "https://github.com/fruktstav/Kryptokrona/blob/master/LICENSE";
+const char     LATEST_VERSION_URL[]                          = "https://github.com/kryptokrona/kryptokrona";
+const std::string LICENSE_URL                                = "https://github.com/kryptokrona/kryptokrona/blob/master/LICENSE";
 const static   boost::uuids::uuid CRYPTONOTE_NETWORK         =
 {
     {  0xf1, 0x4b, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc  }
 };
 
 const char* const SEED_NODES[] = {
-  "188.151.21.1:11897"//frukt
+  "68.183.214.93:11897",//pool1
+  "5.9.250.93:11897"//techy
 
 };
 } // CryptoNote
