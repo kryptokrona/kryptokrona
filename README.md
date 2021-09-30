@@ -1,5 +1,9 @@
 ![image](https://camo.githubusercontent.com/f5d34152294d08caedf05224685b39b6b8d695b0/68747470733a2f2f692e696d6775722e636f6d2f304e6a654548552e706e67)
 
+#Munin Update Proposal
+
+This branch includes propsed changes to the kryptokrona nodes. The purpose of these changes is to make Hugin Messenger infinitely more scalable by storing Hugin messages only in the transaction pool. After a fixed time (proposed time is 3 days), messages are removed from the nodes memory pool.  Regular transactions are treated just like before.
+
 ### Installing
 
 We offer binary images of the latest releases here: http://latest.kryptokrona.se
