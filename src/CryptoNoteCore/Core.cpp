@@ -7,7 +7,8 @@
 #include <algorithm>
 
 #include <numeric>
-
+#include<iostream>
+#include<ctime>
 #include <Common/ShuffleGenerator.h>
 #include <Common/Math.h>
 #include <Common/MemoryInputStream.h>
@@ -1391,7 +1392,7 @@ bool Core::getGlobalIndexesForRange(
                 getBinaryArrayHash(toBinaryArray(block.baseTransaction))
             );
         }
-        
+
         indexes = mainChain->getGlobalIndexes(transactionHashes);
 
         return true;
@@ -1449,7 +1450,7 @@ bool Core::isTransactionValidForPool(const CachedTransaction& cachedTransaction,
       return false;
   }
 
-  if (cachedTransaction.getTransaction().extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
+  if (cachedTransaction.getTransaction().extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_POOL)
   {
       logger(Logging::TRACE) << "Not adding transaction "
                              << cachedTransaction.getTransactionHash()
@@ -2397,13 +2398,14 @@ bool Core::validateBlockTemplateTransaction(
 {
     const auto &transaction = cachedTransaction.getTransaction();
 
-    if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
+    if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_BLOCK)
     {
         logger(Logging::TRACE) << "Not adding transaction "
                                << cachedTransaction.getTransactionHash()
                                << " to block template, extra too large.";
         return false;
     }
+
 
     auto [success, error] = Mixins::validate({cachedTransaction}, blockHeight);
 
@@ -2445,8 +2447,21 @@ void Core::fillBlockTemplate(
 
     if (!validateBlockTemplateTransaction(transaction, height))
     {
-        transactionPool->removeTransaction(transaction.getTransactionHash());
-        continue;
+
+          std::time_t currentTime = std::time(0);
+          uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(transaction.getTransactionHash());
+
+          logger(Logging::INFO) << "Transaction age is "
+                                 << transactionAge;
+
+          if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+          {
+            logger(Logging::INFO) << "Removing.. ";
+            transactionPool->removeTransaction(transaction.getTransactionHash());
+
+          }
+
+          continue;
     }
 
     if (!spentInputsChecker.haveSpentInputs(transaction.getTransaction())) {
@@ -2465,8 +2480,21 @@ void Core::fillBlockTemplate(
 
     if (!validateBlockTemplateTransaction(cachedTransaction, height))
     {
+      std::time_t currentTime = std::time(0);
+      uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
+
+      logger(Logging::INFO) << "Transaction age is "
+                             << transactionAge;
+
+      if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+      {
+        logger(Logging::INFO) << "Removing.. ";
+
         transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
-        continue;
+
+      }
+
+      continue;
     }
 
     if (!spentInputsChecker.haveSpentInputs(cachedTransaction.getTransaction())) {
@@ -2920,4 +2948,3 @@ std::time_t Core::getStartTime() const
 }
 
 }
-
