@@ -2066,6 +2066,8 @@ void Core::initRootSegment() {
 
   contextGroup.spawn(std::bind(&Core::transactionPoolCleaningProcedure, this));
 
+  contextGroup.spawn(std::bind(&Core::huginCleaningProcedure, this));
+
   updateBlockMedianSize();
 
   chainsLeaves[0]->load();
@@ -2916,15 +2918,90 @@ void Core::transactionPoolCleaningProcedure() {
     for (;;) {
       timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
 
+
+      logger(Logging::INFO) << "Running pool transaction cleaning sequence.. "
+                             << " ";
+
       auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
+
+            logger(Logging::INFO) << "Got some bad transactions.. "
+                                   << " ";
       notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
     }
+  } catch (System::InterruptedException&) {
+    logger(Logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
+  } catch (std::exception& e) {
+    logger(Logging::INFO) << "Error occurred while cleaning transactions pool: " << e.what();
+  }
+}
+
+
+void Core::huginCleaningProcedure() {
+  System::Timer timer(dispatcher);
+
+  try {
+    for (;;) {
+      timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
+
+      logger(Logging::INFO) << "Running Hugin cleaner sequence.. "
+                             << " ";
+
+      std::vector<CachedTransaction> poolTransactions = transactionPool->getPoolTransactions();
+      for (const auto& cachedTransaction : poolTransactions) {
+        logger(Logging::INFO) << "Found transaction.. "
+        << " ";
+
+
+      logger(Logging::INFO) << "Checking transaction "
+                             << cachedTransaction.getTransactionHash();
+
+          uint64_t height = getTopBlockIndex() + 1;
+
+
+                              logger(Logging::INFO) << "Height is "
+                                                     << height;
+
+      if (!validateBlockTemplateTransaction(cachedTransaction, height))
+      {
+
+            logger(Logging::INFO) << "tx is invalid "
+                                   << cachedTransaction.getTransactionHash();
+
+
+            std::time_t currentTime = std::time(0);
+
+
+            logger(Logging::INFO) << "Current time is "
+                                   << currentTime;
+
+            uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
+
+            logger(Logging::INFO) << "Transaction age is "
+                                   << transactionAge;
+
+            if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+            {
+              logger(Logging::INFO) << "Removing.. ";
+              transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
+
+            }
+
+            continue;
+      }
+
+    }
+
+      // auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
+      // notifyObservers(ma>keDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
+    }
+
   } catch (System::InterruptedException&) {
     logger(Logging::DEBUGGING) << "transactionPoolCleaningProcedure has been interrupted";
   } catch (std::exception& e) {
     logger(Logging::ERROR) << "Error occurred while cleaning transactions pool: " << e.what();
   }
 }
+
 
 void Core::updateBlockMedianSize() {
   auto mainChain = chainsLeaves[0];

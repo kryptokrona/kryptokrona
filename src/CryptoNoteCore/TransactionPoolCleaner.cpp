@@ -76,14 +76,18 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t heig
     uint64_t currentTime = timeProvider->now();
     auto transactionHashes = transactionPool->getTransactionHashes();
 
+
     std::vector<Crypto::Hash> deletedTransactions;
     for (const auto& hash: transactionHashes) {
+      logger(Logging::INFO) << "Checking transaction " << Common::podToHex(hash);
       uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
       if (transactionAge >= timeout) {
-        logger(Logging::DEBUGGING) << "Deleting transaction " << Common::podToHex(hash) << " from pool";
+        logger(Logging::INFO) << "Deleting transaction " << Common::podToHex(hash) << " from pool";
         recentlyDeletedTransactions.emplace(hash, currentTime);
         transactionPool->removeTransaction(hash);
         deletedTransactions.emplace_back(std::move(hash));
+      } else {
+        logger(Logging::INFO) << "Transaction " << Common::podToHex(hash) << " is cool";
       }
 
       CachedTransaction transaction = transactionPool->getTransaction(hash);
@@ -94,7 +98,7 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t heig
 
       if (!success)
       {
-        logger(Logging::DEBUGGING) << "Deleting invalid transaction " << Common::podToHex(hash) << " from pool." <<
+        logger(Logging::INFO) << "Deleting invalid transaction " << Common::podToHex(hash) << " from pool." <<
           error;
         recentlyDeletedTransactions.emplace(hash, currentTime);
         transactionPool->removeTransaction(hash);
