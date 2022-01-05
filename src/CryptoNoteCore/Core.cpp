@@ -42,6 +42,9 @@
 
 #include <WalletTypes.h>
 
+#include <string>
+#include "../../include/json.hpp"
+
 using namespace Crypto;
 
 namespace CryptoNote {
@@ -3023,5 +3026,30 @@ std::time_t Core::getStartTime() const
 {
   return start_time;
 }
+
+
+std::string ascii;
+
+std::string hex2ascii(string hex){
+   for (size_t i = 0; i < hex.length(); i += 2){
+      //taking two characters from hex string
+      std::string part = hex.substr(i, 2);
+      //changing it into base 16
+      char ch = stoul(part, nullptr, 16);
+      //putting it into the ASCII string
+      ascii += ch;
+   }
+   return ascii;
+}
+
+int Translator() {
+  try {
+   auto data = json::parse(ascii);
+   }
+   catch (json::parse_error& ex) {
+      return;
+  }
+}
+
 
 }
