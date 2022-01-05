@@ -42,10 +42,9 @@
 
 #include <WalletTypes.h>
 
-#include <string>
-#include "../../include/json.hpp"
-
 using namespace Crypto;
+
+using json = nlohmann::json;
 
 namespace CryptoNote {
 
