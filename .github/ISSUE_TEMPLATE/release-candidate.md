@@ -20,7 +20,7 @@ Binaries for Testing:
 - [ ] `Version.h.in` updated to correct semver value
 - [ ] Release Notes Prepared (<!-- link to proposed copy of release notes -->)
 
-### TurtleCoind Tests
+### kryptokronad Tests
 - Daemon connects to local DB
   - [ ] Windows
   - [ ] Linux

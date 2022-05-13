@@ -664,7 +664,7 @@ bool Core::getWalletSyncData(
 
         std::vector<RawBlock> rawBlocks = mainChain->getBlocksByHeight(startIndex, endIndex);
 
-        for (const auto rawBlock : rawBlocks)
+        for (const auto& rawBlock : rawBlocks)
         {
             BlockTemplate block;
 
@@ -1377,9 +1377,9 @@ bool Core::getGlobalIndexesForRange(
 
         std::vector<Crypto::Hash> transactionHashes;
 
-        for (const auto rawBlock : mainChain->getBlocksByHeight(startHeight, endHeight))
+        for (const auto& rawBlock : mainChain->getBlocksByHeight(startHeight, endHeight))
         {
-            for (const auto transaction : rawBlock.transactions)
+            for (const auto& transaction : rawBlock.transactions)
             {
                 transactionHashes.push_back(getBinaryArrayHash(transaction));
             }
@@ -2924,7 +2924,7 @@ void Core::transactionPoolCleaningProcedure() {
 
       auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
 
-            logger(Logging::INFO) << "Got some bad transactions.. "
+      logger(Logging::INFO) << "Got some bad transactions.. "
                                    << " ";
       notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
     }
