@@ -1,0 +1,3 @@
+SHELL=/bin/sh
+*/2 * * * * /usr/src/kryptokrona/build/src/miner --daemon-address 172.10.1.1:20000 --address SEKReYwbPp2NBcX5TxYoxrDhPdzPa7kXaXFVW6WqoNTaEkk8CAqM4HCRzkyKtMR2czK1Bma5w5HBM2xHtCb1zwfp9TSS2UitA67 --threads 1 --limit 10 2> /var/log/cron.log 2>&1
+*/5 * * * * killall /usr/src/kryptokrona/build/src/miner 2> /var/log/cron.log 2>&1

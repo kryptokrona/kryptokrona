@@ -36,7 +36,7 @@ Please insert your default verbosity CMake output here
 
 ### Issue Report
 
-**Binary Reported:** <!-- does this issue affect zedwallet, TurtleCoind, turtle-service, miner? -->
+**Binary Reported:** <!-- does this issue affect zedwallet, kryptokronad, turtle-service, miner? -->
 
 #### Expected Behavior
 

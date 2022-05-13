@@ -490,7 +490,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
     std::vector<WalletTypes::TxInputAndOwner> inputsToUse;
 
     /* Loop through each input */
-    for (const auto walletAmount : availableInputs)
+    for (const auto& walletAmount : availableInputs)
     {
         /* Add each input */
         inputsToUse.push_back(walletAmount);
@@ -576,7 +576,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
        requirements */
     std::vector<std::vector<WalletTypes::TxInputAndOwner>> fullBuckets;
 
-    for (const auto [amount, bucket] : buckets)
+    for (const auto &[amount, bucket] : buckets)
     {
         /* Skip the buckets with not enough items */
         if (bucket.size() >= CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
@@ -599,7 +599,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
     /* Otherwise just use all buckets */
     else
     {
-        for (const auto [amount, bucket] : buckets)
+        for (const auto &[amount, bucket] : buckets)
         {
             bucketsToTakeFrom.push_back(bucket);
         }
@@ -611,7 +611,7 @@ std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
 
     /* Loop through each bucket (Remember we're only looping through one if
        we've got a full bucket) */
-    for (const auto bucket : bucketsToTakeFrom)
+    for (const auto& bucket : bucketsToTakeFrom)
     {
         /* Loop through each input in this bucket */
         for (const auto &walletAmount : bucket)
@@ -656,7 +656,7 @@ std::vector<std::string> SubWallets::getAddresses() const
 {
     std::vector<std::string> addresses;
 
-    for (const auto [pubKey, subWallet] : m_subWallets)
+    for (const auto &[pubKey, subWallet] : m_subWallets)
     {
         addresses.push_back(subWallet.address());
     }
@@ -809,7 +809,7 @@ std::unordered_set<Crypto::Hash> SubWallets::getLockedTransactionsHashes() const
 
     std::unordered_set<Crypto::Hash> result;
 
-    for (const auto transaction : m_lockedTransactions)
+    for (const auto& transaction : m_lockedTransactions)
     {
         result.insert(transaction.hash);
     }
@@ -848,7 +848,7 @@ std::vector<Crypto::SecretKey> SubWallets::getPrivateSpendKeys() const
 {
     std::vector<Crypto::SecretKey> spendKeys;
 
-    for (const auto [pubKey, subWallet] : m_subWallets)
+    for (const auto &[pubKey, subWallet] : m_subWallets)
     {
         spendKeys.push_back(subWallet.privateSpendKey());
     }

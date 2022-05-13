@@ -20,6 +20,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <unordered_set>
 
 #include "Common/StreamTools.h"

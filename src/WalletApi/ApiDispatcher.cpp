@@ -616,7 +616,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedTransaction(
 
     std::vector<std::pair<std::string, uint64_t>> destinations;
 
-    for (const auto destination : destinationsJSON)
+    for (const auto& destination : destinationsJSON)
     {
         const std::string address = tryGetJsonValue<std::string>(destination, "address");
         const uint64_t amount = tryGetJsonValue<uint64_t>(destination, "amount");
@@ -1351,7 +1351,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionDetails(
 
     Common::podFromHex(hashStr, hash.data);
 
-    for (const auto tx : m_walletBackend->getTransactions())
+    for (const auto& tx : m_walletBackend->getTransactions())
     {
         if (tx.hash == hash)
         {
@@ -1419,7 +1419,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getBalances(
 
     nlohmann::json j;
 
-    for (const auto [address, unlocked, locked] : balances)
+    for (const auto& [address, unlocked, locked] : balances)
     {
         j.push_back({
             {"address", address},

@@ -94,7 +94,7 @@ void WalletSynchronizer::mainLoop()
     {
         const auto blocks = downloadBlocks();
 
-        for (const auto block : blocks)
+        for (const auto& block : blocks)
         {
             if (m_shouldStop)
             {
@@ -220,7 +220,7 @@ std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> Wallet
         inputs.insert(inputs.end(), newInputs.begin(), newInputs.end());
     }
 
-    for (const auto tx : block.transactions)
+    for (const auto& tx : block.transactions)
     {
         const auto newInputs = processTransactionOutputs(tx, block.blockHeight);
 
@@ -274,20 +274,20 @@ void WalletSynchronizer::processBlock(const WalletTypes::WalletBlockInfo &block)
 
     BlockScanTmpInfo blockScanInfo = processBlockTransactions(block, ourInputs);
 
-    for (const auto tx : blockScanInfo.transactionsToAdd)
+    for (const auto& tx : blockScanInfo.transactionsToAdd)
     {
         m_subWallets->addTransaction(tx);
         m_eventHandler->onTransaction.fire(tx);
     }
 
-    for (const auto [publicKey, input] : blockScanInfo.inputsToAdd)
+    for (const auto &[publicKey, input] : blockScanInfo.inputsToAdd)
     {
         m_subWallets->storeTransactionInput(publicKey, input);
     }
 
     /* The input has been spent, discard the key image so we
        don't double spend it */
-    for (const auto [publicKey, keyImage] : blockScanInfo.keyImagesToMarkSpent)
+    for (const auto &[publicKey, keyImage] : blockScanInfo.keyImagesToMarkSpent)
     {
         m_subWallets->markInputAsSpent(keyImage, publicKey, block.blockHeight);
     }
@@ -319,7 +319,7 @@ BlockScanTmpInfo WalletSynchronizer::processBlockTransactions(
         }
     }
 
-    for (const auto rawTX : block.transactions)
+    for (const auto& rawTX : block.transactions)
     {
         const auto [tx, keyImagesToMarkSpent] = processTransaction(
             block, inputs, rawTX
@@ -396,7 +396,7 @@ std::tuple<std::optional<WalletTypes::Transaction>, std::vector<std::tuple<Crypt
 
     std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>> spentKeyImages;
 
-    for (const auto input : tx.keyInputs)
+    for (const auto& input : tx.keyInputs)
     {
         const auto [found, publicSpendKey] = m_subWallets->getKeyImageOwner(
             input.keyImage
@@ -413,12 +413,12 @@ std::tuple<std::optional<WalletTypes::Transaction>, std::vector<std::tuple<Crypt
     {
         uint64_t fee = 0;
 
-        for (const auto input : tx.keyInputs)
+        for (const auto& input : tx.keyInputs)
         {
             fee += input.amount;
         }
 
-        for (const auto output : tx.keyOutputs)
+        for (const auto& output : tx.keyOutputs)
         {
             fee -= output.amount;
         }

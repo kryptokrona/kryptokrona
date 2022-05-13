@@ -17,6 +17,7 @@
 
 #include "TcpConnection.h"
 
+#include <stdexcept>
 #include <arpa/inet.h>
 #include <cassert>
 #include <sys/epoll.h>

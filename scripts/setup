@@ -57,7 +57,7 @@ ls -al
 # zip file just in case.
 echo -e "\n\n\n== COMPRESSING BINARIES"
 wget https://raw.githubusercontent.com/turtlecoin/turtlecoin/development/LICENSE
-zip turtlecoin-dev-bin-$(date +%F)-linux.zip miner LICENSE zedwallet TurtleCoind turtle-service
+zip turtlecoin-dev-bin-$(date +%F)-linux.zip miner LICENSE zedwallet kryptokronad turtle-service
 
 # Create directories to keep always-up-to-date binaries for 
 # TRTL Network files. Ideally, your bashrc has aliases to run
@@ -73,11 +73,11 @@ cd ~/Binaries
 # Remove the files that are already there just in case.
 rm ~/.Crypto/TurtleCoin/miner
 rm ~/.Crypto/TurtleCoin/zedwallet
-rm ~/.Crypto/TurtleCoin/TurtleCoind
+rm ~/.Crypto/TurtleCoin/kryptokronad
 rm ~/.Crypto/TurtleCoin/turtle-service
 cp miner ~/.Crypto/TurtleCoin/miner
 cp zedwallet ~/.Crypto/TurtleCoin/zedwallet
-cp TurtleCoind ~/.Crypto/TurtleCoin/TurtleCoind
+cp kryptokronad ~/.Crypto/TurtleCoin/kryptokronad
 cp turtle-service ~/.Crypto/TurtleCoin/turtle-service
 
 
