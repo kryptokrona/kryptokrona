@@ -27,7 +27,8 @@ RUN apt-get update && \
       libboost-regex1.74.0 \
       libboost-serialization1.74.0 \
       libboost-program-options1.74.0 \
-      libicu70
+      libicu70 \ 
+      p7zip-full
 
 # create the build directory
 RUN mkdir build

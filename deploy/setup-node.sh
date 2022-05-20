@@ -29,6 +29,12 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 # clone kryptokrona repository
 git clone https://github.com/kryptokrona/kryptokrona.git
 
+# download existing blocks from blockchain to speed up the sync process
+curl http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-20220426.7z --output bootstrap.7z
+
+# extract files
+7za e bootstrap.7z
+
 # build docker image
 (cd ./kryptokrona/deploy && docker build -t kryptokrona-node .)
 
@@ -36,4 +42,4 @@ git clone https://github.com/kryptokrona/kryptokrona.git
 docker create network kryptokrona
 
 # run the docker container
-docker run -p 20000:20000 kryptokrona-node 
+docker run -p 20000:20000 --volume=./:/usr/src/kryptokrona/build/src/blockloc kryptokrona-node 
