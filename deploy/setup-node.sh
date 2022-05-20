@@ -2,7 +2,7 @@
 # this file is intended of setting up a kryptokrona node on a vps
 # copy this file to your vps and make it executable
 
-# update
+# update headers
 sudo apt-get update
 
 # installing dependencies

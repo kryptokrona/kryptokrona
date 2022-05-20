@@ -1,4 +1,4 @@
-![image](https://camo.githubusercontent.com/f5d34152294d08caedf05224685b39b6b8d695b0/68747470733a2f2f692e696d6775722e636f6d2f304e6a654548552e706e67)
+![image](https://user-images.githubusercontent.com/36674091/169624229-5d071dea-bf48-49d2-86f3-6e7b1126e38d.png)
 
 # Munin Update Proposal
 
@@ -336,7 +336,7 @@ Hi kryptokrona contributor, thanks for forking and sending back Pull Requests. E
 ```
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c) 2018-19, The TurtleCoin Developers
+// Copyright (c) 2018-2019, The TurtleCoin Developers
 // Copyright (c) 2019, Kryptokrona
 //
 // Please see the included LICENSE file for more information.
