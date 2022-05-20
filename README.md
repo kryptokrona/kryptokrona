@@ -324,7 +324,15 @@ Now we will remove networks, volumes, images and containers existing on our syst
 
 ## Deploy node
 
-...
+To deploy, login to your VPS and copy the file in `deploy/setup-node.sh` to it and make it executable by:
+
+- `sudo chmod +x setup-node.sh`
+
+Now run the file:
+
+- `./setup-node.sh`
+
+Now this script will take care of basically everything. Just sit back and relax and grab a ☕.
 
 ## Thanks
 Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community
