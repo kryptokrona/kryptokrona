@@ -322,6 +322,10 @@ When we want to do a full cleanup on our system with Docker we can start the scr
 
 Now we will remove networks, volumes, images and containers existing on our system. If you after removing everything want to start again. Just use the file `setup-testnet.sh` again.
 
+## Deploy node
+
+...
+
 ## Thanks
 Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community
 
