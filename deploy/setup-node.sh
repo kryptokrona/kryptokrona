@@ -85,7 +85,7 @@ docker network create kryptokrona
 echo ""
 echo "###### RUNNING DOCKER CONTAINER ######"
 echo ""
-docker run -p 20000:20000 --volume=$CURRENT_DIR/boostrap/.kryptokrona:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona kryptokrona/kryptokrona-node 
+docker run -d -p 20000:20000 --volume=$CURRENT_DIR/boostrap/.kryptokrona:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona kryptokrona/kryptokrona-node 
 
 echo ""
 echo "###### SETTING UP NGINX AND LET'S ENCRYPT ######"
