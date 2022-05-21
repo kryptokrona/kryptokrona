@@ -55,7 +55,40 @@ docker run -p 20000:20000 --volume=./:/usr/src/kryptokrona/build/src/blockloc kr
 # setup nginx and let's encrypt
 
 # Setup configuration file
-sudo cp $CURRENT_DIR/kryptokrona/deploy/kryptokrona $NGINX_PROJECT_DIR/kryptokrona
+sudo tee -a $DOMAIN > /dev/null <<EOT
+server {
+    root                /var/www/html;
+
+    index               index.html index.htm index.nginx-debian.html;
+    server_name         $DOMAIN;
+    include             /etc/nginx/mime.types; 
+
+    location / {
+        proxy_pass http://127.0.0.1:20000;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+
+server {
+    if (\$host = $DOMAIN) {
+        return 301 https://\$host\$request_uri;
+    }
+
+    listen              80;
+    listen              [::]:80;
+    server_name         $DOMAIN;
+    return              404;
+}
+EOT
+
+sudo cp $CURRENT_DIR/$DOMAIN $NGINX_PROJECT_DIR/$DOMAIN
 
 # Setup and configure Certbot
 sudo certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m $EMAIL
+
+# reload and restart nginx
+sudo systemctl reload nginx
+sudo systemctl restart nginx
