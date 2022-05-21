@@ -324,9 +324,18 @@ Now we will remove networks, volumes, images and containers existing on our syst
 
 ## Deploy node
 
+Before you start you should have set a DNS record of type A to the IP address of your VPS. Then you should use this domain in the shell file below.
+
 To deploy, login to your VPS and copy the file in `deploy/setup-node.sh` to it and make it executable by:
 
 - `sudo chmod +x setup-node.sh`
+
+Edit the two constant values to your values:
+
+```sh
+DOMAIN="example.com"
+EMAIL="foo@bar.com"
+```
 
 Now run the file:
 
