@@ -35,11 +35,11 @@ RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
 
 # build and install
-RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc)
+RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc) --ignore-errors
 
 # create the directory for the daemon files (this can perhaps be removed since we use the volume flag while starting the docker container, but untested!)
 RUN mkdir -p src/blockloc
 
 EXPOSE 20000
 
-CMD [ "sh", "./src/kryptokronad --data-dir src/blockloc --p2p-bind-ip 127.0.0.1 --rpc-bind-ip 127.0.0.1 --hide-my-port" ]
+CMD [ "sh", "/usr/src/kryptokrona/build/src/kryptokronad --data-dir /usr/src/kryptokrona/build/src/blockloc --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0 --hide-my-port" ]
