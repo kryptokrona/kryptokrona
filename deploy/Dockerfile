@@ -37,7 +37,7 @@ WORKDIR /usr/src/kryptokrona/build
 # build and install
 RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc)
 
-# create the directory for the daemon files
+# create the directory for the daemon files (this can perhaps be removed since we use the volume flag while starting the docker container, but untested!)
 RUN mkdir -p src/blockloc
 
 EXPOSE 20000
