@@ -3,7 +3,7 @@
 
 FROM ubuntu:22.04
 
-COPY ../ /usr/src/kryptokrona
+COPY . /usr/src/kryptokrona
 WORKDIR /usr/src/kryptokrona
 
 # install build dependencies
