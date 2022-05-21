@@ -59,7 +59,7 @@ echo "###### DOWNLOADING EXISTING BLOCKS FROM BOOTSTRAP ######"
 echo ""
 if [ -f "bootstrap.7z" ]; then
     echo "bootstrap.7z exists. No need to download. Skipping..."
-else if [ -d "bootstrap" ]; then
+elif [ -d "bootstrap" ]; then
     echo "boostrap directory exists. No need to extract it. Skipping..."
 else
     curl http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-20220426.7z --output bootstrap.7z
