@@ -58,21 +58,23 @@ echo ""
 echo "###### DOWNLOADING EXISTING BLOCKS FROM BOOTSTRAP ######"
 echo ""
 if [ -f "bootstrap.7z" ]; then
-    echo "bootstrap.7z exists. Skipping..."
+    echo "bootstrap.7z exists. No need to download. Skipping..."
+else if [ -d "bootstrap" ]; then
+    echo "boostrap directory exists. No need to extract it. Skipping..."
 else
     curl http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-20220426.7z --output bootstrap.7z
 
     echo ""
     echo "###### EXTRACING BOOSTRAP ######"
     echo ""
-    7za e bootstrap.7z
+    7za x bootstrap.7z -o./bootstrap
 fi
 
 echo ""
 echo "###### BULDING DOCKER IMAGE ######"
 echo ""
 (cd ./kryptokrona && git checkout docker-prod) # remove this line after when finished
-(cd ./kryptokrona && docker build -f ./deploy/Dockerfile -t kryptokrona-node .)
+(cd ./kryptokrona && docker build -f ./deploy/Dockerfile -t kryptokrona/kryptokrona-node .)
 
 echo ""
 echo "###### CREATING DOCKER NETWORK ######"
@@ -82,7 +84,7 @@ docker create network kryptokrona
 echo ""
 echo "###### RUNNING DOCKER CONTAINER ######"
 echo ""
-docker run -p 20000:20000 --volume=./:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona kryptokrona-node 
+docker run -p 20000:20000 --volume=$CURRENT_DIR/boostrap/.kryptokrona:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona kryptokrona/kryptokrona-node 
 
 echo ""
 echo "###### SETTING UP NGINX AND LET'S ENCRYPT ######"
