@@ -50,6 +50,7 @@ echo "###### CLONE KRYPTOKRONA REPOSITORY ######"
 echo ""
 if [ -f "kryptokrona" ]; then
     echo "kryptokrona repository exists. Skipping..."
+    (cd kryptokrona && git pull)
 else
     git clone https://github.com/kryptokrona/kryptokrona.git
 fi
@@ -79,7 +80,7 @@ echo ""
 echo ""
 echo "###### CREATING DOCKER NETWORK ######"
 echo ""
-docker create network kryptokrona
+docker network create kryptokrona
 
 echo ""
 echo "###### RUNNING DOCKER CONTAINER ######"
