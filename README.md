@@ -1,4 +1,4 @@
-![image](https://camo.githubusercontent.com/f5d34152294d08caedf05224685b39b6b8d695b0/68747470733a2f2f692e696d6775722e636f6d2f304e6a654548552e706e67)
+![image](https://user-images.githubusercontent.com/36674091/169624229-5d071dea-bf48-49d2-86f3-6e7b1126e38d.png)
 
 # Munin Update Proposal
 
@@ -322,6 +322,27 @@ When we want to do a full cleanup on our system with Docker we can start the scr
 
 Now we will remove networks, volumes, images and containers existing on our system. If you after removing everything want to start again. Just use the file `setup-testnet.sh` again.
 
+## Deploy node
+
+Before you start you should have set a DNS record of type A to the IP address of your VPS. Then you should use this domain in the shell file below.
+
+To deploy, login to your VPS and copy the file in `deploy/setup-node.sh` to it and make it executable by:
+
+- `sudo chmod +x setup-node.sh`
+
+Edit the two constant values to your values:
+
+```sh
+DOMAIN="example.com"
+EMAIL="foo@bar.com"
+```
+
+Now run the file:
+
+- `./setup-node.sh`
+
+Now this script will take care of basically everything. Just sit back and relax and grab a ☕.
+
 ## Thanks
 Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community
 
@@ -332,7 +353,7 @@ Hi kryptokrona contributor, thanks for forking and sending back Pull Requests. E
 ```
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c) 2018-19, The TurtleCoin Developers
+// Copyright (c) 2018-2019, The TurtleCoin Developers
 // Copyright (c) 2019, Kryptokrona
 //
 // Please see the included LICENSE file for more information.
