@@ -203,7 +203,7 @@ std::tuple<Error, Crypto::Hash> sendFusionTransactionAdvanced(
     subWallets->storeTxPrivateKey(txKeyPair.secretKey, txHash);
 
     /* Lock the input for spending till it is confirmed as spent in a block */
-    for (const auto input : ourInputs)
+    for (const auto& input : ourInputs)
     {
         subWallets->markInputAsLocked(
             input.input.keyImage, input.publicSpendKey
@@ -384,7 +384,7 @@ std::tuple<Error, Crypto::Hash> sendTransactionAdvanced(
     subWallets->storeTxPrivateKey(txResult.txKeyPair.secretKey, txHash);
 
     /* Lock the input for spending till it is confirmed as spent in a block */
-    for (const auto input : ourInputs)
+    for (const auto& input : ourInputs)
     {
         subWallets->markInputAsLocked(
             input.input.keyImage, input.publicSpendKey
@@ -479,7 +479,7 @@ void storeSentTransaction(
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
     /* Loop through each input, and minus that from the transfers array */
-    for (const auto input : ourInputs)
+    for (const auto& input : ourInputs)
     {
         transfers[input.publicSpendKey] -= input.input.amount;
     }
@@ -540,7 +540,7 @@ std::vector<WalletTypes::TransactionDestination> setupDestinations(
 
     std::vector<WalletTypes::TransactionDestination> destinations;
 
-    for (const auto [address, amount] : addressesAndAmounts)
+    for (const auto &[address, amount] : addressesAndAmounts)
     {
         /* Grab the public keys from the receiver address */
         const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
@@ -694,7 +694,7 @@ std::tuple<Error, std::vector<WalletTypes::ObscuredInput>> prepareRingParticipan
 
     size_t i = 0;
 
-    for (const auto walletAmount : sources)
+    for (const auto& walletAmount : sources)
     {
         WalletTypes::GlobalIndexKey realOutput {
             walletAmount.input.globalOutputIndex.value(),
@@ -822,7 +822,7 @@ std::tuple<Error, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretK
 
     std::vector<Crypto::SecretKey> tmpSecretKeys;
 
-    for (const auto input : inputsAndFakes)
+    for (const auto& input : inputsAndFakes)
     {
         const auto [tmpKeyPair, keyImage] = genKeyImage(input, privateViewKey);
 
@@ -877,7 +877,7 @@ std::tuple<std::vector<WalletTypes::KeyOutput>, CryptoNote::KeyPair> setupOutput
 
     std::vector<WalletTypes::KeyOutput> outputs;
 
-    for (const auto destination : destinations)
+    for (const auto& destination : destinations)
     {
         Crypto::KeyDerivation derivation;
 
@@ -922,7 +922,7 @@ std::tuple<Error, CryptoNote::Transaction> generateRingSignatures(
     size_t i = 0;
     
     /* Add the transaction signatures */
-    for (const auto input : inputsAndFakes)
+    for (const auto& input : inputsAndFakes)
     {
         std::vector<Crypto::PublicKey> publicKeys;
 
@@ -952,7 +952,7 @@ std::tuple<Error, CryptoNote::Transaction> generateRingSignatures(
 
     i = 0;
 
-    for (const auto input: inputsAndFakes)
+    for (const auto& input: inputsAndFakes)
     {
         std::vector<Crypto::PublicKey> publicKeys;
 
@@ -1008,7 +1008,7 @@ std::vector<CryptoNote::TransactionInput> keyInputToTransactionInput(
 {
     std::vector<CryptoNote::TransactionInput> result;
 
-    for (const auto input : keyInputs)
+    for (const auto& input : keyInputs)
     {
         result.push_back(input);
     }
@@ -1125,7 +1125,7 @@ bool verifyAmounts(const CryptoNote::Transaction tx)
 
     /* Note - not verifying inputs as it's possible to have received inputs
        from another wallet which don't enforce this rule */
-    for (const auto output : tx.outputs)
+    for (const auto& output : tx.outputs)
     {
         amounts.push_back(output.amount);
     }
@@ -1155,12 +1155,12 @@ bool verifyTransactionFee(const uint64_t expectedFee, const CryptoNote::Transact
     uint64_t inputTotal = 0;
     uint64_t outputTotal = 0;
 
-    for (const auto input : tx.inputs)
+    for (const auto& input : tx.inputs)
     {
         inputTotal += boost::get<CryptoNote::KeyInput>(input).amount;
     }
 
-    for (const auto output : tx.outputs)
+    for (const auto& output : tx.outputs)
     {
         outputTotal += output.amount;
     }

@@ -6,6 +6,8 @@
 #include <zedwallet/GetInput.h>
 ///////////////////////////////
 
+#include <thread>
+
 #include "linenoise.hpp"
 
 #include <zedwallet/Sync.h>

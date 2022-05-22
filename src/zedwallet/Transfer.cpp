@@ -6,6 +6,8 @@
 #include <zedwallet/Transfer.h>
 ///////////////////////////////
 
+#include <thread>
+
 #include <Common/Base58.h>
 #include <Common/StringTools.h>
 

@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <limits>
 #include <Common/StreamTools.h>
 
 using namespace Common;

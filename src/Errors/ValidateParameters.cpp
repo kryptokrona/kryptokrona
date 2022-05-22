@@ -111,7 +111,7 @@ Error validateIntegratedAddresses(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     std::string paymentID)
 {
-    for (const auto [address, amount] : destinations)
+    for (const auto &[address, amount] : destinations)
     {
         if (address.length() != WalletConfig::integratedAddressLength)
         {
@@ -386,7 +386,7 @@ Error validateOurAddresses(
         return error;
     }
 
-    for (const auto address : addresses)
+    for (const auto& address : addresses)
     {
         const auto [spendKey, viewKey] = Utilities::addressToKeys(address);
 

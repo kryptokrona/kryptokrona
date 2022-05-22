@@ -1662,7 +1662,7 @@ std::unordered_map<Crypto::Hash, std::vector<uint64_t>> DatabaseBlockchainCache:
 
     std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
 
-    for (const auto [txHash, transaction] : txs)
+    for (const auto &[txHash, transaction] : txs)
     {
         indexes[txHash].assign(transaction.globalIndexes.begin(), transaction.globalIndexes.end());
     }

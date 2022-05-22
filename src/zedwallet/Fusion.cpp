@@ -6,6 +6,8 @@
 #include <zedwallet/Fusion.h>
 /////////////////////////////
 
+#include <thread>
+
 #include <config/CryptoNoteConfig.h>
 
 #include <Wallet/WalletGreen.h>
