@@ -6,6 +6,8 @@
 #include <zedwallet/Sync.h>
 ///////////////////////////
 
+#include <thread>
+
 #include <Common/StringTools.h>
 
 #include <Utilities/ColouredMsg.h>

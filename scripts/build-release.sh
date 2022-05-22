@@ -71,7 +71,7 @@ function generate_tarball()
     tar --transform "s,^,$RELEASE_NAME/," -c -f $TARBALL -z -C "$CLONE_DIR/build/release/src" \
         miner \
         zedwallet \
-        TurtleCoind \
+        kryptokronad \
         walletd
 
     generate_checksums $TARBALL

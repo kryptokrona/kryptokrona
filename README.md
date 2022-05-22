@@ -6,7 +6,7 @@ This branch includes propsed changes to the kryptokrona nodes. The purpose of th
 
 ### Installing
 
-We offer binary images of the latest releases here: http://latest.kryptokrona.se
+We offer binary images of the latest releases here: https://github.com/kryptokrona/kryptokrona/releases
 
 If you would like to compile yourself, read on.
 
@@ -20,19 +20,21 @@ You will need the following packages: boost, cmake (3.8 or higher), make, and gi
 
 You will also need either GCC/G++, or Clang.
 
-If you are using GCC, you will need GCC-7.0 or higher.
+If you are using GCC, you will need GCC-11.0 or higher.
 
 If you are using Clang, you will need Clang 6.0 or higher. You will also need libstdc++\-6.0 or higher.
 
 ##### Ubuntu, using GCC
 
+If you are using Ubuntu 22.04 LTS GCC11 and C++11 now comes as default and no need to install this.
+
 - `sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y`
 - `sudo apt-get update`
-- `sudo apt-get install aptitude -y`
-- `sudo aptitude install -y build-essential g++-8 gcc-8 git libboost-all-dev python-pip`
-- `sudo pip install cmake`
-- `export CC=gcc-8`
-- `export CXX=g++-8`
+- `sudo apt-get install aptitude python3-pip -y`
+- `sudo aptitude install -y build-essential g++-11 gcc-11 git libboost-all-dev`
+- `sudo pip3 install cmake`
+- `export CC=gcc-11`
+- `export CXX=g++-11`
 - `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
 - `cd kryptokrona`
 - `mkdir build`
@@ -105,6 +107,8 @@ The binaries will be in the `src` folder when you are complete.
 - Install XCode and Developer Tools.
 
 ##### Building
+
+If using M1 chip, switch gcc@8 to gcc@11 when installing through brew.
 
 - `which brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
 - `brew install --force cmake boost llvm gcc@8`
@@ -199,17 +203,137 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### Thanks
+## Setup testnet
+
+### Change config
+
+Before we start we just need to change slight a bit on the `CryptoNoteConfig.h` header file with some constants so we don't use our main net to test on.
+
+Open up `src/config/CryptoNoteConfig.h`
+
+Then we need to change the constants **P2P_DEFAULT_PORT** and **RPC_DEFAULT_PORT** to:
+
+```cpp
+const int      P2P_DEFAULT_PORT                              =  11898;
+const int      RPC_DEFAULT_PORT                              =  11899;
+```
+
+And put some different letter or number in one of these **CRYPTONOTE_NETWORK** uuids:
+
+```cpp
+const static   boost::uuids::uuid CRYPTONOTE_NETWORK         =
+{
+    {  0xf1, 0x4c, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc  }
+};
+```
+
+And also we need to comment out seed nodes:
+
+```cpp
+const char* const SEED_NODES[] = {
+  // "68.183.214.93:11897",//pool1
+  // "5.9.250.93:11898"//techy
+};
+```
+
+Now we are good to go to start with Docker. So if we want to setup our own testnet locally on our computer we will need to install Docker on our computer.
+
+### Install Docker 
+
+On Windows or Mac it's enough to install Docker Desktop and we will have everything we need in order to setup. For GNU/Linux however there is a slight different process. We are going through the steps for doing it on a Ubuntu distribution, it should work on all Debian derived distributions. Read below.
+
+Update our headers:
+
+```bash
+sudo apt-get update
+```
+
+Installing neccessary dependencies for Docker:
+
+```bash
+sudo apt-get -y install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+```
+
+Setting up the keyring:
+
+```bash
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
+
+Updating our sources.list for be able to download Docker:
+
+```bash
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+Installing Docker and Docker Compose:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
+```
+
+### Start the orchestration of Docker containers
+
+So now we have everything in place in order for us to build and orchestrate up a local testnet. We do not need to install all dependencies mentioned before this section of Docker on your computer. When we start the process of setting up the testnet we will build a Docker Image that installs everything for us automatically.
+
+So to start from scratch we will use the shell script `setup-testnet.sh` but before that we must make sure that all our shell scripts that we need are executable on our system. To make the shell scripts executable:
+
+```bash
+sudo chmod +x setup-testnet.sh \
+              remove-testnet.sh \
+              start-testnet.sh \
+              teardown-testnet.sh
+```
+
+To start:
+
+- `./setup-testnet.sh`
+
+So now the first time when starting the script it will take a while to compile and link all the files (around 15-20 minutes dependening on how powerful computer you have). So when it's done you will see a lot of output of the Daemons starting on three nodes. The miner do not have any output on the terminal.
+
+### Stop all Docker containers
+
+So all of these containers running will take up some memory and CPU usage on your system so it could be wise to stop these when not using them. To do that just run the shell script:
+
+- `./teardown-testnet.sh`
+
+This makes sure that we still have the image saved locally so we don't need to build it again when we will start it.
+
+### Start all Docker containers again
+
+Instead of using `setup-testnet.sh` file we will use the file `start-testnet.sh`:
+
+- `./start-testnet.sh`
+
+The difference here is that we will not build the image again and thus has to wait a while. Now this will only take seconds. And now we have our testnet up again!
+
+### Removing all data
+
+When we want to do a full cleanup on our system with Docker we can start the script `remove-testnet.sh`:
+
+- `./remove-testnet.sh`
+
+Now we will remove networks, volumes, images and containers existing on our system. If you after removing everything want to start again. Just use the file `setup-testnet.sh` again.
+
+## Thanks
 Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community
 
-### Copypasta for license when editing files
+## Copypasta for license when editing files
 
 Hi kryptokrona contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/CryptoNoteConfig.h](https://github.com/turtlecoin/turtlecoin/commit/28cfef2575f2d767f6e512f2a4017adbf44e610e) for an example.
 
 ```
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
-// Copyright (c) 2018, The TurtleCoin Developers
+// Copyright (c) 2018-19, The TurtleCoin Developers
+// Copyright (c) 2019, Kryptokrona
 //
 // Please see the included LICENSE file for more information.
 ```

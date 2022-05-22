@@ -325,7 +325,7 @@ void listAddressBook()
 
     size_t i = 1;
 
-    for (const auto entry : addressBook)
+    for (const auto& entry : addressBook)
     {
         std::cout << InformationMsg("Address Book Entry: ")
                   << InformationMsg(i) << InformationMsg(" | ")

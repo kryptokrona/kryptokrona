@@ -2,8 +2,8 @@
 #define STR(x) STR_HELPER(x)
 
 #define PROJECT_NAME "kryptokrona"
-#define PROJECT_SITE "http://www.kryptokrona.se"
-#define PROJECT_COPYRIGHT "Copyright 2019, kryptokrona.se"
+#define PROJECT_SITE "https://www.kryptokrona.org"
+#define PROJECT_COPYRIGHT "Copyright 2019, Kryptokrona"
 #define APP_VER_MAJOR 0
 #define APP_VER_MINOR 1
 #define APP_VER_REV 0

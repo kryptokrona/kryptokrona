@@ -1,82 +1,45 @@
-# daemon runs in the background
-# run something like tail /var/log/turtlecoind/current to see the status
-# be sure to run with volumes, ie:
-# docker run -v $(pwd)/turtlecoind:/var/lib/turtlecoind -v $(pwd)/wallet:/home/turtlecoin --rm -ti turtlecoin:0.2.2
-ARG base_image_version=0.10.0
-FROM phusion/baseimage:$base_image_version
+# this docker file can be used for both a daemon, miner and a wallet if needed
+# we only have to set specific command or entrypoint inside the docker compose
+# file to customize the behavior of the container when started.
 
-ADD https://github.com/just-containers/s6-overlay/releases/download/v1.21.2.2/s6-overlay-amd64.tar.gz /tmp/
-RUN tar xzf /tmp/s6-overlay-amd64.tar.gz -C /
+FROM ubuntu:22.04
 
-ADD https://github.com/just-containers/socklog-overlay/releases/download/v2.1.0-0/socklog-overlay-amd64.tar.gz /tmp/
-RUN tar xzf /tmp/socklog-overlay-amd64.tar.gz -C /
+COPY . /usr/src/kryptokrona
+WORKDIR /usr/src/kryptokrona
 
-ARG TURTLECOIN_BRANCH=master
-ENV TURTLECOIN_BRANCH=${TURTLECOIN_BRANCH}
+RUN chmod +x ./wait-for-it.sh ./docker-entrypoint.sh
 
 # install build dependencies
-# checkout the latest tag
-# build and install
 RUN apt-get update && \
     apt-get install -y \
       build-essential \
-      python-dev \
-      gcc-4.9 \
-      g++-4.9 \
-      git cmake \
-      libboost1.58-all-dev && \
-    git clone https://github.com/turtlecoin/turtlecoin.git /src/turtlecoin && \
-    cd /src/turtlecoin && \
-    git checkout $TURTLECOIN_BRANCH && \
-    mkdir build && \
-    cd build && \
-    cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++11" .. && \
-    make -j$(nproc) && \
-    mkdir -p /usr/local/bin && \
-    cp src/TurtleCoind /usr/local/bin/TurtleCoind && \
-    cp src/walletd /usr/local/bin/walletd && \
-    cp src/zedwallet /usr/local/bin/zedwallet && \
-    cp src/miner /usr/local/bin/miner && \
-    strip /usr/local/bin/TurtleCoind && \
-    strip /usr/local/bin/walletd && \
-    strip /usr/local/bin/zedwallet && \
-    strip /usr/local/bin/miner && \
-    cd / && \
-    rm -rf /src/turtlecoin && \
-    apt-get remove -y build-essential python-dev gcc-4.9 g++-4.9 git cmake libboost1.58-all-dev && \
-    apt-get autoremove -y && \
-    apt-get install -y  \
-      libboost-system1.58.0 \
-      libboost-filesystem1.58.0 \
-      libboost-thread1.58.0 \
-      libboost-date-time1.58.0 \
-      libboost-chrono1.58.0 \
-      libboost-regex1.58.0 \
-      libboost-serialization1.58.0 \
-      libboost-program-options1.58.0 \
-      libicu55
+      libssl-dev \
+      libffi-dev \
+      python3-dev \
+      gcc-11 \
+      g++-11 \
+      git \
+      cmake \
+      librocksdb-dev \
+      libboost-all-dev \
+      libboost-system1.74.0 \
+      libboost-filesystem1.74.0 \
+      libboost-thread1.74.0 \
+      libboost-date-time1.74.0 \
+      libboost-chrono1.74.0 \
+      libboost-regex1.74.0 \
+      libboost-serialization1.74.0 \
+      libboost-program-options1.74.0 \
+      libicu70 \
+      cron \
+      rpcbind
 
-# setup the turtlecoind service
-RUN useradd -r -s /usr/sbin/nologin -m -d /var/lib/turtlecoind turtlecoind && \
-    useradd -s /bin/bash -m -d /home/turtlecoin turtlecoin && \
-    mkdir -p /etc/services.d/turtlecoind/log && \
-    mkdir -p /var/log/turtlecoind && \
-    echo "#!/usr/bin/execlineb" > /etc/services.d/turtlecoind/run && \
-    echo "fdmove -c 2 1" >> /etc/services.d/turtlecoind/run && \
-    echo "cd /var/lib/turtlecoind" >> /etc/services.d/turtlecoind/run && \
-    echo "export HOME /var/lib/turtlecoind" >> /etc/services.d/turtlecoind/run && \
-    echo "s6-setuidgid turtlecoind /usr/local/bin/TurtleCoind" >> /etc/services.d/turtlecoind/run && \
-    chmod +x /etc/services.d/turtlecoind/run && \
-    chown nobody:nogroup /var/log/turtlecoind && \
-    echo "#!/usr/bin/execlineb" > /etc/services.d/turtlecoind/log/run && \
-    echo "s6-setuidgid nobody" >> /etc/services.d/turtlecoind/log/run && \
-    echo "s6-log -bp -- n20 s1000000 /var/log/turtlecoind" >> /etc/services.d/turtlecoind/log/run && \
-    chmod +x /etc/services.d/turtlecoind/log/run && \
-    echo "/var/lib/turtlecoind true turtlecoind 0644 0755" > /etc/fix-attrs.d/turtlecoind-home && \
-    echo "/home/turtlecoin true turtlecoin 0644 0755" > /etc/fix-attrs.d/turtlecoin-home && \
-    echo "/var/log/turtlecoind true nobody 0644 0755" > /etc/fix-attrs.d/turtlecoind-logs
+# create the build directory
+RUN mkdir build
+WORKDIR /usr/src/kryptokrona/build
 
-VOLUME ["/var/lib/turtlecoind", "/home/turtlecoin","/var/log/turtlecoind"]
+# build and install
+RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc)
 
-ENTRYPOINT ["/init"]
-CMD ["/usr/bin/execlineb", "-P", "-c", "emptyenv cd /home/turtlecoin export HOME /home/turtlecoin s6-setuidgid turtlecoin /bin/bash"]
+# create the directory for the daemon files
+RUN mkdir -p src/blockloc

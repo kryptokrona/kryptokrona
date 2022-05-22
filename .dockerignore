@@ -1,5 +1,8 @@
-
 build/
 .git/
+.gitignore
 README.md
 LICENSE
+docker-compose.yml
+Dockerfile
+setup-testnet.sh
