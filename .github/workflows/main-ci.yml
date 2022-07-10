@@ -1,0 +1,6 @@
+name: Kryptokrona Main Pipeline
+
+on:
+  push:
+    branches:
+      - master
