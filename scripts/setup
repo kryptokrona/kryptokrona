@@ -1,4 +1,4 @@
-# setup - pull a copy of turtlecoin-development 
+# setup - pull a copy of kryptokrona-development 
 # and put it inside a timestamped folder.
 # rock made this
 #!/usr/bin/env bash
@@ -23,8 +23,8 @@ cd ~/Source/
 # What's in the Source folder? Let's see.
 ls -al
 
-# Clone a copy of the TurtleCoin source code
-echo -e "\n\n\n== CLONING TurtleCoin in $sourcefolder"
+# Clone a copy of the Kryptokrona source code
+echo -e "\n\n\n== CLONING Kryptokrona in $sourcefolder"
 
 # By default we always push to the development branch, so if you 
 # want a nightly build, this is your best option. However, if you
@@ -32,7 +32,7 @@ echo -e "\n\n\n== CLONING TurtleCoin in $sourcefolder"
 # master branch instead, and it will get the source from the last
 # time that we merged development to master, which normally only
 # happens when we create a version release.
-git clone -b development https://github.com/turtlecoin/turtlecoin $sourcefolder
+git clone -b development https://github.com/kryptokrona/kryptokrona $sourcefolder
 cd $sourcefolder
 ls -al
 
@@ -47,7 +47,7 @@ ls -al
 # to use all of your cores to compile this, or if you get errors 
 # about not enough ram/swap, you can remove the -j`nproc` from 
 # the make command.
-echo -e "\n\n\n== BUILDING TurtleCoin"
+echo -e "\n\n\n== BUILDING Kryptokrona"
 cmake .. && make
 cd src
 ls -al
@@ -56,13 +56,13 @@ ls -al
 # distribution. We should also include the LICENSE file in this 
 # zip file just in case.
 echo -e "\n\n\n== COMPRESSING BINARIES"
-wget https://raw.githubusercontent.com/turtlecoin/turtlecoin/development/LICENSE
-zip turtlecoin-dev-bin-$(date +%F)-linux.zip miner LICENSE zedwallet kryptokronad turtle-service
+wget https://raw.githubusercontent.com/kryptokrona/kryptokrona/development/LICENSE
+zip kryptokrona-dev-bin-$(date +%F)-linux.zip miner LICENSE zedwallet kryptokronad turtle-service
 
 # Create directories to keep always-up-to-date binaries for 
 # TRTL Network files. Ideally, your bashrc has aliases to run
 # from this folder, or you can add it to your $PATH.
-mkdir -p ~/.Crypto/{Athena,TurtleCoin,Karai}
+mkdir -p ~/.Crypto/{Athena,Kryptokrona,Karai}
 mkdir ~/Binaries
 
 # Move the zip we created to the Binaries snapshot folder.
@@ -71,14 +71,14 @@ cd ~/Binaries
 
 # Copy the binaries to the folder we just created for them.
 # Remove the files that are already there just in case.
-rm ~/.Crypto/TurtleCoin/miner
-rm ~/.Crypto/TurtleCoin/zedwallet
-rm ~/.Crypto/TurtleCoin/kryptokronad
-rm ~/.Crypto/TurtleCoin/turtle-service
-cp miner ~/.Crypto/TurtleCoin/miner
-cp zedwallet ~/.Crypto/TurtleCoin/zedwallet
-cp kryptokronad ~/.Crypto/TurtleCoin/kryptokronad
-cp turtle-service ~/.Crypto/TurtleCoin/turtle-service
+rm ~/.Crypto/Kryptokrona/miner
+rm ~/.Crypto/Kryptokrona/zedwallet
+rm ~/.Crypto/Kryptokrona/kryptokronad
+rm ~/.Crypto/Kryptokrona/turtle-service
+cp miner ~/.Crypto/Kryptokrona/miner
+cp zedwallet ~/.Crypto/Kryptokrona/zedwallet
+cp kryptokronad ~/.Crypto/Kryptokrona/kryptokronad
+cp turtle-service ~/.Crypto/Kryptokrona/turtle-service
 
 
 
