@@ -1,20 +1,68 @@
-![image](https://user-images.githubusercontent.com/36674091/169624229-5d071dea-bf48-49d2-86f3-6e7b1126e38d.png)
+![Kryptokrona](kryptokrona.png)
 
-# Munin Update Proposal
+<p>
+  <a href="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml">
+      <img src="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml/badge.svg">
+  </a>
+</p>
 
-This branch includes propsed changes to the kryptokrona nodes. The purpose of these changes is to make Hugin Messenger infinitely more scalable by storing Hugin messages only in the transaction pool. After a fixed time (proposed time is 3 days), messages are removed from the nodes memory pool.  Regular transactions are treated just like before.
+Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, which forms the basis for Monero, among others. CryptoNote is a so-called “application layer” protocol further developed by TurtleCoin that enables things like: private transactions, messages and arbitrary data storage, completely decentralized.
 
-### Installing
+# Table of Contents
+
+- [Development Resources](#development-resources)
+- [Installation](#installation)
+  - [How To Compile](#how-to-compile)
+    - [Linux](#linux)
+      - [Prerequisites](#prerequisites)
+      - [Ubuntu, using GCC](#ubuntu-using-gcc)
+      - [Ubuntu, using Clang](#ubuntu-using-clang)
+      - [Generic Linux](#generic-linux)
+    - [OSX/Apple](#osxapple)
+      - [Using GCC](#using-gcc)
+      - [Prerequisites](#prerequisites-1)
+      - [Building](#building)
+    - [Using Clang](#using-clang)
+      - [Prerequisites](#prerequisites-2)
+      - [Building](#building-1)
+    - [Windows](#windows)
+      - [Prerequisites](#prerequisites-3)
+      - [Building](#building-2)
+    - [Raspberry Pi 3 B+ (AARCH64/ARM64)](#raspberry-pi-3-b-aarch64arm64)
+      - [Known working images](#known-working-images)
+      - [Building](#building-3)
+- [Setup testnet](#setup-testnet)
+  - [Change config](#change-config)
+  - [Install Docker](#install-docker)
+  - [Start the orchestration of Docker containers](#start-the-orchestration-of-docker-containers)
+  - [Stop all Docker containers](#stop-all-docker-containers)
+  - [Start all Docker containers again](#start-all-docker-containers-again)
+  - [Removing all data](#removing-all-data)
+- [Deploy node](#deploy-node)
+- [Thanks](#thanks)
+- [Copypasta for license when editing files](#copypasta-for-license-when-editing-files)
+  - [Contributors](#contributors)
+  - [License](#license)
+
+# Development Resources
+
+- Web: kryptokrona.org
+- Mail: mjovanc@protonmail.com
+- GitHub: https://github.com/kryptokrona
+- Hugin: projectdevelopment board on Hugin Messenger
+- It is HIGHLY recommended to join our board on Hugin Messenger if you want to contribute to stay up to date on what is happening on the project.
+
+# Installation
 
 We offer binary images of the latest releases here: https://github.com/kryptokrona/kryptokrona/releases
 
 If you would like to compile yourself, read on.
 
-### How To Compile
+## How To Compile
 
-#### Linux
+### Linux
 
-##### Prerequisites
+#### Prerequisites
 
 You will need the following packages: boost, cmake (3.8 or higher), make, and git.
 
@@ -24,7 +72,7 @@ If you are using GCC, you will need GCC-11.0 or higher.
 
 If you are using Clang, you will need Clang 6.0 or higher. You will also need libstdc++\-6.0 or higher.
 
-##### Ubuntu, using GCC
+#### Ubuntu, using GCC
 
 If you are using Ubuntu 22.04 LTS GCC11 and C++11 now comes as default and no need to install this.
 
@@ -47,41 +95,44 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-##### Ubuntu, using Clang
+#### Ubuntu, using Clang
 
 - `sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y`
 - `wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -`
 
 You need to modify the below command for your version of ubuntu - see https://apt.llvm.org/
 
-* Ubuntu 14.04 (Trusty)
-- `sudo add-apt-repository "deb https://apt.llvm.org/trusty/ llvm-toolchain-trusty 6.0 main"`
+- Ubuntu 14.04 (Trusty)
 
-* Ubuntu 16.04 (Xenial)
-- `sudo add-apt-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial 6.0 main"`
+* `sudo add-apt-repository "deb https://apt.llvm.org/trusty/ llvm-toolchain-trusty 6.0 main"`
 
-* Ubuntu 18.04 (Bionic)
-- `sudo add-apt-repository "deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic 6.0 main"`
+- Ubuntu 16.04 (Xenial)
 
-- `sudo apt-get update`
-- `sudo apt-get install aptitude -y`
-- `sudo aptitude install -y -o Aptitude::ProblemResolver::SolutionCost='100*canceled-actions,200*removals' build-essential clang-6.0 libstdc++-7-dev git libboost-all-dev python-pip`
-- `sudo pip install cmake`
-- `export CC=clang-6.0`
-- `export CXX=clang++-6.0`
-- `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
-- `cd kryptokrona`
-- `mkdir build`
-- `cd build`
-- `cmake ..`
-- `make`
+* `sudo add-apt-repository "deb https://apt.llvm.org/xenial/ llvm-toolchain-xenial 6.0 main"`
+
+- Ubuntu 18.04 (Bionic)
+
+* `sudo add-apt-repository "deb https://apt.llvm.org/bionic/ llvm-toolchain-bionic 6.0 main"`
+
+* `sudo apt-get update`
+* `sudo apt-get install aptitude -y`
+* `sudo aptitude install -y -o Aptitude::ProblemResolver::SolutionCost='100*canceled-actions,200*removals' build-essential clang-6.0 libstdc++-7-dev git libboost-all-dev python-pip`
+* `sudo pip install cmake`
+* `export CC=clang-6.0`
+* `export CXX=clang++-6.0`
+* `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
+* `cd kryptokrona`
+* `mkdir build`
+* `cd build`
+* `cmake ..`
+* `make`
 
 The binaries will be in the `src` folder when you are complete.
 
 - `cd src`
 - `./kryptokrona --version`
 
-##### Generic Linux
+#### Generic Linux
 
 Ensure you have the dependencies listed above.
 
@@ -100,11 +151,13 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### OSX/Apple, using GCC
+### OSX/Apple
 
-##### Prerequisites
+#### Prerequisites
 
 - Install XCode and Developer Tools.
+
+#### Using GCC
 
 ##### Building
 
@@ -126,11 +179,7 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### OSX/Apple, using Clang
-
-##### Prerequisites
-
-- Install XCode and Developer Tools.
+#### Using Clang
 
 ##### Building
 
@@ -150,16 +199,15 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
+### Windows
 
-#### Windows
-
-##### Prerequisites
+#### Prerequisites
 
 - Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall)
 - When installing Visual Studio, it is **required** that you install **Desktop development with C++**
 - Install the latest version of [Boost](https://bintray.com/boostorg/release/download_file?file_path=1.68.0%2Fbinaries%2Fboost_1_68_0-msvc-14.1-64.exe) - Currently Boost 1.68.
 
-##### Building
+#### Building
 
 - From the start menu, open 'x64 Native Tools Command Prompt for vs2017'.
 - `cd <your_kryptokrona_directory>`
@@ -178,10 +226,11 @@ The binaries will be in the `src/Release` folder when you are complete.
 - `cd Release`
 - `kryptokrona.exe --version`
 
-#### Raspberry Pi 3 B+ (AARCH64/ARM64)
+### Raspberry Pi 3 B+ (AARCH64/ARM64)
+
 The following images are known to work. Your operation system image **MUST** be 64 bit.
 
-##### Known working images
+#### Known working images
 
 - https://github.com/Crazyhead90/pi64/releases
 - https://fedoraproject.org/wiki/Architectures/ARM/Raspberry_Pi#aarch64_supported_images_for_Raspberry_Pi_3
@@ -189,7 +238,7 @@ The following images are known to work. Your operation system image **MUST** be 
 
 Once you have a 64 bit image installed, setup proceeds the same as any Linux distribution. Ensure you have at least 2GB of ram, or the build is likely to fail. You may need to setup swap space.
 
-##### Building
+#### Building
 
 - `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
 - `cd kryptokrona`
@@ -203,9 +252,9 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-## Setup testnet
+# Setup testnet
 
-### Change config
+## Change config
 
 Before we start we just need to change slight a bit on the `CryptoNoteConfig.h` header file with some constants so we don't use our main net to test on.
 
@@ -238,7 +287,7 @@ const char* const SEED_NODES[] = {
 
 Now we are good to go to start with Docker. So if we want to setup our own testnet locally on our computer we will need to install Docker on our computer.
 
-### Install Docker 
+## Install Docker
 
 On Windows or Mac it's enough to install Docker Desktop and we will have everything we need in order to setup. For GNU/Linux however there is a slight different process. We are going through the steps for doing it on a Ubuntu distribution, it should work on all Debian derived distributions. Read below.
 
@@ -279,7 +328,7 @@ sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
 ```
 
-### Start the orchestration of Docker containers
+## Start the orchestration of Docker containers
 
 So now we have everything in place in order for us to build and orchestrate up a local testnet. We do not need to install all dependencies mentioned before this section of Docker on your computer. When we start the process of setting up the testnet we will build a Docker Image that installs everything for us automatically.
 
@@ -298,7 +347,7 @@ To start:
 
 So now the first time when starting the script it will take a while to compile and link all the files (around 15-20 minutes dependening on how powerful computer you have). So when it's done you will see a lot of output of the Daemons starting on three nodes. The miner do not have any output on the terminal.
 
-### Stop all Docker containers
+## Stop all Docker containers
 
 So all of these containers running will take up some memory and CPU usage on your system so it could be wise to stop these when not using them. To do that just run the shell script:
 
@@ -306,7 +355,7 @@ So all of these containers running will take up some memory and CPU usage on you
 
 This makes sure that we still have the image saved locally so we don't need to build it again when we will start it.
 
-### Start all Docker containers again
+## Start all Docker containers again
 
 Instead of using `setup-testnet.sh` file we will use the file `start-testnet.sh`:
 
@@ -314,7 +363,7 @@ Instead of using `setup-testnet.sh` file we will use the file `start-testnet.sh`
 
 The difference here is that we will not build the image again and thus has to wait a while. Now this will only take seconds. And now we have our testnet up again!
 
-### Removing all data
+## Removing all data
 
 When we want to do a full cleanup on our system with Docker we can start the script `remove-testnet.sh`:
 
@@ -322,7 +371,7 @@ When we want to do a full cleanup on our system with Docker we can start the scr
 
 Now we will remove networks, volumes, images and containers existing on our system. If you after removing everything want to start again. Just use the file `setup-testnet.sh` again.
 
-## Deploy node
+# Deploy node
 
 Before you start you should have set a DNS record of type A to the IP address of your VPS. Then you should use this domain in the shell file below.
 
@@ -343,10 +392,11 @@ Now run the file:
 
 Now this script will take care of basically everything. Just sit back and relax and grab a ☕.
 
-## Thanks
+# Thanks
+
 Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community
 
-## Copypasta for license when editing files
+# Copypasta for license when editing files
 
 Hi kryptokrona contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/CryptoNoteConfig.h](https://github.com/turtlecoin/turtlecoin/commit/28cfef2575f2d767f6e512f2a4017adbf44e610e) for an example.
 
@@ -358,3 +408,15 @@ Hi kryptokrona contributor, thanks for forking and sending back Pull Requests. E
 //
 // Please see the included LICENSE file for more information.
 ```
+
+# Contributors
+
+The following contributors have either helped to start this project, have contributed
+code, are actively maintaining it (including documentation), or in other ways
+being awesome contributors to this project. **We'd like to take a moment to recognize them.**
+
+[<img src="https://github.com/mjovanc.png?size=72" alt="mjovanc" width="72">](https://github.com/mjovanc)
+
+# License
+
+The license is GPL-3.0 License.

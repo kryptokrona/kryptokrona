@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# by Ereptor, TurtleCoin
+# by Ereptor, Kryptokrona
 
 HASH=$1
 
