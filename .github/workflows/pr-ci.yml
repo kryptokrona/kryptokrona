@@ -46,5 +46,7 @@ jobs:
     - name: Create Build Dir
       run: mkdir build
     - name: CMake
-      run: (cd build && cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc) --ignore-errors)
+      run: (cd build && cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" ..)
+    - name: Make
+      run: (cd build && make -j$(nproc) --ignore-errors)
  

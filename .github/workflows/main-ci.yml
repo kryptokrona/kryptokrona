@@ -14,28 +14,28 @@ jobs:
     
     - name: Install General
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
+        apt-get update \
+        apt-get install -y build-essential libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-all-dev libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
     
-    - name: Cache Boost
-      uses: actions/cache@v1.0.3
-      id: cache-boost
-      with:
-        path: "~/boost"
-        key: libboost-all-dev
-    - name: Install Boost
-      env:
-        CACHE_HIT: ${{steps.cache-boost.outputs.cache-hit}}
-      run: |
-        if [[ "$CACHE_HIT" == 'true' ]]; then
-          sudo cp --force --recursive ~/boost/* /
-        else
-          sudo apt-get update && sudo apt-get install -yq libboost-all-dev
-          mkdir -p ~/boost
-          for dep in libboost-all-dev; do
-              dpkg -L $dep | while IFS= read -r f; do if test -f $f; then echo $f; fi; done | xargs cp --parents --target-directory ~/boost/
-          done
-        fi
+    # - name: Cache Boost
+    #   uses: actions/cache@v1.0.3
+    #   id: cache-boost
+    #   with:
+    #     path: "~/boost"
+    #     key: libboost-all-dev
+    # - name: Install Boost
+    #   env:
+    #     CACHE_HIT: ${{steps.cache-boost.outputs.cache-hit}}
+    #   run: |
+    #     if [[ "$CACHE_HIT" == 'true' ]]; then
+    #       sudo cp --force --recursive ~/boost/* /
+    #     else
+    #       sudo apt-get update && sudo apt-get install -yq libboost-all-dev
+    #       mkdir -p ~/boost
+    #       for dep in libboost-all-dev; do
+    #           dpkg -L $dep | while IFS= read -r f; do if test -f $f; then echo $f; fi; done | xargs cp --parents --target-directory ~/boost/
+    #       done
+    #     fi
 
   build:
     name: Build Target

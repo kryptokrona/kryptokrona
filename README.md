@@ -1,9 +1,27 @@
-![Kryptokrona](kryptokrona.png)
+# ![image](https://user-images.githubusercontent.com/36674091/169624229-5d071dea-bf48-49d2-86f3-6e7b1126e38d.png)
 
 <p>
-  <a href="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml">
-      <img src="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml/badge.svg">
-  </a>
+<a href="https://github.com/kryptokrona/kryptokrona/actions">
+    <img src="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml/badge.svg">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/issues">
+    <img src="https://img.shields.io/github/issues/kryptokrona/kryptokrona">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/pulls">
+    <img src="https://img.shields.io/github/issues-pr/kryptokrona/kryptokrona">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/commits/main">
+    <img src="https://img.shields.io/github/commit-activity/m/kryptokrona/kryptokrona">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/kryptokrona/kryptokrona">
+</a>
+<a href="https://chat.kryptokrona.se">
+    <img src="https://img.shields.io/discord/562673808582901793?label=Discord&logo=Discord&logoColor=white&style=flat">
+</a> 
+<a href="https://twitter.com/kryptokrona">
+    <img src="https://img.shields.io/twitter/follow/kryptokrona">
+</a>
 </p>
 
 Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, which forms the basis for Monero, among others. CryptoNote is a so-called “application layer” protocol further developed by TurtleCoin that enables things like: private transactions, messages and arbitrary data storage, completely decentralized.
@@ -47,7 +65,6 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 # Development Resources
 
 - Web: kryptokrona.org
-- Mail: mjovanc@protonmail.com
 - GitHub: https://github.com/kryptokrona
 - Hugin: projectdevelopment board on Hugin Messenger
 - It is HIGHLY recommended to join our board on Hugin Messenger if you want to contribute to stay up to date on what is happening on the project.
