@@ -30,6 +30,7 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 
 - [Development Resources](#development-resources)
 - [Versioning](#versioning)
+- [CI/CD](#cicd)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Ubuntu](#ubuntu)
@@ -73,11 +74,23 @@ Kryptokrona uses [Semantic Versioning Standard 2.0.0](https://semver.org/).
 
 Given a version number MAJOR.MINOR.PATCH, increment the:
 
-- MAJOR version when you make incompatible API changes,
-- MINOR version when you add functionality in a backwards compatible manner, and
-- PATCH version when you make backwards compatible bug fixes.
+- MAJOR version when you make incompatible API changes
+- MINOR version when you add functionality in a backwards compatible manner
+- PATCH version when you make backwards compatible bug fixes
 
-- Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+# CI/CD
+
+This project is automatically built and tested using GitHub Actions. We have two pipelines:
+
+- **Kryptokrona Main Pipeline** - This is the pipeline that runs the code merged into our main branch.
+- **Kryptokrona Pull Request Pipeline** - This is the pipeline that runs each time a pull request come in so the reviewer has some help evaluating the code status.
+
+The Kryptokrona Main Pipeline do everything the Kryptokrona Pull Request Pipeline does in addition to generate Doxygen and building and publishing a Docker Image to
+the project tagged by the project name, owner, repository and short form of commit SHA value.
+
+The purpose of publishing prepared Docker images is to make it faster and easier to deploy a Kryptokrona node/pool.
 
 # Installation
 
