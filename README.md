@@ -56,6 +56,7 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
   - [Start all Docker containers again](#start-all-docker-containers-again)
   - [Removing all data](#removing-all-data)
 - [Deploy node](#deploy-node)
+- [Help and Support](#help-and-support)
 - [Thanks](#thanks)
 - [Copypasta for license when editing files](#copypasta-for-license-when-editing-files)
   - [Contributors](#contributors)
@@ -422,6 +423,10 @@ Now run the file:
 - `./setup-node.sh`
 
 Now this script will take care of basically everything. Just sit back and relax and grab a ☕.
+
+# Help and Support
+
+For questions and support please use the channel #support in [Kryptokrona](https://discord.gg/mkRpVgDubC) Discord server. The issue tracker is for bug reports and feature discussions only.
 
 # Thanks
 
