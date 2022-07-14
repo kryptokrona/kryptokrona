@@ -29,6 +29,7 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 # Table of Contents
 
 - [Development Resources](#development-resources)
+- [Versioning](#versioning)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Ubuntu](#ubuntu)
@@ -65,6 +66,18 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 - GitHub: https://github.com/kryptokrona
 - Hugin: projectdevelopment board on Hugin Messenger
 - It is HIGHLY recommended to join our board on Hugin Messenger if you want to contribute to stay up to date on what is happening on the project.
+
+# Versioning
+
+Kryptokrona uses [Semantic Versioning Standard 2.0.0](https://semver.org/).
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+- MAJOR version when you make incompatible API changes,
+- MINOR version when you add functionality in a backwards compatible manner, and
+- PATCH version when you make backwards compatible bug fixes.
+
+- Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
 
 # Installation
 
