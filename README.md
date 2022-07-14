@@ -30,25 +30,22 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 
 - [Development Resources](#development-resources)
 - [Installation](#installation)
-  - [How To Compile](#how-to-compile)
-    - [Linux](#linux)
-      - [Prerequisites](#prerequisites)
-      - [Ubuntu, using GCC](#ubuntu-using-gcc)
-      - [Ubuntu, using Clang](#ubuntu-using-clang)
-      - [Generic Linux](#generic-linux)
-    - [OSX/Apple](#osxapple)
-      - [Using GCC](#using-gcc)
-      - [Prerequisites](#prerequisites-1)
-      - [Building](#building)
-    - [Using Clang](#using-clang)
-      - [Prerequisites](#prerequisites-2)
-      - [Building](#building-1)
-    - [Windows](#windows)
-      - [Prerequisites](#prerequisites-3)
-      - [Building](#building-2)
-    - [Raspberry Pi 3 B+ (AARCH64/ARM64)](#raspberry-pi-3-b-aarch64arm64)
-      - [Known working images](#known-working-images)
-      - [Building](#building-3)
+  - [Prerequisites](#prerequisites)
+  - [Ubuntu](#ubuntu)
+    - [Build using GCC](#ubuntu-build-using-gcc)
+    - [Build using Clang](#ubuntu-build-using-clang)
+  - [Generic Linux](#generic-linux)
+    - [Build](#build)
+  - [OSX/Apple](#osxapple)
+    - [Prerequisites](#prerequisites-1)
+      - [Build using GCC](#build-using-gcc)
+      - [Build using Clang](#build-using-clang)
+  - [Windows](#windows)
+    - [Prerequisites](#prerequisites)
+    - [Build using Visual C++](#build-using-visual-c)
+  - [Raspberry Pi 3 B+ (AARCH64/ARM64)](#raspberry-pi-3-b-aarch64arm64)
+    - [Known working images](#known-working-images)
+    - [Build](#build)
 - [Setup testnet](#setup-testnet)
   - [Change config](#change-config)
   - [Install Docker](#install-docker)
@@ -75,11 +72,7 @@ We offer binary images of the latest releases here: https://github.com/kryptokro
 
 If you would like to compile yourself, read on.
 
-## How To Compile
-
-### Linux
-
-#### Prerequisites
+## Prerequisites
 
 You will need the following packages: boost, cmake (3.8 or higher), make, and git.
 
@@ -89,7 +82,9 @@ If you are using GCC, you will need GCC-11.0 or higher.
 
 If you are using Clang, you will need Clang 6.0 or higher. You will also need libstdc++\-6.0 or higher.
 
-#### Ubuntu, using GCC
+## Ubuntu
+
+### Build using GCC
 
 If you are using Ubuntu 22.04 LTS GCC11 and C++11 now comes as default and no need to install this.
 
@@ -112,7 +107,7 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### Ubuntu, using Clang
+### Build using Clang
 
 - `sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y`
 - `wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -`
@@ -149,12 +144,9 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### Generic Linux
+## Generic Linux
 
-Ensure you have the dependencies listed above.
-
-If you want to use clang, ensure you set the environment variables `CC` and `CXX`.
-See the ubuntu instructions for an example.
+### Build
 
 - `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
 - `cd turtlecoin`
@@ -168,15 +160,13 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-### OSX/Apple
+## OSX/Apple
 
-#### Prerequisites
+### Prerequisites
 
 - Install XCode and Developer Tools.
 
-#### Using GCC
-
-##### Building
+### Build using GCC
 
 If using M1 chip, switch gcc@8 to gcc@11 when installing through brew.
 
@@ -196,9 +186,7 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### Using Clang
-
-##### Building
+### Build using Clang
 
 - `which brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
 - `brew install --force cmake boost llvm`
@@ -216,15 +204,15 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-### Windows
+## Windows
 
-#### Prerequisites
+### Prerequisites
 
 - Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall)
 - When installing Visual Studio, it is **required** that you install **Desktop development with C++**
 - Install the latest version of [Boost](https://bintray.com/boostorg/release/download_file?file_path=1.68.0%2Fbinaries%2Fboost_1_68_0-msvc-14.1-64.exe) - Currently Boost 1.68.
 
-#### Building
+### Build using Visual C++
 
 - From the start menu, open 'x64 Native Tools Command Prompt for vs2017'.
 - `cd <your_kryptokrona_directory>`
@@ -243,11 +231,11 @@ The binaries will be in the `src/Release` folder when you are complete.
 - `cd Release`
 - `kryptokrona.exe --version`
 
-### Raspberry Pi 3 B+ (AARCH64/ARM64)
+## Raspberry Pi 3 B+ (AARCH64/ARM64)
 
 The following images are known to work. Your operation system image **MUST** be 64 bit.
 
-#### Known working images
+### Known working images
 
 - https://github.com/Crazyhead90/pi64/releases
 - https://fedoraproject.org/wiki/Architectures/ARM/Raspberry_Pi#aarch64_supported_images_for_Raspberry_Pi_3
@@ -255,7 +243,7 @@ The following images are known to work. Your operation system image **MUST** be 
 
 Once you have a 64 bit image installed, setup proceeds the same as any Linux distribution. Ensure you have at least 2GB of ram, or the build is likely to fail. You may need to setup swap space.
 
-#### Building
+### Build
 
 - `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
 - `cd kryptokrona`
