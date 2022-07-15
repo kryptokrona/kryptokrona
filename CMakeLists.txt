@@ -254,7 +254,7 @@ if(NOT MSVC)
   endif()
 endif()
 
-# # Go get us some static BOOST libraries
+# Go get us some static BOOST libraries
 set(Boost_NO_BOOST_CMAKE ON)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_RUNTIME ON)
