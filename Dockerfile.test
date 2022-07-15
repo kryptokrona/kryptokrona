@@ -1,10 +1,13 @@
-# this docker file is intended for production usage to setup a node for the 
-# kryptokrona blockchain
+# this docker file can be used for both a daemon, miner and a wallet if needed
+# we only have to set specific command or entrypoint inside the docker compose
+# file to customize the behavior of the container when started.
 
 FROM ubuntu:22.04
 
 COPY . /usr/src/kryptokrona
 WORKDIR /usr/src/kryptokrona
+
+RUN chmod +x ./wait-for-it.sh ./docker-entrypoint.sh
 
 # install build dependencies
 RUN apt-get update && \
@@ -28,23 +31,15 @@ RUN apt-get update && \
       libboost-serialization1.74.0 \
       libboost-program-options1.74.0 \
       libicu70 \
-      p7zip-full
+      cron \
+      rpcbind
 
 # create the build directory
 RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
 
 # build and install
-RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc) --ignore-errors
+RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc)
 
-# create the directory for the daemon files (this can perhaps be removed since we use the volume flag while starting the docker container, but untested!)
+# create the directory for the daemon files
 RUN mkdir -p src/blockloc
-
-WORKDIR /usr/src/kryptokrona/build/src
-
-# set executable permission on kryptokrona deamon
-RUN chmod +x kryptokronad
-
-EXPOSE 11898
-
-CMD [ "/bin/sh", "-c", "./kryptokronad --data-dir /usr/src/kryptokrona/build/src/blockloc --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0 --hide-my-port" ]

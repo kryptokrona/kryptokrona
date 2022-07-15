@@ -1,13 +1,10 @@
-# this docker file can be used for both a daemon, miner and a wallet if needed
-# we only have to set specific command or entrypoint inside the docker compose
-# file to customize the behavior of the container when started.
+# this docker file is intended for production usage to setup a node for the
+# kryptokrona blockchain. it is build using github actions.
 
 FROM ubuntu:22.04
 
 COPY . /usr/src/kryptokrona
 WORKDIR /usr/src/kryptokrona
-
-RUN chmod +x ./wait-for-it.sh ./docker-entrypoint.sh
 
 # install build dependencies
 RUN apt-get update && \
@@ -30,16 +27,22 @@ RUN apt-get update && \
       libboost-regex1.74.0 \
       libboost-serialization1.74.0 \
       libboost-program-options1.74.0 \
-      libicu70 \
-      cron \
-      rpcbind
+      libicu70
 
 # create the build directory
 RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
 
 # build and install
-RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc)
+RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc) --ignore-errors
 
-# create the directory for the daemon files
-RUN mkdir -p src/blockloc
+WORKDIR /usr/src/kryptokrona/build/src
+
+# set executable permission on kryptokrona deamon
+RUN chmod +x kryptokronad
+
+EXPOSE 11898
+
+# --data-dir is binded to a volume - this volume is binded when starting the container
+# to start the container follow instructions on readme or in article published by marcus cvjeticanin on https://mjovanc.com
+CMD [ "/bin/sh", "-c", "./kryptokronad --data-dir ~/.kryptokrona --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0" ]
