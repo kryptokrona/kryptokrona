@@ -1,9 +1,27 @@
-![Kryptokrona](kryptokrona.png)
+# ![image](https://user-images.githubusercontent.com/36674091/169624229-5d071dea-bf48-49d2-86f3-6e7b1126e38d.png)
 
 <p>
-  <a href="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml">
-      <img src="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml/badge.svg">
-  </a>
+<a href="https://github.com/kryptokrona/kryptokrona/actions">
+    <img src="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml/badge.svg">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/issues">
+    <img src="https://img.shields.io/github/issues/kryptokrona/kryptokrona">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/pulls">
+    <img src="https://img.shields.io/github/issues-pr/kryptokrona/kryptokrona">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/commits/main">
+    <img src="https://img.shields.io/github/commit-activity/m/kryptokrona/kryptokrona">
+</a>
+<a href="https://github.com/kryptokrona/kryptokrona/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/kryptokrona/kryptokrona">
+</a>
+<a href="https://chat.kryptokrona.se">
+    <img src="https://img.shields.io/discord/562673808582901793?label=Discord&logo=Discord&logoColor=white&style=flat">
+</a> 
+<a href="https://twitter.com/kryptokrona">
+    <img src="https://img.shields.io/twitter/follow/kryptokrona">
+</a>
 </p>
 
 Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, which forms the basis for Monero, among others. CryptoNote is a so-called “application layer” protocol further developed by TurtleCoin that enables things like: private transactions, messages and arbitrary data storage, completely decentralized.
@@ -11,26 +29,25 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 # Table of Contents
 
 - [Development Resources](#development-resources)
+- [Versioning](#versioning)
+- [CI/CD](#cicd)
 - [Installation](#installation)
-  - [How To Compile](#how-to-compile)
-    - [Linux](#linux)
-      - [Prerequisites](#prerequisites)
-      - [Ubuntu, using GCC](#ubuntu-using-gcc)
-      - [Ubuntu, using Clang](#ubuntu-using-clang)
-      - [Generic Linux](#generic-linux)
-    - [OSX/Apple](#osxapple)
-      - [Using GCC](#using-gcc)
-      - [Prerequisites](#prerequisites-1)
-      - [Building](#building)
-    - [Using Clang](#using-clang)
-      - [Prerequisites](#prerequisites-2)
-      - [Building](#building-1)
-    - [Windows](#windows)
-      - [Prerequisites](#prerequisites-3)
-      - [Building](#building-2)
-    - [Raspberry Pi 3 B+ (AARCH64/ARM64)](#raspberry-pi-3-b-aarch64arm64)
-      - [Known working images](#known-working-images)
-      - [Building](#building-3)
+  - [Prerequisites](#prerequisites)
+  - [Ubuntu](#ubuntu)
+    - [Build using GCC](#ubuntu-build-using-gcc)
+    - [Build using Clang](#ubuntu-build-using-clang)
+  - [Generic Linux](#generic-linux)
+    - [Build](#build)
+  - [OSX/Apple](#osxapple)
+    - [Prerequisites](#prerequisites-1)
+      - [Build using GCC](#build-using-gcc)
+      - [Build using Clang](#build-using-clang)
+  - [Windows](#windows)
+    - [Prerequisites](#prerequisites)
+    - [Build using Visual C++](#build-using-visual-c)
+  - [Raspberry Pi 3 B+ (AARCH64/ARM64)](#raspberry-pi-3-b-aarch64arm64)
+    - [Known working images](#known-working-images)
+    - [Build](#build)
 - [Setup testnet](#setup-testnet)
   - [Change config](#change-config)
   - [Install Docker](#install-docker)
@@ -39,6 +56,7 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
   - [Start all Docker containers again](#start-all-docker-containers-again)
   - [Removing all data](#removing-all-data)
 - [Deploy node](#deploy-node)
+- [Help and Support](#help-and-support)
 - [Thanks](#thanks)
 - [Copypasta for license when editing files](#copypasta-for-license-when-editing-files)
   - [Contributors](#contributors)
@@ -47,10 +65,33 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 # Development Resources
 
 - Web: kryptokrona.org
-- Mail: mjovanc@protonmail.com
 - GitHub: https://github.com/kryptokrona
 - Hugin: projectdevelopment board on Hugin Messenger
 - It is HIGHLY recommended to join our board on Hugin Messenger if you want to contribute to stay up to date on what is happening on the project.
+
+# Versioning
+
+Kryptokrona uses [Semantic Versioning Standard 2.0.0](https://semver.org/).
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+- MAJOR version when you make incompatible API changes
+- MINOR version when you add functionality in a backwards compatible manner
+- PATCH version when you make backwards compatible bug fixes
+
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+
+# CI/CD
+
+This project is automatically built and tested using GitHub Actions. We have two pipelines:
+
+- **Kryptokrona Main Pipeline** - This is the pipeline that runs the code merged into our main branch.
+- **Kryptokrona Pull Request Pipeline** - This is the pipeline that runs each time a pull request come in so the reviewer has some help evaluating the code status.
+
+The Kryptokrona Main Pipeline do everything the Kryptokrona Pull Request Pipeline does in addition to generate Doxygen and building and publishing a Docker Image to
+the project tagged by the project name, owner, repository and short form of commit SHA value.
+
+The purpose of publishing prepared Docker images is to make it faster and easier to deploy a Kryptokrona node/pool.
 
 # Installation
 
@@ -58,11 +99,7 @@ We offer binary images of the latest releases here: https://github.com/kryptokro
 
 If you would like to compile yourself, read on.
 
-## How To Compile
-
-### Linux
-
-#### Prerequisites
+## Prerequisites
 
 You will need the following packages: boost, cmake (3.8 or higher), make, and git.
 
@@ -72,7 +109,9 @@ If you are using GCC, you will need GCC-11.0 or higher.
 
 If you are using Clang, you will need Clang 6.0 or higher. You will also need libstdc++\-6.0 or higher.
 
-#### Ubuntu, using GCC
+## Ubuntu
+
+### Build using GCC
 
 If you are using Ubuntu 22.04 LTS GCC11 and C++11 now comes as default and no need to install this.
 
@@ -95,7 +134,7 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### Ubuntu, using Clang
+### Build using Clang
 
 - `sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y`
 - `wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -`
@@ -132,12 +171,9 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### Generic Linux
+## Generic Linux
 
-Ensure you have the dependencies listed above.
-
-If you want to use clang, ensure you set the environment variables `CC` and `CXX`.
-See the ubuntu instructions for an example.
+### Build
 
 - `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
 - `cd turtlecoin`
@@ -151,15 +187,13 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-### OSX/Apple
+## OSX/Apple
 
-#### Prerequisites
+### Prerequisites
 
 - Install XCode and Developer Tools.
 
-#### Using GCC
-
-##### Building
+### Build using GCC
 
 If using M1 chip, switch gcc@8 to gcc@11 when installing through brew.
 
@@ -179,9 +213,7 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-#### Using Clang
-
-##### Building
+### Build using Clang
 
 - `which brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
 - `brew install --force cmake boost llvm`
@@ -199,15 +231,15 @@ The binaries will be in the `src` folder when you are complete.
 - `cd src`
 - `./kryptokrona --version`
 
-### Windows
+## Windows
 
-#### Prerequisites
+### Prerequisites
 
 - Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall)
 - When installing Visual Studio, it is **required** that you install **Desktop development with C++**
 - Install the latest version of [Boost](https://bintray.com/boostorg/release/download_file?file_path=1.68.0%2Fbinaries%2Fboost_1_68_0-msvc-14.1-64.exe) - Currently Boost 1.68.
 
-#### Building
+### Build using Visual C++
 
 - From the start menu, open 'x64 Native Tools Command Prompt for vs2017'.
 - `cd <your_kryptokrona_directory>`
@@ -226,11 +258,11 @@ The binaries will be in the `src/Release` folder when you are complete.
 - `cd Release`
 - `kryptokrona.exe --version`
 
-### Raspberry Pi 3 B+ (AARCH64/ARM64)
+## Raspberry Pi 3 B+ (AARCH64/ARM64)
 
 The following images are known to work. Your operation system image **MUST** be 64 bit.
 
-#### Known working images
+### Known working images
 
 - https://github.com/Crazyhead90/pi64/releases
 - https://fedoraproject.org/wiki/Architectures/ARM/Raspberry_Pi#aarch64_supported_images_for_Raspberry_Pi_3
@@ -238,7 +270,7 @@ The following images are known to work. Your operation system image **MUST** be 
 
 Once you have a 64 bit image installed, setup proceeds the same as any Linux distribution. Ensure you have at least 2GB of ram, or the build is likely to fail. You may need to setup swap space.
 
-#### Building
+### Build
 
 - `git clone -b master --single-branch https://github.com/kryptokrona/kryptokrona`
 - `cd kryptokrona`
@@ -371,6 +403,8 @@ When we want to do a full cleanup on our system with Docker we can start the scr
 
 Now we will remove networks, volumes, images and containers existing on our system. If you after removing everything want to start again. Just use the file `setup-testnet.sh` again.
 
+Check also out the article made by Marcus Cvjeticanin here: https://medium.com/coinsbench/setup-a-testnet-with-kryptokrona-blockchain-41b5f9ffd86
+
 # Deploy node
 
 Before you start you should have set a DNS record of type A to the IP address of your VPS. Then you should use this domain in the shell file below.
@@ -391,6 +425,12 @@ Now run the file:
 - `./setup-node.sh`
 
 Now this script will take care of basically everything. Just sit back and relax and grab a ☕.
+
+Check also out the article made by Marcus Cvjeticanin here: https://medium.com/coinsbench/deploy-your-own-kryptokrona-node-13253d5d39a3
+
+# Help and Support
+
+For questions and support please use the channel #support in [Kryptokrona](https://discord.gg/mkRpVgDubC) Discord server. The issue tracker is for bug reports and feature discussions only.
 
 # Thanks
 
@@ -416,6 +456,7 @@ code, are actively maintaining it (including documentation), or in other ways
 being awesome contributors to this project. **We'd like to take a moment to recognize them.**
 
 [<img src="https://github.com/mjovanc.png?size=72" alt="mjovanc" width="72">](https://github.com/mjovanc)
+[<img src="https://github.com/f-r00t.png?size=72" alt="f-r00t" width="72">](https://github.com/f-r00t)
 
 # License
 
