@@ -3,20 +3,9 @@ name: Kryptokrona Pull Request Pipeline
 on: [ pull_request ]
 
 jobs:
-  clean:
-    name: Clean
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Clean
-        run: echo "Running Clean..."
-
-# do not work since github actions does not set Boost_INCLUDE_DIRS variable for some reason
   build:
     name: Build Target
     runs-on: ubuntu-22.04
-    needs: [ clean ]
     steps:
       - uses: actions/checkout@v2
 
@@ -28,7 +17,7 @@ jobs:
       - name: Create Build Dir
         run: mkdir build
       - name: CMake
-        run: cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_DEBUG=ON -DBoost_ARCHITECTURE=-x64 ..
+        run: cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64 .. # add flag -DBoost_DEBUG=ON to debug
         working-directory: build
       - name: Make
         run: make -j$(nproc) --ignore-errors
