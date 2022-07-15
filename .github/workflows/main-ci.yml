@@ -8,7 +8,7 @@ env:
 on:
   push:
     branches:
-      - master
+      - munin
 
 jobs:
   clean:
@@ -32,39 +32,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
-      - name: Cache Boost
-        uses: actions/cache@v1.0.3
-        id: cache-boost
-        with:
-          path: "~/boost"
-          key: libboost-all-dev
-      - name: Install Boost
-        env:
-          CACHE_HIT: ${{steps.cache-boost.outputs.cache-hit}}
-        run: |
-          if [[ "$CACHE_HIT" == 'true' ]]; then
-            sudo cp --force --recursive ~/boost/* /
-          else
-            sudo apt-get update && sudo apt-get install -yq libboost-all-dev
-            mkdir -p ~/boost
-            for dep in libboost-all-dev; do
-                dpkg -L $dep | while IFS= read -r f; do if test -f $f; then echo $f; fi; done | xargs cp --parents --target-directory ~/boost/
-            done
-          fi
-
-  build:
-    name: Build Target
-    runs-on: ubuntu-22.04
-    needs: [ install ]
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Create Build Dir
-        run: mkdir build
-      - name: CMake
-        run: (cd build && cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" ..)
-      - name: Make
-        run: (cd build && make -j$(nproc) --ignore-errors)
+#  build:
+#    name: Build Target
+#    runs-on: ubuntu-22.04
+#    needs: [ install ]
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Create Build Dir
+#        run: mkdir build
+#      - name: CMake
+#        run: cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_DEBUG=ON -DBoost_ARCHITECTURE=-x64 ..
+#        working-directory: build
+#      - name: Make
+#        run: make -j$(nproc) --ignore-errors
+#        working-directory: build
 
   test:
     name: Tests
