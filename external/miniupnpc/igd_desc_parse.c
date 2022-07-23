@@ -96,7 +96,7 @@ void IGDdata(void * d, const char * data, int l)
 void printIGD(struct IGDdatas * d)
 {
 	printf("urlbase = '%s'\n", d->urlbase);
-	printf("WAN Device (Common interface config) :\n");
+	printf("WAN Device (common interface config) :\n");
 	/*printf(" deviceType = '%s'\n", d->CIF.devicetype);*/
 	printf(" serviceType = '%s'\n", d->CIF.servicetype);
 	printf(" controlURL = '%s'\n", d->CIF.controlurl);

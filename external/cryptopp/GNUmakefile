@@ -468,7 +468,7 @@ endif
 endif  # X86, X64, ARM32, ARM64, PPC32, PPC64, etc
 
 ###########################################################
-#####                      Common                     #####
+#####                      common                     #####
 ###########################################################
 
 # Use -pthread whenever it is available. See http://www.hpl.hp.com/techreports/2004/HPL-2004-209.pdf

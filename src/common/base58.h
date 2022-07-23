@@ -17,23 +17,17 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+#include <cstdint>
+#include <string>
 
-namespace Logging {
+namespace tools
+{
+  namespace base58
+  {
+    std::string encode(const std::string& data);
+    bool decode(const std::string& enc, std::string& data);
 
-class LoggerManager : public LoggerGroup {
-public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
-
-private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
-};
-
+    std::string encode_addr(uint64_t tag, const std::string& data);
+    bool decode_addr(std::string addr, uint64_t& tag, std::string& data);
+  }
 }
