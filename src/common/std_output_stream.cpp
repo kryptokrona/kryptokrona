@@ -15,25 +15,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "std_output_stream.h"
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+namespace common {
 
-namespace Logging {
+StdOutputStream::StdOutputStream(std::ostream& out) : out(out) {
+}
 
-class LoggerManager : public LoggerGroup {
-public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
+uint64_t StdOutputStream::writeSome(const void* data, uint64_t size) {
+  out.write(static_cast<const char*>(data), size);
+  if (out.bad()) {
+    return 0;
+  }
 
-private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
-};
+  return size;
+}
 
 }

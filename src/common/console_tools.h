@@ -17,23 +17,31 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+#include <cstdint>
 
-namespace Logging {
+namespace common { namespace Console {
 
-class LoggerManager : public LoggerGroup {
-public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
+enum class Color : uint8_t {
+  Default,
 
-private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
+  Blue,
+  Green,
+  Red,
+  Yellow,
+  White,
+  Cyan,
+  Magenta,
+
+  BrightBlue,
+  BrightGreen,
+  BrightRed,
+  BrightYellow,
+  BrightWhite,
+  BrightCyan,
+  BrightMagenta
 };
 
-}
+void setTextColor(Color color);
+bool isConsoleTty();
+
+}}

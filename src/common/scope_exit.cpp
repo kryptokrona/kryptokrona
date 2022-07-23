@@ -15,25 +15,27 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "scope_exit.h"
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+namespace tools {
 
-namespace Logging {
+ScopeExit::ScopeExit(std::function<void()>&& handler) :
+  m_handler(std::move(handler)),
+  m_cancelled(false) {
+}
 
-class LoggerManager : public LoggerGroup {
-public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
+ScopeExit::~ScopeExit() {
+  if (!m_cancelled) {
+    m_handler();
+  }
+}
 
-private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
-};
+void ScopeExit::cancel() {
+  m_cancelled = true;
+}
+
+void ScopeExit::resume() {
+  m_cancelled = false;
+}
 
 }
