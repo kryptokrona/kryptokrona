@@ -17,23 +17,27 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+#include <algorithm>
+#include <vector>
 
-namespace Logging {
+namespace common {
 
-class LoggerManager : public LoggerGroup {
-public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
+template <class T>
+T medianValue(std::vector<T> &v) {
+  if (v.empty())
+    return T();
 
-private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
-};
+  if (v.size() == 1)
+    return v[0];
+
+  auto n = (v.size()) / 2;
+  std::sort(v.begin(), v.end());
+  //nth_element(v.begin(), v.begin()+n-1, v.end());
+  if (v.size() % 2) { //1, 3, 5...
+    return v[n];
+  } else { //2, 4, 6...
+    return (v[n - 1] + v[n]) / 2;
+  }
+}
 
 }

@@ -17,23 +17,15 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+#include <cstdint>
+#include <cstddef>
 
-namespace Logging {
+namespace common {
 
-class LoggerManager : public LoggerGroup {
+class IOutputStream {
 public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
-
-private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
+  virtual ~IOutputStream() { }
+  virtual uint64_t writeSome(const void* data, uint64_t size) = 0;
 };
 
 }

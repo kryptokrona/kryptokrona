@@ -15,25 +15,30 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "memory_input_stream.h"
+#include <algorithm>
+#include <cassert>
+#include <cstring> // memcpy
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+namespace common {
 
-namespace Logging {
+MemoryInputStream::MemoryInputStream(const void* buffer, uint64_t bufferSize) : 
+buffer(static_cast<const char*>(buffer)), bufferSize(bufferSize), position(0) {}
 
-class LoggerManager : public LoggerGroup {
-public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
+bool MemoryInputStream::endOfStream() const {
+  return position == bufferSize;
+}
 
-private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
-};
+uint64_t MemoryInputStream::readSome(void* data, uint64_t size) {
+  assert(position <= bufferSize);
+  uint64_t readSize = std::min(size, bufferSize - position);
+
+  if (readSize > 0) {
+    memcpy(data, buffer + position, readSize);
+    position += readSize;
+  }
+  
+  return readSize;
+}
 
 }

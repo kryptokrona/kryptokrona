@@ -443,7 +443,7 @@ BlockchainSynchronizer::GetBlocksRequest BlockchainSynchronizer::getCommonHistor
   request.knownBlocks = shortest->second->getShortHistory(m_node.getLastLocalBlockHeight());
   request.syncStart = syncStart;
 
-  m_logger(DEBUGGING) << "Common history: start block index " << request.syncStart.height << ", sparse chain size " << request.knownBlocks.size();
+  m_logger(DEBUGGING) << "common history: start block index " << request.syncStart.height << ", sparse chain size " << request.knownBlocks.size();
 
   return request;
 }
