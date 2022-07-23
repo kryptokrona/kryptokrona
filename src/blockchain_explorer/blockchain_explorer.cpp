@@ -13,16 +13,16 @@
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Bytecoin. If not, see <http://www.gnu.org/licenses/>.
 
-#include "BlockchainExplorer.h"
+#include "blockchain_explorer.h"
 
 #include <future>
 #include <functional>
 #include <memory>
 #include <utility>
 
-#include "BlockchainExplorerErrors.h"
+#include "blockchain_explorer_errors.h"
 #include "Common/StdOutputStream.h"
 #include "Common/StdInputStream.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
@@ -148,7 +148,7 @@ private:
 
 BlockchainExplorer::BlockchainExplorer(INode& node, std::shared_ptr<Logging::ILogger> logger) :
   node(node), 
-  logger(logger, "BlockchainExplorer"),
+  logger(logger, "blockchain_explorer"),
   state(NOT_INITIALIZED), 
   synchronized(false), 
   observersCounter(0) {
@@ -190,7 +190,7 @@ struct StateRollback {
 
 void BlockchainExplorer::init() {
   if (state.load() != NOT_INITIALIZED) {
-    logger(ERROR) << "Init called on already initialized BlockchainExplorer.";
+    logger(ERROR) << "Init called on already initialized blockchain_explorer.";
     throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::ALREADY_INITIALIZED));
   }
 
@@ -221,7 +221,7 @@ void BlockchainExplorer::init() {
 
 void BlockchainExplorer::shutdown() {
   if (state.load() != INITIALIZED) {
-    logger(ERROR) << "Shutdown called on not initialized BlockchainExplorer.";
+    logger(ERROR) << "Shutdown called on not initialized blockchain_explorer.";
     throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
   }
 
