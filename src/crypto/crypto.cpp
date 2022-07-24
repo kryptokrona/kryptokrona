@@ -21,7 +21,7 @@
 namespace Crypto {
 
   extern "C" {
-#include "crypto-ops.h"
+#include "crypto_ops.h"
   }
 
   static inline void random_scalar(EllipticCurveScalar &res) {

@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "hash-ops.h"
+#include "hash_ops.h"
 #include "keccak.h"
 
 void hash_permutation(union hash_state *state) {

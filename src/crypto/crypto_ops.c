@@ -18,7 +18,7 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "crypto-ops.h"
+#include "crypto_ops.h"
 
 /* Predeclarations */
 
