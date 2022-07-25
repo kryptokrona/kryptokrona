@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "P2pNode.h"
+#include "p2p_node.h"
 
 #include <boost/uuid/uuid_io.hpp>
 
@@ -23,16 +23,16 @@
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
 
-#include "LevinProtocol.h"
-#include "P2pConnectionProxy.h"
-#include "P2pContext.h"
-#include "P2pContextOwner.h"
+#include "levin_protocol.h"
+#include "p2p_connection_proxy.h"
+#include "p2p_context.h"
+#include "p2p_context_owner.h"
 
-using namespace Common;
-using namespace Logging;
-using namespace System;
+using namespace common;
+using namespace logging;
+using namespace system;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 namespace {
 

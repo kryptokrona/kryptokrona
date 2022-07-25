@@ -15,18 +15,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "P2pContext.h"
+#include "p2p_context.h"
 
 #include <System/EventLock.h>
 #include <System/InterruptedException.h>
 #include <System/Ipv4Address.h>
 #include <System/OperationTimeout.h>
 
-#include "LevinProtocol.h"
+#include "levin_protocol.h"
 
-using namespace System;
+using namespace system;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 P2pContext::Message::Message(P2pMessage&& msg, Type messageType, uint32_t returnCode) :
   messageType(messageType), returnCode(returnCode) {

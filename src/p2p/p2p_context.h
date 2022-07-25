@@ -27,12 +27,12 @@
 #include <System/Timer.h>
 
 #include <config/CryptoNoteConfig.h>
-#include "LevinProtocol.h"
-#include "P2pInterfaces.h"
-#include "P2pProtocolDefinitions.h"
-#include "P2pProtocolTypes.h"
+#include "levin_protocol.h"
+#include "p2p_interfaces.h"
+#include "p2p_protocol_definitions.h"
+#include "p2p_protocol_types.h"
 
-namespace CryptoNote {
+namespace cryptonote {
   
 class P2pContext {
 public:

@@ -27,9 +27,9 @@
 #include <System/TcpListener.h>
 #include <System/Timer.h>
 
-#include "IP2pNodeInternal.h"
+#include "ip2p_node_internal.h"
 #include "IStreamSerializable.h"
-#include "NetNodeConfig.h"
+#include "net_node_config.h"
 
 #include <P2p/P2pInterfaces.h>
 #include <P2p/P2pNodeConfig.h>
@@ -37,7 +37,7 @@
 #include <P2p/PeerListManager.h>
 #include <P2p/Peerlist.h>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class P2pContext;
 class P2pConnectionProxy;

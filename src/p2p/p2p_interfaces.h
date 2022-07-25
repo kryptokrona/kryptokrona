@@ -17,30 +17,29 @@
 
 #pragma once
 
-#include <list>
+#include <cstdint>
 #include <memory>
 
-namespace CryptoNote {
+#include <CryptoNote.h>
 
-class P2pContext;
+namespace cryptonote {
 
-class P2pContextOwner {
+struct P2pMessage {
+  uint32_t type;
+  BinaryArray data;
+};
+
+class IP2pConnection {
 public:
+  virtual ~IP2pConnection();
+  virtual void read(P2pMessage &message) = 0;
+  virtual void write(const P2pMessage &message) = 0;
+  virtual void stop() = 0;
+};
 
-  typedef std::list<std::unique_ptr<P2pContext>> ContextList;
-
-  P2pContextOwner(P2pContext* ctx, ContextList& contextList);
-  P2pContextOwner(P2pContextOwner&& other);
-  P2pContextOwner(const P2pContextOwner& other) = delete;
-  ~P2pContextOwner();
-
-  P2pContext& get();
-  P2pContext* operator -> ();
-
-private:
-
-  ContextList& contextList;
-  ContextList::iterator contextIterator;
+class IP2pNode {
+public:
+  virtual void stop() = 0;
 };
 
 }

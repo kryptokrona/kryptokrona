@@ -19,12 +19,12 @@
 
 #include <queue>
 
-#include "IP2pNodeInternal.h"
-#include "LevinProtocol.h"
-#include "P2pContextOwner.h"
-#include "P2pInterfaces.h"
+#include "ip2p_node_internal.h"
+#include "levin_protocol.h"
+#include "p2p_context_owner.h"
+#include "p2p_interfaces.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class P2pContext;
 class P2pNode;
