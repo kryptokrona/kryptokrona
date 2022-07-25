@@ -17,23 +17,30 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include "../Common/json_value.h"
-#include "LoggerGroup.h"
+#include <iostream>
+#include "ilogger.h"
 
-namespace Logging {
+namespace logging {
 
-class LoggerManager : public LoggerGroup {
+class LoggerMessage : public std::ostream, std::streambuf {
 public:
-  LoggerManager();
-  void configure(const Common::JsonValue& val);
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
+  LoggerMessage(std::shared_ptr<ILogger> logger, const std::string& category, Level level, const std::string& color);
+  ~LoggerMessage();
+  LoggerMessage(const LoggerMessage&) = delete;
+  LoggerMessage& operator=(const LoggerMessage&) = delete;
+  LoggerMessage(LoggerMessage&& other);
 
 private:
-  std::vector<std::unique_ptr<CommonLogger>> loggers;
-  std::mutex reconfigureLock;
+  int sync() override;
+  std::streamsize xsputn(const char* s, std::streamsize n) override;
+  int overflow(int c) override;
+
+  std::string message;
+  const std::string category;
+  Level logLevel;
+  std::shared_ptr<ILogger> logger;
+  boost::posix_time::ptime timestamp;
+  bool gotText;
 };
 
 }

@@ -17,20 +17,21 @@
 
 #pragma once
 
-#include <mutex>
-#include "CommonLogger.h"
+#include <vector>
+#include "common_logger.h"
 
-namespace Logging {
+namespace logging {
 
-class ConsoleLogger : public CommonLogger {
+class LoggerGroup : public CommonLogger {
 public:
-  ConsoleLogger(Level level = DEBUGGING);
+  LoggerGroup(Level level = DEBUGGING);
+
+  void addLogger(ILogger& logger);
+  void removeLogger(ILogger& logger);
+  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
 
 protected:
-  virtual void doLogString(const std::string& message) override;
-
-private:
-  std::mutex mutex;
+  std::vector<ILogger*> loggers;
 };
 
 }

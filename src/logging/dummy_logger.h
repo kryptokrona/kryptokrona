@@ -6,7 +6,7 @@
 
 #include <Logging/ILogger.h>
 
-namespace Logging
+namespace logging
 {
 
 class DummyLogger : public ILogger 
@@ -20,4 +20,4 @@ class DummyLogger : public ILogger
         }
 };
 
-} // namespace Logging
+} // namespace logging

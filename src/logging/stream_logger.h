@@ -18,9 +18,9 @@
 #pragma once
 
 #include <mutex>
-#include "CommonLogger.h"
+#include "common_logger.h"
 
-namespace Logging {
+namespace logging {
 
 class StreamLogger : public CommonLogger {
 public:

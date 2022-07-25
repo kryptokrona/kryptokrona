@@ -17,18 +17,20 @@
 
 #pragma once
 
-#include <fstream>
-#include "StreamLogger.h"
+#include <mutex>
+#include "common_logger.h"
 
-namespace Logging {
+namespace logging {
 
-class FileLogger : public StreamLogger {
+class ConsoleLogger : public CommonLogger {
 public:
-  FileLogger(Level level = DEBUGGING);
-  void init(const std::string& filename);
+  ConsoleLogger(Level level = DEBUGGING);
+
+protected:
+  virtual void doLogString(const std::string& message) override;
 
 private:
-  std::ofstream fileStream;
+  std::mutex mutex;
 };
 
 }
