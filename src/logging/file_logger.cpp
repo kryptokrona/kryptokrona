@@ -15,22 +15,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "file_logger.h"
 
-#include "ILogger.h"
-#include "LoggerMessage.h"
+namespace logging {
 
-namespace Logging {
+FileLogger::FileLogger(Level level) : StreamLogger(level) {
+}
 
-class LoggerRef {
-public:
-  LoggerRef(std::shared_ptr<ILogger> logger, const std::string& category);
-  LoggerMessage operator()(Level level = INFO, const std::string& color = DEFAULT) const;
-  std::shared_ptr<ILogger> getLogger() const;
-
-private:
-  std::shared_ptr<ILogger> logger;
-  std::string category;
-};
+void FileLogger::init(const std::string& fileName) {
+  fileStream.open(fileName, std::ios::app);
+  StreamLogger::attachToStream(fileStream);
+}
 
 }

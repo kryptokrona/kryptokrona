@@ -15,31 +15,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "logger_ref.h"
 
-#include <set>
-#include "ILogger.h"
+namespace logging {
 
-namespace Logging {
+LoggerRef::LoggerRef(std::shared_ptr<ILogger> logger, const std::string& category) : logger(logger), category(category) {
+}
 
-class CommonLogger : public ILogger {
-public:
+LoggerMessage LoggerRef::operator()(Level level, const std::string& color) const {
+  return LoggerMessage(logger, category, level, color);
+}
 
-  virtual ~CommonLogger() {};
-
-  virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
-  virtual void disableCategory(const std::string& category);
-  virtual void setMaxLevel(Level level);
-
-  void setPattern(const std::string& pattern);
-
-protected:
-  std::set<std::string> disabledCategories;
-  Level logLevel;
-  std::string pattern;
-
-  CommonLogger(Level level);
-  virtual void doLogString(const std::string& message);
-};
+std::shared_ptr<ILogger> LoggerRef::getLogger() const {
+  return logger;
+}
 
 }

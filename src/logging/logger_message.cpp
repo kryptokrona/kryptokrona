@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "LoggerMessage.h"
+#include "logger_message.h"
 
-namespace Logging {
+namespace logging {
 
 LoggerMessage::LoggerMessage(std::shared_ptr<ILogger> logger, const std::string& category, Level level, const std::string& color)
   : std::ostream(this)

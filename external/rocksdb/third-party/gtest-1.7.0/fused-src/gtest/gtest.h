@@ -322,7 +322,7 @@
 //                    platforms, or a reduced regular exception syntax on
 //                    other platforms, including Windows.
 //
-// Logging:
+// logging:
 //   GTEST_LOG_()   - logs messages at the specified severity level.
 //   LogToStderr()  - directs all log messages to stderr.
 //   FlushInfoLog() - flushes informational log messages.

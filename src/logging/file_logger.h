@@ -15,24 +15,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "LoggerGroup.h"
-#include <algorithm>
+#pragma once
 
-namespace Logging {
+#include <fstream>
+#include "stream_logger.h"
 
-LoggerGroup::LoggerGroup(Level level) : CommonLogger(level) {
-}
+namespace logging {
 
-void LoggerGroup::addLogger(ILogger& logger) {
-  loggers.push_back(&logger);
-}
+class FileLogger : public StreamLogger {
+public:
+  FileLogger(Level level = DEBUGGING);
+  void init(const std::string& filename);
 
-void LoggerGroup::operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) {
-  if (level <= logLevel && disabledCategories.count(category) == 0) {
-    for (auto& logger : loggers) {
-      (*logger)(category, level, time, body);
-    }
-  }
-}
+private:
+  std::ofstream fileStream;
+};
 
 }
