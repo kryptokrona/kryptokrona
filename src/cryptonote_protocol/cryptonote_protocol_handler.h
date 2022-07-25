@@ -23,11 +23,11 @@
 
 #include <Logging/LoggerRef.h>
 
-namespace System {
+namespace system {
   class Dispatcher;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
   class Currency;
 

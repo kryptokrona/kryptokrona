@@ -19,8 +19,8 @@
 #define PERFORMANCE_ITERATIONS  1000
 #define PERFORMANCE_ITERATIONS_LONG_MULTIPLIER 10
 
-using namespace Crypto;
-using namespace CryptoNote;
+using namespace crypto;
+using namespace cryptonote;
 
 const std::string INPUT_DATA = "0100fb8e8ac805899323371bb790db19218afd8db8e3755d8b90f39b3d5506a9abce4fa912244500000000ee8146d49fa93ee724deb57d12cbc6c6f3b924d946127c7a97418f9348828f0f02";
 
