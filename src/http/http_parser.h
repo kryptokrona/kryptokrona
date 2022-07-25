@@ -21,10 +21,10 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include "HttpRequest.h"
-#include "HttpResponse.h"
+#include "http_request.h"
+#include "http_response.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 //Blocking HttpParser
 class HttpParser {

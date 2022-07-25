@@ -69,7 +69,7 @@ void invokeJsonCommand(HttpClient& client, const std::string& url, const Request
   client.request(hreq, hres);
 
   if (hres.getStatus() != HttpResponse::STATUS_200) {
-    throw std::runtime_error("HTTP status: " + std::to_string(hres.getStatus()));
+    throw std::runtime_error("http status: " + std::to_string(hres.getStatus()));
   }
 
   if (!loadFromJson(res, hres.getBody())) {

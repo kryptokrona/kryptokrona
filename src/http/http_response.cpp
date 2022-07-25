@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "HttpResponse.h"
+#include "http_response.h"
 
 #include <stdexcept>
 
@@ -30,7 +30,7 @@ const char* getStatusString(CryptoNote::HttpResponse::HTTP_STATUS status) {
   case CryptoNote::HttpResponse::STATUS_500:
     return "500 Internal Server Error";
   default:
-    throw std::runtime_error("Unknown HTTP status code is given");
+    throw std::runtime_error("Unknown http status code is given");
   }
 
   return ""; //unaccessible
@@ -55,7 +55,7 @@ namespace CryptoNote {
 
 HttpResponse::HttpResponse() {
   status = STATUS_200;
-  headers["Server"] = "CryptoNote-based HTTP server";
+  headers["Server"] = "CryptoNote-based http server";
   headers["Connection"] = "keep-alive";
 }
 
@@ -81,7 +81,7 @@ void HttpResponse::setBody(const std::string& b) {
 }
 
 std::ostream& HttpResponse::printHttpResponse(std::ostream& os) const {
-  os << "HTTP/1.1 " << getStatusString(status) << "\r\n";
+  os << "http/1.1 " << getStatusString(status) << "\r\n";
 
   for (auto pair: headers) {
     os << pair.first << ": " << pair.second << "\r\n";

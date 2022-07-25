@@ -20,7 +20,7 @@
 #include <string>
 #include <system_error>
 
-namespace CryptoNote {
+namespace cryptonote {
 namespace error {
 
 enum HttpParserErrorCodes {

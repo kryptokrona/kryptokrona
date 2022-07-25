@@ -54,7 +54,7 @@
 #endif
 
 /*
- * Read a HTTP response from a socket.
+ * Read a http response from a socket.
  * Process Content-Length and Transfer-encoding headers.
  * return a pointer to the content buffer, which length is saved
  * to the length parameter.
@@ -219,7 +219,7 @@ getHTTPResponse(int s, int * size)
 						if(chunksize == 0)
 						{
 #ifdef DEBUG
-							printf("end of HTTP content - %d %d\n", i, n);
+							printf("end of http content - %d %d\n", i, n);
 							/*printf("'%.*s'\n", n-i, buf+i);*/
 #endif
 							goto end_of_stream;
@@ -268,7 +268,7 @@ getHTTPResponse(int s, int * size)
 		if(content_length > 0 && (int)content_buf_used >= content_length)
 		{
 #ifdef DEBUG
-			printf("End of HTTP content\n");
+			printf("End of http content\n");
 #endif
 			break;
 		}
@@ -361,7 +361,7 @@ miniwget3(const char * host,
 	}
 
 	len = snprintf(buf, sizeof(buf),
-                 "GET %s HTTP/%s\r\n"
+                 "GET %s http/%s\r\n"
 			     "Host: %s:%d\r\n"
 				 "Connection: Close\r\n"
 				 "User-Agent: " OS_STRING ", UPnP/1.0, MiniUPnPc/" MINIUPNPC_VERSION_STRING "\r\n"
@@ -369,7 +369,7 @@ miniwget3(const char * host,
 				 "\r\n",
 			   path, httpversion, host, port);
 	sent = 0;
-	/* sending the HTTP request */
+	/* sending the http request */
 	while(sent < len)
 	{
 		n = send(s, buf+sent, len-sent, 0);
@@ -390,7 +390,7 @@ miniwget3(const char * host,
 }
 
 /* miniwget2() :
- * Call miniwget3(); retry with HTTP/1.1 if 1.0 fails. */
+ * Call miniwget3(); retry with http/1.1 if 1.0 fails. */
 static void *
 miniwget2(const char * host,
 		  unsigned short port, const char * path,
@@ -408,7 +408,7 @@ miniwget2(const char * host,
 	if (*size == 0)
 	{
 #ifdef DEBUG
-		printf("Retrying with HTTP/1.1\n");
+		printf("Retrying with http/1.1\n");
 #endif
 		free(respbuffer);
 		respbuffer = miniwget3(host, port, path, size,

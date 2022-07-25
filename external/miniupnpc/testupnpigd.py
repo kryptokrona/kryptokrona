@@ -20,7 +20,7 @@ def list_redirections():
 		print i, p
 		i = i + 1
 
-#define the handler class for HTTP connections
+#define the handler class for http connections
 class handler_class(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_GET(self):
 		self.send_response(200)
@@ -64,7 +64,7 @@ try:
 	b = u.addportmapping(eport, 'TCP', u.lanaddr, httpd.server_port,
 	                    'UPnP IGD Tester port %u' % eport, '')
 	if b:
-		print 'Success. Now waiting for some HTTP request on http://%s:%u' % (externalipaddress ,eport)
+		print 'Success. Now waiting for some http request on http://%s:%u' % (externalipaddress ,eport)
 		try:
 			httpd.handle_request()
 			httpd.server_close()
