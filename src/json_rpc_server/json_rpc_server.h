@@ -14,20 +14,20 @@
 #include "Rpc/HttpServer.h"
 #include "WalletService/ConfigurationManager.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 class HttpResponse;
 class HttpRequest;
 }
 
-namespace Common {
+namespace common {
 class JsonValue;
 }
 
-namespace System {
+namespace system {
 class TcpConnection;
 }
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class JsonRpcServer : HttpServer {
 public:
