@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "JsonRpc.h"
+#include "json_rpc.h"
 #include "Rpc/HttpClient.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
-namespace JsonRpc {
+namespace json_rpc {
 
 JsonRpcError::JsonRpcError() : code(0) {}
 

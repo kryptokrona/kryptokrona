@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "HttpClient.h"
+#include "http_client.h"
 
 #include <HTTP/HttpParser.h>
 #include <System/Ipv4Resolver.h>
 #include <System/Ipv4Address.h>
 #include <System/TcpConnector.h>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 HttpClient::HttpClient(System::Dispatcher& dispatcher, const std::string& address, uint16_t port) :
   m_dispatcher(dispatcher), m_address(address), m_port(port) {

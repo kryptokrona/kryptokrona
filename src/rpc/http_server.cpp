@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "HttpServer.h"
+#include "http_server.h"
 #include <boost/scope_exit.hpp>
 
 #include <HTTP/HttpParser.h>
@@ -23,9 +23,9 @@
 #include <System/TcpStream.h>
 #include <System/Ipv4Address.h>
 
-using namespace Logging;
+using namespace logging;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 HttpServer::HttpServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log)
   : m_dispatcher(dispatcher), workingContextGroup(dispatcher), logger(log, "HttpServer") {
