@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "JsonRpcServer.h"
+#include "json_rpc_server.h"
 
 #include <fstream>
 #include <future>
@@ -24,12 +24,12 @@
 #include "Serialization/JsonInputValueSerializer.h"
 #include "Serialization/JsonOutputStreamSerializer.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 JsonRpcServer::JsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config) :
   HttpServer(sys, loggerGroup),
   stopEvent(stopEvent),
-  logger(loggerGroup, "JsonRpcServer"),
+  logger(loggerGroup, "json_rpc_server"),
   config(config)
 {
 }
