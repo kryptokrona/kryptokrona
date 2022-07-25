@@ -12,7 +12,8 @@
 
 using nlohmann::json;
 
-namespace DaemonConfig {
+namespace daemon_config
+{
   struct DaemonConfiguration
   {
     DaemonConfiguration()

@@ -2,7 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "DaemonConfiguration.h"
+#include "daemon_configuration.h"
 #include <cxxopts.hpp>
 #include <json.hpp>
 #include <fstream>
@@ -16,7 +16,8 @@
 
 using nlohmann::json;
 
-namespace DaemonConfig{
+namespace daemon_config
+{
   
   DaemonConfiguration initConfiguration(const char* path)
   {
@@ -38,7 +39,7 @@ namespace DaemonConfig{
       ("genesis-block-reward-address", "Specify the address for any premine genesis block rewards", cxxopts::value<std::vector<std::string>>(), "<address>")
       ("print-genesis-tx", "Print the genesis block transaction hex and exits", cxxopts::value<bool>()->default_value("false")->implicit_value("true"));
 
-    options.add_options("Daemon")
+    options.add_options("daemon")
       ("c,config-file", "Specify the <path> to a configuration file", cxxopts::value<std::string>(), "<path>")
       ("data-dir", "Specify the <path> to the Blockchain data directory", cxxopts::value<std::string>()->default_value(config.dataDirectory), "<path>")
       ("dump-config", "Prints the current configuration to the screen", cxxopts::value<bool>()->default_value("false")->implicit_value("true"))

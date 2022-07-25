@@ -6,8 +6,8 @@
 
 #include <config/CliHeader.h>
 
-#include "DaemonConfiguration.h"
-#include "DaemonCommandsHandler.h"
+#include "daemon_configuration.h"
+#include "daemon_commands_handler.h"
 #include "Common/ScopeExit.h"
 #include "Common/SignalHandler.h"
 #include "Common/StdOutputStream.h"
@@ -41,9 +41,9 @@
 #endif
 
 using Common::JsonValue;
-using namespace CryptoNote;
-using namespace Logging;
-using namespace DaemonConfig;
+using namespace cryptonote;
+using namespace logging;
+using namespace daemon_config;
 
 void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const bool blockExplorerMode, std::shared_ptr<LoggerManager> logManager)
 {
