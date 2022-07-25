@@ -15,17 +15,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "P2pConnectionProxy.h"
+#include "p2p_connection_proxy.h"
 
-#include "LevinProtocol.h"
-#include "P2pContext.h"
-#include "P2pNode.h"
+#include "levin_protocol.h"
+#include "p2p_context.h"
+#include "p2p_node.h"
 
 #include <System/InterruptedException.h>
 
-using namespace System;
+using namespace system;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 P2pConnectionProxy::P2pConnectionProxy(P2pContextOwner&& ctx, IP2pNodeInternal& node)
   : m_contextOwner(std::move(ctx)), m_context(m_contextOwner.get()), m_node(node) {}

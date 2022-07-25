@@ -23,11 +23,11 @@
 #include "Serialization/KVBinaryInputStreamSerializer.h"
 #include "Serialization/KVBinaryOutputStreamSerializer.h"
 
-namespace System {
+namespace system {
 class TcpConnection;
 }
 
-namespace CryptoNote {
+namespace cryptonote {
 
 enum class LevinError: int32_t {
   OK = 0,

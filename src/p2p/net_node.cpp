@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "NetNode.h"
+#include "net_node.h"
 
 #include <algorithm>
 #include <fstream>
@@ -34,17 +34,17 @@
 #include "crypto/crypto.h"
 #include <crypto/random.h>
 
-#include "ConnectionContext.h"
-#include "LevinProtocol.h"
-#include "P2pProtocolDefinitions.h"
+#include "connection_context.h"
+#include "levin_protocol.h"
+#include "p2p_protocol_definitions.h"
 
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
 #include "Serialization/SerializationOverloads.h"
 
-using namespace Common;
-using namespace Logging;
-using namespace CryptoNote;
+using namespace common;
+using namespace logging;
+using namespace cryptonote;
 
 namespace {
 

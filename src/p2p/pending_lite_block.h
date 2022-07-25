@@ -8,7 +8,7 @@
 
 #include "CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 struct PendingLiteBlock {
   NOTIFY_NEW_LITE_BLOCK_request request;
   std::unordered_set<Crypto::Hash> missed_transactions;
