@@ -446,7 +446,7 @@ int CryptoNoteProtocolHandler::handle_request_get_objects(int command, NOTIFY_RE
   logger(Logging::TRACE) << context << "NOTIFY_REQUEST_GET_OBJECTS";
   NOTIFY_RESPONSE_GET_OBJECTS::request rsp;
   //if (!m_core.handle_get_objects(arg, rsp)) {
-  //  logger(Logging::ERROR) << context << "failed to handle request NOTIFY_REQUEST_GET_OBJECTS, dropping connection";
+  //  logger(logging::ERROR) << context << "failed to handle request NOTIFY_REQUEST_GET_OBJECTS, dropping connection";
   //  context.m_state = CryptoNoteConnectionContext::state_shutdown;
   //}
 

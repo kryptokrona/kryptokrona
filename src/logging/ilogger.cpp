@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "ILogger.h"
+#include "ilogger.h"
 
-namespace Logging {
+namespace logging {
 
 const std::string BLUE = "\x1F""BLUE\x1F";
 const std::string GREEN = "\x1F""GREEN\x1F";

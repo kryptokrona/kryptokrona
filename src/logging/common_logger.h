@@ -17,21 +17,29 @@
 
 #pragma once
 
-#include <vector>
-#include "CommonLogger.h"
+#include <set>
+#include "ilogger.h"
 
-namespace Logging {
+namespace logging {
 
-class LoggerGroup : public CommonLogger {
+class CommonLogger : public ILogger {
 public:
-  LoggerGroup(Level level = DEBUGGING);
 
-  void addLogger(ILogger& logger);
-  void removeLogger(ILogger& logger);
+  virtual ~CommonLogger() {};
+
   virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
+  virtual void disableCategory(const std::string& category);
+  virtual void setMaxLevel(Level level);
+
+  void setPattern(const std::string& pattern);
 
 protected:
-  std::vector<ILogger*> loggers;
+  std::set<std::string> disabledCategories;
+  Level logLevel;
+  std::string pattern;
+
+  CommonLogger(Level level);
+  virtual void doLogString(const std::string& message);
 };
 
 }
