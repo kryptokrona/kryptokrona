@@ -44,7 +44,7 @@ Config parseArguments(int argc, char **argv)
     {
         const auto result = options.parse(argc, argv);
 
-        /* Rpc password must be specified if not --help or --version */
+        /* rpc password must be specified if not --help or --version */
         if (result.count("rpc-password") == 0 && !(help || version))
         {
             std::cout << "You must specify an rpc-password!" << std::endl;
