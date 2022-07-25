@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <vector>
 
-namespace CRC32
+namespace crc32
 {
     /* oof */
     std::vector<uint64_t> table

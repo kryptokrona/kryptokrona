@@ -4,9 +4,9 @@
 //
 // Please see the included LICENSE file for more information.
 
-namespace Mnemonics
+namespace mnemonics
 {
-    namespace WordList
+    namespace wordlist
     {
         const static std::vector<const char *> English =
         {

@@ -11,7 +11,7 @@
 
 #include <Errors/Errors.h>
 
-namespace Mnemonics
+namespace mnemonics
 {
     std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::string words);
 
