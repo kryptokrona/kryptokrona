@@ -17,13 +17,13 @@
 #include "INode.h"
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 
-namespace System {
+namespace system {
   class ContextGroup;
   class Dispatcher;
   class Event;
 }
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class HttpClient;
 

@@ -20,8 +20,8 @@
 #include <string>
 #include <system_error>
 
-namespace CryptoNote {
-namespace NodeError {
+namespace cryptonote {
+namespace node_error {
 
 // custom error conditions enum type:
 enum NodeErrorCodes {
