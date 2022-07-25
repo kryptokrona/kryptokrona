@@ -68,7 +68,7 @@ UPNP_GetConnectionTypeInfo(const char * controlURL,
  * 0 : SUCCESS
  * NON ZERO : ERROR Either an UPnP error code or an unknown error.
  *
- * possible UPnP Errors :
+ * possible UPnP errors :
  * 402 Invalid Args - See UPnP Device Architecture section on Control.
  * 501 Action Failed - See UPnP Device Architecture section on Control. */
 LIBSPEC int

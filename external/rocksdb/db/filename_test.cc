@@ -69,7 +69,7 @@ TEST_F(FileNameTest, Parse) {
     }
   }
 
-  // Errors
+  // errors
   static const char* errors[] = {
     "",
     "foo",
