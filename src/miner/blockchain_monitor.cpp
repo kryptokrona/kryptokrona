@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "BlockchainMonitor.h"
+#include "blockchain_monitor.h"
 
 #include "Common/StringTools.h"
 

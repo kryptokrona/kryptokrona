@@ -11,18 +11,18 @@
 #include <System/ContextGroup.h>
 #include <System/Event.h>
 
-#include "BlockchainMonitor.h"
+#include "blockchain_monitor.h"
 #include "Logging/LoggerRef.h"
-#include "Miner.h"
-#include "MinerEvent.h"
-#include "MiningConfig.h"
+#include "miner.h"
+#include "miner_event.h"
+#include "mining_config.h"
 
-namespace System
+namespace system
 {
     class Dispatcher;
 }
 
-namespace Miner {
+namespace miner {
 
 class MinerManager
 {
@@ -67,4 +67,4 @@ class MinerManager
         void adjustBlockTemplate(CryptoNote::BlockTemplate& blockTemplate) const;
 };
 
-} //namespace Miner
+}

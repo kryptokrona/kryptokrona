@@ -1684,7 +1684,7 @@ bool Core::getBlockTemplate(BlockTemplate& b, const AccountPublicAddress& adr, c
           // fuck, not lucky, -1 makes varint-counter size smaller, in that case we continue to grow with
           // cumulative_size
           logger(Logging::TRACE, Logging::BRIGHT_RED)
-              << "Miner tx creation have no luck with delta_extra size = " << delta << " and " << delta - 1;
+              << "miner tx creation have no luck with delta_extra size = " << delta << " and " << delta - 1;
           cumulativeSize += delta - 1;
           continue;
         }
