@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace CryptoNote {
+namespace cryptonote {
 class ICryptoNoteProtocolObserver;
 
 class ICryptoNoteProtocolQuery {

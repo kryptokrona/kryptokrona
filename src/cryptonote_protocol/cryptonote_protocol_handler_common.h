@@ -17,17 +17,23 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <cstddef>
+#include <CryptoNoteProtocol/ICryptoNoteProtocolQuery.h>
+#include <CryptoNote.h>
 
-namespace CryptoNote {
+#include <vector>
 
-class ICryptoNoteProtocolObserver {
-public:
-  virtual void peerCountUpdated(size_t count) {}
-  virtual void lastKnownBlockHeightUpdated(uint32_t height) {}
-  virtual void blockchainSynchronized(uint32_t topHeight) {}
-};
+namespace cryptonote
+{
+  struct NOTIFY_NEW_BLOCK_request;
 
-} //namespace CryptoNote
+  /************************************************************************/
+  /*                                                                      */
+  /************************************************************************/
+  struct ICryptoNoteProtocol {
+    virtual void relayBlock(NOTIFY_NEW_BLOCK_request& arg) = 0;
+    virtual void relayTransactions(const std::vector<BinaryArray>& transactions) = 0;
+  };
+  
+  struct ICryptoNoteProtocolHandler : ICryptoNoteProtocol, public ICryptoNoteProtocolQuery {
+  };
+}

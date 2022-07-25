@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "CryptoNoteProtocolHandler.h"
+#include "cryptonote_protocol_handler.h"
 
 #include <future>
 #include <boost/scope_exit.hpp>
@@ -23,10 +23,10 @@
 #include <config/CryptoNoteConfig.h>
 #include <config/WalletConfig.h>
 
-using namespace Logging;
-using namespace Common;
+using namespace logging;
+using namespace common;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 namespace {
 
