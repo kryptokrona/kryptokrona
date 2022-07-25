@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "P2pProtocolTypes.h"
+#include "p2p_protocol_types.h"
 
 #include <boost/uuid/uuid.hpp>
 
@@ -18,7 +18,7 @@
 #include "Serialization/SerializationOverloads.h"
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
   inline bool serialize(boost::uuids::uuid& v, Common::StringView name, ISerializer& s) {
     return s.binary(&v, sizeof(v), name);

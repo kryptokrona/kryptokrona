@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "P2pContextOwner.h"
+#include "p2p_context_owner.h"
 #include <cassert>
-#include "P2pContext.h"
+#include "p2p_context.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 P2pContextOwner::P2pContextOwner(P2pContext* ctx, ContextList& contextList) : contextList(contextList) {
   contextIterator = contextList.insert(contextList.end(), ContextList::value_type(ctx));

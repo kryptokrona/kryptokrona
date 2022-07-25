@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "P2pNodeConfig.h"
+#include "p2p_node_config.h"
 
 #include <config/CryptoNoteConfig.h>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 namespace {
 

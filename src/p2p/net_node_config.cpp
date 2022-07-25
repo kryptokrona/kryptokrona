@@ -3,14 +3,14 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "NetNodeConfig.h"
+#include "net_node_config.h"
 
 #include <Common/Util.h>
 #include "Common/StringTools.h"
 #include <config/CryptoNoteConfig.h>
 #include <crypto/random.h>
 
-namespace CryptoNote {
+namespace cryptonote {
 namespace {
 
 bool parsePeerFromString(NetworkAddress& pe, const std::string& node_addr)
