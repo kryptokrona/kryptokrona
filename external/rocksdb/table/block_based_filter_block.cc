@@ -225,7 +225,7 @@ bool BlockBasedFilterBlockReader::MayMatch(const Slice& entry,
       return false;
     }
   }
-  return true;  // Errors are treated as potential matches
+  return true;  // errors are treated as potential matches
 }
 
 size_t BlockBasedFilterBlockReader::ApproximateMemoryUsage() const {

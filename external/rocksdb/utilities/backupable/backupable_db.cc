@@ -671,7 +671,7 @@ Status BackupEngineImpl::Initialize() {
                            std::make_pair(s, std::move(backup_iter->second))));
       } else if (!s.ok()) {
         // Distinguish corruption errors from errors in the backup Env.
-        // Errors in the backup Env (i.e., this code path) will cause Open() to
+        // errors in the backup Env (i.e., this code path) will cause Open() to
         // fail, whereas corruption errors would not cause Open() failures.
         return s;
       } else {

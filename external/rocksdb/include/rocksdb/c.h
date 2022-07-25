@@ -27,7 +27,7 @@
   the caller has to pass the pointer and length as separate
   arguments.
 
-  (3) Errors are represented by a null-terminated c string.  NULL
+  (3) errors are represented by a null-terminated c string.  NULL
   means no error.  All operations that can raise an error are passed
   a "char** errptr" as the last argument.  One of the following must
   be true on entry:
