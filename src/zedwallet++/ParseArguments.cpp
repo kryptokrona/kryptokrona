@@ -32,7 +32,7 @@ Config parseArguments(int argc, char **argv)
         ("h,help", "Display this help message", cxxopts::value<bool>(help)->implicit_value("true"))
         ("v,version", "Output software version information", cxxopts::value<bool>(version)->default_value("false")->implicit_value("true"));
 
-    options.add_options("Daemon")
+    options.add_options("daemon")
         ("r,remote-daemon", "The daemon <host:port> combination to use for node operations.",
           cxxopts::value<std::string>(remoteDaemon)->default_value(defaultRemoteDaemon), "<host:port>");
 

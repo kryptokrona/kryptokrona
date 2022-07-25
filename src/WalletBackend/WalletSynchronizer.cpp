@@ -253,7 +253,7 @@ void WalletSynchronizer::processBlock(const WalletTypes::WalletBlockInfo &block)
 
             const auto it = globalIndexes.find(input.parentTransactionHash);
 
-            /* Daemon returns indexes for hashes in a range. If we don't
+            /* daemon returns indexes for hashes in a range. If we don't
                find our hash, either the chain has forked, or the daemon
                is faulty. Print a warning message, then return so we
                can fetch new blocks, in the likely case the daemon has
@@ -567,7 +567,7 @@ void WalletSynchronizer::start()
 
     if (m_daemon == nullptr)
     {
-        throw std::runtime_error("Daemon has not been initialized!");
+        throw std::runtime_error("daemon has not been initialized!");
     }
 
     m_syncThread = std::thread(&WalletSynchronizer::mainLoop, this);

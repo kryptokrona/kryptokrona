@@ -24,7 +24,7 @@ namespace PaymentService {
       ("h,help", "Display this help message", cxxopts::value<bool>()->implicit_value("true"))
       ("v,version", "Output software version information", cxxopts::value<bool>()->default_value("false")->implicit_value("true"));
 
-    options.add_options("Daemon")
+    options.add_options("daemon")
       ("daemon-address", "The daemon host to use for node operations",cxxopts::value<std::string>()->default_value(config.daemonAddress), "<ip>")
       ("daemon-port", "The daemon RPC port to use for node operations", cxxopts::value<int>()->default_value(std::to_string(config.daemonPort)), "<port>");
 

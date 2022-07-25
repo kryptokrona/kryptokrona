@@ -22,7 +22,7 @@ namespace WalletTypes
 
         uint64_t amount;
 
-        /* Daemon doesn't supply this, blockchain cache api does. */
+        /* daemon doesn't supply this, blockchain cache api does. */
         std::optional<uint64_t> globalOutputIndex;
     };
 

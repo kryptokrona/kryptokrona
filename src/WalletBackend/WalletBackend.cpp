@@ -513,7 +513,7 @@ void WalletBackend::init()
 {
     if (m_daemon == nullptr)
     {
-        throw std::runtime_error("Daemon has not been initialized!");
+        throw std::runtime_error("daemon has not been initialized!");
     }
 
     m_daemon->init();

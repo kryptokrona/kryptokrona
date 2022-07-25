@@ -94,7 +94,7 @@ void MiningConfig::parse(int argc, char** argv)
         ("help", "Display this help message", cxxopts::value<bool>(help)->implicit_value("true"))
         ("version", "Output software version information", cxxopts::value<bool>(version)->default_value("false")->implicit_value("true"));
 
-    options.add_options("Daemon")
+    options.add_options("daemon")
         ("daemon-address", "The daemon [host:port] combination to use for node operations. This option overrides --daemon-host and --daemon-rpc-port", 
           cxxopts::value<std::string>(daemonAddress), "<host:port>")
         ("daemon-host", "The daemon host to use for node operations", cxxopts::value<std::string>(daemonHost)->default_value("127.0.0.1"), "<host>")
