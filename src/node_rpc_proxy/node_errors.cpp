@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "NodeErrors.h"
+#include "node_errors.h"
 
-namespace CryptoNote {
-namespace NodeError {
+namespace cryptonote {
+namespace node_error {
 
 NodeErrorCategory NodeErrorCategory::INSTANCE;
 

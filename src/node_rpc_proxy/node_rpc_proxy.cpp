@@ -4,8 +4,8 @@
 // Please see the included LICENSE file for more information.
 
 
-#include "NodeRpcProxy.h"
-#include "NodeErrors.h"
+#include "node_rpc_proxy.h"
+#include "node_errors.h"
 
 #include <atomic>
 #include <ctime>
@@ -35,12 +35,12 @@
 #define AUTO_VAL_INIT(n) boost::value_initialized<decltype(n)>()
 #endif
 
-using namespace Crypto;
-using namespace Common;
-using namespace Logging;
-using namespace System;
+using namespace crypto;
+using namespace common;
+using namespace logging;
+using namespace system;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 namespace {
 
@@ -56,7 +56,7 @@ std::error_code interpretResponseStatus(const std::string& status) {
 }
 
 NodeRpcProxy::NodeRpcProxy(const std::string& nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<Logging::ILogger> logger) :
-  m_logger(logger, "NodeRpcProxy"),
+  m_logger(logger, "node_rpc_proxy"),
   m_rpcTimeout(10000),
   m_pullInterval(5000),
   m_nodeHost(nodeHost),
@@ -71,7 +71,7 @@ NodeRpcProxy::NodeRpcProxy(const std::string& nodeHost, unsigned short nodePort,
 }
 
 NodeRpcProxy::NodeRpcProxy(const std::string& nodeHost, unsigned short nodePort, unsigned int initTimeout) :
-  m_logger(std::make_shared<Logging::DummyLogger>(), "NodeRpcProxy"),
+  m_logger(std::make_shared<Logging::DummyLogger>(), "node_rpc_proxy"),
   m_rpcTimeout(10000),
   m_pullInterval(5000),
   m_nodeHost(nodeHost),
@@ -581,7 +581,7 @@ std::error_code NodeRpcProxy::doRelayTransaction(const CryptoNote::Transaction& 
   COMMAND_RPC_SEND_RAW_TX::request req;
   COMMAND_RPC_SEND_RAW_TX::response rsp;
   req.tx_as_hex = toHex(toBinaryArray(transaction));
-  m_logger(TRACE) << "NodeRpcProxy::doRelayTransaction, tx hex " << req.tx_as_hex;
+  m_logger(TRACE) << "node_rpc_proxy::doRelayTransaction, tx hex " << req.tx_as_hex;
   return jsonCommand("/sendrawtransaction", req, rsp);
 }
 
