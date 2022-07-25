@@ -42,7 +42,7 @@ void JsonRpcServer::start(const std::string& bindAddress, uint16_t bindPort) {
 
 void JsonRpcServer::processRequest(const CryptoNote::HttpRequest& req, CryptoNote::HttpResponse& resp) {
   try {
-    logger(Logging::TRACE) << "HTTP request came: \n" << req;
+    logger(Logging::TRACE) << "http request came: \n" << req;
 
     if (req.getUrl() == "/json_rpc") {
       std::istringstream jsonInputStream(req.getBody());

@@ -1538,7 +1538,7 @@ inline const std::string& BufferStream::get_buffer() const {
 }
 
 
-// HTTP server implementation
+// http server implementation
 inline Server::Server()
     : keep_alive_max_count_(5)
     , is_running_(false)
@@ -1642,7 +1642,7 @@ inline void Server::stop()
 
 inline bool Server::parse_request_line(const char* s, Request& req)
 {
-    static std::regex re("(GET|HEAD|POST|PUT|DELETE|OPTIONS) (([^?]+)(?:\\?(.+?))?) (HTTP/1\\.[01])\r\n");
+    static std::regex re("(GET|HEAD|POST|PUT|DELETE|OPTIONS) (([^?]+)(?:\\?(.+?))?) (http/1\\.[01])\r\n");
 
     std::cmatch m;
     if (std::regex_match(s, m, re)) {
@@ -1672,7 +1672,7 @@ inline void Server::write_response(Stream& strm, bool last_connection, const Req
     }
 
     // Response line
-    strm.write_format("HTTP/1.1 %d %s\r\n",
+    strm.write_format("http/1.1 %d %s\r\n",
         res.status,
         detail::status_message(res.status));
 
@@ -1918,7 +1918,7 @@ inline bool Server::process_request(Stream& strm, bool last_connection, bool& co
     Request req;
     Response res;
 
-    res.version = "HTTP/1.1";
+    res.version = "http/1.1";
 
     // Request line and headers
     if (!parse_request_line(reader.ptr(), req) || !detail::read_headers(strm, req.headers)) {
@@ -1996,7 +1996,7 @@ inline bool Server::read_socket(socket_t sock)
         close);
 }
 
-// HTTP client implementation
+// http client implementation
 inline Client::Client(
     const char* host, int port, time_t timeout_sec)
     : host_(host)
@@ -2054,7 +2054,7 @@ inline bool Client::read_response_line(Stream& strm, Response& res)
         return false;
     }
 
-    const static std::regex re("(HTTP/1\\.[01]) (\\d+?) .+\r\n");
+    const static std::regex re("(http/1\\.[01]) (\\d+?) .+\r\n");
 
     std::cmatch m;
     if (std::regex_match(reader.ptr(), m, re)) {
@@ -2101,7 +2101,7 @@ inline bool Client::write_request(Stream& strm, Request& req)
     // Request line
     auto path = detail::encode_url(req.path);
 
-    bstrm.write_format("%s %s HTTP/1.1\r\n",
+    bstrm.write_format("%s %s http/1.1\r\n",
         req.method.c_str(),
         path.c_str());
 
@@ -2162,7 +2162,7 @@ inline bool Client::process_request(Stream& strm, Request& req, Response& res, b
         return false;
     }
 
-    if (res.get_header_value("Connection") == "close" || res.version == "HTTP/1.0") {
+    if (res.get_header_value("Connection") == "close" || res.version == "http/1.0") {
         connection_close = true;
     }
 
@@ -2443,7 +2443,7 @@ inline std::string SSLSocketStream::get_remote_addr() const {
     return detail::get_remote_addr(sock_);
 }
 
-// SSL HTTP server implementation
+// SSL http server implementation
 inline SSLServer::SSLServer(const char* cert_path, const char* private_key_path)
 {
     ctx_ = SSL_CTX_new(SSLv23_server_method());
@@ -2494,7 +2494,7 @@ inline bool SSLServer::read_socket(socket_t sock)
         close);
 }
 
-// SSL HTTP client implementation
+// SSL http client implementation
 inline SSLClient::SSLClient(const char* host, int port, time_t timeout_sec)
     : Client(host, port, timeout_sec)
 {

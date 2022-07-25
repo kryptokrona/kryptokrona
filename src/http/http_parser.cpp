@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "HttpParser.h"
+#include "http_parser.h"
 
 #include <algorithm>
 
-#include "HttpParserErrorCodes.h"
+#include "http_parser_error_codes.h"
 
 namespace {
 
@@ -42,7 +42,7 @@ HttpResponse::HTTP_STATUS HttpParser::parseResponseStatusFromString(const std::s
   else if (status == "404 Not Found") return CryptoNote::HttpResponse::STATUS_404;
   else if (status == "500 Internal Server Error") return CryptoNote::HttpResponse::STATUS_500;
   else throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL),
-      "Unknown HTTP status code is given");
+      "Unknown http status code is given");
 
   return CryptoNote::HttpResponse::STATUS_200; //unaccessible
 }

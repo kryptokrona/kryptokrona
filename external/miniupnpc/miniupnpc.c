@@ -346,7 +346,7 @@ upnpDiscover(int delay, const char * multicastif,
 	unsigned int scope_id = 0;
 	int opt = 1;
 	static const char MSearchMsgFmt[] =
-	"M-SEARCH * HTTP/1.1\r\n"
+	"M-SEARCH * http/1.1\r\n"
 	"HOST: %s:" XSTR(PORT) "\r\n"
 	"ST: %s\r\n"
 	"MAN: \"ssdp:discover\"\r\n"

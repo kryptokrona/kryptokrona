@@ -104,7 +104,7 @@ char * build_chunked_response(int content_length, int * response_len) {
 	buffer_length = 256 + content_length + (content_length >> 4);
 	response_buffer = malloc(buffer_length);
 	*response_len = snprintf(response_buffer, buffer_length,
-	                         "HTTP/1.1 200 OK\r\n"
+	                         "http/1.1 200 OK\r\n"
 	                         "Content-Type: text/plain\r\n"
 	                         "Transfer-Encoding: chunked\r\n"
 	                         "\r\n");
@@ -178,7 +178,7 @@ void send_response(int c, const char * buffer, int len)
 }
 
 /**
- * handle the HTTP connection
+ * handle the http connection
  */
 void handle_http_connection(int c)
 {
@@ -253,7 +253,7 @@ void handle_http_connection(int c)
 	       request_method, request_uri, http_version);
 	/* check if the request method is allowed */
 	if(0 != strcmp(request_method, "GET")) {
-		const char response405[] = "HTTP/1.1 405 Method Not Allowed\r\n"
+		const char response405[] = "http/1.1 405 Method Not Allowed\r\n"
 		                           "Allow: GET\r\n\r\n";
 		const char * pc;
 		/* 405 Method Not Allowed */
@@ -293,7 +293,7 @@ void handle_http_connection(int c)
 		response_len = content_length+256;
 		response_buffer = malloc(response_len);
 		n = snprintf(response_buffer, response_len,
-		             "HTTP/1.1 200 OK\r\n"
+		             "http/1.1 200 OK\r\n"
 		             "Server: minihttptestserver\r\n"
 		             "Content-Type: text/plain\r\n"
 		             "Content-Length: %d\r\n"
@@ -307,7 +307,7 @@ void handle_http_connection(int c)
 		response_len = content_length+256;
 		response_buffer = malloc(response_len);
 		n = snprintf(response_buffer, response_len,
-		             "HTTP/1.1 200 OK\r\n"
+		             "http/1.1 200 OK\r\n"
 		             "Server: minihttptestserver\r\n"
 		             "Content-Type: text/plain\r\n"
 		             "\r\n");

@@ -50,7 +50,7 @@ void invokeJsonRpcCommand(HttpClient& httpClient, JsonRpcRequest& jsReq, JsonRpc
   httpClient.request(httpReq, httpRes);
 
   if (httpRes.getStatus() != HttpResponse::STATUS_200) {
-    throw std::runtime_error("JSON-RPC call failed, HTTP status = " + std::to_string(httpRes.getStatus()));
+    throw std::runtime_error("JSON-RPC call failed, http status = " + std::to_string(httpRes.getStatus()));
   }
 
   jsRes.parse(httpRes.getBody());

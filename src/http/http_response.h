@@ -21,7 +21,7 @@
 #include <string>
 #include <map>
 
-namespace CryptoNote {
+namespace cryptonote {
 
   class HttpResponse {
   public:
