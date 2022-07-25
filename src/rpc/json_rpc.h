@@ -21,16 +21,16 @@
 #include <boost/foreach.hpp>
 #include <functional>
 
-#include "CoreRpcServerCommandsDefinitions.h"
+#include "core_rpc_server_commands_definitions.h"
 #include <Common/JsonValue.h>
 #include "Serialization/ISerializer.h"
 #include "Serialization/SerializationTools.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class HttpClient;
   
-namespace JsonRpc {
+namespace json_rpc {
 
 const int errParseError = -32700;
 const int errInvalidRequest = -32600;

@@ -35,11 +35,11 @@
 
 #undef ERROR
 
-using namespace Logging;
-using namespace Crypto;
-using namespace Common;
+using namespace logging;
+using namespace crypto;
+using namespace common;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 static inline void serialize(COMMAND_RPC_GET_BLOCKS_FAST::response& response, ISerializer &s) {
   KV_MEMBER(response.blocks)
