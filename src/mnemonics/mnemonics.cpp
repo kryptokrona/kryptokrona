@@ -11,7 +11,7 @@
 
 #include <sstream>
 
-namespace Mnemonics
+namespace mnemonics
 {
     std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::string words)
     {
@@ -34,7 +34,7 @@ namespace Mnemonics
     {
         const size_t len = words.size();
 
-        /* Mnemonics must be 25 words long */
+        /* mnemonics must be 25 words long */
         if (len != 25)
         {
             /* Write out "word" or "words" to make the grammar of the next sentence
