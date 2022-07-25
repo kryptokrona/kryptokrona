@@ -78,7 +78,7 @@ bool isInputUnlocked(
    100,000 + ((height * 102,400) / 1,051,200)
    At a block height of 400k, this gives us a size of 138,964.
    The constants this calculation arise from can be seen below, or in
-   src/CryptoNoteCore/Currency.cpp::maxBlockCumulativeSize(). Call this value
+   src/cryptonote_core/Currency.cpp::maxBlockCumulativeSize(). Call this value
    x.
 
    Next, calculate the median size of the last 100 blocks. Take the max of
