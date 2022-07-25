@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "MinerManager.h"
+#include "miner_manager.h"
 
 #include <System/EventLock.h>
 #include <System/InterruptedException.h>
@@ -26,11 +26,11 @@
 
 #include <Utilities/ColouredMsg.h>
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 using json = nlohmann::json;
 
-namespace Miner {
+namespace miner {
 
 namespace {
 
@@ -360,4 +360,4 @@ void MinerManager::adjustBlockTemplate(CryptoNote::BlockTemplate& blockTemplate)
     }
 }
 
-} //namespace Miner
+} //namespace miner

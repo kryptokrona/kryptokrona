@@ -16,7 +16,7 @@
 
 #include "CryptoNote.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 struct BlockMiningParameters
 {

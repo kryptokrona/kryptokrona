@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "Miner.h"
+#include "miner.h"
 
 #include <iostream>
 
@@ -22,7 +22,7 @@
 
 #include <Utilities/ColouredMsg.h>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 Miner::Miner(System::Dispatcher& dispatcher) :
     m_dispatcher(dispatcher),
@@ -35,7 +35,7 @@ BlockTemplate Miner::mine(const BlockMiningParameters& blockMiningParameters, si
 {
     if (threadCount == 0)
     {
-        throw std::runtime_error("Miner requires at least one thread");
+        throw std::runtime_error("miner requires at least one thread");
     }
 
     if (m_state == MiningState::MINING_IN_PROGRESS)

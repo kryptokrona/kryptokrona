@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <string>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 struct MiningConfig
 {
@@ -31,4 +31,4 @@ struct MiningConfig
     bool version;
 };
 
-} //namespace CryptoNote
+}
