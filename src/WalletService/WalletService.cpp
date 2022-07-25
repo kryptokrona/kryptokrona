@@ -1254,7 +1254,7 @@ std::error_code WalletService::getStatus(uint32_t& blockCount, uint32_t& knownBl
     System::EventLock lk(readyEvent);
 
     System::RemoteContext<std::tuple<uint32_t, uint64_t, uint32_t>> remoteContext(dispatcher, [this] () {
-      /* Daemon remote height, daemon local height, peer count */
+      /* daemon remote height, daemon local height, peer count */
       return std::make_tuple(node.getKnownBlockCount(), node.getNodeHeight(), static_cast<uint32_t>(node.getPeerCount()));
     });
 

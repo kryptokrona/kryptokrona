@@ -31,7 +31,7 @@ Config parseArguments(int argc, char **argv)
         ("debug", "Enable " + WalletConfig::walletdName + " debugging to "+ WalletConfig::walletName + ".log",
             cxxopts::value<bool>(config.debug)->default_value("false")->implicit_value("true"));
 
-    options.add_options("Daemon")
+    options.add_options("daemon")
         ("r,remote-daemon", "The daemon <host:port> combination to use for node operations.",
           cxxopts::value<std::string>(remoteDaemon)->default_value(defaultRemoteDaemon.str()), "<host:port>");
 
