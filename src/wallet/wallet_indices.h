@@ -33,7 +33,7 @@
 #include "Common/FileMappedVector.h"
 #include "crypto/chacha8.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 const uint64_t ACCOUNT_CREATE_TIME_ACCURACY = 60 * 60 * 24;
 

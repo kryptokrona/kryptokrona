@@ -6,7 +6,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "WalletGreen.h"
+#include "wallet_green.h"
 
 #include <algorithm>
 #include <ctime>
@@ -40,14 +40,14 @@
 #include "crypto/crypto.h"
 #include <crypto/random.h>
 #include "Transfers/TransfersContainer.h"
-#include "WalletSerializationV2.h"
-#include "WalletErrors.h"
-#include "WalletUtils.h"
+#include "wallet_serialization_v2.h"
+#include "wallet_errors.h"
+#include "wallet_utils.h"
 
-using namespace Common;
-using namespace Crypto;
-using namespace CryptoNote;
-using namespace Logging;
+using namespace common;
+using namespace crypto;
+using namespace cryptonote;
+using namespace logging;
 
 namespace {
 
@@ -1104,7 +1104,7 @@ std::string WalletGreen::addWallet(const NewAddressData &addressData, uint64_t s
     trSubscription.addObserver(this);
 
     index.insert(insertIt, std::move(wallet));
-    m_logger(DEBUGGING) << "Wallet count " << m_walletsContainer.size();
+    m_logger(DEBUGGING) << "wallet count " << m_walletsContainer.size();
 
     if (index.size() == 1) {
       m_synchronizer.subscribeConsumerNotifications(m_viewPublicKey, this);
@@ -1112,7 +1112,7 @@ std::string WalletGreen::addWallet(const NewAddressData &addressData, uint64_t s
     }
 
     auto address = m_currency.accountAddressAsString({ spendPublicKey, m_viewPublicKey });
-    m_logger(DEBUGGING) << "Wallet added " << address << ", creation timestamp " << sub.syncStart.timestamp;
+    m_logger(DEBUGGING) << "wallet added " << address << ", creation timestamp " << sub.syncStart.timestamp;
     return address;
   } catch (const std::exception& e) {
     m_logger(ERROR) << "Failed to add wallet: " << e.what();
@@ -1300,7 +1300,7 @@ void WalletGreen::deleteAddress(const std::string& address) {
   deleteFromUncommitedTransactions(deletedTransactions);
 
   m_walletsContainer.get<KeysIndex>().erase(it);
-  m_logger(DEBUGGING) << "Wallet count " << m_walletsContainer.size();
+  m_logger(DEBUGGING) << "wallet count " << m_walletsContainer.size();
 
   if (m_walletsContainer.get<RandomAccessIndex>().size() != 0) {
     startBlockchainSynchronizer();
@@ -1313,7 +1313,7 @@ void WalletGreen::deleteAddress(const std::string& address) {
     pushEvent(makeTransactionUpdatedEvent(transactionId));
   }
 
-  m_logger(INFO, BRIGHT_WHITE) << "Wallet deleted " << address;
+  m_logger(INFO, BRIGHT_WHITE) << "wallet deleted " << address;
 }
 
 uint64_t WalletGreen::getActualBalance() const {
@@ -3063,7 +3063,7 @@ void WalletGreen::updateBalance(CryptoNote::ITransfersContainer* container) {
       wallet.pendingBalance = pending;
     });
 
-    m_logger(INFO, BRIGHT_WHITE) << "Wallet balance updated, address " << m_currency.accountAddressAsString({ it->spendPublicKey, m_viewPublicKey }) <<
+    m_logger(INFO, BRIGHT_WHITE) << "wallet balance updated, address " << m_currency.accountAddressAsString({ it->spendPublicKey, m_viewPublicKey }) <<
       ", actual " << m_currency.formatAmount(it->actualBalance) <<
       ", pending " << m_currency.formatAmount(it->pendingBalance);
     m_logger(INFO, BRIGHT_WHITE) << "Container balance updated, actual " << m_currency.formatAmount(m_actualBalance) <<

@@ -15,26 +15,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "WalletAsyncContextCounter.h"
+#pragma once
 
-namespace CryptoNote {
+#include <cstdint>
+#include <utility>
 
-void WalletAsyncContextCounter::addAsyncContext() {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  m_asyncContexts++;
+namespace cryptonote {
+
+class IFusionManager {
+public:
+  struct EstimateResult {
+    size_t fusionReadyCount;
+    size_t totalOutputCount;
+  };
+
+  virtual ~IFusionManager() {}
+
+  virtual size_t createFusionTransaction(uint64_t threshold, uint16_t mixin,
+    const std::vector<std::string>& sourceAddresses = {}, const std::string& destinationAddress = "") = 0;
+  virtual bool isFusionTransaction(size_t transactionId) const = 0;
+  virtual EstimateResult estimate(uint64_t threshold, const std::vector<std::string>& sourceAddresses = {}) const = 0;
+};
+
 }
-
-void WalletAsyncContextCounter::delAsyncContext() {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  m_asyncContexts--;
-
-  if (!m_asyncContexts) m_cv.notify_one();
-}
-
-void WalletAsyncContextCounter::waitAsyncContextsFinish() {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  while (m_asyncContexts > 0)
-    m_cv.wait(lock);
-}
-
-} //namespace CryptoNote

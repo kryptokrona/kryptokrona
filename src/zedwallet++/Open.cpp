@@ -371,7 +371,7 @@ std::string getExistingWalletFileName(const Config &config)
         {
             if (walletName == "")
             {
-                std::cout << WarningMsg("\nWallet name can't be blank! Try again.\n\n");
+                std::cout << WarningMsg("\nwallet name can't be blank! Try again.\n\n");
             }
             /* Allow people to enter wallet name with or without file extension */
             else if (fs::exists(walletName))
@@ -426,7 +426,7 @@ std::string getNewWalletFileName()
             else if (walletName == "")
             {
                 std::cout << std::endl
-                          << WarningMsg("Wallet name can't be blank! Try again.")
+                          << WarningMsg("wallet name can't be blank! Try again.")
                           << std::endl << std::endl;
             }
             else

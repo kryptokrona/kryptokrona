@@ -37,10 +37,10 @@ namespace PaymentService {
       ("save-config", "Save the configuration to the specified <file>", cxxopts::value<std::string>(), "<file>")
       ("init-timeout", "Amount of time in seconds to wait for initial connection", cxxopts::value<int>()->default_value("10"), "<seconds>");
 
-    options.add_options("Wallet")
+    options.add_options("wallet")
       ("address", "Print the wallet addresses and then exit", cxxopts::value<bool>()->default_value("false")->implicit_value("true"))
-      ("w,container-file", "Wallet container <file>", cxxopts::value<std::string>(), "<file>")
-      ("p,container-password", "Wallet container <password>", cxxopts::value<std::string>(), "<password>")
+      ("w,container-file", "wallet container <file>", cxxopts::value<std::string>(), "<file>")
+      ("p,container-password", "wallet container <password>", cxxopts::value<std::string>(), "<password>")
       ("g,generate-container", "Generate a new wallet container", cxxopts::value<bool>()->default_value("false")->implicit_value("true"))
       ("view-key", "Generate a wallet container with this secret view <key>", cxxopts::value<std::string>(), "<key>")
       ("spend-key", "Generate a wallet container with this secret spend <key>", cxxopts::value<std::string>(), "<key>")

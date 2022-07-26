@@ -438,7 +438,7 @@ void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfigu
   }
 
   wallet->save(CryptoNote::WalletSaveLevel::SAVE_KEYS_ONLY);
-  log(Logging::INFO, Logging::BRIGHT_WHITE) << "Wallet is saved";
+  log(Logging::INFO, Logging::BRIGHT_WHITE) << "wallet is saved";
 }
 
 WalletService::WalletService(const CryptoNote::Currency& currency, System::Dispatcher& sys, CryptoNote::INode& node,
@@ -508,13 +508,13 @@ void WalletService::getNodeFee() {
 
 void WalletService::saveWallet() {
   wallet.save();
-  logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Wallet is saved";
+  logger(Logging::INFO, Logging::BRIGHT_WHITE) << "wallet is saved";
 }
 
 void WalletService::loadWallet() {
   logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Loading wallet";
   wallet.load(config.walletFile, config.walletPassword);
-  logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Wallet loading is finished.";
+  logger(Logging::INFO, Logging::BRIGHT_WHITE) << "wallet loading is finished.";
 }
 
 void WalletService::loadTransactionIdIndex() {
@@ -532,7 +532,7 @@ std::error_code WalletService::saveWalletNoThrow() {
     logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Saving wallet...";
 
     if (!inited) {
-      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Save impossible: Wallet Service is not initialized";
+      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Save impossible: wallet Service is not initialized";
       return make_error_code(CryptoNote::error::NOT_INITIALIZED);
     }
 
@@ -553,7 +553,7 @@ std::error_code WalletService::exportWallet(const std::string& fileName) {
     System::EventLock lk(readyEvent);
 
     if (!inited) {
-      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Export impossible: Wallet Service is not initialized";
+      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Export impossible: wallet Service is not initialized";
       return make_error_code(CryptoNote::error::NOT_INITIALIZED);
     }
 
@@ -580,12 +580,12 @@ std::error_code WalletService::resetWallet(const uint64_t scanHeight) {
     logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Resetting wallet";
 
     if (!inited) {
-      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Reset impossible: Wallet Service is not initialized";
+      logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Reset impossible: wallet Service is not initialized";
       return make_error_code(CryptoNote::error::NOT_INITIALIZED);
     }
 
     reset(scanHeight);
-    logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Wallet has been reset";
+    logger(Logging::INFO, Logging::BRIGHT_WHITE) << "wallet has been reset";
   } catch (std::system_error& x) {
     logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Error while resetting wallet: " << x.what();
     return x.code();
@@ -756,7 +756,7 @@ std::error_code WalletService::getBalance(uint64_t& availableBalance, uint64_t& 
     return x.code();
   }
 
-  logger(Logging::DEBUGGING) << "Wallet actual balance: " << availableBalance << ", pending: " << lockedAmount;
+  logger(Logging::DEBUGGING) << "wallet actual balance: " << availableBalance << ", pending: " << lockedAmount;
   return std::error_code();
 }
 

@@ -145,7 +145,7 @@ void printHeights(
     /* This is the height that the wallet has been scanned to. The blockchain
        can be fully updated, but we have to walk the chain to find our
        transactions, and this number indicates that progress. */
-    std::cout << "Wallet blockchain height: ";
+    std::cout << "wallet blockchain height: ";
 
     /* Small buffer because wallet height doesn't update instantly like node
        height does */
@@ -195,7 +195,7 @@ void printSyncStatus(
         std::cout << WarningMsg(networkSyncPercentage) << std::endl;
     }
 
-    std::cout << "Wallet sync status: ";
+    std::cout << "wallet sync status: ";
     
     /* Small buffer because wallet height is not always completely accurate */
     if (walletBlockCount + 10 > networkBlockCount)
