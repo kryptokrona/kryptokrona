@@ -9,7 +9,7 @@
 #include <string>
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 
-namespace Utilities
+namespace utilities
 {
     std::string get_mining_speed(const uint64_t hashrate);
 

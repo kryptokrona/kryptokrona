@@ -17,7 +17,7 @@
 
 #include <thread>
 
-namespace Utilities
+namespace utilities
 {
 
 uint64_t getTransactionSum(const std::vector<std::pair<std::string, uint64_t>> destinations)
@@ -199,4 +199,4 @@ uint64_t getCurrentTimestampAdjusted()
     return time - adjust;
 }
 
-} // namespace Utilities
+} // namespace utilities

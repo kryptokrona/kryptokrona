@@ -106,7 +106,7 @@
 //
 // Author: wan@google.com (Zhanyong Wan)
 //
-// Utilities for testing Google Test itself and code that uses Google Test
+// utilities for testing Google Test itself and code that uses Google Test
 // (e.g. frameworks built on top of Google Test).
 
 #ifndef GTEST_INCLUDE_GTEST_GTEST_SPI_H_
@@ -2286,7 +2286,7 @@ TimeInMillis GetTimeInMillis() {
 #endif
 }
 
-// Utilities
+// utilities
 
 // class String.
 
@@ -6932,7 +6932,7 @@ bool KilledBySignal::operator()(int exit_status) const {
 
 namespace internal {
 
-// Utilities needed for death tests.
+// utilities needed for death tests.
 
 // Generates a textual description of a given exit code, in the format
 // specified by wait(2).

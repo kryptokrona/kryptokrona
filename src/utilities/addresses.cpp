@@ -13,7 +13,7 @@
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
 
-namespace Utilities
+namespace utilities
 {
 
 /* Will throw an exception if the addresses are invalid. Please check they
@@ -118,4 +118,4 @@ std::string privateKeysToAddress(
     );
 }
 
-} // namespace Utilities
+} // namespace utilities
