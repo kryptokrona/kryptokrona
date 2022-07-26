@@ -8796,7 +8796,7 @@ class ThreadWithParamSupport : public ThreadWithParamBase {
   };
 
   static DWORD WINAPI ThreadMain(void* ptr) {
-    // Transfers ownership.
+    // transfers ownership.
     scoped_ptr<ThreadMainParam> param(static_cast<ThreadMainParam*>(ptr));
     if (param->thread_can_start_ != NULL)
       param->thread_can_start_->WaitForNotification();

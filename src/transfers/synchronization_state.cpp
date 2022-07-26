@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "SynchronizationState.h"
+#include "synchronization_state.h"
 
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
@@ -23,9 +23,9 @@
 #include "Serialization/BinaryOutputStreamSerializer.h"
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
 
-using namespace Common;
+using namespace common;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 SynchronizationState::ShortHistory SynchronizationState::getShortHistory(uint32_t localHeight) const {
   ShortHistory history;
