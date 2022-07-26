@@ -17,30 +17,29 @@
 
 #pragma once
 
-#include <array>
-#include <cstdint>
-#include <streambuf>
+namespace system {
 
-namespace System {
+class Dispatcher;
 
-class TcpConnection;
-
-class TcpStreambuf : public std::streambuf {
+class Event {
 public:
-  explicit TcpStreambuf(TcpConnection& connection);
-  TcpStreambuf(const TcpStreambuf&) = delete;
-  ~TcpStreambuf();
-  TcpStreambuf& operator=(const TcpStreambuf&) = delete;
+  Event();
+  explicit Event(Dispatcher& dispatcher);
+  Event(const Event&) = delete;
+  Event(Event&& other);
+  ~Event();
+  Event& operator=(const Event&) = delete;
+  Event& operator=(Event&& other);
+  bool get() const;
+  void clear();
+  void set();
+  void wait();
 
 private:
-  TcpConnection& connection;
-  std::array<char, 4096> readBuf;
-  std::array<uint8_t, 1024> writeBuf;
-
-  std::streambuf::int_type overflow(std::streambuf::int_type ch) override;
-  int sync() override;
-  std::streambuf::int_type underflow() override;
-  bool dumpBuffer(bool finalize);
+  Dispatcher* dispatcher;
+  bool state;
+  void* first;
+  void* last;
 };
 
 }

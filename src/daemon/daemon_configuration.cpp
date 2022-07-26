@@ -32,7 +32,7 @@ namespace daemon_config
 
     options.add_options("Core")
       ("help", "Display this help message", cxxopts::value<bool>()->implicit_value("true"))
-      ("os-version", "Output Operating System version information", cxxopts::value<bool>()->default_value("false")->implicit_value("true"))
+      ("os-version", "Output Operating system version information", cxxopts::value<bool>()->default_value("false")->implicit_value("true"))
       ("version","Output daemon version information",cxxopts::value<bool>()->default_value("false")->implicit_value("true"));
 
     options.add_options("Genesis Block")

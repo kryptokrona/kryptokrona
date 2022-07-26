@@ -25,7 +25,7 @@
 #include <System/Event.h>
 #include <System/InterruptedException.h>
 
-namespace System {
+namespace system {
 
 template<class T = void> class RemoteContext {
 public:

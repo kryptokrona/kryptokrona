@@ -17,25 +17,30 @@
 
 #pragma once
 
-#include <System/Dispatcher.h>
+#include <array>
+#include <cstdint>
+#include <streambuf>
 
-namespace System {
+namespace system {
 
-class ContextGroup {
+class TcpConnection;
+
+class TcpStreambuf : public std::streambuf {
 public:
-  explicit ContextGroup(Dispatcher& dispatcher);
-  ContextGroup(const ContextGroup&) = delete;
-  ContextGroup(ContextGroup&& other);
-  ~ContextGroup();
-  ContextGroup& operator=(const ContextGroup&) = delete;
-  ContextGroup& operator=(ContextGroup&& other);
-  void interrupt();
-  void spawn(std::function<void()>&& procedure);
-  void wait();
+  explicit TcpStreambuf(TcpConnection& connection);
+  TcpStreambuf(const TcpStreambuf&) = delete;
+  ~TcpStreambuf();
+  TcpStreambuf& operator=(const TcpStreambuf&) = delete;
 
 private:
-  Dispatcher* dispatcher;
-  NativeContextGroup contextGroup;
+  TcpConnection& connection;
+  std::array<char, 4096> readBuf;
+  std::array<uint8_t, 1024> writeBuf;
+
+  std::streambuf::int_type overflow(std::streambuf::int_type ch) override;
+  int sync() override;
+  std::streambuf::int_type underflow() override;
+  bool dumpBuffer(bool finalize);
 };
 
 }

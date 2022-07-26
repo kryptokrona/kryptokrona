@@ -15,10 +15,36 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "InterruptedException.h"
+#pragma once
 
-namespace {
-#ifdef MSVC
-char suppressMSVCWarningLNK4221;
-#endif
+#include <System/ContextGroup.h>
+#include <System/Dispatcher.h>
+#include <System/Timer.h>
+
+namespace system {
+
+template<typename T> class OperationTimeout {
+public:
+  OperationTimeout(Dispatcher& dispatcher, T& object, std::chrono::nanoseconds timeout) :
+    object(object), timerContext(dispatcher), timeoutTimer(dispatcher) {
+    timerContext.spawn([this, timeout]() {
+      try {
+        timeoutTimer.sleep(timeout);
+        timerContext.interrupt();
+      } catch (...) {
+      }
+    });
+  }
+
+  ~OperationTimeout() {
+    timerContext.interrupt();
+    timerContext.wait();
+  }
+
+private:
+  T& object;
+  ContextGroup timerContext;
+  Timer timeoutTimer;
+};
+
 }
