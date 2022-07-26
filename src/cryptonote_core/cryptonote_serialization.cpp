@@ -207,7 +207,7 @@ void serialize(Transaction& tx, ISerializer& serializer) {
 
   bool signaturesNotExpected = tx.signatures.empty();
   if (!signaturesNotExpected && tx.inputs.size() != tx.signatures.size()) {
-    throw std::runtime_error("Serialization error: unexpected signatures size");
+    throw std::runtime_error("serialization error: unexpected signatures size");
   }
 
   for (uint64_t i = 0; i < tx.inputs.size(); ++i) {
@@ -216,13 +216,13 @@ void serialize(Transaction& tx, ISerializer& serializer) {
       if (signatureSize == 0) {
         continue;
       } else {
-        throw std::runtime_error("Serialization error: signatures are not expected");
+        throw std::runtime_error("serialization error: signatures are not expected");
       }
     }
 
     if (serializer.type() == ISerializer::OUTPUT) {
       if (signatureSize != tx.signatures[i].size()) {
-        throw std::runtime_error("Serialization error: unexpected signatures size");
+        throw std::runtime_error("serialization error: unexpected signatures size");
       }
 
       for (Crypto::Signature& sig : tx.signatures[i]) {

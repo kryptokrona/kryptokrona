@@ -21,13 +21,13 @@
 #include <vector>
 #include <Common/MemoryInputStream.h>
 #include <Common/StringOutputStream.h>
-#include "JsonInputStreamSerializer.h"
-#include "JsonOutputStreamSerializer.h"
-#include "KVBinaryInputStreamSerializer.h"
-#include "KVBinaryOutputStreamSerializer.h"
+#include "json_input_stream_serializer.h"
+#include "json_output_stream_serializer.h"
+#include "kv_binary_input_stream_serializer.h"
+#include "kv_binary_output_stream_serializer.h"
 #include <zedwallet/Types.h>
 
-namespace Common {
+namespace common {
 
 template <typename T>
 T getValueAs(const JsonValue& js) {

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "BlockchainExplorerDataSerialization.h"
+#include "blockchain_explorer_data_serialization.h"
 
 #include <stdexcept>
 
@@ -26,9 +26,9 @@
 
 #include "Serialization/SerializationOverloads.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
-using CryptoNote::SerializationTag;
+using cryptonote::SerializationTag;
 
 namespace {
 

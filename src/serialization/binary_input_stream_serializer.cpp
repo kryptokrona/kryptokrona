@@ -15,18 +15,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "BinaryInputStreamSerializer.h"
+#include "binary_input_stream_serializer.h"
 
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
 #include <Common/StreamTools.h>
-#include "SerializationOverloads.h"
+#include "serialization_overloads.h"
 #include <config/CryptoNoteConfig.h>
 
-using namespace Common;
+using namespace common;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 namespace {
 

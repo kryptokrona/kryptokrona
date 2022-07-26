@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "ISerializer.h"
+#include "iserializer.h"
 
 #include <array>
 #include <cstring>
@@ -31,7 +31,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 template<typename T>
 typename std::enable_if<std::is_pod<T>::value>::type

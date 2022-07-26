@@ -17,18 +17,18 @@
 
 #pragma once
 
-#include "Common/IOutputStream.h"
-#include "ISerializer.h"
-#include "SerializationOverloads.h"
+#include <iostream>
+#include "../Common/json_value.h"
+#include "iserializer.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
-class BinaryOutputStreamSerializer : public ISerializer {
+class JsonOutputStreamSerializer : public ISerializer {
 public:
-  BinaryOutputStreamSerializer(Common::IOutputStream& strm) : stream(strm) {}
-  virtual ~BinaryOutputStreamSerializer() {}
+  JsonOutputStreamSerializer();
+  virtual ~JsonOutputStreamSerializer();
 
-  virtual ISerializer::SerializerType type() const override;
+  SerializerType type() const override;
 
   virtual bool beginObject(Common::StringView name) override;
   virtual void endObject() override;
@@ -54,9 +54,15 @@ public:
     return ISerializer::operator()(value, name);
   }
 
+  const Common::JsonValue& getValue() const {
+    return root;
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const JsonOutputStreamSerializer& enumerator);
+
 private:
-  void checkedWrite(const char* buf, uint64_t size);
-  Common::IOutputStream& stream;
+  Common::JsonValue root;
+  std::vector<Common::JsonValue*> chain;
 };
 
 }
