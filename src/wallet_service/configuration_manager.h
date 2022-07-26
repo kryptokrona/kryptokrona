@@ -6,10 +6,10 @@
 #pragma once
 
 #include <CryptoTypes.h>
-#include "WalletServiceConfiguration.h"
+#include "wallet_service_configuration.h"
 #include "P2p/NetNodeConfig.h"
 
-namespace PaymentService {
+namespace payment_service {
 
 class ConfigurationManager {
 public:

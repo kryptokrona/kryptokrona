@@ -23,7 +23,7 @@
 
 #include "Logging/LoggerRef.h"
 
-namespace PaymentService {
+namespace payment_service {
 
 class NodeFactory {
 public:
