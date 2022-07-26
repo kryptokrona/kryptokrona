@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "IWallet.h"
-#include "TransfersContainer.h"
+#include "transfers_container.h"
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
@@ -25,11 +25,11 @@
 #include "Serialization/BinaryOutputStreamSerializer.h"
 #include "Serialization/SerializationOverloads.h"
 
-using namespace Common;
-using namespace Crypto;
-using namespace Logging;
+using namespace common;
+using namespace crypto;
+using namespace logging;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 void serialize(TransactionInformation& ti, CryptoNote::ISerializer& s) {
   s(ti.transactionHash, "");

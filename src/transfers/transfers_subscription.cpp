@@ -16,13 +16,13 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "IWallet.h"
-#include "TransfersSubscription.h"
+#include "transfers_subscription.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 
-using namespace Crypto;
-using namespace Logging;
+using namespace crypto;
+using namespace logging;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 TransfersSubscription::TransfersSubscription(const CryptoNote::Currency& currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription& sub)
   : subscription(sub), logger(logger, "TransfersSubscription"), transfers(currency, logger, sub.transactionSpendableAge),

@@ -18,12 +18,12 @@
 #pragma once
 
 #include "ITransfersSynchronizer.h"
-#include "TransfersContainer.h"
-#include "IObservableImpl.h"
+#include "transfers_container.h"
+#include "iobservable_impl.h"
 
 #include "Logging/LoggerRef.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class TransfersSubscription : public IObservableImpl < ITransfersObserver, ITransfersSubscription > {
 public:

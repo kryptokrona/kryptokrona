@@ -5,8 +5,8 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "TransfersSynchronizer.h"
-#include "TransfersConsumer.h"
+#include "transfers_synchronizer.h"
+#include "transfers_consumer.h"
 
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
@@ -14,10 +14,10 @@
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
 
-using namespace Common;
-using namespace Crypto;
+using namespace common;
+using namespace crypto;
 
-namespace CryptoNote {
+namespace cryptonote {
 
 const uint32_t TRANSFERS_STORAGE_ARCHIVE_VERSION = 0;
 
