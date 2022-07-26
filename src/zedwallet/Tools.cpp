@@ -340,7 +340,7 @@ bool shutdown(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
             /* If not, wait for a max of 20 seconds then force exit. */
             if ((currentTime - startTime) > std::chrono::seconds(20))
             {
-                std::cout << WarningMsg("Wallet took too long to save! "
+                std::cout << WarningMsg("wallet took too long to save! "
                                         "Force closing.") << std::endl
                           << "Bye." << std::endl;
                 exit(0);

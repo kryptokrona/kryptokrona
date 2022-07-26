@@ -36,7 +36,7 @@ Config parseArguments(int argc, char **argv)
         ("r,remote-daemon", "The daemon <host:port> combination to use for node operations.",
           cxxopts::value<std::string>(remoteDaemon)->default_value(defaultRemoteDaemon), "<host:port>");
 
-    options.add_options("Wallet")
+    options.add_options("wallet")
         ("w,wallet-file", "Open the wallet <file>", cxxopts::value<std::string>(config.walletFile), "<file>")
         ("p,password", "Use the password <pass> to open the wallet", cxxopts::value<std::string>(config.walletPass), "<pass>");
 

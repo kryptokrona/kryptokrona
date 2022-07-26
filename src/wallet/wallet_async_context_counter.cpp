@@ -15,29 +15,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "wallet_async_context_counter.h"
 
-#include <condition_variable>
-#include <mutex>
-#include <stdint.h>
+namespace cryptonote {
 
-namespace CryptoNote {
+void WalletAsyncContextCounter::addAsyncContext() {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  m_asyncContexts++;
+}
 
-class WalletAsyncContextCounter
-{
-public:
-  WalletAsyncContextCounter() : m_asyncContexts(0) {}
+void WalletAsyncContextCounter::delAsyncContext() {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  m_asyncContexts--;
 
-  void addAsyncContext();
-  void delAsyncContext();
+  if (!m_asyncContexts) m_cv.notify_one();
+}
 
-  //returns true if contexts are finished before timeout
-  void waitAsyncContextsFinish();
-
-private:
-  uint32_t m_asyncContexts;
-  std::condition_variable m_cv;
-  std::mutex m_mutex;
-};
+void WalletAsyncContextCounter::waitAsyncContextsFinish() {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  while (m_asyncContexts > 0)
+    m_cv.wait(lock);
+}
 
 } //namespace CryptoNote

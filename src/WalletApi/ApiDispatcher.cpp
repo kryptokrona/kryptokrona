@@ -266,13 +266,13 @@ void ApiDispatcher::middleware(
         return;
     }
 
-    /* Wallet must be open for this operation, and it is not */
+    /* wallet must be open for this operation, and it is not */
     if (walletMustBeOpen && !assertWalletOpen())
     {
         res.status = 403;
         return;
     }
-    /* Wallet must not be open for this operation, and it is */
+    /* wallet must not be open for this operation, and it is */
     else if (!walletMustBeOpen && !assertWalletClosed())
     {
         res.status = 403;
@@ -512,7 +512,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importAddress(
 {
     uint64_t scanHeight = 0;
 
-    /* Strongly suggested to supply a scan height. Wallet syncing will have to
+    /* Strongly suggested to supply a scan height. wallet syncing will have to
        begin again from zero if none is given */
     if (body.find("scanHeight") != body.end())
     {
@@ -546,7 +546,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importViewAddress(
 {
     uint64_t scanHeight = 0;
 
-    /* Strongly suggested to supply a scan height. Wallet syncing will have to
+    /* Strongly suggested to supply a scan height. wallet syncing will have to
        begin again from zero if none is given */
     if (body.find("scanHeight") != body.end())
     {
