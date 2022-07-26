@@ -17,20 +17,16 @@
 
 #pragma once
 
-#include <vector>
-#include <Common/IOutputStream.h>
-#include "ISerializer.h"
-#include "MemoryStream.h"
+#include <Common/IInputStream.h>
+#include "iserializer.h"
+#include "serialization_overloads.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
-class KVBinaryOutputStreamSerializer : public ISerializer {
+class BinaryInputStreamSerializer : public ISerializer {
 public:
-
-  KVBinaryOutputStreamSerializer();
-  virtual ~KVBinaryOutputStreamSerializer() {}
-
-  void dump(Common::IOutputStream& target);
+  BinaryInputStreamSerializer(Common::IInputStream& strm) : stream(strm) {}
+  virtual ~BinaryInputStreamSerializer() {}
 
   virtual ISerializer::SerializerType type() const override;
 
@@ -60,39 +56,8 @@ public:
 
 private:
 
-  void writeElementPrefix(uint8_t type, Common::StringView name);
-  void checkArrayPreamble(uint8_t type);
-  void updateState(uint8_t type);
-  MemoryStream& stream();
-
-  enum class State {
-    Root,
-    Object,
-    ArrayPrefix,
-    Array
-  };
-
-  struct Level {
-    State state;
-    std::string name;
-    uint64_t count;
-
-    Level(Common::StringView nm) :
-      name(nm), state(State::Object), count(0) {}
-
-    Level(Common::StringView nm, uint64_t arraySize) :
-      name(nm), state(State::ArrayPrefix), count(arraySize) {}
-
-    Level(Level&& rv) {
-      state = rv.state;
-      name = std::move(rv.name);
-      count = rv.count;
-    }
-
-  };
-
-  std::vector<MemoryStream> m_objectsStack;
-  std::vector<Level> m_stack;
+  void checkedRead(char* buf, uint64_t size);
+  Common::IInputStream& stream;
 };
 
 }
