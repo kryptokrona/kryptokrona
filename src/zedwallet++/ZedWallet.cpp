@@ -132,7 +132,7 @@ int main(int argc, char **argv)
         
         std::cout << InformationMsg("\nSaving and shutting down...\n");
 
-        /* Wallet backend destructor gets called here, which saves */
+        /* wallet backend destructor gets called here, which saves */
     }
     catch (const std::exception &e)
     {

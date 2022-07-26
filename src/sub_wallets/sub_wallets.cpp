@@ -821,7 +821,7 @@ void SubWallets::throwIfViewWallet() const
 {
     if (m_isViewWallet)
     {
-        throw std::runtime_error("Wallet is a view wallet, but this function cannot be called in a view wallet");
+        throw std::runtime_error("wallet is a view wallet, but this function cannot be called in a view wallet");
     }
 }
 

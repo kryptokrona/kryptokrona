@@ -23,7 +23,7 @@
 #include "Transfers/TransfersSynchronizer.h"
 #include "Wallet/WalletIndices.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class WalletSerializerV2 {
 public:

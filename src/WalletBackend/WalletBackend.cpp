@@ -155,7 +155,7 @@ WalletBackend::WalletBackend(
     );
 }
 
-/* View Wallet Constructor */
+/* View wallet Constructor */
 WalletBackend::WalletBackend(
     const std::string filename,
     const std::string password,
