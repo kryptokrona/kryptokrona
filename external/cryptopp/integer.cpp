@@ -17,7 +17,7 @@
 // Wei's original code was much simpler. It simply used the Singleton pattern, but it always
 //  produced memory findings on some platforms. The Singleton generates memory findings because
 //  it uses a Create On First Use pattern (a dumb Nifty Counter) and the compiler had to be smart
-//  enough to fold them to return the same object. Unix and Linux compilers do a good job of folding
+//  enough to fold them to return the same object. Unix and linux compilers do a good job of folding
 //  objects, but Microsoft compilers do a rather poor job for some versions of the compilers.
 // Another problem with the Singleton is resource destruction requires running resource acquisition
 //  in reverse. For resources provided through the Singletons, there is no way to express the

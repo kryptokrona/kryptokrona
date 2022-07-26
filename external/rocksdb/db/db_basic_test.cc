@@ -819,7 +819,7 @@ TEST_F(DBBasicTest, ChecksumTest) {
   }
 }
 
-// On Windows you can have either memory mapped file or a file
+// On windows you can have either memory mapped file or a file
 // with unbuffered access. So this asserts and does not make
 // sense to run
 #ifndef OS_WIN

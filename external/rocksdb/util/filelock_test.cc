@@ -53,7 +53,7 @@ class LockTest : public testing::Test {
 #ifdef OS_WIN
 
     // WaitForSingleObject and GetExitCodeProcess can do what waitpid does.
-    // TODO - implement on Windows
+    // TODO - implement on windows
     return true;
 
 #else

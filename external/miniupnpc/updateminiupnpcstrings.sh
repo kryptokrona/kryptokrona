@@ -14,7 +14,7 @@ if [ -f /etc/debian_version ]; then
 	OS_NAME=Debian
 	OS_VERSION=`cat /etc/debian_version`
 fi
-# use lsb_release (Linux Standard Base) when available
+# use lsb_release (linux Standard Base) when available
 LSB_RELEASE=`which lsb_release`
 if [ 0 -eq $? -a -x "${LSB_RELEASE}" ]; then
 	OS_NAME=`${LSB_RELEASE} -i -s`

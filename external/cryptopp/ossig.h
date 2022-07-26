@@ -15,7 +15,7 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-// ************** Unix and Linux compatibles ***************
+// ************** Unix and linux compatibles ***************
 
 #if defined(UNIX_SIGNALS_AVAILABLE) || defined(CRYPTOPP_DOXYGEN_PROCESSING)
 
@@ -36,7 +36,7 @@ extern "C" {
     inline void NullSignalHandler(int unused) {CRYPTOPP_UNUSED(unused);}
 }
 
-/// Signal handler for Linux and Unix compatibles
+/// Signal handler for linux and Unix compatibles
 /// \tparam S Signal number
 /// \tparam O Flag indicating exsting handler should be overwriiten
 /// \details SignalHandler() can be used to install a signal handler with the signature

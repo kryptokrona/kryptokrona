@@ -1850,7 +1850,7 @@ commit_prereq: build_tools/rocksdb-lego-determinator \
 	$(MAKE) clean && $(MAKE) jclean && $(MAKE) rocksdbjava;
 
 # ---------------------------------------------------------------------------
-#  	Platform-specific compilation
+#  	platform-specific compilation
 # ---------------------------------------------------------------------------
 
 ifeq ($(PLATFORM), IOS)

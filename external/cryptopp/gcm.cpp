@@ -12,7 +12,7 @@
 #ifndef CRYPTOPP_IMPORTS
 #ifndef CRYPTOPP_GENERATE_X64_MASM
 
-// Clang 3.3 integrated assembler crash on Linux. Other versions produce incorrect results.
+// Clang 3.3 integrated assembler crash on linux. Other versions produce incorrect results.
 //   Clang has never handled Intel ASM very well. I wish LLVM would fix it.
 #if defined(__clang__)
 # undef CRYPTOPP_X86_ASM_AVAILABLE

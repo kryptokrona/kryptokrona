@@ -12,7 +12,7 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-/// \brief Windows Handle
+/// \brief windows Handle
 class WindowsHandle
 {
 public:
@@ -38,7 +38,7 @@ protected:
 	bool m_own;
 };
 
-/// \brief Windows Pipe
+/// \brief windows Pipe
 class WindowsPipe
 {
 public:
@@ -105,7 +105,7 @@ private:
 	bool m_resultPending;
 };
 
-/// \brief Windows Pipe Source
+/// \brief windows Pipe Source
 class WindowsPipeSource : public WindowsHandle, public NetworkSource, public WindowsPipeReceiver
 {
 public:
@@ -124,7 +124,7 @@ private:
 	NetworkReceiver & AccessReceiver() {return *this;}
 };
 
-/// \brief Windows Pipe Sink
+/// \brief windows Pipe Sink
 class WindowsPipeSink : public WindowsHandle, public NetworkSink, public WindowsPipeSender
 {
 public:

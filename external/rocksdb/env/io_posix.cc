@@ -824,10 +824,10 @@ Status PosixWritableFile::Close() {
     // with FALLOC_FL_PUNCH_HOLE flag to explicitly release these unused
     // blocks. FALLOC_FL_PUNCH_HOLE is supported on at least the following
     // filesystems:
-    //   XFS (since Linux 2.6.38)
-    //   ext4 (since Linux 3.0)
-    //   Btrfs (since Linux 3.7)
-    //   tmpfs (since Linux 3.5)
+    //   XFS (since linux 2.6.38)
+    //   ext4 (since linux 3.0)
+    //   Btrfs (since linux 3.7)
+    //   tmpfs (since linux 3.5)
     // We ignore error since failure of this operation does not affect
     // correctness.
     // TRAVIS - this code does not work on TRAVIS filesystems.

@@ -298,7 +298,7 @@ Status WinMmapFile::UnmapCurrentRegion() {
     file_offset_ += view_size_;
 
     // UnmapView automatically sends data to disk but not the metadata
-    // which is good and provides some equivalent of fdatasync() on Linux
+    // which is good and provides some equivalent of fdatasync() on linux
     // therefore, we donot need separate flag for metadata
     mapped_begin_ = nullptr;
     mapped_end_ = nullptr;
@@ -411,7 +411,7 @@ WinMmapFile::WinMmapFile(const std::string& fname, HANDLE hFile, size_t page_siz
 
   // View size must be both the multiple of allocation_granularity AND the
   // page size and the granularity is usually a multiple of a page size.
-  const size_t viewSize = 32 * 1024; // 32Kb similar to the Windows File Cache in buffered mode
+  const size_t viewSize = 32 * 1024; // 32Kb similar to the windows File Cache in buffered mode
   view_size_ = Roundup(viewSize, allocation_granularity_);
 }
 
@@ -617,7 +617,7 @@ Status WinSequentialFile::Read(size_t n, Slice* result, char* scratch) {
     return Status::NotSupported("Read() does not support direct_io");
   }
 
-  // Windows ReadFile API accepts a DWORD.
+  // windows ReadFile API accepts a DWORD.
   // While it is possible to read in a loop if n is too big
   // it is an unlikely case.
   if (n > std::numeric_limits<DWORD>::max()) {

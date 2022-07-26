@@ -14,7 +14,7 @@
 #include <zedwallet/Tools.h>
 
 /* Note: this is not portable, it only works with terminals that support ANSI
-   codes (e.g., not Windows) - however! due to the way linenoise-cpp works,
+   codes (e.g., not windows) - however! due to the way linenoise-cpp works,
    it will actually convert these codes for us to the windows equivalent. <3 */
 std::string yellowANSIMsg(std::string msg)
 {

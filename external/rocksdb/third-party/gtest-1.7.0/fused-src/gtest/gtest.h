@@ -201,12 +201,12 @@
 //   GTEST_LINKED_AS_SHARED_LIBRARY
 //                            - Define to 1 when compiling tests that use
 //                              Google Test as a shared library (known as
-//                              DLL on Windows).
+//                              DLL on windows).
 //   GTEST_CREATE_SHARED_LIBRARY
 //                            - Define to 1 when compiling Google Test itself
 //                              as a shared library.
 
-// Platform-indicating macros
+// platform-indicating macros
 // --------------------------
 //
 // Macros indicating the platform on which Google Test is being used
@@ -219,7 +219,7 @@
 //   GTEST_OS_CYGWIN   - Cygwin
 //   GTEST_OS_FREEBSD  - FreeBSD
 //   GTEST_OS_HPUX     - HP-UX
-//   GTEST_OS_LINUX    - Linux
+//   GTEST_OS_LINUX    - linux
 //     GTEST_OS_LINUX_ANDROID - Google Android
 //   GTEST_OS_MAC      - Mac OS X
 //     GTEST_OS_IOS    - iOS
@@ -228,15 +228,15 @@
 //   GTEST_OS_QNX      - QNX
 //   GTEST_OS_SOLARIS  - Sun Solaris
 //   GTEST_OS_SYMBIAN  - Symbian
-//   GTEST_OS_WINDOWS  - Windows (Desktop, MinGW, or Mobile)
-//     GTEST_OS_WINDOWS_DESKTOP  - Windows Desktop
+//   GTEST_OS_WINDOWS  - windows (Desktop, MinGW, or Mobile)
+//     GTEST_OS_WINDOWS_DESKTOP  - windows Desktop
 //     GTEST_OS_WINDOWS_MINGW    - MinGW
-//     GTEST_OS_WINDOWS_MOBILE   - Windows Mobile
-//     GTEST_OS_WINDOWS_PHONE    - Windows Phone
-//     GTEST_OS_WINDOWS_RT       - Windows Store App/WinRT
+//     GTEST_OS_WINDOWS_MOBILE   - windows Mobile
+//     GTEST_OS_WINDOWS_PHONE    - windows Phone
+//     GTEST_OS_WINDOWS_RT       - windows Store App/WinRT
 //   GTEST_OS_ZOS      - z/OS
 //
-// Among the platforms, Cygwin, Linux, Max OS X, and Windows have the
+// Among the platforms, Cygwin, linux, Max OS X, and windows have the
 // most stable support.  Since core members of the Google Test project
 // don't have access to other platforms, support for them may be less
 // stable.  If you notice any problems on your platform, please notify
@@ -320,7 +320,7 @@
 //   RE             - a simple regular expression class using the POSIX
 //                    Extended Regular Expression syntax on UNIX-like
 //                    platforms, or a reduced regular exception syntax on
-//                    other platforms, including Windows.
+//                    other platforms, including windows.
 //
 // logging:
 //   GTEST_LOG_()   - logs messages at the specified severity level.
@@ -528,7 +528,7 @@
 
 // Brings in definitions for functions used in the testing::internal::posix
 // namespace (read, write, close, chdir, isatty, stat). We do not currently
-// use them on Windows Mobile.
+// use them on windows Mobile.
 #if GTEST_OS_WINDOWS
 # if !GTEST_OS_WINDOWS_MOBILE
 #  include <direct.h>
@@ -540,7 +540,7 @@
 // WindowsTypesTest.CRITICAL_SECTIONIs_RTL_CRITICAL_SECTION.
 struct _RTL_CRITICAL_SECTION;
 #else
-// This assumes that non-Windows OSes provide unistd.h. For OSes where this
+// This assumes that non-windows OSes provide unistd.h. For OSes where this
 // is not the case, we need to include headers that provide the functions
 // mentioned above.
 # include <unistd.h>
@@ -574,7 +574,7 @@ struct _RTL_CRITICAL_SECTION;
 
 #elif GTEST_OS_WINDOWS
 
-// <regex.h> is not available on Windows.  Use our own simple regex
+// <regex.h> is not available on windows.  Use our own simple regex
 // implementation instead.
 # define GTEST_USES_SIMPLE_RE 1
 
@@ -1892,8 +1892,8 @@ using ::std::tuple_size;
 #endif  // GTEST_HAS_TR1_TUPLE
 
 // Determines whether clone(2) is supported.
-// Usually it will only be available on Linux, excluding
-// Linux on the Itanium architecture.
+// Usually it will only be available on linux, excluding
+// linux on the Itanium architecture.
 // Also see http://linux.die.net/man/2/clone.
 #ifndef GTEST_HAS_CLONE
 // The user didn't tell us, so we need to figure it out.
@@ -2047,7 +2047,7 @@ using ::std::tuple_size;
     GTEST_DISABLE_MSC_WARNINGS_POP_()
 
 // Determine whether the compiler supports Microsoft's Structured Exception
-// Handling.  This is supported by several Windows compilers but generally
+// Handling.  This is supported by several windows compilers but generally
 // does not exist on any other system.
 #ifndef GTEST_HAS_SEH
 // The user didn't tell us, so we need to figure it out.
@@ -2630,7 +2630,7 @@ class Notification {
 
 GTEST_API_ void SleepMilliseconds(int n);
 
-// Provides leak-safe Windows kernel handle ownership.
+// Provides leak-safe windows kernel handle ownership.
 // Used in death tests and in threading support.
 class GTEST_API_ AutoHandle {
  public:
@@ -2763,7 +2763,7 @@ class ThreadWithParam : public ThreadWithParamBase {
 # if 0  // OS detection
 # elif GTEST_OS_WINDOWS && !GTEST_OS_WINDOWS_PHONE && !GTEST_OS_WINDOWS_RT
 
-// Mutex implements mutex on Windows platforms.  It is used in conjunction
+// Mutex implements mutex on windows platforms.  It is used in conjunction
 // with class MutexLock:
 //
 //   Mutex mutex;
@@ -2935,7 +2935,7 @@ class ThreadWithParam : public ThreadWithParamBase {
   GTEST_DISALLOW_COPY_AND_ASSIGN_(ThreadWithParam);
 };
 
-// Implements thread-local storage on Windows systems.
+// Implements thread-local storage on windows systems.
 //
 //   // Thread 1
 //   ThreadLocal<int> tl(100);  // 100 is the default value for each thread.
@@ -3347,13 +3347,13 @@ inline std::string StripTrailingSpaces(std::string str) {
 
 // The testing::internal::posix namespace holds wrappers for common
 // POSIX functions.  These wrappers hide the differences between
-// Windows/MSVC and POSIX systems.  Since some compilers define these
+// windows/MSVC and POSIX systems.  Since some compilers define these
 // standard functions as macros, the wrapper cannot have the same name
 // as the wrapped function.
 
 namespace posix {
 
-// Functions with a different name on Windows.
+// Functions with a different name on windows.
 
 #if GTEST_OS_WINDOWS
 
@@ -3379,7 +3379,7 @@ inline char* StrDup(const char* src) { return _strdup(src); }
 
 # if GTEST_OS_WINDOWS_MOBILE
 inline int FileNo(FILE* file) { return reinterpret_cast<int>(_fileno(file)); }
-// Stat(), RmDir(), and IsDir() are not needed on Windows CE at this
+// Stat(), RmDir(), and IsDir() are not needed on windows CE at this
 // time and thus not defined there.
 # else
 inline int FileNo(FILE* file) { return _fileno(file); }
@@ -3411,7 +3411,7 @@ inline bool IsDir(const StatStruct& st) { return S_ISDIR(st.st_mode); }
 GTEST_DISABLE_MSC_WARNINGS_PUSH_(4996 /* deprecated function */)
 
 // ChDir(), FReopen(), FDOpen(), Read(), Write(), Close(), and
-// StrError() aren't needed on Windows CE at this time and thus not
+// StrError() aren't needed on windows CE at this time and thus not
 // defined there.
 
 #if !GTEST_OS_WINDOWS_MOBILE && !GTEST_OS_WINDOWS_PHONE && !GTEST_OS_WINDOWS_RT
@@ -3439,7 +3439,7 @@ inline const char* StrError(int errnum) { return strerror(errnum); }
 #endif
 inline const char* GetEnv(const char* name) {
 #if GTEST_OS_WINDOWS_MOBILE || GTEST_OS_WINDOWS_PHONE | GTEST_OS_WINDOWS_RT
-  // We are on Windows CE, which has no environment variables.
+  // We are on windows CE, which has no environment variables.
   static_cast<void>(name);  // To prevent 'unused argument' warning.
   return NULL;
 #elif defined(__BORLANDC__) || defined(__SunOS_5_8) || defined(__SunOS_5_9)
@@ -3455,7 +3455,7 @@ inline const char* GetEnv(const char* name) {
 GTEST_DISABLE_MSC_WARNINGS_POP_()
 
 #if GTEST_OS_WINDOWS_MOBILE
-// Windows CE has no C library. The abort() function is used in
+// windows CE has no C library. The abort() function is used in
 // several places in Google Test. This implementation provides a reasonable
 // imitation of standard behaviour.
 void Abort();
@@ -3475,7 +3475,7 @@ inline void Abort() { abort(); }
 # define GTEST_SNPRINTF_(buffer, size, format, ...) \
      _snprintf_s(buffer, size, size, format, __VA_ARGS__)
 #elif defined(_MSC_VER)
-// Windows CE does not define _snprintf_s and MSVC prior to 2005 doesn't
+// windows CE does not define _snprintf_s and MSVC prior to 2005 doesn't
 // complain about _snprintf.
 # define GTEST_SNPRINTF_ _snprintf
 #else
@@ -3524,7 +3524,7 @@ class TypeWithSize<4> {
  public:
   // unsigned int has size 4 in both gcc and MSVC.
   //
-  // As base/basictypes.h doesn't compile on Windows, we cannot use
+  // As base/basictypes.h doesn't compile on windows, we cannot use
   // uint32, uint64, and etc here.
   typedef int Int;
   typedef unsigned int UInt;
@@ -3933,7 +3933,7 @@ class GTEST_API_ String {
   static const char* CloneCString(const char* c_str);
 
 #if GTEST_OS_WINDOWS_MOBILE
-  // Windows CE does not have the 'ANSI' versions of Win32 APIs. To be
+  // windows CE does not have the 'ANSI' versions of Win32 APIs. To be
   // able to pass strings to Win32 APIs on CE we need to convert them
   // to 'Unicode', UTF-16.
 
@@ -4113,7 +4113,7 @@ class GTEST_API_ FilePath {
   // Given directory = "dir", base_name = "test", number = 0,
   // extension = "xml", returns "dir/test.xml". If number is greater
   // than zero (e.g., 12), returns "dir/test_12.xml".
-  // On Windows platform, uses \ as the separator rather than /.
+  // On windows platform, uses \ as the separator rather than /.
   static FilePath MakeFileName(const FilePath& directory,
                                const FilePath& base_name,
                                int number,
@@ -4121,7 +4121,7 @@ class GTEST_API_ FilePath {
 
   // Given directory = "dir", relative_path = "test.xml",
   // returns "dir/test.xml".
-  // On Windows, uses \ as the separator rather than /.
+  // On windows, uses \ as the separator rather than /.
   static FilePath ConcatPaths(const FilePath& directory,
                               const FilePath& relative_path);
 
@@ -4142,7 +4142,7 @@ class GTEST_API_ FilePath {
 
   // If input name has a trailing separator character, removes it and returns
   // the name, otherwise return the name string unmodified.
-  // On Windows platform, uses \ as the separator, other platforms use /.
+  // On windows platform, uses \ as the separator, other platforms use /.
   FilePath RemoveTrailingPathSeparator() const;
 
   // Returns a copy of the FilePath with the directory part removed.
@@ -4150,15 +4150,15 @@ class GTEST_API_ FilePath {
   // FilePath("file"). If there is no directory part ("just_a_file"), it returns
   // the FilePath unmodified. If there is no file part ("just_a_dir/") it
   // returns an empty FilePath ("").
-  // On Windows platform, '\' is the path separator, otherwise it is '/'.
+  // On windows platform, '\' is the path separator, otherwise it is '/'.
   FilePath RemoveDirectoryName() const;
 
   // RemoveFileName returns the directory path with the filename removed.
   // Example: FilePath("path/to/file").RemoveFileName() returns "path/to/".
   // If the FilePath is "a_file" or "/a_file", RemoveFileName returns
-  // FilePath("./") or, on Windows, FilePath(".\\"). If the filepath does
+  // FilePath("./") or, on windows, FilePath(".\\"). If the filepath does
   // not have a file, like "just/a/dir/", it returns the FilePath unmodified.
-  // On Windows platform, '\' is the path separator, otherwise it is '/'.
+  // On windows platform, '\' is the path separator, otherwise it is '/'.
   FilePath RemoveFileName() const;
 
   // Returns a copy of the FilePath with the case-insensitive extension removed.
@@ -4176,7 +4176,7 @@ class GTEST_API_ FilePath {
   // Create the directory so that path exists. Returns true if successful or
   // if the directory already exists; returns false if unable to create the
   // directory for any reason, including if the parent directory does not
-  // exist. Not named "CreateDirectory" because that's a macro on Windows.
+  // exist. Not named "CreateDirectory" because that's a macro on windows.
   bool CreateFolder() const;
 
   // Returns true if FilePath describes something in the file-system,
@@ -4192,7 +4192,7 @@ class GTEST_API_ FilePath {
   // This does NOT check that a directory (or file) actually exists.
   bool IsDirectory() const;
 
-  // Returns true if pathname describes a root directory. (Windows has one
+  // Returns true if pathname describes a root directory. (windows has one
   // root directory per disk drive.)
   bool IsRootDirectory() const;
 
@@ -4216,14 +4216,14 @@ class GTEST_API_ FilePath {
   // it is called in CreateDirectoriesRecursively() assuming that it will change
   // a pathname from directory syntax (trailing separator) to filename syntax.
   //
-  // On Windows this method also replaces the alternate path separator '/' with
+  // On windows this method also replaces the alternate path separator '/' with
   // the primary path separator '\\', so that for example "bar\\/\\foo" becomes
   // "bar\\foo".
 
   void Normalize();
 
   // Returns a pointer to the last occurence of a valid path separator in
-  // the FilePath. On Windows, for example, both '/' and '\' are valid path
+  // the FilePath. On windows, for example, both '/' and '\' are valid path
   // separators. Returns NULL if no path separator was found.
   const char* FindLastPathSeparator() const;
 
@@ -9113,7 +9113,7 @@ GTEST_API_ bool InDeathTestChild();
 //   On POSIX-compliant systems (*nix), we use the <regex.h> library,
 //   which uses the POSIX extended regex syntax.
 //
-//   On other platforms (e.g. Windows), we only support a simple regex
+//   On other platforms (e.g. windows), we only support a simple regex
 //   syntax implemented as part of Google Test.  This limited
 //   implementation should be enough most of the time when writing
 //   death tests; though it lacks many features you can find in PCRE
@@ -18101,7 +18101,7 @@ INSTANTIATE_TYPED_TEST_CASE_P(My, FooTest, MyTypes);
 #endif  // GTEST_INCLUDE_GTEST_GTEST_TYPED_TEST_H_
 
 // Depending on the platform, different string classes are available.
-// On Linux, in addition to ::std::string, Google also makes use of
+// On linux, in addition to ::std::string, Google also makes use of
 // class ::string, which has the same interface as ::std::string, but
 // has a different implementation.
 //
@@ -19389,7 +19389,7 @@ inline Environment* AddGlobalTestEnvironment(Environment* env) {
 // Calling the function for the second time has no user-visible effect.
 GTEST_API_ void InitGoogleTest(int* argc, char** argv);
 
-// This overloaded version can be used in Windows programs compiled in
+// This overloaded version can be used in windows programs compiled in
 // UNICODE mode.
 GTEST_API_ void InitGoogleTest(int* argc, wchar_t** argv);
 
@@ -20549,7 +20549,7 @@ GTEST_API_ AssertionResult DoubleLE(const char* expr1, const char* expr2,
 #if GTEST_OS_WINDOWS
 
 // Macros that test for HRESULT failure and success, these are only useful
-// on Windows, and rely on Windows SDK macros and APIs to compile.
+// on windows, and rely on windows SDK macros and APIs to compile.
 //
 //    * {ASSERT|EXPECT}_HRESULT_{SUCCEEDED|FAILED}(expr)
 //

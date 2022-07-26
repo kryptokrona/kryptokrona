@@ -183,7 +183,7 @@ char* Decompress(const char* input_data, size_t input_length,
 
   assert(decompressedBufferSize > 0);
 
-  // On Windows we are limited to a 32-bit int for the
+  // On windows we are limited to a 32-bit int for the
   // output data size argument
   // so we hopefully never get here
   if (decompressedBufferSize > std::numeric_limits<int>::max()) {

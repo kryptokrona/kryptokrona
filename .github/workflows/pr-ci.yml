@@ -11,18 +11,18 @@ jobs:
       matrix:
         config:
           # - {
-          #   name: "Windows Latest MSVC", artifact: "Windows-MSVC.7z",
+          #   name: "windows Latest MSVC", artifact: "windows-MSVC.7z",
           #   os: windows-latest,
           #   cc: "cl", cxx: "cl",
           #   environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           # }
           # - {
-          #   name: "Windows Latest MinGW", artifact: "Windows-MinGW.7z",
+          #   name: "windows Latest MinGW", artifact: "windows-MinGW.7z",
           #   os: windows-latest,
           #   cc: "gcc", cxx: "g++"
           # }
           - {
-            name: "Ubuntu Latest GCC", artifact: "Linux.7z",
+            name: "Ubuntu Latest GCC", artifact: "linux.7z",
             os: ubuntu-22.04,
             cc: "gcc", cxx: "g++"
           }
@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # # Windows MSVC
+      # # windows MSVC
       # - name: Install Dependencies
       #   if: matrix.config.os == 'windows-latest'
       #   uses: microsoft/setup-msbuild@v1.1
@@ -54,13 +54,13 @@ jobs:
       #   if: matrix.config.os == 'windows-latest'
       #   run: mkdir build
 
-      # - name: Build Windows Target using Visual C++
+      # - name: Build windows Target using Visual C++
       #   if: matrix.config.os == 'windows-latest'
       #   working-directory: build
       #   run: |
       #     cmake -G "Visual Studio 17 2022" -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBOOST_ROOT=C:/Boost/boost_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
 
-      # Windows MinGW
+      # windows MinGW
       #- name: Install Dependencies
       #  if: matrix.config.os == 'windows-latest'
       #  run: d

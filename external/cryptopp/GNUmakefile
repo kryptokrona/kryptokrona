@@ -30,7 +30,7 @@ INSTALL = install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_DATA = $(INSTALL) -m 644
 
-# Solaris provides a non-Posix shell at /usr/bin
+# Solaris provides a non-posix shell at /usr/bin
 ifneq ($(wildcard /usr/xpg4/bin),)
   GREP ?= /usr/xpg4/bin/grep
 else
@@ -89,7 +89,7 @@ SUNCC_511_OR_LATER := $(shell echo "$(SUNCC_VERSION)" | $(GREP) -i -c -E "CC: (S
 SUNCC_512_OR_LATER := $(shell echo "$(SUNCC_VERSION)" | $(GREP) -i -c -E "CC: (Sun|Studio) .* (5\.1[2-9]|5\.[2-9]|6\.)")
 SUNCC_513_OR_LATER := $(shell echo "$(SUNCC_VERSION)" | $(GREP) -i -c -E "CC: (Sun|Studio) .* (5\.1[3-9]|5\.[2-9]|6\.)")
 
-# Enable shared object versioning for Linux
+# Enable shared object versioning for linux
 HAS_SOLIB_VERSION := $(IS_LINUX)
 
 # Fixup SunOS
@@ -168,7 +168,7 @@ endif
 CLANG_INTEGRATED_ASSEMBLER ?= 0
 
 # original MinGW targets Win2k by default, but lacks proper Win2k support
-# if target Windows version is not specified, use Windows XP instead
+# if target windows version is not specified, use windows XP instead
 ifeq ($(IS_MINGW),1)
 ifeq ($(findstring -D_WIN32_WINNT,$(CXXFLAGS)),)
 ifeq ($(findstring -D_WIN32_WINDOWS,$(CXXFLAGS)),)
@@ -668,7 +668,7 @@ ifeq ($(findstring lean,$(MAKECMDGOALS)),lean)
     ifeq ($(findstring -Wl,-dead_strip,$(LDFLAGS)),)
       LDFLAGS += -Wl,-dead_strip
     endif # CXXFLAGS
-  else # BSD, Linux and Unix
+  else # BSD, linux and Unix
     ifeq ($(findstring -Wl,--gc-sections,$(LDFLAGS)),)
       LDFLAGS += -Wl,--gc-sections
     endif # LDFLAGS
@@ -699,7 +699,7 @@ endif # HAS_SOLIB_VERSION
 
 # List cryptlib.cpp first, then cpu.cpp, then integer.cpp to tame C++ static initialization problems.
 SRCS := cryptlib.cpp cpu.cpp integer.cpp $(filter-out cryptlib.cpp cpu.cpp integer.cpp pch.cpp simple.cpp winpipes.cpp cryptlib_bds.cpp,$(sort $(wildcard *.cpp)))
-# For Makefile.am; resource.h is Windows
+# For Makefile.am; resource.h is windows
 INCL := $(filter-out resource.h,$(sort $(wildcard *.h)))
 
 ifneq ($(IS_MINGW),0)
@@ -755,7 +755,7 @@ dep deps depend GNUmakefile.deps:
 native no-asm asan ubsan: cryptest.exe
 
 # CXXFLAGS are tuned earlier. Applications must use linker flags
-#  -Wl,--gc-sections (Linux and Unix) or -Wl,-dead_strip (OS X)
+#  -Wl,--gc-sections (linux and Unix) or -Wl,-dead_strip (OS X)
 .PHONY: lean
 lean: static dynamic cryptest.exe
 

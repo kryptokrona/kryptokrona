@@ -255,7 +255,7 @@ class SpecialEnv : public EnvWrapper {
         return s;
       }
       Status Close() override {
-// SyncPoint is not supported in Released Windows Mode.
+// SyncPoint is not supported in Released windows Mode.
 #if !(defined NDEBUG) || !defined(OS_WIN)
         // Check preallocation size
         // preallocation size is never passed to base file.
@@ -351,7 +351,7 @@ class SpecialEnv : public EnvWrapper {
       }
       Status Truncate(uint64_t size) override { return base_->Truncate(size); }
       Status Close() override {
-// SyncPoint is not supported in Released Windows Mode.
+// SyncPoint is not supported in Released windows Mode.
 #if !(defined NDEBUG) || !defined(OS_WIN)
         // Check preallocation size
         // preallocation size is never passed to base file.

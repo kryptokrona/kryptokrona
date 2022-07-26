@@ -41,7 +41,7 @@
 #include "misc.h"
 #include "cpu.h"
 
-// Clang 3.3 integrated assembler crash on Linux
+// Clang 3.3 integrated assembler crash on linux
 //  http://github.com/weidai11/cryptopp/issues/264
 // Clang 3.4.1 (x86) crash on FreeBSD 10.3. Clang 3.4.1 (x64) works fine.
 #if defined(CRYPTOPP_LLVM_CLANG_VERSION) && (CRYPTOPP_LLVM_CLANG_VERSION < 30500)

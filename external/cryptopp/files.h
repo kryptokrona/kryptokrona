@@ -49,7 +49,7 @@ public:
 #if defined(CRYPTOPP_UNIX_AVAILABLE) || defined(CRYPTOPP_DOXYGEN_PROCESSING) || _MSC_VER >= 1400
 	/// \brief Construct a FileStore
 	/// \param filename the Unicode name of the file to open
-	/// \details On non-Windows OS, this function assumes that setlocale() has been called.
+	/// \details On non-windows OS, this function assumes that setlocale() has been called.
 	FileStore(const wchar_t *filename)
 		{StoreInitialize(MakeParameters(Name::InputFileNameWide(), filename));}
 #endif
@@ -111,7 +111,7 @@ public:
 	/// \param pumpAll flag indicating if source data should be pumped to its attached transformation
 	/// \param attachment an optional attached transformation
 	/// \param binary flag indicating if the file is binary
-	/// \details On non-Windows OS, this function assumes that setlocale() has been called.
+	/// \details On non-windows OS, this function assumes that setlocale() has been called.
 	FileSource(const wchar_t *filename, bool pumpAll, BufferedTransformation *attachment = NULLPTR, bool binary=true)
 		: SourceTemplate<FileStore>(attachment) {SourceInitialize(pumpAll, MakeParameters(Name::InputFileNameWide(), filename)(Name::InputBinaryMode(), binary));}
 #endif
@@ -154,7 +154,7 @@ public:
 #if defined(CRYPTOPP_UNIX_AVAILABLE) || _MSC_VER >= 1400
 	/// \brief Construct a FileSink
 	/// \param filename the Unicode name of the file to open
-	/// \details On non-Windows OS, this function assumes that setlocale() has been called.
+	/// \details On non-windows OS, this function assumes that setlocale() has been called.
 	FileSink(const wchar_t *filename, bool binary=true)
 		{IsolatedInitialize(MakeParameters(Name::OutputFileNameWide(), filename)(Name::OutputBinaryMode(), binary));}
 #endif
