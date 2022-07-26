@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Event.h"
+#include "event.h"
 #include <cassert>
 #include <System/Dispatcher.h>
 #include <System/InterruptedException.h>
 
-namespace System {
+namespace system {
 
 namespace {
 

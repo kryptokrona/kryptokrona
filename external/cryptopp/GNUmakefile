@@ -1,5 +1,5 @@
 ###########################################################
-#####        System Attributes and Programs           #####
+#####        system Attributes and Programs           #####
 ###########################################################
 
 # https://www.gnu.org/software/make/manual/make.html#Makefile-Conventions

@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "RemoteEventLock.h"
+#include "remote_event_lock.h"
 #include <cassert>
 #include <mutex>
 #include <condition_variable>
 #include <System/Dispatcher.h>
 #include <System/Event.h>
 
-namespace System {
+namespace system {
 
 RemoteEventLock::RemoteEventLock(Dispatcher& dispatcher, Event& event) : dispatcher(dispatcher), event(event) {
   std::mutex mutex;

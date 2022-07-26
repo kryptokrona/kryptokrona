@@ -17,19 +17,24 @@
 
 #pragma once
 
-namespace System {
+#include <cstdint>
+#include <string>
 
-class Dispatcher;
-class Event;
+namespace system {
 
-class RemoteEventLock {
+class Ipv4Address {
 public:
-  RemoteEventLock(Dispatcher& dispatcher, Event& event);
-  ~RemoteEventLock();
+  explicit Ipv4Address(uint32_t value);
+  explicit Ipv4Address(const std::string& dottedDecimal);
+  bool operator!=(const Ipv4Address& other) const;
+  bool operator==(const Ipv4Address& other) const;
+  uint32_t getValue() const;
+  bool isLoopback() const;
+  bool isPrivate() const;
+  std::string toDottedDecimal() const;
 
 private:
-  Dispatcher& dispatcher;
-  Event& event;
+  uint32_t value;
 };
 
 }

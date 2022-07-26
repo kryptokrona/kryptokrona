@@ -484,7 +484,7 @@ bool TestCryptoSignKeys()
 
 // NaCl requires an integrated random number generator; see randombytes()
 // in tweetnacl.cpp. We use DefaultAutoSeededRNG but it means we need
-// Operating System features to seed the generator. If you use another
+// Operating system features to seed the generator. If you use another
 // generator, like RDRAND, then undefine CRYPTOPP_DISABLE_NACL in naclite.h.
 bool ValidateNaCl()
 {

@@ -21,7 +21,7 @@
 #include <System/Event.h>
 #include <System/InterruptedException.h>
 
-namespace System {
+namespace system {
 
 template<typename ResultType = void>
 class Context {
