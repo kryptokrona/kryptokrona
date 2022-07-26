@@ -17,7 +17,7 @@
 #include <Utilities/ColouredMsg.h>
 #include <zedwallet++/PasswordContainer.h>
 
-namespace ZedUtilities
+namespace zed_utilities
 {
 
 void confirmPassword(

@@ -5,7 +5,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////
-#include "PasswordContainer.h"
+#include "password_container.h"
 //////////////////////////////
 
 #include <iostream>
@@ -25,7 +25,7 @@
 
 #include <Utilities/ColouredMsg.h>
 
-namespace Tools
+namespace tools
 {
   namespace
   {
