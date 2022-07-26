@@ -785,7 +785,7 @@ if [[ "$XLC_COMPILER" -ne "0" ]]; then
 fi
 
 ############################################
-# System information
+# system information
 
 echo | tee -a "$TEST_RESULTS"
 if [[ "$IS_LINUX" -ne "0" ]]; then

@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "TcpStream.h"
+#include "tcp_stream.h"
 #include <System/TcpConnection.h>
 
-namespace System {
+namespace system {
 
 TcpStreambuf::TcpStreambuf(TcpConnection& connection) : connection(connection) {
   setg(&readBuf.front(), &readBuf.front(), &readBuf.front());

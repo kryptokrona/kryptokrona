@@ -196,7 +196,7 @@ WCHAR prefix2;              // secondary prefix ( '?' or '>' );
 WCHAR suffix;               // escape sequence suffix
 int   es_argc;              // escape sequence args count
 int   es_argv[MAX_ARG];     // escape sequence args
-WCHAR Pt_arg[MAX_PATH * 2]; // text parameter for Operating System Command
+WCHAR Pt_arg[MAX_PATH * 2]; // text parameter for Operating system Command
 int   Pt_len;
 BOOL  shifted;
 

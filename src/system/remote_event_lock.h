@@ -17,34 +17,19 @@
 
 #pragma once
 
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/Timer.h>
+namespace system {
 
-namespace System {
+class Dispatcher;
+class Event;
 
-template<typename T> class OperationTimeout {
+class RemoteEventLock {
 public:
-  OperationTimeout(Dispatcher& dispatcher, T& object, std::chrono::nanoseconds timeout) :
-    object(object), timerContext(dispatcher), timeoutTimer(dispatcher) {
-    timerContext.spawn([this, timeout]() {
-      try {
-        timeoutTimer.sleep(timeout);
-        timerContext.interrupt();
-      } catch (...) {
-      }
-    });
-  }
-
-  ~OperationTimeout() {
-    timerContext.interrupt();
-    timerContext.wait();
-  }
+  RemoteEventLock(Dispatcher& dispatcher, Event& event);
+  ~RemoteEventLock();
 
 private:
-  T& object;
-  ContextGroup timerContext;
-  Timer timeoutTimer;
+  Dispatcher& dispatcher;
+  Event& event;
 };
 
 }

@@ -430,7 +430,7 @@ NAMESPACE_END
 
 // Linux provides X32, which is 32-bit integers, longs and pointers on x86_64 using the full x86_64 register set.
 // Detect via __ILP32__ (http://wiki.debian.org/X32Port). However, __ILP32__ shows up in more places than
-// the System V ABI specs calls out, like on some Solaris installations and just about any 32-bit system with Clang.
+// the system V ABI specs calls out, like on some Solaris installations and just about any 32-bit system with Clang.
 #if (defined(__ILP32__) || defined(_ILP32)) && defined(__x86_64__)
 	#define CRYPTOPP_BOOL_X32 1
 #endif

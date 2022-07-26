@@ -17,29 +17,25 @@
 
 #pragma once
 
-namespace System {
+#include <System/Dispatcher.h>
 
-class Dispatcher;
+namespace system {
 
-class Event {
+class ContextGroup {
 public:
-  Event();
-  explicit Event(Dispatcher& dispatcher);
-  Event(const Event&) = delete;
-  Event(Event&& other);
-  ~Event();
-  Event& operator=(const Event&) = delete;
-  Event& operator=(Event&& other);
-  bool get() const;
-  void clear();
-  void set();
+  explicit ContextGroup(Dispatcher& dispatcher);
+  ContextGroup(const ContextGroup&) = delete;
+  ContextGroup(ContextGroup&& other);
+  ~ContextGroup();
+  ContextGroup& operator=(const ContextGroup&) = delete;
+  ContextGroup& operator=(ContextGroup&& other);
+  void interrupt();
+  void spawn(std::function<void()>&& procedure);
   void wait();
 
 private:
   Dispatcher* dispatcher;
-  bool state;
-  void* first;
-  void* last;
+  NativeContextGroup contextGroup;
 };
 
 }

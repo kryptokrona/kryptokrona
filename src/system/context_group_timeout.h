@@ -15,26 +15,20 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#pragma once 
+#include <chrono>
+#include <System/ContextGroup.h>
+#include <System/Timer.h>
 
-#include <cstdint>
-#include <string>
+namespace system {
 
-namespace System {
+class ContextGroupTimeout {
+public: 
+  ContextGroupTimeout(Dispatcher&, ContextGroup&, std::chrono::nanoseconds);
 
-class Ipv4Address {
-public:
-  explicit Ipv4Address(uint32_t value);
-  explicit Ipv4Address(const std::string& dottedDecimal);
-  bool operator!=(const Ipv4Address& other) const;
-  bool operator==(const Ipv4Address& other) const;
-  uint32_t getValue() const;
-  bool isLoopback() const;
-  bool isPrivate() const;
-  std::string toDottedDecimal() const;
-
-private:
-  uint32_t value;
+private: 
+  Timer timeoutTimer;
+  ContextGroup workingContextGroup;
 };
 
 }
