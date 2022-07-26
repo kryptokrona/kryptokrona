@@ -1827,16 +1827,6 @@ std::error_code Core::validateSemantic(const Transaction& transaction, uint64_t&
     return error::TransactionValidationError::EMPTY_INPUTS;
   }
 
-  /* Small buffer until enforcing - helps clear out tx pool with old, previously
-     valid transactions */
-  if (blockIndex >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2_HEIGHT + CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
-  {
-      if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
-      {
-          return error::TransactionValidationError::EXTRA_TOO_LARGE;
-      }
-  }
-
   uint64_t summaryOutputAmount = 0;
   for (const auto& output : transaction.outputs) {
     if (output.amount == 0) {
