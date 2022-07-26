@@ -17,16 +17,16 @@
 
 #pragma once
 
-#include <Common/IInputStream.h>
-#include "ISerializer.h"
-#include "SerializationOverloads.h"
+#include "Common/IOutputStream.h"
+#include "iserializer.h"
+#include "serialization_overloads.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
-class BinaryInputStreamSerializer : public ISerializer {
+class BinaryOutputStreamSerializer : public ISerializer {
 public:
-  BinaryInputStreamSerializer(Common::IInputStream& strm) : stream(strm) {}
-  virtual ~BinaryInputStreamSerializer() {}
+  BinaryOutputStreamSerializer(Common::IOutputStream& strm) : stream(strm) {}
+  virtual ~BinaryOutputStreamSerializer() {}
 
   virtual ISerializer::SerializerType type() const override;
 
@@ -55,9 +55,8 @@ public:
   }
 
 private:
-
-  void checkedRead(char* buf, uint64_t size);
-  Common::IInputStream& stream;
+  void checkedWrite(const char* buf, uint64_t size);
+  Common::IOutputStream& stream;
 };
 
 }

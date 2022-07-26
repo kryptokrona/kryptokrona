@@ -17,19 +17,22 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
+#include "BlockchainExplorerData.h"
 
-namespace CryptoNote {
+#include "Serialization/ISerializer.h"
 
-class IInputStream {
-public:
-  virtual uint64_t read(char* data, uint64_t size) = 0;
-};
+namespace cryptonote {
 
-class IOutputStream {
-public:
-  virtual void write(const char* data, uint64_t size) = 0;
-};
+void serialize(TransactionOutputDetails& output, ISerializer& serializer);
+void serialize(TransactionOutputReferenceDetails& outputReference, ISerializer& serializer);
 
-}
+void serialize(BaseInputDetails& inputBase, ISerializer& serializer);
+void serialize(KeyInputDetails& inputToKey, ISerializer& serializer);
+void serialize(TransactionInputDetails& input, ISerializer& serializer);
+
+void serialize(TransactionExtraDetails& extra, ISerializer& serializer);
+void serialize(TransactionDetails& transaction, ISerializer& serializer);
+
+void serialize(BlockDetails& block, ISerializer& serializer);
+
+} //namespace CryptoNote

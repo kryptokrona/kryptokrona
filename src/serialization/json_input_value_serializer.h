@@ -18,9 +18,9 @@
 #pragma once
 
 #include "Common/JsonValue.h"
-#include "ISerializer.h"
+#include "iserializer.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 //deserialization
 class JsonInputValueSerializer : public ISerializer {

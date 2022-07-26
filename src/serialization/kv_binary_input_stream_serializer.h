@@ -17,22 +17,18 @@
 
 #pragma once
 
-#include "BlockchainExplorerData.h"
+#include <Common/IInputStream.h>
+#include "iserializer.h"
+#include "json_input_value_serializer.h"
 
-#include "Serialization/ISerializer.h"
+namespace cryptonote {
 
-namespace CryptoNote {
+class KVBinaryInputStreamSerializer : public JsonInputValueSerializer {
+public:
+  KVBinaryInputStreamSerializer(Common::IInputStream& strm);
 
-void serialize(TransactionOutputDetails& output, ISerializer& serializer);
-void serialize(TransactionOutputReferenceDetails& outputReference, ISerializer& serializer);
+  virtual bool binary(void* value, uint64_t size, Common::StringView name) override;
+  virtual bool binary(std::string& value, Common::StringView name) override;
+};
 
-void serialize(BaseInputDetails& inputBase, ISerializer& serializer);
-void serialize(KeyInputDetails& inputToKey, ISerializer& serializer);
-void serialize(TransactionInputDetails& input, ISerializer& serializer);
-
-void serialize(TransactionExtraDetails& extra, ISerializer& serializer);
-void serialize(TransactionDetails& transaction, ISerializer& serializer);
-
-void serialize(BlockDetails& block, ISerializer& serializer);
-
-} //namespace CryptoNote
+}

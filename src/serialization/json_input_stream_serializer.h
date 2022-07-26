@@ -15,4 +15,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "MemoryStream.h"
+#pragma once
+
+#include <iosfwd>
+#include <string>
+#include <vector>
+#include "../Common/json_value.h"
+#include "json_input_value_serializer.h"
+
+namespace cryptonote {
+
+//deserialization
+class JsonInputStreamSerializer : public JsonInputValueSerializer {
+public:
+  JsonInputStreamSerializer(std::istream& stream);
+  virtual ~JsonInputStreamSerializer();
+};
+
+}

@@ -15,15 +15,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "JsonOutputStreamSerializer.h"
+#include "json_output_stream_serializer.h"
 #include <cassert>
 #include <stdexcept>
 #include "Common/StringTools.h"
 
-using Common::JsonValue;
-using namespace CryptoNote;
+using common::JsonValue;
+using namespace cryptonote;
 
-namespace CryptoNote {
+namespace cryptonote {
 std::ostream& operator<<(std::ostream& out, const JsonOutputStreamSerializer& enumerator) {
   out << enumerator.root;
   return out;

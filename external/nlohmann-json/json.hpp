@@ -13025,7 +13025,7 @@ class basic_json
     /*!
     @brief serialization
 
-    Serialization function for JSON values. The function tries to mimic
+    serialization function for JSON values. The function tries to mimic
     Python's `json.dumps()` function, and currently supports its @a indent
     and @a ensure_ascii parameters.
 
