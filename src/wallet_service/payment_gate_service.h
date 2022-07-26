@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ConfigurationManager.h"
+#include "configuration_manager.h"
 
 #include <config/CliHeader.h>
 #include "Logging/ConsoleLogger.h"

@@ -12,9 +12,9 @@
 
 #include "Serialization/ISerializer.h"
 
-namespace PaymentService {
+namespace payment_service {
 
-/* Forward declaration to avoid circular dependency from including "WalletService.h" */
+/* Forward declaration to avoid circular dependency from including "wallet_service.h" */
 class WalletService;
 
 class RequestSerializationError: public std::exception {

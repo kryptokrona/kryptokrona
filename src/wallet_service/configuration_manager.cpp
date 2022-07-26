@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "ConfigurationManager.h"
+#include "configuration_manager.h"
 
 #include <iostream>
 #include <fstream>
@@ -16,7 +16,7 @@
 #include "crypto/hash.h"
 #include "Logging/ILogger.h"
 
-namespace PaymentService {
+namespace payment_service {
 
 ConfigurationManager::ConfigurationManager() {
   rpcSecret = Crypto::Hash();

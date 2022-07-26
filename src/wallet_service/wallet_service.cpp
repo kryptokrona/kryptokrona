@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "WalletService.h"
+#include "wallet_service.h"
 
 
 #include <future>
@@ -32,17 +32,17 @@
 #include <System/EventLock.h>
 #include <System/RemoteContext.h>
 
-#include "PaymentServiceJsonRpcMessages.h"
-#include "NodeFactory.h"
+#include "payment_service_json_rpc_messages.h"
+#include "node_factory.h"
 
 #include "Wallet/WalletGreen.h"
 #include "Wallet/WalletErrors.h"
 #include "Wallet/WalletUtils.h"
-#include "WalletServiceErrorCategory.h"
+#include "wallet_service_error_category.h"
 
 #include "Mnemonics/Mnemonics.h"
 
-namespace PaymentService {
+namespace payment_service {
 
 namespace {
 
@@ -449,7 +449,7 @@ WalletService::WalletService(const CryptoNote::Currency& currency, System::Dispa
     node(node),
     config(conf),
     inited(false),
-    logger(logger, "WalletService"),
+    logger(logger, "wallet_service"),
     dispatcher(sys),
     readyEvent(dispatcher),
     refreshContext(dispatcher)

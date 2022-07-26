@@ -11,7 +11,7 @@
 
 using nlohmann::json;
 
-namespace PaymentService {
+namespace payment_service {
   struct WalletServiceConfiguration
   {
     WalletServiceConfiguration()

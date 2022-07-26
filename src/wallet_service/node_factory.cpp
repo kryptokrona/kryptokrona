@@ -3,13 +3,13 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "NodeFactory.h"
+#include "node_factory.h"
 
 #include "NodeRpcProxy/NodeRpcProxy.h"
 #include <memory>
 #include <future>
 
-namespace PaymentService {
+namespace payment_service {
 
 class NodeRpcStub: public CryptoNote::INode {
 public:
