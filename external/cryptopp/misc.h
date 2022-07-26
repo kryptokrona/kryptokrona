@@ -86,7 +86,7 @@
 #else
 // Its amazing portability problems still plague this simple concept in 2015.
 //   http://stackoverflow.com/questions/30472731/which-c-standard-header-defines-size-max
-// Avoid NOMINMAX macro on Windows. http://support.microsoft.com/en-us/kb/143208
+// Avoid NOMINMAX macro on windows. http://support.microsoft.com/en-us/kb/143208
 #ifndef SIZE_MAX
 # if defined(__SIZE_MAX__) && (__SIZE_MAX__ > 0)
 #  define SIZE_MAX __SIZE_MAX__
@@ -173,11 +173,11 @@ struct CompileAssert
 #if CRYPTOPP_DOXYGEN_PROCESSING
 /// \brief Counts elements in an array
 /// \param arr an array of elements
-/// \details COUNTOF counts elements in an array. On Windows COUNTOF(x) is defined
+/// \details COUNTOF counts elements in an array. On windows COUNTOF(x) is defined
 ///   to <tt>_countof(x)</tt> to ensure correct results for pointers.
 /// \note COUNTOF does not produce correct results with pointers, and an array must be used.
 ///   <tt>sizeof(x)/sizeof(x[0])</tt> suffers the same problem. The risk is eliminated by using
-///   <tt>_countof(x)</tt> on Windows. Windows will provide the immunity for other platforms.
+///   <tt>_countof(x)</tt> on windows. windows will provide the immunity for other platforms.
 # define COUNTOF(arr)
 #else
 // VS2005 added _countof
@@ -276,10 +276,10 @@ struct NewObject
 ///   and below it will do so without using locks for portability. If two threads call Ref() at the same
 ///   time, they may get back different references, and one object may end up being memory leaked. This
 ///   is by design and it avoids a subltle initialization problem ina multithreaded environment with thread
-///   local storage on early Windows platforms, like Windows XP and Windows 2003.
+///   local storage on early windows platforms, like windows XP and windows 2003.
 /// \details For C++11 and above, a standard double-checked locking pattern with thread fences
 ///   are used. The locks and fences are standard and do not hinder portability.
-/// \details Microsoft's C++11 implementation provides the necessary primitive support on Windows Vista and
+/// \details Microsoft's C++11 implementation provides the necessary primitive support on windows Vista and
 ///   above when using Visual Studio 2015 (<tt>cl.exe</tt> version 19.00). If C++11 is desired, you should
 ///   set <tt>WINVER</tt> or <tt>_WIN32_WINNT</tt> to 0x600 (or above), and compile with Visual Studio 2015.
 /// \sa <A HREF="http://preshing.com/20130930/double-checked-locking-is-fixed-in-cpp11/">Double-Checked Locking
@@ -382,7 +382,7 @@ template <class T, class F, int instance>
 ///   in debug builds. Passing NULL for either pointer is undefined behavior.
 inline void memcpy_s(void *dest, size_t sizeInBytes, const void *src, size_t count)
 {
-	// Safer functions on Windows for C&A, http://github.com/weidai11/cryptopp/issues/55
+	// Safer functions on windows for C&A, http://github.com/weidai11/cryptopp/issues/55
 
 	// Pointers must be valid; otherwise undefined behavior
 	CRYPTOPP_ASSERT(dest != NULLPTR); CRYPTOPP_ASSERT(src != NULLPTR);
@@ -427,7 +427,7 @@ inline void memcpy_s(void *dest, size_t sizeInBytes, const void *src, size_t cou
 ///   in debug builds. Passing NULL for either pointer is undefined behavior.
 inline void memmove_s(void *dest, size_t sizeInBytes, const void *src, size_t count)
 {
-	// Safer functions on Windows for C&A, http://github.com/weidai11/cryptopp/issues/55
+	// Safer functions on windows for C&A, http://github.com/weidai11/cryptopp/issues/55
 
 	// Pointers must be valid; otherwise undefined behavior
 	CRYPTOPP_ASSERT(dest != NULLPTR); CRYPTOPP_ASSERT(src != NULLPTR);
@@ -503,7 +503,7 @@ inline void * memset_z(void *ptr, int value, size_t num)
 /// \param a the first value
 /// \param b the second value
 /// \returns the minimum value based on a comparison of <tt>b \< a</tt> using <tt>operator\<</tt>
-/// \details STDMIN was provided because the library could not easily use std::min or std::max in Windows or Cygwin 1.1.0
+/// \details STDMIN was provided because the library could not easily use std::min or std::max in windows or Cygwin 1.1.0
 template <class T> inline const T& STDMIN(const T& a, const T& b)
 {
 	return b < a ? b : a;
@@ -514,7 +514,7 @@ template <class T> inline const T& STDMIN(const T& a, const T& b)
 /// \param a the first value
 /// \param b the second value
 /// \returns the minimum value based on a comparison of <tt>a \< b</tt> using <tt>operator\<</tt>
-/// \details STDMAX was provided because the library could not easily use std::min or std::max in Windows or Cygwin 1.1.0
+/// \details STDMAX was provided because the library could not easily use std::min or std::max in windows or Cygwin 1.1.0
 template <class T> inline const T& STDMAX(const T& a, const T& b)
 {
 	return a < b ? b : a;
@@ -1295,7 +1295,7 @@ inline void SecureWipeArray(T *buf, size_t n)
 ///   throwOnError as true, the function throws an InvalidArgument() exception.
 /// \note If you try to convert, say, the Chinese character for "bone" from UTF-16 (0x9AA8) to UTF-8
 ///   (0xE9 0xAA 0xA8), then you must ensure the locale is available. If the locale is not available,
-///   then a 0x21 error is returned on Windows which eventually results in an InvalidArgument() exception.
+///   then a 0x21 error is returned on windows which eventually results in an InvalidArgument() exception.
 std::string StringNarrow(const wchar_t *str, bool throwOnError = true);
 
 /// \brief Converts a multibyte C-string to a wide character string
@@ -1309,7 +1309,7 @@ std::string StringNarrow(const wchar_t *str, bool throwOnError = true);
 ///   throwOnError as true, the function throws an InvalidArgument() exception.
 /// \note If you try to convert, say, the Chinese character for "bone" from UTF-8 (0xE9 0xAA 0xA8)
 ///   to UTF-16 (0x9AA8), then you must ensure the locale is available. If the locale is not available,
-///   then a 0x21 error is returned on Windows which eventually results in an InvalidArgument() exception.
+///   then a 0x21 error is returned on windows which eventually results in an InvalidArgument() exception.
 std::wstring StringWiden(const char *str, bool throwOnError = true);
 
 #ifdef CRYPTOPP_DOXYGEN_PROCESSING
@@ -1318,8 +1318,8 @@ std::wstring StringWiden(const char *str, bool throwOnError = true);
 /// \param size the size of the buffer
 /// \details AlignedAllocate is primarily used when the data will be proccessed by MMX, SSE2 and NEON
 ///   instructions. The assembly language routines rely on the alignment. If the alignment is not
-///   respected, then a SIGBUS could be generated on Unix and Linux, and an
-///   EXCEPTION_DATATYPE_MISALIGNMENT could be generated on Windows.
+///   respected, then a SIGBUS could be generated on Unix and linux, and an
+///   EXCEPTION_DATATYPE_MISALIGNMENT could be generated on windows.
 /// \note AlignedAllocate and AlignedDeallocate are available when CRYPTOPP_BOOL_ALIGN16 is
 ///   defined. CRYPTOPP_BOOL_ALIGN16 is defined in config.h
 CRYPTOPP_DLL void* CRYPTOPP_API AlignedAllocate(size_t size);

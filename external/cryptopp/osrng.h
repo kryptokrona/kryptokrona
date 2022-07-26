@@ -80,7 +80,7 @@ private:
 
 /// \brief Wrapper class for /dev/random and /dev/srandom
 /// \details Encapsulates CryptoAPI's CryptGenRandom() or CryptoNG's BCryptGenRandom()
-///   on Windows, or /dev/urandom on Unix and compatibles.
+///   on windows, or /dev/urandom on Unix and compatibles.
 class CRYPTOPP_DLL NonblockingRng : public RandomNumberGenerator
 {
 public:
@@ -110,10 +110,10 @@ protected:
 #if defined(BLOCKING_RNG_AVAILABLE) || defined(CRYPTOPP_DOXYGEN_PROCESSING)
 
 /// \brief Wrapper class for /dev/random and /dev/srandom
-/// \details Encapsulates /dev/random on Linux, OS X and Unix; and /dev/srandom on the BSDs.
-/// \note On Linux the /dev/random interface is effectively deprecated. According to the
+/// \details Encapsulates /dev/random on linux, OS X and Unix; and /dev/srandom on the BSDs.
+/// \note On linux the /dev/random interface is effectively deprecated. According to the
 ///   Kernel Crypto developers, /dev/urandom or getrandom(2) should be used instead. Also
-///   see <A HREF="https://lkml.org/lkml/2017/7/20/993">[RFC PATCH v12 3/4] Linux Random
+///   see <A HREF="https://lkml.org/lkml/2017/7/20/993">[RFC PATCH v12 3/4] linux Random
 ///   Number Generator</A> on the kernel-crypto mailing list.
 class CRYPTOPP_DLL BlockingRng : public RandomNumberGenerator
 {
@@ -143,7 +143,7 @@ protected:
 /// \param output the byte buffer
 /// \param size the length of the buffer, in bytes
 /// \details OS_GenerateRandomBlock() uses the underlying operating system's
-///   random number generator. On Windows, CryptGenRandom() is called using NonblockingRng.
+///   random number generator. On windows, CryptGenRandom() is called using NonblockingRng.
 /// \details On Unix and compatibles, /dev/urandom is called if blocking is false using
 ///   NonblockingRng. If blocking is true, then either /dev/randomd or /dev/srandom is used
 ///  by way of BlockingRng, if available.

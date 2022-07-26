@@ -170,11 +170,11 @@ publish/
 ## TODO: If you have NuGet Package Restore enabled, uncomment the next line
 #packages/
 
-# Windows Azure Build Output
+# windows Azure Build Output
 csx
 *.build.csdef
 
-# Windows Store app package directory
+# windows Store app package directory
 AppPackages/
 
 # Others
@@ -207,7 +207,7 @@ App_Data/*.ldf
 ## Windows detritus
 #############
 
-# Windows image file caches
+# windows image file caches
 Thumbs.db
 ehthumbs.db
 

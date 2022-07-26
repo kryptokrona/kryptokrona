@@ -18,7 +18,7 @@
 #include "db/db_impl.h"
 
 #ifdef _WIN32
-// Windows API macro interference
+// windows API macro interference
 #undef GetCurrentTime
 #endif
 

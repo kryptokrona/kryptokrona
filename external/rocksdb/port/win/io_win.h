@@ -275,7 +275,7 @@ class WinRandomAccessFile
 };
 
 // This is a sequential write class. It has been mimicked (as others) after
-// the original Posix class. We add support for unbuffered I/O on windows as
+// the original posix class. We add support for unbuffered I/O on windows as
 // well
 // we utilize the original buffer as an alignment buffer to write directly to
 // file with no buffering.
@@ -290,7 +290,7 @@ class WinWritableImpl {
  protected:
   WinFileData* file_data_;
   const uint64_t alignment_;
-  uint64_t next_write_offset_; // Needed because Windows does not support O_APPEND
+  uint64_t next_write_offset_; // Needed because windows does not support O_APPEND
   uint64_t reservedsize_;  // how far we have reserved space
 
   virtual Status PreallocateInternal(uint64_t spaceToReserve);

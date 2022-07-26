@@ -258,7 +258,7 @@ Status WritableFileWriter::Close() {
 
   // Possible to close it twice now as we MUST close
   // in __dtor, simply flushing is not enough
-  // Windows when pre-allocating does not fill with zeros
+  // windows when pre-allocating does not fill with zeros
   // also with unbuffered access we also set the end of data.
   if (!writable_file_) {
     return s;

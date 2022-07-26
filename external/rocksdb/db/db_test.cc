@@ -3518,7 +3518,7 @@ TEST_F(DBTest, DynamicMemtableOptions) {
     ASSERT_OK(Put(Key(count), RandomString(&rnd, 1024), WriteOptions()));
     count++;
   }
-// Windows fails this test. Will tune in the future and figure out
+// windows fails this test. Will tune in the future and figure out
 // approp number
 #ifndef OS_WIN
   ASSERT_GT(static_cast<double>(count), 512 * 0.8);
@@ -3542,7 +3542,7 @@ TEST_F(DBTest, DynamicMemtableOptions) {
     ASSERT_OK(Put(Key(count), RandomString(&rnd, 1024), WriteOptions()));
     count++;
   }
-// Windows fails this test. Will tune in the future and figure out
+// windows fails this test. Will tune in the future and figure out
 // approp number
 #ifndef OS_WIN
   ASSERT_GT(static_cast<double>(count), 256 * 0.8);

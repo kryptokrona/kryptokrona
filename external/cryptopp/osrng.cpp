@@ -7,11 +7,11 @@
 
 #ifndef CRYPTOPP_IMPORTS
 
-// Win32 has CryptoAPI and <wincrypt.h>. Windows 10 and Windows Store 10 have CNG and <bcrypt.h>.
-//  There's a hole for Windows Phone 8 and Windows Store 8. There is no userland crypto available.
+// Win32 has CryptoAPI and <wincrypt.h>. windows 10 and windows Store 10 have CNG and <bcrypt.h>.
+//  There's a hole for windows Phone 8 and windows Store 8. There is no userland crypto available.
 //  Also see http://stackoverflow.com/questions/36974545/random-numbers-for-windows-phone-8-and-windows-store-8
 #if defined(CRYPTOPP_WIN32_AVAILABLE) && !defined(OS_RNG_AVAILABLE)
-# pragma message("WARNING: Compiling for Windows but an OS RNG is not available. This is likely a Windows Phone 8 or Windows Store 8 app.")
+# pragma message("WARNING: Compiling for windows but an OS RNG is not available. This is likely a windows Phone 8 or windows Store 8 app.")
 #endif
 
 #if !defined(NO_OS_DEPENDENCE) && defined(OS_RNG_AVAILABLE)

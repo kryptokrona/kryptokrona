@@ -119,7 +119,7 @@ endif ()
 
 ###############################################################################
 
-# Try to find a Posix compatible grep and sed. Solaris, Digital Unix,
+# Try to find a posix compatible grep and sed. Solaris, Digital Unix,
 #   Tru64, HP-UX and a few others need tweaking
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "SunOS")
@@ -337,7 +337,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   endif ()
 endif ()
 
-# TODO: what about ICC and LLVM on Windows?
+# TODO: what about ICC and LLVM on windows?
 if (MSVC)
   if (CMAKE_SYSTEM_VERSION MATCHES "10\\.0.*")
     list(APPEND CRYPTOPP_COMPILE_DEFINITIONS "_WIN32_WINNT=0x0A00")
@@ -581,7 +581,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU
         set_source_files_properties(${SRC_DIR}/aes-armv4.S PROPERTIES LANGUAGE C)
       endif ()
 
-      # Need to set floating point ABI to something, like "hard" of "softfp". Most Linux use hard floats.
+      # Need to set floating point ABI to something, like "hard" of "softfp". Most linux use hard floats.
       set_source_files_properties(${SRC_DIR}/aes-armv4.S PROPERTIES COMPILE_FLAGS "${CRYPTOPP_ARMV7A_FLAGS}")
       set_source_files_properties(${SRC_DIR}/aria-simd.cpp PROPERTIES COMPILE_FLAGS "${CRYPTOPP_ARMV7A_FLAGS}")
       set_source_files_properties(${SRC_DIR}/blake2-simd.cpp PROPERTIES COMPILE_FLAGS "${CRYPTOPP_ARMV7A_FLAGS}")

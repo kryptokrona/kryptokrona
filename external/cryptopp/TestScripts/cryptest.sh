@@ -2,7 +2,7 @@
 
 # cryptest.sh - written and placed in public domain by Jeffrey Walton and Uri Blumenthal.
 
-# This is a test script that can be used on some Linux/Unix/Apple machines to automate building the
+# This is a test script that can be used on some linux/Unix/Apple machines to automate building the
 # library and running the self test with various combinations of flags, options, and conditions.
 # For more details, see http://cryptopp.com/wiki/cryptest.sh.
 
@@ -1028,7 +1028,7 @@ echo | tee -a "$TEST_RESULTS"
 echo "Start time: $TEST_BEGIN" | tee -a "$TEST_RESULTS"
 
 ############################################
-# Posix NDEBUG and assert
+# posix NDEBUG and assert
 if true; then
 
 	echo
@@ -1067,7 +1067,7 @@ fi
 
 ############################################
 # C++ std::min and std::max
-# This is due to Windows.h and NOMINMAX. Linux test fine, while Windows breaks.
+# This is due to windows.h and NOMINMAX. linux test fine, while windows breaks.
 if true; then
 
 	echo

@@ -9,7 +9,7 @@
 #include "rocksdb/db.h"
 
 #ifdef _WIN32
-// Windows API macro interference
+// windows API macro interference
 #undef DeleteFile
 #endif
 

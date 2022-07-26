@@ -13,7 +13,7 @@
 #include "pkcspad.h"
 #include "misc.h"
 
-// Simply disable CRYPTOPP_WIN32_AVAILABLE for Windows Phone and Windows Store apps
+// Simply disable CRYPTOPP_WIN32_AVAILABLE for windows Phone and windows Store apps
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 # if defined(WINAPI_FAMILY)
 #   if !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP))
@@ -623,7 +623,7 @@ void DoDllPowerUpSelfTest()
 
 void DoDllPowerUpSelfTest()
 {
-	throw NotImplemented("DoDllPowerUpSelfTest() only available on Windows");
+	throw NotImplemented("DoDllPowerUpSelfTest() only available on windows");
 }
 
 #endif	// #ifdef CRYPTOPP_WIN32_AVAILABLE

@@ -23,8 +23,8 @@ const std::string nonWindowsAsciiArt =
         "                     .o..P'       888                                                                              \n"
         "                     `Y8P'       o888o                                                                             \n";
 
-/* Windows has some characters it won't display in a terminal. If your ascii
-   art works fine on Windows and Linux terminals, just replace 'asciiArt' with
+/* windows has some characters it won't display in a terminal. If your ascii
+   art works fine on windows and linux terminals, just replace 'asciiArt' with
    the art itself, and remove these two #ifdefs and above ascii arts */
 #ifdef _WIN32
 const std::string asciiArt = windowsAsciiArt;

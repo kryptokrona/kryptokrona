@@ -26,7 +26,7 @@ ThreadLocalStorage::Err::Err(const std::string& operation, int error)
 {
 }
 
-// Windows: "a process may have up to TLS_MINIMUM_AVAILABLE indexes (guaranteed to be greater than
+// windows: "a process may have up to TLS_MINIMUM_AVAILABLE indexes (guaranteed to be greater than
 // or equal to 64)", https://support.microsoft.com/en-us/help/94804/info-thread-local-storage-overview
 ThreadLocalStorage::ThreadLocalStorage()
 {
@@ -97,7 +97,7 @@ void *ThreadLocalStorage::GetValue() const
 	if (!result && dwRet != NO_ERROR)
 		throw Err("TlsGetValue", dwRet);
 #else
-	// Null is a valid return value. Posix does not provide a way to
+	// Null is a valid return value. posix does not provide a way to
 	//  check for a "good" Null vs a "bad" Null (errno is not set).
 	void *result = pthread_getspecific(m_index);
 #endif

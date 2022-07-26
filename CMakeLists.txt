@@ -141,9 +141,9 @@ endif()
 
 include_directories(include "${CMAKE_CURRENT_BINARY_DIR}/version" src external)
 
-# # Platform specific code base information is applied here
+# # platform specific code base information is applied here
 if(MSVC)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Windows)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/windows)
   add_definitions("/bigobj /MP /W3 /GS- /D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4345 /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN /DGTEST_HAS_TR1_TUPLE=0 /D_VARIADIC_MAX=8 /D__SSE4_1__")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10485760")
 
@@ -155,12 +155,12 @@ if(MSVC)
 elseif(APPLE)
   include_directories(SYSTEM /usr/include/malloc)
   enable_language(ASM)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OSX)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Posix)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/osx)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/posix)
 
 else()
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Linux)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Posix)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/linux)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/posix)
 endif()
 
 if(NOT MSVC)
@@ -210,7 +210,7 @@ if(NOT MSVC)
       # Need to build against libc++ instead of libstc++ on apple
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++ -I/usr/local/opt/llvm/include/c++/v1 -nodefaultlibs -lc++ -lc++abi -lm -lc -lgcc -lgcc_eh")
 
-      # Need these flags so gcc OSX works on the cryptopp ASM - https://groups.google.com/forum/#!topic/cryptopp-users/po8yO-vYaac
+      # Need these flags so gcc osx works on the cryptopp ASM - https://groups.google.com/forum/#!topic/cryptopp-users/po8yO-vYaac
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCRYPTOPP_CLANG_INTEGRATED_ASSEMBLER=1")
 
     elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")

@@ -8,7 +8,7 @@
 ///   functions provide cpu specific feature testing on IA-32, ARM and PowerPC machines.
 /// \details Feature detection uses CPUID on IA-32, like Intel and AMD. On other platforms
 ///   a two-part strategy is used. First, the library attempts to *Query* the OS for a feature,
-///   like using Linux getauxval() or android_getCpuFeatures(). If that fails, then *Probe*
+///   like using linux getauxval() or android_getCpuFeatures(). If that fails, then *Probe*
 ///   the cpu executing an instruction and an observe a SIGILL if unsupported. The general
 ///   pattern used by the library is:
 /// <pre>

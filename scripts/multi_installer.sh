@@ -5,7 +5,7 @@
 #
 #     ` $ curl -sL "https://raw.githubusercontent.com/kryptokrona/kryptokrona/master/scripts/multi_installer.sh" | bash
 #
-# Supports Ubuntu 16.04 LTS, OSX 10.10+
+# Supports Ubuntu 16.04 LTS, osx 10.10+
 # Supports building project from current directory (automatic detection)
 
 set -o errexit
@@ -131,7 +131,7 @@ _configure_os() {
     _note "Configuring your operating system and installing required software..."
     _unameOut="$(uname -s)"
     case "${_unameOut}" in
-        Linux*)
+        linux*)
             _configure_linux
             ;;
         Darwin*)

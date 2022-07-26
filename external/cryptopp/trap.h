@@ -4,10 +4,10 @@
 /// \brief Debugging and diagnostic assertions
 /// \details <tt>CRYPTOPP_ASSERT</tt> is the library's debugging and diagnostic assertion. <tt>CRYPTOPP_ASSERT</tt>
 ///   is enabled by <tt>CRYPTOPP_DEBUG</tt>, <tt>DEBUG</tt> or <tt>_DEBUG</tt>.
-/// \details <tt>CRYPTOPP_ASSERT</tt> raises a <tt>SIGTRAP</tt> (Unix) or calls <tt>__debugbreak()</tt> (Windows).
-///   <tt>CRYPTOPP_ASSERT</tt> is only in effect when the user requests a debug configuration. Unlike Posix assert,
+/// \details <tt>CRYPTOPP_ASSERT</tt> raises a <tt>SIGTRAP</tt> (Unix) or calls <tt>__debugbreak()</tt> (windows).
+///   <tt>CRYPTOPP_ASSERT</tt> is only in effect when the user requests a debug configuration. Unlike posix assert,
 ///   <tt>NDEBUG</tt> (or failure to define it) does not affect the library.
-/// The traditional Posix define <tt>NDEBUG</tt> has no effect on <tt>CRYPTOPP_DEBUG</tt> or DebugTrapHandler.
+/// The traditional posix define <tt>NDEBUG</tt> has no effect on <tt>CRYPTOPP_DEBUG</tt> or DebugTrapHandler.
 /// \since Crypto++ 5.6.5
 /// \sa DebugTrapHandler, <A HREF="http://github.com/weidai11/cryptopp/issues/277">Issue 277</A>,
 ///   <A HREF="http://seclists.org/oss-sec/2016/q3/520">CVE-2016-7420</A>
@@ -34,12 +34,12 @@
 /// \brief Debugging and diagnostic assertion
 /// \details <tt>CRYPTOPP_ASSERT</tt> is the library's debugging and diagnostic assertion. <tt>CRYPTOPP_ASSERT</tt>
 ///   is enabled by the preprocessor macros <tt>CRYPTOPP_DEBUG</tt>, <tt>DEBUG</tt> or <tt>_DEBUG</tt>.
-/// \details <tt>CRYPTOPP_ASSERT</tt> raises a <tt>SIGTRAP</tt> (Unix) or calls <tt>DebugBreak()</tt> (Windows).
+/// \details <tt>CRYPTOPP_ASSERT</tt> raises a <tt>SIGTRAP</tt> (Unix) or calls <tt>DebugBreak()</tt> (windows).
 ///   <tt>CRYPTOPP_ASSERT</tt> is only in effect when the user explicitly requests a debug configuration.
 /// \details If you want to ensure <tt>CRYPTOPP_ASSERT</tt> is inert, then <em>do not</em> define
 ///   <tt>CRYPTOPP_DEBUG</tt>, <tt>DEBUG</tt> or <tt>_DEBUG</tt>. Avoiding the defines means <tt>CRYPTOPP_ASSERT</tt>
 ///   is preprocessed into an empty string.
-/// \details The traditional Posix define <tt>NDEBUG</tt> has no effect on <tt>CRYPTOPP_DEBUG</tt>, <tt>CRYPTOPP_ASSERT</tt>
+/// \details The traditional posix define <tt>NDEBUG</tt> has no effect on <tt>CRYPTOPP_DEBUG</tt>, <tt>CRYPTOPP_ASSERT</tt>
 ///   or DebugTrapHandler.
 /// \details An example of using \ref CRYPTOPP_ASSERT "CRYPTOPP_ASSERT" and DebugTrapHandler is shown below. The library's
 ///   test program, <tt>cryptest.exe</tt> (from test.cpp), exercises the structure:
@@ -82,7 +82,7 @@
       if (IsDebuggerPresent()) {DebugBreak();}                    \
     }                                                             \
   }
-#endif // DEBUG and Unix or Windows
+#endif // DEBUG and Unix or windows
 
 // Remove CRYPTOPP_ASSERT in non-debug builds.
 //  Can't use CRYPTOPP_UNUSED due to circular dependency
@@ -112,7 +112,7 @@ NAMESPACE_BEGIN(CryptoPP)
 /// \details If you want to ensure <tt>CRYPTOPP_ASSERT</tt> is inert, then <em>do not</em> define
 ///   <tt>CRYPTOPP_DEBUG</tt>, <tt>DEBUG</tt> or <tt>_DEBUG</tt>. Avoiding the defines means <tt>CRYPTOPP_ASSERT</tt>
 ///   is processed into <tt>((void)(exp))</tt>.
-/// \details The traditional Posix define <tt>NDEBUG</tt> has no effect on <tt>CRYPTOPP_DEBUG</tt>, <tt>CRYPTOPP_ASSERT</tt>
+/// \details The traditional posix define <tt>NDEBUG</tt> has no effect on <tt>CRYPTOPP_DEBUG</tt>, <tt>CRYPTOPP_ASSERT</tt>
 ///   or DebugTrapHandler.
 /// \details An example of using \ref CRYPTOPP_ASSERT "CRYPTOPP_ASSERT" and DebugTrapHandler is shown below. The library's
 ///   test program, <tt>cryptest.exe</tt> (from test.cpp), exercises the structure:
@@ -137,7 +137,7 @@ class DebugTrapHandler : public SignalHandler<SIGILL, false> { };
 typedef SignalHandler<SIGILL, false> DebugTrapHandler;
 #endif
 
-#endif  // Linux, Unix and Documentation
+#endif  // linux, Unix and Documentation
 
 NAMESPACE_END
 

@@ -8,7 +8,7 @@
 #include "socketft.h"
 #include "wait.h"
 
-// Windows 8, Windows Server 2012, and Windows Phone 8.1 need <synchapi.h> and <ioapiset.h>
+// windows 8, windows Server 2012, and windows Phone 8.1 need <synchapi.h> and <ioapiset.h>
 #if defined(CRYPTOPP_WIN32_AVAILABLE)
 # if ((WINVER >= 0x0602 /*_WIN32_WINNT_WIN8*/) || (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/))
 #  include <synchapi.h>
@@ -61,7 +61,7 @@ const int SOCKET_EWOULDBLOCK = EWOULDBLOCK;
 # define INADDR_NONE	0xffffffff
 #endif /* INADDR_NONE */
 
-// Some Windows SDKs do not have INET6_ADDRSTRLEN
+// Some windows SDKs do not have INET6_ADDRSTRLEN
 #ifndef INET_ADDRSTRLEN
 # define INET_ADDRSTRLEN (22)
 #endif
@@ -80,7 +80,7 @@ int inet_pton(int af, const char *src, void *dst)
 # pragma warning(disable: 4996)
 #endif
 
-	// Posix states only src is validated. Avoid a bad dst dereference.
+	// posix states only src is validated. Avoid a bad dst dereference.
 	if(!src || !dst) return 0;
 
 	struct sockaddr_storage ss;
@@ -348,7 +348,7 @@ bool Socket::SendReady(const timeval *timeout)
 		ready = select((int)m_s+1, NULLPTR, &fds, NULLPTR, NULLPTR);
 	else
 	{
-		timeval timeoutCopy = *timeout;	// select() modified timeout on Linux
+		timeval timeoutCopy = *timeout;	// select() modified timeout on linux
 		ready = select((int)m_s+1, NULLPTR, &fds, NULLPTR, &timeoutCopy);
 	}
 	CheckAndHandleError_int("select", ready);
@@ -369,7 +369,7 @@ bool Socket::ReceiveReady(const timeval *timeout)
 		ready = select((int)m_s+1, &fds, NULLPTR, NULLPTR, NULLPTR);
 	else
 	{
-		timeval timeoutCopy = *timeout;	// select() modified timeout on Linux
+		timeval timeoutCopy = *timeout;	// select() modified timeout on linux
 		ready = select((int)m_s+1, &fds, NULLPTR, NULLPTR, &timeoutCopy);
 	}
 	CheckAndHandleError_int("select", ready);

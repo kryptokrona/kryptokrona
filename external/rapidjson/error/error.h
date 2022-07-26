@@ -32,7 +32,7 @@ RAPIDJSON_DIAG_OFF(padded)
 //! Character type of error messages.
 /*! \ingroup RAPIDJSON_ERRORS
     The default character type is \c char.
-    On Windows, user can define this macro as \c TCHAR for supporting both
+    On windows, user can define this macro as \c TCHAR for supporting both
     unicode/non-unicode settings.
 */
 #ifndef RAPIDJSON_ERROR_CHARTYPE
@@ -45,7 +45,7 @@ RAPIDJSON_DIAG_OFF(padded)
 //! Macro for converting string literial to \ref RAPIDJSON_ERROR_CHARTYPE[].
 /*! \ingroup RAPIDJSON_ERRORS
     By default this conversion macro does nothing.
-    On Windows, user can define this macro as \c _T(x) for supporting both
+    On windows, user can define this macro as \c _T(x) for supporting both
     unicode/non-unicode settings.
 */
 #ifndef RAPIDJSON_ERROR_STRING

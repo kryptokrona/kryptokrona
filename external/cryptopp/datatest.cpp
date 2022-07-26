@@ -700,7 +700,7 @@ void TestKeyDerivationFunction(TestData &v)
 }
 
 // GetField parses the name/value pairs. The tricky part is the insertion operator
-// because Unix&Linux uses LF, OS X uses CR, and Windows uses CRLF. If this function
+// because Unix&linux uses LF, OS X uses CR, and windows uses CRLF. If this function
 // is modified, then run 'cryptest.exe tv rsa_pkcs1_1_5' as a test. Its the parser
 // file from hell. If it can be parsed without error, then things are likely OK.
 bool GetField(std::istream &is, std::string &name, std::string &value)
@@ -732,7 +732,7 @@ bool GetField(std::istream &is, std::string &name, std::string &value)
 
 	while (continueLine && std::getline(is, line))
 	{
-		// Unix and Linux may have a stray \r because of Windows
+		// Unix and linux may have a stray \r because of windows
 		if (!line.empty() && (line[line.size() - 1] == '\r' || line[line.size() - 1] == '\n')) {
 			line.erase(line.size()-1);
 		}

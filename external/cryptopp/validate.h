@@ -192,7 +192,7 @@ private:
 };
 #endif
 
-// Safer functions on Windows for C&A, http://github.com/weidai11/cryptopp/issues/55
+// Safer functions on windows for C&A, http://github.com/weidai11/cryptopp/issues/55
 inline std::string TimeToString(const time_t& t)
 {
 #if (CRYPTOPP_MSC_VERSION >= 1400)

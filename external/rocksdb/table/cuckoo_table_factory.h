@@ -19,8 +19,8 @@ static inline uint64_t CuckooHash(
     uint64_t table_size_, bool identity_as_first_hash,
     uint64_t (*get_slice_hash)(const Slice&, uint32_t, uint64_t)) {
 #if !defined NDEBUG || defined OS_WIN
-  // This part is used only in unit tests but we have to keep it for Windows
-  // build as we run test in both debug and release modes under Windows.
+  // This part is used only in unit tests but we have to keep it for windows
+  // build as we run test in both debug and release modes under windows.
   if (get_slice_hash != nullptr) {
     return get_slice_hash(user_key, hash_cnt, table_size_);
   }

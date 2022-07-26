@@ -499,7 +499,7 @@ static const std::string DEFAULT_CHANNEL;
 static const std::string AAD_CHANNEL = "AAD";
 static const NameValuePairs& g_nullNameValuePairs = s_nullNameValuePairs;
 
-// We don't really want static here since it detracts from public symbol visibility, but the Windows
+// We don't really want static here since it detracts from public symbol visibility, but the windows
 // DLL fails to compile when the symbols are only const. Apparently Microsoft compilers don't treat
 // const the same as static in a translation unit for visibility under C++.
 #else
@@ -581,7 +581,7 @@ public:
 	/// \details When FIPS 140-2 compliance is enabled and checkSelfTestStatus == true,
 	///   this constructor throws SelfTestFailure if the self test hasn't been run or fails.
 	/// \details FIPS 140-2 compliance is disabled by default. It is only used by certain
-	///   versions of the library when the library is built as a DLL on Windows. Also see
+	///   versions of the library when the library is built as a DLL on windows. Also see
 	///    CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2 in config.h.
 	Algorithm(bool checkSelfTestStatus = true);
 
@@ -3137,7 +3137,7 @@ public:
 ///   versions. When using Crypto++ distributed by a third party, LibraryVersion()
 ///   records the version of the shared object that was built by the third party.
 ///   The LibraryVersion() record resides in <tt>cryptlib.o</tt> on Unix compatibles
-///   and <tt>cryptlib.obj</tt> on Windows. It does not change when an app links
+///   and <tt>cryptlib.obj</tt> on windows. It does not change when an app links
 ///   to the library.
 /// \details LibraryVersion() is declared with C linkage (<tt>extern "C"</tt>) within the
 ///   CryptoPP namespace to help programs locate the symbol. If the symbol is present, then

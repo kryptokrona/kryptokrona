@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# make-benchmarks - Scan build submission instructions for Unix and Linux.
+# make-benchmarks - Scan build submission instructions for Unix and linux.
 #                   Written and placed in public domain by Jeffrey Walton and Uri Blumenthal.
 #                   Copyright assigned to Crypto++ project.
 #

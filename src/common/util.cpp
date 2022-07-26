@@ -82,15 +82,15 @@ namespace tools
         if( osvi.dwMinorVersion == 0 )
         {
           if( osvi.wProductType == VER_NT_WORKSTATION )
-            StringCchCat(pszOS, BUFSIZE, TEXT("Windows Vista "));
-          else StringCchCat(pszOS, BUFSIZE, TEXT("Windows Server 2008 " ));
+            StringCchCat(pszOS, BUFSIZE, TEXT("windows Vista "));
+          else StringCchCat(pszOS, BUFSIZE, TEXT("windows Server 2008 " ));
         }
 
         if ( osvi.dwMinorVersion == 1 )
         {
           if( osvi.wProductType == VER_NT_WORKSTATION )
-            StringCchCat(pszOS, BUFSIZE, TEXT("Windows 7 "));
-          else StringCchCat(pszOS, BUFSIZE, TEXT("Windows Server 2008 R2 " ));
+            StringCchCat(pszOS, BUFSIZE, TEXT("windows 7 "));
+          else StringCchCat(pszOS, BUFSIZE, TEXT("windows Server 2008 R2 " ));
         }
 
         pGPI = (PGPI) GetProcAddress(
@@ -161,17 +161,17 @@ namespace tools
       if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 )
       {
         if( GetSystemMetrics(SM_SERVERR2) )
-          StringCchCat(pszOS, BUFSIZE, TEXT( "Windows Server 2003 R2, "));
+          StringCchCat(pszOS, BUFSIZE, TEXT( "windows Server 2003 R2, "));
         else if ( osvi.wSuiteMask & VER_SUITE_STORAGE_SERVER )
-          StringCchCat(pszOS, BUFSIZE, TEXT( "Windows Storage Server 2003"));
+          StringCchCat(pszOS, BUFSIZE, TEXT( "windows Storage Server 2003"));
         else if ( osvi.wSuiteMask & VER_SUITE_WH_SERVER )
-          StringCchCat(pszOS, BUFSIZE, TEXT( "Windows Home Server"));
+          StringCchCat(pszOS, BUFSIZE, TEXT( "windows Home Server"));
         else if( osvi.wProductType == VER_NT_WORKSTATION &&
           si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
         {
-          StringCchCat(pszOS, BUFSIZE, TEXT( "Windows XP Professional x64 Edition"));
+          StringCchCat(pszOS, BUFSIZE, TEXT( "windows XP Professional x64 Edition"));
         }
-        else StringCchCat(pszOS, BUFSIZE, TEXT("Windows Server 2003, "));
+        else StringCchCat(pszOS, BUFSIZE, TEXT("windows Server 2003, "));
 
         // Test for the server type.
         if ( osvi.wProductType != VER_NT_WORKSTATION )
@@ -210,7 +210,7 @@ namespace tools
 
       if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1 )
       {
-        StringCchCat(pszOS, BUFSIZE, TEXT("Windows XP "));
+        StringCchCat(pszOS, BUFSIZE, TEXT("windows XP "));
         if( osvi.wSuiteMask & VER_SUITE_PERSONAL )
           StringCchCat(pszOS, BUFSIZE, TEXT( "Home Edition" ));
         else StringCchCat(pszOS, BUFSIZE, TEXT( "Professional" ));
@@ -218,7 +218,7 @@ namespace tools
 
       if ( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0 )
       {
-        StringCchCat(pszOS, BUFSIZE, TEXT("Windows 2000 "));
+        StringCchCat(pszOS, BUFSIZE, TEXT("windows 2000 "));
 
         if ( osvi.wProductType == VER_NT_WORKSTATION )
         {
@@ -259,7 +259,7 @@ namespace tools
     }
     else
     {  
-      printf( "This sample does not support this version of Windows.\n");
+      printf( "This sample does not support this version of windows.\n");
       return pszOS;
     }
   }
@@ -302,13 +302,13 @@ std::string get_nix_version_display_string()
 
   std::string getDefaultDataDirectory()
   {
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\CRYPTONOTE_NAME
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\CRYPTONOTE_NAME
+    // windows < Vista: C:\Documents and Settings\Username\Application Data\CRYPTONOTE_NAME
+    // windows >= Vista: C:\Users\Username\AppData\Roaming\CRYPTONOTE_NAME
     // Mac: ~/Library/Application Support/CRYPTONOTE_NAME
     // Unix: ~/.CRYPTONOTE_NAME
     std::string config_folder;
 #ifdef WIN32
-    // Windows
+    // windows
     config_folder = get_special_folder_path(CSIDL_APPDATA, true) + "/" + CryptoNote::CRYPTONOTE_NAME;
 #else
     std::string pathRet;
