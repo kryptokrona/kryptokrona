@@ -33,7 +33,7 @@ class TablePropertiesTest : public testing::Test,
   bool backward_mode_;
 };
 
-// Utilities test functions
+// utilities test functions
 namespace {
 static const uint32_t kTestColumnFamilyId = 66;
 static const std::string kTestColumnFamilyName = "test_column_fam";

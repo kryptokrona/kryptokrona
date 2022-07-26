@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace Utilities
+namespace utilities
 {
     std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses);
 
