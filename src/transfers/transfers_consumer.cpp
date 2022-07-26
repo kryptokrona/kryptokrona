@@ -5,12 +5,12 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "TransfersConsumer.h"
+#include "transfers_consumer.h"
 
 #include <numeric>
 #include <future>
 
-#include "CommonTypes.h"
+#include "common_types.h"
 #include "Common/BlockingQueue.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"

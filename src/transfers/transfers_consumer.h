@@ -7,19 +7,19 @@
 
 #pragma once
 
-#include "IBlockchainSynchronizer.h"
+#include "iblockchain_synchronizer.h"
 #include "ITransfersSynchronizer.h"
-#include "TransfersSubscription.h"
-#include "TypeHelpers.h"
+#include "transfers_subscription.h"
+#include "type_helpers.h"
 
 #include "crypto/crypto.h"
 #include "Logging/LoggerRef.h"
 
-#include "IObservableImpl.h"
+#include "iobservable_impl.h"
 
 #include <unordered_set>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class INode;
 

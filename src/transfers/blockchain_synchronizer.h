@@ -18,9 +18,9 @@
 #pragma once
 
 #include "INode.h"
-#include "SynchronizationState.h"
-#include "IBlockchainSynchronizer.h"
-#include "IObservableImpl.h"
+#include "synchronization_state.h"
+#include "iblockchain_synchronizer.h"
+#include "iobservable_impl.h"
 #include "IStreamSerializable.h"
 
 #include <condition_variable>
@@ -30,7 +30,7 @@
 
 #include "Logging/LoggerRef.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class BlockchainSynchronizer :
   public IObservableImpl<IBlockchainSynchronizerObserver, IBlockchainSynchronizer>,
