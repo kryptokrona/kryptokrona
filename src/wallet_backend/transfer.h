@@ -16,7 +16,7 @@
 
 #include <WalletTypes.h>
 
-namespace SendTransaction
+namespace send_transaction
 {
     std::tuple<Error, Crypto::Hash> sendFusionTransactionBasic(
         const std::shared_ptr<Nigel> daemon,

@@ -19,7 +19,7 @@
 
 using nlohmann::json;
 
-namespace WalletTypes
+namespace wallet_types
 {
     //////////////////////////////
     /* WalletTypes::Transaction */
