@@ -18,7 +18,7 @@ namespace CryptoNote
   namespace parameters
   {
 
-    const uint64_t DIFFICULTY_TARGET = 10; // seconds
+    const uint64_t DIFFICULTY_TARGET = 90; // seconds
 
     const uint32_t CRYPTONOTE_MAX_BLOCK_NUMBER = 500000000;
     const size_t CRYPTONOTE_MAX_BLOCK_BLOB_SIZE = 500000000;
@@ -268,7 +268,10 @@ namespace CryptoNote
 
   const char *const SEED_NODES[] = {
       "68.183.214.93:11897", // pool1
-      "5.9.250.93:11897"     // techy
-
+      "5.9.250.93:11897",     // techy
+      "167.86.87.91:11897", // göta pool
+      "144.91.80.155:11897", // blocksum
+      "95.111.239.13:11897", // swepool
+      "5.9.250.93:11987" // gamersnest
   };
 } // CryptoNote
