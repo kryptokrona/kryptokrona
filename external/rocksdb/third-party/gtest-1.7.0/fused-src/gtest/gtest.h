@@ -3298,7 +3298,7 @@ typedef __int64 BiggestInt;
 typedef long long BiggestInt;  // NOLINT
 #endif  // GTEST_OS_WINDOWS
 
-// Utilities for char.
+// utilities for char.
 
 // isspace(int ch) and friends accept an unsigned char or EOF.  char
 // may be signed, depending on the compiler (or compiler flags).
@@ -3550,7 +3550,7 @@ typedef TypeWithSize<8>::Int Int64;
 typedef TypeWithSize<8>::UInt UInt64;
 typedef TypeWithSize<8>::Int TimeInMillis;  // Represents time in milliseconds.
 
-// Utilities for command line flags and environment variables.
+// utilities for command line flags and environment variables.
 
 // Macro for referencing flags.
 #define GTEST_FLAG(name) FLAGS_gtest_##name
@@ -8403,7 +8403,7 @@ IsNotContainer IsContainerTest(long /* dummy */) { return '\0'; }
 template<bool> struct EnableIf;
 template<> struct EnableIf<true> { typedef void type; };  // NOLINT
 
-// Utilities for native arrays.
+// utilities for native arrays.
 
 // ArrayEq() compares two k-dimensional native arrays using the
 // elements' operator==, where k can be any integer >= 0.  When k is
