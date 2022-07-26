@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace Constants
+namespace constants
 {
     /* We use this to check that the file is a wallet file, this bit does
        not get encrypted, and we can check if it exists before decrypting.
