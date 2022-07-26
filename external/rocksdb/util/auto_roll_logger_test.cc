@@ -225,7 +225,7 @@ TEST_F(AutoRollLoggerTest, CompositeRollByTimeAndSizeLogger) {
 }
 
 #ifndef OS_WIN
-// TODO: does not build for Windows because of PosixLogger use below. Need to
+// TODO: does not build for windows because of PosixLogger use below. Need to
 // port
 TEST_F(AutoRollLoggerTest, CreateLoggerFromOptions) {
   DBOptions options;

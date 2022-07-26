@@ -2,7 +2,7 @@
 
 /// \file fips140.h
 /// \brief Classes and functions for the FIPS 140-2 validated library
-/// \details The FIPS validated library is only available on Windows as a DLL. Once compiled,
+/// \details The FIPS validated library is only available on windows as a DLL. Once compiled,
 ///   the library is always in FIPS mode contingent upon successful execution of
 ///   DoPowerUpSelfTest() or DoDllPowerUpSelfTest().
 /// \sa <A HREF="http://cryptopp.com/wiki/Visual_Studio">Visual Studio</A> and

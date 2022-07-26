@@ -85,7 +85,7 @@ void WinLogger::Flush() {
   assert(file_ != INVALID_HANDLE_VALUE);
   if (flush_pending_) {
     flush_pending_ = false;
-    // With Windows API writes go to OS buffers directly so no fflush needed
+    // With windows API writes go to OS buffers directly so no fflush needed
     // unlike with C runtime API. We don't flush all the way to disk
     // for perf reasons.
   }
@@ -176,7 +176,7 @@ void WinLogger::Logv(const char* format, va_list ap) {
         static_cast<uint64_t>(now_tv.tv_sec) * 1000000 + now_tv.tv_usec;
     if (now_micros - last_flush_micros_ >= flush_every_seconds_ * 1000000) {
       flush_pending_ = false;
-      // With Windows API writes go to OS buffers directly so no fflush needed
+      // With windows API writes go to OS buffers directly so no fflush needed
       // unlike with C runtime API. We don't flush all the way to disk
       // for perf reasons.
       last_flush_micros_ = now_micros;

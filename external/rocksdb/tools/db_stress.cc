@@ -69,7 +69,7 @@ int main() {
 #include "util/mutexlock.h"
 #include "util/random.h"
 #include "util/string_util.h"
-// SyncPoint is not supported in Released Windows Mode.
+// SyncPoint is not supported in Released windows Mode.
 #if !(defined NDEBUG) || !defined(OS_WIN)
 #include "util/sync_point.h"
 #endif  // !(defined NDEBUG) || !defined(OS_WIN)

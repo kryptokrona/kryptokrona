@@ -719,7 +719,7 @@ struct DBOptions {
   // value and always try to read ahead. With read-ahead we always
   // pre-allocate buffer to the size instead of growing it up to a limit.
   //
-  // This option is currently honored only on Windows
+  // This option is currently honored only on windows
   //
   // Default: 1 Mb
   //
@@ -728,7 +728,7 @@ struct DBOptions {
   size_t random_access_max_buffer_size = 1024 * 1024;
 
   // This is the maximum buffer size that is used by WritableFileWriter.
-  // On Windows, we need to maintain an aligned buffer for writes.
+  // On windows, we need to maintain an aligned buffer for writes.
   // We allow the buffer to grow until it's size hits the limit in buffered
   // IO and fix the buffer size when using direct IO to ensure alignment of
   // write requests if the logical sector size is unusual
@@ -838,7 +838,7 @@ struct DBOptions {
   uint64_t write_thread_max_yield_usec = 100;
 
   // The latency in microseconds after which a std::this_thread::yield
-  // call (sched_yield on Linux) is considered to be a signal that
+  // call (sched_yield on linux) is considered to be a signal that
   // other processes or threads would like to use the current core.
   // Increasing this makes writer threads more likely to take CPU
   // by spinning, which will show up as an increase in the number of

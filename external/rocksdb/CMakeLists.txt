@@ -1,18 +1,18 @@
-# Prerequisites for Windows:
-#     This cmake build is for Windows 64-bit only.
+# Prerequisites for windows:
+#     This cmake build is for windows 64-bit only.
 #
 # Prerequisites:
 #     You must have at least Visual Studio 2015 Update 3. Start the Developer Command Prompt window that is a part of Visual Studio installation.
 #     Run the build commands from within the Developer Command Prompt window to have paths to the compiler and runtime libraries set.
 #     You must have git.exe in your %PATH% environment variable.
 #
-# To build Rocksdb for Windows is as easy as 1-2-3-4-5:
+# To build Rocksdb for windows is as easy as 1-2-3-4-5:
 #
 # 1. Update paths to third-party libraries in thirdparty.inc file
 # 2. Create a new directory for build artifacts
 #        mkdir build
 #        cd build
-# 3. Run cmake to generate project files for Windows, add more options to enable required third-party libraries.
+# 3. Run cmake to generate project files for windows, add more options to enable required third-party libraries.
 #    See thirdparty.inc for more information.
 #        sample command: cmake -G "Visual Studio 15 Win64" -DWITH_GFLAGS=1 -DWITH_SNAPPY=1 -DWITH_JEMALLOC=1 -DWITH_JNI=1 ..
 # 4. Then build the project in debug mode (you may want to add /m[:<N>] flag to run msbuild in <N> parallel threads
@@ -25,7 +25,7 @@
 # 5. And release mode (/m[:<N>] is also supported)
 #        msbuild rocksdb.sln /p:Configuration=Release
 #
-# Linux:
+# linux:
 #
 # 1. Install a recent toolchain such as devtoolset-3 if you're on a older distro. C++11 required.
 # 2. mkdir build; cd build
@@ -797,7 +797,7 @@ endif()
 if(NOT WIN32 OR ROCKSDB_INSTALL_ON_WINDOWS)
   if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-      # Change default installation prefix on Linux to /usr
+      # Change default installation prefix on linux to /usr
       set(CMAKE_INSTALL_PREFIX /usr CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
     endif()
   endif()

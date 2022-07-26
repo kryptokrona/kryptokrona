@@ -242,12 +242,12 @@ class PosixEnv : public Env {
     Status s;
     int fd = -1;
     int flags = (reopen) ? (O_CREAT | O_APPEND) : (O_CREAT | O_TRUNC);
-    // Direct IO mode with O_DIRECT flag or F_NOCAHCE (MAC OSX)
+    // Direct IO mode with O_DIRECT flag or F_NOCAHCE (MAC osx)
     if (options.use_direct_writes && !options.use_mmap_writes) {
       // Note: we should avoid O_APPEND here due to ta the following bug:
       // POSIX requires that opening a file with the O_APPEND flag should
       // have no affect on the location at which pwrite() writes data.
-      // However, on Linux, if a file is opened with O_APPEND, pwrite()
+      // However, on linux, if a file is opened with O_APPEND, pwrite()
       // appends data to the end of the file, regardless of the value of
       // offset.
       // More info here: https://linux.die.net/man/2/pwrite
@@ -337,7 +337,7 @@ class PosixEnv : public Env {
     int fd = -1;
 
     int flags = 0;
-    // Direct IO mode with O_DIRECT flag or F_NOCAHCE (MAC OSX)
+    // Direct IO mode with O_DIRECT flag or F_NOCAHCE (MAC osx)
     if (options.use_direct_writes && !options.use_mmap_writes) {
 #ifdef ROCKSDB_LITE
       return Status::IOError(fname, "Direct I/O not supported in RocksDB lite");
@@ -1056,7 +1056,7 @@ std::string Env::GenerateUniqueId() {
 }
 
 //
-// Default Posix Env
+// Default posix Env
 //
 Env* Env::Default() {
   // The following function call initializes the singletons of ThreadLocalPtr

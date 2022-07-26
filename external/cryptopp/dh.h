@@ -127,8 +127,8 @@ public:
 	/// \param rng RandomNumberGenerator derived class
 	/// \param privateKey byte buffer with the previously generated private key
 	/// \param publicKey byte buffer for the generated public key in this domain
-	/// \details If using a FIPS 140-2 validated library on Windows, then this class will perform
-	///   a self test to ensure the key pair is pairwise consistent. Non-FIPS and non-Windows
+	/// \details If using a FIPS 140-2 validated library on windows, then this class will perform
+	///   a self test to ensure the key pair is pairwise consistent. Non-FIPS and non-windows
 	///   builds of the library do not provide FIPS validated cryptography, so the code should be
 	///   removed by the optimizer.
 	/// \pre <tt>COUNTOF(publicKey) == PublicKeyLength()</tt>

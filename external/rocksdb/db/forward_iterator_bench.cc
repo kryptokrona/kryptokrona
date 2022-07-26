@@ -14,7 +14,7 @@ int main() {
   return 1;
 }
 #elif defined(OS_MACOSX) || defined(OS_WIN)
-// Block forward_iterator_bench under MAC and Windows
+// Block forward_iterator_bench under MAC and windows
 int main() { return 0; }
 #else
 #include <semaphore.h>

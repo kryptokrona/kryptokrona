@@ -4,7 +4,7 @@
    Performance
 
    Microprocessor: Intel CORE 2 processor (Core 2 Duo Mobile T6600 2.2GHz)
-   Operating system: 64-bit Ubuntu 10.04 (Linux kernel 2.6.32-22-generic)
+   Operating system: 64-bit Ubuntu 10.04 (linux kernel 2.6.32-22-generic)
    Speed for long message:
    1) 45.8 cycles/byte   compiler: Intel C++ Compiler 11.1   compilation option: icc -O2
    2) 56.8 cycles/byte   compiler: gcc 4.4.3                 compilation option: gcc -O3

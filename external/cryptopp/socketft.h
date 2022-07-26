@@ -41,7 +41,7 @@ const int SOCKET_ERROR = -1;
 typedef TYPE_OF_SOCKLEN_T socklen_t;	// see config.h
 #endif
 
-/// wrapper for Windows or Berkeley Sockets
+/// wrapper for windows or Berkeley Sockets
 class Socket
 {
 public:
@@ -102,9 +102,9 @@ public:
 
 	/// look up the port number given its name, returns 0 if not found
 	static unsigned int PortNameToNumber(const char *name, const char *protocol="tcp");
-	/// start Windows Sockets 2
+	/// start windows Sockets 2
 	static void StartSockets();
-	/// calls WSACleanup for Windows Sockets
+	/// calls WSACleanup for windows Sockets
 	static void ShutdownSockets();
 	/// returns errno or WSAGetLastError
 	static int GetLastError();

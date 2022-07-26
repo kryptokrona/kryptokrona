@@ -142,7 +142,7 @@ std::string StringNarrow(const wchar_t *str, bool throwOnError)
 	CRYPTOPP_ASSERT(str);
 	std::string result;
 
-	// Safer functions on Windows for C&A, https://github.com/weidai11/cryptopp/issues/55
+	// Safer functions on windows for C&A, https://github.com/weidai11/cryptopp/issues/55
 #if (CRYPTOPP_MSC_VERSION >= 1400)
 	size_t len=0, size=0;
 	errno_t err = 0;
@@ -206,7 +206,7 @@ std::wstring StringWiden(const char *str, bool throwOnError)
 	CRYPTOPP_ASSERT(str);
 	std::wstring result;
 
-	// Safer functions on Windows for C&A, https://github.com/weidai11/cryptopp/issues/55
+	// Safer functions on windows for C&A, https://github.com/weidai11/cryptopp/issues/55
 #if (CRYPTOPP_MSC_VERSION >= 1400)
 	size_t len=0, size=0;
 	errno_t err = 0;

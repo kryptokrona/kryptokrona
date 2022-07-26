@@ -42,11 +42,11 @@ file(GLOB_RECURSE zedwallet zedwallet/*)
 file(GLOB_RECURSE zedwallet++ zedwallet++/*)
 
 if(MSVC)
-    file(GLOB_RECURSE system system/* Platform/Windows/System/*)
+    file(GLOB_RECURSE system system/* platform/windows/system/*)
 elseif(APPLE)
-    file(GLOB_RECURSE system system/* Platform/OSX/System/* Platform/Posix/System/*)
+    file(GLOB_RECURSE system system/* platform/osx/system/* platform/posix/system/*)
 else()
-    file(GLOB_RECURSE system system/* Platform/Linux/System/* Platform/Posix/System/*)
+    file(GLOB_RECURSE system system/* platform/linux/system/* platform/posix/system/*)
 endif()
 
 # Group the files together in IDEs
@@ -114,7 +114,7 @@ endif ()
 # wants to use filesystem
 add_library(__filesystem INTERFACE)
 
-# Windows works out of the box
+# windows works out of the box
 if (APPLE)
     target_link_libraries(__filesystem INTERFACE /usr/local/opt/llvm/lib/libc++fs.a)
 elseif (UNIX)

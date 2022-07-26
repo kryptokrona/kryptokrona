@@ -308,7 +308,7 @@ Status WinEnvIO::OpenWritableFile(const std::string& fname,
       desired_access,  // Access desired
       shared_mode,
       NULL,           // Security attributes
-      creation_disposition,  // Posix env says (reopen) ? (O_CREATE | O_APPEND) : O_CREAT | O_TRUNC
+      creation_disposition,  // posix env says (reopen) ? (O_CREATE | O_APPEND) : O_CREAT | O_TRUNC
       fileFlags,      // Flags
       NULL);          // Template File
   }
@@ -578,7 +578,7 @@ Status WinEnvIO::GetChildren(const std::string& dir,
     // If the function fails the return value is zero
     // and non-zero otherwise. Not TRUE or FALSE.
     if (ret == FALSE) {
-      // Posix does not care why we stopped
+      // posix does not care why we stopped
       break;
     }
     data.cFileName[MAX_PATH - 1] = 0;
@@ -651,7 +651,7 @@ Status WinEnvIO::GetFileSize(const std::string& fname,
 uint64_t WinEnvIO::FileTimeToUnixTime(const FILETIME& ftTime) {
   const uint64_t c_FileTimePerSecond = 10000000U;
   // UNIX epoch starts on 1970-01-01T00:00:00Z
-  // Windows FILETIME starts on 1601-01-01T00:00:00Z
+  // windows FILETIME starts on 1601-01-01T00:00:00Z
   // Therefore, we need to subtract the below number of seconds from
   // the seconds that we obtain from FILETIME with an obvious loss of
   // precision
@@ -687,7 +687,7 @@ Status WinEnvIO::RenameFile(const std::string& src,
   const std::string& target) {
   Status result;
 
-  // rename() is not capable of replacing the existing file as on Linux
+  // rename() is not capable of replacing the existing file as on linux
   // so use OS API directly
   if (!MoveFileExA(src.c_str(), target.c_str(), MOVEFILE_REPLACE_EXISTING)) {
     DWORD lastError = GetLastError();
@@ -932,7 +932,7 @@ uint64_t WinEnvIO::NowMicros() {
 uint64_t WinEnvIO::NowNanos() {
   // all std::chrono clocks on windows have the same resolution that is only
   // good enough for microseconds but not nanoseconds
-  // On Windows 8 and Windows 2012 Server
+  // On windows 8 and windows 2012 Server
   // GetSystemTimePreciseAsFileTime(&current_time) can be used
   LARGE_INTEGER li;
   QueryPerformanceCounter(&li);
@@ -1025,7 +1025,7 @@ EnvOptions WinEnvIO::OptimizeForLogWrite(const EnvOptions& env_options,
   // This adversely affects %999 on windows
   optimized.use_mmap_writes = false;
   // Direct writes will produce a huge perf impact on
-  // Windows. Pre-allocate space for WAL.
+  // windows. Pre-allocate space for WAL.
   optimized.use_direct_writes = false;
   return optimized;
 }

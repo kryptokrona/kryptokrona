@@ -8,7 +8,7 @@
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
 // This file is a portable substitute for sys/time.h which does not exist on
-// Windows
+// windows
 
 #ifndef STORAGE_LEVELDB_PORT_SYS_TIME_H_
 #define STORAGE_LEVELDB_PORT_SYS_TIME_H_
