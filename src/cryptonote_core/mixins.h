@@ -55,7 +55,7 @@ namespace cryptonote
         return {minMixin, maxMixin, defaultMixin};
       }
 
-      /* This method is used by WalletService to determine if the mixin amount is correct
+      /* This method is used by wallet_service to determine if the mixin amount is correct
          for the current block height */
       static std::tuple<bool, std::string, std::error_code> validate(const uint64_t mixin, const uint64_t height)
       {

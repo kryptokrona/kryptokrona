@@ -10,11 +10,11 @@
 
 #include "Common/JsonValue.h"
 #include "JsonRpcServer/JsonRpcServer.h"
-#include "PaymentServiceJsonRpcMessages.h"
+#include "payment_service_json_rpc_messages.h"
 #include "Serialization/JsonInputValueSerializer.h"
 #include "Serialization/JsonOutputStreamSerializer.h"
 
-namespace PaymentService {
+namespace payment_service {
 
 class WalletService;
 

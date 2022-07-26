@@ -4,21 +4,21 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "PaymentServiceJsonRpcServer.h"
+#include "payment_service_json_rpc_server.h"
 
 #include <functional>
 
 #include <CryptoTypes.h>
 #include "crypto/hash.h"
-#include "PaymentServiceJsonRpcMessages.h"
-#include "WalletService.h"
+#include "payment_service_json_rpc_messages.h"
+#include "wallet_service.h"
 
 #include "Serialization/JsonInputValueSerializer.h"
 #include "Serialization/JsonOutputStreamSerializer.h"
 
 #include "Rpc/JsonRpc.h"
 
-namespace PaymentService {
+namespace payment_service {
 
 PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, WalletService& service, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config)
   : JsonRpcServer(sys, stopEvent, loggerGroup, config)

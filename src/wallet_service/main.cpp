@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include <config/CliHeader.h>
-#include "PaymentGateService.h"
+#include "payment_gate_service.h"
 #include "version.h"
 
 #ifdef WIN32

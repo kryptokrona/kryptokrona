@@ -3,14 +3,14 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "PaymentGateService.h"
+#include "payment_gate_service.h"
 
 #include <future>
 
 #include "Common/SignalHandler.h"
 #include "Common/Util.h"
 #include "Logging/LoggerRef.h"
-#include "PaymentServiceJsonRpcServer.h"
+#include "payment_service_json_rpc_server.h"
 
 #include "Common/ScopeExit.h"
 #include "NodeRpcProxy/NodeRpcProxy.h"
@@ -27,7 +27,7 @@
 #include <unistd.h>
 #endif
 
-using namespace PaymentService;
+using namespace payment_service;
 
 void changeDirectory(const std::string& path) {
   if (chdir(path.c_str())) {
