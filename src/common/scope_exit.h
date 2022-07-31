@@ -19,24 +19,23 @@
 
 #include <functional>
 
-namespace tools {
+namespace tools
+{
+    class ScopeExit {
+    public:
+      ScopeExit(std::function<void()>&& handler);
+      ~ScopeExit();
 
-class ScopeExit {
-public:
-  ScopeExit(std::function<void()>&& handler);
-  ~ScopeExit();
+      ScopeExit(const ScopeExit&) = delete;
+      ScopeExit(ScopeExit&&) = delete;
+      ScopeExit& operator=(const ScopeExit&) = delete;
+      ScopeExit& operator=(ScopeExit&&) = delete;
 
-  ScopeExit(const ScopeExit&) = delete;
-  ScopeExit(ScopeExit&&) = delete;
-  ScopeExit& operator=(const ScopeExit&) = delete;
-  ScopeExit& operator=(ScopeExit&&) = delete;
+      void cancel();
+      void resume();
 
-  void cancel();
-  void resume();
-
-private:
-  std::function<void()> m_handler;
-  bool m_cancelled;
-};
-
+    private:
+      std::function<void()> m_handler;
+      bool m_cancelled;
+    };
 }

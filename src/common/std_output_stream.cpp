@@ -17,18 +17,17 @@
 
 #include "std_output_stream.h"
 
-namespace common {
+namespace common
+{
+    StdOutputStream::StdOutputStream(std::ostream& out) : out(out) {
+    }
 
-StdOutputStream::StdOutputStream(std::ostream& out) : out(out) {
-}
+    uint64_t StdOutputStream::writeSome(const void* data, uint64_t size) {
+      out.write(static_cast<const char*>(data), size);
+      if (out.bad()) {
+        return 0;
+      }
 
-uint64_t StdOutputStream::writeSome(const void* data, uint64_t size) {
-  out.write(static_cast<const char*>(data), size);
-  if (out.bad()) {
-    return 0;
-  }
-
-  return size;
-}
-
+      return size;
+    }
 }

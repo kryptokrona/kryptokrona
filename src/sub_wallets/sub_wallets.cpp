@@ -3,12 +3,12 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 //////////////////////////////////
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
-#include <CryptoNoteCore/Currency.h>
+#include <cryptonote_core/currency.h>
 
 #include <ctime>
 
@@ -16,8 +16,8 @@
 
 #include <random>
 
-#include <Utilities/Addresses.h>
-#include <Utilities/Utilities.h>
+#include <utilities/addresses.h>
+#include <utilities/utilities.h>
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */

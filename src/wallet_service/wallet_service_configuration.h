@@ -6,12 +6,13 @@
 
 #include <json.hpp>
 #include <string>
-#include <config/CryptoNoteConfig.h>
-#include <Logging/ILogger.h>
+#include <config/cryptonote_config.h>
+#include <logging/ilogger.h>
 
 using nlohmann::json;
 
-namespace payment_service {
+namespace payment_service
+{
   struct WalletServiceConfiguration
   {
     WalletServiceConfiguration()

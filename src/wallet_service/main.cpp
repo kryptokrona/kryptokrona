@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 #include "payment_gate_service.h"
 #include "version.h"
 
@@ -28,7 +28,7 @@
 #include <errno.h>
 #endif
 
-#define SERVICE_NAME "Turtle-Service"
+#define SERVICE_NAME "kryptokrona-service"
 
 PaymentGateService* ppg;
 

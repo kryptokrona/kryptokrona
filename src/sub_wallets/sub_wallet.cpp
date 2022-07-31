@@ -3,15 +3,15 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////
-#include <SubWallets/SubWallet.h>
+#include <sub_wallets/sub_wallet.h>
 /////////////////////////////////
 
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/account.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 
-#include <Utilities/Utilities.h>
+#include <utilities/utilities.h>
 
-#include <WalletBackend/Constants.h>
+#include <wallet_backend/constants.h>
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */

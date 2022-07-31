@@ -5,16 +5,16 @@
 
 #include "blockchain_monitor.h"
 
-#include "Common/StringTools.h"
+#include "common/string_tools.h"
 
-#include <System/EventLock.h>
-#include <System/Timer.h>
-#include <System/InterruptedException.h>
+#include <system/event_lock.h>
+#include <system/timer.h>
+#include <system/interrupted_exception.h>
 
-#include "Rpc/CoreRpcServerCommandsDefinitions.h"
-#include "Rpc/JsonRpc.h"
+#include "rpc/core_rpc_server_commands_definitions.h"
+#include "rpc/json_rpc.h"
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 
 using json = nlohmann::json;
 

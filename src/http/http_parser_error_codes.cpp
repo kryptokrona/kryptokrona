@@ -17,10 +17,10 @@
 
 #include "http_parser_error_codes.h"
 
-namespace cryptonote {
-namespace error {
-
-HttpParserErrorCategory HttpParserErrorCategory::INSTANCE;
-
-} //namespace error
-} //namespace CryptoNote
+namespace cryptonote
+{
+    namespace error
+    {
+        HttpParserErrorCategory HttpParserErrorCategory::INSTANCE;
+    }
+}

@@ -19,7 +19,8 @@
 
 #include <string>
 
-namespace system {
-std::string lastErrorMessage();
-std::string errorMessage(int);
+namespace system
+{
+    std::string lastErrorMessage();
+    std::string errorMessage(int);
 }

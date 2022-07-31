@@ -3,17 +3,17 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////
-#include <zedwallet++/Fusion.h>
+#include <zedwallet++/fusion.h>
 ///////////////////////////////
 
 #include <iostream>
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/Utilities.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/utilities.h>
 
 void optimize(const std::shared_ptr<WalletBackend> walletBackend)
 {

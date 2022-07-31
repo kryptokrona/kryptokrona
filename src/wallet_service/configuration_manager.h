@@ -5,20 +5,19 @@
 
 #pragma once
 
-#include <CryptoTypes.h>
+#include <crypto_types.h>
 #include "wallet_service_configuration.h"
-#include "P2p/NetNodeConfig.h"
+#include "p2p/net_node_config.h"
 
-namespace payment_service {
+namespace payment_service
+{
+    class ConfigurationManager {
+    public:
+      ConfigurationManager();
+      bool init(int argc, char** argv);
 
-class ConfigurationManager {
-public:
-  ConfigurationManager();
-  bool init(int argc, char** argv);
+      WalletServiceConfiguration serviceConfig;
 
-  WalletServiceConfiguration serviceConfig;
-
-  Crypto::Hash rpcSecret;
-};
-
-} //namespace PaymentService
+      Crypto::Hash rpcSecret;
+    };
+}

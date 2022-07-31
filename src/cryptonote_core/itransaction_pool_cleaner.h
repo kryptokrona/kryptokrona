@@ -7,19 +7,19 @@
 
 #include <vector>
 
-#include "CryptoNoteCore/ITransactionPool.h"
+#include "cryptonote_core/itransaction_pool.h"
 
-namespace crypto {
-struct Hash;
+namespace crypto
+{
+    struct Hash;
 }
 
-namespace cryptonote {
+namespace cryptonote
+{
+    class ITransactionPoolCleanWrapper: public ITransactionPool {
+    public:
+      virtual ~ITransactionPoolCleanWrapper() {}
 
-class ITransactionPoolCleanWrapper: public ITransactionPool {
-public:
-  virtual ~ITransactionPoolCleanWrapper() {}
-
-  virtual std::vector<Crypto::Hash> clean(const uint32_t height) = 0;
-};
-
+      virtual std::vector<Crypto::Hash> clean(const uint32_t height) = 0;
+    };
 }

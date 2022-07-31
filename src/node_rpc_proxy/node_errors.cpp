@@ -17,10 +17,10 @@
 
 #include "node_errors.h"
 
-namespace cryptonote {
-namespace node_error {
-
-NodeErrorCategory NodeErrorCategory::INSTANCE;
-
-}
+namespace cryptonote
+{
+    namespace node_error
+    {
+        NodeErrorCategory NodeErrorCategory::INSTANCE;
+    }
 }

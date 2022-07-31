@@ -3,13 +3,13 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "CryptoNote.h"
+#include "cryptonote.h"
 
 #include <tuple>
 
 #include <vector>
 
-#include <Errors/Errors.h>
+#include <errors/errors.h>
 
 namespace mnemonics
 {

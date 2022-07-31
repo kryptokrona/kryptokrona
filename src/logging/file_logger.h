@@ -20,15 +20,14 @@
 #include <fstream>
 #include "stream_logger.h"
 
-namespace logging {
+namespace logging
+{
+    class FileLogger : public StreamLogger {
+    public:
+      FileLogger(Level level = DEBUGGING);
+      void init(const std::string& filename);
 
-class FileLogger : public StreamLogger {
-public:
-  FileLogger(Level level = DEBUGGING);
-  void init(const std::string& filename);
-
-private:
-  std::ofstream fileStream;
-};
-
+    private:
+      std::ofstream fileStream;
+    };
 }

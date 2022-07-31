@@ -7,15 +7,15 @@
 #include <fstream>
 #include <string>
 
-#include <config/CliHeader.h>
-#include <config/CryptoNoteConfig.h>
-#include <Logging/ILogger.h>
+#include <config/cli_header.h>
+#include <config/cryptonote_config.h>
+#include <logging/ilogger.h>
 
 
 using nlohmann::json;
 
-namespace payment_service {
-  
+namespace payment_service
+{
   void handleSettings(int argc, char* argv[], WalletServiceConfiguration& config)
   {
     cxxopts::Options options(argv[0], CryptoNote::getProjectCLIHeader());

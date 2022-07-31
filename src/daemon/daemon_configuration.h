@@ -5,10 +5,10 @@
 #pragma once
 
 #include <json.hpp>
-#include <config/CryptoNoteConfig.h>
-#include <Logging/ILogger.h>
-#include "Common/PathTools.h"
-#include "Common/Util.h"
+#include <config/cryptonote_config.h>
+#include <logging/ilogger.h>
+#include "common/path_tools.h"
+#include "common/util.h"
 
 using nlohmann::json;
 

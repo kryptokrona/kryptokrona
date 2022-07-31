@@ -6,7 +6,7 @@
 
 #include "httplib.h"
 
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 
 #include <cryptopp/modes.h>
 

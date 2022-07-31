@@ -17,10 +17,10 @@
 
 #include "wallet_service_error_category.h"
 
-namespace cryptonote {
-namespace error {
-
-WalletServiceErrorCategory WalletServiceErrorCategory::INSTANCE;
-
-}
+namespace cryptonote
+{
+    namespace error
+    {
+        WalletServiceErrorCategory WalletServiceErrorCategory::INSTANCE;
+    }
 }

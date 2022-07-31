@@ -3,21 +3,21 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////
-#include <zedwallet++/AddressBook.h>
+#include <zedwallet++/address_book.h>
 ////////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include <fstream>
 
 #include <iostream>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/GetInput.h>
-#include <zedwallet++/Transfer.h>
-#include <zedwallet++/Utilities.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/get_input.h>
+#include <zedwallet++/transfer.h>
+#include <zedwallet++/utilities.h>
 
 const std::string getAddressBookName(const std::vector<AddressBookEntry> addressBook)
 {

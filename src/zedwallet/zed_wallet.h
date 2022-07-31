@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <NodeRpcProxy/NodeRpcProxy.h>
+#include <node_rpc_proxy/node_rpc_proxy.h>
 
-#include <zedwallet/Types.h>
+#include <zedwallet/types.h>
 
 int main(int argc, char **argv);
 

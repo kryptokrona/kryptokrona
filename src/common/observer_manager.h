@@ -21,38 +21,38 @@
 #include <mutex>
 #include <vector>
 
-namespace tools {
+namespace tools
+{
+    template<typename T>
+    class ObserverManager {
+    public:
+      bool add(T* observer) {
+        std::unique_lock<std::mutex> lock(m_observersMutex);
+        auto it = std::find(m_observers.begin(), m_observers.end(), observer);
+        if (m_observers.end() == it) {
+          m_observers.push_back(observer);
+          return true;
+        } else {
+          return false;
+        }
+      }
 
-template<typename T>
-class ObserverManager {
-public:
-  bool add(T* observer) {
-    std::unique_lock<std::mutex> lock(m_observersMutex);
-    auto it = std::find(m_observers.begin(), m_observers.end(), observer);
-    if (m_observers.end() == it) {
-      m_observers.push_back(observer);
-      return true;
-    } else {
-      return false;
-    }
-  }
+      bool remove(T* observer) {
+        std::unique_lock<std::mutex> lock(m_observersMutex);
 
-  bool remove(T* observer) {
-    std::unique_lock<std::mutex> lock(m_observersMutex);
+        auto it = std::find(m_observers.begin(), m_observers.end(), observer);
+        if (m_observers.end() == it) {
+          return false;
+        } else {
+          m_observers.erase(it);
+          return true;
+        }
+      }
 
-    auto it = std::find(m_observers.begin(), m_observers.end(), observer);
-    if (m_observers.end() == it) {
-      return false;
-    } else {
-      m_observers.erase(it);
-      return true;
-    }
-  }
-
-  void clear() {
-    std::unique_lock<std::mutex> lock(m_observersMutex);
-    m_observers.clear();
-  }
+      void clear() {
+        std::unique_lock<std::mutex> lock(m_observersMutex);
+        m_observers.clear();
+      }
 
 #if defined(_MSC_VER)
   template<typename F>

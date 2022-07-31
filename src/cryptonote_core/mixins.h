@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
-#include <CryptoNoteCore/CachedTransaction.h>
-#include <CryptoNoteCore/TransactionApi.h>
+#include <cryptonote_core/cached_transaction.h>
+#include <cryptonote_core/transaction_api.h>
 
-#include <Wallet/WalletErrors.h>
+#include <wallet/wallet_errors.h>
 
 namespace cryptonote
 {

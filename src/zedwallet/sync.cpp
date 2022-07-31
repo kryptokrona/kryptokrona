@@ -3,19 +3,19 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////
-#include <zedwallet/Sync.h>
+#include <zedwallet/sync.h>
 ///////////////////////////
 
 #include <thread>
 
-#include <Common/StringTools.h>
+#include <common/string_tools.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet/CommandImplementations.h>
-#include <zedwallet/GetInput.h>
-#include <zedwallet/Tools.h>
-#include <zedwallet/Types.h>
-#include <config/WalletConfig.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet/command_implementations.h>
+#include <zedwallet/get_input.h>
+#include <zedwallet/tools.h>
+#include <zedwallet/types.h>
+#include <config/wallet_config.h>
 
 void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
 {

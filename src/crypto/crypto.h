@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <CryptoTypes.h>
+#include <crypto_types.h>
 
 #include "hash.h"
 

@@ -17,7 +17,8 @@
 
 #include "file_mapped_vector.h"
 
-namespace {
+namespace
+{
 #ifdef MSVC
 char suppressMSVCWarningLNK4221;
 #endif

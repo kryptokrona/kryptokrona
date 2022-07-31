@@ -17,10 +17,10 @@
 
 #include "add_block_errors.h"
 
-namespace CryptoNote {
-namespace error {
-
-AddBlockErrorCategory AddBlockErrorCategory::INSTANCE;
-
-}
+namespace cryptonote
+{
+    namespace error
+    {
+        AddBlockErrorCategory AddBlockErrorCategory::INSTANCE;
+    }
 }

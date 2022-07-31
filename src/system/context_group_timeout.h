@@ -17,18 +17,17 @@
 
 #pragma once 
 #include <chrono>
-#include <System/ContextGroup.h>
-#include <System/Timer.h>
+#include <system/context_group.h>
+#include <system/timer.h>
 
-namespace system {
+namespace system
+{
+    class ContextGroupTimeout {
+    public:
+      ContextGroupTimeout(Dispatcher&, ContextGroup&, std::chrono::nanoseconds);
 
-class ContextGroupTimeout {
-public: 
-  ContextGroupTimeout(Dispatcher&, ContextGroup&, std::chrono::nanoseconds);
-
-private: 
-  Timer timeoutTimer;
-  ContextGroup workingContextGroup;
-};
-
+    private:
+      Timer timeoutTimer;
+      ContextGroup workingContextGroup;
+    };
 }

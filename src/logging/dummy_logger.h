@@ -4,20 +4,18 @@
 
 #pragma once
 
-#include <Logging/ILogger.h>
+#include <logging/ilogger.h>
 
 namespace logging
 {
+    class DummyLogger : public ILogger
+    {
+        public:
+            virtual ~DummyLogger() {};
 
-class DummyLogger : public ILogger 
-{
-    public:
-        virtual ~DummyLogger() {};
-
-        virtual void operator()(const std::string &category, Level level, boost::posix_time::ptime time, const std::string &body) override
-        {
-            // do nothing
-        }
-};
-
-} // namespace logging
+            virtual void operator()(const std::string &category, Level level, boost::posix_time::ptime time, const std::string &body) override
+            {
+                // do nothing
+            }
+    };
+}

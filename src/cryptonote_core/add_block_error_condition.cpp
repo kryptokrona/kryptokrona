@@ -17,17 +17,17 @@
 
 #include "add_block_error_condition.h"
 
-namespace cryptonote {
-namespace error {
+namespace cryptonote
+{
+    namespace error
+    {
+        AddBlockErrorConditionCategory AddBlockErrorConditionCategory::INSTANCE;
 
-AddBlockErrorConditionCategory AddBlockErrorConditionCategory::INSTANCE;
 
-
-std::error_condition make_error_condition(AddBlockErrorCondition e) {
-  return std::error_condition(
-      static_cast<int>(e),
-      AddBlockErrorConditionCategory::INSTANCE);
-}
-
-}
+        std::error_condition make_error_condition(AddBlockErrorCondition e) {
+          return std::error_condition(
+              static_cast<int>(e),
+              AddBlockErrorConditionCategory::INSTANCE);
+        }
+    }
 }

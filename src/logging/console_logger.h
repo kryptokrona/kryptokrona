@@ -20,17 +20,16 @@
 #include <mutex>
 #include "common_logger.h"
 
-namespace logging {
+namespace logging
+{
+    class ConsoleLogger : public CommonLogger {
+    public:
+      ConsoleLogger(Level level = DEBUGGING);
 
-class ConsoleLogger : public CommonLogger {
-public:
-  ConsoleLogger(Level level = DEBUGGING);
+    protected:
+      virtual void doLogString(const std::string& message) override;
 
-protected:
-  virtual void doLogString(const std::string& message) override;
-
-private:
-  std::mutex mutex;
-};
-
+    private:
+      std::mutex mutex;
+    };
 }

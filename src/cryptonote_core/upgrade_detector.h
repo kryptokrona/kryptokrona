@@ -21,14 +21,15 @@
 #include <cstdint>
 #include <ctime>
 
-#include "Common/StringTools.h"
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/Currency.h"
-#include <config/CryptoNoteConfig.h>
-#include <Logging/LoggerRef.h>
+#include "common/string_tools.h"
+#include "cryptonote_core/cryptonote_basic_impl.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
+#include "cryptonote_core/currency.h"
+#include <config/cryptonote_config.h>
+#include <logging/logger_ref.h>
 
-namespace cryptonote {
+namespace cryptonote
+{
   class UpgradeDetectorBase {
   public:
     enum : uint32_t {

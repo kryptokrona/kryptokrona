@@ -3,17 +3,17 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////
-#include <zedwallet/Menu.h>
+#include <zedwallet/menu.h>
 ///////////////////////////
 
-#include <Common/SignalHandler.h>
+#include <common/signal_handler.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet/CommandDispatcher.h>
-#include <zedwallet/Commands.h>
-#include <zedwallet/GetInput.h>
-#include <zedwallet/Sync.h>
-#include <zedwallet/Tools.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet/command_dispatcher.h>
+#include <zedwallet/commands.h>
+#include <zedwallet/get_input.h>
+#include <zedwallet/sync.h>
+#include <zedwallet/tools.h>
 
 template<typename T>
 std::string parseCommand(const std::vector<T> &printableCommands,

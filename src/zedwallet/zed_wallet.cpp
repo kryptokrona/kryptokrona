@@ -3,24 +3,24 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////
-#include <zedwallet/ZedWallet.h>
+#include <zedwallet/zed_wallet.h>
 ////////////////////////////////
 
-#include <config/CliHeader.h>
-#include <Common/SignalHandler.h>
-#include <CryptoNoteCore/Currency.h>
-#include <Logging/FileLogger.h>
-#include <Logging/LoggerManager.h>
+#include <config/cli_header.h>
+#include <common/signal_handler.h>
+#include <cryptonote_core/currency.h>
+#include <logging/file_logger.h>
+#include <logging/logger_manager.h>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet/Menu.h>
-#include <zedwallet/ParseArguments.h>
-#include <zedwallet/Tools.h>
-#include <config/WalletConfig.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet/menu.h>
+#include <zedwallet/parse_arguments.h>
+#include <zedwallet/tools.h>
+#include <config/wallet_config.h>
 
 int main(int argc, char **argv)
 {

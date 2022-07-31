@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include <zedwallet/Types.h>
-#include <config/WalletConfig.h>
+#include <zedwallet/types.h>
+#include <config/wallet_config.h>
 
 enum AddressType {NotAnAddress, IntegratedAddress, StandardAddress};
 

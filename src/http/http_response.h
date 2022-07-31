@@ -21,8 +21,8 @@
 #include <string>
 #include <map>
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   class HttpResponse {
   public:
     enum HTTP_STATUS {
@@ -53,5 +53,4 @@ namespace cryptonote {
   inline std::ostream& operator<<(std::ostream& os, const HttpResponse& resp) {
     return resp.printHttpResponse(os);
   }
-
-} //namespace CryptoNote
+}

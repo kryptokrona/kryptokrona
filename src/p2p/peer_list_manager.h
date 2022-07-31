@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 #include <list>
 
-#include <P2p/P2pProtocolTypes.h>
-#include <P2p/Peerlist.h>
+#include <p2p/p2p_protocol_types.h>
+#include <p2p/peer_list.h>
 
-#include <Serialization/ISerializer.h>
+#include <serialization/iserializer.h>
 
 class PeerlistManager
 {

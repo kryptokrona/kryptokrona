@@ -3,23 +3,23 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////////
-#include <WalletBackend/Transfer.h>
+#include <wallet_backend/transfer.h>
 ///////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/Currency.h>
-#include <CryptoNoteCore/Mixins.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <cryptonote_core/cryptonote_tools.h>
+#include <cryptonote_core/currency.h>
+#include <cryptonote_core/mixins.h>
+#include <cryptonote_core/transaction_extra.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
-#include <Utilities/Addresses.h>
-#include <Utilities/FormatTools.h>
-#include <Utilities/Utilities.h>
+#include <utilities/addresses.h>
+#include <utilities/format_tools.h>
+#include <utilities/utilities.h>
 
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 
 namespace SendTransaction
 {

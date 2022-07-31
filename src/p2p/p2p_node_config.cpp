@@ -17,71 +17,69 @@
 
 #include "p2p_node_config.h"
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
-namespace cryptonote {
+namespace cryptonote
+{
+    namespace
+    {
+        const std::chrono::nanoseconds P2P_DEFAULT_CONNECT_INTERVAL = std::chrono::seconds(2);
+        const size_t P2P_DEFAULT_CONNECT_RANGE = 20;
+        const size_t P2P_DEFAULT_PEERLIST_GET_TRY_COUNT = 10;
+    }
 
-namespace {
+    P2pNodeConfig::P2pNodeConfig() :
+      timedSyncInterval(std::chrono::seconds(P2P_DEFAULT_HANDSHAKE_INTERVAL)),
+      handshakeTimeout(std::chrono::milliseconds(P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT)),
+      connectInterval(P2P_DEFAULT_CONNECT_INTERVAL),
+      connectTimeout(std::chrono::milliseconds(P2P_DEFAULT_CONNECTION_TIMEOUT)),
+      networkId(CryptoNote::CRYPTONOTE_NETWORK),
+      expectedOutgoingConnectionsCount(P2P_DEFAULT_CONNECTIONS_COUNT),
+      whiteListConnectionsPercent(P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT),
+      peerListConnectRange(P2P_DEFAULT_CONNECT_RANGE),
+      peerListGetTryCount(P2P_DEFAULT_PEERLIST_GET_TRY_COUNT) {
+    }
 
-const std::chrono::nanoseconds P2P_DEFAULT_CONNECT_INTERVAL = std::chrono::seconds(2);
-const size_t P2P_DEFAULT_CONNECT_RANGE = 20;
-const size_t P2P_DEFAULT_PEERLIST_GET_TRY_COUNT = 10;
+    // getters
 
-}
+    std::chrono::nanoseconds P2pNodeConfig::getTimedSyncInterval() const {
+      return timedSyncInterval;
+    }
 
-P2pNodeConfig::P2pNodeConfig() :
-  timedSyncInterval(std::chrono::seconds(P2P_DEFAULT_HANDSHAKE_INTERVAL)),
-  handshakeTimeout(std::chrono::milliseconds(P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT)),
-  connectInterval(P2P_DEFAULT_CONNECT_INTERVAL),
-  connectTimeout(std::chrono::milliseconds(P2P_DEFAULT_CONNECTION_TIMEOUT)),
-  networkId(CryptoNote::CRYPTONOTE_NETWORK),
-  expectedOutgoingConnectionsCount(P2P_DEFAULT_CONNECTIONS_COUNT),
-  whiteListConnectionsPercent(P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT),
-  peerListConnectRange(P2P_DEFAULT_CONNECT_RANGE),
-  peerListGetTryCount(P2P_DEFAULT_PEERLIST_GET_TRY_COUNT) {
-}
+    std::chrono::nanoseconds P2pNodeConfig::getHandshakeTimeout() const {
+      return handshakeTimeout;
+    }
 
-// getters
+    std::chrono::nanoseconds P2pNodeConfig::getConnectInterval() const {
+      return connectInterval;
+    }
 
-std::chrono::nanoseconds P2pNodeConfig::getTimedSyncInterval() const {
-  return timedSyncInterval;
-}
+    std::chrono::nanoseconds P2pNodeConfig::getConnectTimeout() const {
+      return connectTimeout;
+    }
 
-std::chrono::nanoseconds P2pNodeConfig::getHandshakeTimeout() const {
-  return handshakeTimeout;
-}
+    size_t P2pNodeConfig::getExpectedOutgoingConnectionsCount() const {
+      return expectedOutgoingConnectionsCount;
+    }
 
-std::chrono::nanoseconds P2pNodeConfig::getConnectInterval() const {
-  return connectInterval;
-}
+    size_t P2pNodeConfig::getWhiteListConnectionsPercent() const {
+      return whiteListConnectionsPercent;
+    }
 
-std::chrono::nanoseconds P2pNodeConfig::getConnectTimeout() const {
-  return connectTimeout;
-}
+    boost::uuids::uuid P2pNodeConfig::getNetworkId() const {
+      if (getTestnet()) {
+        boost::uuids::uuid copy = networkId;
+        copy.data[0] += 1;
+        return copy;
+      }
+      return networkId;
+    }
 
-size_t P2pNodeConfig::getExpectedOutgoingConnectionsCount() const {
-  return expectedOutgoingConnectionsCount;
-}
+    size_t P2pNodeConfig::getPeerListConnectRange() const {
+      return peerListConnectRange;
+    }
 
-size_t P2pNodeConfig::getWhiteListConnectionsPercent() const {
-  return whiteListConnectionsPercent;
-}
-
-boost::uuids::uuid P2pNodeConfig::getNetworkId() const {
-  if (getTestnet()) {
-    boost::uuids::uuid copy = networkId;
-    copy.data[0] += 1;
-    return copy;
-  }
-  return networkId;
-}
-
-size_t P2pNodeConfig::getPeerListConnectRange() const {
-  return peerListConnectRange;
-}
-
-size_t P2pNodeConfig::getPeerListGetTryCount() const {
-  return peerListGetTryCount;
-}
-
+    size_t P2pNodeConfig::getPeerListGetTryCount() const {
+      return peerListGetTryCount;
+    }
 }

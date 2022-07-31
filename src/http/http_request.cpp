@@ -17,8 +17,8 @@
 
 #include "http_request.h"
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   const std::string& HttpRequest::getMethod() const {
     return method;
   }

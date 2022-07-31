@@ -2,19 +2,19 @@
 // 
 // Please see the included LICENSE file for more information.
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
+#include <cryptonote_core/cryptonote_format_utils.h>
 
-#include <Errors/Errors.h>
+#include <errors/errors.h>
 
-#include <Nigel/Nigel.h>
+#include <nigel/nigel.h>
 
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 
 #include <vector>
 
-#include <WalletTypes.h>
+#include <wallet_types.h>
 
 namespace send_transaction
 {

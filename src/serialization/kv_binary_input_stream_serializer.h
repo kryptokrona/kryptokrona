@@ -17,18 +17,17 @@
 
 #pragma once
 
-#include <Common/IInputStream.h>
+#include <common/iinput_stream.h>
 #include "iserializer.h"
 #include "json_input_value_serializer.h"
 
-namespace cryptonote {
+namespace cryptonote
+{
+    class KVBinaryInputStreamSerializer : public JsonInputValueSerializer {
+    public:
+      KVBinaryInputStreamSerializer(Common::IInputStream& strm);
 
-class KVBinaryInputStreamSerializer : public JsonInputValueSerializer {
-public:
-  KVBinaryInputStreamSerializer(Common::IInputStream& strm);
-
-  virtual bool binary(void* value, uint64_t size, Common::StringView name) override;
-  virtual bool binary(std::string& value, Common::StringView name) override;
-};
-
+      virtual bool binary(void* value, uint64_t size, Common::StringView name) override;
+      virtual bool binary(std::string& value, Common::StringView name) override;
+    };
 }

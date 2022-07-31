@@ -23,8 +23,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace tools {
-
+namespace tools
+{
     template<typename OutputIt, typename T>
     typename std::enable_if<std::is_integral<T>::value && std::is_unsigned<T>::value, void>::type
     write_varint(OutputIt &&dest, T i) {

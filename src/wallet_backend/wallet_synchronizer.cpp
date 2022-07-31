@@ -3,12 +3,12 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////////////////
-#include <WalletBackend/WalletSynchronizer.h>
+#include <wallet_backend/wallet_synchronizer.h>
 /////////////////////////////////////////////
 
-#include <Common/StringTools.h>
+#include <common/string_tools.h>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <crypto/crypto.h>
 
@@ -16,9 +16,9 @@
 
 #include <iostream>
 
-#include <Utilities/Utilities.h>
+#include <utilities/utilities.h>
 
-#include <WalletBackend/Constants.h>
+#include <wallet_backend/constants.h>
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */

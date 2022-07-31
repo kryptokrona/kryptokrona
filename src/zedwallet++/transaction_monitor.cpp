@@ -3,14 +3,14 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////////////////
-#include <zedwallet++/TransactionMonitor.h>
+#include <zedwallet++/transaction_monitor.h>
 ///////////////////////////////////////////
 
 #include <iostream>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/CommandImplementations.h>
-#include <zedwallet++/GetInput.h>
+#include <Utilities/coloured_msg.h>
+#include <zedwallet++/command_implementations.h>
+#include <zedwallet++/get_input.h>
 
 void TransactionMonitor::start()
 {

@@ -4,11 +4,11 @@
 
 #include <string>
 
-constexpr std::string_view canary = "TurtleCoin";
+constexpr std::string_view canary = "kryptokrona";
 
 constexpr std::string_view canaryObfusticated = "\u0054\u0075\u0072\u0074\u006c\u0065\u0043\u006f\u0069\u006e";
 
-/* Compare the canary with T u r t l e C o i n. Done as unicode to not be caught
+/* Compare the canary with kryptokrona. Done as unicode to not be caught
    by find and replace. If find and replace occured, the canary will no longer
    match. Then we can warn them that they have probably replaced license headers,
    and halt compilation till it's fixed. */

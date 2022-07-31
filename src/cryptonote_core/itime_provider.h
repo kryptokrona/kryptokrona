@@ -19,8 +19,8 @@
 
 #include <time.h>
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   struct ITimeProvider {
     virtual time_t now() = 0;
     virtual ~ITimeProvider() {}
@@ -31,5 +31,4 @@ namespace cryptonote {
       return time(nullptr);
     }
   };
-
 }

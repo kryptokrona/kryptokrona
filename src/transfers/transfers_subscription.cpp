@@ -15,78 +15,76 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "IWallet.h"
+#include "iwallet.h"
 #include "transfers_subscription.h"
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
+#include "cryptonote_core/cryptonote_basic_impl.h"
 
 using namespace crypto;
 using namespace logging;
 
-namespace cryptonote {
+namespace cryptonote
+{
+    TransfersSubscription::TransfersSubscription(const CryptoNote::Currency& currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription& sub)
+      : subscription(sub), logger(logger, "TransfersSubscription"), transfers(currency, logger, sub.transactionSpendableAge),
+        m_address(currency.accountAddressAsString(sub.keys.address)) {
+    }
 
-TransfersSubscription::TransfersSubscription(const CryptoNote::Currency& currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription& sub)
-  : subscription(sub), logger(logger, "TransfersSubscription"), transfers(currency, logger, sub.transactionSpendableAge),
-    m_address(currency.accountAddressAsString(sub.keys.address)) {
-}
+    SynchronizationStart TransfersSubscription::getSyncStart() {
+      return subscription.syncStart;
+    }
 
+    void TransfersSubscription::onBlockchainDetach(uint32_t height) {
+      std::vector<Hash> deletedTransactions = transfers.detach(height);
+      for (auto& hash : deletedTransactions) {
+        logger(TRACE) << "Transaction deleted from wallet " << m_address << ", hash " << hash;
+        m_observerManager.notify(&ITransfersObserver::onTransactionDeleted, this, hash);
+      }
+    }
 
-SynchronizationStart TransfersSubscription::getSyncStart() {
-  return subscription.syncStart;
-}
+    void TransfersSubscription::onError(const std::error_code& ec, uint32_t height) {
+      if (height != WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
+      transfers.detach(height);
+      }
+      m_observerManager.notify(&ITransfersObserver::onError, this, height, ec);
+    }
 
-void TransfersSubscription::onBlockchainDetach(uint32_t height) {
-  std::vector<Hash> deletedTransactions = transfers.detach(height);
-  for (auto& hash : deletedTransactions) {
-    logger(TRACE) << "Transaction deleted from wallet " << m_address << ", hash " << hash;
-    m_observerManager.notify(&ITransfersObserver::onTransactionDeleted, this, hash);
-  }
-}
+    bool TransfersSubscription::advanceHeight(uint32_t height) {
+      return transfers.advanceHeight(height);
+    }
 
-void TransfersSubscription::onError(const std::error_code& ec, uint32_t height) {
-  if (height != WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
-  transfers.detach(height);
-  }
-  m_observerManager.notify(&ITransfersObserver::onError, this, height, ec);
-}
+    const AccountKeys& TransfersSubscription::getKeys() const {
+      return subscription.keys;
+    }
 
-bool TransfersSubscription::advanceHeight(uint32_t height) {
-  return transfers.advanceHeight(height);
-}
+    bool TransfersSubscription::addTransaction(const TransactionBlockInfo& blockInfo, const ITransactionReader& tx,
+                                               const std::vector<TransactionOutputInformationIn>& transfersList) {
+      bool added = transfers.addTransaction(blockInfo, tx, transfersList);
+      if (added) {
+        logger(TRACE) << "Transaction updates balance of wallet " << m_address << ", hash " << tx.getTransactionHash();
+        m_observerManager.notify(&ITransfersObserver::onTransactionUpdated, this, tx.getTransactionHash());
+      }
 
-const AccountKeys& TransfersSubscription::getKeys() const {
-  return subscription.keys;
-}
+      return added;
+    }
 
-bool TransfersSubscription::addTransaction(const TransactionBlockInfo& blockInfo, const ITransactionReader& tx,
-                                           const std::vector<TransactionOutputInformationIn>& transfersList) {
-  bool added = transfers.addTransaction(blockInfo, tx, transfersList);
-  if (added) {
-    logger(TRACE) << "Transaction updates balance of wallet " << m_address << ", hash " << tx.getTransactionHash();
-    m_observerManager.notify(&ITransfersObserver::onTransactionUpdated, this, tx.getTransactionHash());
-  }
+    AccountPublicAddress TransfersSubscription::getAddress() {
+      return subscription.keys.address;
+    }
 
-  return added;
-}
+    ITransfersContainer& TransfersSubscription::getContainer() {
+      return transfers;
+    }
 
-AccountPublicAddress TransfersSubscription::getAddress() {
-  return subscription.keys.address;
-}
+    void TransfersSubscription::deleteUnconfirmedTransaction(const Hash& transactionHash) {
+      if (transfers.deleteUnconfirmedTransaction(transactionHash)) {
+        logger(TRACE) << "Transaction deleted from wallet " << m_address << ", hash " << transactionHash;
+        m_observerManager.notify(&ITransfersObserver::onTransactionDeleted, this, transactionHash);
+      }
+    }
 
-ITransfersContainer& TransfersSubscription::getContainer() {
-  return transfers;
-}
-
-void TransfersSubscription::deleteUnconfirmedTransaction(const Hash& transactionHash) {
-  if (transfers.deleteUnconfirmedTransaction(transactionHash)) {
-    logger(TRACE) << "Transaction deleted from wallet " << m_address << ", hash " << transactionHash;
-    m_observerManager.notify(&ITransfersObserver::onTransactionDeleted, this, transactionHash);
-  }
-}
-
-void TransfersSubscription::markTransactionConfirmed(const TransactionBlockInfo& block, const Hash& transactionHash,
-                                                     const std::vector<uint32_t>& globalIndices) {
-  transfers.markTransactionConfirmed(block, transactionHash, globalIndices);
-  m_observerManager.notify(&ITransfersObserver::onTransactionUpdated, this, transactionHash);
-}
-
+    void TransfersSubscription::markTransactionConfirmed(const TransactionBlockInfo& block, const Hash& transactionHash,
+                                                         const std::vector<uint32_t>& globalIndices) {
+      transfers.markTransactionConfirmed(block, transactionHash, globalIndices);
+      m_observerManager.notify(&ITransfersObserver::onTransactionUpdated, this, transactionHash);
+    }
 }

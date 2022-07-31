@@ -8,17 +8,16 @@
 #include <fstream>
 #include <sstream>
 
-#include <config/CliHeader.h>
-#include <config/CryptoNoteConfig.h>
-#include <Logging/ILogger.h>
-#include "Common/PathTools.h"
-#include "Common/Util.h"
+#include <config/cli_header.h>
+#include <config/cryptonote_config.h>
+#include <logging/ilogger.h>
+#include "common/path_tools.h"
+#include "common/util.h"
 
 using nlohmann::json;
 
 namespace daemon_config
 {
-  
   DaemonConfiguration initConfiguration(const char* path)
   {
     DaemonConfiguration config;

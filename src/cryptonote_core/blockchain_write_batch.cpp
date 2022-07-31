@@ -22,11 +22,9 @@
 using namespace cryptonote;
 
 BlockchainWriteBatch::BlockchainWriteBatch() {
-
 }
 
 BlockchainWriteBatch::~BlockchainWriteBatch() {
-
 }
 
 BlockchainWriteBatch& BlockchainWriteBatch::insertSpentKeyImages(uint32_t blockIndex, const std::unordered_set<Crypto::KeyImage>& spentKeyImages) {
