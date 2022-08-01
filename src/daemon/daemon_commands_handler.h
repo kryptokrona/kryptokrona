@@ -21,7 +21,7 @@ namespace cryptonote
 class DaemonCommandsHandler
 {
 public:
-  DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, std::shared_ptr<Logging::LoggerManager> log, CryptoNote::RpcServer* prpc_server);
+  DaemonCommandsHandler(cryptonote::Core& core, cryptonote::NodeServer& srv, std::shared_ptr<logging::LoggerManager> log, cryptonote::RpcServer* prpc_server);
 
   bool start_handling() {
     m_consoleHandler.start();
@@ -36,12 +36,12 @@ public:
 
 private:
 
-  Common::ConsoleHandler m_consoleHandler;
-  CryptoNote::Core& m_core;
-  CryptoNote::NodeServer& m_srv;
-  Logging::LoggerRef logger;
-  std::shared_ptr<Logging::LoggerManager> m_logManager;
-  CryptoNote::RpcServer* m_prpc_server;
+  common::ConsoleHandler m_consoleHandler;
+  cryptonote::Core& m_core;
+  cryptonote::NodeServer& m_srv;
+  logging::LoggerRef logger;
+  std::shared_ptr<logging::LoggerManager> m_logManager;
+  cryptonote::RpcServer* m_prpc_server;
 
   std::string get_commands_str();
   bool print_block_by_height(uint32_t height);
