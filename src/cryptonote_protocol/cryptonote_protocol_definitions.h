@@ -60,8 +60,8 @@ namespace cryptonote
   /************************************************************************/
   struct NOTIFY_REQUEST_GET_OBJECTS_request
   {
-    std::vector<Crypto::Hash> txs;
-    std::vector<Crypto::Hash> blocks;
+    std::vector<crypto::Hash> txs;
+    std::vector<crypto::Hash> blocks;
 
     void serialize(ISerializer& s) {
       serializeAsBinary(txs, "txs", s);
@@ -79,7 +79,7 @@ namespace cryptonote
   {
     std::vector<std::string> txs;
     std::vector<RawBlockLegacy> blocks;
-    std::vector<Crypto::Hash> missed_ids;
+    std::vector<crypto::Hash> missed_ids;
     uint32_t current_blockchain_height;
   };
 
@@ -95,7 +95,7 @@ namespace cryptonote
 
     struct request
     {
-      std::vector<Crypto::Hash> block_ids; /*IDs of the first 10 blocks are sequential, next goes with pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block */
+      std::vector<crypto::Hash> block_ids; /*IDs of the first 10 blocks are sequential, next goes with pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block */
 
       void serialize(ISerializer& s) {
         serializeAsBinary(block_ids, "block_ids", s);
@@ -107,7 +107,7 @@ namespace cryptonote
   {
     uint32_t start_height;
     uint32_t total_height;
-    std::vector<Crypto::Hash> m_block_ids;
+    std::vector<crypto::Hash> m_block_ids;
 
     void serialize(ISerializer& s) {
       KV_MEMBER(start_height)
@@ -126,7 +126,7 @@ namespace cryptonote
   /*                                                                      */
   /************************************************************************/
   struct NOTIFY_REQUEST_TX_POOL_request {
-    std::vector<Crypto::Hash> txs;
+    std::vector<crypto::Hash> txs;
 
     void serialize(ISerializer& s) {
       serializeAsBinary(txs, "txs", s);
@@ -153,9 +153,9 @@ namespace cryptonote
   };
 
   struct NOTIFY_MISSING_TXS_request {
-    Crypto::Hash blockHash;
+    crypto::Hash blockHash;
     uint32_t current_blockchain_height;
-    std::vector<Crypto::Hash> missing_txs;
+    std::vector<crypto::Hash> missing_txs;
   };
 
   struct NOTIFY_MISSING_TXS {
