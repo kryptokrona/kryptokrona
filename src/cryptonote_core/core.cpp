@@ -2453,7 +2453,7 @@ namespace cryptonote
               std::time_t currentTime = std::time(0);
               uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(transaction.getTransactionHash());
 
-              logger(Logging::INFO) << "Transaction age is "
+              logger(Logging::DEBUGGING) << "Transaction age is "
                                      << transactionAge;
 
               if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
@@ -2943,45 +2943,45 @@ namespace cryptonote
         for (;;) {
           timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
 
-          logger(Logging::INFO) << "Running Hugin cleaner sequence.. "
+          logger(Logging::DEBUGGING) << "Running Hugin cleaner sequence.. "
                                  << " ";
 
           std::vector<CachedTransaction> poolTransactions = transactionPool->getPoolTransactions();
           for (const auto& cachedTransaction : poolTransactions) {
-            logger(Logging::INFO) << "Found transaction.. "
+            logger(Logging::DEBUGGING) << "Found transaction.. "
             << " ";
 
 
-          logger(Logging::INFO) << "Checking transaction "
+          logger(Logging::DEBUGGING) << "Checking transaction "
                                  << cachedTransaction.getTransactionHash();
 
               uint64_t height = getTopBlockIndex() + 1;
 
 
-                                  logger(Logging::INFO) << "Height is "
+                                  logger(Logging::DEBUGGING) << "Height is "
                                                          << height;
 
           if (!validateBlockTemplateTransaction(cachedTransaction, height))
           {
 
-                logger(Logging::INFO) << "tx is invalid "
+                logger(Logging::DEBUGGING) << "tx is invalid "
                                        << cachedTransaction.getTransactionHash();
 
 
                 std::time_t currentTime = std::time(0);
 
 
-                logger(Logging::INFO) << "Current time is "
+                logger(Logging::DEBUGGING) << "Current time is "
                                        << currentTime;
 
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
 
-                logger(Logging::INFO) << "Transaction age is "
+                logger(Logging::DEBUGGING) << "Transaction age is "
                                        << transactionAge;
 
                 if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                 {
-                  logger(Logging::INFO) << "Removing.. ";
+                  logger(Logging::DEBUGGING) << "Removing.. ";
                   transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
 
                 }
