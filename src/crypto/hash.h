@@ -44,7 +44,7 @@
 #error The CryptoNight Soft Shell Parameters you supplied will exceed normal paging operations.
 #endif
 
-namespace Crypto {
+namespace crypto {
 
   extern "C" {
 #include "hash_ops.h"

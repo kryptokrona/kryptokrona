@@ -18,7 +18,7 @@
 #include "hash.h"
 #include "random.h"
 
-namespace Crypto {
+namespace crypto {
 
   extern "C" {
 #include "crypto_ops.h"

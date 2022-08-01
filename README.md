@@ -288,9 +288,9 @@ The binaries will be in the `src` folder when you are complete.
 
 ## Change config
 
-Before we start we just need to change slight a bit on the `CryptoNoteConfig.h` header file with some constants so we don't use our main net to test on.
+Before we start we just need to change slight a bit on the `cryptonote_config.h` header file with some constants so we don't use our main net to test on.
 
-Open up `src/config/CryptoNoteConfig.h`
+Open up `src/config/cryptonote_config.h`
 
 Then we need to change the constants **P2P_DEFAULT_PORT** and **RPC_DEFAULT_PORT** to:
 
