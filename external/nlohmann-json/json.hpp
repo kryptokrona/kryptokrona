@@ -13025,7 +13025,7 @@ class basic_json
     /*!
     @brief serialization
 
-    Serialization function for JSON values. The function tries to mimic
+    serialization function for JSON values. The function tries to mimic
     Python's `json.dumps()` function, and currently supports its @a indent
     and @a ensure_ascii parameters.
 
@@ -18721,7 +18721,7 @@ class basic_json
     /*!
     @brief applies a JSON Merge Patch
 
-    The merge patch format is primarily intended for use with the HTTP PATCH
+    The merge patch format is primarily intended for use with the http PATCH
     method as a means of describing a set of modifications to a target
     resource's content. This function applies a merge patch to the current
     JSON value.

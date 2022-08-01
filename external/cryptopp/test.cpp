@@ -781,7 +781,7 @@ void HexDecode(const char *in, const char *out)
 
 void ForwardTcpPort(const char *sourcePortName, const char *destinationHost, const char *destinationPortName)
 {
-	// Quiet warnings for Windows Phone and Windows Store builds
+	// Quiet warnings for windows Phone and windows Store builds
 	CRYPTOPP_UNUSED(sourcePortName), CRYPTOPP_UNUSED(destinationHost), CRYPTOPP_UNUSED(destinationPortName);
 
 #ifdef SOCKETS_AVAILABLE

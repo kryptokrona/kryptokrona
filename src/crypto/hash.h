@@ -9,7 +9,7 @@
 
 #include <stddef.h>
 
-#include <CryptoTypes.h>
+#include <crypto_types.h>
 
 // Standard Cryptonight Definitions
 #define CN_PAGE_SIZE                    2097152
@@ -47,7 +47,7 @@
 namespace Crypto {
 
   extern "C" {
-#include "hash-ops.h"
+#include "hash_ops.h"
   }
 
   /*

@@ -2,7 +2,7 @@
 
 /// \file pch.h
 /// \brief Precompiled header file
-/// \details The precompiled header files are used Windows.
+/// \details The precompiled header files are used windows.
 
 #ifndef CRYPTOPP_PCH_H
 #define CRYPTOPP_PCH_H

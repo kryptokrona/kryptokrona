@@ -40,8 +40,8 @@ private:
 };
 
 /// \brief Measure CPU time spent executing instructions of this thread (if supported by OS)
-/// \note ThreadUserTimer only works correctly on Windows NT or later desktops and servers.
-/// On Unix-based it reports process time. On Windows Phone and Windows Store it reports wall
+/// \note ThreadUserTimer only works correctly on windows NT or later desktops and servers.
+/// On Unix-based it reports process time. On windows Phone and windows Store it reports wall
 /// clock time with performance counter precision. On all others it reports wall clock time.
 class ThreadUserTimer : public TimerBase
 {

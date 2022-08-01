@@ -869,9 +869,9 @@ class RecoveryTestHelper {
     ASSERT_OK(env->GetFileSize(fname, &size));
     ASSERT_GT(size, 0);
 #ifdef OS_WIN
-    // Windows disk cache behaves differently. When we truncate
+    // windows disk cache behaves differently. When we truncate
     // the original content is still in the cache due to the original
-    // handle is still open. Generally, in Windows, one prohibits
+    // handle is still open. Generally, in windows, one prohibits
     // shared access to files and it is not needed for WAL but we allow
     // it to induce corruption at various tests.
     test->Close();

@@ -70,7 +70,7 @@ RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
-// Verbose Utilities
+// Verbose utilities
 
 #if RAPIDJSON_SCHEMA_VERBOSE
 

@@ -155,7 +155,7 @@ private:
 __thread ThreadData* ThreadLocalPtr::StaticMeta::tls_ = nullptr;
 #endif
 
-// Windows doesn't support a per-thread destructor with its
+// windows doesn't support a per-thread destructor with its
 // TLS primitives.  So, we build it manually by inserting a
 // function to be called on each thread's exit.
 // See http://www.codeproject.com/Articles/8113/Thread-Local-Storage-The-C-Way
@@ -166,10 +166,10 @@ __thread ThreadData* ThreadLocalPtr::StaticMeta::tls_ = nullptr;
 // although OK within a request. But otherwise, threads have no identity in its
 // modern use.
 
-// This runs on windows only called from the System Loader
+// This runs on windows only called from the system Loader
 #ifdef OS_WIN
 
-// Windows cleanup routine is invoked from a System Loader with a different
+// windows cleanup routine is invoked from a system Loader with a different
 // signature so we can not directly hookup the original OnThreadExit which is
 // private member
 // so we make StaticMeta class share with the us the address of the function so
@@ -323,7 +323,7 @@ ThreadLocalPtr::StaticMeta::StaticMeta()
   // of memory backing destructed statically-scoped objects. Perhaps
   // registering with atexit(3) would be more robust.
   //
-// This is not required on Windows.
+// This is not required on windows.
 #if !defined(OS_WIN)
   static struct A {
     ~A() {
@@ -342,7 +342,7 @@ ThreadLocalPtr::StaticMeta::StaticMeta()
   head_.prev = &head_;
 
 #ifdef OS_WIN
-  // Share with Windows its cleanup routine and the key
+  // Share with windows its cleanup routine and the key
   wintlscleanup::thread_local_inclass_routine = OnThreadExit;
   wintlscleanup::thread_local_key = pthread_key_;
 #endif

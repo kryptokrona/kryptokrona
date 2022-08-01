@@ -106,7 +106,7 @@ class DeleteScheduler {
   // Number of trash files that are waiting to be deleted
   int32_t pending_files_;
   uint64_t bytes_max_delete_chunk_;
-  // Errors that happened in BackgroundEmptyTrash (file_path => error)
+  // errors that happened in BackgroundEmptyTrash (file_path => error)
   std::map<std::string, Status> bg_errors_;
 
   bool num_link_error_printed_ = false;

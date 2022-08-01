@@ -106,7 +106,7 @@
 //
 // Author: wan@google.com (Zhanyong Wan)
 //
-// Utilities for testing Google Test itself and code that uses Google Test
+// utilities for testing Google Test itself and code that uses Google Test
 // (e.g. frameworks built on top of Google Test).
 
 #ifndef GTEST_INCLUDE_GTEST_GTEST_SPI_H_
@@ -333,7 +333,7 @@ class GTEST_API_ SingleFailureChecker {
 # include <fcntl.h>  // NOLINT
 # include <limits.h>  // NOLINT
 # include <sched.h>  // NOLINT
-// Declares vsnprintf().  This header is not available on Windows.
+// Declares vsnprintf().  This header is not available on windows.
 # include <strings.h>  // NOLINT
 # include <sys/mman.h>  // NOLINT
 # include <sys/time.h>  // NOLINT
@@ -351,12 +351,12 @@ class GTEST_API_ SingleFailureChecker {
 // On z/OS we additionally need strings.h for strcasecmp.
 # include <strings.h>  // NOLINT
 
-#elif GTEST_OS_WINDOWS_MOBILE  // We are on Windows CE.
+#elif GTEST_OS_WINDOWS_MOBILE  // We are on windows CE.
 
 # include <windows.h>  // NOLINT
 # undef min
 
-#elif GTEST_OS_WINDOWS  // We are on Windows proper.
+#elif GTEST_OS_WINDOWS  // We are on windows proper.
 
 # include <io.h>  // NOLINT
 # include <sys/timeb.h>  // NOLINT
@@ -368,7 +368,7 @@ class GTEST_API_ SingleFailureChecker {
 // TODO(kenton@google.com): Use autoconf to detect availability of
 //   gettimeofday().
 // TODO(kenton@google.com): There are other ways to get the time on
-//   Windows, like GetTickCount() or GetSystemTimeAsFileTime().  MinGW
+//   windows, like GetTickCount() or GetSystemTimeAsFileTime().  MinGW
 //   supports these.  consider using them instead.
 #  define GTEST_HAS_GETTIMEOFDAY_ 1
 #  include <sys/time.h>  // NOLINT
@@ -642,8 +642,8 @@ GTEST_API_ std::string CodePointToUtf8(UInt32 code_point);
 
 // Converts a wide string to a narrow string in UTF-8 encoding.
 // The wide string is assumed to have the following encoding:
-//   UTF-16 if sizeof(wchar_t) == 2 (on Windows, Cygwin, Symbian OS)
-//   UTF-32 if sizeof(wchar_t) == 4 (on Linux)
+//   UTF-16 if sizeof(wchar_t) == 2 (on windows, Cygwin, Symbian OS)
+//   UTF-32 if sizeof(wchar_t) == 4 (on linux)
 // Parameter str points to a null-terminated wide string.
 // Parameter num_chars may additionally limit the number
 // of wchar_t characters processed. -1 is used when the entire string
@@ -1740,7 +1740,7 @@ GTEST_DEFINE_string_(
     internal::StringFromGTestEnv("stream_result_to", ""),
     "This flag specifies the host name and the port number on which to stream "
     "test results. Example: \"localhost:555\". The flag is effective only on "
-    "Linux.");
+    "linux.");
 
 GTEST_DEFINE_bool_(
     throw_on_failure,
@@ -1881,7 +1881,7 @@ std::string UnitTestOptions::GetAbsolutePathToOutputFile() {
 
   internal::FilePath output_name(colon + 1);
   if (!output_name.IsAbsolutePath())
-    // TODO(wan@google.com): on Windows \some\path is not an absolute
+    // TODO(wan@google.com): on windows \some\path is not an absolute
     // path (as its meaning depends on the current drive), yet the
     // following logic for turning it into an absolute path is wrong.
     // Fix it.
@@ -2286,7 +2286,7 @@ TimeInMillis GetTimeInMillis() {
 #endif
 }
 
-// Utilities
+// utilities
 
 // class String.
 
@@ -3088,7 +3088,7 @@ AssertionResult HRESULTFailureHelper(const char* expr,
                                      long hr) {  // NOLINT
 # if GTEST_OS_WINDOWS_MOBILE
 
-  // Windows CE doesn't support FormatMessage.
+  // windows CE doesn't support FormatMessage.
   const char error_text[] = "";
 
 # else
@@ -3209,7 +3209,7 @@ std::string CodePointToUtf8(UInt32 code_point) {
 
 // The following two functions only make sense if the system
 // uses UTF-16 for wide string encoding. All supported systems
-// with 16 bit wchar_t (Windows, Cygwin, Symbian OS) do use UTF-16.
+// with 16 bit wchar_t (windows, Cygwin, Symbian OS) do use UTF-16.
 
 // Determines if the arguments constitute UTF-16 surrogate pair
 // and thus should be combined into a single Unicode code point
@@ -3232,8 +3232,8 @@ inline UInt32 CreateCodePointFromUtf16SurrogatePair(wchar_t first,
 
 // Converts a wide string to a narrow string in UTF-8 encoding.
 // The wide string is assumed to have the following encoding:
-//   UTF-16 if sizeof(wchar_t) == 2 (on Windows, Cygwin, Symbian OS)
-//   UTF-32 if sizeof(wchar_t) == 4 (on Linux)
+//   UTF-16 if sizeof(wchar_t) == 2 (on windows, Cygwin, Symbian OS)
+//   UTF-32 if sizeof(wchar_t) == 4 (on linux)
 // Parameter str points to a null-terminated wide string.
 // Parameter num_chars may additionally limit the number
 // of wchar_t characters processed. -1 is used when the entire string
@@ -4283,7 +4283,7 @@ static void PrintTestPartResult(const TestPartResult& test_part_result) {
   // window such that the user can double-click on it to jump to the
   // corresponding source code location; otherwise they do nothing.
 #if GTEST_OS_WINDOWS && !GTEST_OS_WINDOWS_MOBILE
-  // We don't call OutputDebugString*() on Windows Mobile, as printing
+  // We don't call OutputDebugString*() on windows Mobile, as printing
   // to stdout is done by OutputDebugString() there already - we don't
   // want the same message printed twice.
   ::OutputDebugStringA(result.c_str());
@@ -4334,11 +4334,11 @@ bool ShouldUseColor(bool stdout_is_tty) {
 
   if (String::CaseInsensitiveCStringEquals(gtest_color, "auto")) {
 #if GTEST_OS_WINDOWS
-    // On Windows the TERM variable is usually not set, but the
+    // On windows the TERM variable is usually not set, but the
     // console there does support colors.
     return stdout_is_tty;
 #else
-    // On non-Windows platforms, we rely on the TERM variable.
+    // On non-windows platforms, we rely on the TERM variable.
     const char* const term = posix::GetEnv("TERM");
     const bool term_supports_color =
         String::CStringEquals(term, "xterm") ||
@@ -4361,10 +4361,10 @@ bool ShouldUseColor(bool stdout_is_tty) {
   // be conservative.
 }
 
-// Helpers for printing colored strings to stdout. Note that on Windows, we
+// Helpers for printing colored strings to stdout. Note that on windows, we
 // cannot simply emit special characters and have the terminal change colors.
 // This routine must actually emit the characters rather than return a string
-// that would be colored when printed, as can be done on Linux.
+// that would be colored when printed, as can be done on linux.
 void ColoredPrintf(GTestColor color, const char* fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -4857,10 +4857,10 @@ void XmlUnitTestResultPrinter::OnTestIterationEnd(const UnitTest& unit_test,
     //
     //   1. There is no urgent need for it.
     //   2. It's a bit involved to make the errno variable thread-safe on
-    //      all three operating systems (Linux, Windows, and Mac OS).
+    //      all three operating systems (linux, windows, and Mac OS).
     //   3. To interpret the meaning of errno in a thread-safe way,
     //      we need the strerror_r() function, which is not available on
-    //      Windows.
+    //      windows.
     fprintf(stderr,
             "Unable to open file \"%s\"\n",
             output_file_.c_str());
@@ -4970,7 +4970,7 @@ static bool PortableLocaltime(time_t seconds, struct tm* out) {
   return localtime_s(out, &seconds) == 0;
 #elif defined(__MINGW32__) || defined(__MINGW64__)
   // MINGW <time.h> provides neither localtime_r nor localtime_s, but uses
-  // Windows' localtime(), which has a thread-local tm buffer.
+  // windows' localtime(), which has a thread-local tm buffer.
   struct tm* tm_ptr = localtime(&seconds);  // NOLINT
   if (tm_ptr == NULL)
     return false;
@@ -5567,7 +5567,7 @@ void UnitTest::AddTestPartResult(
     // command line for debugging.
     if (GTEST_FLAG(break_on_failure)) {
 #if GTEST_OS_WINDOWS && !GTEST_OS_WINDOWS_PHONE && !GTEST_OS_WINDOWS_RT
-      // Using DebugBreak on Windows allows gtest to still break into a debugger
+      // Using DebugBreak on windows allows gtest to still break into a debugger
       // when a failure happens and both the --gtest_break_on_failure and
       // the --gtest_catch_exceptions flags are specified.
       DebugBreak();
@@ -5651,7 +5651,7 @@ int UnitTest::Run() {
 # endif  // !GTEST_OS_WINDOWS_MOBILE
 
 # if (defined(_MSC_VER) || GTEST_OS_WINDOWS_MINGW) && !GTEST_OS_WINDOWS_MOBILE
-    // Death test children can be terminated with _abort().  On Windows,
+    // Death test children can be terminated with _abort().  On windows,
     // _abort() can show a dialog with a warning message.  This forces the
     // abort message to go to stderr instead.
     _set_error_mode(_OUT_TO_STDERR);
@@ -6615,7 +6615,7 @@ static const char kColorEncodedHelpMessage[] =
 "      Turn assertion failures into C++ exceptions.\n"
 "  @G--" GTEST_FLAG_PREFIX_ "catch_exceptions=0@D\n"
 "      Do not report exceptions as test failures. Instead, allow them\n"
-"      to crash the program or throw a pop-up (on Windows).\n"
+"      to crash the program or throw a pop-up (on windows).\n"
 "\n"
 "Except for @G--" GTEST_FLAG_PREFIX_ "list_tests@D, you can alternatively set "
     "the corresponding\n"
@@ -6753,7 +6753,7 @@ void InitGoogleTest(int* argc, char** argv) {
   internal::InitGoogleTestImpl(argc, argv);
 }
 
-// This overloaded version can be used in Windows programs compiled in
+// This overloaded version can be used in windows programs compiled in
 // UNICODE mode.
 void InitGoogleTest(int* argc, wchar_t** argv) {
   internal::InitGoogleTestImpl(argc, argv);
@@ -6887,7 +6887,7 @@ static bool g_in_fast_death_test_child = false;
 bool InDeathTestChild() {
 # if GTEST_OS_WINDOWS
 
-  // On Windows, death tests are thread-safe regardless of the value of the
+  // On windows, death tests are thread-safe regardless of the value of the
   // death_test_style flag.
   return !GTEST_FLAG(internal_run_death_test).empty();
 
@@ -6932,7 +6932,7 @@ bool KilledBySignal::operator()(int exit_status) const {
 
 namespace internal {
 
-// Utilities needed for death tests.
+// utilities needed for death tests.
 
 // Generates a textual description of a given exit code, in the format
 // specified by wait(2).
@@ -7064,7 +7064,7 @@ std::string GetLastErrnoDescription() {
 
 // This is called from a death test parent process to read a failure
 // message from the death test child process and log it with the FATAL
-// severity. On Windows, the message is read from a pipe handle. On other
+// severity. On windows, the message is read from a pipe handle. On other
 // platforms, it is read from a file descriptor.
 static void FailFromInternalError(int fd) {
   Message error;
@@ -7234,7 +7234,7 @@ void DeathTestImpl::Abort(AbortReason reason) {
 
   GTEST_DEATH_TEST_CHECK_SYSCALL_(posix::Write(write_fd(), &status_ch, 1));
   // We are leaking the descriptor here because on some platforms (i.e.,
-  // when built as Windows DLL), destructors of global objects will still
+  // when built as windows DLL), destructors of global objects will still
   // run after calling _exit(). On such systems, write_fd_ will be
   // indirectly closed from the destructor of UnitTestImpl, causing double
   // close if it is also closed here. On debug configurations, double close
@@ -7270,7 +7270,7 @@ static ::std::string FormatDeathTestOutput(const ::std::string& output) {
 //             concluded: DIED, LIVED, THREW, or RETURNED.  The death test
 //             fails in the latter three cases.
 //   status:   The exit status of the child process. On *nix, it is in the
-//             in the format specified by wait(2). On Windows, this is the
+//             in the format specified by wait(2). On windows, this is the
 //             value supplied to the ExitProcess() API or a numeric code
 //             of the exception that terminated the program.
 //   regex:    A regular expression object to be applied to
@@ -7334,22 +7334,22 @@ bool DeathTestImpl::Passed(bool status_ok) {
 }
 
 # if GTEST_OS_WINDOWS
-// WindowsDeathTest implements death tests on Windows. Due to the
-// specifics of starting new processes on Windows, death tests there are
+// WindowsDeathTest implements death tests on windows. Due to the
+// specifics of starting new processes on windows, death tests there are
 // always threadsafe, and Google Test considers the
 // --gtest_death_test_style=fast setting to be equivalent to
 // --gtest_death_test_style=threadsafe there.
 //
-// A few implementation notes:  Like the Linux version, the Windows
+// A few implementation notes:  Like the linux version, the windows
 // implementation uses pipes for child-to-parent communication. But due to
-// the specifics of pipes on Windows, some extra steps are required:
+// the specifics of pipes on windows, some extra steps are required:
 //
 // 1. The parent creates a communication pipe and stores handles to both
 //    ends of it.
 // 2. The parent starts the child and provides it with the information
 //    necessary to acquire the handle to the write end of the pipe.
 // 3. The child acquires the write end of the pipe and signals the parent
-//    using a Windows event.
+//    using a windows event.
 // 4. Now the parent can release the write end of the pipe on its side. If
 //    this is done before step 3, the object's reference count goes down to
 //    0 and it is destroyed, preventing the child from acquiring it. The
@@ -7433,7 +7433,7 @@ int WindowsDeathTest::Wait() {
   return status();
 }
 
-// The AssumeRole process for a Windows death test.  It creates a child
+// The AssumeRole process for a windows death test.  It creates a child
 // process with the same executable as the current process to run the
 // death test.  The child process is given the --gtest_filter and
 // --gtest_internal_run_death_test flags such that it knows to run the
@@ -7479,7 +7479,7 @@ DeathTest::TestRole WindowsDeathTest::AssumeRole() {
       StreamableToString(death_test_index) + "|" +
       StreamableToString(static_cast<unsigned int>(::GetCurrentProcessId())) +
       // size_t has the same width as pointers on both 32-bit and 64-bit
-      // Windows platforms.
+      // windows platforms.
       // See http://msdn.microsoft.com/en-us/library/tcxf1dw6.aspx.
       "|" + StreamableToString(reinterpret_cast<size_t>(write_handle)) +
       "|" + StreamableToString(reinterpret_cast<size_t>(event_handle_.Get()));
@@ -7525,7 +7525,7 @@ DeathTest::TestRole WindowsDeathTest::AssumeRole() {
   set_spawned(true);
   return OVERSEE_TEST;
 }
-# else  // We are not on Windows.
+# else  // We are not on windows.
 
 // ForkingDeathTest provides implementations for most of the abstract
 // methods of the DeathTest interface.  Only the AssumeRole method is
@@ -8145,7 +8145,7 @@ InternalRunDeathTestFlag* ParseInternalRunDeathTestFlag() {
 # include <sys/syslimits.h>
 #else
 # include <limits.h>
-# include <climits>  // Some Linux distributions define PATH_MAX here.
+# include <climits>  // Some linux distributions define PATH_MAX here.
 #endif  // GTEST_OS_WINDOWS_MOBILE
 
 #if GTEST_OS_WINDOWS
@@ -8163,19 +8163,19 @@ namespace testing {
 namespace internal {
 
 #if GTEST_OS_WINDOWS
-// On Windows, '\\' is the standard path separator, but many tools and the
-// Windows API also accept '/' as an alternate path separator. Unless otherwise
+// On windows, '\\' is the standard path separator, but many tools and the
+// windows API also accept '/' as an alternate path separator. Unless otherwise
 // noted, a file path can contain either kind of path separators, or a mixture
 // of them.
 const char kPathSeparator = '\\';
 const char kAlternatePathSeparator = '/';
 const char kAlternatePathSeparatorString[] = "/";
 # if GTEST_OS_WINDOWS_MOBILE
-// Windows CE doesn't have a current directory. You should not use
-// the current directory in tests on Windows CE, but this at least
+// windows CE doesn't have a current directory. You should not use
+// the current directory in tests on windows CE, but this at least
 // provides a reasonable fallback.
 const char kCurrentDirectoryString[] = "\\";
-// Windows CE doesn't define INVALID_FILE_ATTRIBUTES
+// windows CE doesn't define INVALID_FILE_ATTRIBUTES
 const DWORD kInvalidFileAttributes = 0xffffffff;
 # else
 const char kCurrentDirectoryString[] = ".\\";
@@ -8197,7 +8197,7 @@ static bool IsPathSeparator(char c) {
 // Returns the current working directory, or "" if unsuccessful.
 FilePath FilePath::GetCurrentDir() {
 #if GTEST_OS_WINDOWS_MOBILE || GTEST_OS_WINDOWS_PHONE || GTEST_OS_WINDOWS_RT
-  // Windows CE doesn't have a current directory, so we just return
+  // windows CE doesn't have a current directory, so we just return
   // something reasonable.
   return FilePath(kCurrentDirectoryString);
 #elif GTEST_OS_WINDOWS
@@ -8230,7 +8230,7 @@ FilePath FilePath::RemoveExtension(const char* extension) const {
 }
 
 // Returns a pointer to the last occurrence of a valid path separator in
-// the FilePath. On Windows, for example, both '/' and '\' are valid path
+// the FilePath. On windows, for example, both '/' and '\' are valid path
 // separators. Returns NULL if no path separator was found.
 const char* FilePath::FindLastPathSeparator() const {
   const char* const last_sep = strrchr(c_str(), kPathSeparator);
@@ -8250,7 +8250,7 @@ const char* FilePath::FindLastPathSeparator() const {
 // FilePath("file"). If there is no directory part ("just_a_file"), it returns
 // the FilePath unmodified. If there is no file part ("just_a_dir/") it
 // returns an empty FilePath ("").
-// On Windows platform, '\' is the path separator, otherwise it is '/'.
+// On windows platform, '\' is the path separator, otherwise it is '/'.
 FilePath FilePath::RemoveDirectoryName() const {
   const char* const last_sep = FindLastPathSeparator();
   return last_sep ? FilePath(last_sep + 1) : *this;
@@ -8259,9 +8259,9 @@ FilePath FilePath::RemoveDirectoryName() const {
 // RemoveFileName returns the directory path with the filename removed.
 // Example: FilePath("path/to/file").RemoveFileName() returns "path/to/".
 // If the FilePath is "a_file" or "/a_file", RemoveFileName returns
-// FilePath("./") or, on Windows, FilePath(".\\"). If the filepath does
+// FilePath("./") or, on windows, FilePath(".\\"). If the filepath does
 // not have a file, like "just/a/dir/", it returns the FilePath unmodified.
-// On Windows platform, '\' is the path separator, otherwise it is '/'.
+// On windows platform, '\' is the path separator, otherwise it is '/'.
 FilePath FilePath::RemoveFileName() const {
   const char* const last_sep = FindLastPathSeparator();
   std::string dir;
@@ -8278,7 +8278,7 @@ FilePath FilePath::RemoveFileName() const {
 // Given directory = "dir", base_name = "test", number = 0,
 // extension = "xml", returns "dir/test.xml". If number is greater
 // than zero (e.g., 12), returns "dir/test_12.xml".
-// On Windows platform, uses \ as the separator rather than /.
+// On windows platform, uses \ as the separator rather than /.
 FilePath FilePath::MakeFileName(const FilePath& directory,
                                 const FilePath& base_name,
                                 int number,
@@ -8294,7 +8294,7 @@ FilePath FilePath::MakeFileName(const FilePath& directory,
 }
 
 // Given directory = "dir", relative_path = "test.xml", returns "dir/test.xml".
-// On Windows, uses \ as the separator rather than /.
+// On windows, uses \ as the separator rather than /.
 FilePath FilePath::ConcatPaths(const FilePath& directory,
                                const FilePath& relative_path) {
   if (directory.IsEmpty())
@@ -8323,7 +8323,7 @@ bool FilePath::DirectoryExists() const {
   bool result = false;
 #if GTEST_OS_WINDOWS
   // Don't strip off trailing separator if path is a root directory on
-  // Windows (like "C:\\").
+  // windows (like "C:\\").
   const FilePath& path(IsRootDirectory() ? *this :
                                            RemoveTrailingPathSeparator());
 #else
@@ -8347,11 +8347,11 @@ bool FilePath::DirectoryExists() const {
   return result;
 }
 
-// Returns true if pathname describes a root directory. (Windows has one
+// Returns true if pathname describes a root directory. (windows has one
 // root directory per disk drive.)
 bool FilePath::IsRootDirectory() const {
 #if GTEST_OS_WINDOWS
-  // TODO(wan@google.com): on Windows a network share like
+  // TODO(wan@google.com): on windows a network share like
   // \\server\share can be a root directory, although it cannot be the
   // current directory.  Handle this properly.
   return pathname_.length() == 3 && IsAbsolutePath();
@@ -8420,7 +8420,7 @@ bool FilePath::CreateDirectoriesRecursively() const {
 // Create the directory so that path exists. Returns true if successful or
 // if the directory already exists; returns false if unable to create the
 // directory for any reason, including if the parent directory does not
-// exist. Not named "CreateDirectory" because that's a macro on Windows.
+// exist. Not named "CreateDirectory" because that's a macro on windows.
 bool FilePath::CreateFolder() const {
 #if GTEST_OS_WINDOWS_MOBILE
   FilePath removed_sep(this->RemoveTrailingPathSeparator());
@@ -8441,7 +8441,7 @@ bool FilePath::CreateFolder() const {
 
 // If input name has a trailing separator character, remove it and return the
 // name, otherwise return the name string unmodified.
-// On Windows platform, uses \ as the separator, other platforms use /.
+// On windows platform, uses \ as the separator, other platforms use /.
 FilePath FilePath::RemoveTrailingPathSeparator() const {
   return IsDirectory()
       ? FilePath(pathname_.substr(0, pathname_.length() - 1))
@@ -8451,7 +8451,7 @@ FilePath FilePath::RemoveTrailingPathSeparator() const {
 // Removes any redundant separators that might be in the pathname.
 // For example, "bar///foo" becomes "bar/foo". Does not eliminate other
 // redundancies that might be in a pathname involving "." or "..".
-// TODO(wan@google.com): handle Windows network shares (e.g. \\server\share).
+// TODO(wan@google.com): handle windows network shares (e.g. \\server\share).
 void FilePath::Normalize() {
   if (pathname_.c_str() == NULL) {
     pathname_ = "";
@@ -8653,7 +8653,7 @@ void AutoHandle::Reset(HANDLE handle) {
 }
 
 bool AutoHandle::IsCloseable() const {
-  // Different Windows APIs may use either of these values to represent an
+  // Different windows APIs may use either of these values to represent an
   // invalid handle.
   return handle_ != NULL && handle_ != INVALID_HANDLE_VALUE;
 }
@@ -8796,7 +8796,7 @@ class ThreadWithParamSupport : public ThreadWithParamBase {
   };
 
   static DWORD WINAPI ThreadMain(void* ptr) {
-    // Transfers ownership.
+    // transfers ownership.
     scoped_ptr<ThreadMainParam> param(static_cast<ThreadMainParam*>(ptr));
     if (param->thread_can_start_ != NULL)
       param->thread_can_start_->WaitForNotification();
@@ -9188,7 +9188,7 @@ bool MatchRepetitionAndRegexAtHead(
   const size_t max_count = (repeat == '?') ? 1 :
       static_cast<size_t>(-1) - 1;
   // We cannot call numeric_limits::max() as it conflicts with the
-  // max() macro on Windows.
+  // max() macro on windows.
 
   for (size_t i = 0; i <= max_count; ++i) {
     // We know that the atom matches each of the first i characters in str.
@@ -9795,7 +9795,7 @@ enum CharFormat {
 
 // Returns true if c is a printable ASCII character.  We test the
 // value of c directly instead of calling isprint(), which is buggy on
-// Windows Mobile.
+// windows Mobile.
 inline bool IsPrintableAscii(wchar_t c) {
   return 0x20 <= c && c <= 0x7E;
 }

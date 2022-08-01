@@ -83,18 +83,18 @@ int soapPostSubmit(int fd,
 	int headerssize;
 	char portstr[8];
 	bodysize = (int)strlen(body);
-	/* We are not using keep-alive HTTP connections.
-	 * HTTP/1.1 needs the header Connection: close to do that.
-	 * This is the default with HTTP/1.0
-	 * Using HTTP/1.1 means we need to support chunked transfer-encoding :
-	 * When using HTTP/1.1, the router "BiPAC 7404VNOX" always use chunked
+	/* We are not using keep-alive http connections.
+	 * http/1.1 needs the header Connection: close to do that.
+	 * This is the default with http/1.0
+	 * Using http/1.1 means we need to support chunked transfer-encoding :
+	 * When using http/1.1, the router "BiPAC 7404VNOX" always use chunked
 	 * transfer encoding. */
-    /* Connection: Close is normally there only in HTTP/1.1 but who knows */
+    /* Connection: Close is normally there only in http/1.1 but who knows */
 	portstr[0] = '\0';
 	if(port != 80)
 		snprintf(portstr, sizeof(portstr), ":%hu", port);
 	headerssize = snprintf(headerbuf, sizeof(headerbuf),
-                       "POST %s HTTP/%s\r\n"
+                       "POST %s http/%s\r\n"
 	                   "Host: %s%s\r\n"
 					   "User-Agent: " OS_STRING ", UPnP/1.0, MiniUPnPc/" MINIUPNPC_VERSION_STRING "\r\n"
 	                   "Content-Length: %d\r\n"
@@ -109,7 +109,7 @@ int soapPostSubmit(int fd,
 	/*printf("SOAP request : headersize=%d bodysize=%d\n",
 	       headerssize, bodysize);
 	*/
-	printf("SOAP request : POST %s HTTP/%s - Host: %s%s\n",
+	printf("SOAP request : POST %s http/%s - Host: %s%s\n",
 	        url, httpversion, host, portstr);
 	printf("SOAPAction: \"%s\" - Content-Length: %d\n", action, bodysize);
 	printf("Headers :\n%s", headerbuf);

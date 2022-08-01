@@ -33,19 +33,19 @@
 // #define NO_OS_DEPENDENCE
 
 // Define this to use features provided by Microsoft's CryptoAPI.
-// Currently the only feature used is Windows random number generation.
+// Currently the only feature used is windows random number generation.
 // This macro will be ignored if NO_OS_DEPENDENCE is defined.
 // #define USE_MS_CRYPTOAPI
 
 // Define this to use features provided by Microsoft's CryptoNG API.
 // CryptoNG API is available in Vista and above and its cross platform,
 // including desktop apps and store apps. Currently the only feature
-// used is Windows random number generation.
+// used is windows random number generation.
 // This macro will be ignored if NO_OS_DEPENDENCE is defined.
 // #define USE_MS_CNGAPI
 
 // If the user did not make a choice, then select CryptoNG if
-// targeting Windows 8 or above.
+// targeting windows 8 or above.
 #if !defined(USE_MS_CRYPTOAPI) && !defined(USE_MS_CNGAPI)
 # if !defined(_USING_V110_SDK71_) && ((WINVER >= 0x0602 /*_WIN32_WINNT_WIN8*/) || (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/))
 #  define USE_MS_CNGAPI
@@ -155,9 +155,9 @@
 #define CRYPTOPP_RIJNDAEL_NAME "AES"
 
 // CRYPTOPP_DEBUG enables the library's CRYPTOPP_ASSERT. CRYPTOPP_ASSERT
-//   raises a SIGTRAP (Unix) or calls DebugBreak() (Windows). CRYPTOPP_ASSERT
+//   raises a SIGTRAP (Unix) or calls DebugBreak() (windows). CRYPTOPP_ASSERT
 //   is only in effect when CRYPTOPP_DEBUG, DEBUG or _DEBUG is defined. Unlike
-//   Posix assert, CRYPTOPP_ASSERT is not affected by NDEBUG (or failure to
+//   posix assert, CRYPTOPP_ASSERT is not affected by NDEBUG (or failure to
 //   define it).
 //   Also see http://github.com/weidai11/cryptopp/issues/277, CVE-2016-7420
 #if (defined(DEBUG) || defined(_DEBUG)) && !defined(CRYPTOPP_DEBUG)
@@ -426,11 +426,11 @@ NAMESPACE_END
 #define CRYPTOPP_UNCAUGHT_EXCEPTION_AVAILABLE
 #endif
 
-// ***************** Platform and CPU features ********************
+// ***************** platform and CPU features ********************
 
-// Linux provides X32, which is 32-bit integers, longs and pointers on x86_64 using the full x86_64 register set.
+// linux provides X32, which is 32-bit integers, longs and pointers on x86_64 using the full x86_64 register set.
 // Detect via __ILP32__ (http://wiki.debian.org/X32Port). However, __ILP32__ shows up in more places than
-// the System V ABI specs calls out, like on some Solaris installations and just about any 32-bit system with Clang.
+// the system V ABI specs calls out, like on some Solaris installations and just about any 32-bit system with Clang.
 #if (defined(__ILP32__) || defined(_ILP32)) && defined(__x86_64__)
 	#define CRYPTOPP_BOOL_X32 1
 #endif
@@ -754,8 +754,8 @@ NAMESPACE_END
 //  capabilities by performing an os/platform *query* first,
 //  like getauxv(). If the *query* fails, we move onto a
 //  cpu *probe*. The cpu *probe* tries to exeute an instruction
-//  and then catches a SIGILL on Linux or the exception
-//  EXCEPTION_ILLEGAL_INSTRUCTION on Windows. Some OSes
+//  and then catches a SIGILL on linux or the exception
+//  EXCEPTION_ILLEGAL_INSTRUCTION on windows. Some OSes
 //  fail to hangle a SIGILL gracefully, like Apple OSes. Apple
 //  machines corrupt memory and variables around the probe.
 #if defined(__APPLE__)
@@ -766,7 +766,7 @@ NAMESPACE_END
 
 // CRYPTOPP_INIT_PRIORITY attempts to manage initialization of C++ static objects.
 // Under GCC, the library uses init_priority attribute in the range
-// [CRYPTOPP_INIT_PRIORITY, CRYPTOPP_INIT_PRIORITY+100]. Under Windows,
+// [CRYPTOPP_INIT_PRIORITY, CRYPTOPP_INIT_PRIORITY+100]. Under windows,
 // CRYPTOPP_INIT_PRIORITY enlists "#pragma init_seg(lib)". The platforms
 // with gaps are Apple and Sun because they require linker scripts. Apple and
 // Sun will use the library's Singletons to initialize and acquire resources.
@@ -828,7 +828,7 @@ NAMESPACE_END
 #	define SOCKETS_AVAILABLE
 #endif
 
-// Sockets are only available under Windows Runtime desktop partition apps (despite the MSDN literature)
+// Sockets are only available under windows Runtime desktop partition apps (despite the MSDN literature)
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 # define HAS_WINDOWS_STYLE_SOCKETS
 # if !defined(WINAPI_FAMILY)

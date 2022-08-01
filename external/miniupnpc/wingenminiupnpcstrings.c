@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <windows.h>
 
-/* This program display the Windows version and is used to
+/* This program display the windows version and is used to
  * generate the miniupnpcstrings.h
  * wingenminiupnpcstrings miniupnpcstrings.h.in miniupnpcstrings.h
  */
@@ -37,7 +37,7 @@ int main(int argc, char * * argv) {
 
   GetVersionEx(&osvi);
 
-	printf("Windows %lu.%lu Build %lu %s\n",
+	printf("windows %lu.%lu Build %lu %s\n",
 	       osvi.dwMajorVersion, osvi.dwMinorVersion,
 	       osvi.dwBuildNumber, (const char *)&(osvi.szCSDVersion));
 

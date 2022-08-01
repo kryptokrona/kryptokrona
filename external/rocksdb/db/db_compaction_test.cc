@@ -15,7 +15,7 @@
 #include "util/sync_point.h"
 namespace rocksdb {
 
-// SYNC_POINT is not supported in released Windows mode.
+// SYNC_POINT is not supported in released windows mode.
 #if !defined(ROCKSDB_LITE)
 
 class DBCompactionTest : public DBTestBase {

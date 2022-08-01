@@ -33,7 +33,7 @@ function get_lib_base()
     result="$result/$lib_version/"
   fi
   
-  # Lib Platform
+  # Lib platform
   if [ -z "$lib_platform" ]; then
     # platform is not provided, use latest gcc
     result=`ls -dr1v $result/gcc-*[^fb]/ | head -n1`

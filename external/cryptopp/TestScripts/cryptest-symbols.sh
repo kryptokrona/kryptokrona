@@ -3,7 +3,7 @@
 # cryptest.sh - written and placed in public domain by Jeffrey Walton and Uri Blumenthal.
 #               Copyright assigned to Crypto++ project.
 
-# This is a test script that can be used on some Linux/Unix/Apple machines to automate testing
+# This is a test script that can be used on some linux/Unix/Apple machines to automate testing
 # of the shared object to ensure linking and symbols don't go missing from release to release.
 
 ############################################
@@ -75,7 +75,7 @@ if [[ "$IS_SOLARIS" -ne "0" ]]; then
 		IS_X86=0
 	fi
 
-	# Need something more powerful than the Posix versions
+	# Need something more powerful than the posix versions
 	if [[ (-e "/usr/gnu/bin/grep") ]]; then
 		GREP=/usr/gnu/bin/grep
 	fi

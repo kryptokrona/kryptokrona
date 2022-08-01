@@ -7,10 +7,10 @@
 # is usually invoked by "make check"
 #
 # This test program :
-#  1 - launches a local HTTP server (minihttptestserver)
+#  1 - launches a local http server (minihttptestserver)
 #  2 - uses testminiwget to retreive data from this server
 #  3 - compares served and received data
-#  4 - kills the local HTTP server and exits
+#  4 - kills the local http server and exits
 #
 # The script was tested and works with ksh, bash
 # it should now also run with dash
@@ -37,7 +37,7 @@ esac
 #make minihttptestserver
 #make testminiwget
 
-# launching the test HTTP server
+# launching the test http server
 ./minihttptestserver $SERVERARGS -e $EXPECTEDFILE > $HTTPSERVEROUT &
 SERVERPID=$!
 while [ -z "$PORT" ]; do
@@ -77,7 +77,7 @@ else
 	RET=1
 fi
 
-# kill the test HTTP server
+# kill the test http server
 kill $SERVERPID
 wait $SERVERPID
 

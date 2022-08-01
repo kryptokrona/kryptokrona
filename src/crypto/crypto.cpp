@@ -13,7 +13,7 @@
 #include <cstring>
 #include <memory>
 
-#include "Common/Varint.h"
+#include "common/varint.h"
 #include "crypto.h"
 #include "hash.h"
 #include "random.h"
@@ -21,7 +21,7 @@
 namespace Crypto {
 
   extern "C" {
-#include "crypto-ops.h"
+#include "crypto_ops.h"
   }
 
   static inline void random_scalar(EllipticCurveScalar &res) {

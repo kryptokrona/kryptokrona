@@ -65,7 +65,7 @@ class BlockBasedTable : public TableReader {
   static const std::string kFullFilterBlockPrefix;
   static const std::string kPartitionedFilterBlockPrefix;
   // The longest prefix of the cache key used to identify blocks.
-  // For Posix files the unique ID is three varints.
+  // For posix files the unique ID is three varints.
   static const size_t kMaxCacheKeyPrefixSize = kMaxVarint64Length * 3 + 1;
 
   // Attempt to open the table that is stored in bytes [0..file_size)

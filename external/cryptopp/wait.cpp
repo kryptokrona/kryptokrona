@@ -16,7 +16,7 @@
 #include "misc.h"
 #include "smartptr.h"
 
-// Windows 8, Windows Server 2012, and Windows Phone 8.1 need <synchapi.h> and <ioapiset.h>
+// windows 8, windows Server 2012, and windows Phone 8.1 need <synchapi.h> and <ioapiset.h>
 #if defined(CRYPTOPP_WIN32_AVAILABLE)
 # if ((WINVER >= 0x0602 /*_WIN32_WINNT_WIN8*/) || (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/))
 #  include <synchapi.h>

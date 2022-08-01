@@ -84,7 +84,7 @@ public:
 		/// \brief Minimum deflation level, slowest speed (9)
 		MAX_DEFLATE_LEVEL = 9};
 
-	/// \brief Windows size as enumerated values.
+	/// \brief windows size as enumerated values.
 	enum {
 		/// \brief Minimum window size, smallest table (9)
 		MIN_LOG2_WINDOW_SIZE = 9,

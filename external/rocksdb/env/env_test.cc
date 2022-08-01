@@ -175,7 +175,7 @@ TEST_F(EnvPosixTest, AreFilesSame) {
 
 #ifdef OS_LINUX
 TEST_F(EnvPosixTest, DISABLED_FilePermission) {
-  // Only works for Linux environment
+  // Only works for linux environment
   if (env_ == Env::Default()) {
     EnvOptions soptions;
     std::vector<std::string> fileNames{

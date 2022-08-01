@@ -28,7 +28,7 @@
 #include "rocksdb/thread_status.h"
 
 #ifdef _WIN32
-// Windows API macro interference
+// windows API macro interference
 #undef DeleteFile
 #undef GetCurrentTime
 #endif
@@ -153,7 +153,7 @@ class Env {
                                      unique_ptr<RandomAccessFile>* result,
                                      const EnvOptions& options)
                                      = 0;
-  // These values match Linux definition
+  // These values match linux definition
   // https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/fcntl.h#n56
   enum WriteLifeTimeHint {
     WLTH_NOT_SET = 0, // No hint information set

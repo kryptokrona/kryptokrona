@@ -36,7 +36,7 @@
 xxHash is an extremely fast Hash algorithm, running at RAM speed limits.
 It also successfully passes all tests from the SMHasher suite.
 
-Comparison (single thread, Windows Seven 32 bits, using SMHasher on a Core 2 Duo @3GHz)
+Comparison (single thread, windows Seven 32 bits, using SMHasher on a Core 2 Duo @3GHz)
 
 Name            Speed       Q.Score   Author
 xxHash          5.4 GB/s     10

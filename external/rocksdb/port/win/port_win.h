@@ -63,7 +63,7 @@ typedef SSIZE_T ssize_t;
 #ifdef _MSC_VER
 #define __attribute__(A)
 
-// Thread local storage on Linux
+// Thread local storage on linux
 // There is thread_local in C++11
 #ifndef __thread
 #define __thread __declspec(thread)
@@ -222,7 +222,7 @@ class CondVar {
 using Thread = WindowsThread;
 
 // OnceInit type helps emulate
-// Posix semantics with initialization
+// posix semantics with initialization
 // adopted in the project
 struct OnceType {
 

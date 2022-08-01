@@ -346,7 +346,7 @@ upnpDiscover(int delay, const char * multicastif,
 	unsigned int scope_id = 0;
 	int opt = 1;
 	static const char MSearchMsgFmt[] =
-	"M-SEARCH * HTTP/1.1\r\n"
+	"M-SEARCH * http/1.1\r\n"
 	"HOST: %s:" XSTR(PORT) "\r\n"
 	"ST: %s\r\n"
 	"MAN: \"ssdp:discover\"\r\n"
@@ -504,7 +504,7 @@ upnpDiscover(int delay, const char * multicastif,
 		if(ipv6) {
 #if !defined(_WIN32)
 			/* according to MSDN, if_nametoindex() is supported since
-			 * MS Windows Vista and MS Windows Server 2008.
+			 * MS windows Vista and MS windows Server 2008.
 			 * http://msdn.microsoft.com/en-us/library/bb408409%28v=vs.85%29.aspx */
 			unsigned int ifindex = if_nametoindex(multicastif); /* eth0, etc. */
 			if(setsockopt(sudp, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifindex, sizeof(&ifindex)) < 0)
@@ -513,7 +513,7 @@ upnpDiscover(int delay, const char * multicastif,
 			}
 #else
 #ifdef DEBUG
-			printf("Setting of multicast interface not supported in IPv6 under Windows.\n");
+			printf("Setting of multicast interface not supported in IPv6 under windows.\n");
 #endif
 #endif
 		} else {
