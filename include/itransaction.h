@@ -32,14 +32,14 @@ namespace cryptonote
         enum class OutputType : uint8_t { Invalid, Key };
 
         struct GlobalOutput {
-            Crypto::PublicKey targetKey;
+            crypto::PublicKey targetKey;
             uint32_t outputIndex;
         };
 
         typedef std::vector<GlobalOutput> GlobalOutputsContainer;
 
         struct OutputKeyInfo {
-            Crypto::PublicKey transactionPublicKey;
+            crypto::PublicKey transactionPublicKey;
             size_t transactionIndex;
             size_t outputInTransaction;
         };
@@ -58,13 +58,13 @@ namespace cryptonote
     public:
       virtual ~ITransactionReader() { }
 
-      virtual Crypto::Hash getTransactionHash() const = 0;
-      virtual Crypto::Hash getTransactionPrefixHash() const = 0;
-      virtual Crypto::PublicKey getTransactionPublicKey() const = 0;
+      virtual crypto::Hash getTransactionHash() const = 0;
+      virtual crypto::Hash getTransactionPrefixHash() const = 0;
+      virtual crypto::PublicKey getTransactionPublicKey() const = 0;
       virtual uint64_t getUnlockTime() const = 0;
 
       // extra
-      virtual bool getPaymentId(Crypto::Hash& paymentId) const = 0;
+      virtual bool getPaymentId(crypto::Hash& paymentId) const = 0;
       virtual bool getExtraNonce(BinaryArray& nonce) const = 0;
       virtual BinaryArray getExtra() const = 0;
 
@@ -82,7 +82,7 @@ namespace cryptonote
 
       // signatures
       virtual size_t getRequiredSignaturesCount(size_t inputIndex) const = 0;
-      virtual bool findOutputsToAccount(const AccountPublicAddress& addr, const Crypto::SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const = 0;
+      virtual bool findOutputsToAccount(const AccountPublicAddress& addr, const crypto::SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const = 0;
 
       // serialized transaction
       virtual BinaryArray getTransactionData() const = 0;
