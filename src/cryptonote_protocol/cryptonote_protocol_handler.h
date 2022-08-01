@@ -36,7 +36,7 @@ namespace cryptonote
   {
   public:
 
-    CryptoNoteProtocolHandler(const Currency& currency, System::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<Logging::ILogger> log);
+    CryptoNoteProtocolHandler(const Currency& currency, system::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<logging::ILogger> log);
 
     virtual bool addObserver(ICryptoNoteProtocolObserver* observer) override;
     virtual bool removeObserver(ICryptoNoteProtocolObserver* observer) override;
@@ -83,14 +83,14 @@ namespace cryptonote
     void updateObservedHeight(uint32_t peerHeight, const CryptoNoteConnectionContext& context);
     void recalculateMaxObservedHeight(const CryptoNoteConnectionContext& context);
     int processObjects(CryptoNoteConnectionContext& context, std::vector<RawBlock>&& rawBlocks, const std::vector<CachedBlock>& cachedBlocks);
-    Logging::LoggerRef logger;
+    logging::LoggerRef logger;
 
 private:
     int doPushLiteBlock(NOTIFY_NEW_LITE_BLOCK::request block, CryptoNoteConnectionContext& context, std::vector<BinaryArray> missingTxs);
 
   private:
 
-    System::Dispatcher& m_dispatcher;
+    system::Dispatcher& m_dispatcher;
     ICore& m_core;
     const Currency& m_currency;
 
@@ -106,6 +106,6 @@ private:
     uint32_t m_blockchainHeight;
 
     std::atomic<size_t> m_peersCount;
-    Tools::ObserverManager<ICryptoNoteProtocolObserver> m_observerManager;
+    tools::ObserverManager<ICryptoNoteProtocolObserver> m_observerManager;
   };
 }
