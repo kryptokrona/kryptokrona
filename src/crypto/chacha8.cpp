@@ -37,7 +37,7 @@ Public domain.
 
 static const char sigma[] = "expand 32-byte k";
 
-namespace Crypto
+namespace crypto
 {
 
 void chacha8(const void* data, size_t length, const uint8_t* key, const uint8_t* iv, char* cipher) {

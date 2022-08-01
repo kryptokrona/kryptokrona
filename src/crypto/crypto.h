@@ -17,7 +17,7 @@
 
 #include "hash.h"
 
-namespace Crypto {
+namespace crypto {
 
 struct EllipticCurvePoint {
   uint8_t data[32];

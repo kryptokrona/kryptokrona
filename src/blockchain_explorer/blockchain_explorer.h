@@ -41,7 +41,7 @@ enum State {
 
 class BlockchainExplorer : public IBlockchainExplorer, public INodeObserver {
 public:
-  BlockchainExplorer(INode& node, std::shared_ptr<Logging::ILogger> logger);
+  BlockchainExplorer(INode& node, std::shared_ptr<logging::ILogger> logger);
 
   BlockchainExplorer(const BlockchainExplorer&) = delete;
   BlockchainExplorer(BlockchainExplorer&&) = delete;
@@ -55,14 +55,14 @@ public:
   virtual bool removeObserver(IBlockchainObserver* observer) override;
 
   virtual bool getBlocks(const std::vector<uint32_t>& blockHeights, std::vector<std::vector<BlockDetails>>& blocks) override;
-  virtual bool getBlocks(const std::vector<Crypto::Hash>& blockHashes, std::vector<BlockDetails>& blocks) override;
+  virtual bool getBlocks(const std::vector<crypto::Hash>& blockHashes, std::vector<BlockDetails>& blocks) override;
   virtual bool getBlocks(uint64_t timestampBegin, uint64_t timestampEnd, uint32_t blocksNumberLimit, std::vector<BlockDetails>& blocks, uint32_t& blocksNumberWithinTimestamps) override;
 
   virtual bool getBlockchainTop(BlockDetails& topBlock) override;
 
-  virtual bool getTransactions(const std::vector<Crypto::Hash>& transactionHashes, std::vector<TransactionDetails>& transactions) override;
-  virtual bool getTransactionsByPaymentId(const Crypto::Hash& paymentId, std::vector<TransactionDetails>& transactions) override;
-  virtual bool getPoolState(const std::vector<Crypto::Hash>& knownPoolTransactionHashes, Crypto::Hash knownBlockchainTop, bool& isBlockchainActual, std::vector<TransactionDetails>& newTransactions, std::vector<Crypto::Hash>& removedTransactions) override;
+  virtual bool getTransactions(const std::vector<crypto::Hash>& transactionHashes, std::vector<TransactionDetails>& transactions) override;
+  virtual bool getTransactionsByPaymentId(const crypto::Hash& paymentId, std::vector<TransactionDetails>& transactions) override;
+  virtual bool getPoolState(const std::vector<crypto::Hash>& knownPoolTransactionHashes, crypto::Hash knownBlockchainTop, bool& isBlockchainActual, std::vector<TransactionDetails>& newTransactions, std::vector<crypto::Hash>& removedTransactions) override;
 
   virtual bool isSynchronized() override;
 
@@ -102,17 +102,17 @@ private:
   void handleBlockchainUpdatedNotification(const std::vector<std::vector<BlockDetails>>& blocks);
 
   BlockDetails knownBlockchainTop;
-  std::unordered_map<Crypto::Hash, TransactionDetails> knownPoolState;
+  std::unordered_map<crypto::Hash, TransactionDetails> knownPoolState;
 
   std::atomic<State> state;
   std::atomic<bool> synchronized;
   std::atomic<uint32_t> observersCounter;
-  Tools::ObserverManager<IBlockchainObserver> observerManager;
+  tools::ObserverManager<IBlockchainObserver> observerManager;
 
   std::mutex mutex;
 
   INode& node;
-  Logging::LoggerRef logger;
+  logging::LoggerRef logger;
 
   AsyncContextCounter asyncContextCounter;
   PoolUpdateGuard poolUpdateGuard;
