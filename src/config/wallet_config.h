@@ -40,7 +40,7 @@ namespace wallet_config
 
 
     /* The number of decimals your coin has */
-    const uint8_t numDecimalPlaces = CryptoNote::parameters
+    const uint8_t numDecimalPlaces = cryptonote::parameters
                                                ::CRYPTONOTE_DISPLAY_DECIMAL_POINT;
 
 
