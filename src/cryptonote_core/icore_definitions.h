@@ -25,16 +25,16 @@
 namespace cryptonote
 {
     struct BlockFullInfo : public RawBlock {
-      Crypto::Hash block_id;
+      crypto::Hash block_id;
     };
 
     struct TransactionPrefixInfo {
-      Crypto::Hash txHash;
+      crypto::Hash txHash;
       TransactionPrefix txPrefix;
     };
 
     struct BlockShortInfo {
-      Crypto::Hash blockId;
+      crypto::Hash blockId;
       BinaryArray block;
       std::vector<TransactionPrefixInfo> txPrefixes;
     };

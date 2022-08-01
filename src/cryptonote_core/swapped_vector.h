@@ -292,8 +292,8 @@ template<class T> const T& SwappedVector<T>::operator[](uint64_t index) {
   m_itemsFile.seekg(m_offsets[index]);
   T tempItem;
   
-  Common::StdInputStream stream(m_itemsFile);
-  CryptoNote::BinaryInputStreamSerializer archive(stream);
+  common::StdInputStream stream(m_itemsFile);
+  cryptonote::BinaryInputStreamSerializer archive(stream);
   serialize(tempItem, archive);
 
   T* item = prepare(index);
@@ -359,8 +359,8 @@ template<class T> void SwappedVector<T>::push_back(const T& item) {
 
     m_itemsFile.seekp(m_itemsFileSize);
 
-    Common::StdOutputStream stream(m_itemsFile);
-    CryptoNote::BinaryOutputStreamSerializer archive(stream);
+    common::StdOutputStream stream(m_itemsFile);
+    cryptonote::BinaryOutputStreamSerializer archive(stream);
     serialize(const_cast<T&>(item), archive);
 
     itemsFileSize = m_itemsFile.tellp();

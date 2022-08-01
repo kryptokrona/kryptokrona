@@ -33,4 +33,4 @@ namespace cryptonote
   bool parseAccountAddressString(uint64_t& prefix, AccountPublicAddress& adr, const std::string& str);
 }
 
-bool parse_hash256(const std::string& str_hash, Crypto::Hash& hash);
+bool parse_hash256(const std::string& str_hash, crypto::Hash& hash);

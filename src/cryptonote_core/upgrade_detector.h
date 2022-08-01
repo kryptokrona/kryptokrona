@@ -37,7 +37,7 @@ namespace cryptonote
     };
   };
 
-  static_assert(CryptoNote::UpgradeDetectorBase::UNDEF_HEIGHT == UINT32_C(0xFFFFFFFF), "UpgradeDetectorBase::UNDEF_HEIGHT has invalid value");
+  static_assert(cryptonote::UpgradeDetectorBase::UNDEF_HEIGHT == UINT32_C(0xFFFFFFFF), "UpgradeDetectorBase::UNDEF_HEIGHT has invalid value");
 
   template <typename BC>
   class BasicUpgradeDetector : public UpgradeDetectorBase {
@@ -138,10 +138,10 @@ namespace cryptonote
             struct tm* upgradeTime = localtime(&upgradeTimestamp);;
             char upgradeTimeStr[40];
             strftime(upgradeTimeStr, 40, "%H:%M:%S %Y.%m.%d", upgradeTime);
-            CryptoNote::CachedBlock cachedBlock(m_blockchain.back().bl);
+            cryptonote::CachedBlock cachedBlock(m_blockchain.back().bl);
 
             logger(Logging::TRACE, Logging::BRIGHT_GREEN) << "###### UPGRADE is going to happen after block index " << upgradeHeight() << " at about " <<
-              upgradeTimeStr << " (in " << Common::timeIntervalToString(interval) << ")! Current last block index " << (m_blockchain.size() - 1) <<
+              upgradeTimeStr << " (in " << common::timeIntervalToString(interval) << ")! Current last block index " << (m_blockchain.size() - 1) <<
               ", hash " << cachedBlock.getBlockHash();
           }
         } else if (m_blockchain.size() == upgradeHeight() + 1) {

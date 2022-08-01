@@ -45,19 +45,19 @@ namespace cryptonote
         (lhs_hi == rhs_hi && lhs_lo == rhs_lo && left.getTransactionBinaryArray().size() == right.getTransactionBinaryArray().size() && lhs.receiveTime < rhs.receiveTime);
     }
 
-    const Crypto::Hash& TransactionPool::PendingTransactionInfo::getTransactionHash() const {
+    const crypto::Hash& TransactionPool::PendingTransactionInfo::getTransactionHash() const {
       return cachedTransaction.getTransactionHash();
     }
 
-    size_t TransactionPool::PaymentIdHasher::operator() (const boost::optional<Crypto::Hash>& paymentId) const {
+    size_t TransactionPool::PaymentIdHasher::operator() (const boost::optional<crypto::Hash>& paymentId) const {
       if (!paymentId) {
         return std::numeric_limits<size_t>::max();
       }
 
-      return std::hash<Crypto::Hash>{}(*paymentId);
+      return std::hash<crypto::Hash>{}(*paymentId);
     }
 
-    TransactionPool::TransactionPool(std::shared_ptr<Logging::ILogger> logger) :
+    TransactionPool::TransactionPool(std::shared_ptr<logging::ILogger> logger) :
       transactionHashIndex(transactions.get<TransactionHashTag>()),
       transactionCostIndex(transactions.get<TransactionCostTag>()),
       paymentIdIndex(transactions.get<PaymentIdTag>()),
@@ -67,45 +67,45 @@ namespace cryptonote
     bool TransactionPool::pushTransaction(CachedTransaction&& transaction, TransactionValidatorState&& transactionState) {
       auto pendingTx = PendingTransactionInfo{static_cast<uint64_t>(time(nullptr)), std::move(transaction)};
 
-      Crypto::Hash paymentId;
+      crypto::Hash paymentId;
       if(getPaymentIdFromTxExtra(pendingTx.cachedTransaction.getTransaction().extra, paymentId)) {
         pendingTx.paymentId = paymentId;
       }
 
       if (transactionHashIndex.count(pendingTx.getTransactionHash()) > 0) {
-        logger(Logging::DEBUGGING) << "pushTransaction: transaction hash already present in index";
+        logger(logging::DEBUGGING) << "pushTransaction: transaction hash already present in index";
         return false;
       }
 
       if (hasIntersections(poolState, transactionState)) {
-        logger(Logging::DEBUGGING) << "pushTransaction: failed to merge states, some keys already used";
+        logger(logging::DEBUGGING) << "pushTransaction: failed to merge states, some keys already used";
         return false;
       }
 
       mergeStates(poolState, transactionState);
 
-      logger(Logging::DEBUGGING) << "pushed transaction " << pendingTx.getTransactionHash() << " to pool";
+      logger(logging::DEBUGGING) << "pushed transaction " << pendingTx.getTransactionHash() << " to pool";
       return transactionHashIndex.insert(std::move(pendingTx)).second;
     }
 
-    const CachedTransaction& TransactionPool::getTransaction(const Crypto::Hash& hash) const {
+    const CachedTransaction& TransactionPool::getTransaction(const crypto::Hash& hash) const {
       auto it = transactionHashIndex.find(hash);
       assert(it != transactionHashIndex.end());
 
       return it->cachedTransaction;
     }
 
-    bool TransactionPool::removeTransaction(const Crypto::Hash& hash) {
+    bool TransactionPool::removeTransaction(const crypto::Hash& hash) {
       auto it = transactionHashIndex.find(hash);
       if (it == transactionHashIndex.end()) {
-        logger(Logging::DEBUGGING) << "removeTransaction: transaction not found";
+        logger(logging::DEBUGGING) << "removeTransaction: transaction not found";
         return false;
       }
 
       excludeFromState(poolState, it->cachedTransaction);
       transactionHashIndex.erase(it);
 
-      logger(Logging::DEBUGGING) << "transaction " << hash << " removed from pool";
+      logger(logging::DEBUGGING) << "transaction " << hash << " removed from pool";
       return true;
     }
 
@@ -113,8 +113,8 @@ namespace cryptonote
       return transactionHashIndex.size();
     }
 
-    std::vector<Crypto::Hash> TransactionPool::getTransactionHashes() const {
-      std::vector<Crypto::Hash> hashes;
+    std::vector<crypto::Hash> TransactionPool::getTransactionHashes() const {
+      std::vector<crypto::Hash> hashes;
       for (auto it = transactionCostIndex.begin(); it != transactionCostIndex.end(); ++it) {
         hashes.push_back(it->getTransactionHash());
       }
@@ -122,7 +122,7 @@ namespace cryptonote
       return hashes;
     }
 
-    bool TransactionPool::checkIfTransactionPresent(const Crypto::Hash& hash) const {
+    bool TransactionPool::checkIfTransactionPresent(const crypto::Hash& hash) const {
       return transactionHashIndex.find(hash) != transactionHashIndex.end();
     }
 
@@ -141,18 +141,18 @@ namespace cryptonote
       return result;
     }
 
-    uint64_t TransactionPool::getTransactionReceiveTime(const Crypto::Hash& hash) const {
+    uint64_t TransactionPool::getTransactionReceiveTime(const crypto::Hash& hash) const {
       auto it = transactionHashIndex.find(hash);
       assert(it != transactionHashIndex.end());
 
       return it->receiveTime;
     }
 
-    std::vector<Crypto::Hash> TransactionPool::getTransactionHashesByPaymentId(const Crypto::Hash& paymentId) const {
-      boost::optional<Crypto::Hash> p(paymentId);
+    std::vector<crypto::Hash> TransactionPool::getTransactionHashesByPaymentId(const crypto::Hash& paymentId) const {
+      boost::optional<crypto::Hash> p(paymentId);
 
       auto range = paymentIdIndex.equal_range(p);
-      std::vector<Crypto::Hash> transactionHashes;
+      std::vector<crypto::Hash> transactionHashes;
       transactionHashes.reserve(std::distance(range.first, range.second));
       for (auto it = range.first; it != range.second; ++it) {
         transactionHashes.push_back(it->getTransactionHash());

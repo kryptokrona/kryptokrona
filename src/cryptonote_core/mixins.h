@@ -23,7 +23,7 @@ namespace cryptonote
       {
         uint64_t minMixin = 0;
         uint64_t maxMixin = std::numeric_limits<uint64_t>::max();
-        uint64_t defaultMixin = CryptoNote::parameters::DEFAULT_MIXIN_V0;
+        uint64_t defaultMixin = cryptonote::parameters::DEFAULT_MIXIN_V0;
 
         /* We now limit the mixin allowed in a transaction. However, there have been
            some transactions outside these limits in the past, so we need to only
@@ -33,23 +33,23 @@ namespace cryptonote
            was correct when the block was formed - i.e. if 0 mixin was allowed at
            block 100, but is no longer allowed - we should still validate block 100 */
 
-        if (height >= CryptoNote::parameters::MIXIN_LIMITS_V3_HEIGHT)
+        if (height >= cryptonote::parameters::MIXIN_LIMITS_V3_HEIGHT)
         {
-          minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V3;
-          maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V3;
-          defaultMixin = CryptoNote::parameters::DEFAULT_MIXIN_V3;
+          minMixin = cryptonote::parameters::MINIMUM_MIXIN_V3;
+          maxMixin = cryptonote::parameters::MAXIMUM_MIXIN_V3;
+          defaultMixin = cryptonote::parameters::DEFAULT_MIXIN_V3;
         }
-        else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
+        else if (height >= cryptonote::parameters::MIXIN_LIMITS_V2_HEIGHT)
         {
-          minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V2;
-          maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V2;
-          defaultMixin = CryptoNote::parameters::DEFAULT_MIXIN_V2;
+          minMixin = cryptonote::parameters::MINIMUM_MIXIN_V2;
+          maxMixin = cryptonote::parameters::MAXIMUM_MIXIN_V2;
+          defaultMixin = cryptonote::parameters::DEFAULT_MIXIN_V2;
         }
-        else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT)
+        else if (height >= cryptonote::parameters::MIXIN_LIMITS_V1_HEIGHT)
         {
-          minMixin = CryptoNote::parameters::MINIMUM_MIXIN_V1;
-          maxMixin = CryptoNote::parameters::MAXIMUM_MIXIN_V1;
-          defaultMixin = CryptoNote::parameters::DEFAULT_MIXIN_V1;
+          minMixin = cryptonote::parameters::MINIMUM_MIXIN_V1;
+          maxMixin = cryptonote::parameters::MAXIMUM_MIXIN_V1;
+          defaultMixin = cryptonote::parameters::DEFAULT_MIXIN_V1;
         }
 
         return {minMixin, maxMixin, defaultMixin};
@@ -66,12 +66,12 @@ namespace cryptonote
         if (mixin < minMixin)
         {
           str << "Mixin of " << mixin << " under minimum mixin threshold of " << minMixin;
-          return {false, str.str(), make_error_code(CryptoNote::error::MIXIN_BELOW_THRESHOLD)};
+          return {false, str.str(), make_error_code(cryptonote::error::MIXIN_BELOW_THRESHOLD)};
         }
         else if (mixin > maxMixin)
         {
           str << "Mixin of " << mixin << " above maximum mixin threshold of " << maxMixin;
-          return {false, str.str(), make_error_code(CryptoNote::error::MIXIN_ABOVE_THRESHOLD)};
+          return {false, str.str(), make_error_code(cryptonote::error::MIXIN_ABOVE_THRESHOLD)};
         }
 
         return {true, std::string(), std::error_code()};

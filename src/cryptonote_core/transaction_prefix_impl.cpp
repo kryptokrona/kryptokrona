@@ -91,7 +91,7 @@ namespace cryptonote
     }
 
     PublicKey TransactionPrefixImpl::getTransactionPublicKey() const {
-      Crypto::PublicKey pk(NULL_PUBLIC_KEY);
+      crypto::PublicKey pk(NULL_PUBLIC_KEY);
       m_extra.getPublicKey(pk);
       return pk;
     }
@@ -104,7 +104,7 @@ namespace cryptonote
       BinaryArray nonce;
 
       if (getExtraNonce(nonce)) {
-        Crypto::Hash paymentId;
+        crypto::Hash paymentId;
         if (getPaymentIdFromTransactionExtraNonce(nonce, paymentId)) {
           hash = reinterpret_cast<const Hash&>(paymentId);
           return true;
@@ -166,11 +166,11 @@ namespace cryptonote
     }
 
     size_t TransactionPrefixImpl::getRequiredSignaturesCount(size_t inputIndex) const {
-      return ::CryptoNote::getRequiredSignaturesCount(getInputChecked(m_txPrefix, inputIndex));
+      return ::cryptonote::getRequiredSignaturesCount(getInputChecked(m_txPrefix, inputIndex));
     }
 
     bool TransactionPrefixImpl::findOutputsToAccount(const AccountPublicAddress& addr, const SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const {
-      return ::CryptoNote::findOutputsToAccount(m_txPrefix, addr, viewSecretKey, outs, outputAmount);
+      return ::cryptonote::findOutputsToAccount(m_txPrefix, addr, viewSecretKey, outs, outputAmount);
     }
 
     BinaryArray TransactionPrefixImpl::getTransactionData() const {
