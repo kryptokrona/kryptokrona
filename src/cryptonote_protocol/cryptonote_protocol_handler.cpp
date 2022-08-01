@@ -770,10 +770,10 @@ namespace cryptonote
         logger(logging::INFO)
           << ENDL ;
           logger(INFO, BRIGHT_CYAN) << "===[ " + std::string(cryptonote::CRYPTONOTE_NAME) + " Tip! ]=============================" << ENDL ;
-          logger(INFO, WHITE) << " Always exit " + WalletConfig::daemonName + " and " + WalletConfig::walletName + " with the \"exit\" command to preserve your chain and wallet data." << ENDL ;
+          logger(INFO, WHITE) << " Always exit " + wallet_config::daemonName + " and " + wallet_config::walletName + " with the \"exit\" command to preserve your chain and wallet data." << ENDL ;
           logger(INFO, WHITE) << " Use the \"help\" command to see a list of available commands." << ENDL ;
-          logger(INFO, WHITE) << " Use the \"backup\" command in " + WalletConfig::walletName + " to display your keys/seed for restoring a corrupted wallet." << ENDL ;
-          logger(INFO, WHITE) << " If you need more assistance, you can contact us for support at " + WalletConfig::contactLink << ENDL;
+          logger(INFO, WHITE) << " Use the \"backup\" command in " + wallet_config::walletName + " to display your keys/seed for restoring a corrupted wallet." << ENDL ;
+          logger(INFO, WHITE) << " If you need more assistance, you can contact us for support at " + wallet_config::contactLink << ENDL;
           logger(INFO, BRIGHT_CYAN) << "===================================================" << ENDL << ENDL ;
 
           logger(INFO, BRIGHT_YELLOW) << asciiArt << ENDL;
