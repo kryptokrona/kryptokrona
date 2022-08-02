@@ -53,22 +53,22 @@ namespace miner
 
             if (blockTemplate.majorVersion >= BLOCK_MAJOR_VERSION_2)
             {
-                CryptoNote::TransactionExtraMergeMiningTag mmTag;
+                cryptonote::TransactionExtraMergeMiningTag mmTag;
                 mmTag.depth = 0;
                 mmTag.merkleRoot = cachedBlock.getAuxiliaryBlockHeaderHash();
 
                 blockTemplate.parentBlock.baseTransaction.extra.clear();
-                if (!CryptoNote::appendMergeMiningTagToExtra(blockTemplate.parentBlock.baseTransaction.extra, mmTag))
+                if (!cryptonote::appendMergeMiningTagToExtra(blockTemplate.parentBlock.baseTransaction.extra, mmTag))
                 {
                     throw std::runtime_error("Couldn't append merge mining tag");
                 }
             }
         }
-    } // namespace
+    }
 
     MinerManager::MinerManager(
-        System::Dispatcher& dispatcher,
-        const CryptoNote::MiningConfig& config,
+        system::Dispatcher& dispatcher,
+        const cryptonote::MiningConfig& config,
         const std::shared_ptr<httplib::Client> httpClient) :
 
         m_contextGroup(dispatcher),
@@ -111,7 +111,7 @@ namespace miner
             last_hash_count = current_hash_count;
 
             std::cout << SuccessMsg("\nMining at ")
-                      << SuccessMsg(Utilities::get_mining_speed(hashes))
+                      << SuccessMsg(utilities::get_mining_speed(hashes))
                       << "\n\n";
         }
     }
@@ -184,7 +184,7 @@ namespace miner
         m_eventOccurred.set();
     }
 
-    void MinerManager::startMining(const CryptoNote::BlockMiningParameters& params)
+    void MinerManager::startMining(const cryptonote::BlockMiningParameters& params)
     {
         m_contextGroup.spawn([this, params] ()
         {
@@ -231,7 +231,7 @@ namespace miner
         json j = {
             {"jsonrpc", "2.0"},
             {"method", "submitblock"},
-            {"params", {Common::toHex(toBinaryArray(minedBlock))}}
+            {"params", {common::toHex(toBinaryArray(minedBlock))}}
         };
 
         auto res = m_httpClient->Post("/json_rpc", j.dump(), "application/json");
@@ -338,7 +338,7 @@ namespace miner
         }
     }
 
-    void MinerManager::adjustBlockTemplate(CryptoNote::BlockTemplate& blockTemplate) const
+    void MinerManager::adjustBlockTemplate(cryptonote::BlockTemplate& blockTemplate) const
     {
         adjustMergeMiningTag(blockTemplate);
 

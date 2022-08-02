@@ -24,7 +24,7 @@
 
 namespace cryptonote
 {
-    Miner::Miner(System::Dispatcher& dispatcher) :
+    Miner::Miner(system::Dispatcher& dispatcher) :
         m_dispatcher(dispatcher),
         m_miningStopped(dispatcher),
         m_state(MiningState::MINING_STOPPED)
@@ -50,7 +50,7 @@ namespace cryptonote
 
         if (m_state == MiningState::MINING_STOPPED)
         {
-            throw System::InterruptedException();
+            throw system::InterruptedException();
         }
 
         return m_block;
@@ -75,12 +75,12 @@ namespace cryptonote
 
         try
         {
-            blockMiningParameters.blockTemplate.nonce = Random::randomValue<uint32_t>();
+            blockMiningParameters.blockTemplate.nonce = random::randomValue<uint32_t>();
 
             for (size_t i = 0; i < threadCount; ++i)
             {
-                m_workers.emplace_back(std::unique_ptr<System::RemoteContext<void>> (
-                    new System::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount))))
+                m_workers.emplace_back(std::unique_ptr<system::RemoteContext<void>> (
+                    new system::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount))))
                 );
 
                 blockMiningParameters.blockTemplate.nonce++;
@@ -108,7 +108,7 @@ namespace cryptonote
             while (m_state == MiningState::MINING_IN_PROGRESS)
             {
                 CachedBlock cachedBlock(block);
-                Crypto::Hash hash = cachedBlock.getBlockLongHash();
+                crypto::Hash hash = cachedBlock.getBlockLongHash();
 
                 if (check_hash(hash, difficulty))
                 {
