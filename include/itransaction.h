@@ -71,13 +71,13 @@ namespace cryptonote
       // inputs
       virtual size_t getInputCount() const = 0;
       virtual uint64_t getInputTotalAmount() const = 0;
-      virtual TransactionTypes::InputType getInputType(size_t index) const = 0;
+      virtual transaction_types::InputType getInputType(size_t index) const = 0;
       virtual void getInput(size_t index, KeyInput& input) const = 0;
 
       // outputs
       virtual size_t getOutputCount() const = 0;
       virtual uint64_t getOutputTotalAmount() const = 0;
-      virtual TransactionTypes::OutputType getOutputType(size_t index) const = 0;
+      virtual transaction_types::OutputType getOutputType(size_t index) const = 0;
       virtual void getOutput(size_t index, KeyOutput& output, uint64_t& amount) const = 0;
 
       // signatures
@@ -105,13 +105,13 @@ namespace cryptonote
 
       // Inputs/Outputs
       virtual size_t addInput(const KeyInput& input) = 0;
-      virtual size_t addInput(const AccountKeys& senderKeys, const TransactionTypes::InputKeyInfo& info, KeyPair& ephKeys) = 0;
+      virtual size_t addInput(const AccountKeys& senderKeys, const transaction_types::InputKeyInfo& info, KeyPair& ephKeys) = 0;
 
       virtual size_t addOutput(uint64_t amount, const AccountPublicAddress& to) = 0;
       virtual size_t addOutput(uint64_t amount, const KeyOutput& out) = 0;
 
       // signing
-      virtual void signInputKey(size_t input, const TransactionTypes::InputKeyInfo& info, const KeyPair& ephKeys) = 0;
+      virtual void signInputKey(size_t input, const transaction_types::InputKeyInfo& info, const KeyPair& ephKeys) = 0;
     };
 
     class ITransaction :

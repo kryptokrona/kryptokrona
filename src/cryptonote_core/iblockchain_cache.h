@@ -25,7 +25,7 @@
 
 #include "cryptonote_core/cached_block.h"
 #include "cryptonote_core/cached_transaction.h"
-#include "cryptonote_core/transaction_validatior_state.h"
+#include "cryptonote_core/transaction_validator_state.h"
 #include "common/array_view.h"
 
 namespace cryptonote
