@@ -47,7 +47,7 @@ bool LevinProtocol::Command::needReply() const {
   return !(isNotify || isResponse);
 }
 
-LevinProtocol::LevinProtocol(System::TcpConnection& connection) 
+LevinProtocol::LevinProtocol(system::TcpConnection& connection) 
   : m_conn(connection) {}
 
 void LevinProtocol::sendMessage(uint32_t command, const BinaryArray& out, bool needResponse) {
@@ -63,7 +63,7 @@ void LevinProtocol::sendMessage(uint32_t command, const BinaryArray& out, bool n
   BinaryArray writeBuffer;
   writeBuffer.reserve(sizeof(head) + out.size());
 
-  Common::VectorOutputStream stream(writeBuffer);
+  common::VectorOutputStream stream(writeBuffer);
   stream.writeSome(&head, sizeof(head));
   stream.writeSome(out.data(), out.size());
 
@@ -115,7 +115,7 @@ void LevinProtocol::sendReply(uint32_t command, const BinaryArray& out, int32_t 
   BinaryArray writeBuffer;
   writeBuffer.reserve(sizeof(head) + out.size());
 
-  Common::VectorOutputStream stream(writeBuffer);
+  common::VectorOutputStream stream(writeBuffer);
   stream.writeSome(&head, sizeof(head));
   stream.writeSome(out.data(), out.size());
 

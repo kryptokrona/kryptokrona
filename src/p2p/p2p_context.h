@@ -53,7 +53,7 @@ namespace cryptonote
         size_t size() const;
       };
 
-      P2pContext(System::Dispatcher& dispatcher, System::TcpConnection&& conn,
+      P2pContext(system::Dispatcher& dispatcher, system::TcpConnection&& conn,
         bool isIncoming, const NetworkAddress& remoteAddress, std::chrono::nanoseconds timedSyncInterval, const CORE_SYNC_DATA& timedSyncData);
       ~P2pContext();
 
@@ -77,8 +77,8 @@ namespace cryptonote
       uint64_t peerId = 0;
       uint16_t peerPort = 0;
 
-      System::Dispatcher& dispatcher;
-      System::ContextGroup contextGroup;
+      system::Dispatcher& dispatcher;
+      system::ContextGroup contextGroup;
       const TimePoint timeStarted;
       bool stopped = false;
       TimePoint lastReadTime;
@@ -86,12 +86,12 @@ namespace cryptonote
       // timed sync info
       const std::chrono::nanoseconds timedSyncInterval;
       const CORE_SYNC_DATA& timedSyncData;
-      System::Timer timedSyncTimer;
-      System::Event timedSyncFinished;
+      system::Timer timedSyncTimer;
+      system::Event timedSyncFinished;
 
-      System::TcpConnection connection;
-      System::Event writeEvent;
-      System::Event readEvent;
+      system::TcpConnection connection;
+      system::Event writeEvent;
+      system::Event readEvent;
 
       void timedSyncLoop();
     };
