@@ -12,17 +12,17 @@
 
 namespace utilities
 {
-    std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses);
+    std::vector<crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses);
 
-    std::tuple<Crypto::PublicKey, Crypto::PublicKey> addressToKeys(const std::string address);
+    std::tuple<crypto::PublicKey, crypto::PublicKey> addressToKeys(const std::string address);
 
     std::tuple<std::string, std::string> extractIntegratedAddressData(const std::string address);
 
     std::string publicKeysToAddress(
-        const Crypto::PublicKey publicSpendKey,
-        const Crypto::PublicKey publicViewKey);
+        const crypto::PublicKey publicSpendKey,
+        const crypto::PublicKey publicViewKey);
 
     std::string privateKeysToAddress(
-        const Crypto::SecretKey privateSpendKey,
-        const Crypto::SecretKey privateViewKey);
+        const crypto::SecretKey privateSpendKey,
+        const crypto::SecretKey privateViewKey);
 }
