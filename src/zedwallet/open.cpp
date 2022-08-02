@@ -21,7 +21,7 @@
 #include <zedwallet/password_container.h>
 #include <config/wallet_config.h>
 
-std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
+std::shared_ptr<WalletInfo> createViewWallet(cryptonote::WalletGreen &wallet)
 {
     std::cout << WarningMsg("View wallets are only for viewing incoming ")
               << WarningMsg("transactions, and cannot make transfers.")
@@ -36,14 +36,14 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
         return nullptr;
     }
     
-    Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
+    crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
 
     std::string address;
 
     while (true)
     {
         std::cout << InformationMsg("Enter your public ")
-                  << InformationMsg(WalletConfig::ticker)
+                  << InformationMsg(wallet_config::ticker)
                   << InformationMsg(" address: ");
 
         std::getline(std::cin, address);
@@ -77,18 +77,18 @@ std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
                                         address, true, wallet);
 }
 
-std::shared_ptr<WalletInfo> importWallet(CryptoNote::WalletGreen &wallet)
+std::shared_ptr<WalletInfo> importWallet(cryptonote::WalletGreen &wallet)
 {
-    const Crypto::SecretKey privateSpendKey
+    const crypto::SecretKey privateSpendKey
         = getPrivateKey("Enter your private spend key: ");
 
-    const Crypto::SecretKey privateViewKey
+    const crypto::SecretKey privateViewKey
         = getPrivateKey("Enter your private view key: ");
 
     return importFromKeys(wallet, privateSpendKey, privateViewKey);
 }
 
-std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
+std::shared_ptr<WalletInfo> mnemonicImportWallet(cryptonote::WalletGreen
                                                  &wallet)
 {
     while (true)
@@ -112,9 +112,9 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
         }
         else
         {
-            Crypto::SecretKey privateViewKey;
+            crypto::SecretKey privateViewKey;
 
-            CryptoNote::AccountBase::generateViewFromSpend(
+            cryptonote::AccountBase::generateViewFromSpend(
                 privateSpendKey, privateViewKey
             );
 
@@ -123,9 +123,9 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
     }
 }
 
-std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
-                                           Crypto::SecretKey privateSpendKey, 
-                                           Crypto::SecretKey privateViewKey)
+std::shared_ptr<WalletInfo> importFromKeys(cryptonote::WalletGreen &wallet,
+                                           crypto::SecretKey privateSpendKey, 
+                                           crypto::SecretKey privateViewKey)
 {
     const std::string walletFileName = getNewWalletFileName();
 
@@ -154,7 +154,7 @@ std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
                                         walletAddress, false, wallet);
 }
 
-std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
+std::shared_ptr<WalletInfo> generateWallet(cryptonote::WalletGreen &wallet)
 {
     const std::string walletFileName = getNewWalletFileName();
 
@@ -162,12 +162,12 @@ std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
 
     const std::string walletPass = getWalletPassword(true, msg);
 
-    CryptoNote::KeyPair spendKey;
-    Crypto::SecretKey privateViewKey;
+    cryptonote::KeyPair spendKey;
+    crypto::SecretKey privateViewKey;
 
-    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+    crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
 
-    CryptoNote::AccountBase::generateViewFromSpend(spendKey.secretKey,
+    cryptonote::AccountBase::generateViewFromSpend(spendKey.secretKey,
                                                    privateViewKey);
 
     wallet.initializeWithViewKey(
@@ -188,7 +188,7 @@ std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet)
                                         walletAddress, false, wallet);
 }
 
-std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
+std::shared_ptr<WalletInfo> openWallet(cryptonote::WalletGreen &wallet,
                                        Config &config)
 {
     const std::string walletFileName = getExistingWalletFileName(config);
@@ -220,12 +220,12 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
 
             const std::string walletAddress = wallet.getAddress(0);
             
-            const Crypto::SecretKey privateSpendKey
+            const crypto::SecretKey privateSpendKey
                 = wallet.getAddressSpendKey(0).secretKey;
 
             bool viewWallet = false;
 
-            if (privateSpendKey == CryptoNote::NULL_SECRET_KEY)
+            if (privateSpendKey == cryptonote::NULL_SECRET_KEY)
             {
                 std::cout << std::endl
                           << InformationMsg("Your view only wallet ")
@@ -258,7 +258,7 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
 
             switch (e.code().value())
             {
-                case CryptoNote::error::WRONG_PASSWORD:
+                case cryptonote::error::WRONG_PASSWORD:
                 {
                     std::cout << std::endl 
                               << WarningMsg("Incorrect password! Try again.")
@@ -268,7 +268,7 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
 
                     break;
                 }
-                case CryptoNote::error::WRONG_VERSION:
+                case cryptonote::error::WRONG_VERSION:
                 {
                     std::stringstream msg;
 
@@ -277,7 +277,7 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                         << "Ensure you are opening a wallet file, and the "
                         << "file has not gotten corrupted." << std::endl
                         << "Try reimporting via keys, and always close "
-                        << WalletConfig::walletName << " with the exit "
+                        << wallet_config::walletName << " with the exit "
                         << "command to prevent corruption." << std::endl;
 
                     std::cout << WarningMsg(msg.str()) << std::endl;
@@ -307,13 +307,13 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
                           << std::endl
                           << WarningMsg("Check with a task manager that you "
                                         "don't have ")
-                          << WalletConfig::walletName
+                          << wallet_config::walletName
                           << WarningMsg(" open twice.")
                           << std::endl
                           << WarningMsg("Also check you don't have another "
                                         "wallet program open, such as a GUI "
                                         "wallet or ")
-                          << WarningMsg(WalletConfig::walletdName)
+                          << WarningMsg(wallet_config::walletdName)
                           << WarningMsg(".")
                           << std::endl << std::endl;
 
@@ -332,15 +332,15 @@ std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
     }
 }
 
-Crypto::SecretKey getPrivateKey(std::string msg)
+crypto::SecretKey getPrivateKey(std::string msg)
 {
     const uint64_t privateKeyLen = 64;
     uint64_t size;
 
     std::string privateKeyString;
-    Crypto::Hash privateKeyHash;
-    Crypto::SecretKey privateKey;
-    Crypto::PublicKey publicKey;
+    crypto::Hash privateKeyHash;
+    crypto::SecretKey privateKey;
+    crypto::PublicKey publicKey;
 
     while (true)
     {
@@ -358,7 +358,7 @@ Crypto::SecretKey getPrivateKey(std::string msg)
 
             continue;
         }
-        else if (!Common::fromHex(privateKeyString, &privateKeyHash, 
+        else if (!common::fromHex(privateKeyString, &privateKeyHash, 
                   sizeof(privateKeyHash), size)
                || size != sizeof(privateKeyHash))
         {
@@ -369,11 +369,11 @@ Crypto::SecretKey getPrivateKey(std::string msg)
             continue;
         }
 
-        privateKey = *(struct Crypto::SecretKey *) &privateKeyHash;
+        privateKey = *(struct crypto::SecretKey *) &privateKeyHash;
 
         /* Just used for verification purposes before we pass it to
            walletgreen */
-        if (!Crypto::secret_key_to_public_key(privateKey, publicKey))
+        if (!crypto::secret_key_to_public_key(privateKey, publicKey))
         {
             std::cout << std::endl
                       << WarningMsg("Invalid private key, is not on the ")
@@ -481,7 +481,7 @@ std::string getNewWalletFileName()
 
 std::string getWalletPassword(bool verifyPwd, std::string msg)
 {
-    Tools::PasswordContainer pwdContainer;
+    tools::PasswordContainer pwdContainer;
     pwdContainer.read_password(verifyPwd, msg);
     return pwdContainer.password();
 }
@@ -499,14 +499,14 @@ void viewWalletMsg()
 void connectingMsg()
 {
     std::cout << std::endl << "Making initial contact with "
-              << WalletConfig::daemonName
+              << wallet_config::daemonName
               << "."
               << std::endl
               << "Please wait, this sometimes can take a long time..."
               << std::endl << std::endl;
 }
 
-void promptSaveKeys(CryptoNote::WalletGreen &wallet)
+void promptSaveKeys(cryptonote::WalletGreen &wallet)
 {
     std::cout << "Welcome to your new wallet, here is your payment address:"
               << std::endl << InformationMsg(wallet.getAddress(0))

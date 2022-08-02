@@ -20,7 +20,7 @@ Config parseArguments(int argc, char **argv)
     std::stringstream defaultRemoteDaemon;
     defaultRemoteDaemon << config.host << ":" << config.port;
 
-    cxxopts::Options options(argv[0], CryptoNote::getProjectCLIHeader());
+    cxxopts::Options options(argv[0], cryptonote::getProjectCLIHeader());
 
     bool help, version;
     std::string remoteDaemon;
@@ -28,7 +28,7 @@ Config parseArguments(int argc, char **argv)
     options.add_options("Core")
         ("h,help", "Display this help message", cxxopts::value<bool>(help)->implicit_value("true"))
         ("v,version", "Output software version information", cxxopts::value<bool>(version)->default_value("false")->implicit_value("true"))
-        ("debug", "Enable " + WalletConfig::walletdName + " debugging to "+ WalletConfig::walletName + ".log",
+        ("debug", "Enable " + wallet_config::walletdName + " debugging to "+ WalletConfig::walletName + ".log",
             cxxopts::value<bool>(config.debug)->default_value("false")->implicit_value("true"));
 
     options.add_options("daemon")
@@ -57,7 +57,7 @@ Config parseArguments(int argc, char **argv)
     }
     else if (version) // Do we want to display the software version?
     {
-        std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+        std::cout << cryptonote::getProjectCLIHeader() << std::endl;
         exit(0);
     }
 

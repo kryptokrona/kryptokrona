@@ -114,8 +114,8 @@ std::string parseCommand(const std::vector<T> &printableCommands,
 }
 
 std::tuple<bool, std::shared_ptr<WalletInfo>>
-    selectionScreen(Config &config, CryptoNote::WalletGreen &wallet,
-                    CryptoNote::INode &node)
+    selectionScreen(Config &config, cryptonote::WalletGreen &wallet,
+                    cryptonote::INode &node)
 {
     while (true)
     {
@@ -187,21 +187,21 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
     }
 }
 
-bool checkNodeStatus(CryptoNote::INode &node)
+bool checkNodeStatus(cryptonote::INode &node)
 {
     while (node.getLastKnownBlockHeight() == 0)
     {
         std::stringstream msg;
 
-        msg << "It looks like " << WalletConfig::daemonName << " isn't open!"
+        msg << "It looks like " << wallet_config::daemonName << " isn't open!"
             << std::endl << std::endl
-            << "Ensure " << WalletConfig::daemonName
+            << "Ensure " << wallet_config::daemonName
             << " is open and has finished initializing." << std::endl
             << "If it's still not working, try restarting "
-            << WalletConfig::daemonName << "."
+            << wallet_config::daemonName << "."
             << "The daemon sometimes gets stuck."
             << std::endl << "Alternatively, perhaps "
-            << WalletConfig::daemonName << " can't communicate with any peers."
+            << wallet_config::daemonName << " can't communicate with any peers."
             << std::endl << std::endl
             << "The wallet can't function fully until it can communicate with "
             << "the network.";
@@ -251,7 +251,7 @@ std::string getAction(Config &config)
                         "What would you like to do?: ", false, nullptr);
 }
 
-void mainLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node)
+void mainLoop(std::shared_ptr<WalletInfo> walletInfo, cryptonote::INode &node)
 {
     if (walletInfo->viewWallet)
     {

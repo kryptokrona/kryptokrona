@@ -41,7 +41,7 @@ std::string getPrompt(std::shared_ptr<WalletInfo> walletInfo)
 
     const std::string shortName = walletName.substr(0, promptLength);
 
-    return "[" + WalletConfig::ticker + " " + shortName + "]: ";
+    return "[" + wallet_config::ticker + " " + shortName + "]: ";
 }
 
 template<typename T>

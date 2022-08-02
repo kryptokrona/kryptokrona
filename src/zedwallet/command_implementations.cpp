@@ -61,24 +61,24 @@ void exportKeys(std::shared_ptr<WalletInfo> walletInfo)
     printPrivateKeys(walletInfo->wallet, walletInfo->viewWallet);
 }
 
-void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
+void printPrivateKeys(cryptonote::WalletGreen &wallet, bool viewWallet)
 {
-    const Crypto::SecretKey privateViewKey = wallet.getViewKey().secretKey;
+    const crypto::SecretKey privateViewKey = wallet.getViewKey().secretKey;
 
     if (viewWallet)
     {
         std::cout << SuccessMsg("Private view key:")
                   << std::endl
-                  << SuccessMsg(Common::podToHex(privateViewKey))
+                  << SuccessMsg(common::podToHex(privateViewKey))
                   << std::endl;
         return;
     }
 
-    Crypto::SecretKey privateSpendKey = wallet.getAddressSpendKey(0).secretKey;
+    crypto::SecretKey privateSpendKey = wallet.getAddressSpendKey(0).secretKey;
 
-    Crypto::SecretKey derivedPrivateViewKey;
+    crypto::SecretKey derivedPrivateViewKey;
 
-    CryptoNote::AccountBase::generateViewFromSpend(privateSpendKey,
+    cryptonote::AccountBase::generateViewFromSpend(privateSpendKey,
                                                    derivedPrivateViewKey);
 
     const bool deterministicPrivateKeys
@@ -86,12 +86,12 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
 
     std::cout << SuccessMsg("Private spend key:")
               << std::endl
-              << SuccessMsg(Common::podToHex(privateSpendKey))
+              << SuccessMsg(common::podToHex(privateSpendKey))
               << std::endl
               << std::endl
               << SuccessMsg("Private view key:")
               << std::endl
-              << SuccessMsg(Common::podToHex(privateViewKey))
+              << SuccessMsg(common::podToHex(privateViewKey))
               << std::endl;
 
     if (deterministicPrivateKeys)
@@ -104,7 +104,7 @@ void printPrivateKeys(CryptoNote::WalletGreen &wallet, bool viewWallet)
     }
 }
 
-void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
+void balance(cryptonote::INode &node, cryptonote::WalletGreen &wallet,
              bool viewWallet)
 {
     const uint64_t unconfirmedBalance = wallet.getPendingBalance();
@@ -128,7 +128,7 @@ void balance(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet,
         
         for (size_t i = 0; i < numTransactions; i++)
         {
-            const CryptoNote::WalletTransaction t = wallet.getTransaction(i);
+            const cryptonote::WalletTransaction t = wallet.getTransaction(i);
 
             /* Fusion transactions are zero fee, skip them. Coinbase
                transactions are also zero fee, include them. */
@@ -218,10 +218,10 @@ void printSyncStatus(uint32_t localHeight, uint32_t remoteHeight,
                      uint32_t walletHeight)
 {
     std::string networkSyncPercentage
-        = Utilities::get_sync_percentage(localHeight, remoteHeight) + "%";
+        = utilities::get_sync_percentage(localHeight, remoteHeight) + "%";
 
     std::string walletSyncPercentage
-        = Utilities::get_sync_percentage(walletHeight, remoteHeight) + "%";
+        = utilities::get_sync_percentage(walletHeight, remoteHeight) + "%";
 
     std::cout << "Network sync status: ";
 
@@ -253,7 +253,7 @@ void printSyncSummary(uint32_t localHeight, uint32_t remoteHeight,
     if (localHeight == 0 && remoteHeight == 0)
     {
         std::cout << WarningMsg("Uh oh, it looks like you don't have ")
-                  << WarningMsg(WalletConfig::daemonName)
+                  << WarningMsg(wallet_config::daemonName)
                   << WarningMsg(" open!")
                   << std::endl;
     }
@@ -293,18 +293,18 @@ void printHashrate(uint64_t difficulty)
 
     /* Hashrate is difficulty divided by block target time */
     uint32_t hashrate = static_cast<uint32_t>(
-        round(difficulty / CryptoNote::parameters::DIFFICULTY_TARGET)
+        round(difficulty / cryptonote::parameters::DIFFICULTY_TARGET)
     );
 
     std::cout << "Network hashrate: "
-              << SuccessMsg(Utilities::get_mining_speed(hashrate))
+              << SuccessMsg(utilities::get_mining_speed(hashrate))
               << " (Based on the last local block)" << std::endl;
 }
 
 /* This makes sure to call functions on the node which only return cached
    data. This ensures it returns promptly, and doesn't hang waiting for a
    response when the node is having issues. */
-void status(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
+void status(cryptonote::INode &node, cryptonote::WalletGreen &wallet)
 {
     uint32_t localHeight = node.getLastLocalBlockHeight();
     uint32_t remoteHeight = node.getLastKnownBlockHeight();
@@ -332,7 +332,7 @@ void status(CryptoNote::INode &node, CryptoNote::WalletGreen &wallet)
     printSyncSummary(localHeight, remoteHeight, walletHeight);
 }
 
-void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo)
+void reset(cryptonote::INode &node, std::shared_ptr<WalletInfo> walletInfo)
 {
     uint64_t scanHeight = getScanHeight();
 
@@ -355,12 +355,12 @@ void reset(CryptoNote::INode &node, std::shared_ptr<WalletInfo> walletInfo)
     syncWallet(node, walletInfo);
 }
 
-void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
+void saveCSV(cryptonote::WalletGreen &wallet, cryptonote::INode &node)
 {
     const size_t numTransactions = wallet.getTransactionCount();
 
     std::ofstream csv;
-    csv.open(WalletConfig::csvFilename);
+    csv.open(wallet_config::csvFilename);
 
     if (!csv)
     {
@@ -382,7 +382,7 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
     /* Loop through transactions */
     for (size_t i = 0; i < numTransactions; i++)
     {
-        const CryptoNote::WalletTransaction t = wallet.getTransaction(i);
+        const cryptonote::WalletTransaction t = wallet.getTransaction(i);
 
         /* Ignore fusion transactions */
         if (t.totalAmount == 0)
@@ -396,7 +396,7 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
 
         csv << unixTimeToDate(t.timestamp) << ","       /* Timestamp */
             << t.blockHeight << ","                     /* Block Height */
-            << Common::podToHex(t.hash) << ","          /* Hash */
+            << common::podToHex(t.hash) << ","          /* Hash */
             << amount << ","                            /* Amount */
             << direction                                /* In/Out */
             << std::endl;
@@ -405,17 +405,17 @@ void saveCSV(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
     csv.close();
 
     std::cout << SuccessMsg("CSV successfully written to ")
-              << SuccessMsg(WalletConfig::csvFilename)
+              << SuccessMsg(wallet_config::csvFilename)
               << SuccessMsg("!")
               << std::endl;
 }
 
-void printOutgoingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node)
+void printOutgoingTransfer(cryptonote::WalletTransaction t,
+                           cryptonote::INode &node)
 {
     std::cout << WarningMsg("Outgoing transfer:")
               << std::endl
-              << WarningMsg("Hash: " + Common::podToHex(t.hash))
+              << WarningMsg("Hash: " + common::podToHex(t.hash))
               << std::endl;
 
     if (t.timestamp != 0)
@@ -445,12 +445,12 @@ void printOutgoingTransfer(CryptoNote::WalletTransaction t,
     std::cout << std::endl;
 }
 
-void printIncomingTransfer(CryptoNote::WalletTransaction t,
-                           CryptoNote::INode &node)
+void printIncomingTransfer(cryptonote::WalletTransaction t,
+                           cryptonote::INode &node)
 {
     std::cout << SuccessMsg("Incoming transfer:")
               << std::endl
-              << SuccessMsg("Hash: " + Common::podToHex(t.hash))
+              << SuccessMsg("Hash: " + common::podToHex(t.hash))
               << std::endl;
 
     if (t.timestamp != 0)
@@ -478,7 +478,7 @@ void printIncomingTransfer(CryptoNote::WalletTransaction t,
 }
 
 void listTransfers(bool incoming, bool outgoing, 
-                   CryptoNote::WalletGreen &wallet, CryptoNote::INode &node)
+                   cryptonote::WalletGreen &wallet, cryptonote::INode &node)
 {
     const size_t numTransactions = wallet.getTransactionCount();
 
@@ -487,7 +487,7 @@ void listTransfers(bool incoming, bool outgoing,
 
     for (size_t i = 0; i < numTransactions; i++)
     {
-        const CryptoNote::WalletTransaction t = wallet.getTransaction(i);
+        const cryptonote::WalletTransaction t = wallet.getTransaction(i);
 
         /* Is a fusion transaction (on a view only wallet). It appears to have
            an incoming amount, because we can't detract the outputs (can't
@@ -523,7 +523,7 @@ void listTransfers(bool incoming, bool outgoing,
     }
 }
 
-void save(CryptoNote::WalletGreen &wallet)
+void save(cryptonote::WalletGreen &wallet)
 {
     std::cout << InformationMsg("Saving.") << std::endl;
     wallet.save();
@@ -565,7 +565,7 @@ void createIntegratedAddress()
 
         std::cout << std::endl;
 
-        if (!CryptoNote::createTxExtraWithPaymentId(paymentID, extra))
+        if (!cryptonote::createTxExtraWithPaymentId(paymentID, extra))
         {
             std::cout << WarningMsg("Failed to parse! Payment ID's are 64 "
                                     "character hexadecimal strings.")

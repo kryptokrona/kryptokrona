@@ -15,7 +15,7 @@
 
 bool handleCommand(const std::string command,
                    std::shared_ptr<WalletInfo> walletInfo,
-                   CryptoNote::INode &node)
+                   cryptonote::INode &node)
 {
     /* Basic commands */
     if (command == "advanced")
