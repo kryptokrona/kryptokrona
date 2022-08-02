@@ -89,7 +89,7 @@ std::string getInput(
     }
 	
     /* Remove any whitespace */
-    Common::trim(command);
+    common::trim(command);
 
     if (command != "")
     {
@@ -116,7 +116,7 @@ std::string getAddress(
             return "cancel";
         }
 
-        Common::trim(address);
+        common::trim(address);
 
         /* \n == no-op */
         if (address == "")
@@ -160,7 +160,7 @@ std::string getPaymentID(
             return "cancel";
         }
 
-        Common::trim(paymentID);
+        common::trim(paymentID);
 
         if (paymentID == "cancel" && cancelAllowed)
         {
@@ -201,7 +201,7 @@ std::string getHash(
             return "cancel";
         }
 
-        Common::trim(hash);
+        common::trim(hash);
 
         if (hash == "cancel" && cancelAllowed)
         {
@@ -244,10 +244,10 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
             continue;
         }
 
-        Common::trim(amountString);
+        common::trim(amountString);
 
         /* If the user entered thousand separators, remove them */
-        ZedUtilities::removeCharFromString(amountString, ',');
+        zed_utilities::removeCharFromString(amountString, ',');
 
         if (amountString == "cancel" && cancelAllowed)
         {
@@ -262,12 +262,12 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
             amountString.substr(decimalPos + 1, amountString.length()).length();
 
         /* Can't send amounts with more decimal places than supported */
-        if (decimalLength > WalletConfig::numDecimalPlaces)
+        if (decimalLength > wallet_config::numDecimalPlaces)
         {
             std::stringstream stream;
 
-            stream << CryptoNote::CRYPTONOTE_NAME << " transfers can have "
-                   << "a max of " << WalletConfig::numDecimalPlaces
+            stream << cryptonote::CRYPTONOTE_NAME << " transfers can have "
+                   << "a max of " << wallet_config::numDecimalPlaces
                    << " decimal places.\n";
 
             std::cout << WarningMsg(stream.str());
@@ -276,11 +276,11 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
         }
 
         /* Remove the decimal place, so we can parse it as an atomic amount */
-        ZedUtilities::removeCharFromString(amountString, '.');
+        zed_utilities::removeCharFromString(amountString, '.');
 
         /* Pad the string with 0's at the end, so 123 becomes 12300, so we 
            can parse it as an atomic amount. 123.45 parses as 12345. */
-        amountString.append(WalletConfig::numDecimalPlaces - decimalLength, '0');
+        amountString.append(wallet_config::numDecimalPlaces - decimalLength, '0');
 
         try
         {
@@ -289,7 +289,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
             if (amount < WalletConfig::minimumSend)
             {
                 std::cout << WarningMsg("The minimum send allowed is ")
-                          << WarningMsg(Utilities::formatAmount(WalletConfig::minimumSend))
+                          << WarningMsg(utilities::formatAmount(wallet_config::minimumSend))
                           << WarningMsg("!\n");
             }
             else
@@ -322,7 +322,7 @@ std::tuple<std::string, uint16_t> getDaemonAddress()
 
         std::string host = "127.0.0.1";
 
-        uint16_t port = CryptoNote::RPC_DEFAULT_PORT;
+        uint16_t port = cryptonote::RPC_DEFAULT_PORT;
 
         /* Fixes infinite looping when someone does a ctrl + c */
         if (!std::getline(std::cin, address) || address == "")
@@ -330,9 +330,9 @@ std::tuple<std::string, uint16_t> getDaemonAddress()
             return {host, port};
         }
 
-        Common::trim(address);
+        common::trim(address);
 
-        if (!ZedUtilities::parseDaemonAddressFromString(host, port, address))
+        if (!zed_utilities::parseDaemonAddressFromString(host, port, address))
         {
             std::cout << WarningMsg("\nInvalid daemon address! Try again.\n");
             continue;

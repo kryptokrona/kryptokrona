@@ -105,7 +105,7 @@ bool handleCommand(
                      "send large amounts at once.\n"
                   << WarningMsg("This may take a very long time!\n");
 
-        if (!ZedUtilities::confirm("Do you want to proceed?"))
+        if (!zed_utilities::confirm("Do you want to proceed?"))
         {
             std::cout << WarningMsg("Cancelling optimization.") << std::endl;
         }
