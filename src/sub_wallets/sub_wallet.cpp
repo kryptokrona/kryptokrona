@@ -19,7 +19,7 @@
 
 /* Makes a view only subwallet */
 SubWallet::SubWallet(
-    const Crypto::PublicKey publicSpendKey,
+    const crypto::PublicKey publicSpendKey,
     const std::string address,
     const uint64_t scanHeight,
     const uint64_t scanTimestamp,
@@ -36,8 +36,8 @@ SubWallet::SubWallet(
 
 /* Makes a standard subwallet */
 SubWallet::SubWallet(
-    const Crypto::PublicKey publicSpendKey,
-    const Crypto::SecretKey privateSpendKey,
+    const crypto::PublicKey publicSpendKey,
+    const crypto::SecretKey privateSpendKey,
     const std::string address,
     const uint64_t scanHeight,
     const uint64_t scanTimestamp,
@@ -56,8 +56,8 @@ SubWallet::SubWallet(
 /* CLASS FUNCTIONS */
 /////////////////////
 
-Crypto::KeyImage SubWallet::getTxInputKeyImage(
-    const Crypto::KeyDerivation derivation,
+crypto::KeyImage SubWallet::getTxInputKeyImage(
+    const crypto::KeyDerivation derivation,
     const size_t outputIndex,
     const bool isViewWallet) const
 {
@@ -65,32 +65,32 @@ Crypto::KeyImage SubWallet::getTxInputKeyImage(
        input so we can calculate the balance */
     if (!isViewWallet)
     {
-        Crypto::KeyImage keyImage;
+        crypto::KeyImage keyImage;
 
         /* Make a temporary key pair */
-        CryptoNote::KeyPair tmp;
+        cryptonote::KeyPair tmp;
 
         /* Get the tmp public key from the derivation, the index,
            and our public spend key */
-        Crypto::derive_public_key(
+        crypto::derive_public_key(
             derivation, outputIndex, m_publicSpendKey, tmp.publicKey
         );
 
         /* Get the tmp private key from the derivation, the index,
            and our private spend key */
-        Crypto::derive_secret_key(
+        crypto::derive_secret_key(
             derivation, outputIndex, m_privateSpendKey, tmp.secretKey
         );
 
         /* Get the key image from the tmp public and private key */
-        Crypto::generate_key_image(
+        crypto::generate_key_image(
             tmp.publicKey, tmp.secretKey, keyImage
         );
 
         return keyImage;
     }
 
-    return Crypto::KeyImage();
+    return crypto::KeyImage();
 }
 
 void SubWallet::storeTransactionInput(
@@ -129,7 +129,7 @@ std::tuple<uint64_t, uint64_t> SubWallet::getBalance(
     for (const auto& input : m_unspentInputs)
     {
         /* If an unlock height is present, check if the input is unlocked */
-        if (Utilities::isInputUnlocked(input.unlockTime, currentHeight))
+        if (utilities::isInputUnlocked(input.unlockTime, currentHeight))
         {
             unlockedBalance += input.amount;
         }
@@ -169,7 +169,7 @@ std::string SubWallet::address() const
     return m_address;
 }
 
-bool SubWallet::hasKeyImage(const Crypto::KeyImage keyImage) const
+bool SubWallet::hasKeyImage(const crypto::KeyImage keyImage) const
 {
     auto it = std::find_if(m_unspentInputs.begin(), m_unspentInputs.end(),
     [&keyImage](const auto &input)
@@ -198,18 +198,18 @@ bool SubWallet::hasKeyImage(const Crypto::KeyImage keyImage) const
     /* Also don't need to check unconfirmed inputs - we can't spend those yet */
 }
 
-Crypto::PublicKey SubWallet::publicSpendKey() const
+crypto::PublicKey SubWallet::publicSpendKey() const
 {
     return m_publicSpendKey;
 }
 
-Crypto::SecretKey SubWallet::privateSpendKey() const
+crypto::SecretKey SubWallet::privateSpendKey() const
 {
     return m_privateSpendKey;
 }
 
 void SubWallet::markInputAsSpent(
-    const Crypto::KeyImage keyImage,
+    const crypto::KeyImage keyImage,
     const uint64_t spendHeight)
 {
     /* Find the input */
@@ -258,7 +258,7 @@ void SubWallet::markInputAsSpent(
     throw std::runtime_error("Could not find key image to remove!");
 }
 
-void SubWallet::markInputAsLocked(const Crypto::KeyImage keyImage)
+void SubWallet::markInputAsLocked(const crypto::KeyImage keyImage)
 {
     /* Find the input */
     auto it = std::find_if(m_unspentInputs.begin(), m_unspentInputs.end(),
@@ -326,7 +326,7 @@ void SubWallet::removeForkedInputs(const uint64_t forkHeight)
 /* Cancelled transactions are transactions we sent, but got cancelled and not
    included in a block for some reason */
 void SubWallet::removeCancelledTransactions(
-    const std::unordered_set<Crypto::Hash> cancelledTransactions)
+    const std::unordered_set<crypto::Hash> cancelledTransactions)
 {
     /* Find the inputs used in the cancelled transactions */
     auto it = std::remove_if(m_lockedInputs.begin(), m_lockedInputs.end(),
@@ -373,7 +373,7 @@ std::vector<WalletTypes::TxInputAndOwner> SubWallet::getSpendableInputs(
 
     for (const auto& input : m_unspentInputs)
     {
-        if (Utilities::isInputUnlocked(input.unlockTime, height))
+        if (utilities::isInputUnlocked(input.unlockTime, height))
         {
             inputs.emplace_back(input, m_publicSpendKey, m_privateSpendKey);
         }
