@@ -46,7 +46,7 @@ namespace cryptonote
     class LevinProtocol {
     public:
 
-      LevinProtocol(System::TcpConnection& connection);
+      LevinProtocol(system::TcpConnection& connection);
 
       template <typename Request, typename Response>
       bool invoke(uint32_t command, const Request& request, Response& response) {
@@ -84,7 +84,7 @@ namespace cryptonote
       template <typename T>
       static bool decode(const BinaryArray& buf, T& value) {
         try {
-          Common::MemoryInputStream stream(buf.data(), buf.size());
+          common::MemoryInputStream stream(buf.data(), buf.size());
           KVBinaryInputStreamSerializer serializer(stream);
           serialize(value, serializer);
         } catch (std::exception&) {
@@ -99,7 +99,7 @@ namespace cryptonote
         BinaryArray result;
         KVBinaryOutputStreamSerializer serializer;
         serialize(const_cast<T&>(value), serializer);
-        Common::VectorOutputStream stream(result);
+        common::VectorOutputStream stream(result);
         serializer.dump(stream);
         return result;
       }
@@ -108,6 +108,6 @@ namespace cryptonote
 
       bool readStrict(uint8_t* ptr, size_t size);
       void writeStrict(const uint8_t* ptr, size_t size);
-      System::TcpConnection& m_conn;
+      system::TcpConnection& m_conn;
     };
 }

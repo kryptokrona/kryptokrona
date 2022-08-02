@@ -66,7 +66,7 @@ namespace cryptonote
               return 0;
             }
 
-            size_t x = Random::randomValue<size_t>() % (maxIndex + 1);
+            size_t x = random::randomValue<size_t>() % (maxIndex + 1);
             return (x * x * x) / (maxIndex * maxIndex);
           }
 
@@ -85,13 +85,13 @@ namespace cryptonote
 
         void doWithTimeoutAndThrow(System::Dispatcher& dispatcher, std::chrono::nanoseconds timeout, std::function<void()> f) {
           std::string result;
-          System::ContextGroup cg(dispatcher);
-          System::ContextGroupTimeout cgTimeout(dispatcher, cg, timeout);
+          system::ContextGroup cg(dispatcher);
+          system::ContextGroupTimeout cgTimeout(dispatcher, cg, timeout);
 
           cg.spawn([&] {
             try {
               f();
-            } catch (System::InterruptedException&) {
+            } catch (system::InterruptedException&) {
               result = "Operation timeout";
             } catch (std::exception& e) {
               result = e.what();
@@ -106,7 +106,7 @@ namespace cryptonote
         }
     }
 
-    P2pNode::P2pNode(const P2pNodeConfig& cfg, Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log, const Crypto::Hash& genesisHash, uint64_t peerId) :
+    P2pNode::P2pNode(const P2pNodeConfig& cfg, Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, const crypto::Hash& genesisHash, uint64_t peerId) :
       logger(log, "P2pNode:" + std::to_string(cfg.getBindPort())),
       m_stopRequested(false),
       m_cfg(cfg),
@@ -161,13 +161,13 @@ namespace cryptonote
     void P2pNode::save(std::ostream& os) {
       StdOutputStream stream(os);
       BinaryOutputStreamSerializer a(stream);
-      CryptoNote::serialize(*this, a);
+      cryptonote::serialize(*this, a);
     }
 
     void P2pNode::load(std::istream& in) {
       StdInputStream stream(in);
       BinaryInputStreamSerializer a(stream);
-      CryptoNote::serialize(*this, a);
+      cryptonote::serialize(*this, a);
     }
 
     void P2pNode::acceptLoop() {
@@ -270,7 +270,7 @@ namespace cryptonote
         }
 
         logger(DEBUGGING) << "Selected peer: [" << peer.id << " " << peer.adr << "] last_seen: " <<
-          (peer.last_seen ? Common::timeIntervalToString(time(NULL) - peer.last_seen) : "never");
+          (peer.last_seen ? common::timeIntervalToString(time(NULL) - peer.last_seen) : "never");
 
         auto conn = tryToConnectPeer(peer.adr);
         if (conn.get()) {
@@ -340,7 +340,7 @@ namespace cryptonote
 
         doWithTimeoutAndThrow(m_dispatcher, m_cfg.getConnectTimeout(), [&] {
           tcpConnection = connector.connect(
-            Ipv4Address(Common::ipAddressToString(address.ip)),
+            Ipv4Address(common::ipAddressToString(address.ip)),
             static_cast<uint16_t>(address.port));
         });
 
@@ -381,10 +381,10 @@ namespace cryptonote
           return false;
         }
 
-        if (response.node_data.version < CryptoNote::P2P_MINIMUM_VERSION) {
+        if (response.node_data.version < cryptonote::P2P_MINIMUM_VERSION) {
           logger(DEBUGGING) << *connection << "COMMAND_HANDSHAKE Failed, peer is wrong version: " << std::to_string(response.node_data.version);
           return false;
-        } else if ((response.node_data.version - CryptoNote::P2P_CURRENT_VERSION) >= CryptoNote::P2P_UPGRADE_WINDOW) {
+        } else if ((response.node_data.version - cryptonote::P2P_CURRENT_VERSION) >= cryptonote::P2P_UPGRADE_WINDOW) {
           logger(WARNING) << *connection << "COMMAND_HANDSHAKE Warning, your software may be out of date. Please visit: "
             << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
         }
@@ -433,7 +433,7 @@ namespace cryptonote
     basic_node_data P2pNode::getNodeData() const {
       basic_node_data nodeData;
       nodeData.network_id = m_cfg.getNetworkId();
-      nodeData.version = CryptoNote::P2P_CURRENT_VERSION;
+      nodeData.version = cryptonote::P2P_CURRENT_VERSION;
       nodeData.local_time = time(nullptr);
       nodeData.peer_id = m_myPeerId;
 
@@ -506,7 +506,7 @@ namespace cryptonote
             entry.last_seen = time(nullptr);
             m_peerlist.append_with_peer_white(entry);
           } else {
-            logger(Logging::DEBUGGING) << ctx << "back ping invoke wrong response \"" << response.status << "\" from"
+            logger(logging::DEBUGGING) << ctx << "back ping invoke wrong response \"" << response.status << "\" from"
               << peerAddress << ", expected peerId=" << ctx.getPeerId() << ", got " << response.peer_id;
           }
         });
