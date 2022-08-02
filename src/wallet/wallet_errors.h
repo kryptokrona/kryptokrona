@@ -121,6 +121,6 @@ namespace cryptonote
     }
 }
 
-inline std::error_code make_error_code(CryptoNote::error::WalletErrorCodes e) {
-  return std::error_code(static_cast<int>(e), CryptoNote::error::WalletErrorCategory::INSTANCE);
+inline std::error_code make_error_code(cryptonote::error::WalletErrorCodes e) {
+  return std::error_code(static_cast<int>(e), cryptonote::error::WalletErrorCategory::INSTANCE);
 }
