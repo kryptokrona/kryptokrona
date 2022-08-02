@@ -37,7 +37,7 @@ class ThreadSafeQueue
                 return false;
             }
 
-            if (m_queue.size() >= Constants::MAXIMUM_SYNC_QUEUE_SIZE)
+            if (m_queue.size() >= constants::MAXIMUM_SYNC_QUEUE_SIZE)
             {
                 m_consumedBlock.wait(lock, [&]
                 {
@@ -49,7 +49,7 @@ class ThreadSafeQueue
 
                     /* Wait for the queue size to fall below the maximum size
                        before pushing our data */
-                    return m_queue.size() < Constants::MAXIMUM_SYNC_QUEUE_SIZE;
+                    return m_queue.size() < constants::MAXIMUM_SYNC_QUEUE_SIZE;
                 });
             }
 

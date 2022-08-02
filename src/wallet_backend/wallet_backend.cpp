@@ -132,8 +132,8 @@ WalletBackend::~WalletBackend()
 WalletBackend::WalletBackend(
     const std::string filename,
     const std::string password,
-    const Crypto::SecretKey privateSpendKey,
-    const Crypto::SecretKey privateViewKey,
+    const crypto::SecretKey privateSpendKey,
+    const crypto::SecretKey privateViewKey,
     const uint64_t scanHeight,
     const bool newWallet,
     const std::string daemonHost,
@@ -159,7 +159,7 @@ WalletBackend::WalletBackend(
 WalletBackend::WalletBackend(
     const std::string filename,
     const std::string password,
-    const Crypto::SecretKey privateViewKey,
+    const crypto::SecretKey privateViewKey,
     const std::string address,
     const uint64_t scanHeight,
     const std::string daemonHost,
@@ -200,19 +200,19 @@ std::tuple<Error, std::string> WalletBackend::createIntegratedAddress(
 
     uint64_t prefix;
 
-    CryptoNote::AccountPublicAddress addr;
+    cryptonote::AccountPublicAddress addr;
 
     /* Get the private + public key from the address */
-    CryptoNote::parseAccountAddressString(prefix, addr, address);
+    cryptonote::parseAccountAddressString(prefix, addr, address);
 
     /* Pack as a binary array */
-    CryptoNote::BinaryArray ba;
-    CryptoNote::toBinaryArray(addr, ba);
-    std::string keys = Common::asString(ba);
+    cryptonote::BinaryArray ba;
+    cryptonote::toBinaryArray(addr, ba);
+    std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
     const std::string integratedAddress = Tools::Base58::encode_addr(
-        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
         paymentID + keys
     );
 
@@ -243,10 +243,10 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFro
         return {mnemonicError, nullptr}; 
     }
 
-    Crypto::SecretKey privateViewKey;
+    crypto::SecretKey privateViewKey;
 
     /* Derive the private view key from the private spend key */
-    CryptoNote::AccountBase::generateViewFromSpend(
+    cryptonote::AccountBase::generateViewFromSpend(
         privateSpendKey, privateViewKey
     );
 
@@ -270,8 +270,8 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFro
 /* Imports a wallet from a private spend key and a view key. Returns
    the wallet class, or an error. */
 std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFromKeys(
-    const Crypto::SecretKey privateSpendKey,
-    const Crypto::SecretKey privateViewKey,
+    const crypto::SecretKey privateSpendKey,
+    const crypto::SecretKey privateViewKey,
     const std::string filename,
     const std::string password,
     const uint64_t scanHeight,
@@ -304,7 +304,7 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFro
 /* Imports a view wallet from a private view key and an address.
    Returns the wallet class, or an error. */
 std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importViewWallet(
-    const Crypto::SecretKey privateViewKey,
+    const crypto::SecretKey privateViewKey,
     const std::string address,
     const std::string filename,
     const std::string password,
@@ -344,15 +344,15 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::createWallet(
         return {error, nullptr};
     }
 	
-    CryptoNote::KeyPair spendKey;
-    Crypto::SecretKey privateViewKey;
-    Crypto::PublicKey publicViewKey;
+    cryptonote::KeyPair spendKey;
+    crypto::SecretKey privateViewKey;
+    crypto::PublicKey publicViewKey;
 
     /* Generate a spend key */
-    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+    crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
 
     /* Derive the view key from the spend key */
-    CryptoNote::AccountBase::generateViewFromSpend(
+    cryptonote::AccountBase::generateViewFromSpend(
         spendKey.secretKey, privateViewKey, publicViewKey
     );
 
@@ -397,7 +397,7 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::openWallet(
     /* Check that the decrypted data has the 'isAWallet' identifier,
        and remove it it does. If it doesn't, return an error. */
     Error error = hasMagicIdentifier(
-        buffer, Constants::IS_A_WALLET_IDENTIFIER,
+        buffer, constants::IS_A_WALLET_IDENTIFIER,
         NOT_A_WALLET_FILE, NOT_A_WALLET_FILE
     );
 
@@ -432,7 +432,7 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::openWallet(
     /* Generate the AES Key using pbkdf2 */
     pbkdf2.DeriveKey(
         key, sizeof(key), 0, (byte *)password.c_str(),
-        password.size(), salt, sizeof(salt), Constants::PBKDF2_ITERATIONS
+        password.size(), salt, sizeof(salt), constants::PBKDF2_ITERATIONS
     );
 
     CBC_Mode<AES>::Decryption cbcDecryption;
@@ -461,7 +461,7 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::openWallet(
     /* Check that the decrypted data has the 'isCorrectPassword' identifier,
        and remove it it does. If it doesn't, return an error. */
     error = hasMagicIdentifier(
-        decryptedData, Constants::IS_CORRECT_PASSWORD_IDENTIFIER,
+        decryptedData, constants::IS_CORRECT_PASSWORD_IDENTIFIER,
         WALLET_FILE_CORRUPTED, WRONG_PASSWORD
     );
 
@@ -562,8 +562,8 @@ Error WalletBackend::unsafeSave() const
     /* Add an identifier to the start of the string so we can verify the wallet
        has been correctly decrypted */
     std::string identiferAsString(
-        Constants::IS_CORRECT_PASSWORD_IDENTIFIER.begin(),
-        Constants::IS_CORRECT_PASSWORD_IDENTIFIER.end()
+        constants::IS_CORRECT_PASSWORD_IDENTIFIER.begin(),
+        constants::IS_CORRECT_PASSWORD_IDENTIFIER.end()
     );
 
     /* Add magic identifier, and get wallet as a JSON string */
@@ -586,7 +586,7 @@ Error WalletBackend::unsafeSave() const
     /* Generate the AES Key using pbkdf2 */
     pbkdf2.DeriveKey(
         key, sizeof(key), 0, (byte *)m_password.c_str(),
-        m_password.size(), salt, sizeof(salt), Constants::PBKDF2_ITERATIONS
+        m_password.size(), salt, sizeof(salt), constants::PBKDF2_ITERATIONS
     );
 
     CBC_Mode<AES>::Encryption cbcEncryption;
@@ -613,8 +613,8 @@ Error WalletBackend::unsafeSave() const
 
     /* Write the isAWalletIdentifier to the file, so when we open it we can
        verify that it is a wallet file */
-    std::copy(Constants::IS_A_WALLET_IDENTIFIER.begin(),
-              Constants::IS_A_WALLET_IDENTIFIER.end(),
+    std::copy(constants::IS_A_WALLET_IDENTIFIER.begin(),
+              constants::IS_A_WALLET_IDENTIFIER.end(),
               std::ostreambuf_iterator<char>(file));
 
     /* Write the salt to the file, so we can use it to unencrypt the file
@@ -669,7 +669,7 @@ uint64_t WalletBackend::getTotalUnlockedBalance() const
 
 /* This is simply a wrapper for Transfer::sendTransactionBasic - we need to
    pass in the daemon and subwallets instance */
-std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionBasic(
+std::tuple<Error, crypto::Hash> WalletBackend::sendTransactionBasic(
     const std::string destination,
     const uint64_t amount,
     const std::string paymentID)
@@ -679,7 +679,7 @@ std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionBasic(
     );
 }
 
-std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
+std::tuple<Error, crypto::Hash> WalletBackend::sendTransactionAdvanced(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     const uint64_t mixin,
     const uint64_t fee,
@@ -694,12 +694,12 @@ std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
     );
 }
 
-std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionBasic()
+std::tuple<Error, crypto::Hash> WalletBackend::sendFusionTransactionBasic()
 {
     return SendTransaction::sendFusionTransactionBasic(m_daemon, m_subWallets);
 }
 
-std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
+std::tuple<Error, crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
     const uint64_t mixin,
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string destination)
@@ -737,7 +737,7 @@ void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
     });
 }
 
-std::tuple<Error, std::string, Crypto::SecretKey> WalletBackend::addSubWallet()
+std::tuple<Error, std::string, crypto::SecretKey> WalletBackend::addSubWallet()
 {
     return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([this]() {
         /* Add the sub wallet */
@@ -746,7 +746,7 @@ std::tuple<Error, std::string, Crypto::SecretKey> WalletBackend::addSubWallet()
 }
 
 std::tuple<Error, std::string> WalletBackend::importSubWallet(
-    const Crypto::SecretKey privateSpendKey,
+    const crypto::SecretKey privateSpendKey,
     const uint64_t scanHeight)
 {
     return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([&, this]() {
@@ -777,7 +777,7 @@ std::tuple<Error, std::string> WalletBackend::importSubWallet(
 }
 
 std::tuple<Error, std::string> WalletBackend::importViewSubWallet(
-    const Crypto::PublicKey publicSpendKey,
+    const crypto::PublicKey publicSpendKey,
     const uint64_t scanHeight)
 {
     return m_syncRAIIWrapper->pauseSynchronizerToRunFunction([&, this]() {
@@ -872,7 +872,7 @@ Error WalletBackend::changePassword(const std::string newPassword)
     return save();
 }
 
-std::tuple<Error, Crypto::PublicKey, Crypto::SecretKey>
+std::tuple<Error, crypto::PublicKey, crypto::SecretKey>
     WalletBackend::getSpendKeys(const std::string &address) const
 {
     const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
@@ -882,13 +882,13 @@ std::tuple<Error, Crypto::PublicKey, Crypto::SecretKey>
     return {success, publicSpendKey, privateSpendKey};
 }
 
-Crypto::SecretKey WalletBackend::getPrivateViewKey() const
+crypto::SecretKey WalletBackend::getPrivateViewKey() const
 {
     return m_subWallets->getPrivateViewKey();
 }
 
 /* Returns the private spend key for the primary address, and the shared private view key */
-std::tuple<Crypto::SecretKey, Crypto::SecretKey> WalletBackend::getPrimaryAddressPrivateKeys() const
+std::tuple<crypto::SecretKey, crypto::SecretKey> WalletBackend::getPrimaryAddressPrivateKeys() const
 {
     return {m_subWallets->getPrimaryPrivateSpendKey(), m_subWallets->getPrivateViewKey()};
 }
@@ -909,11 +909,11 @@ std::tuple<Error, std::string> WalletBackend::getMnemonicSeedForAddress(
         return {error, std::string()};
     }
 
-    Crypto::SecretKey derivedPrivateViewKey;
+    crypto::SecretKey derivedPrivateViewKey;
 
     /* Derive the view key from the spend key, and check if it matches the
        actual view key */
-    CryptoNote::AccountBase::generateViewFromSpend(
+    cryptonote::AccountBase::generateViewFromSpend(
         privateSpendKey,
         derivedPrivateViewKey
     );
@@ -926,22 +926,22 @@ std::tuple<Error, std::string> WalletBackend::getMnemonicSeedForAddress(
     return {SUCCESS, Mnemonics::PrivateKeyToMnemonic(privateSpendKey)};
 }
 
-std::vector<WalletTypes::Transaction> WalletBackend::getTransactions() const
+std::vector<wallet_types::Transaction> WalletBackend::getTransactions() const
 {
     return m_subWallets->getTransactions();
 }
 
-std::vector<WalletTypes::Transaction> WalletBackend::getUnconfirmedTransactions() const
+std::vector<wallet_types::Transaction> WalletBackend::getUnconfirmedTransactions() const
 {
     return m_subWallets->getUnconfirmedTransactions();
 }
 
-WalletTypes::WalletStatus WalletBackend::getStatus() const
+wallet_types::WalletStatus WalletBackend::getStatus() const
 {
     const auto [walletBlockCount, localDaemonBlockCount, networkBlockCount]
         = getSyncStatus();
 
-    WalletTypes::WalletStatus status;
+    wallet_types::WalletStatus status;
 
     status.walletBlockCount = walletBlockCount;
     status.localDaemonBlockCount = localDaemonBlockCount;
@@ -955,10 +955,10 @@ WalletTypes::WalletStatus WalletBackend::getStatus() const
 
 /* Returns transactions in the range [startHeight, endHeight - 1] - so if
    we give 1, 100, it will return transactions from block 1 to block 99 */
-std::vector<WalletTypes::Transaction> WalletBackend::getTransactionsRange(
+std::vector<wallet_types::Transaction> WalletBackend::getTransactionsRange(
     const uint64_t startHeight, const uint64_t endHeight) const
 {
-    std::vector<WalletTypes::Transaction> result;
+    std::vector<wallet_types::Transaction> result;
 
     const auto transactions = getTransactions();
 
@@ -1000,13 +1000,13 @@ bool WalletBackend::daemonOnline() const
 }
 
 std::tuple<Error, std::string> WalletBackend::getAddress(
-    const Crypto::PublicKey spendKey) const
+    const crypto::PublicKey spendKey) const
 {
     return m_subWallets->getAddress(spendKey);
 }
 
-std::tuple<Error, Crypto::SecretKey> WalletBackend::getTxPrivateKey(
-    const Crypto::Hash txHash) const
+std::tuple<Error, crypto::SecretKey> WalletBackend::getTxPrivateKey(
+    const crypto::Hash txHash) const
 {
     const auto [success, key] = m_subWallets->getTxPrivateKey(txHash);
 
@@ -1031,7 +1031,7 @@ std::string WalletBackend::toJSON() const
     writer.StartObject();
 
     writer.Key("walletFileFormatVersion");
-    writer.Uint(Constants::WALLET_FILE_FORMAT_VERSION);
+    writer.Uint(constants::WALLET_FILE_FORMAT_VERSION);
 
     writer.Key("subWallets");
     m_subWallets->toJSON(writer);
@@ -1048,7 +1048,7 @@ Error WalletBackend::fromJSON(const rapidjson::Document &j)
 {
     uint64_t version = getUint64FromJSON(j, "walletFileFormatVersion");
 
-    if (version != Constants::WALLET_FILE_FORMAT_VERSION)
+    if (version != constants::WALLET_FILE_FORMAT_VERSION)
     {
         return UNSUPPORTED_WALLET_FILE_FORMAT_VERSION;
     }
