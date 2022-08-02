@@ -23,30 +23,30 @@ public:
 
   const PaymentService::ConfigurationManager& getConfig() const { return config; }
   PaymentService::WalletConfiguration getWalletConfig() const;
-  const CryptoNote::Currency getCurrency();
+  const cryptonote::Currency getCurrency();
 
   void run();
   void stop();
 
-  std::shared_ptr<Logging::ILogger> getLogger() { return logger; }
+  std::shared_ptr<logging::ILogger> getLogger() { return logger; }
 
 private:
 
-  void runInProcess(Logging::LoggerRef& log);
-  void runRpcProxy(Logging::LoggerRef& log);
+  void runInProcess(logging::LoggerRef& log);
+  void runRpcProxy(logging::LoggerRef& log);
 
-  void runWalletService(const CryptoNote::Currency& currency, CryptoNote::INode& node);
+  void runWalletService(const cryptonote::Currency& currency, cryptonote::INode& node);
 
-  System::Dispatcher* dispatcher;
-  System::Event* stopEvent;
+  system::Dispatcher* dispatcher;
+  system::Event* stopEvent;
   PaymentService::ConfigurationManager config;
   PaymentService::WalletService* service;
 
-  std::shared_ptr<Logging::LoggerGroup> logger = std::make_shared<Logging::LoggerGroup>();
+  std::shared_ptr<logging::LoggerGroup> logger = std::make_shared<logging::LoggerGroup>();
 
-  std::shared_ptr<CryptoNote::CurrencyBuilder> currencyBuilder;
+  std::shared_ptr<cryptonote::CurrencyBuilder> currencyBuilder;
 
   std::ofstream fileStream;
-  Logging::StreamLogger fileLogger;
-  Logging::ConsoleLogger consoleLogger;
+  logging::StreamLogger fileLogger;
+  logging::ConsoleLogger consoleLogger;
 };
