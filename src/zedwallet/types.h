@@ -16,7 +16,7 @@ struct WalletInfo
                std::string walletPass, 
                std::string walletAddress,
                bool viewWallet,
-               CryptoNote::WalletGreen &wallet) : 
+               cryptonote::WalletGreen &wallet) : 
                walletFileName(walletFileName), 
                walletPass(walletPass), 
                walletAddress(walletAddress),
@@ -39,7 +39,7 @@ struct WalletInfo
     bool viewWallet;
 
     /* The walletgreen wallet container */
-    CryptoNote::WalletGreen &wallet;
+    cryptonote::WalletGreen &wallet;
 };
 
 struct Config
@@ -93,7 +93,7 @@ struct AddressBookEntry
        address + payment ID pair */
     bool integratedAddress;
 
-    void serialize(CryptoNote::ISerializer &s)
+    void serialize(cryptonote::ISerializer &s)
     {
         KV_MEMBER(friendlyName)
         KV_MEMBER(address)

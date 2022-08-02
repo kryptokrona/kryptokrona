@@ -29,7 +29,7 @@ void confirmPassword(const std::string &walletPass, const std::string &msg)
     /* Password container requires an rvalue, we don't want to wipe our current
        pass so copy it into a tmp string and std::move that instead */
     std::string tmpString = walletPass;
-    Tools::PasswordContainer pwdContainer(std::move(tmpString));
+    tools::PasswordContainer pwdContainer(std::move(tmpString));
 
     while (!pwdContainer.read_and_validate(msg))
     {
@@ -41,7 +41,7 @@ void confirmPassword(const std::string &walletPass, const std::string &msg)
    e.g. 100 for 2 decimal places */
 uint64_t getDivisor()
 {
-    return static_cast<uint64_t>(pow(10, WalletConfig::numDecimalPlaces));
+    return static_cast<uint64_t>(pow(10, wallet_config::numDecimalPlaces));
 }
 
 std::string formatAmount(const uint64_t amount)
@@ -51,7 +51,7 @@ std::string formatAmount(const uint64_t amount)
     const uint64_t cents = amount % divisor;
 
     return formatDollars(dollars) + "." + formatCents(cents) + " "
-         + WalletConfig::ticker;
+         + wallet_config::ticker;
 }
 
 std::string formatAmountBasic(const uint64_t amount)
@@ -116,7 +116,7 @@ std::string formatDollars(const uint64_t amount)
 std::string formatCents(const uint64_t amount)
 {
     std::stringstream stream;
-    stream << std::setfill('0') << std::setw(WalletConfig::numDecimalPlaces)
+    stream << std::setfill('0') << std::setw(wallet_config::numDecimalPlaces)
            << amount;
     return stream.str();
 }
@@ -181,11 +181,11 @@ std::string getPaymentIDFromExtra(const std::string &extra)
             vecExtra.push_back(static_cast<uint8_t>(it));
         }
 
-        Crypto::Hash paymentIdHash;
+        crypto::Hash paymentIdHash;
 
-        if (CryptoNote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash))
+        if (cryptonote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash))
         {
-            return Common::podToHex(paymentIdHash);
+            return common::podToHex(paymentIdHash);
         }
     }
 
@@ -205,20 +205,20 @@ std::string createIntegratedAddress(const std::string &address,
 {
     uint64_t prefix;
 
-    CryptoNote::AccountPublicAddress addr;
+    cryptonote::AccountPublicAddress addr;
 
     /* Get the private + public key from the address */
-    CryptoNote::parseAccountAddressString(prefix, addr, address);
+    cryptonote::parseAccountAddressString(prefix, addr, address);
 
     /* Pack as a binary array */
-    CryptoNote::BinaryArray ba;
-    CryptoNote::toBinaryArray(addr, ba);
-    std::string keys = Common::asString(ba);
+    cryptonote::BinaryArray ba;
+    cryptonote::toBinaryArray(addr, ba);
+    std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
-    return Tools::Base58::encode_addr
+    return tools::Base58::encode_addr
     (
-        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
         paymentID + keys
     );
 }
@@ -311,7 +311,7 @@ bool fileExists(const std::string &filename)
     return static_cast<bool>(std::ifstream(filename));
 }
 
-bool shutdown(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
+bool shutdown(std::shared_ptr<WalletInfo> walletInfo, cryptonote::INode &node,
               bool &alreadyShuttingDown)
 {
     if (alreadyShuttingDown)
@@ -415,6 +415,6 @@ bool parseDaemonAddressFromString(std::string& host, int& port, const std::strin
     }
 
     host = parts.at(0);
-    port = CryptoNote::RPC_DEFAULT_PORT;
+    port = cryptonote::RPC_DEFAULT_PORT;
     return true;
 }

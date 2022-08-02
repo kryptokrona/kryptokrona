@@ -28,7 +28,7 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
         for (size_t i = walletInfo->knownTransactionCount; 
                     i < newTransactionCount; i++)
         {
-            const CryptoNote::WalletTransaction t 
+            const cryptonote::WalletTransaction t 
                 = walletInfo->wallet.getTransaction(i);
 
             /* Don't print outgoing or fusion transfers */
@@ -39,7 +39,7 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
                           << std::endl
                           << SuccessMsg("Incoming transfer:")
                           << std::endl
-                          << SuccessMsg("Hash: " + Common::podToHex(t.hash))
+                          << SuccessMsg("Hash: " + common::podToHex(t.hash))
                           << std::endl
                           << SuccessMsg("Amount: "
                                       + formatAmount(t.totalAmount))
@@ -66,7 +66,7 @@ void syncWallet(CryptoNote::INode &node,
 
     if (localHeight != remoteHeight)
     {
-        std::cout << "Your " << WalletConfig::daemonName << " isn't fully "
+        std::cout << "Your " << wallet_config::daemonName << " isn't fully "
                   << "synced yet!" << std::endl
                   << "Until you are fully synced, you won't be able to send "
                   << "transactions,"
@@ -145,11 +145,11 @@ void syncWallet(CryptoNote::INode &node,
             if (stuckCounter > 20)
             {
                 std::cout << WarningMsg("Syncing may be stuck. Try restarting ")
-                          << WarningMsg(WalletConfig::daemonName)
+                          << WarningMsg(wallet_config::daemonName)
                           << WarningMsg(".")
                           << std::endl
                           << WarningMsg("If this persists, visit ")
-                          << WarningMsg(WalletConfig::contactLink)
+                          << WarningMsg(wallet_config::contactLink)
                           << WarningMsg(" for support.")
                           << std::endl;
             }
@@ -177,7 +177,7 @@ void syncWallet(CryptoNote::INode &node,
             {
                 for (size_t i = transactionCount; i < tmpTransactionCount; i++)
                 {
-                    CryptoNote::WalletTransaction t
+                    cryptonote::WalletTransaction t
                         = walletInfo->wallet.getTransaction(i);
 
                     /* Don't print out fusion transactions */

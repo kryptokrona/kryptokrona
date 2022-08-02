@@ -34,30 +34,30 @@ int main(int argc, char **argv)
 
     Config config = parseArguments(argc, argv);
 
-    std::cout << InformationMsg(CryptoNote::getProjectCLIHeader()) << std::endl;
+    std::cout << InformationMsg(cryptonote::getProjectCLIHeader()) << std::endl;
 
-    const auto logManager = std::make_shared<Logging::LoggerManager>();
+    const auto logManager = std::make_shared<logging::LoggerManager>();
 
     if (config.debug)
     {
-        logManager->setMaxLevel(Logging::DEBUGGING);
+        logManager->setMaxLevel(logging::DEBUGGING);
 
-        Logging::FileLogger fileLogger;
+        logging::FileLogger fileLogger;
 
-        fileLogger.init(WalletConfig::walletName + ".log");
+        fileLogger.init(wallet_config::walletName + ".log");
         logManager->addLogger(fileLogger);
     }
 
     /* Currency contains our coin parameters, such as decimal places, supply */
-    const CryptoNote::Currency currency 
-        = CryptoNote::CurrencyBuilder(logManager).currency();
+    const cryptonote::Currency currency 
+        = cryptonote::CurrencyBuilder(logManager).currency();
 
-    System::Dispatcher localDispatcher;
-    System::Dispatcher *dispatcher = &localDispatcher;
+    system::Dispatcher localDispatcher;
+    system::Dispatcher *dispatcher = &localDispatcher;
 
     /* Our connection to kryptokronad */
-    std::unique_ptr<CryptoNote::INode> node(
-        new CryptoNote::NodeRpcProxy(config.host, config.port, 10, logManager)
+    std::unique_ptr<cryptonote::INode> node(
+        new cryptonote::NodeRpcProxy(config.host, config.port, 10, logManager)
     );
 
     std::promise<std::error_code> errorPromise;
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
              formatAmount(node->feeAmount()) << 
              " per transaction." << std::endl << std::endl <<
              "If you don't want to pay the node fee, please " <<
-             "relaunch " << WalletConfig::walletName <<
+             "relaunch " << wallet_config::walletName <<
              " and specify a different node or run your own." <<
              std::endl;
 
@@ -117,13 +117,13 @@ int main(int argc, char **argv)
     }
 
     /* Create the wallet instance */
-    CryptoNote::WalletGreen wallet(*dispatcher, currency, *node, logManager);
+    cryptonote::WalletGreen wallet(*dispatcher, currency, *node, logManager);
 
     /* Run the interactive wallet interface */
     run(wallet, *node, config);
 }
 
-void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+void run(cryptonote::WalletGreen &wallet, cryptonote::INode &node,
          Config &config)
 {
     auto [quit, walletInfo] = selectionScreen(config, wallet, node);
@@ -136,7 +136,7 @@ void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
         /* walletInfo = walletInfo - workaround for
            https://stackoverflow.com/a/46115028/8737306 - standard &
            capture works in newer compilers. */
-        Tools::SignalHandler::install([&walletInfo = walletInfo, &node,
+        tools::SignalHandler::install([&walletInfo = walletInfo, &node,
                                        &alreadyShuttingDown]
         {
             /* If we're already shutting down let control flow continue

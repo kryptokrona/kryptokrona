@@ -23,15 +23,15 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
                 uint64_t mixin, std::string nodeAddress, uint32_t nodeFee,
                 std::string originalAddress);
 
-void splitTX(CryptoNote::WalletGreen &wallet,
-             const CryptoNote::TransactionParameters splitTXParams,
+void splitTX(cryptonote::WalletGreen &wallet,
+             const cryptonote::TransactionParameters splitTXParams,
              uint32_t nodeFee);
 
 void sendTX(std::shared_ptr<WalletInfo> walletInfo, 
-            CryptoNote::TransactionParameters p, uint32_t height,
+            cryptonote::TransactionParameters p, uint32_t height,
             bool retried = false, uint32_t nodeFee = 0);
 
-bool confirmTransaction(CryptoNote::TransactionParameters t,
+bool confirmTransaction(cryptonote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo,
                         bool integratedAddress, uint32_t nodeFee,
                         std::string originalAddress);

@@ -33,7 +33,7 @@ bool startsWith(const std::string &str, const std::string &substring);
 
 bool fileExists(const std::string &filename);
 
-bool shutdown(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
+bool shutdown(std::shared_ptr<WalletInfo> walletInfo, cryptonote::INode &node,
               bool &alreadyShuttingDown);
 
 std::string formatAmountBasic(const uint64_t amount);
