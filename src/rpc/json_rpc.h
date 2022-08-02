@@ -62,17 +62,17 @@ namespace cryptonote
           std::string message;
         };
 
-        typedef boost::optional<Common::JsonValue> OptionalId;
-        typedef boost::optional<Common::JsonValue> OptionalPassword;
+        typedef boost::optional<common::JsonValue> OptionalId;
+        typedef boost::optional<common::JsonValue> OptionalPassword;
 
         class JsonRpcRequest {
         public:
 
-          JsonRpcRequest() : psReq(Common::JsonValue::OBJECT) {}
+          JsonRpcRequest() : psReq(common::JsonValue::OBJECT) {}
 
           bool parseRequest(const std::string& requestBody) {
             try {
-              psReq = Common::JsonValue::fromString(requestBody);
+              psReq = common::JsonValue::fromString(requestBody);
             } catch (std::exception&) {
               throw JsonRpcError(errParseError);
             }
@@ -131,7 +131,7 @@ namespace cryptonote
 
         private:
 
-          Common::JsonValue psReq;
+          common::JsonValue psReq;
           OptionalId id;
           OptionalPassword password;
           std::string method;
@@ -141,11 +141,11 @@ namespace cryptonote
         class JsonRpcResponse {
         public:
 
-          JsonRpcResponse() : psResp(Common::JsonValue::OBJECT) {}
+          JsonRpcResponse() : psResp(common::JsonValue::OBJECT) {}
 
           void parse(const std::string& responseBody) {
             try {
-              psResp = Common::JsonValue::fromString(responseBody);
+              psResp = common::JsonValue::fromString(responseBody);
             } catch (std::exception&) {
               throw JsonRpcError(errParseError);
             }
@@ -192,7 +192,7 @@ namespace cryptonote
           }
 
         private:
-          Common::JsonValue psResp;
+          common::JsonValue psResp;
         };
 
 
@@ -216,7 +216,7 @@ namespace cryptonote
           Request req;
           Response res;
 
-          if (!std::is_same<Request, CryptoNote::EMPTY_STRUCT>::value && !jsReq.loadParams(req)) {
+          if (!std::is_same<Request, cryptonote::EMPTY_STRUCT>::value && !jsReq.loadParams(req)) {
             throw JsonRpcError(JsonRpc::errInvalidParams);
           }
 
@@ -224,7 +224,7 @@ namespace cryptonote
 
           if (result) {
             if (!jsRes.setResult(res)) {
-              throw JsonRpcError(JsonRpc::errInternalError);
+              throw JsonRpcError(json_rpc::errInternalError);
             }
           }
           return result;
@@ -235,7 +235,7 @@ namespace cryptonote
         template <typename Class, typename Params, typename Result>
         JsonMemberMethod makeMemberMethod(bool (Class::*handler)(const Params&, Result&)) {
           return [handler](void* obj, const JsonRpcRequest& req, JsonRpcResponse& res) {
-            return JsonRpc::invokeMethod<Params, Result>(
+            return json_rpc::invokeMethod<Params, Result>(
               req, res, std::bind(handler, static_cast<Class*>(obj), std::placeholders::_1, std::placeholders::_2));
           };
         }
