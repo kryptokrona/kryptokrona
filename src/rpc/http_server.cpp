@@ -27,13 +27,13 @@ using namespace logging;
 
 namespace cryptonote
 {
-    HttpServer::HttpServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log)
+    HttpServer::HttpServer(system::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log)
       : m_dispatcher(dispatcher), workingContextGroup(dispatcher), logger(log, "HttpServer") {
 
     }
 
     void HttpServer::start(const std::string& address, uint16_t port) {
-      m_listener = System::TcpListener(m_dispatcher, System::Ipv4Address(address), port);
+      m_listener = system::TcpListener(m_dispatcher, system::Ipv4Address(address), port);
       workingContextGroup.spawn(std::bind(&HttpServer::acceptLoop, this));
     }
 
@@ -44,14 +44,14 @@ namespace cryptonote
 
     void HttpServer::acceptLoop() {
       try {
-        System::TcpConnection connection;
+        system::TcpConnection connection;
         bool accepted = false;
 
         while (!accepted) {
           try {
             connection = m_listener.accept();
             accepted = true;
-          } catch (System::InterruptedException&) {
+          } catch (system::InterruptedException&) {
             throw;
           } catch (std::exception&) {
             // try again
@@ -68,7 +68,7 @@ namespace cryptonote
 
         logger(DEBUGGING) << "Incoming connection from " << addr.first.toDottedDecimal() << ":" << addr.second;
 
-        System::TcpStreambuf streambuf(connection);
+        system::TcpStreambuf streambuf(connection);
         std::iostream stream(&streambuf);
         HttpParser parser;
 
@@ -89,7 +89,7 @@ namespace cryptonote
 
         logger(DEBUGGING) << "Closing connection from " << addr.first.toDottedDecimal() << ":" << addr.second << " total=" << m_connections.size();
 
-      } catch (System::InterruptedException&) {
+      } catch (system::InterruptedException&) {
       } catch (std::exception& e) {
         logger(DEBUGGING) << "Connection error: " << e.what();
       }

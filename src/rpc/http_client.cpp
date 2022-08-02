@@ -24,7 +24,7 @@
 
 namespace cryptonote
 {
-    HttpClient::HttpClient(System::Dispatcher& dispatcher, const std::string& address, uint16_t port) :
+    HttpClient::HttpClient(system::Dispatcher& dispatcher, const std::string& address, uint16_t port) :
       m_dispatcher(dispatcher), m_address(address), m_port(port) {
     }
 
@@ -55,9 +55,9 @@ namespace cryptonote
 
     void HttpClient::connect() {
       try {
-        auto ipAddr = System::Ipv4Resolver(m_dispatcher).resolve(m_address);
-        m_connection = System::TcpConnector(m_dispatcher).connect(ipAddr, m_port);
-        m_streamBuf.reset(new System::TcpStreambuf(m_connection));
+        auto ipAddr = system::Ipv4Resolver(m_dispatcher).resolve(m_address);
+        m_connection = system::TcpConnector(m_dispatcher).connect(ipAddr, m_port);
+        m_streamBuf.reset(new system::TcpStreambuf(m_connection));
         m_connected = true;
       } catch (const std::exception& e) {
         throw ConnectException(e.what());
@@ -77,7 +77,7 @@ namespace cryptonote
       }
 
       try {
-        m_connection = System::TcpConnection();
+        m_connection = system::TcpConnection();
       } catch (std::exception&) {
         //Ignoring possible exception.
       }
