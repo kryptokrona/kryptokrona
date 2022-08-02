@@ -11,18 +11,18 @@ int main(int argc, char **argv)
 {
     while (true)
     {
-        CryptoNote::MiningConfig config;
+        cryptonote::MiningConfig config;
         config.parse(argc, argv);
 
         try
         {
-            System::Dispatcher dispatcher;
+            system::Dispatcher dispatcher;
 
             auto httpClient = std::make_shared<httplib::Client>(
                 config.daemonHost.c_str(), config.daemonPort, 10 /* 10 second timeout */
             );
 
-            Miner::MinerManager app(dispatcher, config, httpClient);
+            miner::MinerManager app(dispatcher, config, httpClient);
 
             app.start();
         }
