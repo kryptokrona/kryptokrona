@@ -25,52 +25,52 @@ namespace cryptonote
 {
     uint64_t getDefaultMixinByHeight(const uint64_t height)
     {
-        if (height >= CryptoNote::parameters::MIXIN_LIMITS_V3_HEIGHT)
+        if (height >= cryptonote::parameters::MIXIN_LIMITS_V3_HEIGHT)
         {
-            return CryptoNote::parameters::DEFAULT_MIXIN_V3;
+            return cryptonote::parameters::DEFAULT_MIXIN_V3;
         }
-        if (height >= CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT)
+        if (height >= cryptonote::parameters::MIXIN_LIMITS_V2_HEIGHT)
         {
-            return CryptoNote::parameters::DEFAULT_MIXIN_V2;
+            return cryptonote::parameters::DEFAULT_MIXIN_V2;
         }
-        else if (height >= CryptoNote::parameters::MIXIN_LIMITS_V1_HEIGHT)
+        else if (height >= cryptonote::parameters::MIXIN_LIMITS_V1_HEIGHT)
         {
-            return CryptoNote::parameters::DEFAULT_MIXIN_V1;
+            return cryptonote::parameters::DEFAULT_MIXIN_V1;
         }
         else
         {
-            return CryptoNote::parameters::DEFAULT_MIXIN_V0;
+            return cryptonote::parameters::DEFAULT_MIXIN_V0;
         }
     }
 
-    void throwIfKeysMismatch(const Crypto::SecretKey& secretKey, const Crypto::PublicKey& expectedPublicKey, const std::string& message) {
-      Crypto::PublicKey pub;
-      bool r = Crypto::secret_key_to_public_key(secretKey, pub);
+    void throwIfKeysMismatch(const crypto::SecretKey& secretKey, const crypto::PublicKey& expectedPublicKey, const std::string& message) {
+      crypto::PublicKey pub;
+      bool r = crypto::secret_key_to_public_key(secretKey, pub);
       if (!r || expectedPublicKey != pub) {
-        throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD), message);
+        throw std::system_error(make_error_code(cryptonote::error::WRONG_PASSWORD), message);
       }
     }
 
-    bool validateAddress(const std::string& address, const CryptoNote::Currency& currency) {
-      CryptoNote::AccountPublicAddress ignore;
+    bool validateAddress(const std::string& address, const cryptonote::Currency& currency) {
+      cryptonote::AccountPublicAddress ignore;
       return currency.parseAccountAddressString(address, ignore);
     }
 
-    std::ostream& operator<<(std::ostream& os, CryptoNote::WalletTransactionState state) {
+    std::ostream& operator<<(std::ostream& os, cryptonote::WalletTransactionState state) {
       switch (state) {
-      case CryptoNote::WalletTransactionState::SUCCEEDED:
+      case cryptonote::WalletTransactionState::SUCCEEDED:
         os << "SUCCEEDED";
         break;
-      case CryptoNote::WalletTransactionState::FAILED:
+      case cryptonote::WalletTransactionState::FAILED:
         os << "FAILED";
         break;
-      case CryptoNote::WalletTransactionState::CANCELLED:
+      case cryptonote::WalletTransactionState::CANCELLED:
         os << "CANCELLED";
         break;
-      case CryptoNote::WalletTransactionState::CREATED:
+      case cryptonote::WalletTransactionState::CREATED:
         os << "CREATED";
         break;
-      case CryptoNote::WalletTransactionState::DELETED:
+      case cryptonote::WalletTransactionState::DELETED:
         os << "DELETED";
         break;
       default:
@@ -80,15 +80,15 @@ namespace cryptonote
       return os << " (" << static_cast<int>(state) << ')';
     }
 
-    std::ostream& operator<<(std::ostream& os, CryptoNote::WalletTransferType type) {
+    std::ostream& operator<<(std::ostream& os, cryptonote::WalletTransferType type) {
       switch (type) {
-      case CryptoNote::WalletTransferType::USUAL:
+      case cryptonote::WalletTransferType::USUAL:
         os << "USUAL";
         break;
-      case CryptoNote::WalletTransferType::DONATION:
+      case cryptonote::WalletTransferType::DONATION:
         os << "DONATION";
         break;
-      case CryptoNote::WalletTransferType::CHANGE:
+      case cryptonote::WalletTransferType::CHANGE:
         os << "CHANGE";
         break;
       default:
@@ -98,12 +98,12 @@ namespace cryptonote
       return os << " (" << static_cast<int>(type) << ')';
     }
 
-    std::ostream& operator<<(std::ostream& os, CryptoNote::WalletGreen::WalletState state) {
+    std::ostream& operator<<(std::ostream& os, cryptonote::WalletGreen::WalletState state) {
       switch (state) {
-      case CryptoNote::WalletGreen::WalletState::INITIALIZED:
+      case cryptonote::WalletGreen::WalletState::INITIALIZED:
         os << "INITIALIZED";
         break;
-      case CryptoNote::WalletGreen::WalletState::NOT_INITIALIZED:
+      case cryptonote::WalletGreen::WalletState::NOT_INITIALIZED:
         os << "NOT_INITIALIZED";
         break;
       default:
@@ -113,15 +113,15 @@ namespace cryptonote
       return os << " (" << static_cast<int>(state) << ')';
     }
 
-    std::ostream& operator<<(std::ostream& os, CryptoNote::WalletGreen::WalletTrackingMode mode) {
+    std::ostream& operator<<(std::ostream& os, cryptonote::WalletGreen::WalletTrackingMode mode) {
       switch (mode) {
-      case CryptoNote::WalletGreen::WalletTrackingMode::TRACKING:
+      case cryptonote::WalletGreen::WalletTrackingMode::TRACKING:
         os << "TRACKING";
         break;
-      case CryptoNote::WalletGreen::WalletTrackingMode::NOT_TRACKING:
+      case cryptonote::WalletGreen::WalletTrackingMode::NOT_TRACKING:
         os << "NOT_TRACKING";
         break;
-      case CryptoNote::WalletGreen::WalletTrackingMode::NO_ADDRESSES:
+      case cryptonote::WalletGreen::WalletTrackingMode::NO_ADDRESSES:
         os << "NO_ADDRESSES";
         break;
       default:
@@ -131,7 +131,7 @@ namespace cryptonote
       return os << " (" << static_cast<int>(mode) << ')';
     }
 
-    TransferListFormatter::TransferListFormatter(const CryptoNote::Currency& currency, const WalletGreen::TransfersRange& range) :
+    TransferListFormatter::TransferListFormatter(const cryptonote::Currency& currency, const WalletGreen::TransfersRange& range) :
       m_currency(currency),
       m_range(range) {
     }
@@ -149,7 +149,7 @@ namespace cryptonote
       return os;
     }
 
-    WalletOrderListFormatter::WalletOrderListFormatter(const CryptoNote::Currency& currency, const std::vector<CryptoNote::WalletOrder>& walletOrderList) :
+    WalletOrderListFormatter::WalletOrderListFormatter(const cryptonote::Currency& currency, const std::vector<cryptonote::WalletOrder>& walletOrderList) :
       m_currency(currency),
       m_walletOrderList(walletOrderList) {
     }
