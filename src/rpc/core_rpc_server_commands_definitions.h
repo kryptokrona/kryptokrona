@@ -828,7 +828,7 @@ namespace cryptonote
 
       struct response {
         std::string status;
-        std::vector<WalletTypes::WalletBlockInfo> items;
+        std::vector<wallet_types::WalletBlockInfo> items;
 
         void serialize(ISerializer &s) {
           KV_MEMBER(status)

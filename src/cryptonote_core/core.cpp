@@ -2458,7 +2458,7 @@ namespace cryptonote
 
               if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
               {
-                logger(logging::INFO) << "Removing.. ";
+                logger(logging::DEBUGGING) << "Removing.. ";
                 transactionPool->removeTransaction(transaction.getTransactionHash());
 
               }
@@ -2485,12 +2485,12 @@ namespace cryptonote
           std::time_t currentTime = std::time(0);
           uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
 
-          logger(logging::INFO) << "Transaction age is "
+          logger(logging::DEBUGGING) << "Transaction age is "
                                  << transactionAge;
 
           if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
           {
-            logger(logging::INFO) << "Removing.. ";
+            logger(logging::DEBUGGING) << "Removing.. ";
 
             transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
 
