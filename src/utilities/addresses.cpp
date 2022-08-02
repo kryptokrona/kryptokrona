@@ -64,7 +64,7 @@ namespace utilities
         std::string decoded;
 
         /* Decode from base58 */
-        Tools::Base58::decode_addr(address, ignore, decoded);
+        tools::Base58::decode_addr(address, ignore, decoded);
 
         const uint64_t paymentIDLen = 64;
 
