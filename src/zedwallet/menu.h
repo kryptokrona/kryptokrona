@@ -14,14 +14,14 @@ std::string parseCommand(const std::vector<T> &printableCommands,
                          std::shared_ptr<WalletInfo> walletInfo);
 
 std::tuple<bool, std::shared_ptr<WalletInfo>>
-    selectionScreen(Config &config, CryptoNote::WalletGreen &wallet,
-                    CryptoNote::INode &node);
+    selectionScreen(Config &config, cryptonote::WalletGreen &wallet,
+                    cryptonote::INode &node);
 
-bool checkNodeStatus(CryptoNote::INode &node);
+bool checkNodeStatus(cryptonote::INode &node);
 
 std::string getAction(Config &config);
 
-void mainLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node);
+void mainLoop(std::shared_ptr<WalletInfo> walletInfo, cryptonote::INode &node);
 
 template<typename T>
 void printCommands(const std::vector<T> &commands, size_t offset = 0);
