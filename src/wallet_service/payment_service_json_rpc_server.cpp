@@ -20,7 +20,7 @@
 
 namespace payment_service
 {
-    PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, WalletService& service, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config)
+    PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(system::Dispatcher& sys, system::Event& stopEvent, WalletService& service, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config)
       : JsonRpcServer(sys, stopEvent, loggerGroup, config)
       , service(service)
       , logger(loggerGroup, "PaymentServiceJsonRpcServer")
@@ -71,7 +71,7 @@ namespace payment_service
           clientPassword = req("password").getString();
 
           std::vector<uint8_t> rawData(clientPassword.begin(), clientPassword.end());
-          Crypto::Hash hashedPassword = Crypto::Hash();
+          crypto::Hash hashedPassword = crypto::Hash();
           cn_slow_hash_v0(rawData.data(), rawData.size(), hashedPassword);
           if (hashedPassword != config.rpcSecret) {
             makeInvalidPasswordResponse(resp);
@@ -80,13 +80,13 @@ namespace payment_service
         }
 
         if (!req.contains("method")) {
-          logger(Logging::WARNING) << "Field \"method\" is not found in json request: " << req;
+          logger(logging::WARNING) << "Field \"method\" is not found in json request: " << req;
           makeGenericErrorReponse(resp, "Invalid Request", -3600);
           return;
         }
 
         if (!req("method").isString()) {
-          logger(Logging::WARNING) << "Field \"method\" is not a string type: " << req;
+          logger(logging::WARNING) << "Field \"method\" is not a string type: " << req;
           makeGenericErrorReponse(resp, "Invalid Request", -3600);
           return;
         }
@@ -95,12 +95,12 @@ namespace payment_service
 
         auto it = handlers.find(method);
         if (it == handlers.end()) {
-          logger(Logging::WARNING) << "Requested method not found: " << method;
+          logger(logging::WARNING) << "Requested method not found: " << method;
           makeMethodNotFoundResponse(resp);
           return;
         }
 
-        logger(Logging::DEBUGGING) << method << " request came";
+        logger(logging::DEBUGGING) << method << " request came";
 
         Common::JsonValue params(Common::JsonValue::OBJECT);
         if (req.contains("params")) {
@@ -109,7 +109,7 @@ namespace payment_service
 
         it->second(params, resp);
       } catch (std::exception& e) {
-        logger(Logging::WARNING) << "Error occurred while processing JsonRpc request: " << e.what();
+        logger(logging::WARNING) << "Error occurred while processing JsonRpc request: " << e.what();
         makeGenericErrorReponse(resp, e.what());
       }
     }
