@@ -6,9 +6,9 @@
 #include <wallet_api/api_dispatcher.h>
 ////////////////////////////////////
 
-#include <config/cryptonote_config.h>
+#include <config/cryptonote::_config.h>
 
-#include <cryptonote_core/mixins.h>
+#include <cryptonote::_core/mixins.h>
 
 #include <crypto/random.h>
 
@@ -41,7 +41,7 @@ ApiDispatcher::ApiDispatcher(
     m_rpcPassword(rpcPassword)
 {
     /* Generate the salt used for pbkdf2 api authentication */
-    Random::randomBytes(16, m_salt);
+    random::randomBytes(16, m_salt);
 
     /* Make sure to do this after initializing the salt above! */
     m_hashedPassword = hashPassword(rpcPassword);
@@ -116,7 +116,7 @@ ApiDispatcher::ApiDispatcher(
             .Delete("/wallet", router(&ApiDispatcher::closeWallet, walletMustBeOpen, viewWalletsAllowed))
 
             /* Delete the given address */
-            .Delete("/addresses/" + ApiConstants::addressRegex, router(&ApiDispatcher::deleteAddress, walletMustBeOpen, viewWalletsAllowed))
+            .Delete("/addresses/" + api_constants::addressRegex, router(&ApiDispatcher::deleteAddress, walletMustBeOpen, viewWalletsAllowed))
 
     /* PUT */
 
@@ -138,10 +138,10 @@ ApiDispatcher::ApiDispatcher(
             .Get("/keys", router(&ApiDispatcher::getPrivateViewKey, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get the spend keys for the given address */
-            .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys, walletMustBeOpen, viewWalletsBanned))
+            .Get("/keys/" + api_constants:::addressRegex, router(&ApiDispatcher::getSpendKeys, walletMustBeOpen, viewWalletsBanned))
 
             /* Get the mnemonic seed for the given address */
-            .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed, walletMustBeOpen, viewWalletsBanned))
+            .Get("/keys/mnemonic/" + api_constants:::addressRegex, router(&ApiDispatcher::getMnemonicSeed, walletMustBeOpen, viewWalletsBanned))
 
             /* Get the wallet status */
             .Get("/status", router(&ApiDispatcher::getStatus, walletMustBeOpen, viewWalletsAllowed))
@@ -153,7 +153,7 @@ ApiDispatcher::ApiDispatcher(
             .Get("/addresses/primary", router(&ApiDispatcher::getPrimaryAddress, walletMustBeOpen, viewWalletsAllowed))
 
             /* Creates an integrated address from the given address and payment ID */
-            .Get("/addresses/" + ApiConstants::addressRegex + "/" + ApiConstants::hashRegex, router(
+            .Get("/addresses/" + api_constants:::addressRegex + "/" + api_constants:::hashRegex, router(
                 &ApiDispatcher::createIntegratedAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
@@ -164,7 +164,7 @@ ApiDispatcher::ApiDispatcher(
             .Get("/transactions/unconfirmed", router(&ApiDispatcher::getUnconfirmedTransactions, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get all (outgoing) unconfirmed transactions, belonging to the given address */
-            .Get("/transactions/unconfirmed/" + ApiConstants::addressRegex, router(
+            .Get("/transactions/unconfirmed/" + api_constants:::addressRegex, router(
                 &ApiDispatcher::getUnconfirmedTransactionsForAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
@@ -175,28 +175,28 @@ ApiDispatcher::ApiDispatcher(
             .Get("/transactions/\\d+/\\d+", router(&ApiDispatcher::getTransactionsFromHeightToHeight, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get the transactions starting at the given block, for 1000 blocks, belonging to the given address */
-            .Get("/transactions/address/" + ApiConstants::addressRegex + "/\\d+", router(
+            .Get("/transactions/address/" + api_constants:::addressRegex + "/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
             /* Get the transactions starting at the given block, and ending at the given block, belonging to the given address */
-            .Get("/transactions/address/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
+            .Get("/transactions/address/" + api_constants:::addressRegex + "/\\d+/\\d+", router(
                 &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed)
             )
 
             /* Get the transaction private key for the given hash */
-            .Get("/transactions/privatekey/" + ApiConstants::hashRegex, router(
+            .Get("/transactions/privatekey/" + api_constants:::hashRegex, router(
                 &ApiDispatcher::getTxPrivateKey, walletMustBeOpen, viewWalletsBanned)
             )
 
             /* Get details for the given transaction hash, if known */
-            .Get("/transactions/hash/" + ApiConstants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
+            .Get("/transactions/hash/" + api_constants:::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get balance for the wallet */
             .Get("/balance", router(&ApiDispatcher::getBalance, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get balance for a specific address */
-            .Get("/balance/" + ApiConstants::addressRegex, router(&ApiDispatcher::getBalanceForAddress, walletMustBeOpen, viewWalletsAllowed))
+            .Get("/balance/" + api_constants:::addressRegex, router(&ApiDispatcher::getBalanceForAddress, walletMustBeOpen, viewWalletsAllowed))
 
             /* Get balances for each address */
             .Get("/balances", router(&ApiDispatcher::getBalances, walletMustBeOpen, viewWalletsAllowed))
@@ -394,8 +394,8 @@ std::tuple<Error, uint16_t> ApiDispatcher::keyImportWallet(
 
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
-    const auto privateViewKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateViewKey");
-    const auto privateSpendKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateSpendKey");
+    const auto privateViewKey = tryGetJsonValue<crypto::SecretKey>(body, "privateViewKey");
+    const auto privateSpendKey = tryGetJsonValue<crypto::SecretKey>(body, "privateSpendKey");
 
     uint64_t scanHeight = 0;
 
@@ -451,7 +451,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importViewWallet(
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
     const std::string address = tryGetJsonValue<std::string>(body, "address");
-    const auto privateViewKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateViewKey");
+    const auto privateViewKey = tryGetJsonValue<crypto::SecretKey>(body, "privateViewKey");
 
     uint64_t scanHeight = 0;
 
@@ -519,7 +519,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importAddress(
         scanHeight = tryGetJsonValue<uint64_t>(body, "scanHeight");
     }
 
-    const auto privateSpendKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateSpendKey");
+    const auto privateSpendKey = tryGetJsonValue<crypto::SecretKey>(body, "privateSpendKey");
 
     const auto [error, address] = m_walletBackend->importSubWallet(
         privateSpendKey, scanHeight
@@ -553,7 +553,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importViewAddress(
         scanHeight = tryGetJsonValue<uint64_t>(body, "scanHeight");
     }
 
-    const auto publicSpendKey = tryGetJsonValue<Crypto::PublicKey>(body, "publicSpendKey");
+    const auto publicSpendKey = tryGetJsonValue<crypto::PublicKey>(body, "publicSpendKey");
 
     const auto [error, address] = m_walletBackend->importViewSubWallet(
         publicSpendKey, scanHeight
@@ -632,12 +632,12 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedTransaction(
     else
     {
         /* Get the default mixin */
-        std::tie(std::ignore, std::ignore, mixin) = CryptoNote::Mixins::getMixinAllowableRange(
+        std::tie(std::ignore, std::ignore, mixin) = cryptonote::::Mixins::getMixinAllowableRange(
             m_walletBackend->getStatus().networkBlockCount
         );
     }
 
-    uint64_t fee = WalletConfig::defaultFee;
+    uint64_t fee = wallet_config::defaultFee;
 
     if (body.find("fee") != body.end())
     {
@@ -728,7 +728,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedFusionTransaction(
     else
     {
         /* Get the default mixin */
-        std::tie(std::ignore, std::ignore, mixin) = CryptoNote::Mixins::getMixinAllowableRange(
+        std::tie(std::ignore, std::ignore, mixin) = cryptonote::::Mixins::getMixinAllowableRange(
             m_walletBackend->getStatus().networkBlockCount
         );
     }
@@ -953,7 +953,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getStatus(
     Response &res,
     const nlohmann::json &body) const
 {
-    const WalletTypes::WalletStatus status = m_walletBackend->getStatus();
+    const wallet_types::WalletStatus status = m_walletBackend->getStatus();
 
     nlohmann::json j {
         {"walletBlockCount", status.walletBlockCount},
@@ -1069,7 +1069,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getUnconfirmedTransactionsForAddress(
 
     const auto txs = m_walletBackend->getUnconfirmedTransactions();
 
-    std::vector<WalletTypes::Transaction> result;
+    std::vector<wallet_types::Transaction> result;
 
     std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
     [address, this](const auto tx)
@@ -1216,7 +1216,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightWithAddress(
             startHeight, startHeight + 1000
         );
 
-        std::vector<WalletTypes::Transaction> result;
+        std::vector<wallet_types::Transaction> result;
 
         std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
         [address, this](const auto tx)
@@ -1299,7 +1299,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeightWith
             startHeight, endHeight
         );
 
-        std::vector<WalletTypes::Transaction> result;
+        std::vector<wallet_types::Transaction> result;
 
         std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
         [address, this](const auto tx)
@@ -1347,9 +1347,9 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionDetails(
 {
     std::string hashStr = req.path.substr(std::string("/transactions/hash/").size());
 
-    Crypto::Hash hash;
+    crypto::Hash hash;
 
-    Common::podFromHex(hashStr, hash.data);
+    common::podFromHex(hashStr, hash.data);
 
     for (const auto& tx : m_walletBackend->getTransactions())
     {
@@ -1440,9 +1440,9 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTxPrivateKey(
 {
     std::string txHashStr = req.path.substr(std::string("/transactions/privatekey/").size());
 
-    Crypto::Hash txHash;
+    crypto::Hash txHash;
 
-    Common::podFromHex(txHashStr, txHash.data);
+    common::podFromHex(txHashStr, txHash.data);
 
     const auto [error, key] = m_walletBackend->getTxPrivateKey(txHash);
 
@@ -1501,7 +1501,7 @@ std::tuple<std::string, uint16_t, std::string, std::string>
     ApiDispatcher::getDefaultWalletParams(const nlohmann::json body) const
 {
     std::string daemonHost = "127.0.0.1";
-    uint16_t daemonPort = CryptoNote::RPC_DEFAULT_PORT;
+    uint16_t daemonPort = cryptonote::::RPC_DEFAULT_PORT;
 
     const std::string filename = tryGetJsonValue<std::string>(body, "filename"); 
     const std::string password = tryGetJsonValue<std::string>(body, "password");
@@ -1577,7 +1577,7 @@ void ApiDispatcher::publicKeysToAddresses(nlohmann::json &j) const
         for (auto &tx : item.at("transfers"))
         {
             /* Get the spend key */
-            Crypto::PublicKey spendKey = tx.at("publicKey").get<Crypto::PublicKey>();
+            crypto::PublicKey spendKey = tx.at("publicKey").get<crypto::PublicKey>();
 
             /* Get the address it belongs to */
             const auto [error, address] = m_walletBackend->getAddress(spendKey);
@@ -1603,8 +1603,8 @@ std::string ApiDispatcher::hashPassword(const std::string password) const
     /* Hash the password with pbkdf2 */
     pbkdf2.DeriveKey(
         key, sizeof(key), 0, (byte *)password.c_str(),
-        password.size(), m_salt, sizeof(m_salt), ApiConstants::PBKDF2_ITERATIONS
+        password.size(), m_salt, sizeof(m_salt), api_constants:::PBKDF2_ITERATIONS
     );
 
-    return Common::podToHex(key);
+    return common::podToHex(key);
 }

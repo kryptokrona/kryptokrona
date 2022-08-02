@@ -18,7 +18,7 @@ Config parseArguments(int argc, char **argv)
 {
     Config config;
 
-    cxxopts::Options options(argv[0], CryptoNote::getProjectCLIHeader());
+    cxxopts::Options options(argv[0], cryptonote::getProjectCLIHeader());
 
     bool help, version;
 
@@ -29,7 +29,7 @@ Config parseArguments(int argc, char **argv)
 
     options.add_options("Network")
         ("p,port", "The port to listen on for http requests",
-        cxxopts::value<uint16_t>(config.port)->default_value(std::to_string(CryptoNote::SERVICE_DEFAULT_PORT)), "<port>")
+        cxxopts::value<uint16_t>(config.port)->default_value(std::to_string(cryptonote::SERVICE_DEFAULT_PORT)), "<port>")
 
         ("rpc-bind-ip", "Interface IP address for the RPC service",
         cxxopts::value<std::string>(config.rpcBindIp)->default_value("127.0.0.1"));
@@ -66,7 +66,7 @@ Config parseArguments(int argc, char **argv)
     }
     else if (version) // Do we want to display the software version?
     {
-        std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+        std::cout << cryptonote::getProjectCLIHeader() << std::endl;
         exit(0);
     }
 
