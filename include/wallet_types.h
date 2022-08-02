@@ -18,7 +18,7 @@ namespace wallet_types
 {
     struct KeyOutput
     {
-        crypto::::PublicKey key;
+        crypto::PublicKey key;
 
         uint64_t amount;
 
@@ -37,10 +37,10 @@ namespace wallet_types
         std::vector<KeyOutput> keyOutputs;
 
         /* The hash of the transaction */
-        crypto::::Hash hash;
+        crypto::Hash hash;
 
         /* The public key of this transaction, taken from the tx extra */
-        crypto::::PublicKey transactionPublicKey;
+        crypto::PublicKey transactionPublicKey;
 
         /* When this transaction's inputs become spendable. Some genius thought
            it was a good idea to use this field as both a block height, and a
@@ -58,7 +58,7 @@ namespace wallet_types
 
         /* The inputs used for a transaction, can be used to track outgoing
            transactions */
-        std::vector<cryptonote::::KeyInput> keyInputs;
+        std::vector<cryptonote::KeyInput> keyInputs;
     };
 
     /* A 'block' with the very basics needed to sync the transactions */
@@ -74,7 +74,7 @@ namespace wallet_types
         uint64_t blockHeight;
 
         /* The hash of the block */
-        crypto::::Hash blockHash;
+        crypto::Hash blockHash;
 
         /* The timestamp of the block */
         uint64_t blockTimestamp;
@@ -83,7 +83,7 @@ namespace wallet_types
     struct TransactionInput
     {
         /* The key image of this amount */
-        crypto::::KeyImage keyImage;
+        crypto::KeyImage keyImage;
 
         /* The value of this key image */
         uint64_t amount;
@@ -95,7 +95,7 @@ namespace wallet_types
 
         /* The transaction public key that was included in the tx_extra of the
            transaction */
-        crypto::::PublicKey transactionPublicKey;
+        crypto::PublicKey transactionPublicKey;
 
         /* The index of this input in the transaction */
         uint64_t transactionIndex;
@@ -104,7 +104,7 @@ namespace wallet_types
         std::optional<uint64_t> globalOutputIndex;
 
         /* The transaction key we took from the key outputs */
-        crypto::::PublicKey key;
+        crypto::PublicKey key;
         
         /* If spent, what height did we spend it at. Used to remove spent
            transaction inputs once they are sure to not be removed from a
@@ -118,7 +118,7 @@ namespace wallet_types
         uint64_t unlockTime;
 
         /* The transaction hash of the transaction that contains this input */
-        crypto::::Hash parentTransactionHash;
+        crypto::Hash parentTransactionHash;
 
         bool operator==(const TransactionInput &other)
         {
@@ -185,8 +185,8 @@ namespace wallet_types
     {
         TxInputAndOwner(
             const TransactionInput input,
-            const crypto::::PublicKey publicSpendKey,
-            const crypto::::SecretKey privateSpendKey) :
+            const crypto::PublicKey publicSpendKey,
+            const crypto::SecretKey privateSpendKey) :
 
             input(input),
             publicSpendKey(publicSpendKey),
@@ -196,18 +196,18 @@ namespace wallet_types
 
         TransactionInput input;
 
-        crypto::::PublicKey publicSpendKey;
+        crypto::PublicKey publicSpendKey;
 
-        crypto::::SecretKey privateSpendKey;
+        crypto::SecretKey privateSpendKey;
     };
 
     struct TransactionDestination
     {
         /* The public spend key of the receiver of the transaction output */
-        crypto::::PublicKey receiverPublicSpendKey;
+        crypto::PublicKey receiverPublicSpendKey;
 
         /* The public view key of the receiver of the transaction output */
-        crypto::::PublicKey receiverPublicViewKey;
+        crypto::PublicKey receiverPublicViewKey;
 
         /* The amount of the transaction output */
         uint64_t amount;
@@ -216,7 +216,7 @@ namespace wallet_types
     struct GlobalIndexKey
     {
         uint64_t index;
-        crypto::::PublicKey key;
+        crypto::PublicKey key;
     };
 
     struct ObscuredInput
@@ -228,7 +228,7 @@ namespace wallet_types
         uint64_t realOutput;
 
         /* The real transaction public key */
-        crypto::::PublicKey realTransactionPublicKey;
+        crypto::PublicKey realTransactionPublicKey;
 
         /* The index in the transaction outputs vector */
         uint64_t realOutputTransactionIndex;
@@ -237,9 +237,9 @@ namespace wallet_types
         uint64_t amount;
 
         /* The owners keys, so we can sign the input correctly */
-        crypto::::PublicKey ownerPublicSpendKey;
+        crypto::PublicKey ownerPublicSpendKey;
 
-        crypto::::SecretKey ownerPrivateSpendKey;
+        crypto::SecretKey ownerPrivateSpendKey;
     };
 
     class Transaction
@@ -255,8 +255,8 @@ namespace wallet_types
             Transaction(
                 /* Mapping of public key to transaction amount, can be multiple
                    if one transaction sends to multiple subwallets */
-                const std::unordered_map<crypto::::PublicKey, int64_t> transfers,
-                const crypto::::Hash hash,
+                const std::unordered_map<crypto::PublicKey, int64_t> transfers,
+                const crypto::Hash hash,
                 const uint64_t fee,
                 const uint64_t timestamp,
                 const uint64_t blockHeight,
@@ -313,10 +313,10 @@ namespace wallet_types
                
                All the public keys in this map, are ones that the wallet container
                owns, it won't store amounts belonging to random people */
-            std::unordered_map<crypto::::PublicKey, int64_t> transfers;
+            std::unordered_map<crypto::PublicKey, int64_t> transfers;
 
             /* The hash of the transaction */
-            crypto::::Hash hash;
+            crypto::Hash hash;
 
             /* The fee the transaction was sent with (always positive) */
             uint64_t fee;
@@ -386,7 +386,7 @@ namespace wallet_types
             {
                 for (const auto &x : getArrayFromJSON(j, "transfers"))
                 {
-                    crypto::::PublicKey publicKey;
+                    crypto::PublicKey publicKey;
                     publicKey.fromString(getStringFromJSON(x, "publicKey"));
 
                     transfers[publicKey] = getInt64FromJSON(x, "amount");
@@ -429,10 +429,10 @@ namespace wallet_types
         uint64_t amount;
 
         /* The transaction key we took from the key outputs */
-        crypto::::PublicKey key;
+        crypto::PublicKey key;
 
         /* The transaction hash of the transaction that contains this input */
-        crypto::::Hash parentTransactionHash;
+        crypto::Hash parentTransactionHash;
 
         /* Converts the class to a json object */
         void toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
@@ -476,7 +476,7 @@ namespace wallet_types
         w.coinbaseTransaction = j.at("coinbaseTX").get<RawCoinbaseTransaction>();
         w.transactions = j.at("transactions").get<std::vector<RawTransaction>>();
         w.blockHeight = j.at("blockHeight").get<uint64_t>();
-        w.blockHash = j.at("blockHash").get<crypto::::Hash>();
+        w.blockHash = j.at("blockHash").get<crypto::Hash>();
         w.blockTimestamp = j.at("blockTimestamp").get<uint64_t>();
     }
 
@@ -493,8 +493,8 @@ namespace wallet_types
     inline void from_json(const nlohmann::json &j, RawCoinbaseTransaction &r)
     {
         r.keyOutputs = j.at("outputs").get<std::vector<KeyOutput>>();
-        r.hash = j.at("hash").get<crypto::::Hash>();
-        r.transactionPublicKey = j.at("txPublicKey").get<crypto::::PublicKey>();
+        r.hash = j.at("hash").get<crypto::Hash>();
+        r.transactionPublicKey = j.at("txPublicKey").get<crypto::PublicKey>();
         r.unlockTime = j.at("unlockTime").get<uint64_t>();
     }
 
@@ -513,11 +513,11 @@ namespace wallet_types
     inline void from_json(const nlohmann::json &j, RawTransaction &r)
     {
         r.keyOutputs = j.at("outputs").get<std::vector<KeyOutput>>();
-        r.hash = j.at("hash").get<crypto::::Hash>();
-        r.transactionPublicKey = j.at("txPublicKey").get<crypto::::PublicKey>();
+        r.hash = j.at("hash").get<crypto::Hash>();
+        r.transactionPublicKey = j.at("txPublicKey").get<crypto::PublicKey>();
         r.unlockTime = j.at("unlockTime").get<uint64_t>();
         r.paymentID = j.at("paymentID").get<std::string>();
-        r.keyInputs = j.at("inputs").get<std::vector<cryptonote::::KeyInput>>();
+        r.keyInputs = j.at("inputs").get<std::vector<cryptonote::KeyInput>>();
     }
 
     inline void to_json(nlohmann::json &j, const KeyOutput &k)
@@ -530,7 +530,7 @@ namespace wallet_types
 
     inline void from_json(const nlohmann::json &j, KeyOutput &k)
     {
-        k.key = j.at("key").get<crypto::::PublicKey>();
+        k.key = j.at("key").get<crypto::PublicKey>();
         k.amount = j.at("amount").get<uint64_t>();
     }
 
@@ -546,7 +546,7 @@ namespace wallet_types
     inline void from_json(const nlohmann::json &j, UnconfirmedInput &u)
     {
         u.amount = j.at("amount").get<uint64_t>();
-        u.key = j.at("key").get<crypto::::PublicKey>();
-        u.parentTransactionHash = j.at("parentTransactionHash").get<crypto::::Hash>();
+        u.key = j.at("key").get<crypto::PublicKey>();
+        u.parentTransactionHash = j.at("parentTransactionHash").get<crypto::Hash>();
     }
 }
