@@ -18,7 +18,7 @@ namespace payment_service
 {
   void handleSettings(int argc, char* argv[], WalletServiceConfiguration& config)
   {
-    cxxopts::Options options(argv[0], CryptoNote::getProjectCLIHeader());
+    cxxopts::Options options(argv[0], cryptonote::getProjectCLIHeader());
 
     options.add_options("Core")
       ("h,help", "Display this help message", cxxopts::value<bool>()->implicit_value("true"))
@@ -217,7 +217,7 @@ namespace payment_service
       }
       else if (config.version) // Do we want to display the software version?
       {
-        std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+        std::cout << cryptonote::getProjectCLIHeader() << std::endl;
         exit(0);
       }
     }
