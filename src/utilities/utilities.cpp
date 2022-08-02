@@ -58,16 +58,16 @@ namespace utilities
 
         /* if unlockTime is greater than this amount, we treat it as a
            timestamp, otherwise we treat it as a block height */
-        if (unlockTime >= CryptoNote::parameters::CRYPTONOTE_MAX_BLOCK_NUMBER)
+        if (unlockTime >= cryptonote::parameters::CRYPTONOTE_MAX_BLOCK_NUMBER)
         {
             const uint64_t currentTimeAdjusted = static_cast<uint64_t>(std::time(nullptr))
-                + CryptoNote::parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS;
+                + cryptonote::parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS;
 
             return currentTimeAdjusted >= unlockTime;
         }
 
         const uint64_t currentHeightAdjusted = currentHeight
-            + CryptoNote::parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
+            + cryptonote::parameters::CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
         return currentHeightAdjusted >= unlockTime;
     }
@@ -100,17 +100,17 @@ namespace utilities
     */
     uint64_t getMaxTxSize(const uint64_t currentHeight)
     {
-        const uint64_t numerator = currentHeight * CryptoNote::parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR;
-        const uint64_t denominator = CryptoNote::parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
+        const uint64_t numerator = currentHeight * cryptonote::parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR;
+        const uint64_t denominator = cryptonote::parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
 
         const uint64_t growth = numerator / denominator;
 
-        const uint64_t x = CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
+        const uint64_t x = cryptonote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
 
         const uint64_t y = 125000;
 
         /* Need space for the miner transaction */
-        return std::min(x, y) - CryptoNote::parameters::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+        return std::min(x, y) - cryptonote::parameters::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
     }
 
     /* Sleep for approximately duration, unless condition is true. This lets us
@@ -142,10 +142,10 @@ namespace utilities
 
         /* Get the amount of seconds since the blockchain launched */
         uint64_t secondsSinceLaunch = scanHeight *
-                                      CryptoNote::parameters::DIFFICULTY_TARGET;
+                                      cryptonote::parameters::DIFFICULTY_TARGET;
 
         /* Get the genesis block timestamp and add the time since launch */
-        uint64_t timestamp = CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP
+        uint64_t timestamp = cryptonote::parameters::GENESIS_BLOCK_TIMESTAMP
                            + secondsSinceLaunch;
 
         /* Don't make timestamp too large or daemon throws an error */
@@ -165,17 +165,17 @@ namespace utilities
         }
 
         /* Timestamp is before the chain launched! */
-        if (timestamp <= CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP)
+        if (timestamp <= cryptonote::parameters::GENESIS_BLOCK_TIMESTAMP)
         {
             return 0;
         }
 
         /* Find the amount of seconds between launch and the timestamp */
-        uint64_t launchTimestampDelta = timestamp - CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP;
+        uint64_t launchTimestampDelta = timestamp - cryptonote::parameters::GENESIS_BLOCK_TIMESTAMP;
 
         /* Get an estimation of the amount of blocks that have passed before the
            timestamp */
-        return launchTimestampDelta / CryptoNote::parameters::DIFFICULTY_TARGET;
+        return launchTimestampDelta / cryptonote::parameters::DIFFICULTY_TARGET;
     }
 
     uint64_t getCurrentTimestampAdjusted()
@@ -186,9 +186,9 @@ namespace utilities
         /* Take the amount of time a block can potentially be in the past/future */
         std::initializer_list<uint64_t> limits =
         {
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT,
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3,
-            CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4
+            cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT,
+            cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3,
+            cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4
         };
 
         /* Get the largest adjustment possible */

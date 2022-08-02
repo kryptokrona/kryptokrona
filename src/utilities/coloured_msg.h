@@ -18,14 +18,14 @@ class ColouredMsg
     public:
         ColouredMsg(
             const T msg,
-            const Common::Console::Color colour) : 
+            const common::Console::Color colour) : 
             msg(msg),
             colour(colour) {}
 
         ColouredMsg(
             const T msg,
             const int padding, 
-            const Common::Console::Color colour) :
+            const common::Console::Color colour) :
             msg(msg),
             colour(colour),
             padding(padding),
@@ -45,7 +45,7 @@ class ColouredMsg
 
         friend std::ostream& operator<<(std::ostream& os, const ColouredMsg &m)
         {
-            Common::Console::setTextColor(m.colour);
+            common::Console::setTextColor(m.colour);
 
             if (m.pad)
             {
@@ -56,7 +56,7 @@ class ColouredMsg
                 os << m.msg;
             }
 
-            Common::Console::setTextColor(Common::Console::Color::Default);
+            common::Console::setTextColor(common::Console::Color::Default);
             return os;
         }
 
@@ -65,7 +65,7 @@ class ColouredMsg
         T msg;
 
         /* The colour to use */
-        const Common::Console::Color colour;
+        const common::Console::Color colour;
 
         /* The amount to pad the message to */
         const int padding = 0;
@@ -79,10 +79,10 @@ class SuccessMsg : public ColouredMsg<T>
 {
     public:
         explicit SuccessMsg(T msg) 
-               : ColouredMsg<T>(msg, Common::Console::Color::Green) {}
+               : ColouredMsg<T>(msg, common::Console::Color::Green) {}
 
         explicit SuccessMsg(T msg, int padding)
-               : ColouredMsg<T>(msg, padding, Common::Console::Color::Green) {}
+               : ColouredMsg<T>(msg, padding, common::Console::Color::Green) {}
 };
 
 template<typename T>
@@ -90,10 +90,10 @@ class InformationMsg : public ColouredMsg<T>
 {
     public:
         explicit InformationMsg(T msg) 
-               : ColouredMsg<T>(msg, Common::Console::Color::BrightYellow) {}
+               : ColouredMsg<T>(msg, common::Console::Color::BrightYellow) {}
 
         explicit InformationMsg(T msg, int padding)
-               : ColouredMsg<T>(msg, padding, Common::Console::Color::BrightYellow) {}
+               : ColouredMsg<T>(msg, padding, common::Console::Color::BrightYellow) {}
 };
 
 template<typename T>
@@ -101,8 +101,8 @@ class WarningMsg : public ColouredMsg<T>
 {
     public:
         explicit WarningMsg(T msg) 
-               : ColouredMsg<T>(msg, Common::Console::Color::BrightRed) {}
+               : ColouredMsg<T>(msg, common::Console::Color::BrightRed) {}
 
         explicit WarningMsg(T msg, int padding)
-               : ColouredMsg<T>(msg, padding, Common::Console::Color::BrightRed) {}
+               : ColouredMsg<T>(msg, padding, common::Console::Color::BrightRed) {}
 };
