@@ -70,11 +70,11 @@ namespace cryptonote
     using Clock = std::chrono::steady_clock;
     using TimePoint = Clock::time_point;
 
-    System::Context<void>* context;
+    system::Context<void>* context;
     uint64_t peerId;
-    System::TcpConnection connection;
+    system::TcpConnection connection;
 
-    P2pConnectionContext(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log, System::TcpConnection&& conn) :
+    P2pConnectionContext(System::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, System::TcpConnection&& conn) :
       context(nullptr),
       peerId(0),
       connection(std::move(conn)),
@@ -100,9 +100,9 @@ namespace cryptonote
     uint64_t writeDuration(TimePoint now) const;
 
   private:
-    Logging::LoggerRef logger;
+    logging::LoggerRef logger;
     TimePoint writeOperationStartTime;
-    System::Event queueEvent;
+    system::Event queueEvent;
     std::vector<P2pMessage> writeQueue;
     size_t writeQueueSize = 0;
     bool stopped;
@@ -111,14 +111,14 @@ namespace cryptonote
   class NodeServer :  public IP2pEndpoint
   {
   public:
-    NodeServer(System::Dispatcher& dispatcher, CryptoNote::CryptoNoteProtocolHandler& payload_handler, std::shared_ptr<Logging::ILogger> log);
+    NodeServer(system::Dispatcher& dispatcher, cryptonote::CryptoNoteProtocolHandler& payload_handler, std::shared_ptr<logging::ILogger> log);
 
     bool run();
     bool init(const NetNodeConfig& config);
     bool deinit();
     bool sendStopSignal();
     uint32_t get_this_peer_port(){return m_listeningPort;}
-    CryptoNote::CryptoNoteProtocolHandler& get_payload_object();
+    cryptonote::CryptoNoteProtocolHandler& get_payload_object();
 
     void serialize(ISerializer& s);
 
@@ -150,7 +150,7 @@ namespace cryptonote
     bool store_config();
     void initUpnp();
 
-    bool handshake(CryptoNote::LevinProtocol& proto, P2pConnectionContext& context, bool just_take_peerlist = false);
+    bool handshake(cryptonote::LevinProtocol& proto, P2pConnectionContext& context, bool just_take_peerlist = false);
     bool timedSync();
     bool handleTimedSyncResponse(const BinaryArray& in, P2pConnectionContext& context);
     void forEachConnection(std::function<void(P2pConnectionContext&)> action);
@@ -161,7 +161,7 @@ namespace cryptonote
     //----------------- i_p2p_endpoint -------------------------------------------------------------
     virtual void relay_notify_to_all(int command, const BinaryArray& data_buff, const boost::uuids::uuid* excludeConnection) override;
     virtual bool invoke_notify_to_peer(int command, const BinaryArray& req_buff, const CryptoNoteConnectionContext& context) override;
-    virtual void for_each_connection(std::function<void(CryptoNote::CryptoNoteConnectionContext&, uint64_t)> f) override;
+    virtual void for_each_connection(std::function<void(cryptonote::CryptoNoteConnectionContext&, uint64_t)> f) override;
     virtual void externalRelayNotifyToAll(int command, const BinaryArray& data_buff, const boost::uuids::uuid* excludeConnection) override;
     virtual void externalRelayNotifyToList(int command, const BinaryArray& data_buff, const std::list<boost::uuids::uuid> relayList) override;
 
@@ -225,13 +225,13 @@ namespace cryptonote
     bool m_hide_my_port;
     std::string m_p2p_state_filename;
 
-    System::Dispatcher& m_dispatcher;
-    System::ContextGroup m_workingContextGroup;
-    System::Event m_stopEvent;
-    System::Timer m_idleTimer;
-    System::Timer m_timeoutTimer;
-    System::TcpListener m_listener;
-    Logging::LoggerRef logger;
+    system::Dispatcher& m_dispatcher;
+    system::ContextGroup m_workingContextGroup;
+    system::Event m_stopEvent;
+    system::Timer m_idleTimer;
+    system::Timer m_timeoutTimer;
+    system::TcpListener m_listener;
+    logging::LoggerRef logger;
     std::atomic<bool> m_stop;
 
     CryptoNoteProtocolHandler& m_payload_handler;
@@ -240,7 +240,7 @@ namespace cryptonote
     // OnceInInterval m_peer_handshake_idle_maker_interval;
     OnceInInterval m_connections_maker_interval;
     OnceInInterval m_peerlist_store_interval;
-    System::Timer m_timedSyncTimer;
+    system::Timer m_timedSyncTimer;
 
     std::string m_bind_ip;
     std::string m_port;
