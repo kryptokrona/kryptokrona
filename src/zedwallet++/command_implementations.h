@@ -44,9 +44,9 @@ void listTransfers(
     const bool outgoing, 
     const std::shared_ptr<WalletBackend> walletBackend);
 
-void printOutgoingTransfer(const WalletTypes::Transaction t);
+void printOutgoingTransfer(const wallet_types::Transaction t);
 
-void printIncomingTransfer(const WalletTypes::Transaction t);
+void printIncomingTransfer(const wallet_types::Transaction t);
 
 void createIntegratedAddress();
 

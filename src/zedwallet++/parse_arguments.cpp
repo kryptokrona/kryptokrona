@@ -63,7 +63,7 @@ Config parseArguments(int argc, char **argv)
     }
     else if (version) // Do we want to display the software version?
     {
-        std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+        std::cout << cryptonote::getProjectCLIHeader() << std::endl;
         exit(0);
     }
 

@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 {
     Config config = parseArguments(argc, argv);
 
-    std::cout << InformationMsg(CryptoNote::getProjectCLIHeader()) << std::endl;
+    std::cout << InformationMsg(cryptonote::getProjectCLIHeader()) << std::endl;
 
     /* Declare outside the try/catch, so if an exception is thrown, it doesn't
        cause the threads to go out of scope, calling std::terminate

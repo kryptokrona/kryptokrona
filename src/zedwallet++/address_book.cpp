@@ -30,7 +30,7 @@ const std::string getAddressBookName(const std::vector<AddressBookEntry> address
 
         std::getline(std::cin, friendlyName);
 
-        Common::trim(friendlyName);
+        common::trim(friendlyName);
 
         const auto it = std::find(addressBook.begin(), addressBook.end(),
                                   AddressBookEntry(friendlyName));
@@ -121,7 +121,7 @@ const std::tuple<bool, AddressBookEntry> getAddressBookEntry(
 
         std::getline(std::cin, friendlyName);
 
-        Common::trim(friendlyName);
+        common::trim(friendlyName);
 
         /* \n == no-op */
         if (friendlyName == "")
@@ -185,7 +185,7 @@ const std::tuple<bool, AddressBookEntry> getAddressBookEntry(
                       << std::endl << std::endl;
         }
 
-        const bool list = ZedUtilities::confirm(
+        const bool list = zed_utilities::confirm(
             "Would you like to list everyone in your address book?"
         );
 
@@ -271,7 +271,7 @@ void deleteFromAddressBook()
 
         std::getline(std::cin, friendlyName);
 
-        Common::trim(friendlyName);
+        common::trim(friendlyName);
 
         if (friendlyName == "cancel")
         {

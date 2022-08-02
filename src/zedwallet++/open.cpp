@@ -27,7 +27,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
               << WarningMsg("transactions, and cannot make transfers.")
               << std::endl;
 
-    bool create = ZedUtilities::confirm("Is this OK?");
+    bool create = zed_utilities::confirm("Is this OK?");
 
     std::cout << "\n";
 
@@ -36,7 +36,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
         return nullptr;
     }
     
-    Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
+    crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
 
     std::string address;
 
@@ -48,7 +48,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
         std::getline(std::cin, address);
 
-        Common::trim(address);
+        common::trim(address);
 
         const bool integratedAddressesAllowed = false;
 
@@ -100,10 +100,10 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
 std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
 {
-    const Crypto::SecretKey privateSpendKey
+    const crypto::SecretKey privateSpendKey
         = getPrivateKey("Enter your private spend key: ");
 
-    const Crypto::SecretKey privateViewKey
+    const crypto::SecretKey privateViewKey
         = getPrivateKey("Enter your private view key: ");
 
     const std::string walletFileName = getNewWalletFileName();
@@ -114,7 +114,7 @@ std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
 
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 
-    const uint64_t scanHeight = ZedUtilities::getScanHeight();
+    const uint64_t scanHeight = zed_utilities::getScanHeight();
 
     const auto [error, walletBackend] = WalletBackend::importWalletFromKeys(
         privateSpendKey, privateViewKey, walletFileName, walletPass,
@@ -148,10 +148,10 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
 
         std::getline(std::cin, mnemonicSeed);
 
-        Common::trim(mnemonicSeed);
+        common::trim(mnemonicSeed);
         
         /* Just to check if it's valid */
-        auto [error, privateSpendKey] = Mnemonics::MnemonicToPrivateKey(mnemonicSeed);
+        auto [error, privateSpendKey] = mnemonics::MnemonicToPrivateKey(mnemonicSeed);
 
         if (!error)
         {
@@ -171,7 +171,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
 
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 
-    const uint64_t scanHeight = ZedUtilities::getScanHeight();
+    const uint64_t scanHeight = zed_utilities::getScanHeight();
 
     auto [error, walletBackend] = WalletBackend::importWalletFromSeed(
         mnemonicSeed, walletFileName, walletPass, scanHeight,
@@ -285,15 +285,15 @@ std::shared_ptr<WalletBackend> openWallet(const Config &config)
     }
 }
 
-Crypto::SecretKey getPrivateKey(const std::string outputMsg)
+crypto::SecretKey getPrivateKey(const std::string outputMsg)
 {
     const uint64_t privateKeyLen = 64;
     uint64_t size;
 
     std::string privateKeyString;
-    Crypto::Hash privateKeyHash;
-    Crypto::SecretKey privateKey;
-    Crypto::PublicKey publicKey;
+    crypto::Hash privateKeyHash;
+    crypto::SecretKey privateKey;
+    crypto::PublicKey publicKey;
 
     while (true)
     {
@@ -301,7 +301,7 @@ Crypto::SecretKey getPrivateKey(const std::string outputMsg)
 
         std::getline(std::cin, privateKeyString);
 
-        Common::trim(privateKeyString);
+        crypto::trim(privateKeyString);
 
         if (privateKeyString.length() != privateKeyLen)
         {
@@ -443,7 +443,7 @@ std::string getNewWalletFileName()
 
 std::string getWalletPassword(const bool verifyPwd, const std::string msg)
 {
-    Tools::PasswordContainer pwdContainer;
+    tools::PasswordContainer pwdContainer;
     pwdContainer.read_password(verifyPwd, msg);
     return pwdContainer.password();
 }
