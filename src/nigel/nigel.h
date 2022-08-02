@@ -60,27 +60,27 @@ class Nigel
 
         std::tuple<std::string, uint16_t> nodeAddress() const;
 
-        std::tuple<bool, std::vector<WalletTypes::WalletBlockInfo>> getWalletSyncData(
-            const std::vector<Crypto::Hash> blockHashCheckpoints,
+        std::tuple<bool, std::vector<wallet_types::WalletBlockInfo>> getWalletSyncData(
+            const std::vector<crypto::Hash> blockHashCheckpoints,
             uint64_t startHeight,
             uint64_t startTimestamp) const;
 
         /* Returns a bool on success or not */
         bool getTransactionsStatus(
-            const std::unordered_set<Crypto::Hash> transactionHashes,
-            std::unordered_set<Crypto::Hash> &transactionsInPool,
-            std::unordered_set<Crypto::Hash> &transactionsInBlock,
-            std::unordered_set<Crypto::Hash> &transactionsUnknown) const;
+            const std::unordered_set<crypto::Hash> transactionHashes,
+            std::unordered_set<crypto::Hash> &transactionsInPool,
+            std::unordered_set<crypto::Hash> &transactionsInBlock,
+            std::unordered_set<crypto::Hash> &transactionsUnknown) const;
 
-        std::tuple<bool, std::vector<CryptoNote::RandomOuts>> getRandomOutsByAmounts(
+        std::tuple<bool, std::vector<cryptonote::RandomOuts>> getRandomOutsByAmounts(
             const std::vector<uint64_t> amounts,
             const uint64_t requestedOuts) const;
 
         /* {success, connectionError} */
         std::tuple<bool, bool> sendTransaction(
-            const CryptoNote::Transaction tx) const;
+            const cryptonote::Transaction tx) const;
 
-        std::tuple<bool, std::unordered_map<Crypto::Hash, std::vector<uint64_t>>>
+        std::tuple<bool, std::unordered_map<crypto::Hash, std::vector<uint64_t>>>
             getGlobalIndexesForRange(
                 const uint64_t startHeight,
                 const uint64_t endHeight) const;
