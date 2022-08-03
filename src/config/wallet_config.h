@@ -33,7 +33,7 @@ namespace wallet_config
     const std::string walletdName = "kryptokrona-service";
 
     /* The full name of your crypto */
-    const std::string coinName = std::string(CryptoNote::CRYPTONOTE_NAME);
+    const std::string coinName = std::string(cryptonote::CRYPTONOTE_NAME);
 
     /* Where can your users contact you for support? E.g. discord */
     const std::string contactLink = "https://kryptokrona.org";
@@ -56,10 +56,10 @@ namespace wallet_config
                                            + ((64 * 11) / 8);
 
     /* The default fee value to use with transactions (in ATOMIC units!) */
-    const uint64_t defaultFee = CryptoNote::parameters::MINIMUM_FEE;
+    const uint64_t defaultFee = cryptonote::parameters::MINIMUM_FEE;
 
     /* The minimum fee value to allow with transactions (in ATOMIC units!) */
-    const uint64_t minimumFee = CryptoNote::parameters::MINIMUM_FEE;
+    const uint64_t minimumFee = cryptonote::parameters::MINIMUM_FEE;
 
     /* The minimum amount allowed to be sent - usually 1 (in ATOMIC units!) */
     const uint64_t minimumSend = 1;
@@ -71,7 +71,7 @@ namespace wallet_config
        fork height, or 0, if never allowed. This is ignored if a mixin of
        zero is allowed */
     const uint64_t mixinZeroDisabledHeight
-        = CryptoNote::parameters::MIXIN_LIMITS_V2_HEIGHT;
+        = cryptonote::parameters::MIXIN_LIMITS_V2_HEIGHT;
 
     /* Should we process coinbase transactions? We can skip them to speed up
        syncing, as most people don't have solo mined transactions */

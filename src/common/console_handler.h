@@ -86,7 +86,7 @@ namespace common
 
       std::thread m_thread;
       std::string m_prompt;
-      Console::Color m_promptColor = Console::Color::Default;
+      console::Color m_promptColor = Console::Color::Default;
       CommandHandlersMap m_handlers;
       AsyncConsoleReader m_consoleReader;
   };

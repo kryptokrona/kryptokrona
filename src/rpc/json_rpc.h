@@ -97,7 +97,7 @@ namespace cryptonote
           template <typename T>
           bool loadParams(T& v) const {
             loadFromJsonValue(v, psReq.contains("params") ?
-              psReq("params") : Common::JsonValue(Common::JsonValue::NIL));
+              psReq("params") : common::JsonValue(common::JsonValue::NIL));
             return true;
           }
 

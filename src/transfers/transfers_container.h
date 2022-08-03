@@ -54,7 +54,7 @@ namespace cryptonote
       size_t hash() const;
 
     private:
-      TransactionTypes::OutputType m_type;
+      transaction_types::OutputType m_type;
       union {
         const crypto::KeyImage* m_keyImage;
         struct {
@@ -71,7 +71,7 @@ namespace cryptonote
     };
 
     struct TransactionOutputInformationIn : public TransactionOutputInformation {
-      crypto::KeyImage keyImage;  //!< \attention Used only for TransactionTypes::OutputType::Key
+      crypto::KeyImage keyImage;  //!< \attention Used only for transaction_types::OutputType::Key
     };
 
     struct TransactionOutputInformationEx : public TransactionOutputInformationIn {
@@ -96,7 +96,7 @@ namespace cryptonote
         s(transactionHash, "");
         s(visible, "");
 
-        if (type == TransactionTypes::OutputType::Key) {
+        if (type == transaction_types::OutputType::Key) {
           s(outputKey, "");
         }
       }
@@ -145,7 +145,7 @@ namespace cryptonote
 
     class TransfersContainer : public ITransfersContainer {
     public:
-      TransfersContainer(const cryptonote::Currency& currency, std::shared_ptr<Logging::ILogger> logger, size_t transactionSpendableAge);
+      TransfersContainer(const cryptonote::Currency& currency, std::shared_ptr<logging::ILogger> logger, size_t transactionSpendableAge);
 
       bool addTransaction(const TransactionBlockInfo& block, const ITransactionReader& tx, const std::vector<TransactionOutputInformationIn>& transfers);
       bool deleteUnconfirmedTransaction(const crypto::Hash& transactionHash);
@@ -260,7 +260,7 @@ namespace cryptonote
       void deleteTransactionTransfers(const crypto::Hash& transactionHash);
       bool isSpendTimeUnlocked(uint64_t unlockTime) const;
       bool isIncluded(const TransactionOutputInformationEx& info, uint32_t flags) const;
-      static bool isIncluded(TransactionTypes::OutputType type, uint32_t state, uint32_t flags);
+      static bool isIncluded(transaction_types::OutputType type, uint32_t state, uint32_t flags);
       void updateTransfersVisibility(const crypto::KeyImage& keyImage);
 
       void copyToSpent(const TransactionBlockInfo& block, const ITransactionReader& tx, size_t inputIndex, const TransactionOutputInformationEx& output);
@@ -275,6 +275,6 @@ namespace cryptonote
       size_t m_transactionSpendableAge;
       const cryptonote::Currency& m_currency;
       mutable std::mutex m_mutex;
-      Logging::LoggerRef m_logger;
+      logging::LoggerRef m_logger;
     };
 }
