@@ -45,7 +45,7 @@ namespace cryptonote
 
     protected:
 
-      System::Dispatcher& m_dispatcher;
+      system::Dispatcher& m_dispatcher;
 
     private:
 

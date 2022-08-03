@@ -186,7 +186,7 @@ namespace mnemonics
         }
 
         /* Hash the data */
-        uint64_t hash = CRC32::crc32(trimmed);
+        uint64_t hash = crc32::crc32(trimmed);
 
         /* Modulus the hash by the word length to get the index of the 
            checksum word */
