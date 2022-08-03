@@ -45,7 +45,7 @@ namespace cryptonote
 
     struct TransactionOutputInformation {
       // output info
-      TransactionTypes::OutputType type;
+      transaction_types::OutputType type;
       uint64_t amount;
       uint32_t globalOutputIndex;
       uint32_t outputInTransaction;

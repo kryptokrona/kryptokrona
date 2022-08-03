@@ -82,7 +82,7 @@ namespace
 
         auto outType = tx.getOutputType(size_t(idx));
 
-        if (outType == TransactionTypes::OutputType::Key) {
+        if (outType == transaction_types::OutputType::Key) {
 
           uint64_t amount;
           KeyOutput out;
@@ -437,7 +437,7 @@ namespace cryptonote
 
         auto outType = tx.getOutputType(size_t(idx));
 
-        if (outType != TransactionTypes::OutputType::Key)
+        if (outType != transaction_types::OutputType::Key)
         {
           continue;
         }
@@ -450,7 +450,7 @@ namespace cryptonote
         info.globalOutputIndex = (blockInfo.height == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) ?
           UNCONFIRMED_TRANSACTION_GLOBAL_OUTPUT_INDEX : globalIdxs[idx];
 
-        if (outType == TransactionTypes::OutputType::Key)
+        if (outType == transaction_types::OutputType::Key)
         {
           uint64_t amount;
           KeyOutput out;

@@ -66,11 +66,11 @@ namespace cryptonote
         DeleteTransaction
       };
 
-      using NewBlock = Messages::NewBlock;
-      using NewAlternativeBlock = Messages::NewAlternativeBlock;
-      using ChainSwitch = Messages::ChainSwitch;
-      using AddTransaction = Messages::AddTransaction;
-      using DeleteTransaction = Messages::DeleteTransaction;
+      using NewBlock = messages::NewBlock;
+      using NewAlternativeBlock = messages::NewAlternativeBlock;
+      using ChainSwitch = messages::ChainSwitch;
+      using AddTransaction = messages::AddTransaction;
+      using DeleteTransaction = messages::DeleteTransaction;
 
       BlockchainMessage(const NewBlock& message);
       BlockchainMessage(const NewAlternativeBlock& message);
@@ -111,5 +111,5 @@ namespace cryptonote
     BlockchainMessage makeNewAlternativeBlockMessage(uint32_t index, const crypto::Hash& hash);
     BlockchainMessage makeNewBlockMessage(uint32_t index, const crypto::Hash& hash);
     BlockchainMessage makeAddTransactionMessage(std::vector<crypto::Hash>&& hash);
-    BlockchainMessage makeDelTransactionMessage(std::vector<crypto::Hash>&& hash, Messages::DeleteTransaction::Reason r);
+    BlockchainMessage makeDelTransactionMessage(std::vector<crypto::Hash>&& hash, messages::DeleteTransaction::Reason r);
 }
