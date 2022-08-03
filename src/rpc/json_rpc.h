@@ -217,7 +217,7 @@ namespace cryptonote
           Response res;
 
           if (!std::is_same<Request, cryptonote::EMPTY_STRUCT>::value && !jsReq.loadParams(req)) {
-            throw JsonRpcError(JsonRpc::errInvalidParams);
+            throw JsonRpcError(json_rpc::errInvalidParams);
           }
 
           bool result = handler(req, res);

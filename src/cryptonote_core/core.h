@@ -67,7 +67,7 @@ namespace cryptonote
         const uint64_t startHeight,
         const uint64_t startTimestamp,
         const uint64_t blockCount,
-        std::vector<WalletTypes::WalletBlockInfo> &walletBlocks) const override;
+        std::vector<wallet_types::WalletBlockInfo> &walletBlocks) const override;
 
       virtual bool getTransactionsStatus(
         std::unordered_set<crypto::Hash> transactionHashes,
@@ -229,10 +229,10 @@ namespace cryptonote
 
       void switchMainChainStorage(uint32_t splitBlockIndex, IBlockchainCache& newChain);
 
-      static WalletTypes::RawCoinbaseTransaction getRawCoinbaseTransaction(
+      static wallet_types::RawCoinbaseTransaction getRawCoinbaseTransaction(
         const cryptonote::Transaction &t);
 
-      static WalletTypes::RawTransaction getRawTransaction(
+      static wallet_types::RawTransaction getRawTransaction(
         const std::vector<uint8_t> &rawTX);
 
       static crypto::PublicKey getPubKeyFromExtra(const std::vector<uint8_t> &extra);

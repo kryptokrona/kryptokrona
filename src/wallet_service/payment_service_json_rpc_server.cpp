@@ -54,7 +54,7 @@ namespace payment_service
       handlers.emplace("getNodeFeeInfo", jsonHandler<NodeFeeInfo::Request, NodeFeeInfo::Response>(std::bind(&PaymentServiceJsonRpcServer::handleNodeFeeInfo, this, std::placeholders::_1, std::placeholders::_2)));
     }
 
-    void PaymentServiceJsonRpcServer::processJsonRpcRequest(const Common::JsonValue& req, Common::JsonValue& resp) {
+    void PaymentServiceJsonRpcServer::processJsonRpcRequest(const common::JsonValue& req, common::JsonValue& resp) {
       try {
         prepareJsonResponse(req, resp);
 
@@ -102,7 +102,7 @@ namespace payment_service
 
         logger(logging::DEBUGGING) << method << " request came";
 
-        Common::JsonValue params(Common::JsonValue::OBJECT);
+        common::JsonValue params(common::JsonValue::OBJECT);
         if (req.contains("params")) {
           params = req("params");
         }
