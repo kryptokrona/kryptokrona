@@ -50,11 +50,11 @@ namespace cryptonote
     private:
 
       void acceptLoop();
-      void connectionHandler(system::TcpConnection&& conn);
+      void connectionHandler(system::TcpConnection& conn);
 
       system::ContextGroup workingContextGroup;
       logging::LoggerRef logger;
       system::TcpListener m_listener;
-      std::unordered_set<System::TcpConnection*> m_connections;
+      std::unordered_set<system::TcpConnection*> m_connections;
     };
 }
