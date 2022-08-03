@@ -17,7 +17,7 @@
 #include <system/context_group.h>
 #include <system/dispatcher.h>
 #include <system/event.h>
-#include <system/eventLock.h>
+#include <system/event_lock.h>
 #include <system/timer.h>
 #include <cryptonote_core/transaction_api.h>
 
