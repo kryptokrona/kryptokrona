@@ -108,7 +108,7 @@ namespace cryptonote
       >
     > WalletTransactions;
 
-    typedef Common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
+    typedef common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
     typedef std::pair<uint64_t, cryptonote::WalletTransfer> TransactionTransferPair;
     typedef std::vector<TransactionTransferPair> WalletTransfers;
     typedef std::map<uint64_t, cryptonote::Transaction> UncommitedTransactions;
