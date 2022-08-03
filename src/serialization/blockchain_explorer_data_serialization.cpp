@@ -68,7 +68,7 @@ namespace cryptonote
         }
 
         template <typename T>
-        bool serializePod(T& v, Common::StringView name, cryptonote::ISerializer& serializer) {
+        bool serializePod(T& v, cryptonote::StringView name, cryptonote::ISerializer& serializer) {
           return serializer.binary(&v, sizeof(v), name);
         }
     }
