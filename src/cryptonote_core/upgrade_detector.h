@@ -42,7 +42,7 @@ namespace cryptonote
   template <typename BC>
   class BasicUpgradeDetector : public UpgradeDetectorBase {
   public:
-    BasicUpgradeDetector(const Currency& currency, BC& blockchain, uint8_t targetVersion, std::shared_ptr<Logging::ILogger> log) :
+    BasicUpgradeDetector(const Currency& currency, BC& blockchain, uint8_t targetVersion, std::shared_ptr<logging::ILogger> log) :
       m_currency(currency),
       m_blockchain(blockchain),
       m_targetVersion(targetVersion),
@@ -62,14 +62,14 @@ namespace cryptonote
           auto it = std::lower_bound(m_blockchain.begin(), m_blockchain.end(), m_targetVersion,
             [](const typename BC::value_type& b, uint8_t v) { return b.bl.majorVersion < v; });
           if (it == m_blockchain.end() || it->bl.majorVersion != m_targetVersion) {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: upgrade height isn't found";
+            logger(logging::ERROR, logging::BRIGHT_RED) << "Internal error: upgrade height isn't found";
             return false;
           }
 
           uint32_t upgradeHeight = static_cast<uint32_t>(it - m_blockchain.begin());
           m_votingCompleteHeight = findVotingCompleteHeight(upgradeHeight);
           if (m_votingCompleteHeight == UNDEF_HEIGHT) {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: voting complete height isn't found, upgrade height = " << upgradeHeight;
+            logger(logging::ERROR, logging::BRIGHT_RED) << "Internal error: voting complete height isn't found, upgrade height = " << upgradeHeight;
             return false;
           }
         } else {
@@ -78,7 +78,7 @@ namespace cryptonote
       } else if (!m_blockchain.empty()) {
         if (m_blockchain.size() <= upgradeHeight + 1) {
           if (m_blockchain.back().bl.majorVersion >= m_targetVersion) {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: block at height " << (m_blockchain.size() - 1) <<
+            logger(logging::ERROR, logging::BRIGHT_RED) << "Internal error: block at height " << (m_blockchain.size() - 1) <<
               " has invalid version " << static_cast<int>(m_blockchain.back().bl.majorVersion) <<
               ", expected " << static_cast<int>(m_targetVersion - 1) << " or less";
             return false;
@@ -86,7 +86,7 @@ namespace cryptonote
         } else {
           int blockVersionAtUpgradeHeight = m_blockchain[upgradeHeight].bl.majorVersion;
           if (blockVersionAtUpgradeHeight != m_targetVersion - 1) {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: block at height " << upgradeHeight <<
+            logger(logging::ERROR, logging::BRIGHT_RED) << "Internal error: block at height " << upgradeHeight <<
               " has invalid version " << blockVersionAtUpgradeHeight <<
               ", expected " << static_cast<int>(m_targetVersion - 1);
             return false;
@@ -94,7 +94,7 @@ namespace cryptonote
 
           int blockVersionAfterUpgradeHeight = m_blockchain[upgradeHeight + 1].bl.majorVersion;
           if (blockVersionAfterUpgradeHeight != m_targetVersion) {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Internal error: block at height " << (upgradeHeight + 1) <<
+            logger(logging::ERROR, logging::BRIGHT_RED) << "Internal error: block at height " << (upgradeHeight + 1) <<
               " has invalid version " << blockVersionAfterUpgradeHeight <<
               ", expected " << static_cast<int>(m_targetVersion);
             return false;
@@ -140,14 +140,14 @@ namespace cryptonote
             strftime(upgradeTimeStr, 40, "%H:%M:%S %Y.%m.%d", upgradeTime);
             cryptonote::CachedBlock cachedBlock(m_blockchain.back().bl);
 
-            logger(Logging::TRACE, Logging::BRIGHT_GREEN) << "###### UPGRADE is going to happen after block index " << upgradeHeight() << " at about " <<
+            logger(logging::TRACE, logging::BRIGHT_GREEN) << "###### UPGRADE is going to happen after block index " << upgradeHeight() << " at about " <<
               upgradeTimeStr << " (in " << common::timeIntervalToString(interval) << ")! Current last block index " << (m_blockchain.size() - 1) <<
               ", hash " << cachedBlock.getBlockHash();
           }
         } else if (m_blockchain.size() == upgradeHeight() + 1) {
           assert(m_blockchain.back().bl.majorVersion == m_targetVersion - 1);
 
-          logger(Logging::TRACE, Logging::BRIGHT_GREEN) << "###### UPGRADE has happened! Starting from block index " << (upgradeHeight() + 1) <<
+          logger(logging::TRACE, logging::BRIGHT_GREEN) << "###### UPGRADE has happened! Starting from block index " << (upgradeHeight() + 1) <<
             " blocks with major version below " << static_cast<int>(m_targetVersion) << " will be rejected!";
         } else {
           assert(m_blockchain.back().bl.majorVersion == m_targetVersion);
@@ -157,7 +157,7 @@ namespace cryptonote
         uint32_t lastBlockHeight = static_cast<uint32_t>(m_blockchain.size() - 1);
         if (isVotingComplete(lastBlockHeight)) {
           m_votingCompleteHeight = lastBlockHeight;
-          logger(Logging::TRACE, Logging::BRIGHT_GREEN) << "###### UPGRADE voting complete at block index " << m_votingCompleteHeight <<
+          logger(logging::TRACE, logging::BRIGHT_GREEN) << "###### UPGRADE voting complete at block index " << m_votingCompleteHeight <<
             "! UPGRADE is going to happen after block index " << upgradeHeight() << "!";
         }
       }
@@ -168,7 +168,7 @@ namespace cryptonote
         assert(m_currency.upgradeHeight(m_targetVersion) == UNDEF_HEIGHT);
 
         if (m_blockchain.size() == m_votingCompleteHeight) {
-          logger(Logging::TRACE, Logging::BRIGHT_YELLOW) << "###### UPGRADE after block index " << upgradeHeight() << " has been canceled!";
+          logger(logging::TRACE, logging::BRIGHT_YELLOW) << "###### UPGRADE after block index " << upgradeHeight() << " has been canceled!";
           m_votingCompleteHeight = UNDEF_HEIGHT;
         } else {
           assert(m_blockchain.size() > m_votingCompleteHeight);
@@ -214,7 +214,7 @@ namespace cryptonote
     }
 
   private:
-    Logging::LoggerRef logger;
+    logging::LoggerRef logger;
     const Currency& m_currency;
     BC& m_blockchain;
     uint8_t m_targetVersion;

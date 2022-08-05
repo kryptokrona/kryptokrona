@@ -91,7 +91,7 @@ class SubWallet
         void removeCancelledTransactions(const std::unordered_set<crypto::Hash> cancelledTransactions);
 
         /* Gets inputs that are spendable at the given height */
-        std::vector<WalletTypes::TxInputAndOwner> getSpendableInputs(
+        std::vector<wallet_types::TxInputAndOwner> getSpendableInputs(
             const uint64_t height) const;
 
         uint64_t syncStartHeight() const;

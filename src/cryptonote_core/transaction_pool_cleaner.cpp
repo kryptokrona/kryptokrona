@@ -108,7 +108,7 @@ namespace cryptonote
 
         cleanRecentlyDeletedTransactions(currentTime);
         return deletedTransactions;
-      } catch (System::InterruptedException&) {
+      } catch (system::InterruptedException&) {
         throw;
       } catch (std::exception& e) {
         logger(logging::WARNING) << "Caught an exception: " << e.what() << ", stopping cleaning procedure cycle";

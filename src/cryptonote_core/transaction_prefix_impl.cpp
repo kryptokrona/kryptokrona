@@ -50,13 +50,13 @@ namespace cryptonote
       // inputs
       virtual size_t getInputCount() const override;
       virtual uint64_t getInputTotalAmount() const override;
-      virtual TransactionTypes::InputType getInputType(size_t index) const override;
+      virtual transaction_types::InputType getInputType(size_t index) const override;
       virtual void getInput(size_t index, KeyInput& input) const override;
 
       // outputs
       virtual size_t getOutputCount() const override;
       virtual uint64_t getOutputTotalAmount() const override;
-      virtual TransactionTypes::OutputType getOutputType(size_t index) const override;
+      virtual transaction_types::OutputType getOutputType(size_t index) const override;
       virtual void getOutput(size_t index, KeyOutput& output, uint64_t& amount) const override;
 
       // signatures
@@ -138,12 +138,12 @@ namespace cryptonote
         return val + getTransactionInputAmount(in); });
     }
 
-    TransactionTypes::InputType TransactionPrefixImpl::getInputType(size_t index) const {
+    transaction_types::InputType TransactionPrefixImpl::getInputType(size_t index) const {
       return getTransactionInputType(getInputChecked(m_txPrefix, index));
     }
 
     void TransactionPrefixImpl::getInput(size_t index, KeyInput& input) const {
-      input = boost::get<KeyInput>(getInputChecked(m_txPrefix, index, TransactionTypes::InputType::Key));
+      input = boost::get<KeyInput>(getInputChecked(m_txPrefix, index, transaction_types::InputType::Key));
     }
 
     size_t TransactionPrefixImpl::getOutputCount() const {
@@ -155,12 +155,12 @@ namespace cryptonote
         return val + out.amount; });
     }
 
-    TransactionTypes::OutputType TransactionPrefixImpl::getOutputType(size_t index) const {
+    transaction_types::OutputType TransactionPrefixImpl::getOutputType(size_t index) const {
       return getTransactionOutputType(getOutputChecked(m_txPrefix, index).target);
     }
 
     void TransactionPrefixImpl::getOutput(size_t index, KeyOutput& output, uint64_t& amount) const {
-      const auto& out = getOutputChecked(m_txPrefix, index, TransactionTypes::OutputType::Key);
+      const auto& out = getOutputChecked(m_txPrefix, index, transaction_types::OutputType::Key);
       output = boost::get<KeyOutput>(out.target);
       amount = out.amount;
     }

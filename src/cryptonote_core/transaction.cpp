@@ -67,13 +67,13 @@ namespace cryptonote
     // inputs
     virtual size_t getInputCount() const override;
     virtual uint64_t getInputTotalAmount() const override;
-    virtual TransactionTypes::InputType getInputType(size_t index) const override;
+    virtual transaction_types::InputType getInputType(size_t index) const override;
     virtual void getInput(size_t index, KeyInput& input) const override;
 
     // outputs
     virtual size_t getOutputCount() const override;
     virtual uint64_t getOutputTotalAmount() const override;
-    virtual TransactionTypes::OutputType getOutputType(size_t index) const override;
+    virtual transaction_types::OutputType getOutputType(size_t index) const override;
     virtual void getOutput(size_t index, KeyOutput& output, uint64_t& amount) const override;
 
     virtual size_t getRequiredSignaturesCount(size_t index) const override;
@@ -90,12 +90,12 @@ namespace cryptonote
 
     // Inputs/Outputs 
     virtual size_t addInput(const KeyInput& input) override;
-    virtual size_t addInput(const AccountKeys& senderKeys, const TransactionTypes::InputKeyInfo& info, KeyPair& ephKeys) override;
+    virtual size_t addInput(const AccountKeys& senderKeys, const transaction_types::InputKeyInfo& info, KeyPair& ephKeys) override;
 
     virtual size_t addOutput(uint64_t amount, const AccountPublicAddress& to) override;
     virtual size_t addOutput(uint64_t amount, const KeyOutput& out) override;
 
-    virtual void signInputKey(size_t input, const TransactionTypes::InputKeyInfo& info, const KeyPair& ephKeys) override;
+    virtual void signInputKey(size_t input, const transaction_types::InputKeyInfo& info, const KeyPair& ephKeys) override;
 
   private:
 
@@ -206,7 +206,7 @@ namespace cryptonote
     return transaction.inputs.size() - 1;
   }
 
-  size_t TransactionImpl::addInput(const AccountKeys& senderKeys, const TransactionTypes::InputKeyInfo& info, KeyPair& ephKeys) {
+  size_t TransactionImpl::addInput(const AccountKeys& senderKeys, const transaction_types::InputKeyInfo& info, KeyPair& ephKeys) {
     checkIfSigning();
     KeyInput input;
     input.amount = info.amount;
@@ -248,8 +248,8 @@ namespace cryptonote
     return outputIndex;
   }
 
-  void TransactionImpl::signInputKey(size_t index, const TransactionTypes::InputKeyInfo& info, const KeyPair& ephKeys) {
-    const auto& input = boost::get<KeyInput>(getInputChecked(transaction, index, TransactionTypes::InputType::Key));
+  void TransactionImpl::signInputKey(size_t index, const transaction_types::InputKeyInfo& info, const KeyPair& ephKeys) {
+    const auto& input = boost::get<KeyInput>(getInputChecked(transaction, index, transaction_types::InputType::Key));
     Hash prefixHash = getTransactionPrefixHash();
 
     std::vector<PublicKey> publicKeys;
@@ -336,12 +336,12 @@ namespace cryptonote
       return val + getTransactionInputAmount(in); });
   }
 
-  TransactionTypes::InputType TransactionImpl::getInputType(size_t index) const {
+  transaction_types::InputType TransactionImpl::getInputType(size_t index) const {
     return getTransactionInputType(getInputChecked(transaction, index));
   }
 
   void TransactionImpl::getInput(size_t index, KeyInput& input) const {
-    input = boost::get<KeyInput>(getInputChecked(transaction, index, TransactionTypes::InputType::Key));
+    input = boost::get<KeyInput>(getInputChecked(transaction, index, transaction_types::InputType::Key));
   }
 
   size_t TransactionImpl::getOutputCount() const {
@@ -353,12 +353,12 @@ namespace cryptonote
       return val + out.amount; });
   }
 
-  TransactionTypes::OutputType TransactionImpl::getOutputType(size_t index) const {
+  transaction_types::OutputType TransactionImpl::getOutputType(size_t index) const {
     return getTransactionOutputType(getOutputChecked(transaction, index).target);
   }
 
   void TransactionImpl::getOutput(size_t index, KeyOutput& output, uint64_t& amount) const {
-    const auto& out = getOutputChecked(transaction, index, TransactionTypes::OutputType::Key);
+    const auto& out = getOutputChecked(transaction, index, transaction_types::OutputType::Key);
     output = boost::get<KeyOutput>(out.target);
     amount = out.amount;
   }

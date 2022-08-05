@@ -71,6 +71,6 @@ namespace cryptonote
     }
 }
  
-inline std::error_code make_error_code(cryptonote::NodeError::NodeErrorCodes e) {
-  return std::error_code(static_cast<int>(e), cryptonote::NodeError::NodeErrorCategory::INSTANCE);
+inline std::error_code make_error_code(cryptonote::node_error::NodeErrorCodes e) {
+  return std::error_code(static_cast<int>(e), cryptonote::node_error::NodeErrorCategory::INSTANCE);
 }
