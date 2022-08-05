@@ -29,7 +29,7 @@ SubWallet::SubWallet(
     m_address(address),
     m_syncStartHeight(scanHeight),
     m_syncStartTimestamp(scanTimestamp),
-    m_privateSpendKey(Constants::BLANK_SECRET_KEY),
+    m_privateSpendKey(constants::BLANK_SECRET_KEY),
     m_isPrimaryAddress(isPrimaryAddress)
 {
 }
@@ -94,7 +94,7 @@ crypto::KeyImage SubWallet::getTxInputKeyImage(
 }
 
 void SubWallet::storeTransactionInput(
-    const WalletTypes::TransactionInput input,
+    const wallet_types::TransactionInput input,
     const bool isViewWallet)
 {
     /* Can't create a key image with a view wallet - but we still store the
@@ -366,10 +366,10 @@ void SubWallet::removeCancelledTransactions(
     }
 }
 
-std::vector<WalletTypes::TxInputAndOwner> SubWallet::getSpendableInputs(
+std::vector<wallet_types::TxInputAndOwner> SubWallet::getSpendableInputs(
     const uint64_t height) const
 {
-    std::vector<WalletTypes::TxInputAndOwner> inputs;
+    std::vector<wallet_types::TxInputAndOwner> inputs;
 
     for (const auto& input : m_unspentInputs)
     {
@@ -393,7 +393,7 @@ uint64_t SubWallet::syncStartTimestamp() const
 }
 
 void SubWallet::storeUnconfirmedIncomingInput(
-    const WalletTypes::UnconfirmedInput input)
+    const wallet_types::UnconfirmedInput input)
 {
     m_unconfirmedIncomingAmounts.push_back(input);
 }
@@ -421,21 +421,21 @@ void SubWallet::fromJSON(const JSONValue &j)
 
     for (const auto &x : getArrayFromJSON(j, "unspentInputs"))
     {
-        WalletTypes::TransactionInput input;
+        wallet_types::TransactionInput input;
         input.fromJSON(x);
         m_unspentInputs.push_back(input);
     }
 
     for (const auto &x : getArrayFromJSON(j, "lockedInputs"))
     {
-        WalletTypes::TransactionInput input;
+        wallet_types::TransactionInput input;
         input.fromJSON(x);
         m_lockedInputs.push_back(input);
     }
 
     for (const auto &x : getArrayFromJSON(j, "spentInputs"))
     {
-        WalletTypes::TransactionInput input;
+        wallet_types::TransactionInput input;
         input.fromJSON(x);
         m_spentInputs.push_back(input);
     }
@@ -446,7 +446,7 @@ void SubWallet::fromJSON(const JSONValue &j)
 
     for (const auto &x : getArrayFromJSON(j, "unconfirmedIncomingAmounts"))
     {
-        WalletTypes::UnconfirmedInput amount;
+        wallet_types::UnconfirmedInput amount;
         amount.fromJSON(x);
         m_unconfirmedIncomingAmounts.push_back(amount);
     }

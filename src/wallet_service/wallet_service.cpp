@@ -280,7 +280,7 @@ namespace payment_service
         uint64_t prefix;
 
         /* Need to be able to decode the string as an address */
-        if (!tools::Base58::decode_addr(integratedAddr, prefix, decoded))
+        if (!tools::base58::decode_addr(integratedAddr, prefix, decoded))
         {
             throw std::system_error(make_error_code(cryptonote::error::BAD_ADDRESS));
         }
@@ -1347,7 +1347,7 @@ namespace payment_service
       std::string keys = common::asString(ba);
 
       /* Encode prefix + paymentID + keys as an address */
-      integratedAddress = tools::Base58::encode_addr
+      integratedAddress = tools::base58::encode_addr
       (
           cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
           paymentId + keys

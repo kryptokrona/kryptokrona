@@ -25,12 +25,12 @@ namespace cryptonote
     // TransactionInput helper functions
     size_t getRequiredSignaturesCount(const TransactionInput& in);
     uint64_t getTransactionInputAmount(const TransactionInput& in);
-    TransactionTypes::InputType getTransactionInputType(const TransactionInput& in);
+    transaction_types::InputType getTransactionInputType(const TransactionInput& in);
     const TransactionInput& getInputChecked(const cryptonote::TransactionPrefix& transaction, size_t index);
     const TransactionInput& getInputChecked(const cryptonote::TransactionPrefix& transaction, size_t index, TransactionTypes::InputType type);
 
     // TransactionOutput helper functions
-    TransactionTypes::OutputType getTransactionOutputType(const TransactionOutputTarget& out);
+    transaction_types::OutputType getTransactionOutputType(const TransactionOutputTarget& out);
     const TransactionOutput& getOutputChecked(const cryptonote::TransactionPrefix& transaction, size_t index);
     const TransactionOutput& getOutputChecked(const cryptonote::TransactionPrefix& transaction, size_t index, TransactionTypes::OutputType type);
 

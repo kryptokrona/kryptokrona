@@ -423,7 +423,7 @@ namespace cryptonote
         strAmount.append(m_numberOfDecimalPlaces - fractionSize, '0');
       }
 
-      return Common::fromString(strAmount, amount);
+      return common::fromString(strAmount, amount);
     }
 
     uint64_t Currency::getNextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<uint64_t> cumulativeDifficulties) const

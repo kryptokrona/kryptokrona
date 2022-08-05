@@ -127,7 +127,7 @@ std::optional<crypto::Hash> BlockchainMonitor::requestLastBlockHash()
             return std::nullopt;
         }
 
-        return j.at("result").at("block_header").at("hash").get<Crypto::Hash>();
+        return j.at("result").at("block_header").at("hash").get<crypto::Hash>();
     }
     catch (const json::exception &e)
     {
