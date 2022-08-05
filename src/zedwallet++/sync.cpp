@@ -120,7 +120,7 @@ void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
                       "node is online, and not syncing.\n(Syncing often stalls "
                       "wallet operation)\nGive the daemon a restart if possible.\n"
                    << "If this persists, visit "
-                   << WalletConfig::contactLink
+                   << wallet_config::contactLink
                    << " for support.";
 
             std::cout << WarningMsg(stream.str()) << std::endl;

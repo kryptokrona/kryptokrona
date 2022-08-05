@@ -48,7 +48,7 @@ std::string getPrompt(std::shared_ptr<WalletBackend> walletBackend)
 
     const std::string shortName = walletName.substr(0, promptLength);
 
-    return "[" + WalletConfig::ticker + " " + shortName + "]: ";
+    return "[" + wallet_config::ticker + " " + shortName + "]: ";
 }
 
 template<typename T>
@@ -286,7 +286,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
         {
             unsigned long long amount = std::stoull(amountString);
 
-            if (amount < WalletConfig::minimumSend)
+            if (amount < wallet_config::minimumSend)
             {
                 std::cout << WarningMsg("The minimum send allowed is ")
                           << WarningMsg(utilities::formatAmount(wallet_config::minimumSend))
@@ -315,7 +315,7 @@ std::tuple<std::string, uint16_t> getDaemonAddress()
     {
         std::cout << InformationMsg("\nEnter the daemon address you want to use.\n"
                                     "You can omit the port, and it will default to ")
-                  << InformationMsg(CryptoNote::RPC_DEFAULT_PORT)
+                  << InformationMsg(cryptonote::RPC_DEFAULT_PORT)
                   << ".\n\nHit enter for the default of localhost: ";
 
         std::string address;

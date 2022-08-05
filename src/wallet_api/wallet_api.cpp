@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 {
     Config config = parseArguments(argc, argv);
 
-    std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+    std::cout << cryptonote::getProjectCLIHeader() << std::endl;
 
     std::thread apiThread;
 
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     try
     {
         /* Trigger the shutdown signal if ctrl+c is used */
-        Tools::SignalHandler::install([&ctrl_c] { ctrl_c = true; });
+        tools::SignalHandler::install([&ctrl_c] { ctrl_c = true; });
 
         /* Init the API */
         api = std::make_shared<ApiDispatcher>(

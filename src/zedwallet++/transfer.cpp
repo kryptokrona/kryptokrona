@@ -36,12 +36,12 @@ void transfer(
     
     const auto unlockedBalance = walletBackend->getTotalUnlockedBalance();
 
-    if (sendAll && unlockedBalance <= WalletConfig::minimumSend)
+    if (sendAll && unlockedBalance <= wallet_config::minimumSend)
     {
         std::stringstream stream;
 
         stream << "The minimum send allowed is "
-               << utilities::formatAmount(WalletConfig::minimumSend)
+               << utilities::formatAmount(wallet_config::minimumSend)
                << ", but you have "
                << utilities::formatAmount(unlockedBalance) << "!\n";
 

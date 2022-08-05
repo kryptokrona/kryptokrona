@@ -43,7 +43,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
     while (true)
     {
         std::cout << InformationMsg("Enter your public ")
-                  << InformationMsg(WalletConfig::ticker)
+                  << InformationMsg(wallet_config::ticker)
                   << InformationMsg(" address: ");
 
         std::getline(std::cin, address);
@@ -312,7 +312,7 @@ crypto::SecretKey getPrivateKey(const std::string outputMsg)
 
             continue;
         }
-        else if (!Common::fromHex(privateKeyString, &privateKeyHash, 
+        else if (!common::fromHex(privateKeyString, &privateKeyHash, 
                   sizeof(privateKeyHash), size)
                || size != sizeof(privateKeyHash))
         {

@@ -149,7 +149,7 @@ namespace cryptonote
       uint64_t getCurrentTimestampAdjusted();
 
       struct InputInfo {
-        TransactionTypes::InputKeyInfo keyInfo;
+        transaction_types::InputKeyInfo keyInfo;
         WalletRecord* walletRecord = nullptr;
         KeyPair ephKeys;
       };
