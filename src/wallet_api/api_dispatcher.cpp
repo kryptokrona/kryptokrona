@@ -6,9 +6,9 @@
 #include <wallet_api/api_dispatcher.h>
 ////////////////////////////////////
 
-#include <config/cryptonote::_config.h>
+#include <config/cryptonote_config.h>
 
-#include <cryptonote::_core/mixins.h>
+#include <cryptonote_core/mixins.h>
 
 #include <crypto/random.h>
 

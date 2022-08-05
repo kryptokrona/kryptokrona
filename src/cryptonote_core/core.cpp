@@ -18,8 +18,8 @@
 #include <cryptonote_core/blockchain_utils.h>
 #include <cryptonote_core/core.h>
 #include <cryptonote_core/core_errors.h>
-#include <cryptonote_core/cryptoNote_format_utils.h>
-#include <cryptonote_core/cryptoNote_tools.h>
+#include <cryptonote_core/cryptonote_format_utils.h>
+#include <cryptonote_core/cryptonote_tools.h>
 #include <cryptonote_core/itime_provider.h>
 #include <cryptonote_core/memory_blockchain_storage.h>
 #include <cryptonote_core/mixins.h>

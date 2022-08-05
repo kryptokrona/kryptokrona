@@ -24,7 +24,7 @@
 #include "itransaction.h"
 
 #include "common/scope_exit.h"
-#include "common/shuffle_Generator.h"
+#include "common/shuffle_generator.h"
 #include "common/std_input_stream.h"
 #include "common/std_output_stream.h"
 #include "common/stream_tools.h"

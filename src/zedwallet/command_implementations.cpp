@@ -24,7 +24,7 @@
 #include <utilities/format_tools.h>
 
 #include <zedwallet/address_book.h>
-#include <Utilities/coloured_msg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet/commands.h>
 #include <zedwallet/fusion.h>
 #include <zedwallet/menu.h>
