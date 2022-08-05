@@ -368,12 +368,12 @@ void saveCSV(const std::shared_ptr<WalletBackend> walletBackend)
     }
 
     std::cout << SuccessMsg("CSV successfully written to ")
-              << SuccessMsg(WalletConfig::csvFilename)
+              << SuccessMsg(wallet_config::csvFilename)
               << SuccessMsg("!")
               << std::endl;
 }
 
-void printOutgoingTransfer(const WalletTypes::Transaction tx)
+void printOutgoingTransfer(const wallet_types::Transaction tx)
 {
     std::stringstream stream;
 

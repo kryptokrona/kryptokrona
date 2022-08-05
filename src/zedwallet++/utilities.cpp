@@ -201,7 +201,7 @@ bool parseDaemonAddressFromString(std::string &host, uint16_t &port, const std::
     }
 
     host = parts.at(0);
-    port = CryptoNote::RPC_DEFAULT_PORT;
+    port = cryptonote::RPC_DEFAULT_PORT;
 
     return true;
 }

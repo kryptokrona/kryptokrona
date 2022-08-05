@@ -56,7 +56,7 @@ class ColouredMsg
                 os << m.msg;
             }
 
-            common::Console::setTextColor(common::console::Color::Default);
+            common::console::setTextColor(common::console::Color::Default);
             return os;
         }
 

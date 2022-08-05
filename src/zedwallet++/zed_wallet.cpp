@@ -110,7 +110,7 @@ int main(int argc, char **argv)
         /* Trigger the shutdown signal if ctrl+c is used
            We do the actual handling in a separate thread to handle stuff not
            being re-entrant. */
-        Tools::SignalHandler::install([&ctrl_c] { ctrl_c = true; });
+        tools::SignalHandler::install([&ctrl_c] { ctrl_c = true; });
 
         /* Don't explicitly sync in foreground if it's a new wallet */
         if (sync)
