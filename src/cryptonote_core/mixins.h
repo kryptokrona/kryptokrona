@@ -105,7 +105,7 @@ namespace cryptonote
         const auto tx = createTransaction(transaction.getTransaction());
 
         for (size_t i = 0; i < tx->getInputCount(); ++i) {
-          if (tx->getInputType(i) != TransactionTypes::InputType::Key) {
+          if (tx->getInputType(i) != transaction_types::InputType::Key) {
             continue;
           }
 

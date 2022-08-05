@@ -24,7 +24,7 @@ namespace daemon_config
       dataDirectory = tools::getDefaultDataDirectory();
       checkPoints = "default";
       logFile = logfile.str();
-      logLevel = Logging::WARNING;
+      logLevel = logging::WARNING;
       dbMaxOpenFiles = cryptonote::DATABASE_DEFAULT_MAX_OPEN_FILES;
       dbReadCacheSizeMB = cryptonote::DATABASE_READ_BUFFER_MB_DEFAULT_SIZE;
       dbThreads = cryptonote::DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT;
