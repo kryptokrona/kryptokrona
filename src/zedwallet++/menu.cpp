@@ -60,11 +60,11 @@ std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Con
             feemsg << "You have connected to a node that charges "
                       "a fee to send transactions.\n\n"
                       "The fee for sending transactions is: "
-                   << Utilities::formatAmount(feeAmount)
+                   << utilities::formatAmount(feeAmount)
                    << " per transaction.\n\n"
                       "If you don't want to pay the node fee, please "
                       "relaunch "
-                   << WalletConfig::walletName
+                   << wallet_config::walletName
                    << " and specify a different node or run your own.";
 
             std::cout << WarningMsg(feemsg.str()) << std::endl;

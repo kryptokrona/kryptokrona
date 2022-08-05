@@ -74,7 +74,7 @@ namespace cryptonote
     uint64_t peerId;
     system::TcpConnection connection;
 
-    P2pConnectionContext(System::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, System::TcpConnection&& conn) :
+    P2pConnectionContext(system::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, system::TcpConnection&& conn) :
       context(nullptr),
       peerId(0),
       connection(std::move(conn)),
