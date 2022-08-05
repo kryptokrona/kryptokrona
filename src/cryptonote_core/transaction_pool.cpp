@@ -17,7 +17,7 @@
 
 #include "transaction_pool.h"
 
-#include "Common/int_util.h"
+#include "common/int_util.h"
 #include "cryptonote_basic_impl.h"
 #include "cryptonote_core/transaction_extra.h"
 
