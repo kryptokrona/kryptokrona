@@ -17,7 +17,7 @@
 
 #include "database_blockchain_cache_factory.h"
 
-#include "idataBase.h"
+#include "idatabase.h"
 
 #include "blockchain_cache.h"
 #include "database_blockchain_cache.h"

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "crypto_note.h"
+#include "cryptonote.h"
 #include <common/memory_input_stream.h>
 #include <common/vector_output_stream.h>
 #include "serialization/kv_binary_input_stream_serializer.h"
