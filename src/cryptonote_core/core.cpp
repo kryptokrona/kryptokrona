@@ -2597,7 +2597,7 @@ namespace cryptonote
         }
 
         std::vector<CachedTransaction> transactions;
-        if (!Utils::restoreCachedTransactions(info.rawBlock.transactions, transactions)) {
+        if (!utils::restoreCachedTransactions(info.rawBlock.transactions, transactions)) {
           logger(logging::WARNING) << "mergeSegments error: Couldn't deserialize transactions";
           throw std::runtime_error("Couldn't deserialize transactions");
         }
@@ -2728,7 +2728,7 @@ namespace cryptonote
         assert(rawTransactions.size() == 1);
 
         std::vector<CachedTransaction> transactions;
-        Utils::restoreCachedTransactions(rawTransactions, transactions);
+        utils::restoreCachedTransactions(rawTransactions, transactions);
         assert(transactions.size() == 1);
 
         transactionDetails.inBlockchain = true;
