@@ -21,11 +21,11 @@
 
 #include <future>
 
-#include <system/dispatcher.h>
-#include <system/event.h>
-#include <system/interrupted_exception.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
+#include <sys/interrupted_exception.h>
 
-namespace system
+namespace sys
 {
     template<class T = void> class RemoteContext {
     public:

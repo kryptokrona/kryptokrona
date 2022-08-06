@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace system
+namespace sys
 {
     class Dispatcher;
     class Event;
