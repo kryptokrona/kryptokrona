@@ -556,8 +556,8 @@ namespace payment_service
           return make_error_code(cryptonote::error::NOT_INITIALIZED);
         }
 
-        boost::FileSystem::path walletPath(config.walletFile);
-        boost::FileSystem::path exportPath = walletPath.parent_path() / fileName;
+        boost::filesystem::path walletPath(config.walletFile);
+        boost::filesystem::path exportPath = walletPath.parent_path() / fileName;
 
         logger(logging::INFO, logging::BRIGHT_WHITE) << "Exporting wallet to " << exportPath.string();
         wallet.exportWallet(exportPath.string());
