@@ -98,24 +98,24 @@ namespace cryptonote
     }
 
     BlockchainMessage makeChainSwitchMessage(uint32_t index, std::vector<crypto::Hash>&& hashes) {
-      return BlockchainMessage{Messages::ChainSwitch{index, std::move(hashes)}};
+      return BlockchainMessage{messages::ChainSwitch{index, std::move(hashes)}};
     }
 
     BlockchainMessage makeNewAlternativeBlockMessage(uint32_t index, const crypto::Hash& hash) {
-      return BlockchainMessage{Messages::NewAlternativeBlock{index, std::move(hash)}};
+      return BlockchainMessage{messages::NewAlternativeBlock{index, std::move(hash)}};
     }
 
     BlockchainMessage makeNewBlockMessage(uint32_t index, const crypto::Hash& hash) {
-      return BlockchainMessage{Messages::NewBlock{index, std::move(hash)}};
+      return BlockchainMessage{messages::NewBlock{index, std::move(hash)}};
     }
 
     BlockchainMessage makeAddTransactionMessage(std::vector<crypto::Hash>&& hashes) {
-      return BlockchainMessage{Messages::AddTransaction{std::move(hashes)}};
+      return BlockchainMessage{messages::AddTransaction{std::move(hashes)}};
     }
 
     BlockchainMessage makeDelTransactionMessage(std::vector<crypto::Hash>&& hashes,
-                                                Messages::DeleteTransaction::Reason reason) {
-      return BlockchainMessage{Messages::DeleteTransaction{std::move(hashes), reason}};
+                                                messages::DeleteTransaction::Reason reason) {
+      return BlockchainMessage{messages::DeleteTransaction{std::move(hashes), reason}};
     }
 
     void BlockchainMessage::match(std::function<void(const NewBlock&)> newBlockVisitor,

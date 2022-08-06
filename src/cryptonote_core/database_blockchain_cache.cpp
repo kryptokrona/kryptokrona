@@ -594,7 +594,7 @@ namespace cryptonote
       assert(br);
 
       std::vector<CachedTransaction> transactions;
-      bool tr = Utils::restoreCachedTransactions(pushedBlockInfo.rawBlock.transactions, transactions);
+      bool tr = utils::restoreCachedTransactions(pushedBlockInfo.rawBlock.transactions, transactions);
       if (tr) {}
       assert(tr);
 
