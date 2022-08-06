@@ -491,7 +491,7 @@ namespace cryptonote
              container->getOutputs(allTransfers, ITransfersContainer::IncludeAll);
              m_logger(INFO, BRIGHT_WHITE) << "Known transfers " << allTransfers.size();
              for (auto& o : allTransfers) {
-                 if (o.type == TransactionTypes::OutputType::Key) {
+                 if (o.type == transaction_types::OutputType::Key) {
                     m_synchronizer.addPublicKeysSeen(addr, o.transactionHash, o.outputKey);
                  }
              }
@@ -2513,7 +2513,7 @@ namespace cryptonote
 
       size_t i = 0;
       for (const auto& input: selectedTransfers) {
-        TransactionTypes::InputKeyInfo keyInfo;
+        transaction_types::InputKeyInfo keyInfo;
         keyInfo.amount = input.out.amount;
 
         if(mixinResult.size()) {
@@ -2525,7 +2525,7 @@ namespace cryptonote
               continue;
             }
 
-            TransactionTypes::GlobalOutput globalOutput;
+            transaction_types::GlobalOutput globalOutput;
             globalOutput.outputIndex = static_cast<uint32_t>(fakeOut.global_amount_index);
             globalOutput.targetKey = reinterpret_cast<PublicKey&>(fakeOut.out_key);
             keyInfo.outputs.push_back(std::move(globalOutput));
@@ -2535,11 +2535,11 @@ namespace cryptonote
         }
 
         //paste real transaction to the random index
-        auto insertIn = std::find_if(keyInfo.outputs.begin(), keyInfo.outputs.end(), [&](const TransactionTypes::GlobalOutput& a) {
+        auto insertIn = std::find_if(keyInfo.outputs.begin(), keyInfo.outputs.end(), [&](const transaction_types::GlobalOutput& a) {
           return a.outputIndex >= input.out.globalOutputIndex;
         });
 
-        TransactionTypes::GlobalOutput realOutput;
+        transaction_types::GlobalOutput realOutput;
         realOutput.outputIndex = input.out.globalOutputIndex;
         realOutput.targetKey = reinterpret_cast<const PublicKey&>(input.out.outputKey);
 
