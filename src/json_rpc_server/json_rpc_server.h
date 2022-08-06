@@ -7,8 +7,8 @@
 
 #include <system_error>
 
-#include <system/dispatcher.h>
-#include <system/event.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
 #include "logging/ilogger.h"
 #include "logging/logger_ref.h"
 #include "rpc/http_server.h"
@@ -34,7 +34,7 @@ namespace cryptonote
 {
     class JsonRpcServer : HttpServer {
     public:
-      JsonRpcServer(system::Dispatcher& sys, system::Event& stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config);
+      JsonRpcServer(sys::Dispatcher& sys, sys::Event& stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config);
       JsonRpcServer(const JsonRpcServer&) = delete;
 
       void start(const std::string& bindAddress, uint16_t bindPort);
@@ -55,7 +55,7 @@ namespace cryptonote
       // HttpServer
       virtual void processRequest(const cryptonote::HttpRequest& request, cryptonote::HttpResponse& response) override;
 
-      system::Event& stopEvent;
+      sys::Event& stopEvent;
       logging::LoggerRef logger;
     };
 }

@@ -70,11 +70,11 @@ namespace cryptonote
     using Clock = std::chrono::steady_clock;
     using TimePoint = Clock::time_point;
 
-    system::Context<void>* context;
+    sys::Context<void>* context;
     uint64_t peerId;
-    system::TcpConnection connection;
+    sys::TcpConnection connection;
 
-    P2pConnectionContext(system::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, system::TcpConnection&& conn) :
+    P2pConnectionContext(sys::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, sys::TcpConnection&& conn) :
       context(nullptr),
       peerId(0),
       connection(std::move(conn)),
@@ -102,7 +102,7 @@ namespace cryptonote
   private:
     logging::LoggerRef logger;
     TimePoint writeOperationStartTime;
-    system::Event queueEvent;
+    sys::Event queueEvent;
     std::vector<P2pMessage> writeQueue;
     size_t writeQueueSize = 0;
     bool stopped;
@@ -111,7 +111,7 @@ namespace cryptonote
   class NodeServer :  public IP2pEndpoint
   {
   public:
-    NodeServer(system::Dispatcher& dispatcher, cryptonote::CryptoNoteProtocolHandler& payload_handler, std::shared_ptr<logging::ILogger> log);
+    NodeServer(sys::Dispatcher& dispatcher, cryptonote::CryptoNoteProtocolHandler& payload_handler, std::shared_ptr<logging::ILogger> log);
 
     bool run();
     bool init(const NetNodeConfig& config);
@@ -225,12 +225,12 @@ namespace cryptonote
     bool m_hide_my_port;
     std::string m_p2p_state_filename;
 
-    system::Dispatcher& m_dispatcher;
-    system::ContextGroup m_workingContextGroup;
-    system::Event m_stopEvent;
-    system::Timer m_idleTimer;
-    system::Timer m_timeoutTimer;
-    system::TcpListener m_listener;
+    sys::Dispatcher& m_dispatcher;
+    sys::ContextGroup m_workingContextGroup;
+    sys::Event m_stopEvent;
+    sys::Timer m_idleTimer;
+    sys::Timer m_timeoutTimer;
+    sys::TcpListener m_listener;
     logging::LoggerRef logger;
     std::atomic<bool> m_stop;
 
@@ -240,7 +240,7 @@ namespace cryptonote
     // OnceInInterval m_peer_handshake_idle_maker_interval;
     OnceInInterval m_connections_maker_interval;
     OnceInInterval m_peerlist_store_interval;
-    system::Timer m_timedSyncTimer;
+    sys::Timer m_timedSyncTimer;
 
     std::string m_bind_ip;
     std::string m_port;

@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <system/context_group.h>
-#include <system/dispatcher.h>
-#include <system/event.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
 #include "iwallet.h"
 #include "inode.h"
 #include "cryptonote_core/currency.h"
@@ -39,13 +39,13 @@ namespace payment_service
       uint64_t scanHeight;
     };
 
-    void generateNewWallet(const cryptonote::Currency& currency, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger, system::Dispatcher& dispatcher);
+    void generateNewWallet(const cryptonote::Currency& currency, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger, sys::Dispatcher& dispatcher);
 
     struct TransactionsInBlockInfoFilter;
 
     class WalletService {
     public:
-      WalletService(const cryptonote::Currency& currency, system::Dispatcher& sys, cryptonote::INode& node, cryptonote::IWallet& wallet,
+      WalletService(const cryptonote::Currency& currency, sys::Dispatcher& sys, cryptonote::INode& node, cryptonote::IWallet& wallet,
         cryptonote::IFusionManager& fusionManager, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger);
       virtual ~WalletService();
 
@@ -115,9 +115,9 @@ namespace payment_service
       const WalletConfiguration& config;
       bool inited;
       logging::LoggerRef logger;
-      system::Dispatcher& dispatcher;
-      system::Event readyEvent;
-      system::ContextGroup refreshContext;
+      sys::Dispatcher& dispatcher;
+      sys::Event readyEvent;
+      sys::ContextGroup refreshContext;
       std::string m_node_address;
       uint32_t m_node_fee;
 

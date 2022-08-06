@@ -12,10 +12,10 @@
 #include <sstream>
 #include "http/http_parser_error_codes.h"
 
-#include <system/tcp_connection.h>
-#include <system/tcp_listener.h>
-#include <system/tcp_stream.h>
-#include <system/ipv4_address.h>
+#include <sys/tcp_connection.h>
+#include <sys/tcp_listener.h>
+#include <sys/tcp_stream.h>
+#include <sys/ipv4_address.h>
 #include "http/http_parser.h"
 #include "http/http_response.h"
 #include "rpc/json_rpc.h"
@@ -26,7 +26,7 @@
 
 namespace cryptonote
 {
-    JsonRpcServer::JsonRpcServer(system::Dispatcher& sys, system::Event& stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config) :
+    JsonRpcServer::JsonRpcServer(sys::Dispatcher& sys, sys::Event& stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config) :
       HttpServer(sys, loggerGroup),
       stopEvent(stopEvent),
       logger(loggerGroup, "json_rpc_server"),

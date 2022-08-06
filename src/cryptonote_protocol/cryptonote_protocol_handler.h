@@ -36,7 +36,7 @@ namespace cryptonote
   {
   public:
 
-    CryptoNoteProtocolHandler(const Currency& currency, system::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<logging::ILogger> log);
+    CryptoNoteProtocolHandler(const Currency& currency, sys::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<logging::ILogger> log);
 
     virtual bool addObserver(ICryptoNoteProtocolObserver* observer) override;
     virtual bool removeObserver(ICryptoNoteProtocolObserver* observer) override;
@@ -90,7 +90,7 @@ private:
 
   private:
 
-    system::Dispatcher& m_dispatcher;
+    sys::Dispatcher& m_dispatcher;
     ICore& m_core;
     const Currency& m_currency;
 

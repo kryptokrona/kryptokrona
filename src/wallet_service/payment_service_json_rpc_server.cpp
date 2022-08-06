@@ -20,7 +20,7 @@
 
 namespace payment_service
 {
-    PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(system::Dispatcher& sys, system::Event& stopEvent, WalletService& service, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config)
+    PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(sys::Dispatcher& sys, sys::Event& stopEvent, WalletService& service, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config)
       : JsonRpcServer(sys, stopEvent, loggerGroup, config)
       , service(service)
       , logger(loggerGroup, "PaymentServiceJsonRpcServer")

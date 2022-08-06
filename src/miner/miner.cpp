@@ -18,13 +18,13 @@
 #include "cryptonote_core/check_difficulty.h"
 #include "cryptonote_core/cryptonote_format_utils.h"
 
-#include <system/interrupted_exception.h>
+#include <sys/interrupted_exception.h>
 
 #include <utilities/coloured_msg.h>
 
 namespace cryptonote
 {
-    Miner::Miner(system::Dispatcher& dispatcher) :
+    Miner::Miner(sys::Dispatcher& dispatcher) :
         m_dispatcher(dispatcher),
         m_miningStopped(dispatcher),
         m_state(MiningState::MINING_STOPPED)
@@ -50,7 +50,7 @@ namespace cryptonote
 
         if (m_state == MiningState::MINING_STOPPED)
         {
-            throw system::InterruptedException();
+            throw sys::InterruptedException();
         }
 
         return m_block;
@@ -79,8 +79,8 @@ namespace cryptonote
 
             for (size_t i = 0; i < threadCount; ++i)
             {
-                m_workers.emplace_back(std::unique_ptr<system::RemoteContext<void>> (
-                    new system::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount))))
+                m_workers.emplace_back(std::unique_ptr<sys::RemoteContext<void>> (
+                    new sys::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount))))
                 );
 
                 blockMiningParameters.blockTemplate.nonce++;

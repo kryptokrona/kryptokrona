@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include "error_message.h"
 
-namespace system
+namespace sys
 {
     namespace
     {

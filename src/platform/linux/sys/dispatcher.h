@@ -26,7 +26,7 @@
 #include <bits/reg.h>
 #endif
 
-namespace system
+namespace sys
 {
     struct NativeContextGroup;
 

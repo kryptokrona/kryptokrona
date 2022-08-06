@@ -37,8 +37,8 @@ private:
 
   void runWalletService(const cryptonote::Currency& currency, cryptonote::INode& node);
 
-  system::Dispatcher* dispatcher;
-  system::Event* stopEvent;
+  sys::Dispatcher* dispatcher;
+  sys::Event* stopEvent;
   PaymentService::ConfigurationManager config;
   PaymentService::WalletService* service;
 

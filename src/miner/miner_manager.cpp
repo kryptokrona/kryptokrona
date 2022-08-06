@@ -6,9 +6,9 @@
 
 #include "miner_manager.h"
 
-#include <system/event_lock.h>
-#include <system/interrupted_exception.h>
-#include <system/timer.h>
+#include <sys/event_lock.h>
+#include <sys/interrupted_exception.h>
+#include <sys/timer.h>
 #include <thread>
 #include <chrono>
 
@@ -67,7 +67,7 @@ namespace miner
     }
 
     MinerManager::MinerManager(
-        system::Dispatcher& dispatcher,
+        sys::Dispatcher& dispatcher,
         const cryptonote::MiningConfig& config,
         const std::shared_ptr<httplib::Client> httpClient) :
 

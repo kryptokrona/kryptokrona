@@ -24,7 +24,7 @@
 
 #include "common/scope_exit.h"
 
-namespace system
+namespace sys
 {
     MemoryMappedFile::MemoryMappedFile() :
       m_fileHandle(INVALID_HANDLE_VALUE),

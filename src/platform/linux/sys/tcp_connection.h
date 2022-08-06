@@ -22,7 +22,7 @@
 #include <string>
 #include "dispatcher.h"
 
-namespace system
+namespace sys
 {
     class Ipv4Address;
 

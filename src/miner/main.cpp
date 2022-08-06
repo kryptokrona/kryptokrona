@@ -5,7 +5,7 @@
 
 #include "miner_manager.h"
 
-#include <system/dispatcher.h>
+#include <sys/dispatcher.h>
 
 int main(int argc, char **argv)
 {
@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 
         try
         {
-            system::Dispatcher dispatcher;
+            sys::Dispatcher dispatcher;
 
             auto httpClient = std::make_shared<httplib::Client>(
                 config.daemonHost.c_str(), config.daemonPort, 10 /* 10 second timeout */
