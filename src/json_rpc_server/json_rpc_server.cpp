@@ -26,7 +26,7 @@
 
 namespace cryptonote
 {
-    JsonRpcServer::JsonRpcServer(sys::Dispatcher& sys, sys::Event& stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config) :
+    JsonRpcServer::JsonRpcServer(sys::Dispatcher& sys, sys::Event& stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, payment_service::ConfigurationManager& config) :
       HttpServer(sys, loggerGroup),
       stopEvent(stopEvent),
       logger(loggerGroup, "json_rpc_server"),
