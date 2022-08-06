@@ -18,8 +18,8 @@
 #include <tuple>
 #include <utility>
 
-#include <system/event_lock.h>
-#include <system/remote_context.h>
+#include <sys/event_lock.h>
+#include <sys/remote_context.h>
 
 #include "itransaction.h"
 
@@ -51,7 +51,7 @@ using namespace logging;
 
 namespace
 {
-    void asyncRequestCompletion(system::Event& requestFinished) {
+    void asyncRequestCompletion(sys::Event& requestFinished) {
       requestFinished.set();
     }
 
@@ -120,7 +120,7 @@ namespace
 
 namespace cryptonote
 {
-    WalletGreen::WalletGreen(system::Dispatcher& dispatcher, const Currency& currency, INode& node, std::shared_ptr<logging::ILogger> logger, uint32_t transactionSoftLockTime) :
+    WalletGreen::WalletGreen(sys::Dispatcher& dispatcher, const Currency& currency, INode& node, std::shared_ptr<logging::ILogger> logger, uint32_t transactionSoftLockTime) :
       m_dispatcher(dispatcher),
       m_currency(currency),
       m_node(node),
@@ -389,8 +389,8 @@ namespace cryptonote
         tools::ScopeExit failExitHandler([path, &storageCreated] {
           // Don't delete file if it has existed
           if (storageCreated) {
-            boost::system::error_code ignore;
-            boost::filesystem::remove(path, ignore);
+            boost::FileSystem::error_code ignore;
+            boost::FileSystem::remove(path, ignore);
           }
         });
 
@@ -1390,7 +1390,7 @@ namespace cryptonote
         }
       });
 
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       throwIfNotInitialized();
       throwIfTrackingMode();
@@ -1417,7 +1417,7 @@ namespace cryptonote
         }
       });
 
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       throwIfNotInitialized();
       throwIfTrackingMode();
@@ -1728,7 +1728,7 @@ namespace cryptonote
 
     PreparedTransaction WalletGreen::formTransaction(const TransactionParameters &sendingTransaction)
     {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       throwIfNotInitialized();
       throwIfTrackingMode();
@@ -1774,7 +1774,7 @@ namespace cryptonote
         }
       });
 
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       throwIfNotInitialized();
       throwIfTrackingMode();
@@ -1816,7 +1816,7 @@ namespace cryptonote
     }
 
     void WalletGreen::commitTransaction(size_t transactionId) {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       throwIfNotInitialized();
       throwIfStopped();
@@ -1833,10 +1833,10 @@ namespace cryptonote
         throw std::system_error(make_error_code(error::TX_TRANSFER_IMPOSSIBLE));
       }
 
-      system::Event completion(m_dispatcher);
+      sys::Event completion(m_dispatcher);
       std::error_code ec;
 
-      system::RemoteContext<void> relayTransactionContext(m_dispatcher, [this, transactionId, &ec, &completion] () {
+      sys::RemoteContext<void> relayTransactionContext(m_dispatcher, [this, transactionId, &ec, &completion] () {
         m_node.relayTransaction(m_uncommitedTransactions[transactionId], [&ec, &completion, this](std::error_code error) {
           ec = error;
           this->m_dispatcher.remoteSpawn(std::bind(asyncRequestCompletion, std::ref(completion)));
@@ -1861,7 +1861,7 @@ namespace cryptonote
         m_dispatcher.yield();
       });
 
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       throwIfNotInitialized();
       throwIfStopped();
@@ -2258,12 +2258,12 @@ namespace cryptonote
     }
 
     void WalletGreen::sendTransaction(const cryptonote::Transaction& cryptoNoteTransaction) {
-      system::Event completion(m_dispatcher);
+      sys::Event completion(m_dispatcher);
       std::error_code ec;
 
       throwIfStopped();
 
-      system::RemoteContext<void> relayTransactionContext(m_dispatcher, [this, &cryptoNoteTransaction, &ec, &completion] () {
+      sys::RemoteContext<void> relayTransactionContext(m_dispatcher, [this, &cryptoNoteTransaction, &ec, &completion] () {
         m_node.relayTransaction(cryptoNoteTransaction, [&ec, &completion, this](std::error_code error) {
           ec = error;
           this->m_dispatcher.remoteSpawn(std::bind(asyncRequestCompletion, std::ref(completion)));
@@ -2366,7 +2366,7 @@ namespace cryptonote
         amounts.push_back(out.out.amount);
       }
 
-      system::Event requestFinished(m_dispatcher);
+      sys::Event requestFinished(m_dispatcher);
       std::error_code mixinError;
 
       throwIfStopped();
@@ -2374,7 +2374,7 @@ namespace cryptonote
       uint16_t requestMixinCount = mixIn + 1; //+1 to allow to skip real output
 
       m_logger(DEBUGGING) << "Requesting random outputs";
-      system::RemoteContext<void> getOutputsContext(m_dispatcher, [this, amounts, requestMixinCount, &mixinResult, &requestFinished, &mixinError] () mutable {
+      sys::RemoteContext<void> getOutputsContext(m_dispatcher, [this, amounts, requestMixinCount, &mixinResult, &requestFinished, &mixinError] () mutable {
         m_node.getRandomOutsByAmounts(std::move(amounts), requestMixinCount, mixinResult, [&requestFinished, &mixinError, this] (std::error_code ec) mutable {
           mixinError = ec;
           m_dispatcher.remoteSpawn(std::bind(asyncRequestCompletion, std::ref(requestFinished)));
@@ -2709,7 +2709,7 @@ namespace cryptonote
     void WalletGreen::onSynchronizationProgressUpdated(uint32_t processedBlockCount, uint32_t totalBlockCount) {
       assert(processedBlockCount > 0);
 
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       m_logger(TRACE) << "onSynchronizationProgressUpdated processedBlockCount " << processedBlockCount << ", totalBlockCount " << totalBlockCount;
 
@@ -2724,7 +2724,7 @@ namespace cryptonote
     }
 
     void WalletGreen::onSynchronizationCompleted() {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       m_logger(TRACE) << "onSynchronizationCompleted";
 
@@ -2740,7 +2740,7 @@ namespace cryptonote
     }
 
     void WalletGreen::blocksAdded(const std::vector<crypto::Hash>& blockHashes) {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       if (m_state == WalletState::NOT_INITIALIZED) {
         return;
@@ -2754,7 +2754,7 @@ namespace cryptonote
     }
 
     void WalletGreen::blocksRollback(uint32_t blockIndex) {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       m_logger(TRACE) << "blocksRollback " << blockIndex;
 
@@ -2829,7 +2829,7 @@ namespace cryptonote
     }
 
     void WalletGreen::transactionUpdated(const TransactionInformation& transactionInfo, const std::vector<ContainerAmounts>& containerAmountsList) {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       m_logger(DEBUGGING) << "transactionUpdated event, hash " << transactionInfo.transactionHash <<
         ", block " << transactionInfo.blockHeight <<
@@ -2923,7 +2923,7 @@ namespace cryptonote
     }
 
     void WalletGreen::transactionDeleted(ITransfersSubscription* object, const Hash& transactionHash) {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       m_logger(DEBUGGING) << "transactionDeleted event, hash " << transactionHash;
 
@@ -2989,14 +2989,14 @@ namespace cryptonote
        stops. After some investigation, it appears that we need to run this
        odd line of code to run other code on the dispatcher? */
     void WalletGreen::updateInternalCache() {
-        system::RemoteContext<void> updateInternalBC(m_dispatcher, [] () {});
+        sys::RemoteContext<void> updateInternalBC(m_dispatcher, [] () {});
         updateInternalBC.get();
     }
 
     void WalletGreen::stopBlockchainSynchronizer() {
       if (m_blockchainSynchronizerStarted) {
         m_logger(DEBUGGING) << "Stopping BlockchainSynchronizer";
-        system::RemoteContext<void> stopContext(m_dispatcher, [this] () {
+        sys::RemoteContext<void> stopContext(m_dispatcher, [this] () {
           m_blockchainSynchronizer.stop();
         });
         stopContext.get();
@@ -3006,7 +3006,7 @@ namespace cryptonote
     }
 
     void WalletGreen::addUnconfirmedTransaction(const ITransactionReader& transaction) {
-      system::RemoteContext<std::error_code> context(m_dispatcher, [this, &transaction] {
+      sys::RemoteContext<std::error_code> context(m_dispatcher, [this, &transaction] {
         return m_blockchainSynchronizer.addUnconfirmedTransaction(transaction).get();
       });
 
@@ -3020,7 +3020,7 @@ namespace cryptonote
     }
 
     void WalletGreen::removeUnconfirmedTransaction(const crypto::Hash& transactionHash) {
-      system::RemoteContext<void> context(m_dispatcher, [this, &transactionHash] {
+      sys::RemoteContext<void> context(m_dispatcher, [this, &transactionHash] {
         m_blockchainSynchronizer.removeUnconfirmedTransaction(transactionHash).get();
       });
 
@@ -3145,7 +3145,7 @@ namespace cryptonote
         }
       });
 
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       m_logger(INFO, BRIGHT_WHITE) << "createFusionTransaction" <<
         ", from " << common::makeContainerFormatter(sourceAddresses) <<
@@ -3310,7 +3310,7 @@ namespace cryptonote
     }
 
     IFusionManager::EstimateResult WalletGreen::estimate(uint64_t threshold, const std::vector<std::string>& sourceAddresses) const {
-      system::EventLock lk(m_readyEvent);
+      sys::EventLock lk(m_readyEvent);
 
       throwIfNotInitialized();
       throwIfStopped();

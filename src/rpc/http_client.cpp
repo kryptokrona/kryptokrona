@@ -18,13 +18,13 @@
 #include "http_client.h"
 
 #include <http/http_parser.h>
-#include <system/ipv4_resolver.h>
-#include <system/ipv4_address.h>
-#include <system/tcp_connector.h>
+#include <sys/ipv4_resolver.h>
+#include <sys/ipv4_address.h>
+#include <sys/tcp_connector.h>
 
 namespace cryptonote
 {
-    HttpClient::HttpClient(system::Dispatcher& dispatcher, const std::string& address, uint16_t port) :
+    HttpClient::HttpClient(sys::Dispatcher& dispatcher, const std::string& address, uint16_t port) :
       m_dispatcher(dispatcher), m_address(address), m_port(port) {
     }
 
@@ -55,9 +55,9 @@ namespace cryptonote
 
     void HttpClient::connect() {
       try {
-        auto ipAddr = system::Ipv4Resolver(m_dispatcher).resolve(m_address);
-        m_connection = system::TcpConnector(m_dispatcher).connect(ipAddr, m_port);
-        m_streamBuf.reset(new system::TcpStreambuf(m_connection));
+        auto ipAddr = sys::Ipv4Resolver(m_dispatcher).resolve(m_address);
+        m_connection = sys::TcpConnector(m_dispatcher).connect(ipAddr, m_port);
+        m_streamBuf.reset(new sys::TcpStreambuf(m_connection));
         m_connected = true;
       } catch (const std::exception& e) {
         throw ConnectException(e.what());
@@ -77,7 +77,7 @@ namespace cryptonote
       }
 
       try {
-        m_connection = system::TcpConnection();
+        m_connection = sys::TcpConnection();
       } catch (std::exception&) {
         //Ignoring possible exception.
       }

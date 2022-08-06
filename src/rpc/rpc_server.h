@@ -24,7 +24,7 @@ namespace cryptonote
 
     class RpcServer : public HttpServer {
     public:
-      RpcServer(system::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, Core& c, NodeServer& p2p, ICryptoNoteProtocolHandler& protocol);
+      RpcServer(sys::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log, Core& c, NodeServer& p2p, ICryptoNoteProtocolHandler& protocol);
 
       typedef std::function<bool(RpcServer*, const HttpRequest& request, HttpResponse& response)> HandlerFunction;
       bool enableCors(const std::vector<std::string>  domains);

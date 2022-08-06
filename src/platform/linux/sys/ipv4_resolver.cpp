@@ -22,12 +22,12 @@
 
 #include <netdb.h>
 
-#include <system/dispatcher.h>
-#include <system/error_message.h>
-#include <system/interrupted_exception.h>
-#include <system/ipv4_address.h>
+#include <sys/dispatcher.h>
+#include <sys/error_message.h>
+#include <sys/interrupted_exception.h>
+#include <sys/ipv4_address.h>
 
-namespace system
+namespace sys
 {
     Ipv4Resolver::Ipv4Resolver() : dispatcher(nullptr) {
     }

@@ -28,7 +28,7 @@
 
 #include "common/scope_exit.h"
 
-namespace system
+namespace sys
 {
     MemoryMappedFile::MemoryMappedFile() :
       m_file(-1),

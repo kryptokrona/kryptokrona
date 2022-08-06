@@ -21,15 +21,15 @@
 
 #include "intrusive_linked_list.h"
 
-#include "system/dispatcher.h"
-#include "system/event.h"
-#include "system/interrupted_exception.h"
+#include "sys/dispatcher.h"
+#include "sys/event.h"
+#include "sys/interrupted_exception.h"
 
 namespace cryptonote
 {
     template <class MessageType> class MessageQueue {
     public:
-      MessageQueue(system::Dispatcher& dispatcher);
+      MessageQueue(sys::Dispatcher& dispatcher);
 
       const MessageType& front();
       void pop();
@@ -42,9 +42,9 @@ namespace cryptonote
       typename IntrusiveLinkedList<MessageQueue<MessageType>>::hook& getHook();
       void wait();
 
-      system::Dispatcher& dispatcher;
+      sys::Dispatcher& dispatcher;
       std::queue<MessageType> messageQueue;
-      system::Event event;
+      sys::Event event;
       bool stopped;
 
       typename IntrusiveLinkedList<MessageQueue<MessageType>>::hook hook;
@@ -67,14 +67,14 @@ namespace cryptonote
     };
 
     template <class MessageType>
-    MessageQueue<MessageType>::MessageQueue(system::Dispatcher& dispatch)
+    MessageQueue<MessageType>::MessageQueue(sys::Dispatcher& dispatch)
         : dispatcher(dispatch), event(dispatch), stopped(false) {
     }
 
     template <class MessageType> void MessageQueue<MessageType>::wait() {
       if (messageQueue.empty()) {
         if (stopped) {
-          throw system::InterruptedException();
+          throw sys::InterruptedException();
         }
 
         event.clear();
@@ -82,7 +82,7 @@ namespace cryptonote
           event.wait();
 
           if (stopped) {
-            throw system::InterruptedException();
+            throw sys::InterruptedException();
           }
         }
       }

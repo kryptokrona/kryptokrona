@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include <time.h>
-#include <system/ipv4_address.h>
+#include <sys/ipv4_address.h>
 
 #include "serialization/serialization_overloads.h"
 
@@ -79,7 +79,7 @@ bool PeerlistManager::get_gray_peer_by_index(PeerlistEntry& p, size_t i) const {
 
 bool PeerlistManager::is_ip_allowed(uint32_t ip) const
 {
-  system::Ipv4Address addr(networkToHost(ip));
+  sys::Ipv4Address addr(networkToHost(ip));
 
   //never allow loopback ip
   if (addr.isLoopback()) {

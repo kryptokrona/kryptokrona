@@ -25,10 +25,10 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
-#include <system/interrupted_exception.h>
+#include <sys/interrupted_exception.h>
 #include "dispatcher.h"
 
-namespace system
+namespace sys
 {
     namespace
     {

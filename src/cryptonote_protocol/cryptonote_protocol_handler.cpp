@@ -9,7 +9,7 @@
 #include <future>
 #include <boost/scope_exit.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include <system/dispatcher.h>
+#include <sys/dispatcher.h>
 
 #include "cryptonote_core/cryptonote_basic_impl.h"
 #include "cryptonote_core/cryptonote_format_utils.h"
@@ -142,7 +142,7 @@ namespace cryptonote
       serializeAsBinary(request.missing_txs, "missing_txs", s);
     }
 
-    CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, system::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<logging::ILogger> log) :
+    CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency& currency, sys::Dispatcher& dispatcher, ICore& rcore, IP2pEndpoint* p_net_layout, std::shared_ptr<logging::ILogger> log) :
       m_dispatcher(dispatcher),
       m_currency(currency),
       m_core(rcore),

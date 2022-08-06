@@ -25,7 +25,7 @@
 #include "message_queue.h"
 #include "transaction_validator_state.h"
 
-#include <system/context_group.h>
+#include <sys/context_group.h>
 
 #include <wallet_types.h>
 
@@ -33,7 +33,7 @@ namespace cryptonote
 {
     class Core : public ICore, public ICoreInformation {
     public:
-      Core(const Currency& currency, std::shared_ptr<logging::ILogger> logger, Checkpoints&& checkpoints, system::Dispatcher& dispatcher,
+      Core(const Currency& currency, std::shared_ptr<logging::ILogger> logger, Checkpoints&& checkpoints, sys::Dispatcher& dispatcher,
            std::unique_ptr<IBlockchainCacheFactory>&& blockchainCacheFactory, std::unique_ptr<IMainChainStorage>&& mainChainStorage);
       virtual ~Core();
 
@@ -131,8 +131,8 @@ namespace cryptonote
 
     private:
       const Currency& currency;
-      system::Dispatcher& dispatcher;
-      system::ContextGroup contextGroup;
+      sys::Dispatcher& dispatcher;
+      sys::ContextGroup contextGroup;
       logging::LoggerRef logger;
       Checkpoints checkpoints;
       std::unique_ptr<IUpgradeManager> upgradeManager;

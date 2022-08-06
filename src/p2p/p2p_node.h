@@ -21,11 +21,11 @@
 #include <list>
 
 #include <logging/logger_ref.h>
-#include <system/context_group.h>
-#include <system/dispatcher.h>
-#include <system/event.h>
-#include <system/tcp_listener.h>
-#include <system/timer.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
+#include <sys/tcp_listener.h>
+#include <sys/timer.h>
 
 #include "ip2p_node_internal.h"
 #include "istream_serializable.h"
@@ -51,7 +51,7 @@ namespace cryptonote
 
       P2pNode(
         const P2pNodeConfig& cfg,
-        system::Dispatcher& dispatcher,
+        sys::Dispatcher& dispatcher,
         std::shared_ptr<logging::ILogger> log,
         const crypto::Hash& genesisHash,
         uint64_t peerId);
@@ -79,13 +79,13 @@ namespace cryptonote
       const uint64_t m_myPeerId;
       const CORE_SYNC_DATA m_genesisPayload;
 
-      system::Dispatcher& m_dispatcher;
-      system::ContextGroup workingContextGroup;
-      system::TcpListener m_listener;
-      system::Timer m_connectorTimer;
+      sys::Dispatcher& m_dispatcher;
+      sys::ContextGroup workingContextGroup;
+      sys::TcpListener m_listener;
+      sys::Timer m_connectorTimer;
       PeerlistManager m_peerlist;
       ContextList m_contexts;
-      system::Event m_queueEvent;
+      sys::Event m_queueEvent;
       std::deque<std::unique_ptr<IP2pConnection>> m_connectionQueue;
 
       // IP2pNodeInternal

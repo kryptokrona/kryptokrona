@@ -7,9 +7,9 @@
 
 #include "common/string_tools.h"
 
-#include <system/event_lock.h>
-#include <system/timer.h>
-#include <system/interrupted_exception.h>
+#include <sys/event_lock.h>
+#include <sys/timer.h>
+#include <sys/interrupted_exception.h>
 
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/json_rpc.h"
@@ -19,7 +19,7 @@
 using json = nlohmann::json;
 
 BlockchainMonitor::BlockchainMonitor(
-    system::Dispatcher& dispatcher,
+    sys::Dispatcher& dispatcher,
     const size_t pollingInterval,
     const std::shared_ptr<httplib::Client> httpClient):
 
@@ -46,7 +46,7 @@ void BlockchainMonitor::waitBlockchainUpdate()
     {
         m_sleepingContext.spawn([this] ()
         {
-            system::Timer timer(m_dispatcher);
+            sys::Timer timer(m_dispatcher);
             timer.sleep(std::chrono::seconds(m_pollingInterval));
         });
 
@@ -67,7 +67,7 @@ void BlockchainMonitor::waitBlockchainUpdate()
 
     if (m_stopped)
     {
-        throw system::InterruptedException();
+        throw sys::InterruptedException();
     }
 }
 

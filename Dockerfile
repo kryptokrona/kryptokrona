@@ -37,13 +37,12 @@ WORKDIR /usr/src/kryptokrona/build
 RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc) --ignore-errors
 
 WORKDIR /usr/src/kryptokrona/build/src
-RUN pwd && ls -la
 
 # set executable permission on kryptokrona deamon
-# RUN chmod +x kryptokronad
+RUN chmod +x kryptokronad
 
-#EXPOSE 11898
+EXPOSE 11898
 
 # --data-dir is binded to a volume - this volume is binded when starting the container
 # to start the container follow instructions on readme or in article published by marcus cvjeticanin on https://mjovanc.com
-#CMD [ "/bin/sh", "-c", "./kryptokronad --data-dir ~/.kryptokrona --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0" ]
+CMD [ "/bin/sh", "-c", "./kryptokronad --data-dir ~/.kryptokrona --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0" ]

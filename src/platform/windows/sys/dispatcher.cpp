@@ -27,7 +27,7 @@
 #include <winsock2.h>
 #include "error_message.h"
 
-namespace system
+namespace sys
 {
     namespace
     {

@@ -22,13 +22,13 @@
 #endif
 #include <winsock2.h>
 #include <mswsock.h>
-#include <system/interrupted_exception.h>
-#include <system/ipv4_address.h>
+#include <sys/interrupted_exception.h>
+#include <sys/ipv4_address.h>
 #include "dispatcher.h"
 #include "error_message.h"
 #include "tcp_connection.h"
 
-namespace system
+namespace sys
 {
     namespace
     {
