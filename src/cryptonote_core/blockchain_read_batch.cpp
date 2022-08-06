@@ -21,7 +21,7 @@
 
 #include "db_utils.h"
 
-using namespace crypto::note;
+using namespace cryptonote;
 
 BlockchainReadBatch::BlockchainReadBatch() {
 }

@@ -386,7 +386,7 @@ namespace cryptonote
           return false;
         } else if ((response.node_data.version - cryptonote::P2P_CURRENT_VERSION) >= cryptonote::P2P_UPGRADE_WINDOW) {
           logger(WARNING) << *connection << "COMMAND_HANDSHAKE Warning, your software may be out of date. Please visit: "
-            << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
+            << cryptonote::LATEST_VERSION_URL << " for the latest version.";
         }
 
         return handleRemotePeerList(response.local_peerlist, response.node_data.local_time);
@@ -490,7 +490,7 @@ namespace cryptonote
         TcpConnection connection;
 
         doWithTimeoutAndThrow(m_dispatcher, m_cfg.getConnectTimeout(), [&] {
-          connection = connector.connect(Ipv4Address(Common::ipAddressToString(peerAddress.ip)), static_cast<uint16_t>(peerAddress.port));
+          connection = connector.connect(Ipv4Address(common::ipAddressToString(peerAddress.ip)), static_cast<uint16_t>(peerAddress.port));
         });
 
         doWithTimeoutAndThrow(m_dispatcher, m_cfg.getHandshakeTimeout(), [&]  {
@@ -522,7 +522,7 @@ namespace cryptonote
         throw std::runtime_error(msg.str());
       }
 
-      if (node.version < CryptoNote::P2P_MINIMUM_VERSION) {
+      if (node.version < cryptonote::P2P_MINIMUM_VERSION) {
         std::ostringstream msg;
         msg << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(node.version) << ")";
         throw std::runtime_error(msg.str());
