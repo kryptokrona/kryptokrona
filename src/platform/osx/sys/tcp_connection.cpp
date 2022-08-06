@@ -25,11 +25,11 @@
 #include <unistd.h>
 
 #include "dispatcher.h"
-#include <system/error_message.h>
-#include <system/interrupted_exception.h>
-#include <system/ipv4_address.h>
+#include <sys/error_message.h>
+#include <sys/interrupted_exception.h>
+#include <sys/ipv4_address.h>
 
-namespace system
+namespace sys
 {
     TcpConnection::TcpConnection() : dispatcher(nullptr) {
     }

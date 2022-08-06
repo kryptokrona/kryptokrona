@@ -26,8 +26,8 @@
 #include "wallet_indices.h"
 
 #include "logging/logger_ref.h"
-#include <system/dispatcher.h>
-#include <system/event.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
 #include "transfers/transfers_synchronizer.h"
 #include "transfers/blockchain_synchronizer.h"
 
@@ -46,7 +46,7 @@ namespace cryptonote
                         ITransfersSynchronizerObserver,
                         public IFusionManager {
     public:
-      WalletGreen(system::Dispatcher& dispatcher, const Currency& currency, INode& node, std::shared_ptr<logging::ILogger> logger, uint32_t transactionSoftLockTime = 1);
+      WalletGreen(sys::Dispatcher& dispatcher, const Currency& currency, INode& node, std::shared_ptr<logging::ILogger> logger, uint32_t transactionSoftLockTime = 1);
       virtual ~WalletGreen();
 
       virtual void initializeWithViewKey(const std::string& path, const std::string& password, const crypto::SecretKey& viewSecretKey, const uint64_t scanHeight, const bool newAddress) override;
@@ -352,7 +352,7 @@ namespace cryptonote
       std::vector<size_t> deleteTransfersForAddress(const std::string& address, std::vector<size_t>& deletedTransactions);
       void deleteFromUncommitedTransactions(const std::vector<size_t>& deletedTransactions);
 
-      system::Dispatcher& m_dispatcher;
+      sys::Dispatcher& m_dispatcher;
       const Currency& m_currency;
       INode& m_node;
       mutable logging::LoggerRef m_logger;
@@ -370,9 +370,9 @@ namespace cryptonote
       BlockchainSynchronizer m_blockchainSynchronizer;
       TransfersSyncronizer m_synchronizer;
 
-      system::Event m_eventOccurred;
+      sys::Event m_eventOccurred;
       std::queue<WalletEvent> m_events;
-      mutable system::Event m_readyEvent;
+      mutable sys::Event m_readyEvent;
 
       WalletState m_state;
 

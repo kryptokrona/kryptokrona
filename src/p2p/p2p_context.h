@@ -20,11 +20,11 @@
 #include <chrono>
 #include <vector>
 
-#include <system/context_group.h>
-#include <system/dispatcher.h>
-#include <system/event.h>
-#include <system/tcp_connection.h>
-#include <system/timer.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
+#include <sys/tcp_connection.h>
+#include <sys/timer.h>
 
 #include <config/cryptonote_config.h>
 #include "levin_protocol.h"
@@ -53,7 +53,7 @@ namespace cryptonote
         size_t size() const;
       };
 
-      P2pContext(system::Dispatcher& dispatcher, system::TcpConnection&& conn,
+      P2pContext(sys::Dispatcher& dispatcher, sys::TcpConnection&& conn,
         bool isIncoming, const NetworkAddress& remoteAddress, std::chrono::nanoseconds timedSyncInterval, const CORE_SYNC_DATA& timedSyncData);
       ~P2pContext();
 
@@ -77,8 +77,8 @@ namespace cryptonote
       uint64_t peerId = 0;
       uint16_t peerPort = 0;
 
-      system::Dispatcher& dispatcher;
-      system::ContextGroup contextGroup;
+      sys::Dispatcher& dispatcher;
+      sys::ContextGroup contextGroup;
       const TimePoint timeStarted;
       bool stopped = false;
       TimePoint lastReadTime;
@@ -86,12 +86,12 @@ namespace cryptonote
       // timed sync info
       const std::chrono::nanoseconds timedSyncInterval;
       const CORE_SYNC_DATA& timedSyncData;
-      system::Timer timedSyncTimer;
-      system::Event timedSyncFinished;
+      sys::Timer timedSyncTimer;
+      sys::Event timedSyncFinished;
 
-      system::TcpConnection connection;
-      system::Event writeEvent;
-      system::Event readEvent;
+      sys::TcpConnection connection;
+      sys::Event writeEvent;
+      sys::Event readEvent;
 
       void timedSyncLoop();
     };

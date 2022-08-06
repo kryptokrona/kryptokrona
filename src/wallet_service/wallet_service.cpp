@@ -15,8 +15,8 @@
 
 #include <boost/filesystem/operations.hpp>
 
-#include <system/timer.h>
-#include <system/interrupted_exception.h>
+#include <sys/timer.h>
+#include <sys/interrupted_exception.h>
 #include "common/base58.h"
 #include "common/util.h"
 
@@ -29,8 +29,8 @@
 #include "cryptonote_core/account.h"
 #include "cryptonote_core/mixins.h"
 
-#include <system/event_lock.h>
-#include <system/remote_context.h>
+#include <sys/event_lock.h>
+#include <sys/remote_context.h>
 
 #include "payment_service_json_rpc_messages.h"
 #include "node_factory.h"
@@ -359,7 +359,7 @@ namespace payment_service
 
     }
 
-    void generateNewWallet(const cryptonote::Currency& currency, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger, system::Dispatcher& dispatcher) {
+    void generateNewWallet(const cryptonote::Currency& currency, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger, sys::Dispatcher& dispatcher) {
       logging::LoggerRef log(logger, "generateNewWallet");
 
       cryptonote::INode* nodeStub = NodeFactory::createNodeStub();
@@ -440,7 +440,7 @@ namespace payment_service
       log(logging::INFO, logging::BRIGHT_WHITE) << "wallet is saved";
     }
 
-    WalletService::WalletService(const cryptonote::Currency& currency, system::Dispatcher& sys, cryptonote::INode& node,
+    WalletService::WalletService(const cryptonote::Currency& currency, sys::Dispatcher& sys, cryptonote::INode& node,
       cryptonote::IWallet& wallet, cryptonote::IFusionManager& fusionManager, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger) :
         currency(currency),
         wallet(wallet),
@@ -526,7 +526,7 @@ namespace payment_service
 
     std::error_code WalletService::saveWalletNoThrow() {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         logger(logging::INFO, logging::BRIGHT_WHITE) << "Saving wallet...";
 
@@ -549,15 +549,15 @@ namespace payment_service
 
     std::error_code WalletService::exportWallet(const std::string& fileName) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         if (!inited) {
           logger(logging::WARNING, logging::BRIGHT_YELLOW) << "Export impossible: wallet Service is not initialized";
           return make_error_code(cryptonote::error::NOT_INITIALIZED);
         }
 
-        boost::filesystem::path walletPath(config.walletFile);
-        boost::filesystem::path exportPath = walletPath.parent_path() / fileName;
+        boost::FileSystem::path walletPath(config.walletFile);
+        boost::FileSystem::path exportPath = walletPath.parent_path() / fileName;
 
         logger(logging::INFO, logging::BRIGHT_WHITE) << "Exporting wallet to " << exportPath.string();
         wallet.exportWallet(exportPath.string());
@@ -574,7 +574,7 @@ namespace payment_service
 
     std::error_code WalletService::resetWallet(const uint64_t scanHeight) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         logger(logging::INFO, logging::BRIGHT_WHITE) << "Resetting wallet";
 
@@ -598,7 +598,7 @@ namespace payment_service
 
     std::error_code WalletService::createAddress(const std::string& spendSecretKeyText, uint64_t scanHeight, bool newAddress, std::string& address) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         logger(logging::DEBUGGING) << "Creating address";
 
@@ -621,7 +621,7 @@ namespace payment_service
 
     std::error_code WalletService::createAddressList(const std::vector<std::string>& spendSecretKeysText, uint64_t scanHeight, bool newAddress, std::vector<std::string>& addresses) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         logger(logging::DEBUGGING) << "Creating " << spendSecretKeysText.size() << " addresses...";
 
@@ -658,7 +658,7 @@ namespace payment_service
 
     std::error_code WalletService::createAddress(std::string& address) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         logger(logging::DEBUGGING) << "Creating address";
 
@@ -675,7 +675,7 @@ namespace payment_service
 
     std::error_code WalletService::createTrackingAddress(const std::string& spendPublicKeyText, uint64_t scanHeight, bool newAddress, std::string& address) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         logger(logging::DEBUGGING) << "Creating tracking address";
 
@@ -697,7 +697,7 @@ namespace payment_service
 
     std::error_code WalletService::deleteAddress(const std::string& address) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         logger(logging::DEBUGGING) << "Delete address request came";
         wallet.deleteAddress(address);
@@ -712,7 +712,7 @@ namespace payment_service
 
     std::error_code WalletService::getSpendkeys(const std::string& address, std::string& publicSpendKeyText, std::string& secretSpendKeyText) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         cryptonote::KeyPair key = wallet.getAddressSpendKey(address);
 
@@ -729,7 +729,7 @@ namespace payment_service
 
     std::error_code WalletService::getBalance(const std::string& address, uint64_t& availableBalance, uint64_t& lockedAmount) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         logger(logging::DEBUGGING) << "Getting balance for address " << address;
 
         availableBalance = wallet.getActualBalance(address);
@@ -745,7 +745,7 @@ namespace payment_service
 
     std::error_code WalletService::getBalance(uint64_t& availableBalance, uint64_t& lockedAmount) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         logger(logging::DEBUGGING) << "Getting wallet balance";
 
         availableBalance = wallet.getActualBalance();
@@ -761,7 +761,7 @@ namespace payment_service
 
     std::error_code WalletService::getBlockHashes(uint32_t firstBlockIndex, uint32_t blockCount, std::vector<std::string>& blockHashes) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         std::vector<crypto::Hash> hashes = wallet.getBlockHashes(firstBlockIndex, blockCount);
 
         blockHashes.reserve(hashes.size());
@@ -778,7 +778,7 @@ namespace payment_service
 
     std::error_code WalletService::getViewKey(std::string& viewSecretKey) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         cryptonote::KeyPair viewKey = wallet.getViewKey();
         viewSecretKey = common::podToHex(viewKey.secretKey);
       } catch (std::system_error& x) {
@@ -791,7 +791,7 @@ namespace payment_service
 
     std::error_code WalletService::getMnemonicSeed(const std::string& address, std::string& mnemonicSeed) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         cryptonote::KeyPair key = wallet.getAddressSpendKey(address);
         cryptonote::KeyPair viewKey = wallet.getViewKey();
 
@@ -821,7 +821,7 @@ namespace payment_service
     std::error_code WalletService::getTransactionHashes(const std::vector<std::string>& addresses, const std::string& blockHashString,
       uint32_t blockCount, const std::string& paymentId, std::vector<TransactionHashesInBlockRpcInfo>& transactionHashes) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         validateAddresses(addresses, currency, logger);
 
         if (!paymentId.empty()) {
@@ -846,7 +846,7 @@ namespace payment_service
     std::error_code WalletService::getTransactionHashes(const std::vector<std::string>& addresses, uint32_t firstBlockIndex,
       uint32_t blockCount, const std::string& paymentId, std::vector<TransactionHashesInBlockRpcInfo>& transactionHashes) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         validateAddresses(addresses, currency, logger);
 
         if (!paymentId.empty()) {
@@ -870,7 +870,7 @@ namespace payment_service
     std::error_code WalletService::getTransactions(const std::vector<std::string>& addresses, const std::string& blockHashString,
       uint32_t blockCount, const std::string& paymentId, std::vector<TransactionsInBlockRpcInfo>& transactions) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         validateAddresses(addresses, currency, logger);
 
         if (!paymentId.empty()) {
@@ -896,7 +896,7 @@ namespace payment_service
     std::error_code WalletService::getTransactions(const std::vector<std::string>& addresses, uint32_t firstBlockIndex,
       uint32_t blockCount, const std::string& paymentId, std::vector<TransactionsInBlockRpcInfo>& transactions) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         validateAddresses(addresses, currency, logger);
 
         if (!paymentId.empty()) {
@@ -919,7 +919,7 @@ namespace payment_service
 
     std::error_code WalletService::getTransaction(const std::string& transactionHash, TransactionRpcInfo& transaction) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
         crypto::Hash hash = parseHash(transactionHash, logger);
 
         cryptonote::WalletTransactionWithTransfers transactionWithTransfers = wallet.getTransaction(hash);
@@ -943,7 +943,7 @@ namespace payment_service
 
     std::error_code WalletService::getAddresses(std::vector<std::string>& addresses) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         addresses.clear();
         addresses.reserve(wallet.getAddressCount());
@@ -961,7 +961,7 @@ namespace payment_service
 
     std::error_code WalletService::sendTransaction(SendTransaction::Request& request, std::string& transactionHash) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         /* Integrated address payment ID's are uppercase - lets convert the input
            payment ID to upper so we can compare with more ease */
@@ -1059,7 +1059,7 @@ namespace payment_service
 
     std::error_code WalletService::createDelayedTransaction(CreateDelayedTransaction::Request& request, std::string& transactionHash) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         /* Integrated address payment ID's are uppercase - lets convert the input
            payment ID to upper so we can compare with more ease */
@@ -1149,7 +1149,7 @@ namespace payment_service
 
     std::error_code WalletService::getDelayedTransactionHashes(std::vector<std::string>& transactionHashes) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         std::vector<size_t> transactionIds = wallet.getDelayedTransactionIds();
         transactionHashes.reserve(transactionIds.size());
@@ -1171,7 +1171,7 @@ namespace payment_service
 
     std::error_code WalletService::deleteDelayedTransaction(const std::string& transactionHash) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         parseHash(transactionHash, logger); //validate transactionHash parameter
 
@@ -1197,7 +1197,7 @@ namespace payment_service
 
     std::error_code WalletService::sendDelayedTransaction(const std::string& transactionHash) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         parseHash(transactionHash, logger); //validate transactionHash parameter
 
@@ -1223,7 +1223,7 @@ namespace payment_service
 
     std::error_code WalletService::getUnconfirmedTransactionHashes(const std::vector<std::string>& addresses, std::vector<std::string>& transactionHashes) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         validateAddresses(addresses, currency, logger);
 
@@ -1250,9 +1250,9 @@ namespace payment_service
     /* blockCount = the blocks the wallet has synced. knownBlockCount = the top block the daemon knows of. localDaemonBlockCount = the blocks the daemon has synced. */
     std::error_code WalletService::getStatus(uint32_t& blockCount, uint32_t& knownBlockCount, uint64_t& localDaemonBlockCount, std::string& lastBlockHash, uint32_t& peerCount) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
-        system::RemoteContext<std::tuple<uint32_t, uint64_t, uint32_t>> remoteContext(dispatcher, [this] () {
+        sys::RemoteContext<std::tuple<uint32_t, uint64_t, uint32_t>> remoteContext(dispatcher, [this] () {
           /* daemon remote height, daemon local height, peer count */
           return std::make_tuple(node.getKnownBlockCount(), node.getNodeHeight(), static_cast<uint32_t>(node.getPeerCount()));
         });
@@ -1278,7 +1278,7 @@ namespace payment_service
       const std::string& destinationAddress, std::string& transactionHash) {
 
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         validateAddresses(addresses, currency, logger);
         if (!destinationAddress.empty()) {
@@ -1304,7 +1304,7 @@ namespace payment_service
       uint32_t& fusionReadyCount, uint32_t& totalOutputCount) {
 
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         validateAddresses(addresses, currency, logger);
 
@@ -1324,7 +1324,7 @@ namespace payment_service
 
     std::error_code WalletService::createIntegratedAddress(const std::string &address, const std::string &paymentId, std::string& integratedAddress) {
       try {
-        system::EventLock lk(readyEvent);
+        sys::EventLock lk(readyEvent);
 
         validateAddresses({address}, currency, logger);
         validatePaymentId(paymentId, logger);

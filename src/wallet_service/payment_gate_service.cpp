@@ -14,7 +14,7 @@
 
 #include "common/scope_exit.h"
 #include "node_rpc_proxy/node_rpc_proxy.h"
-#include <system/context.h>
+#include <sys/context.h>
 #include "wallet/wallet_green.h"
 
 #ifdef ERROR
@@ -97,8 +97,8 @@ const cryptonote::Currency PaymentGateService::getCurrency() {
 
 void PaymentGateService::run() {
 
-  system::Dispatcher localDispatcher;
-  system::Event localStopEvent(localDispatcher);
+  sys::Dispatcher localDispatcher;
+  sys::Event localStopEvent(localDispatcher);
 
   this->dispatcher = &localDispatcher;
   this->stopEvent = &localStopEvent;

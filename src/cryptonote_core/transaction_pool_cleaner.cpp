@@ -9,8 +9,8 @@
 
 #include "common/string_tools.h"
 
-#include <system/interrupted_exception.h>
-#include <system/timer.h>
+#include <sys/interrupted_exception.h>
+#include <sys/timer.h>
 
 namespace cryptonote
 {
@@ -108,7 +108,7 @@ namespace cryptonote
 
         cleanRecentlyDeletedTransactions(currentTime);
         return deletedTransactions;
-      } catch (system::InterruptedException&) {
+      } catch (sys::InterruptedException&) {
         throw;
       } catch (std::exception& e) {
         logger(logging::WARNING) << "Caught an exception: " << e.what() << ", stopping cleaning procedure cycle";

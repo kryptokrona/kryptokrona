@@ -33,7 +33,7 @@
 
 #include <set>
 
-#include <system/timer.h>
+#include <sys/timer.h>
 
 #include <utilities/format_tools.h>
 #include <utilities/license_canary.h>
@@ -191,7 +191,7 @@ namespace cryptonote
 
     }
 
-    Core::Core(const Currency& currency, std::shared_ptr<logging::ILogger> logger, Checkpoints&& checkpoints, system::Dispatcher& dispatcher,
+    Core::Core(const Currency& currency, std::shared_ptr<logging::ILogger> logger, Checkpoints&& checkpoints, sys::Dispatcher& dispatcher,
                std::unique_ptr<IBlockchainCacheFactory>&& blockchainCacheFactory, std::unique_ptr<IMainChainStorage>&& mainchainStorage)
         : currency(currency), dispatcher(dispatcher), contextGroup(dispatcher), logger(logger, "Core"), checkpoints(std::move(checkpoints)),
           upgradeManager(new UpgradeManager()), blockchainCacheFactory(std::move(blockchainCacheFactory)),
@@ -2912,7 +2912,7 @@ namespace cryptonote
     }
 
     void Core::transactionPoolCleaningProcedure() {
-      system::Timer timer(dispatcher);
+      sys::Timer timer(dispatcher);
 
       try {
         for (;;) {
@@ -2928,7 +2928,7 @@ namespace cryptonote
                                        << " ";
           notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
         }
-      } catch (system::InterruptedException&) {
+      } catch (sys::InterruptedException&) {
         logger(logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
       } catch (std::exception& e) {
         logger(logging::INFO) << "Error occurred while cleaning transactions pool: " << e.what();
@@ -2937,7 +2937,7 @@ namespace cryptonote
 
 
     void Core::huginCleaningProcedure() {
-      system::Timer timer(dispatcher);
+      sys::Timer timer(dispatcher);
 
       try {
         for (;;) {
@@ -2995,7 +2995,7 @@ namespace cryptonote
           // notifyObservers(ma>keDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
         }
 
-      } catch (system::InterruptedException&) {
+      } catch (sys::InterruptedException&) {
         logger(logging::DEBUGGING) << "transactionPoolCleaningProcedure has been interrupted";
       } catch (std::exception& e) {
         logger(logging::ERROR) << "Error occurred while cleaning transactions pool: " << e.what();

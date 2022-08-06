@@ -11,15 +11,15 @@
 
 #include <optional>
 
-#include <system/context_group.h>
-#include <system/dispatcher.h>
-#include <system/event.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
 
 class BlockchainMonitor
 {
     public:
         BlockchainMonitor(
-            system::Dispatcher& dispatcher,
+            sys::Dispatcher& dispatcher,
             const size_t pollingInterval,
             const std::shared_ptr<httplib::Client> httpClient);
 
@@ -27,10 +27,10 @@ class BlockchainMonitor
         void stop();
 
     private:
-        system::Dispatcher& m_dispatcher;
+        sys::Dispatcher& m_dispatcher;
         size_t m_pollingInterval;
         bool m_stopped;
-        system::ContextGroup m_sleepingContext;
+        sys::ContextGroup m_sleepingContext;
 
         std::optional<crypto::Hash> requestLastBlockHash();
 

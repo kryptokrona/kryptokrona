@@ -23,7 +23,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "system/memory_mapped_file.h"
+#include "sys/memory_mapped_file.h"
 
 #include "common/scope_exit.h"
 
@@ -299,7 +299,7 @@ namespace common
 
     private:
       std::string m_path;
-      system::MemoryMappedFile m_file;
+      sys::MemoryMappedFile m_file;
       uint64_t m_prefixSize;
       uint64_t m_suffixSize;
       bool m_autoFlush;
@@ -351,17 +351,17 @@ namespace common
 
       const uint64_t initialCapacity = 10;
 
-      boost::filesystem::path filePath = path;
-      boost::filesystem::path bakPath = path + ".bak";
+      boost::FileSystem::path filePath = path;
+      boost::FileSystem::path bakPath = path + ".bak";
       bool fileExists;
-      if (boost::filesystem::exists(filePath)) {
-        if (boost::filesystem::exists(bakPath)) {
-          boost::filesystem::remove(bakPath);
+      if (boost::FileSystem::exists(filePath)) {
+        if (boost::FileSystem::exists(bakPath)) {
+          boost::FileSystem::remove(bakPath);
         }
 
         fileExists = true;
-      } else if (boost::filesystem::exists(bakPath)) {
-        boost::filesystem::rename(bakPath, filePath);
+      } else if (boost::FileSystem::exists(bakPath)) {
+        boost::FileSystem::rename(bakPath, filePath);
         fileExists = true;
       } else {
         fileExists = false;
@@ -788,16 +788,16 @@ namespace common
         throw std::runtime_error("Vector is mapped to a .bak file due to earlier errors");
       }
 
-      boost::filesystem::path bakPath = m_path + ".bak";
-      boost::filesystem::path tmpPath = boost::filesystem::unique_path(m_path + ".tmp.%%%%-%%%%");
+      boost::FileSystem::path bakPath = m_path + ".bak";
+      boost::FileSystem::path tmpPath = boost::FileSystem::unique_path(m_path + ".tmp.%%%%-%%%%");
 
-      if (boost::filesystem::exists(bakPath)) {
-        boost::filesystem::remove(bakPath);
+      if (boost::FileSystem::exists(bakPath)) {
+        boost::FileSystem::remove(bakPath);
       }
 
       tools::ScopeExit tmpFileDeleter([&tmpPath] {
         boost::system::error_code ignore;
-        boost::filesystem::remove(tmpPath, ignore);
+        boost::FileSystem::remove(tmpPath, ignore);
       });
 
       // Copy file. It is slow but atomic operation
@@ -823,8 +823,8 @@ namespace common
 
       // Remove .bak file and ignore errors
       tmpVector.close(ignore);
-      boost::system::error_code boostError;
-      boost::filesystem::remove(bakPath, boostError);
+      boost::FileSystem::error_code boostError;
+      boost::FileSystem::remove(bakPath, boostError);
     }
 
     template<class T>
