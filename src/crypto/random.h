@@ -4,7 +4,7 @@
 
 #include <random>
 
-namespace random
+namespace rdm
 {
     /* Used to obtain a random seed */
     static thread_local std::random_device device;

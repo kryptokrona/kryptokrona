@@ -41,7 +41,7 @@ ApiDispatcher::ApiDispatcher(
     m_rpcPassword(rpcPassword)
 {
     /* Generate the salt used for pbkdf2 api authentication */
-    random::randomBytes(16, m_salt);
+    rdm::randomBytes(16, m_salt);
 
     /* Make sure to do this after initializing the salt above! */
     m_hashedPassword = hashPassword(rpcPassword);
