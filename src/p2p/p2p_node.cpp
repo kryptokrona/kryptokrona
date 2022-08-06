@@ -9,12 +9,12 @@
 
 #include <random>
 
-#include <system/context_group_timeout.h>
-#include <system/interrupted_exception.h>
-#include <system/ipv4_address.h>
-#include <system/operation_timeout.h>
-#include <system/tcp_connection.h>
-#include <system/tcp_connector.h>
+#include <sys/context_group_timeout.h>
+#include <sys/interrupted_exception.h>
+#include <sys/ipv4_address.h>
+#include <sys/operation_timeout.h>
+#include <sys/tcp_connection.h>
+#include <sys/tcp_connector.h>
 
 #include <config/cryptonote_config.h>
 #include <crypto/random.h>
@@ -30,7 +30,7 @@
 
 using namespace common;
 using namespace logging;
-using namespace system;
+using namespace sys;
 
 namespace cryptonote
 {

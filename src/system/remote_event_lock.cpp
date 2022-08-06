@@ -19,10 +19,10 @@
 #include <cassert>
 #include <mutex>
 #include <condition_variable>
-#include <system/dispatcher.h>
-#include <system/event.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
 
-namespace system
+namespace sys
 {
     RemoteEventLock::RemoteEventLock(Dispatcher& dispatcher, Event& event) : dispatcher(dispatcher), event(event) {
       std::mutex mutex;

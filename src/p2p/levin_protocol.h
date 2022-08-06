@@ -23,7 +23,7 @@
 #include "serialization/kv_binary_input_stream_serializer.h"
 #include "serialization/kv_binary_output_stream_serializer.h"
 
-namespace system
+namespace sys
 {
     class TcpConnection;
 }

@@ -25,7 +25,7 @@ namespace common
     class JsonValue;
 }
 
-namespace system
+namespace sys
 {
     class TcpConnection;
 }

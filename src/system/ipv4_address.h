@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <string>
 
-namespace system
+namespace sys
 {
     class Ipv4Address {
     public:

@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <system/context_group.h>
-#include <system/dispatcher.h>
-#include <system/timer.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/timer.h>
 
-namespace system
+namespace sys
 {
     template<typename T> class OperationTimeout {
     public:
