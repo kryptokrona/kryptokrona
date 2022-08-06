@@ -66,7 +66,7 @@ namespace cryptonote
               return 0;
             }
 
-            size_t x = random::randomValue<size_t>() % (maxIndex + 1);
+            size_t x = rdm::randomValue<size_t>() % (maxIndex + 1);
             return (x * x * x) / (maxIndex * maxIndex);
           }
 

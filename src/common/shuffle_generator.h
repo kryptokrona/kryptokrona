@@ -31,7 +31,7 @@ public:
       throw SequenceEnded();
     }
 
-    T value = random::randomValue<T>(0, --count);
+    T value = rdm::randomValue<T>(0, --count);
 
     auto rvalIt = selected.find(count);
     auto rval = rvalIt != selected.end() ? rvalIt->second : count;
