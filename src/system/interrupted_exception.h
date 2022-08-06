@@ -19,7 +19,7 @@
 
 #include <exception>
 
-namespace system
+namespace sys
 {
     class InterruptedException : public std::exception {
       public:

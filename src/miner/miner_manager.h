@@ -8,8 +8,8 @@
 
 #include <queue>
 
-#include <system/context_group.h>
-#include <system/event.h>
+#include <sys/context_group.h>
+#include <sys/event.h>
 
 #include "blockchain_monitor.h"
 #include "logging/logger_ref.h"
@@ -17,7 +17,7 @@
 #include "miner_event.h"
 #include "mining_config.h"
 
-namespace system
+namespace sys
 {
     class Dispatcher;
 }

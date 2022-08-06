@@ -16,9 +16,9 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "tcp_stream.h"
-#include <system/tcp_connection.h>
+#include <sys/tcp_connection.h>
 
-namespace system
+namespace sys
 {
     TcpStreambuf::TcpStreambuf(TcpConnection& connection) : connection(connection) {
       setg(&readBuf.front(), &readBuf.front(), &readBuf.front());
