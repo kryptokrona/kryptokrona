@@ -823,7 +823,7 @@ namespace common
 
       // Remove .bak file and ignore errors
       tmpVector.close(ignore);
-      boost::filesystem::error_code boostError;
+      boost::system::error_code boostError;
       boost::filesystem::remove(bakPath, boostError);
     }
 
