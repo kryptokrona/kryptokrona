@@ -111,7 +111,7 @@ namespace
 
     }
 
-    namespace CryptoNote {
+    namespace cryptonote {
 
     WalletSerializerV2::WalletSerializerV2(
       ITransfersObserver& transfersObserver,
