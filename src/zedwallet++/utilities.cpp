@@ -206,4 +206,4 @@ bool parseDaemonAddressFromString(std::string &host, uint16_t &port, const std::
     return true;
 }
 
-} // namespace
+}

@@ -103,11 +103,11 @@ void balance(const std::shared_ptr<WalletBackend> walletBackend)
     const uint64_t totalBalance = unlockedBalance + lockedBalance;
 
     std::cout << "Available balance: "
-              << SuccessMsg(Utilities::formatAmount(unlockedBalance)) << "\n"
+              << SuccessMsg(utilities::formatAmount(unlockedBalance)) << "\n"
               << "Locked (unconfirmed) balance: "
-              << WarningMsg(Utilities::formatAmount(lockedBalance))
+              << WarningMsg(utilities::formatAmount(lockedBalance))
               << "\nTotal balance: "
-              << InformationMsg(Utilities::formatAmount(totalBalance)) << "\n";
+              << InformationMsg(utilities::formatAmount(totalBalance)) << "\n";
 
     if (walletBackend->isViewWallet())
     {
@@ -216,7 +216,7 @@ void printSyncSummary(
     if (localDaemonBlockCount == 0 && networkBlockCount == 0)
     {
         std::cout << WarningMsg("Uh oh, it looks like you don't have ")
-                  << WarningMsg(WalletConfig::daemonName)
+                  << WarningMsg(wallet_config::daemonName)
                   << WarningMsg(" open!")
                   << std::endl;
     }

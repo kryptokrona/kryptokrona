@@ -74,7 +74,7 @@ namespace sys
         }
       }
 
-      Tools::ScopeExit failExitHandler([this, &ec] {
+      tools::ScopeExit failExitHandler([this, &ec] {
         ec = std::error_code(::GetLastError(), std::system_category());
         std::error_code ignore;
         close(ignore);
@@ -136,7 +136,7 @@ namespace sys
         }
       }
 
-      Tools::ScopeExit failExitHandler([this, &ec] {
+      tools::ScopeExit failExitHandler([this, &ec] {
         ec = std::error_code(::GetLastError(), std::system_category());
         std::error_code ignore;
         close(ignore);

@@ -30,7 +30,7 @@ void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
 
     if (localDaemonBlockCount + 1 <= networkBlockCount)
     {
-        std::cout << "Your " << WalletConfig::daemonName << " isn't fully "
+        std::cout << "Your " << wallet_config::daemonName << " isn't fully "
                   << "synced yet!\n"
                   << "Until you are fully synced, you won't be able to send "
                   << "transactions,\nand your balance may be missing or "

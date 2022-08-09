@@ -171,7 +171,7 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
                it yet. */
             bool alreadyShuttingDown = false;
 
-            Tools::SignalHandler::install([&]
+            tools::SignalHandler::install([&]
             {
                 if (shutdown(walletInfo, node, alreadyShuttingDown))
                 {

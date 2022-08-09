@@ -53,7 +53,7 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
     }
 }
 
-void syncWallet(CryptoNote::INode &node,
+void syncWallet(cryptonote::INode &node,
                 std::shared_ptr<WalletInfo> walletInfo)
 {
     uint32_t localHeight = node.getLastLocalBlockHeight();

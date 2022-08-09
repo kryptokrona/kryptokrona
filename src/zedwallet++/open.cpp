@@ -71,7 +71,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 
-    const uint64_t scanHeight = ZedUtilities::getScanHeight();
+    const uint64_t scanHeight = zed_utilities::getScanHeight();
 
     auto [error, walletBackend] = WalletBackend::importViewWallet(
         privateViewKey, address, walletFileName, walletPass, scanHeight,
@@ -323,10 +323,10 @@ crypto::SecretKey getPrivateKey(const std::string outputMsg)
             continue;
         }
 
-        privateKey = *(struct Crypto::SecretKey *) &privateKeyHash;
+        privateKey = *(struct crypto::SecretKey *) &privateKeyHash;
 
         /* Just used for verification */
-        if (!Crypto::secret_key_to_public_key(privateKey, publicKey))
+        if (!crypto::secret_key_to_public_key(privateKey, publicKey))
         {
             std::cout << std::endl
                       << WarningMsg("Invalid private key, is not on the ")
