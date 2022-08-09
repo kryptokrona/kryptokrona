@@ -309,7 +309,7 @@ namespace miner
                 BlockMiningParameters params;
                 params.difficulty = j.at("result").at("difficulty").get<uint64_t>();
 
-                std::vector<uint8_t> blob = Common::fromHex(
+                std::vector<uint8_t> blob = common::fromHex(
                     j.at("result").at("blocktemplate_blob").get<std::string>()
                 );
 

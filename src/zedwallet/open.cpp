@@ -102,7 +102,7 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(cryptonote::WalletGreen
         trim(mnemonicPhrase);
         
         auto [error, privateSpendKey]
-            = Mnemonics::MnemonicToPrivateKey(mnemonicPhrase);
+            = mnemonics::MnemonicToPrivateKey(mnemonicPhrase);
 
         if (error)
         {

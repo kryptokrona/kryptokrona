@@ -69,7 +69,7 @@ Config parseArguments(int argc, char **argv)
 
     if (!remoteDaemon.empty())
     {
-        if (!ZedUtilities::parseDaemonAddressFromString(config.host, config.port, remoteDaemon))
+        if (!zed_utilities::parseDaemonAddressFromString(config.host, config.port, remoteDaemon))
         {
             std::cout << "There was an error parsing the --remote-daemon you specified" << std::endl;
             exit(1);

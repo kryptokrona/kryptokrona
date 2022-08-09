@@ -39,6 +39,7 @@ RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc) -
 WORKDIR /usr/src/kryptokrona/build/src
 
 # set executable permission on kryptokrona deamon
+RUN pwd && ls -la
 RUN chmod +x kryptokronad
 
 EXPOSE 11898
