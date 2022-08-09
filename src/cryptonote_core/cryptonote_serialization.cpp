@@ -129,7 +129,7 @@ namespace
 
     }
 
-    namespace Crypto {
+    namespace crypto {
 
     bool serialize(PublicKey& pubKey, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(pubKey, name, serializer);
@@ -165,7 +165,7 @@ namespace
 
     }
 
-    namespace CryptoNote {
+    namespace cryptonote {
 
     void serialize(TransactionPrefix& txP, ISerializer& serializer) {
       serializer(txP.version, "version");

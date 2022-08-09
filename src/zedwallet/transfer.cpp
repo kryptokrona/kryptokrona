@@ -639,7 +639,7 @@ bool handleTransferError(const std::system_error &e,
             [[fallthrough]];
         }
         case cryptonote::error::MIXIN_COUNT_TOO_BIG:
-        case cryptonote::NodeError::INTERNAL_NODE_ERROR:
+        case cryptonote::node_error::INTERNAL_NODE_ERROR:
         {
     
             if (wrongAmount)
@@ -683,8 +683,8 @@ bool handleTransferError(const std::system_error &e,
 
             break;
         }
-        case cryptonote::NodeError::NETWORK_ERROR:
-        case cryptonote::NodeError::CONNECT_ERROR:
+        case cryptonote::node_error::NETWORK_ERROR:
+        case cryptonote::node_error::CONNECT_ERROR:
         {
             std::cout << WarningMsg("Couldn't connect to the network "
                                     "to send the transaction!")
@@ -917,7 +917,7 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     uint64_t prefix;
 
     /* Need to be able to decode the string as an address */
-    if (!tools::Base58::decode_addr(integratedAddress, prefix, decoded))
+    if (!tools::base58::decode_addr(integratedAddress, prefix, decoded))
     {
         return Nothing<std::pair<std::string, std::string>>();
     }

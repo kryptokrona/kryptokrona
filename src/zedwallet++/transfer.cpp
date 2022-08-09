@@ -149,7 +149,7 @@ void sendTransaction(
 
     Error error;
 
-    Crypto::Hash hash;
+    crypto::Hash hash;
 
     std::tie(error, hash) = walletBackend->sendTransactionBasic(
         address, amount, paymentID

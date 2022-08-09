@@ -388,7 +388,7 @@ namespace payment_service
       {
         log(logging::INFO, logging::BRIGHT_WHITE) << "Attempting to import wallet from mnemonic seed";
 
-        auto [error, private_spend_key] = Mnemonics::MnemonicToPrivateKey(conf.mnemonicSeed);
+        auto [error, private_spend_key] = mnemonics::MnemonicToPrivateKey(conf.mnemonicSeed);
 
         if (error)
         {
@@ -802,7 +802,7 @@ namespace payment_service
         bool deterministic_private_keys = deterministic_private_view_key == viewKey.secretKey;
 
         if (deterministic_private_keys) {
-          mnemonicSeed = Mnemonics::PrivateKeyToMnemonic(key.secretKey);
+          mnemonicSeed = mnemonics::PrivateKeyToMnemonic(key.secretKey);
         } else {
           /* Have to be able to derive view key from spend key to create a mnemonic
              seed, due to being able to generate multiple addresses we can't do

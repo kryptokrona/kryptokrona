@@ -191,7 +191,7 @@ namespace cryptonote
 
     bool RpcServer::processJsonRpcRequest(const HttpRequest& request, HttpResponse& response) {
 
-      using namespace JsonRpc;
+      using namespace json_rpc;
 
       for (const auto& cors_domain: m_cors_domains) {
         response.addHeader("Access-Control-Allow-Origin", cors_domain);

@@ -54,4 +54,4 @@ std::vector<T> filter(const std::vector<T> &input, Function predicate)
     return result;
 }
 
-} // namespace
+}

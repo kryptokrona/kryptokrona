@@ -100,7 +100,7 @@ namespace cryptonote
       template <class Key, class Value>
       void serializeKeys(std::vector<std::string>& rawKeys, const std::string keyPrefix, const std::unordered_map<Key, Value>& map) {
         for (const std::pair<Key, Value> kv : map) {
-          rawKeys.emplace_back(DB::serializeKey(keyPrefix, kv.first));
+          rawKeys.emplace_back(db::serializeKey(keyPrefix, kv.first));
         }
       }
 

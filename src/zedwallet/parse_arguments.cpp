@@ -28,7 +28,7 @@ Config parseArguments(int argc, char **argv)
     options.add_options("Core")
         ("h,help", "Display this help message", cxxopts::value<bool>(help)->implicit_value("true"))
         ("v,version", "Output software version information", cxxopts::value<bool>(version)->default_value("false")->implicit_value("true"))
-        ("debug", "Enable " + wallet_config::walletdName + " debugging to "+ WalletConfig::walletName + ".log",
+        ("debug", "Enable " + wallet_config::walletdName + " debugging to "+ wallet_config::walletName + ".log",
             cxxopts::value<bool>(config.debug)->default_value("false")->implicit_value("true"));
 
     options.add_options("daemon")

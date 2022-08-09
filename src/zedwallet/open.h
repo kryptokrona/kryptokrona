@@ -7,8 +7,8 @@
 #include <zedwallet/types.h>
 
 std::shared_ptr<WalletInfo> importFromKeys(cryptonote::WalletGreen &wallet, 
-                                           Crypto::SecretKey privateSpendKey,
-                                           Crypto::SecretKey privateViewKey);
+                                           crypto::SecretKey privateSpendKey,
+                                           crypto::SecretKey privateViewKey);
 
 std::shared_ptr<WalletInfo> openWallet(cryptonote::WalletGreen &wallet,
                                        Config &config);

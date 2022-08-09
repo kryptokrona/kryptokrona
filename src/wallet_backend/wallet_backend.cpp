@@ -101,7 +101,7 @@ Error checkNewWalletFilename(std::string filename)
     return SUCCESS;
 }
 
-} // namespace
+}
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */
@@ -144,7 +144,7 @@ WalletBackend::WalletBackend(
     m_daemon(std::make_shared<Nigel>(daemonHost, daemonPort))
 {
     /* Generate the address from the two private keys */
-    std::string address = Utilities::privateKeysToAddress(
+    std::string address = utilities::privateKeysToAddress(
         privateSpendKey, privateViewKey
     );
 
@@ -211,7 +211,7 @@ std::tuple<Error, std::string> WalletBackend::createIntegratedAddress(
     std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
-    const std::string integratedAddress = Tools::Base58::encode_addr(
+    const std::string integratedAddress = tools::base58::encode_addr(
         cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
         paymentID + keys
     );
@@ -236,7 +236,7 @@ std::tuple<Error, std::shared_ptr<WalletBackend>> WalletBackend::importWalletFro
     }
 
     /* Convert the mnemonic into a private spend key */
-    auto [mnemonicError, privateSpendKey] = Mnemonics::MnemonicToPrivateKey(mnemonicSeed);
+    auto [mnemonicError, privateSpendKey] = mnemonics::MnemonicToPrivateKey(mnemonicSeed);
 
     if (mnemonicError)
     {
@@ -642,7 +642,7 @@ std::tuple<Error, uint64_t, uint64_t> WalletBackend::getBalance(
     const bool takeFromAll = false;
 
     const auto [unlockedBalance, lockedBalance] = m_subWallets->getBalance(
-        Utilities::addressesToSpendKeys({address}), takeFromAll,
+        utilities::addressesToSpendKeys({address}), takeFromAll,
         m_daemon->networkBlockCount()
     );
 
@@ -674,7 +674,7 @@ std::tuple<Error, crypto::Hash> WalletBackend::sendTransactionBasic(
     const uint64_t amount,
     const std::string paymentID)
 {
-    return SendTransaction::sendTransactionBasic(
+    return send_transaction::sendTransactionBasic(
         destination, amount, paymentID, m_daemon, m_subWallets
     );
 }
@@ -688,7 +688,7 @@ std::tuple<Error, crypto::Hash> WalletBackend::sendTransactionAdvanced(
     const std::string changeAddress,
     const uint64_t unlockTime)
 {
-    return SendTransaction::sendTransactionAdvanced(
+    return send_transaction::sendTransactionAdvanced(
         destinations, mixin, fee, paymentID, subWalletsToTakeFrom,
         changeAddress, m_daemon, m_subWallets, unlockTime
     );
@@ -696,7 +696,7 @@ std::tuple<Error, crypto::Hash> WalletBackend::sendTransactionAdvanced(
 
 std::tuple<Error, crypto::Hash> WalletBackend::sendFusionTransactionBasic()
 {
-    return SendTransaction::sendFusionTransactionBasic(m_daemon, m_subWallets);
+    return send_transaction::sendFusionTransactionBasic(m_daemon, m_subWallets);
 }
 
 std::tuple<Error, crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
@@ -704,7 +704,7 @@ std::tuple<Error, crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string destination)
 {
-    return SendTransaction::sendFusionTransactionAdvanced(
+    return send_transaction::sendFusionTransactionAdvanced(
         mixin, subWalletsToTakeFrom, destination, m_daemon, m_subWallets
     );
 }
@@ -719,7 +719,7 @@ void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
            transaction in block 9, we can't rely on timestamps to reset accurately. */
         if (timestamp != 0)
         {
-            scanHeight = Utilities::timestampToScanHeight(timestamp);
+            scanHeight = utilities::timestampToScanHeight(timestamp);
             timestamp = 0;
         }
 
@@ -875,7 +875,7 @@ Error WalletBackend::changePassword(const std::string newPassword)
 std::tuple<Error, crypto::PublicKey, crypto::SecretKey>
     WalletBackend::getSpendKeys(const std::string &address) const
 {
-    const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
+    const auto [publicSpendKey, publicViewKey] = utilities::addressToKeys(address);
 
     const auto [success, privateSpendKey] = m_subWallets->getPrivateSpendKey(publicSpendKey);
 
@@ -923,7 +923,7 @@ std::tuple<Error, std::string> WalletBackend::getMnemonicSeedForAddress(
         return {KEYS_NOT_DETERMINISTIC, std::string()};
     }
 
-    return {SUCCESS, Mnemonics::PrivateKeyToMnemonic(privateSpendKey)};
+    return {SUCCESS, mnemonics::PrivateKeyToMnemonic(privateSpendKey)};
 }
 
 std::vector<wallet_types::Transaction> WalletBackend::getTransactions() const

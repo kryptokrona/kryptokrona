@@ -99,7 +99,7 @@ void printPrivateKeys(cryptonote::WalletGreen &wallet, bool viewWallet)
         std::cout << std::endl
                   << SuccessMsg("Mnemonic seed:")
                   << std::endl
-                  << SuccessMsg(Mnemonics::PrivateKeyToMnemonic(privateSpendKey))
+                  << SuccessMsg(mnemonics::PrivateKeyToMnemonic(privateSpendKey))
                   << std::endl;
     }
 }

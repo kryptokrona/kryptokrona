@@ -55,7 +55,7 @@ namespace
         return ss.str();
     }
 
-} // namespace
+}
 
 DaemonCommandsHandler::DaemonCommandsHandler(
     cryptonote::Core &core,

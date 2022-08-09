@@ -73,8 +73,6 @@ namespace cryptonote
         }
     }
 
-    //namespace CryptoNote {
-
     void serialize(TransactionOutputDetails& output, ISerializer& serializer) {
       serializer(output.output, "output");
       serializer(output.globalIndex, "globalIndex");
