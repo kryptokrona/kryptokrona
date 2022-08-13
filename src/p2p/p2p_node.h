@@ -70,7 +70,7 @@ namespace cryptonote
       void serialize(ISerializer& s);
 
     private:
-      typedef std::unique_ptr<p2pContext> ContextPtr;
+      typedef std::unique_ptr<P2pContext> ContextPtr;
       typedef std::list<ContextPtr> ContextList;
 
       logging::LoggerRef logger;
@@ -115,7 +115,7 @@ namespace cryptonote
       void makeExpectedConnectionsCount(const Peerlist& peerlist, size_t connectionsCount);
       bool makeNewConnectionFromPeerlist(const Peerlist& peerlist);
       void preprocessIncomingConnection(ContextPtr ctx);
-      void enqueueConnection(std::unique_ptr<p2pConnectionProxy> proxy);
-      std::unique_ptr<p2pConnectionProxy> createProxy(ContextPtr ctx);
+      void enqueueConnection(std::unique_ptr<P2pConnectionProxy> proxy);
+      std::unique_ptr<P2pConnectionProxy> createProxy(ContextPtr ctx);
     };
 }

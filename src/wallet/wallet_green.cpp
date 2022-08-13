@@ -389,7 +389,7 @@ namespace cryptonote
         tools::ScopeExit failExitHandler([path, &storageCreated] {
           // Don't delete file if it has existed
           if (storageCreated) {
-            boost::filesystem::error_code ignore;
+            boost::system::error_code ignore;
             boost::filesystem::remove(path, ignore);
           }
         });
