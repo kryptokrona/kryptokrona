@@ -301,7 +301,7 @@ crypto::SecretKey getPrivateKey(const std::string outputMsg)
 
         std::getline(std::cin, privateKeyString);
 
-        crypto::trim(privateKeyString);
+        common::trim(privateKeyString);
 
         if (privateKeyString.length() != privateKeyLen)
         {
