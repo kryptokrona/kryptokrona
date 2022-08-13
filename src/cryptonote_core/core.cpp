@@ -1107,7 +1107,7 @@ namespace cryptonote
               logger(logging::INFO) << "Block " << blockStr << " added to main chain";
             }
 
-            notifyObservers(makeDelTransactionMessage(std::move(hashes), messages:::DeleteTransaction::Reason::InBlock));
+            notifyObservers(makeDelTransactionMessage(std::move(hashes), messages::DeleteTransaction::Reason::InBlock));
           } else {
             cache->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange, currentDifficulty, std::move(rawBlock));
             logger(logging::DEBUGGING) << "Block " << blockStr << " added to alternative chain.";
@@ -1199,7 +1199,7 @@ namespace cryptonote
         pool.removeTransaction(hash);
 
         if (!addTransactionToPool(std::move(tx))) {
-          notifyObservers(makeDelTransactionMessage({hash}, messages:::DeleteTransaction::Reason::NotActual));
+          notifyObservers(makeDelTransactionMessage({hash}, messages::DeleteTransaction::Reason::NotActual));
         }
       }
     }
@@ -1215,7 +1215,7 @@ namespace cryptonote
 
         if (hasIntersections(validatorState, txState) || tx.getTransactionBinaryArray().size() > getMaximumTransactionAllowedSize(blockMedianSize, currency)) {
           pool.removeTransaction(hash);
-          notifyObservers(makeDelTransactionMessage({ hash }, messages:::DeleteTransaction::Reason::NotActual));
+          notifyObservers(makeDelTransactionMessage({ hash }, messages::DeleteTransaction::Reason::NotActual));
         }
       }
     }
@@ -2926,7 +2926,7 @@ namespace cryptonote
 
           logger(logging::INFO) << "Got some bad transactions.. "
                                        << " ";
-          notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), messages:::DeleteTransaction::Reason::Outdated));
+          notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), messages::DeleteTransaction::Reason::Outdated));
         }
       } catch (sys::InterruptedException&) {
         logger(logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
@@ -2992,7 +2992,7 @@ namespace cryptonote
         }
 
           // auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
-          // notifyObservers(ma>keDelTransactionMessage(std::move(deletedTransactions), messages:::DeleteTransaction::Reason::Outdated));
+          // notifyObservers(ma>keDelTransactionMessage(std::move(deletedTransactions), messages::DeleteTransaction::Reason::Outdated));
         }
 
       } catch (sys::InterruptedException&) {
