@@ -47,7 +47,7 @@ If you want to know how to compile from source or find other relevant developer/
 
 The following showcasing finished releases as well as future releases.
 
-| Dep                | Version | Description                                     |
+| Name                | Version | Description                                     |
 |--------------------|--------------|---------------------------------------------|
 | Loki               | 2.0.0        | To be decided.                        |
 | Munin              | 1.0.0        | This version brings new scaling solutions to Hugin by not storing any messages on the blockchain. Instead, messages are temporarily stored in the mempool for 24h after which they are discarded.                                  |
