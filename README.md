@@ -29,6 +29,7 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 # Table of Contents
 
 - [Development Resources](#development-resources)
+- [Releases](#releases)
 - [Contributors](#contributors)
 - [License](#license)
 
@@ -41,6 +42,15 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 - It is HIGHLY recommended to join our board on Hugin Messenger if you want to contribute to stay up to date on what is happening on the project.
 
 If you want to know how to compile from source or find other relevant developer/user guides, please check out the docs in the link above.
+
+# Releases
+
+The following showcasing finished releases as well as future releases.
+
+| Dep                | Version | Description                                     |
+|--------------------|--------------|---------------------------------------------|
+| Loki               | 2.0.0        | To be decided.                        |
+| Munin              | 1.0.0        | This version brings new scaling solutions to Hugin by not storing any messages on the blockchain. Instead, messages are temporarily stored in the mempool for 24h after which they are discarded.                                  |
 
 # Contributors
 
