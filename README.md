@@ -50,8 +50,9 @@ The following showcasing finished releases as well as future releases.
 | NAME  | VERSION | RELEASED | DESCRIPTION                                                                                                                                                                                       |
 |-------|---------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Loki  | 2.0.0   | No       | To Be Decided.                                                                                                                                                                                    |
-| Munin | 1.1.0   | No       | Dividing The Transaction Arrays                                                                                                                                                                   |
+| Munin | 1.1.0   | No       | Divide into two transaction arrays, one separate array for Hugin Messages and the other for regular transactions.                                                                                  |
 | Munin | 1.0.0   | Yes      | This Version Brings New Scaling Solutions To Hugin By Not Storing Any Messages On The Blockchain. Instead, Messages Are Temporarily Stored In The Mempool For 24h After Which They Are Discarded. |
+
 
 
 # Contributors
