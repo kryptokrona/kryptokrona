@@ -6,7 +6,7 @@ services:
     container_name: kryptokrona-node1
     command: >
       /bin/sh -c "
-      ./src/kryptokronad 
+      ./src/kryptokrona_daemon 
       --data-dir src/blockloc 
       --add-exclusive-node 172.10.1.2:10001 
       --add-exclusive-node 172.10.1.3:10002 
@@ -27,7 +27,7 @@ services:
     container_name: kryptokrona-node2
     command: >
       /bin/sh -c "
-      ./src/kryptokronad 
+      ./src/kryptokrona_daemon
       --data-dir src/blockloc 
       --add-exclusive-node 172.10.1.1:10000 
       --add-exclusive-node 172.10.1.3:10002 
@@ -48,7 +48,7 @@ services:
     container_name: kryptokrona-node3
     command: >
       /bin/sh -c "
-      ./src/kryptokronad 
+      ./src/kryptokrona_daemon
       --data-dir src/blockloc 
       --add-exclusive-node 172.10.1.1:10000 
       --add-exclusive-node 172.10.1.2:10001 
