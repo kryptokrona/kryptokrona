@@ -161,13 +161,13 @@ add_dependencies(wallet_service version)
 add_dependencies(zedwallet version)
 
 # Finally build the binaries
-set_property(TARGET kryptokronad PROPERTY OUTPUT_NAME "kryptokronad")
-set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "xkr_wallet")
-set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "xkr_wallet_beta")
+set_property(TARGET kryptokronad PROPERTY OUTPUT_NAME "kryptokrona_daemon")
+set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "kryptokrona_wallet")
+set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "kryptokrona_wallet_beta")
 set_property(TARGET service PROPERTY OUTPUT_NAME "kryptokrona_service")
-set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
-set_property(TARGET crypto_test PROPERTY OUTPUT_NAME "crypto_test")
-set_property(TARGET wallet_api PROPERTY OUTPUT_NAME "wallet_api")
+set_property(TARGET miner PROPERTY OUTPUT_NAME "kryptokrona_miner")
+set_property(TARGET crypto_test PROPERTY OUTPUT_NAME "kryptokrona_crypto_test")
+set_property(TARGET wallet_api PROPERTY OUTPUT_NAME "kryptokrona_wallet_api")
 
 # Additional make targets, can be used to build a subset of the targets
 # e.g. make pool will build only kryptokronad and service
