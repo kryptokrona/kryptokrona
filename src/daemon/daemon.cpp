@@ -40,7 +40,7 @@
 #include <unistd.h>
 #endif
 
-using common::json_value;
+using common::JsonValue;
 using namespace cryptonote;
 using namespace logging;
 using namespace daemon_config;
