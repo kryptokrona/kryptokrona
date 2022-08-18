@@ -43,8 +43,8 @@ RUN mkdir -p src/blockloc
 WORKDIR /usr/src/kryptokrona/build/src
 
 # set executable permission on kryptokrona deamon
-RUN chmod +x kryptokronad
+RUN chmod +x kryptokrona_daemon
 
 EXPOSE 11898
 
-CMD [ "/bin/sh", "-c", "./kryptokronad --data-dir /usr/src/kryptokrona/build/src/blockloc --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0 --hide-my-port" ]
+CMD [ "/bin/sh", "-c", "./kryptokrona_daemon --data-dir /usr/src/kryptokrona/build/src/blockloc --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0 --hide-my-port" ]
