@@ -321,7 +321,7 @@ Error validateAddresses(
             /* Don't need this */
             uint64_t ignore;
 
-            if (!tools::Base58::decode_addr(address, ignore, decoded))
+            if (!tools::base58::decode_addr(address, ignore, decoded))
             {
                 return ADDRESS_NOT_BASE58;
             }
