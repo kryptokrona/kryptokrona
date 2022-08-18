@@ -45,7 +45,7 @@ If you want to know how to compile from source or find other relevant developer/
 
 # Releases
 
-The following showcasing finished releases as well as future releases.
+The following shows finished releases as well as future upcoming releases.
 
 | NAME  | VERSION | RELEASED | DESCRIPTION                                                                                                                                                                                       |
 |-------|---------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
