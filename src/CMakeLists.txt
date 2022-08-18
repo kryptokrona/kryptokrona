@@ -165,7 +165,7 @@ set_property(TARGET kryptokronad PROPERTY OUTPUT_NAME "kryptokrona_daemon")
 set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "kryptokrona_wallet")
 set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "kryptokrona_wallet_beta")
 set_property(TARGET service PROPERTY OUTPUT_NAME "kryptokrona_service")
-set_property(TARGET miner PROPERTY OUTPUT_NAME "kryptokrona_miner")
+set_property(TARGET miner PROPERTY OUTPUT_NAME "kryptokrona_miner") 
 set_property(TARGET crypto_test PROPERTY OUTPUT_NAME "kryptokrona_crypto_test")
 set_property(TARGET wallet_api PROPERTY OUTPUT_NAME "kryptokrona_wallet_api")
 
