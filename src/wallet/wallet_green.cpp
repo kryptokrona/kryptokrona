@@ -3656,19 +3656,13 @@ namespace cryptonote
     {
         uint32_t currentHeight = m_node.getLastKnownBlockHeight();
 
-        size_t growth = (currentHeight * CryptoNote
-                                       ::parameters
-                                       ::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR) /
-
-                        CryptoNote
-                      ::parameters
-                      ::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
+        size_t growth = (currentHeight * cryptonote::parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR) /
+                        cryptonote::parameters::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
 
         size_t x = cryptonote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
 
         size_t y = 125000;
 
-        return std::min(x, y) - cryptonote::parameters
-                                          ::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+        return std::min(x, y) - cryptonote::parameters::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
     }
 }
