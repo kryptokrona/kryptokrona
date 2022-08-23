@@ -22,7 +22,6 @@ class TransactionMonitor
         std::shared_ptr<std::mutex> getMutex() const;
 
     private:
-
         std::atomic<bool> m_shouldStop;
 
         std::shared_ptr<WalletBackend> m_walletBackend;
