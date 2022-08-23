@@ -24,7 +24,19 @@
 </a>
 </p>
 
-Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, which forms the basis for Monero, among others. CryptoNote is a so-called “application layer” protocol further developed by TurtleCoin that enables things like: private transactions, messages and arbitrary data storage, completely decentralized.
+Kryptokrona is a decentralized fast, easy and private cryptocurrency from the Nordic which allows you to send money to friends and businesses. Kryptokrona is based on CryptoNote, which forms the basis for Monero, among others. CryptoNote is a so-called “application layer” protocol further developed by TurtleCoin that enables things like: private transactions, messages and arbitrary data storage, completely decentralized.
+
+One of kryptokrona's main goals is to make things as simple and as accessible as possible for everyday people, creating a cryptocurrency which is inviting, fun and friendly.
+
+Some of the main features of Kryptokrona include:
+- On-chain privacy
+- Only two decimal places
+- Fast transactions
+- User-centric developers
+- Easy to mine
+- Easy to use
+- Amazing community
+- Send to anyone, around the world
 
 # Table of Contents
 
