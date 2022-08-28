@@ -28,16 +28,6 @@ Kryptokrona is a decentralized fast, easy and private cryptocurrency from the No
 
 One of kryptokrona's main goals is to make things as simple and as accessible as possible for everyday people, creating a cryptocurrency which is inviting, fun and friendly.
 
-Some of the main features of Kryptokrona include:
-- On-chain privacy
-- Only two decimal places
-- Fast transactions
-- User-centric developers
-- Easy to mine
-- Easy to use
-- Amazing community
-- Send to anyone, around the world
-
 # Table of Contents
 
 - [Development Resources](#development-resources)
