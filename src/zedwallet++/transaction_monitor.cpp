@@ -61,7 +61,7 @@ void TransactionMonitor::stop()
     m_queuedTransactions.stop();
 }
 
-std::shared_ptr<std::mutex> m_queuedTransactionsMonitor::getMutex() const
+std::shared_ptr<std::mutex> TransactionMonitor::getMutex() const
 {
     return m_mutex;
 }
