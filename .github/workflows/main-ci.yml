@@ -74,8 +74,11 @@ jobs:
       - name: Build Ubuntu Target
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
-          cmake . -B build -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64
-          make -j$(nproc) --ignore-errors
+          cmake . -B build -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17"
+      
+      - name: Make
+        if: matrix.config.os == 'ubuntu-22.04'
+        run: make
 
       - uses: actions/upload-artifact@v3
         with:
@@ -102,7 +105,10 @@ jobs:
         if: matrix.config.os == 'macos-latest'
         run: |
           cmake . -B build
-          make
+      
+      - name: Make
+        if: matrix.config.os == 'macos-latest'
+        run: make
 
       - uses: actions/upload-artifact@v3
         with:
