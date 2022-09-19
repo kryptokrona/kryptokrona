@@ -12,11 +12,12 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
+    name: 'Build: ${{ matrix.config.name }} / ${{ matrix.platform }}'
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: true
       matrix:
+        platform: [x86, x64]
         config:
           - {
             name: "Windows Latest MSVC", artifact: "windows-MSVC.7z",
@@ -29,11 +30,13 @@ jobs:
             os: ubuntu-22.04,
             cc: "gcc", cxx: "g++"
           }
+          # intel
     #       - {
     #         name: "macOS Latest Clang", artifact: "macOS.7z",
     #         os: macos-latest,
     #         cc: "clang", cxx: "clang++"
     #       }
+          # arm64
     steps:
       - uses: actions/checkout@v2
 
@@ -88,6 +91,7 @@ jobs:
 
   test:
     name: Tests
+    #name: 'Test: ${{ matrix.config.os }} / ${{ matrix.platform }}'
     runs-on: ubuntu-22.04
     needs: [ build ]
     steps:
