@@ -56,12 +56,11 @@ jobs:
             boost_version: 1.74.0
             boost_install_dir: C:\boost_1_74_0
             platform_version: 2019
-            link: static
 
       - name: Build windows Target using Visual C++
         if: matrix.config.os == 'windows-2019'
         run: |
-          cmake . -G "Visual Studio 16 2019" -B build -DBoost_LIBRARY_DIRS=${{ steps.install-boost.outputs.BOOST_ROOT }} -DBOOST_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }}
+          cmake . -G "Visual Studio 16 2019" -B build -DBoost_LIBRARY_DIRS=${{ steps.install-boost.outputs.BOOST_ROOT }}\libs -DBoost_INCLUDE_DIRS=${{ steps.install-boost.outputs.BOOST_ROOT }}\include -DBOOST_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }}
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
