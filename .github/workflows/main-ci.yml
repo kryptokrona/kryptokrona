@@ -54,22 +54,20 @@ jobs:
         id: install-boost
         with:
             boost_version: 1.74.0
-            boost_install_dir: C:\Boost\boost_1_74_0
+            boost_install_dir: C:\boost_1_74_0
             platform_version: 2019
 
       - name: mkdir build
         if: matrix.config.os == 'windows-2019'
-        run: |
-          mkdir build 
-          Get-ChildItem -Path C:\Boost\boost_1_74_0\boost
+        run: mkdir build 
 
       - name: Build windows Target using Visual C++
         if: matrix.config.os == 'windows-2019'
         working-directory: build
         run: |
-          cmake -G "Visual Studio 16 2019" ..
+          cmake . -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B build -DBoost_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}/include -DBoost_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}/libs
         env:
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}\boost
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
       # Ubuntu 22.04
       - name: Install Dependencies
