@@ -60,7 +60,7 @@ jobs:
       - name: Build windows Target using Visual C++
         if: matrix.config.os == 'windows-2019'
         run: |
-          cmake . -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B build -DBoost_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}\include -DBoost_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}\libs
+          cmake . -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B build
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
