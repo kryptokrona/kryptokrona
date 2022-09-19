@@ -53,7 +53,7 @@ The following shows finished releases as well as future upcoming releases.
 |-------|---------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Loki  | 1.3.0   | No       | To Be Decided.                                                                                                                                                                                    |
 | Munin | 1.2.0   | No       | Adding unit tests for pipeline to ensure quality. Changing address prefix SEKR -> XKR.                                                                |
-| Munin | 1.1.0   | No       | Dividing transactions into two arrays, one separate array for Hugin Messages and the other for regular transactions, refactoring whole core and improving CI/CD for building targets to multiple OS on push to master.                                                                         |
+| Munin | 1.1.0   | No       | Refactoring whole core, improving CI/CD for building targets to multiple OS on push to master and changed target names.                                                                         |
 | Munin | [1.0.0](https://github.com/kryptokrona/kryptokrona/releases/tag/1.0.0)   | Yes      | This Version Brings New Scaling Solutions To Hugin By Not Storing Any Messages On The Blockchain. Instead, Messages Are Temporarily Stored In The Mempool For 24h After Which They Are Discarded. |
 
 # Contributors
