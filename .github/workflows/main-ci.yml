@@ -17,11 +17,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        platform: [x86, x64]
+        platform: [x64] # should we add x86?
         config:
+          # should we add 2016 as well?
           - {
-            name: "Windows Latest MSVC", artifact: "windows-MSVC.7z",
-            os: windows-latest,
+            name: "Windows 2019 MSVC", artifact: "windows-MSVC.7z",
+            os: windows-2019,
             cc: "cl", cxx: "cl",
             environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           }
@@ -42,33 +43,27 @@ jobs:
 
       # Windows MSVC
       - name: Install Dependencies
-        if: matrix.config.os == 'windows-latest'
+        if: matrix.config.os == 'windows-2019'
         uses: microsoft/setup-msbuild@v1.1
         with:
           msbuild-architecture: x64
 
       - name: Install Boost
         uses: MarkusJx/install-boost@v2.3.1
-        if: matrix.config.os == 'windows-latest'
+        if: matrix.config.os == 'windows-2019'
         id: install-boost
         with:
-            # REQUIRED: Specify the required boost version
-            # A list of supported versions can be found here:
-            # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
             boost_version: 1.74.0
-            # OPTIONAL: Specify a custon install location
             boost_install_dir: C:\Boost\boost_1_74_0
-            # OPTIONAL: Specify a platform version
             platform_version: 2019
-            # OPTIONAL: Specify a toolset
             toolset: msvc
 
       - name: mkdir build
-        if: matrix.config.os == 'windows-latest'
+        if: matrix.config.os == 'windows-2019'
         run: mkdir build
 
       - name: Build windows Target using Visual C++
-        if: matrix.config.os == 'windows-latest'
+        if: matrix.config.os == 'windows-2019'
         working-directory: build
         run: |
           cmake -G "Visual Studio 17 2022" -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBOOST_ROOT=C:/Boost/boost_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
