@@ -57,10 +57,6 @@ jobs:
             boost_install_dir: C:\boost_1_74_0
             platform_version: 2019
 
-      - name: mkdir build
-        if: matrix.config.os == 'windows-2019'
-        run: mkdir build 
-
       - name: Build windows Target using Visual C++
         if: matrix.config.os == 'windows-2019'
         working-directory: build
