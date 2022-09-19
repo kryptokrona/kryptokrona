@@ -65,7 +65,7 @@ jobs:
         if: matrix.config.os == 'windows-2019'
         working-directory: build
         run: |
-          cmake -G "Visual Studio 17 2022" -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBOOST_ROOT=C:/Boost/boost_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
+          cmake -G "Visual Studio 16 2019" -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBOOST_ROOT=C:/Boost/boost_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
 
       # Ubuntu 22.04
       - name: Install Dependencies
