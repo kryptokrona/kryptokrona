@@ -71,18 +71,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
-      - name: mkdir build
-        if: matrix.config.os == 'ubuntu-22.04'
-        run: mkdir build
-
       - name: Build Ubuntu Target
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
-          cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64 .. # add flag -DBoost_DEBUG=ON to debug
+          cmake . -B build -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64
           make -j$(nproc) --ignore-errors
         working-directory: build
 
-      # MacOS Intel
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ubuntu-x64-build
+          path: |
+            build/src/kryptokrona_daemon
+            build/src/kryptokrona_wallet
+            build/src/kryptokrona_wallet_beta
+            build/src/kryptokrona_service
+            build/src/kryptokrona_miner
+            build/src/kryptokrona_crypto_test
+            build/src/kryptokrona_wallet_api
+
+      # macOS Intel
       - name: Install Dependencies
         if: matrix.config.os == 'macos-latest'
         run: |
@@ -91,16 +99,24 @@ jobs:
           export CC=/usr/local/opt/llvm/bin/clang
           export CXX=/usr/local/opt/llvm/bin/clang++
 
-      - name: mkdir build
-        if: matrix.config.os == 'macos-latest'
-        run: mkdir build
-
       - name: Build Mac Target
         if: matrix.config.os == 'macos-latest'
         run: |
-          cmake ..
+          cmake . -B build
           make
         working-directory: build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: macos-x64-build
+          path: |
+            build/src/kryptokrona_daemon
+            build/src/kryptokrona_wallet
+            build/src/kryptokrona_wallet_beta
+            build/src/kryptokrona_service
+            build/src/kryptokrona_miner
+            build/src/kryptokrona_crypto_test
+            build/src/kryptokrona_wallet_api
 
   test:
     name: Tests
