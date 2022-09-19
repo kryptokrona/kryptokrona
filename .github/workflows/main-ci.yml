@@ -76,7 +76,6 @@ jobs:
         run: |
           cmake . -B build -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64
           make -j$(nproc) --ignore-errors
-        working-directory: build
 
       - uses: actions/upload-artifact@v3
         with:
@@ -104,7 +103,6 @@ jobs:
         run: |
           cmake . -B build
           make
-        working-directory: build
 
       - uses: actions/upload-artifact@v3
         with:
