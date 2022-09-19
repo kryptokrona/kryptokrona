@@ -56,8 +56,6 @@ jobs:
             boost_version: 1.74.0
             boost_install_dir: C:\Boost\boost_1_74_0
             platform_version: 2019
-            toolset: msvc
-            version: default
 
       - name: mkdir build
         if: matrix.config.os == 'windows-2019'
