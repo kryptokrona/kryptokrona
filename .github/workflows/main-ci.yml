@@ -48,12 +48,16 @@ jobs:
           msbuild-architecture: x64
 
       # Need to test this on a windows computer first (do not extract the files yet)
-      - name: Install Boost
+      - name: Download and Extract Boost
         if: matrix.config.os == 'windows-latest'
         run: |
           Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip -OutFile 'c:\boost_1_74_0.zip'
           Expand-Archive c:\boost_1_74_0.zip -DestinationPath c:\Boost\boost_1_74_0
-          cd c:\boost_1_74_0\tools\build
+
+      - name: Download and Install Boost
+        if: matrix.config.os == 'windows-latest'
+        run: |
+          cd c:\Boost\boost_1_74_0\tools\build
           Start-Process bootstrap.bat -ArgumentList -Wait -NoNewWindow
           b2 variant=release address-model=64 link=static,shared
 
