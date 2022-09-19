@@ -47,19 +47,21 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      # Need to test this on a windows computer first (do not extract the files yet)
-      - name: Download and Extract Boost
+      - name: Install Boost
+        uses: MarkusJx/install-boost@v2.3.1
         if: matrix.config.os == 'windows-latest'
-        run: |
-          Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip -OutFile 'c:\boost_1_74_0.zip'
-          Expand-Archive c:\boost_1_74_0.zip -DestinationPath c:\Boost\boost_1_74_0
-
-      - name: Download and Install Boost
-        if: matrix.config.os == 'windows-latest'
-        run: |
-          cd c:\Boost\boost_1_74_0\tools\build
-          Start-Process bootstrap.bat -ArgumentList -Wait -NoNewWindow
-          b2 variant=release address-model=64 link=static,shared
+        id: install-boost
+        with:
+            # REQUIRED: Specify the required boost version
+            # A list of supported versions can be found here:
+            # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
+            boost_version: 1.74.0
+            # OPTIONAL: Specify a custon install location
+            boost_install_dir: C:\Boost\boost_1_74_0
+            # OPTIONAL: Specify a platform version
+            platform_version: 2019
+            # OPTIONAL: Specify a toolset
+            toolset: msvc
 
       - name: mkdir build
         if: matrix.config.os == 'windows-latest'
