@@ -40,20 +40,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # # windows MSVC
+      # Windows MSVC
       - name: Install Dependencies
         if: matrix.config.os == 'windows-latest'
         uses: microsoft/setup-msbuild@v1.1
         with:
           msbuild-architecture: x64
 
-      # need to test this on a windows computer first (do not extract the files yet)
+      # Need to test this on a windows computer first (do not extract the files yet)
       - name: Install Boost
         if: matrix.config.os == 'windows-latest'
         run: |
           Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip -OutFile 'c:\boost_1_74_0.zip'
           Expand-Archive c:\boost_1_74_0.zip -DestinationPath c:\Boost\boost_1_74_0
-          Start-Process -FilePath "c:\Boost\boost_1_74_0\boost_1_74_0\tools\build\bootstrap.bat" -ArgumentList 'mingw' -Wait -NoNewWindow
+          cd c:\boost_1_74_0\tools\build
+          Start-Process bootstrap.bat -ArgumentList -Wait -NoNewWindow
           b2 variant=release address-model=64 link=static,shared
 
       - name: mkdir build
