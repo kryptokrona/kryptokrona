@@ -12,12 +12,6 @@ jobs:
         platform: [x64] # should we add x86?
         config:
           - {
-            name: "Windows 2019 MSVC", artifact: "windows-MSVC.7z",
-            os: windows-2019,
-            cc: "cl", cxx: "cl",
-            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          }
-          - {
             name: "Ubuntu Latest GCC", artifact: "linux.7z",
             os: ubuntu-22.04,
             cc: "gcc", cxx: "g++"
@@ -53,11 +47,20 @@ jobs:
             build/src/kryptokrona_crypto_test
             build/src/kryptokrona_wallet_api
 
-
   test:
     name: Tests
     runs-on: ubuntu-22.04
     needs: [ build ]
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [x64] # should we add x86?
+        config:
+          - {
+            name: "Ubuntu Latest GCC", artifact: "linux.7z",
+            os: ubuntu-22.04,
+            cc: "gcc", cxx: "g++"
+          }
     steps:
       - uses: actions/checkout@v2
 
