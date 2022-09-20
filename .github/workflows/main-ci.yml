@@ -55,46 +55,10 @@ jobs:
             build/src/kryptokrona_crypto_test
             build/src/kryptokrona_wallet_api
 
-  test:
-    name: 'Test: ${{ matrix.config.os }} / ${{ matrix.platform }}'
-    runs-on: ubuntu-22.04
-    needs: [ build ]
-    strategy:
-      fail-fast: true
-      matrix:
-        platform: [x64] # should we add x86?
-        config:
-          - {
-            name: "Ubuntu Latest GCC", artifact: "linux.7z",
-            os: ubuntu-22.04,
-            cc: "gcc", cxx: "g++"
-          }
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Static Code Analysis
-        run: echo "Running Static Code Analysis..."
-
-      - name: Unit Test
-        run: echo "Running Unit Tests..."
-
-      - name: Code Coverage
-        run: echo "Running Code Coverage..."
-
-  doxygen:
-    name: Doxygen
-    runs-on: ubuntu-22.04
-    needs: [ test ]
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Doxygen
-      run: echo "Running Doxygen..."
-
   docker:
     name: Build and Publish Docker Image
     runs-on: ubuntu-22.04
-    needs: [ doxygen ]
+    needs: [ build ]
     steps:
       - uses: actions/checkout@v2
       - uses: benjlevesque/short-sha@v1.2
