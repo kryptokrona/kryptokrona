@@ -4,89 +4,54 @@ on: [ pull_request ]
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
+    name: 'Build: ${{ matrix.config.name }} / ${{ matrix.platform }}'
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: true
       matrix:
+        platform: [x64] # should we add x86?
         config:
-          # - {
-          #   name: "windows Latest MSVC", artifact: "windows-MSVC.7z",
-          #   os: windows-latest,
-          #   cc: "cl", cxx: "cl",
-          #   environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          # }
-          # - {
-          #   name: "windows Latest MinGW", artifact: "windows-MinGW.7z",
-          #   os: windows-latest,
-          #   cc: "gcc", cxx: "g++"
-          # }
+          - {
+            name: "Windows 2019 MSVC", artifact: "windows-MSVC.7z",
+            os: windows-2019,
+            cc: "cl", cxx: "cl",
+            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+          }
           - {
             name: "Ubuntu Latest GCC", artifact: "linux.7z",
             os: ubuntu-22.04,
             cc: "gcc", cxx: "g++"
           }
-    #       - {
-    #         name: "macOS Latest Clang", artifact: "macOS.7z",
-    #         os: macos-latest,
-    #         cc: "clang", cxx: "clang++"
-    #       }
     steps:
       - uses: actions/checkout@v2
 
-      # # windows MSVC
-      # - name: Install Dependencies
-      #   if: matrix.config.os == 'windows-latest'
-      #   uses: microsoft/setup-msbuild@v1.1
-      #   with:
-      #     msbuild-architecture: x64
-
-      # # need to test this on a windows computer first (do not extract the files yet)
-      # - name: Install Boost
-      #   if: matrix.config.os == 'windows-latest'
-      #   run: |
-      #     Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip -OutFile 'c:\boost_1_74_0.zip'
-      #     Expand-Archive c:\boost_1_74_0.zip -DestinationPath c:\Boost\boost_1_74_0
-      #     Start-Process -FilePath "c:\Boost\boost_1_74_0\boost_1_74_0\tools\build\bootstrap.bat" -ArgumentList 'mingw' -Wait -NoNewWindow
-      #     b2 variant=release address-model=64 link=static,shared
-
-      # - name: mkdir build
-      #   if: matrix.config.os == 'windows-latest'
-      #   run: mkdir build
-
-      # - name: Build windows Target using Visual C++
-      #   if: matrix.config.os == 'windows-latest'
-      #   working-directory: build
-      #   run: |
-      #     cmake -G "Visual Studio 17 2022" -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBOOST_ROOT=C:/Boost/boost_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
-
-      # windows MinGW
-      #- name: Install Dependencies
-      #  if: matrix.config.os == 'windows-latest'
-      #  run: d
-
-      # Ubuntu 22.04
       - name: Install Dependencies
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
-      - name: mkdir build
-        if: matrix.config.os == 'ubuntu-22.04'
-        run: mkdir build
-
       - name: Build Ubuntu Target
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
-          cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64 .. # add flag -DBoost_DEBUG=ON to debug
-          make -j$(nproc) --ignore-errors
+          cmake . -B build -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17"
+      
+      - name: Make
+        if: matrix.config.os == 'ubuntu-22.04'
+        run: make
         working-directory: build
 
-      # MacOS
-      #- name: Install Dependencies
-      #  if: matrix.config.os == 'ubuntu-22.04'
-      #  run: d
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ubuntu-x64-build
+          path: |
+            build/src/kryptokrona_daemon
+            build/src/kryptokrona_wallet
+            build/src/kryptokrona_wallet_beta
+            build/src/kryptokrona_service
+            build/src/kryptokrona_miner
+            build/src/kryptokrona_crypto_test
+            build/src/kryptokrona_wallet_api
 
 
   test:
