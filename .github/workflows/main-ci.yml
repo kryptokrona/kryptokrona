@@ -19,7 +19,6 @@ jobs:
       matrix:
         platform: [x64] # should we add x86?
         config:
-          # should we add 2016 as well?
           - {
             name: "Windows 2019 MSVC", artifact: "windows-MSVC.7z",
             os: windows-2019,
@@ -31,13 +30,6 @@ jobs:
             os: ubuntu-22.04,
             cc: "gcc", cxx: "g++"
           }
-          # intel
-          - {
-            name: "macOS Latest Clang", artifact: "macOS.7z",
-            os: macos-latest,
-            cc: "clang", cxx: "clang++"
-          }
-          # arm64
     steps:
       - uses: actions/checkout@v2
 
@@ -102,37 +94,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ubuntu-x64-build
-          path: |
-            build/src/kryptokrona_daemon
-            build/src/kryptokrona_wallet
-            build/src/kryptokrona_wallet_beta
-            build/src/kryptokrona_service
-            build/src/kryptokrona_miner
-            build/src/kryptokrona_crypto_test
-            build/src/kryptokrona_wallet_api
-
-      # macOS Intel
-      - name: Install Dependencies
-        if: matrix.config.os == 'macos-latest'
-        run: |
-          which brew || /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-          brew install --force cmake boost llvm
-          export CC=/usr/local/opt/llvm/bin/clang
-          export CXX=/usr/local/opt/llvm/bin/clang++
-
-      - name: Build Mac Target
-        if: matrix.config.os == 'macos-latest'
-        run: |
-          cmake . -B build
-      
-      - name: Make
-        if: matrix.config.os == 'macos-latest'
-        run: make
-        working-directory: build
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: macos-x64-build
           path: |
             build/src/kryptokrona_daemon
             build/src/kryptokrona_wallet
