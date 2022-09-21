@@ -22,6 +22,10 @@
     # Docker daemon options as a dict
     docker_daemon_options: { }
 
+    # Node configuration
+    # please use a different URL here below if you want to download the bootstrap from a different source
+    kryptokrona_daemon_boostrap: "http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-20220426.7z"
+
     # Prometheus configuration
     prometheus_targets:
       node:

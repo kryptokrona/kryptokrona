@@ -9,6 +9,17 @@
     update=false
   register: gitresult
 
+- name: Download existing blocks
+  ansible.builtin.get_url:
+    url: "{{ kryptokrona_daemon_boostrap }}"
+    dest: ~/bootstrap.7z
+    mode: '0440'
+
+- name: Extract 7z with blocks
+  ansible.builtin.unarchive:
+    src: ~/bootstrap.7z
+    dest: ~/.kryptokrona
+
 - name: Create Kryptokrona Daemon Container
   docker_container:
     name: "{{ docker_node_container_name }}"
