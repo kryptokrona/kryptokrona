@@ -77,7 +77,7 @@
   - postgres
   - docker
   - node
-  - pool
+  #- pool
   - hugin-api
   - nginx
   - prometheus
