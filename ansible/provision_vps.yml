@@ -62,9 +62,12 @@
     sys_project_name: 'Hugin API'
 
   roles:
-  #- base
+  - base
   - postgres
   - docker
+  - node
+  - pool
+  - hugin-api
   - nginx
   - prometheus
   - onion
