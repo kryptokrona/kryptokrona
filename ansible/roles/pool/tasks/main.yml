@@ -11,18 +11,18 @@
 
 - name: Create Hugin API Container
   docker_container:
-    name: "{{ docker_container_name }}"
+    name: "{{ docker_pool_container_name }}"
     image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
     command: /bin/echo success
     state: present
     force_kill: yes
     recreate: yes
     networks:
-      - name: "host"
+      - name: "{{ docker_network_name }}"
 
 - name: Start Hugin API Container
   docker_container:
-    name: "{{ docker_container_name }}"
+    name: "{{ docker_pool_container_name }}"
     image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
     command: "./start.sh"
     env: {
@@ -46,4 +46,4 @@
       SYS_RATELIMIT_MAX: "{{ sys_ratelimit_max }}"
     }
     networks:
-      - name: "host"
+      - name: "{{ docker_network_name }}"

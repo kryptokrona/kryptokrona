@@ -4,19 +4,20 @@
   become: true
   gather_facts: yes
   vars:
-    hugin_api_name: hugin_api
-    hugin_api_port: 3000
-
     # Docker GitHub Container Registry
-    docker_image: "ghcr.io/kryptokrona/hugin-api"
+    docker_hugin_api_image: "ghcr.io/kryptokrona/hugin-api"
+    docker_kryptokona_image: "ghcr.io/kryptokrona/kryptokrona"
 
     # A list of users who will be added to the docker group.
     docker_users: [
-      "hugin_docker"
+      "kryptokrona_docker"
     ]
 
-    docker_container_name: hugin-api
-    docker_network_name: hugin
+    # Docker Container names
+    docker_hugin_api_container_name: hugin-api
+    docker_node_container_name: kryptokrona-node
+    docker_pool_container_name: kryptokrona-pool
+    docker_network_name: kryptokrona-net
 
     # Docker daemon options as a dict
     docker_daemon_options: { }
@@ -37,9 +38,13 @@
     hidden_service_port: "443"
 
     # DO NOT CONFIGURE THE ABOVE YOURSELF
-
     removal_interval: '1 years 2 months 3 days 2 hours 1 minutes 1 second'
-    hugin_node_server: 'blocksum.org:11898'
+    
+    # Hugin API settings
+    hugin_api_name: hugin_api
+    hugin_api_port: 3000
+
+    hugin_node_server: "{{ docker_hugin_api_container_name }}:11898"
 
     sys_criteria_users_include: ''
     sys_criteria_users_exclude: ''

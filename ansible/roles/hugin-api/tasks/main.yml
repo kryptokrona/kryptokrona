@@ -11,19 +11,19 @@
 
 - name: Create Hugin API Container
   docker_container:
-    name: "{{ docker_container_name }}"
-    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    name: "{{ docker_hugin_api_container_name }}"
+    image: "{{ docker_hugin_api_image }}:{{ gitresult.after[:7] }}"
     command: /bin/echo success
     state: present
     force_kill: yes
     recreate: yes
     networks:
-      - name: "host"
+      - name: "{{ docker_network_name }}"
 
 - name: Start Hugin API Container
   docker_container:
-    name: "{{ docker_container_name }}"
-    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    name: "{{ docker_hugin_api_container_name }}"
+    image: "{{ docker_hugin_api_image }}:{{ gitresult.after[:7] }}"
     command: "./start.sh"
     env: {
       DATABASE_URL: "postgres://{{ vault_postgres_db_user }}:{{ vault_postgres_db_password }}@127.0.0.1:5432/{{ vault_postgres_db_name }}",
@@ -46,4 +46,4 @@
       SYS_RATELIMIT_MAX: "{{ sys_ratelimit_max }}"
     }
     networks:
-      - name: "host"
+      - name: "{{ docker_network_name }}"

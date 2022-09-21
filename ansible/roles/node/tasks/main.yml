@@ -1,7 +1,7 @@
 ---
 - name: Checkout Repo
   git:
-    repo=https://github.com/kryptokrona/hugin-api.git
+    repo=https://github.com/kryptokrona/kryptokrona.git
     dest=/root/tmp/checkout
     update=yes
     accept_hostkey=yes
@@ -9,21 +9,21 @@
     update=false
   register: gitresult
 
-- name: Create Hugin API Container
+- name: Create Kryptokrona Daemon Container
   docker_container:
-    name: "{{ docker_container_name }}"
-    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    name: "{{ docker_node_container_name }}"
+    image: "{{ docker_kryptokona_image }}:{{ gitresult.after[:7] }}"
     command: /bin/echo success
     state: present
     force_kill: yes
     recreate: yes
     networks:
-      - name: "host"
+      - name: "{{ docker_network_name }}"
 
-- name: Start Hugin API Container
+- name: Start Kryptokrona Daemon Container
   docker_container:
-    name: "{{ docker_container_name }}"
-    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    name: "{{ docker_node_container_name }}"
+    image: "{{ docker_kryptokona_image }}:{{ gitresult.after[:7] }}"
     command: "./start.sh"
     env: {
       DATABASE_URL: "postgres://{{ vault_postgres_db_user }}:{{ vault_postgres_db_password }}@127.0.0.1:5432/{{ vault_postgres_db_name }}",
@@ -33,17 +33,6 @@
       SYS_CRITERIA_BOARDS_INCLUDE: "",
       SYS_CRITERIA_BOARDS_EXCLUDE: "",
       SYS_CRITERIA_KEYWORDS_INCLUDE: "",
-      SYS_CRITERIA_KEYWORDS_EXCLUDE: "",
-      SYS_CRITERIA_KEYWORDS_CURSEWORDS: "false",
-      SYS_SWAGGER_CONTACT_NAME: "{{ sys_swagger_contact_name }}",
-      SYS_SWAGGER_CONTACT_EMAIL: "{{ sys_swagger_contact_email }}",
-      SYS_SWAGGER_CONTACT_URL: "{{ sys_swagger_contact_url }}",
-      SYS_PROJECT_NAME: "{{ sys_project_name }}",
-      SYS_API_PORT: "{{ sys_api_port }}",
-      SYS_WS_PORT: "{{ sys_ws_port }}",
-      SYS_HUGIN_SYNCER_SLEEP: "{{ sys_hugin_syncer_sleep }}",
-      SYS_RATELIMIT_WINDOW_MS: "{{ sys_ratelimit_window_ms }}",
-      SYS_RATELIMIT_MAX: "{{ sys_ratelimit_max }}"
     }
     networks:
-      - name: "host"
+      - name: "{{ docker_network_name }}"
