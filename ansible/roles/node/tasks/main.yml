@@ -1,5 +1,5 @@
 ---
-- name: Checkout Repo
+- name: Checkout repo
   git:
     repo=https://github.com/kryptokrona/kryptokrona.git
     dest=/root/tmp/checkout
@@ -10,19 +10,19 @@
   register: gitresult
 
 - name: Download boostrap
-  when: kryptokrona_daemon_boostrap | length > 0
+  when: kryptokrona_node_boostrap | length > 0
   get_url:
-    url: "{{ kryptokrona_daemon_boostrap }}"
+    url: "{{ kryptokrona_node_boostrap }}"
     dest: ~/bootstrap.7z
     mode: '0440'
 
 - name: Extract boostrap
-  when: kryptokrona_daemon_boostrap | length > 0
+  when: kryptokrona_node_boostrap | length > 0
   unarchive:
     src: ~/bootstrap.7z
     dest: ~/.kryptokrona
 
-- name: Create Kryptokrona Daemon Container
+- name: Create Kryptokrona Node Container
   docker_container:
     name: "{{ docker_node_container_name }}"
     image: "{{ docker_kryptokona_image }}:{{ gitresult.after[:7] }}"
@@ -33,7 +33,7 @@
     networks:
       - name: "{{ docker_network_name }}"
 
-- name: Start Kryptokrona Daemon Container
+- name: Start Kryptokrona Node Container
   docker_container:
     name: "{{ docker_node_container_name }}"
     image: "{{ docker_kryptokona_image }}:{{ gitresult.after[:7] }}"

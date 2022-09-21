@@ -26,7 +26,7 @@
     kryptokrona_node_name: krytokrona_node
 
     # please use a different URL here below if you want to download the bootstrap from a different source
-    kryptokrona_daemon_boostrap: "http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-20220426.7z"
+    kryptokrona_node_boostrap: "http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-20220426.7z"
 
     # Prometheus configuration
     prometheus_targets:
