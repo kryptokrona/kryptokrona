@@ -123,10 +123,12 @@
     }
     networks:
       - name: "host"
+
 - name: Add docker cronjob to remove old images
   cron:
     name: docker_image_removal
     special_time: weekly
     job: docker images prune -a --filter "until=7d"
+
 - include_tasks: docker-users.yml
   when: docker_users | length > 0
