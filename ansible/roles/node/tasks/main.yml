@@ -9,14 +9,16 @@
     update=false
   register: gitresult
 
-- name: Download existing blocks
-  ansible.builtin.get_url:
+- name: Download boostrap
+  when: kryptokrona_daemon_boostrap | length > 0
+  get_url:
     url: "{{ kryptokrona_daemon_boostrap }}"
     dest: ~/bootstrap.7z
     mode: '0440'
 
-- name: Extract 7z with blocks
-  ansible.builtin.unarchive:
+- name: Extract boostrap
+  when: kryptokrona_daemon_boostrap | length > 0
+  unarchive:
     src: ~/bootstrap.7z
     dest: ~/.kryptokrona
 
