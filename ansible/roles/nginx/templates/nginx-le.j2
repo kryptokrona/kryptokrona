@@ -1,3 +1,7 @@
+upstream {{ kryptokrona_node_name }} {
+    server 127.0.0.1:11898;
+}
+
 upstream {{ hugin_api_name }}_ws {
     server 127.0.0.1:8080;
 }
@@ -5,12 +9,15 @@ upstream {{ hugin_api_name }}_ws {
 upstream {{ hugin_api_name }}_api {
     server 127.0.0.1:3000;
 }
+
 upstream {{ hugin_api_name }}_monitoring {
     server 127.0.0.1:9090;
 }
+
 upstream {{ hugin_api_name }}_stats {
     server 127.0.0.1:9100;
 }
+
 upstream {{ hugin_api_name }}_graphs {
     server 127.0.0.1:433;
 }
@@ -39,6 +46,14 @@ server {
     error_log /var/log/nginx/reverse-error.log;
 
     root /var/www/html/;
+
+    location / {
+        proxy_pass http://{{ kryptokrona_node_name }};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+    }
 
     location /ws {
         proxy_pass http://{{ hugin_api_name }}_ws;
