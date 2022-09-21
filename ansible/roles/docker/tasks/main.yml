@@ -1,0 +1,132 @@
+---
+# - name: Ansible delete files .list
+#   find:
+#     paths: /etc/apt/sources.list.d
+#     patterns: "*.list"
+#   register: files_to_delete
+
+# - name: Ansible remove file list
+#   file:
+#     path: "{{ item.path }}"
+#     state: absent
+#   with_items: "{{ files_to_delete.files }}"
+
+- name: Install Docker prerequisites
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+    - python3-pip
+    - virtualenv
+    - python3-setuptools
+
+- name: Add Docker apt key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker apt repo
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+    state: present
+    update_cache: yes
+
+- name: Install Docker and it's dependencies
+  apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+
+- name: Ensure /etc/docker/ directory exists.
+  file:
+    path: /etc/docker
+    state: directory
+    mode: 0755
+  when: docker_daemon_options.keys() | length > 0
+
+- name: Configure Docker daemon options.
+  copy:
+    content: "{{ docker_daemon_options | to_nice_json }}"
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  when: docker_daemon_options.keys() | length > 0
+  notify: restart docker
+
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: started
+    enabled: true
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Remove unused Docker Images (not currently running)
+  ansible.builtin.shell: docker image prune -a -f
+  args:
+    executable: /bin/bash
+
+- name: Checkout Repo
+  git:
+    repo=https://github.com/kryptokrona/hugin-api.git
+    dest=/root/tmp/checkout
+    update=yes
+    accept_hostkey=yes
+    clone=false
+    update=false
+  register: gitresult
+
+- name: Create Hugin API Container
+  docker_container:
+    name: "{{ docker_container_name }}"
+    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    command: /bin/echo success
+    state: present
+    force_kill: yes
+    recreate: yes
+    networks:
+      - name: "host"
+
+- name: Start Hugin API Container
+  docker_container:
+    name: "{{ docker_container_name }}"
+    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    command: "./start.sh"
+    env: {
+      DATABASE_URL: "postgres://{{ vault_postgres_db_user }}:{{ vault_postgres_db_password }}@127.0.0.1:5432/{{ vault_postgres_db_name }}",
+      SYS_HUGIN_NODE_SERVER: "{{ hugin_node_server }}",
+      SYS_CRITERIA_USERS_INCLUDE: "",
+      SYS_CRITERIA_USERS_EXCLUDE: "",
+      SYS_CRITERIA_BOARDS_INCLUDE: "",
+      SYS_CRITERIA_BOARDS_EXCLUDE: "",
+      SYS_CRITERIA_KEYWORDS_INCLUDE: "",
+      SYS_CRITERIA_KEYWORDS_EXCLUDE: "",
+      SYS_CRITERIA_KEYWORDS_CURSEWORDS: "false",
+      SYS_SWAGGER_CONTACT_NAME: "{{ sys_swagger_contact_name }}",
+      SYS_SWAGGER_CONTACT_EMAIL: "{{ sys_swagger_contact_email }}",
+      SYS_SWAGGER_CONTACT_URL: "{{ sys_swagger_contact_url }}",
+      SYS_PROJECT_NAME: "{{ sys_project_name }}",
+      SYS_API_PORT: "{{ sys_api_port }}",
+      SYS_WS_PORT: "{{ sys_ws_port }}",
+      SYS_HUGIN_SYNCER_SLEEP: "{{ sys_hugin_syncer_sleep }}",
+      SYS_RATELIMIT_WINDOW_MS: "{{ sys_ratelimit_window_ms }}",
+      SYS_RATELIMIT_MAX: "{{ sys_ratelimit_max }}"
+    }
+    networks:
+      - name: "host"
+- name: Add docker cronjob to remove old images
+  cron:
+    name: docker_image_removal
+    special_time: weekly
+    job: docker images prune -a --filter "until=7d"
+- include_tasks: docker-users.yml
+  when: docker_users | length > 0

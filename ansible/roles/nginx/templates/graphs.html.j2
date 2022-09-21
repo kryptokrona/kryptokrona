@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hugin API Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet"/>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+<header>
+    <div class="nav-wrapper container">
+        <!-- <h1 style="color: #ffffff;">Hugin API</h1> -->
+        <img src="https://raw.githubusercontent.com/kryptokrona/hugin-api/main/assets/img/hugin-api.png"class="img-fluid" width="20%" height="20%" >
+        <nav>
+            <a class="link-nav" href="/dashboard" target="_blank">Graphs</a>
+            <a class="link-nav" href="https://{{ domain_name }}/api/docs" target="_blank">Docs</a>
+            <a class="link-nav" href="https://github.com/kryptokrona/hugin-api" target="_blank">Github</a>
+        </nav>
+    </div>
+</header>
+<main>
+    <div class="grid container">
+        <div class="custom-card">
+            <div class="card-body">
+                <h5 style="color: #fff">CPU usage (%)</h5>
+                <canvas id="cpuUsage"></canvas>
+            </div>
+        </div>
+        <div class="custom-card">
+            <div class="card-body">
+                <h5 style="color: #fff">RAM usage (%)</h5>
+                <canvas id="ramUsage"></canvas>
+            </div>
+        </div>
+        <div class="custom-card">
+            <div class="card-body">
+                <h5 style="color: #fff">Disk usage (%)</h5>
+                <canvas id="diskUsage"></canvas>
+	     </div>
+	 </div>
+	 <div class="custom-card">
+            <div class="card-body">
+                <h5 style="color: #fff">Total disk / Used disk (GB)</h5>
+                <canvas id="diskSpace"></canvas>
+
+            </div>
+        </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datasource-prometheus/dist/chartjs-plugin-datasource-prometheus.umd.min.js"></script>
+<script>
+    const ctx = document.getElementById('cpuUsage').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        plugins: [ChartDatasourcePrometheusPlugin],
+        options: {
+         animation: {
+            duration: 0,
+        },
+            plugins: {
+                'datasource-prometheus': {
+                    prometheus: {
+                        endpoint: "https://{{ domain_name }}",
+                        baseURL: "/prometheus",   // default value
+                    },
+                    query: '100 - (avg by (instance) (irate(node_cpu_seconds_total{job="node",mode="idle"}[5m])) * 100)',
+                    timeRange: {
+                        type: 'relative',
+
+                        // from 5 minutes ago to now
+                        start: -5 * 60 * 1000,
+                        end: 0,
+                        msUpdateInterval: 5000,
+                    },
+                },
+            },
+        },
+    });
+    const ctx2 = document.getElementById('ramUsage').getContext('2d');
+    var myChart = new Chart(ctx2, {
+        type: 'line',
+        plugins: [ChartDatasourcePrometheusPlugin],
+        options: {
+         animation: {
+            duration: 0,
+        },
+            plugins: {
+                'datasource-prometheus': {
+                    prometheus: {
+                        endpoint: "https://{{ domain_name }}",
+                        baseURL: "/prometheus",   // default value
+                    },
+                    query: '10 * ( avg_over_time(node_memory_MemTotal_bytes[10m])) / (avg_over_time(node_memory_MemFree_bytes[10m]) + avg_over_time(node_memory_Cached_bytes[10m]) + avg_over_time(node_memory_Buffers_bytes[10m]))',
+                    timeRange: {
+                        type: 'relative',
+
+                        // from 12 hours ago to now
+                        start: -12 * 60 * 60 * 1000,
+                        end: 0,
+                        msUpdateInterval: 5000,
+                    },
+                },
+            },
+        },
+    });
+    const ctx3 = document.getElementById('diskUsage').getContext('2d');
+    var myChart = new Chart(ctx3, {
+        type: 'line',
+        plugins: [ChartDatasourcePrometheusPlugin],
+        options: {
+         animation: {
+            duration: 0,
+        },
+            plugins: {
+                'datasource-prometheus': {
+                    prometheus: {
+                        endpoint: "https://{{ domain_name }}",
+                        baseURL: "/prometheus",   // default value
+                    },
+                    query: '100 - (100 * ((node_filesystem_avail_bytes{mountpoint="/",fstype!="rootfs"} )  / (node_filesystem_size_bytes{mountpoint="/",fstype!="rootfs"}) ))',
+                    timeRange: {
+                        type: 'relative',
+
+                        // from 12 hours ago to now
+                        start: -12 * 60 * 60 * 1000,
+                        end: 0,
+                        msUpdateInterval: 5000,
+                    },
+                },
+            },
+        },
+    });
+     const ctx4 = document.getElementById('diskSpace').getContext('2d');
+    var myChart = new Chart(ctx4, {
+        type: 'line',
+        plugins: [ChartDatasourcePrometheusPlugin],
+        options: {
+         animation: {
+            duration: 0,
+        },
+            plugins: {
+                'datasource-prometheus': {
+                    prometheus: {
+                        endpoint: "https://{{ domain_name }}",
+                        baseURL: "/prometheus",   // default value
+                    },
+                    query: ['(node_filesystem_size_bytes{mountpoint="/",fstype!="rootfs"} * 100) / 100000000000','((node_filesystem_size_bytes{mountpoint="/",fstype!="rootfs"} * 100) - (node_filesystem_avail_bytes{mountpoint="/",fstype!="rootfs"} * 100)) / 100000000000'],
+                    timeRange: {
+                        type: 'relative',
+
+                        // from 12 hours ago to now
+                        start: -12 * 60 * 60 * 1000,
+                        end: 0,
+                        msUpdateInterval: 5000,
+                    },
+                },
+            },
+        },
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+@media (prefers-color-scheme: dark) {
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #121212;
+}
+
+h1 {
+    margin: 0;
+}
+
+h2 {
+    color: rgba(102, 153, 102, 0.507);
+    font-size: 40px;
+    text-align: center;
+    font-family: 'Josefin Sans', sans-serif
+}
+
+h5 {
+    color: #6969;
+    height: 40px;
+    font-size: 20px;
+    text-align: center;
+    font-family: 'Josefin Sans', sans-serif
+}
+
+th {
+    color: #E1AD01;
+    height: 80px;
+    font-size: 30px;
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+td {
+    color: #ffdb60;
+    border: rgba(255, 219, 96, .5);
+    border-bottom-style: solid;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+.container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.grid {
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.custom-card {
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #171717;
+    border: 1px solid #252525;
+    grid-column: span 6 / span 6;
+    color: #fff !important;
+}
+
+
+@media screen and (max-width: 768px) {
+    .custom-card {
+        grid-column: span 12 / span 12;
+    }
+}
+
+header {
+    width: 100%;
+}
+
+.nav-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.link-nav {
+    text-decoration: none;
+    color: white;
+    transition: 200ms ease-in-out;
+}
+
+.link-nav:hover {
+    color: rgba(255, 255, 255, 0.56);
+}
+}
+
+@media (prefers-color-scheme: light) {
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        background-color: #f9f8f9;
+    }
+    
+    h1 {
+        margin: 0;
+    }
+    
+    h2 {
+        color: rgba(102, 153, 102, 0.507);
+        font-size: 40px;
+        text-align: center;
+        font-family: 'Josefin Sans', sans-serif
+    }
+    
+    h5 {
+        color: #6969;
+        height: 40px;
+        font-size: 20px;
+        text-align: center;
+        font-family: 'Josefin Sans', sans-serif
+    }
+    
+    th {
+        color: #E1AD01;
+        height: 80px;
+        font-size: 30px;
+        font-family: 'Josefin Sans', sans-serif;
+    }
+    
+    td {
+        color: #ffdb60;
+        border: rgba(255, 219, 96, .5);
+        border-bottom-style: solid;
+        padding: 10px;
+        text-align: center;
+        font-size: 20px;
+        font-family: 'Josefin Sans', sans-serif;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+    
+    .grid {
+        width: 100%;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    
+    .custom-card {
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        border: 1px solid #ced1d2;
+        grid-column: span 6 / span 6;
+        color: #121212 !important;
+    }
+    
+    
+    @media screen and (max-width: 768px) {
+        .custom-card {
+            grid-column: span 12 / span 12;
+        }
+    }
+    
+    header {
+        width: 100%;
+    }
+    
+    .nav-wrapper {
+        display: flex;
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 20px;
+    }
+    
+    nav {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+    
+    .link-nav {
+        text-decoration: none;
+        color: black;
+        transition: 200ms ease-in-out;
+    }
+    
+    .link-nav:hover {
+        color: rgba(255, 255, 255, 0.56);
+    }
+}

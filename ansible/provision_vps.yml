@@ -1,0 +1,70 @@
+---
+- hosts: vps
+  remote_user: root
+  become: true
+  gather_facts: yes
+  vars:
+    hugin_api_name: hugin_api
+    hugin_api_port: 3000
+
+    # Docker GitHub Container Registry
+    docker_image: "ghcr.io/kryptokrona/hugin-api"
+
+    # A list of users who will be added to the docker group.
+    docker_users: [
+      "hugin_docker"
+    ]
+
+    docker_container_name: hugin-api
+    docker_network_name: hugin
+
+    # Docker daemon options as a dict
+    docker_daemon_options: { }
+
+    # Prometheus configuration
+    prometheus_targets:
+      node:
+      - targets:
+        - "{{ domain_name }}:9100"
+        labels:
+          env: prod
+
+    node_exporter_version: "{{ exporter_version }}"
+
+    website_name: hugin_api
+    web_server_ip: "{{ domain_name }}"
+    web_server_port: "443"
+    hidden_service_port: "443"
+
+    # DO NOT CONFIGURE THE ABOVE YOURSELF
+
+    removal_interval: '1 years 2 months 3 days 2 hours 1 minutes 1 second'
+    hugin_node_server: 'blocksum.org:11898'
+
+    sys_criteria_users_include: ''
+    sys_criteria_users_exclude: ''
+    sys_criteria_boards_include: ''
+    sys_criteria_boards_exclude: ''
+    sys_criteria_keywords_include: ''
+    sys_criteria_keywords_exclude: ''
+    sys_criteria_keywords_cursewords: 'false'
+    sys_ratelimit_window_ms: '900000'
+    sys_ratelimit_max: '1000'
+
+    sys_swagger_contact_name: 'Marcus Cvjeticanin'
+    sys_swagger_contact_email: 'mjovanc@icloud.com'
+    sys_swagger_contact_url: 'https://github.com/kryptokrona/hugin-api/issues'
+
+    sys_api_port: '3000'
+    sys_ws_port: '8080'
+    sys_hugin_syncer_sleep: '2000'
+
+    sys_project_name: 'Hugin API'
+
+  roles:
+  #- base
+  - postgres
+  - docker
+  - nginx
+  - prometheus
+  - onion

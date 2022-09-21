@@ -1,0 +1,15 @@
+-- This file is used in the cron job to delete data periodically
+-- if we want to change for how long timespan we want to keep data
+-- you could add whole line inside the string below to
+-- 6 years 5 months 4 days 3 hours 2 minutes 1 second
+WITH posts_to_delete AS (
+    SELECT id
+    FROM post
+    WHERE created_at < CURRENT_DATE - '{{ removal_interval }}'::INTERVAL
+),
+deleted_refs AS (
+    DELETE FROM post_hashtag ph
+        WHERE ph.post_id IN (SELECT * FROM posts_to_delete)
+)
+DELETE FROM post p
+    WHERE p.id IN (SELECT * FROM posts_to_delete);

@@ -1,0 +1,8 @@
+# hosts.inventory
+# add hostname or IP under vps
+
+[vps]
+api.hugin.chat letsencrypt_email=mjovanc@icloud.com domain_name=api.hugin.chat exporter_version=1.3.1
+
+[server]
+localhost ansible_connection=local

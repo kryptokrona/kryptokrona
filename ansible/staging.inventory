@@ -1,0 +1,8 @@
+# hosts.inventory
+# add hostname or IP under vps
+
+[vps]
+test-api.novastack.org letsencrypt_email=techy@novastack.org domain_name=test-api.novastack.org exporter_version=1.3.1
+
+[server]
+localhost ansible_connection=local

@@ -1,0 +1,84 @@
+---
+- name: Ensure nginx is at the latest version
+  apt:
+    name: nginx
+    state: latest
+
+- name: Install Let's Encrypt
+  apt:
+    name: letsencrypt
+    state: latest
+  
+- name: Create Let's Encrypt Directory
+  file:
+    name: /var/www/letsencrypt
+    state: directory
+
+- name: Remove Default Let's Encrypt Config
+  file:
+    name: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Install System NGINX Config
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+
+- name: Install NGINX Site For Let's Encrypt Requests
+  template:
+    src: templates/nginx-http.j2
+    dest: /etc/nginx/sites-enabled/http
+
+- name: Reload NGINX to activate Let's Encrypt site
+  service:
+    name: nginx
+    state: restarted
+
+- name: Create Let's Encrypt certificate
+  shell: letsencrypt certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ domain_name }}
+  args:
+    creates: /etc/letsencrypt/live/{{ domain_name }}
+
+- name: Generate dhparams
+  shell: openssl dhparam -out /etc/nginx/dhparams.pem 2048
+  args:
+    creates: /etc/nginx/dhparams.pem
+  
+- name: Install NGINX Site For Specified Site
+  template:
+    src: templates/nginx-le.j2
+    dest: /etc/nginx/sites-enabled/le
+
+- name: Reload NGINX To Activate Specified Site
+  service:
+    name: nginx
+    state: restarted
+
+- name: Add Let's Encrypt cronjob For Certificate Renewal
+  cron:
+    name: letsencrypt_renewal
+    special_time: weekly
+    job: letsencrypt --renew certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ domain_name }} && service nginx reload
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: Remove default NGINX page
+  shell: rm -rf /var/www/html/*
+
+- name: Add graphs page
+  template:
+    src: templates/graphs.html.j2
+    dest: /var/www/html/graphs.html
+
+- name: Add graphs CSS
+  template:
+    src: templates/style.css
+    dest: /var/www/html/style.css
+
+- name: Add favicon 
+  template:
+    src: templates/favicon.ico
+    dest: /var/www/html/favicon.ico

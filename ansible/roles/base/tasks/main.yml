@@ -1,0 +1,64 @@
+---
+- name: Create the non-root user
+  user:
+    name: "{{ vault_vps_user }}"
+    password: "{{ vault_vps_password | password_hash('sha512') }}"
+    shell: "/bin/bash"
+
+- name: Add local public key for key-based SSH authentication
+  authorized_key:
+    user: "{{ vault_vps_user }}"
+    key: "{{item}}"
+  with_file:
+    - ~/.ssh/id_hugin_api.pub
+
+- name: Restrict root SSH logins
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    state: present
+    regexp: '^#PermitRootLogin'
+    line: 'PermitRootLogin no'
+
+- name: Restrict SSH logins to keys only
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    state: present
+    regexp: '^#PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+
+- name: Restart sshd
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: sshd
+
+- name: Install ACL
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - acl
+
+- name: Iptables port 22
+  shell: iptables -C INPUT -s 0/0 -p tcp --dport 22 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 22 -j ACCEPT
+
+- name: Iptables port 443
+  shell: iptables -C INPUT -s 0/0 -p tcp --dport 443 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 443 -j ACCEPT
+
+- name: Iptables port 80
+  shell: iptables -C INPUT -s 0/0 -p tcp --dport 80 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 80 -j ACCEPT
+
+- name: Iptables port 9090
+  shell: iptables -C INPUT -s 0/0 -p tcp --dport 9090 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 9090 -j ACCEPT
+
+- name: Iptables port 9100
+  shell: iptables -C INPUT -s 0/0 -p tcp --dport 9100 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 9100 -j ACCEPT
+
+- name: Iptables Websocket port
+  shell : "iptables -C INPUT -s 0/0 -p tcp --dport {{ sys_ws_port }} -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport {{ sys_ws_port }} -j ACCEPT"
+
+- name:  Save iptables changes
+  shell: iptables-save > /etc/network/iptables.rules
+
+
