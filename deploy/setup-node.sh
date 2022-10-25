@@ -74,7 +74,6 @@ fi
 echo ""
 echo "###### BULDING DOCKER IMAGE ######"
 echo ""
-(cd ./kryptokrona && git checkout docker-prod) # remove this line after when finished
 (cd ./kryptokrona && docker build -f ./deploy/Dockerfile -t kryptokrona/kryptokrona-node .)
 
 echo ""
