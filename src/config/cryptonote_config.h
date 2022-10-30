@@ -13,10 +13,8 @@
 #include <initializer_list>
 #include <boost/uuid/uuid.hpp>
 
-namespace CryptoNote
-{
-  namespace parameters
-  {
+namespace cryptonote {
+namespace parameters {
 
     const uint64_t DIFFICULTY_TARGET = 90; // seconds
 
