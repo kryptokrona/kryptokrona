@@ -4,34 +4,34 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 
 #include "daemon_configuration.h"
 #include "daemon_commands_handler.h"
-#include "Common/ScopeExit.h"
-#include "Common/SignalHandler.h"
-#include "Common/StdOutputStream.h"
-#include "Common/StdInputStream.h"
-#include "Common/PathTools.h"
-#include "Common/Util.h"
-#include "Common/FileSystemShim.h"
+#include "common/scope_exit.h"
+#include "common/signal_handler.h"
+#include "common/std_output_stream.h"
+#include "common/std_input_stream.h"
+#include "common/path_tools.h"
+#include "common/util.h"
+#include "common/file_system_shim.h"
 #include "crypto/hash.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/Core.h"
-#include "CryptoNoteCore/Currency.h"
-#include "CryptoNoteCore/DatabaseBlockchainCache.h"
-#include "CryptoNoteCore/DatabaseBlockchainCacheFactory.h"
-#include "CryptoNoteCore/MainChainStorage.h"
-#include "CryptoNoteCore/RocksDBWrapper.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
-#include "P2p/NetNode.h"
-#include "P2p/NetNodeConfig.h"
-#include "Rpc/RpcServer.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
+#include "cryptonote_core/cryptonote_tools.h"
+#include "cryptonote_core/core.h"
+#include "cryptonote_core/currency.h"
+#include "cryptonote_core/database_blockchain_cache.h"
+#include "cryptonote_core/database_blockchain_cache_factory.h"
+#include "cryptonote_core/main_chain_storage.h"
+#include "cryptonote_core/rocks_db_wrapper.h"
+#include "cryptonote_protocol/cryptonote_protocol_handler.h"
+#include "p2p/net_node.h"
+#include "p2p/net_node_config.h"
+#include "rpc/rpc_server.h"
+#include "serialization/binary_input_stream_serializer.h"
+#include "serialization/binary_output_stream_serializer.h"
 
-#include <config/CryptoNoteCheckpoints.h>
-#include <Logging/LoggerManager.h>
+#include <config/cryptonote_checkpoints.h>
+#include <logging/logger_manager.h>
 
 #if defined(WIN32)
 #include <crtdbg.h>
@@ -40,7 +40,7 @@
 #include <unistd.h>
 #endif
 
-using Common::JsonValue;
+using common::json_value;
 using namespace cryptonote;
 using namespace logging;
 using namespace daemon_config;

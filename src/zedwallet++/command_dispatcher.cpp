@@ -3,18 +3,18 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////////////
-#include <zedwallet++/CommandDispatcher.h>
+#include <zedwallet++/command_dispatcher.h>
 //////////////////////////////////////////
 
 #include <iostream>
 
-#include <zedwallet++/AddressBook.h>
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/CommandImplementations.h>
-#include <zedwallet++/Open.h>
-#include <zedwallet++/Transfer.h>
-#include <zedwallet++/Fusion.h>
-#include <zedwallet++/Utilities.h>
+#include <zedwallet++/address_book.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/command_implementations.h>
+#include <zedwallet++/open.h>
+#include <zedwallet++/transfer.h>
+#include <zedwallet++/fusion.h>
+#include <zedwallet++/utilities.h>
 
 bool handleCommand(
     const std::string command,

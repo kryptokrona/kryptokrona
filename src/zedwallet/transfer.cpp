@@ -3,33 +3,33 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////
-#include <zedwallet/Transfer.h>
+#include <zedwallet/transfer.h>
 ///////////////////////////////
 
 #include <thread>
 
-#include <Common/Base58.h>
-#include <Common/StringTools.h>
+#include <common/base58.h>
+#include <common/string_tools.h>
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
+#include <cryptonote_core/cryptonote_tools.h>
+#include <cryptonote_core/transaction_extra.h>
 
-#include "IWallet.h"
+#include "iwallet.h"
 
-#include <NodeRpcProxy/NodeErrors.h>
+#include <node_rpc_proxy/node_errors.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet/Fusion.h>
-#include <zedwallet/Tools.h>
-#include <config/WalletConfig.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet/fusion.h>
+#include <zedwallet/tools.h>
+#include <config/wallet_config.h>
 
-#include <Wallet/WalletErrors.h>
+#include <wallet/wallet_errors.h>
 
-#include <Wallet/WalletGreen.h>
-#include <Wallet/WalletUtils.h>
+#include <wallet/wallet_green.h>
+#include <wallet/wallet_utils.h>
 
 bool parseAmount(std::string strAmount, uint64_t &amount)
 {

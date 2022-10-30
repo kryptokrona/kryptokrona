@@ -20,85 +20,84 @@
 #include <chrono>
 #include <vector>
 
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/Event.h>
-#include <System/TcpConnection.h>
-#include <System/Timer.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
+#include <system/tcp_connection.h>
+#include <system/timer.h>
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 #include "levin_protocol.h"
 #include "p2p_interfaces.h"
 #include "p2p_protocol_definitions.h"
 #include "p2p_protocol_types.h"
 
-namespace cryptonote {
-  
-class P2pContext {
-public:
-  using Clock = std::chrono::steady_clock;
-  using TimePoint = Clock::time_point;
+namespace cryptonote
+{
+    class P2pContext {
+    public:
+      using Clock = std::chrono::steady_clock;
+      using TimePoint = Clock::time_point;
 
-  struct Message : P2pMessage {
-    enum Type {
-      NOTIFY,
-      REQUEST,
-      REPLY
+      struct Message : P2pMessage {
+        enum Type {
+          NOTIFY,
+          REQUEST,
+          REPLY
+        };
+
+        Type messageType;
+        uint32_t returnCode;
+
+        Message(P2pMessage&& msg, Type messageType, uint32_t returnCode = 0);
+        size_t size() const;
+      };
+
+      P2pContext(System::Dispatcher& dispatcher, System::TcpConnection&& conn,
+        bool isIncoming, const NetworkAddress& remoteAddress, std::chrono::nanoseconds timedSyncInterval, const CORE_SYNC_DATA& timedSyncData);
+      ~P2pContext();
+
+      uint64_t getPeerId() const;
+      uint16_t getPeerPort() const;
+      const NetworkAddress& getRemoteAddress() const;
+      bool isIncoming() const;
+
+      void setPeerInfo(uint8_t protocolVersion, uint64_t id, uint16_t port);
+      bool readCommand(LevinProtocol::Command& cmd);
+      void writeMessage(const Message& msg);
+
+      void start();
+      void stop();
+
+    private:
+
+      uint8_t version = 0;
+      const bool incoming;
+      const NetworkAddress remoteAddress;
+      uint64_t peerId = 0;
+      uint16_t peerPort = 0;
+
+      System::Dispatcher& dispatcher;
+      System::ContextGroup contextGroup;
+      const TimePoint timeStarted;
+      bool stopped = false;
+      TimePoint lastReadTime;
+
+      // timed sync info
+      const std::chrono::nanoseconds timedSyncInterval;
+      const CORE_SYNC_DATA& timedSyncData;
+      System::Timer timedSyncTimer;
+      System::Event timedSyncFinished;
+
+      System::TcpConnection connection;
+      System::Event writeEvent;
+      System::Event readEvent;
+
+      void timedSyncLoop();
     };
 
-    Type messageType;
-    uint32_t returnCode;
+    P2pContext::Message makeReply(uint32_t command, const BinaryArray& data, uint32_t returnCode);
+    P2pContext::Message makeRequest(uint32_t command, const BinaryArray& data);
 
-    Message(P2pMessage&& msg, Type messageType, uint32_t returnCode = 0);
-    size_t size() const;
-  };
-
-  P2pContext(System::Dispatcher& dispatcher, System::TcpConnection&& conn, 
-    bool isIncoming, const NetworkAddress& remoteAddress, std::chrono::nanoseconds timedSyncInterval, const CORE_SYNC_DATA& timedSyncData);
-  ~P2pContext();
-
-  uint64_t getPeerId() const;
-  uint16_t getPeerPort() const;
-  const NetworkAddress& getRemoteAddress() const;
-  bool isIncoming() const;
-
-  void setPeerInfo(uint8_t protocolVersion, uint64_t id, uint16_t port);
-  bool readCommand(LevinProtocol::Command& cmd);
-  void writeMessage(const Message& msg);
- 
-  void start();
-  void stop();
-
-private:
-
-  uint8_t version = 0;
-  const bool incoming;
-  const NetworkAddress remoteAddress;
-  uint64_t peerId = 0;
-  uint16_t peerPort = 0;
-
-  System::Dispatcher& dispatcher;
-  System::ContextGroup contextGroup;
-  const TimePoint timeStarted;
-  bool stopped = false;
-  TimePoint lastReadTime;
-
-  // timed sync info
-  const std::chrono::nanoseconds timedSyncInterval;
-  const CORE_SYNC_DATA& timedSyncData;
-  System::Timer timedSyncTimer;
-  System::Event timedSyncFinished;
-
-  System::TcpConnection connection;
-  System::Event writeEvent;
-  System::Event readEvent;
-
-  void timedSyncLoop();
-};
-
-P2pContext::Message makeReply(uint32_t command, const BinaryArray& data, uint32_t returnCode);
-P2pContext::Message makeRequest(uint32_t command, const BinaryArray& data);
-
-std::ostream& operator <<(std::ostream& s, const P2pContext& conn);
-
+    std::ostream& operator <<(std::ostream& s, const P2pContext& conn);
 }

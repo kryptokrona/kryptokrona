@@ -3,20 +3,20 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////
-#include <zedwallet++/GetInput.h>
+#include <zedwallet++/get_input.h>
 /////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include "linenoise.hpp"
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/Commands.h>
-#include <zedwallet++/Utilities.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/commands.h>
+#include <zedwallet++/utilities.h>
 
 /* Note: this is not portable, it only works with terminals that support ANSI
    codes (e.g., not windows) - however! due to the way linenoise-cpp works,

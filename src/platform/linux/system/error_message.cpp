@@ -19,14 +19,13 @@
 #include <cerrno>
 #include <cstring>
 
-namespace system {
+namespace system
+{
+    std::string lastErrorMessage() {
+      return errorMessage(errno);
+    }
 
-std::string lastErrorMessage() {
-  return errorMessage(errno);
-}
-
-std::string errorMessage(int err) {
-  return "result=" + std::to_string(err) + ", " + std::strerror(err);
-}
-
+    std::string errorMessage(int err) {
+      return "result=" + std::to_string(err) + ", " + std::strerror(err);
+    }
 }

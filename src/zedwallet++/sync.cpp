@@ -3,19 +3,19 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////
-#include <zedwallet++/Sync.h>
+#include <zedwallet++/sync.h>
 /////////////////////////////
 
-#include <Common/SignalHandler.h>
+#include <common/signal_handler.h>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <iostream>
 
 #include <thread>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/CommandImplementations.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/command_implementations.h>
 
 void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
 {

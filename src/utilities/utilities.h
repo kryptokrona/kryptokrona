@@ -8,7 +8,7 @@
 
 #include <chrono>
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
 #include <iomanip>
 
@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include <Errors/Errors.h>
+#include <errors/errors.h>
 
 namespace utilities
 {

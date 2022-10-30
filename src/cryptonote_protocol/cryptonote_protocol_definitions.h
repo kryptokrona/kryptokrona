@@ -7,17 +7,16 @@
 #pragma once
 
 #include <list>
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 
 // ISerializer-based serialization
-#include "Serialization/ISerializer.h"
-#include "Serialization/SerializationOverloads.h"
-#include "CryptoNoteCore/CryptoNoteSerialization.h"
+#include "serialization/iserializer.h"
+#include "serialization/serialization_overloads.h"
+#include "cryptonote_core/cryptonote_serialization.h"
 
 namespace cryptonote
 {
-
-#define BC_COMMANDS_POOL_BASE 2000
+    #define BC_COMMANDS_POOL_BASE 2000
 
   /************************************************************************/
   /*                                                                      */

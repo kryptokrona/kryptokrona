@@ -17,24 +17,24 @@
 
 #include "blockchain_utils.h"
 
-namespace cryptonote {
-namespace utils {
+namespace cryptonote
+{
+    namespace utils
+    {
+        bool restoreCachedTransactions(const std::vector<BinaryArray>& binaryTransactions,
+                                       std::vector<CachedTransaction>& transactions) {
+          transactions.reserve(binaryTransactions.size());
 
-bool restoreCachedTransactions(const std::vector<BinaryArray>& binaryTransactions,
-                               std::vector<CachedTransaction>& transactions) {
-  transactions.reserve(binaryTransactions.size());
+          for (auto binaryTransaction : binaryTransactions) {
+            Transaction transaction;
+            if (!fromBinaryArray(transaction, binaryTransaction)) {
+              return false;
+            }
 
-  for (auto binaryTransaction : binaryTransactions) {
-    Transaction transaction;
-    if (!fromBinaryArray(transaction, binaryTransaction)) {
-      return false;
+            transactions.emplace_back(std::move(transaction));
+          }
+
+          return true;
+        }
     }
-
-    transactions.emplace_back(std::move(transaction));
-  }
-
-  return true;
-}
-
-}
 }

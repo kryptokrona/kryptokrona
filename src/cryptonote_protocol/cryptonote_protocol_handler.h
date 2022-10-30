@@ -8,22 +8,23 @@
 
 #include <atomic>
 
-#include <Common/ObserverManager.h>
+#include <common/observer_manager.h>
 
-#include "CryptoNoteCore/ICore.h"
+#include "cryptonote_core/icore.h"
 
-#include "CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h"
-#include "CryptoNoteProtocol/ICryptoNoteProtocolObserver.h"
-#include "CryptoNoteProtocol/ICryptoNoteProtocolQuery.h"
+#include "cryptonote_protocol/cryptonote_protocol_definitions.h"
+#include "cryptonote_protocol/cryptonote_protocol_handler_common.h"
+#include "cryptonote_protocol/icryptonote_protocol_observer.h"
+#include "cryptonote_protocol/icryptonote_protocol_query.h"
 
-#include "P2p/P2pProtocolDefinitions.h"
-#include "P2p/NetNodeCommon.h"
-#include "P2p/ConnectionContext.h"
+#include "p2p/p2p_protocol_definitions.h"
+#include "p2p/net_node_common.h"
+#include "p2p/connection_context.h"
 
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 
-namespace system {
+namespace system
+{
   class Dispatcher;
 }
 

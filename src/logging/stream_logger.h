@@ -20,22 +20,21 @@
 #include <mutex>
 #include "common_logger.h"
 
-namespace logging {
+namespace logging
+{
+    class StreamLogger : public CommonLogger {
+    public:
+      StreamLogger(Level level = DEBUGGING);
+      StreamLogger(std::ostream& stream, Level level = DEBUGGING);
+      void attachToStream(std::ostream& stream);
 
-class StreamLogger : public CommonLogger {
-public:
-  StreamLogger(Level level = DEBUGGING);
-  StreamLogger(std::ostream& stream, Level level = DEBUGGING);
-  void attachToStream(std::ostream& stream);
+    protected:
+      virtual void doLogString(const std::string& message) override;
 
-protected:
-  virtual void doLogString(const std::string& message) override;
+    protected:
+      std::ostream* stream;
 
-protected:
-  std::ostream* stream;
-
-private:
-  std::mutex mutex;
-};
-
+    private:
+      std::mutex mutex;
+    };
 }

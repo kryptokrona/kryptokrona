@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   struct BlockInfo {
     uint32_t height;
     Crypto::Hash id;
@@ -48,5 +48,4 @@ namespace cryptonote {
     virtual bool haveSpentKeyImages(const CryptoNote::Transaction& tx) = 0;
     virtual bool checkTransactionSize(size_t blobSize) = 0;
   };
-
 }

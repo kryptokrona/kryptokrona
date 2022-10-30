@@ -21,12 +21,11 @@
 #include <string>
 #include <utility>
 
-namespace CryptoNote {
-
-class IWriteBatch {
-public:
-  virtual std::vector<std::pair<std::string, std::string>> extractRawDataToInsert() = 0;
-  virtual std::vector<std::string> extractRawKeysToRemove() = 0;
-};
-
-} //namespace CryptoNote
+namespace cryptonote
+{
+    class IReadBatch {
+    public:
+      virtual std::vector<std::string> getRawKeys() const = 0;
+      virtual void submitRawResult(const std::vector<std::string>& values, const std::vector<bool>& resultStates) = 0;
+    };
+}

@@ -17,13 +17,13 @@
 
 #pragma once
 
-namespace CryptoNote {
+#include <sstream>
 
-template <typename T>
-class IObservable {
-public:
-  virtual void addObserver(T* observer) = 0;
-  virtual void removeObserver(T* observer) = 0;
-};
-
+namespace cryptonote
+{
+    class IStreamSerializable {
+    public:
+      virtual void save(std::ostream& os) = 0;
+      virtual void load(std::istream& in) = 0;
+    };
 }

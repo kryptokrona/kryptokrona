@@ -21,18 +21,18 @@
 #include <atomic>
 #include <unordered_set>
 
-#include "IBlockchainExplorer.h"
-#include "INode.h"
+#include "iblockchain_explorer.h"
+#include "inode.h"
 
 #include "blockchain_explorer_errors.h"
-#include "Common/ObserverManager.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
-#include "Wallet/WalletAsyncContextCounter.h"
+#include "common/observer_manager.h"
+#include "serialization/binary_input_stream_serializer.h"
+#include "serialization/binary_output_stream_serializer.h"
+#include "wallet/wallet_async_context_counter.h"
 
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 enum State {
   NOT_INITIALIZED,

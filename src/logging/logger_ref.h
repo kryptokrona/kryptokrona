@@ -20,17 +20,16 @@
 #include "ilogger.h"
 #include "logger_message.h"
 
-namespace logging {
+namespace logging
+{
+    class LoggerRef {
+    public:
+      LoggerRef(std::shared_ptr<ILogger> logger, const std::string& category);
+      LoggerMessage operator()(Level level = INFO, const std::string& color = DEFAULT) const;
+      std::shared_ptr<ILogger> getLogger() const;
 
-class LoggerRef {
-public:
-  LoggerRef(std::shared_ptr<ILogger> logger, const std::string& category);
-  LoggerMessage operator()(Level level = INFO, const std::string& color = DEFAULT) const;
-  std::shared_ptr<ILogger> getLogger() const;
-
-private:
-  std::shared_ptr<ILogger> logger;
-  std::string category;
-};
-
+    private:
+      std::shared_ptr<ILogger> logger;
+      std::string category;
+    };
 }

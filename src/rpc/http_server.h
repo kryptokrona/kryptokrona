@@ -19,43 +19,42 @@
 
 #include <unordered_set>
 
-#include <HTTP/HttpRequest.h>
-#include <HTTP/HttpResponse.h>
+#include <http/http_request.h>
+#include <http/http_response.h>
 
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/TcpListener.h>
-#include <System/TcpConnection.h>
-#include <System/Event.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/tcp_listener.h>
+#include <system/tcp_connection.h>
+#include <system/event.h>
 
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 
-namespace cryptonote {
+namespace cryptonote
+{
+    class HttpServer {
 
-class HttpServer {
+    public:
 
-public:
+      HttpServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log);
 
-  HttpServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log);
+      void start(const std::string& address, uint16_t port);
+      void stop();
 
-  void start(const std::string& address, uint16_t port);
-  void stop();
+      virtual void processRequest(const HttpRequest& request, HttpResponse& response) = 0;
 
-  virtual void processRequest(const HttpRequest& request, HttpResponse& response) = 0;
+    protected:
 
-protected:
+      System::Dispatcher& m_dispatcher;
 
-  System::Dispatcher& m_dispatcher;
+    private:
 
-private:
+      void acceptLoop();
+      void connectionHandler(System::TcpConnection&& conn);
 
-  void acceptLoop();
-  void connectionHandler(System::TcpConnection&& conn);
-
-  System::ContextGroup workingContextGroup;
-  Logging::LoggerRef logger;
-  System::TcpListener m_listener;
-  std::unordered_set<System::TcpConnection*> m_connections;
-};
-
+      System::ContextGroup workingContextGroup;
+      Logging::LoggerRef logger;
+      System::TcpListener m_listener;
+      std::unordered_set<System::TcpConnection*> m_connections;
+    };
 }

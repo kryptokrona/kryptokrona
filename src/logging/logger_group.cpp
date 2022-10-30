@@ -18,21 +18,20 @@
 #include "logger_group.h"
 #include <algorithm>
 
-namespace logging {
-
-LoggerGroup::LoggerGroup(Level level) : CommonLogger(level) {
-}
-
-void LoggerGroup::addLogger(ILogger& logger) {
-  loggers.push_back(&logger);
-}
-
-void LoggerGroup::operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) {
-  if (level <= logLevel && disabledCategories.count(category) == 0) {
-    for (auto& logger : loggers) {
-      (*logger)(category, level, time, body);
+namespace logging
+{
+    LoggerGroup::LoggerGroup(Level level) : CommonLogger(level) {
     }
-  }
-}
 
+    void LoggerGroup::addLogger(ILogger& logger) {
+      loggers.push_back(&logger);
+    }
+
+    void LoggerGroup::operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) {
+      if (level <= logLevel && disabledCategories.count(category) == 0) {
+        for (auto& logger : loggers) {
+          (*logger)(category, level, time, body);
+        }
+      }
+    }
 }

@@ -22,6 +22,7 @@
 
 #include "crypto/hash.h"
 
-namespace cryptonote {
-bool check_hash(const Crypto::Hash &hash, uint64_t difficulty);
+namespace cryptonote
+{
+    bool check_hash(const Crypto::Hash &hash, uint64_t difficulty);
 }

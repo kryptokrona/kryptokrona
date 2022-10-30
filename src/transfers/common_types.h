@@ -23,21 +23,20 @@
 
 #include <boost/optional.hpp>
 
-#include "INode.h"
-#include "ITransaction.h"
+#include "inode.h"
+#include "itransaction.h"
 
-namespace cryptonote {
+namespace cryptonote
+{
+    struct BlockchainInterval {
+      uint32_t startHeight;
+      std::vector<Crypto::Hash> blocks;
+    };
 
-struct BlockchainInterval {
-  uint32_t startHeight;
-  std::vector<Crypto::Hash> blocks;
-};
-
-struct CompleteBlock {
-  Crypto::Hash blockHash;
-  boost::optional<CryptoNote::BlockTemplate> block;
-  // first transaction is always coinbase
-  std::list<std::shared_ptr<ITransactionReader>> transactions;
-};
-
+    struct CompleteBlock {
+      Crypto::Hash blockHash;
+      boost::optional<CryptoNote::BlockTemplate> block;
+      // first transaction is always coinbase
+      std::list<std::shared_ptr<ITransactionReader>> transactions;
+    };
 }

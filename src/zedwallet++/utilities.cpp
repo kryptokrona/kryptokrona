@@ -3,19 +3,19 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////
-#include <zedwallet++/Utilities.h>
+#include <zedwallet++/utilities.h>
 //////////////////////////////////
 
 #include <cmath>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <fstream>
 
 #include <iostream>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/PasswordContainer.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/password_container.h>
 
 namespace zed_utilities
 {

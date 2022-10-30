@@ -17,13 +17,12 @@
 
 #pragma once
 
-namespace cryptonote {
-
-class ICoreObserver {
-public:
-  virtual ~ICoreObserver() {};
-  virtual void blockchainUpdated() {};
-  virtual void poolUpdated() {};
-};
-
+namespace cryptonote
+{
+    class ICoreObserver {
+    public:
+      virtual ~ICoreObserver() {};
+      virtual void blockchainUpdated() {};
+      virtual void poolUpdated() {};
+    };
 }

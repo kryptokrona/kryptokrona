@@ -20,27 +20,26 @@
 #include <cstdint>
 #include <string>
 
-namespace system {
+namespace system
+{
+    class Dispatcher;
+    class Ipv4Address;
+    class TcpConnection;
 
-class Dispatcher;
-class Ipv4Address;
-class TcpConnection;
+    class TcpListener {
+    public:
+      TcpListener();
+      TcpListener(Dispatcher& dispatcher, const Ipv4Address& address, uint16_t port);
+      TcpListener(const TcpListener&) = delete;
+      TcpListener(TcpListener&& other);
+      ~TcpListener();
+      TcpListener& operator=(const TcpListener&) = delete;
+      TcpListener& operator=(TcpListener&& other);
+      TcpConnection accept();
 
-class TcpListener {
-public:
-  TcpListener();
-  TcpListener(Dispatcher& dispatcher, const Ipv4Address& address, uint16_t port);
-  TcpListener(const TcpListener&) = delete;
-  TcpListener(TcpListener&& other);
-  ~TcpListener();
-  TcpListener& operator=(const TcpListener&) = delete;
-  TcpListener& operator=(TcpListener&& other);
-  TcpConnection accept();
-
-private:
-  Dispatcher* dispatcher;
-  void* context;
-  int listener;
-};
-
+    private:
+      Dispatcher* dispatcher;
+      void* context;
+      int listener;
+    };
 }

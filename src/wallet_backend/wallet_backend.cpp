@@ -3,19 +3,19 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////////
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 ////////////////////////////////////////
 
-#include <Common/Base58.h>
-#include <Common/FileSystemShim.h>
+#include <common/base58.h>
+#include <common/file_system_shim.h>
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 #include <crypto/random.h>
 
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/account.h>
+#include <cryptonote_core/cryptonote_tools.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 
 #include <cryptopp/aes.h>
 #include <cryptopp/algparam.h>
@@ -24,7 +24,7 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/pwdbased.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include <fstream>
 
@@ -32,18 +32,18 @@
 
 #include <iomanip>
 
-#include "JsonHelper.h"
+#include "json_helper.h"
 
-#include <Mnemonics/Mnemonics.h>
+#include <mnemonics/mnemonics.h>
 
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include <Utilities/Addresses.h>
-#include <Utilities/Utilities.h>
+#include <utilities/addresses.h>
+#include <utilities/utilities.h>
 
-#include <WalletBackend/Constants.h>
-#include <WalletBackend/Transfer.h>
+#include <wallet_backend/constants.h>
+#include <wallet_backend/transfer.h>
 
 using namespace rapidjson;
 

@@ -3,23 +3,23 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////
-#include <zedwallet/Open.h>
+#include <zedwallet/open.h>
 ///////////////////////////
 
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/account.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 
-#include <Mnemonics/Mnemonics.h>
+#include <mnemonics/mnemonics.h>
 
-#include <Wallet/WalletErrors.h>
+#include <wallet/wallet_errors.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet/CommandImplementations.h>
-#include <zedwallet/Tools.h>
-#include <zedwallet/Transfer.h>
-#include <zedwallet/Types.h>
-#include <zedwallet/PasswordContainer.h>
-#include <config/WalletConfig.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet/command_implementations.h>
+#include <zedwallet/tools.h>
+#include <zedwallet/transfer.h>
+#include <zedwallet/types.h>
+#include <zedwallet/password_container.h>
+#include <config/wallet_config.h>
 
 std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet)
 {

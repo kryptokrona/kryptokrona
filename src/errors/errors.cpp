@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////
-#include <Errors/Errors.h>
+#include <errors/errors.h>
 //////////////////////////
 
 std::string Error::getErrorMessage() const

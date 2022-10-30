@@ -3,24 +3,24 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////////////////////
-#include <zedwallet++/CommandImplementations.h>
+#include <zedwallet++/command_implementations.h>
 ///////////////////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include <fstream>
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/Commands.h>
-#include <zedwallet++/GetInput.h>
-#include <zedwallet++/Menu.h>
-#include <zedwallet++/Open.h>
-#include <zedwallet++/Sync.h>
-#include <zedwallet++/Utilities.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/commands.h>
+#include <zedwallet++/get_input.h>
+#include <zedwallet++/menu.h>
+#include <zedwallet++/open.h>
+#include <zedwallet++/sync.h>
+#include <zedwallet++/utilities.h>
 
 void changePassword(const std::shared_ptr<WalletBackend> walletBackend)
 {

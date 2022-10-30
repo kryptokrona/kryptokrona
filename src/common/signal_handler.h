@@ -19,8 +19,8 @@
 
 #include <functional>
 
-namespace tools {
-  
+namespace tools
+{
   class SignalHandler
   {
   public:

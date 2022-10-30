@@ -3,12 +3,12 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////
-#include <WalletApi/ApiDispatcher.h>
+#include <wallet_api/api_dispatcher.h>
 ////////////////////////////////////
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
-#include <CryptoNoteCore/Mixins.h>
+#include <cryptonote_core/mixins.h>
 
 #include <crypto/random.h>
 
@@ -16,7 +16,7 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/pwdbased.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include <iomanip>
 
@@ -24,9 +24,9 @@
 
 #include "json.hpp"
 
-#include <WalletApi/Constants.h>
+#include <wallet_api/constants.h>
 
-#include <WalletBackend/JsonSerialization.h>
+#include <wallet_backend/json_serialization.h>
 
 using namespace httplib;
 

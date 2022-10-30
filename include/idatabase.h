@@ -17,14 +17,21 @@
 
 #pragma once
 
-#include <sstream>
+#include <string>
+#include <system_error>
 
-namespace CryptoNote {
+#include "iwrite_batch.h"
+#include "iread_batch.h"
 
-class IStreamSerializable {
-public:
-  virtual void save(std::ostream& os) = 0;
-  virtual void load(std::istream& in) = 0;
-};
+namespace cryptonote
+{
+    class IDataBase {
+    public:
+      virtual ~IDataBase() {
+      }
 
+      virtual std::error_code write(IWriteBatch& batch) = 0;
+
+      virtual std::error_code read(IReadBatch& batch) = 0;
+    };
 }

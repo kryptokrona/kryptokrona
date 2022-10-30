@@ -3,36 +3,36 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////////////////
-#include <zedwallet/CommandImplementations.h>
+#include <zedwallet/command_implementations.h>
 /////////////////////////////////////////////
 
 #include <atomic>
 
-#include <Common/StringTools.h>
+#include <common/string_tools.h>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <cryptonote_core/account.h>
+#include <cryptonote_core/transaction_extra.h>
 
 #ifndef MSVC
 #include <fstream>
 #endif
 
-#include <Mnemonics/Mnemonics.h>
+#include <mnemonics/mnemonics.h>
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <zedwallet/AddressBook.h>
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet/Commands.h>
-#include <zedwallet/Fusion.h>
-#include <zedwallet/Menu.h>
-#include <zedwallet/Open.h>
-#include <zedwallet/Sync.h>
-#include <zedwallet/Tools.h>
-#include <zedwallet/Transfer.h>
-#include <zedwallet/Types.h>
+#include <zedwallet/address_book.h>
+#include <Utilities/coloured_msg.h>
+#include <zedwallet/commands.h>
+#include <zedwallet/fusion.h>
+#include <zedwallet/menu.h>
+#include <zedwallet/open.h>
+#include <zedwallet/sync.h>
+#include <zedwallet/tools.h>
+#include <zedwallet/transfer.h>
+#include <zedwallet/types.h>
 
 void changePassword(std::shared_ptr<WalletInfo> walletInfo)
 {

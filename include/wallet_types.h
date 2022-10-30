@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
-#include <JsonHelper.h>
+#include <json_helper.h>
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <optional>
 
-namespace WalletTypes
+namespace wallet_types
 {
     struct KeyOutput
     {

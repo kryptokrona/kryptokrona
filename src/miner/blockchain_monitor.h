@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 
 #include "httplib.h"
 
 #include <optional>
 
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/Event.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
 
 class BlockchainMonitor
 {

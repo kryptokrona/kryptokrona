@@ -21,23 +21,22 @@
 #include <mutex>
 #include <stdint.h>
 
-namespace cryptonote {
-
-class WalletAsyncContextCounter
+namespace cryptonote
 {
-public:
-  WalletAsyncContextCounter() : m_asyncContexts(0) {}
+    class WalletAsyncContextCounter
+    {
+    public:
+      WalletAsyncContextCounter() : m_asyncContexts(0) {}
 
-  void addAsyncContext();
-  void delAsyncContext();
+      void addAsyncContext();
+      void delAsyncContext();
 
-  //returns true if contexts are finished before timeout
-  void waitAsyncContextsFinish();
+      //returns true if contexts are finished before timeout
+      void waitAsyncContextsFinish();
 
-private:
-  uint32_t m_asyncContexts;
-  std::condition_variable m_cv;
-  std::mutex m_mutex;
-};
-
-} //namespace CryptoNote
+    private:
+      uint32_t m_asyncContexts;
+      std::condition_variable m_cv;
+      std::mutex m_mutex;
+    };
+}

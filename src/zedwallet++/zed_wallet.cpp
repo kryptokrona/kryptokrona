@@ -4,15 +4,15 @@
 
 #include <iostream>
 
-#include <Common/SignalHandler.h>
+#include <common/signal_handler.h>
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/Menu.h>
-#include <zedwallet++/ParseArguments.h>
-#include <zedwallet++/Sync.h>
-#include <zedwallet++/TransactionMonitor.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/menu.h>
+#include <zedwallet++/parse_arguments.h>
+#include <zedwallet++/sync.h>
+#include <zedwallet++/transaction_monitor.h>
 
 void shutdown(
     const std::atomic<bool> &ctrl_c,

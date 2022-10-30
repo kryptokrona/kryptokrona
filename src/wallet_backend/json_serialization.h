@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include <Common/StringTools.h>
+#include <common/string_tools.h>
 
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 
-#include "IWallet.h"
+#include "iwallet.h"
 
 #include "json.hpp"
 
-#include <SubWallets/SubWallet.h>
+#include <sub_wallets/sub_wallet.h>
 
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 
 using nlohmann::json;
 

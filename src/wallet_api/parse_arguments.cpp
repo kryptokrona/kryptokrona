@@ -3,14 +3,14 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////////
-#include <WalletApi/ParseArguments.h>
+#include <wallet_api/parse_arguments.h>
 /////////////////////////////////////
 
 #include <cxxopts.hpp>
 
-#include <config/CliHeader.h>
-#include <config/CryptoNoteConfig.h>
-#include <config/WalletConfig.h>
+#include <config/cli_header.h>
+#include <config/cryptonote_config.h>
+#include <config/wallet_config.h>
 
 #include "version.h"
 

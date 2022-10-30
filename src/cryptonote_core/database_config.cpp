@@ -5,15 +5,16 @@
 
 #include "database_config.h"
 
-#include <Common/Util.h>
-#include "Common/StringTools.h"
+#include <common/util.h>
+#include "common/string_tools.h"
 #include "crypto/crypto.h"
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 using namespace cryptonote;
 
-namespace {
-  const uint64_t MEGABYTE = 1024 * 1024;
+namespace
+{
+    const uint64_t MEGABYTE = 1024 * 1024;
 }
 
 DataBaseConfig::DataBaseConfig() :

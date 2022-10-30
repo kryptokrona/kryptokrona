@@ -6,15 +6,15 @@
 
 #include <memory>
 
-#include <Nigel/Nigel.h>
+#include <nigel/nigel.h>
 
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 
-#include <WalletBackend/EventHandler.h>
-#include <WalletBackend/ThreadSafeQueue.h>
-#include <WalletBackend/SynchronizationStatus.h>
+#include <wallet_backend/event_handler.h>
+#include <wallet_backend/thread_safe_queue.h>
+#include <wallet_backend/synchronization_status.h>
 
-#include <WalletTypes.h>
+#include <wallet_types.h>
 
 /* Used to store the data we have accumulating when scanning a specific
    block. We can't add the items directly, because we may stop midway

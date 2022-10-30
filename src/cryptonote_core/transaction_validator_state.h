@@ -8,17 +8,16 @@
 #include <set>
 #include <unordered_set>
 #include "cached_transaction.h"
-#include <CryptoNote.h>
+#include <cryptonote.h>
 #include <crypto/crypto.h>
 
-namespace CryptoNote {
+namespace cryptonote
+{
+    struct TransactionValidatorState {
+      std::unordered_set<Crypto::KeyImage> spentKeyImages;
+    };
 
-struct TransactionValidatorState {
-  std::unordered_set<Crypto::KeyImage> spentKeyImages;
-};
-
-void mergeStates(TransactionValidatorState& destination, const TransactionValidatorState& source);
-bool hasIntersections(const TransactionValidatorState& destination, const TransactionValidatorState& source);
-void excludeFromState(TransactionValidatorState& state, const CachedTransaction& transaction);
-
+    void mergeStates(TransactionValidatorState& destination, const TransactionValidatorState& source);
+    bool hasIntersections(const TransactionValidatorState& destination, const TransactionValidatorState& source);
+    void excludeFromState(TransactionValidatorState& state, const CachedTransaction& transaction);
 }
