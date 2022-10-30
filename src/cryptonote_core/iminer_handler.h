@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 
-namespace cryptonote {
+namespace cryptonote
+{
   struct IMinerHandler {
     virtual bool handle_block_found(BlockTemplate& b) = 0;
     virtual bool get_block_template(BlockTemplate& b, const AccountPublicAddress& adr, uint64_t& diffic, uint32_t& height, const BinaryArray& ex_nonce) = 0;

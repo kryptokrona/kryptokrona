@@ -3,16 +3,16 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////
-#include <zedwallet++/Menu.h>
+#include <zedwallet++/menu.h>
 /////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <zedwallet++/CommandDispatcher.h>
-#include <zedwallet++/Commands.h>
-#include <zedwallet++/GetInput.h>
+#include <zedwallet++/command_dispatcher.h>
+#include <zedwallet++/commands.h>
+#include <zedwallet++/get_input.h>
 
 std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &config)
 {

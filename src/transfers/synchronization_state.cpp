@@ -17,118 +17,117 @@
 
 #include "synchronization_state.h"
 
-#include "Common/StdInputStream.h"
-#include "Common/StdOutputStream.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
-#include "CryptoNoteCore/CryptoNoteSerialization.h"
+#include "common/std_input_stream.h"
+#include "common/std_output_stream.h"
+#include "serialization/binary_input_stream_serializer.h"
+#include "serialization/binary_output_stream_serializer.h"
+#include "cryptonote_core/cryptonote_serialization.h"
 
 using namespace common;
 
-namespace cryptonote {
+namespace cryptonote
+{
+    SynchronizationState::ShortHistory SynchronizationState::getShortHistory(uint32_t localHeight) const {
+      ShortHistory history;
+      uint32_t i = 0;
+      uint32_t current_multiplier = 1;
+      uint32_t sz = std::min(static_cast<uint32_t>(m_blockchain.size()), localHeight + 1);
 
-SynchronizationState::ShortHistory SynchronizationState::getShortHistory(uint32_t localHeight) const {
-  ShortHistory history;
-  uint32_t i = 0;
-  uint32_t current_multiplier = 1;
-  uint32_t sz = std::min(static_cast<uint32_t>(m_blockchain.size()), localHeight + 1);
+      if (!sz)
+        return history;
 
-  if (!sz)
-    return history;
+      uint32_t current_back_offset = 1;
+      bool genesis_included = false;
 
-  uint32_t current_back_offset = 1;
-  bool genesis_included = false;
+      while (current_back_offset < sz) {
+        history.push_back(m_blockchain[sz - current_back_offset]);
+        if (sz - current_back_offset == 0)
+          genesis_included = true;
+        if (i < 10) {
+          ++current_back_offset;
+        } else {
+          current_back_offset += current_multiplier *= 2;
+        }
+        ++i;
+      }
 
-  while (current_back_offset < sz) {
-    history.push_back(m_blockchain[sz - current_back_offset]);
-    if (sz - current_back_offset == 0)
-      genesis_included = true;
-    if (i < 10) {
-      ++current_back_offset;
-    } else {
-      current_back_offset += current_multiplier *= 2;
+      if (!genesis_included) {
+        history.push_back(m_blockchain[0]);
+      }
+
+      return history;
     }
-    ++i;
-  }
 
-  if (!genesis_included) {
-    history.push_back(m_blockchain[0]);
-  }
+    SynchronizationState::CheckResult SynchronizationState::checkInterval(const BlockchainInterval& interval) const {
+      assert(interval.startHeight <= m_blockchain.size());
 
-  return history;
-}
+      CheckResult result = { false, 0, false, 0 };
 
-SynchronizationState::CheckResult SynchronizationState::checkInterval(const BlockchainInterval& interval) const {
-  assert(interval.startHeight <= m_blockchain.size());
+      uint32_t intervalEnd = interval.startHeight + static_cast<uint32_t>(interval.blocks.size());
+      uint32_t iterationEnd = std::min(static_cast<uint32_t>(m_blockchain.size()), intervalEnd);
 
-  CheckResult result = { false, 0, false, 0 };
+      for (uint32_t i = interval.startHeight; i < iterationEnd; ++i) {
+        if (m_blockchain[i] != interval.blocks[i - interval.startHeight]) {
+          result.detachRequired = true;
+          result.detachHeight = i;
+          break;
+        }
+      }
 
-  uint32_t intervalEnd = interval.startHeight + static_cast<uint32_t>(interval.blocks.size());
-  uint32_t iterationEnd = std::min(static_cast<uint32_t>(m_blockchain.size()), intervalEnd);
+      if (result.detachRequired) {
+        result.hasNewBlocks = true;
+        result.newBlockHeight = result.detachHeight;
+        return result;
+      }
 
-  for (uint32_t i = interval.startHeight; i < iterationEnd; ++i) {
-    if (m_blockchain[i] != interval.blocks[i - interval.startHeight]) {
-      result.detachRequired = true;
-      result.detachHeight = i;
-      break;
+      if (intervalEnd > m_blockchain.size()) {
+        result.hasNewBlocks = true;
+        result.newBlockHeight = static_cast<uint32_t>(m_blockchain.size());
+      }
+
+      return result;
     }
-  }
 
-  if (result.detachRequired) {
-    result.hasNewBlocks = true;
-    result.newBlockHeight = result.detachHeight;
-    return result;
-  }
+    void SynchronizationState::detach(uint32_t height) {
+      assert(height < m_blockchain.size());
+      m_blockchain.resize(height);
+    }
 
-  if (intervalEnd > m_blockchain.size()) {
-    result.hasNewBlocks = true;
-    result.newBlockHeight = static_cast<uint32_t>(m_blockchain.size());
-  }
+    void SynchronizationState::addBlocks(const Crypto::Hash* blockHashes, uint32_t height, uint32_t count) {
+      assert(blockHashes);
+      auto size = m_blockchain.size();
+      if (size) {}
+      // Dummy fix for simplewallet or walletd when sync
+      if (height == 0)
+        height = 1;
+      assert( size == height);
+      m_blockchain.insert(m_blockchain.end(), blockHashes, blockHashes + count);
+    }
 
-  return result;
-}
+    uint32_t SynchronizationState::getHeight() const {
+      return static_cast<uint32_t>(m_blockchain.size());
+    }
 
-void SynchronizationState::detach(uint32_t height) {
-  assert(height < m_blockchain.size());
-  m_blockchain.resize(height);
-}
+    const std::vector<Crypto::Hash>& SynchronizationState::getKnownBlockHashes() const {
+      return m_blockchain;
+    }
 
-void SynchronizationState::addBlocks(const Crypto::Hash* blockHashes, uint32_t height, uint32_t count) {
-  assert(blockHashes);
-  auto size = m_blockchain.size();
-  if (size) {}
-  // Dummy fix for simplewallet or walletd when sync
-  if (height == 0)
-    height = 1;
-  assert( size == height);
-  m_blockchain.insert(m_blockchain.end(), blockHashes, blockHashes + count);
-}
+    void SynchronizationState::save(std::ostream& os) {
+      StdOutputStream stream(os);
+      CryptoNote::BinaryOutputStreamSerializer s(stream);
+      serialize(s, "state");
+    }
 
-uint32_t SynchronizationState::getHeight() const {
-  return static_cast<uint32_t>(m_blockchain.size());
-}
+    void SynchronizationState::load(std::istream& in) {
+      StdInputStream stream(in);
+      CryptoNote::BinaryInputStreamSerializer s(stream);
+      serialize(s, "state");
+    }
 
-const std::vector<Crypto::Hash>& SynchronizationState::getKnownBlockHashes() const {
-  return m_blockchain;
-}
-
-void SynchronizationState::save(std::ostream& os) {
-  StdOutputStream stream(os);
-  CryptoNote::BinaryOutputStreamSerializer s(stream);
-  serialize(s, "state");
-}
-
-void SynchronizationState::load(std::istream& in) {
-  StdInputStream stream(in);
-  CryptoNote::BinaryInputStreamSerializer s(stream);
-  serialize(s, "state");
-}
-
-CryptoNote::ISerializer& SynchronizationState::serialize(CryptoNote::ISerializer& s, const std::string& name) {
-  s.beginObject(name);
-  s(m_blockchain, "blockchain");
-  s.endObject();
-  return s;
-}
-
+    CryptoNote::ISerializer& SynchronizationState::serialize(CryptoNote::ISerializer& s, const std::string& name) {
+      s.beginObject(name);
+      s(m_blockchain, "blockchain");
+      s.endObject();
+      return s;
+    }
 }

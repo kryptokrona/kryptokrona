@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <zedwallet/Types.h>
+#include <zedwallet/types.h>
 
 bool handleCommand(const std::string command,
                    std::shared_ptr<WalletInfo> walletInfo,

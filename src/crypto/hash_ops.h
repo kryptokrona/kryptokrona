@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "Common/int-util.h"
+#include "common/int_util.h"
 
 static inline void *padd(void *p, size_t i) {
   return (char *) p + i;

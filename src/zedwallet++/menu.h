@@ -6,10 +6,10 @@
 
 #include <iostream>
 
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/ParseArguments.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/parse_arguments.h>
 
 std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Config &config);
 

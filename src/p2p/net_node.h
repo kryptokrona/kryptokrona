@@ -11,17 +11,17 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/functional/hash.hpp>
 
-#include <System/Context.h>
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/Event.h>
-#include <System/Timer.h>
-#include <System/TcpConnection.h>
-#include <System/TcpListener.h>
+#include <system/context.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
+#include <system/timer.h>
+#include <system/tcp_connection.h>
+#include <system/tcp_listener.h>
 
-#include "CryptoNoteCore/OnceInInterval.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
-#include "Logging/LoggerRef.h"
+#include "cryptonote_core/once_in_interval.h"
+#include "cryptonote_protocol/cryptonote_protocol_handler.h"
+#include "logging/logger_ref.h"
 
 #include "connection_context.h"
 #include "levin_protocol.h"
@@ -30,8 +30,9 @@
 #include "p2p_protocol_definitions.h"
 #include "peer_list_manager.h"
 
-namespace system {
-class TcpConnection;
+namespace system
+{
+    class TcpConnection;
 }
 
 namespace cryptonote

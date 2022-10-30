@@ -7,11 +7,11 @@
 
 #include <boost/uuid/uuid.hpp>
 
-#include "CryptoNote.h"
+#include "cryptonote.h"
 #include "p2p_protocol_types.h"
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   struct CryptoNoteConnectionContext;
 
   struct IP2pEndpoint {

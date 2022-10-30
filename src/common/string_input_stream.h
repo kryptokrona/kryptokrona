@@ -20,16 +20,15 @@
 #include <string>
 #include "iinput_stream.h"
 
-namespace common {
+namespace common
+{
+    class StringInputStream : public IInputStream {
+    public:
+      StringInputStream(const std::string& in);
+      uint64_t readSome(void* data, uint64_t size) override;
 
-class StringInputStream : public IInputStream {
-public:
-  StringInputStream(const std::string& in);
-  uint64_t readSome(void* data, uint64_t size) override;
-
-private:
-  const std::string& in;
-  uint64_t offset;
-};
-
+    private:
+      const std::string& in;
+      uint64_t offset;
+    };
 }

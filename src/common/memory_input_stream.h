@@ -19,8 +19,8 @@
 
 #include "iinput_stream.h"
 
-namespace common {
-
+namespace common
+{
   class MemoryInputStream : public IInputStream {
   public:
     MemoryInputStream(const void* buffer, uint64_t bufferSize);

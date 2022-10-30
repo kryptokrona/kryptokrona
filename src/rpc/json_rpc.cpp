@@ -16,51 +16,49 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "json_rpc.h"
-#include "Rpc/HttpClient.h"
+#include "rpc/http_client.h"
 
-namespace cryptonote {
+namespace cryptonote
+{
+    namespace json_rpc
+    {
+        JsonRpcError::JsonRpcError() : code(0) {}
 
-namespace json_rpc {
+        JsonRpcError::JsonRpcError(int c) : code(c) {
+          switch (c) {
+          case errParseError: message = "Parse error"; break;
+          case errInvalidRequest: message = "Invalid request"; break;
+          case errMethodNotFound: message = "Method not found"; break;
+          case errInvalidParams: message = "Invalid params"; break;
+          case errInternalError: message = "Internal error"; break;
+          case errInvalidPassword: message = "Invalid or no password supplied"; break;
+          default: message = "Unknown error"; break;
+          }
+        }
 
-JsonRpcError::JsonRpcError() : code(0) {}
+        JsonRpcError::JsonRpcError(int c, const std::string& msg) : code(c), message(msg) {
+        }
 
-JsonRpcError::JsonRpcError(int c) : code(c) {
-  switch (c) {
-  case errParseError: message = "Parse error"; break;
-  case errInvalidRequest: message = "Invalid request"; break;
-  case errMethodNotFound: message = "Method not found"; break;
-  case errInvalidParams: message = "Invalid params"; break;
-  case errInternalError: message = "Internal error"; break;
-  case errInvalidPassword: message = "Invalid or no password supplied"; break;
-  default: message = "Unknown error"; break;
-  }
-}
+        void invokeJsonRpcCommand(HttpClient& httpClient, JsonRpcRequest& jsReq, JsonRpcResponse& jsRes) {
+          HttpRequest httpReq;
+          HttpResponse httpRes;
 
-JsonRpcError::JsonRpcError(int c, const std::string& msg) : code(c), message(msg) {
-}
+          httpReq.addHeader("Content-Type", "application/json");
+          httpReq.setUrl("/json_rpc");
+          httpReq.setBody(jsReq.getBody());
 
-void invokeJsonRpcCommand(HttpClient& httpClient, JsonRpcRequest& jsReq, JsonRpcResponse& jsRes) {
-  HttpRequest httpReq;
-  HttpResponse httpRes;
+          httpClient.request(httpReq, httpRes);
 
-  httpReq.addHeader("Content-Type", "application/json");
-  httpReq.setUrl("/json_rpc");
-  httpReq.setBody(jsReq.getBody());
+          if (httpRes.getStatus() != HttpResponse::STATUS_200) {
+            throw std::runtime_error("JSON-RPC call failed, http status = " + std::to_string(httpRes.getStatus()));
+          }
 
-  httpClient.request(httpReq, httpRes);
+          jsRes.parse(httpRes.getBody());
 
-  if (httpRes.getStatus() != HttpResponse::STATUS_200) {
-    throw std::runtime_error("JSON-RPC call failed, http status = " + std::to_string(httpRes.getStatus()));
-  }
-
-  jsRes.parse(httpRes.getBody());
-
-  JsonRpcError err;
-  if (jsRes.getError(err)) {
-    throw err;
-  }
-}
-
-
-}
+          JsonRpcError err;
+          if (jsRes.getError(err)) {
+            throw err;
+          }
+        }
+    }
 }

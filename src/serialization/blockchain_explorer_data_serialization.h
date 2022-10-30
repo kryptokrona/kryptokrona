@@ -17,22 +17,21 @@
 
 #pragma once
 
-#include "BlockchainExplorerData.h"
+#include "blockchain_explorer_data.h"
 
-#include "Serialization/ISerializer.h"
+#include "serialization/iserializer.h"
 
-namespace cryptonote {
+namespace cryptonote
+{
+    void serialize(TransactionOutputDetails& output, ISerializer& serializer);
+    void serialize(TransactionOutputReferenceDetails& outputReference, ISerializer& serializer);
 
-void serialize(TransactionOutputDetails& output, ISerializer& serializer);
-void serialize(TransactionOutputReferenceDetails& outputReference, ISerializer& serializer);
+    void serialize(BaseInputDetails& inputBase, ISerializer& serializer);
+    void serialize(KeyInputDetails& inputToKey, ISerializer& serializer);
+    void serialize(TransactionInputDetails& input, ISerializer& serializer);
 
-void serialize(BaseInputDetails& inputBase, ISerializer& serializer);
-void serialize(KeyInputDetails& inputToKey, ISerializer& serializer);
-void serialize(TransactionInputDetails& input, ISerializer& serializer);
+    void serialize(TransactionExtraDetails& extra, ISerializer& serializer);
+    void serialize(TransactionDetails& transaction, ISerializer& serializer);
 
-void serialize(TransactionExtraDetails& extra, ISerializer& serializer);
-void serialize(TransactionDetails& transaction, ISerializer& serializer);
-
-void serialize(BlockDetails& block, ISerializer& serializer);
-
-} //namespace CryptoNote
+    void serialize(BlockDetails& block, ISerializer& serializer);
+}

@@ -27,17 +27,16 @@
 using namespace cryptonote;
 using namespace logging;
 
-namespace {
-  const std::string DB_NAME = "DB";
-  const std::string TESTNET_DB_NAME = "testnet_DB";
+namespace
+{
+    const std::string DB_NAME = "DB";
+    const std::string TESTNET_DB_NAME = "testnet_DB";
 }
 
 RocksDBWrapper::RocksDBWrapper(std::shared_ptr<Logging::ILogger> logger) : logger(logger, "RocksDBWrapper"), state(NOT_INITIALIZED){
-
 }
 
 RocksDBWrapper::~RocksDBWrapper() {
-
 }
 
 void RocksDBWrapper::init(const DataBaseConfig& config) {

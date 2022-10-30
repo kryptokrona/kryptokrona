@@ -20,8 +20,8 @@
 #include "cryptonote_format_utils.h"
 #include "transaction_extra.h"
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   class TransactionExtra {
   public:
     TransactionExtra() {}

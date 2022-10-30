@@ -3,19 +3,19 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////
-#include <zedwallet++/Transfer.h>
+#include <zedwallet++/transfer.h>
 /////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <iostream>
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/Fusion.h>
-#include <zedwallet++/GetInput.h>
-#include <zedwallet++/Utilities.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/fusion.h>
+#include <zedwallet++/get_input.h>
+#include <zedwallet++/utilities.h>
 
 namespace
 {

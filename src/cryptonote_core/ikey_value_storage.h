@@ -19,17 +19,17 @@
 
 #include <vector>
 
-namespace CryptoNote {
+namespace cryptonote
+{
+    class WriteBatch;
+    class ReadBatch;
 
-class WriteBatch;
-class ReadBatch;
+    class IKeyValueStorage {
+    public:
+      virtual ~IKeyValueStorage() {
+      }
 
-class IKeyValueStorage {
-public:
-  virtual ~IKeyValueStorage() {
-  }
-
-  virtual bool insert(const WriteBatch& batch, bool sync = false) = 0;
-  virtual void read(const ReadBatch& batch) const = 0;
-};
+      virtual bool insert(const WriteBatch& batch, bool sync = false) = 0;
+      virtual void read(const ReadBatch& batch) const = 0;
+    };
 }

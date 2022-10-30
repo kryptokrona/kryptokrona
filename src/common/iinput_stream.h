@@ -20,12 +20,11 @@
 #include <cstdint>
 #include <cstddef>
 
-namespace common {
-
-class IInputStream {
-public:
-  virtual ~IInputStream() { }
-  virtual uint64_t readSome(void* data, uint64_t size) = 0;
-};
-
+namespace common
+{
+    class IInputStream {
+    public:
+      virtual ~IInputStream() { }
+      virtual uint64_t readSome(void* data, uint64_t size) = 0;
+    };
 }

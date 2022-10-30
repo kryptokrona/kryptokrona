@@ -17,11 +17,11 @@
 
 #include "blockchain_explorer_errors.h"
 
-namespace CryptoNote {
-namespace error {
-
-BlockchainExplorerErrorCategory BlockchainExplorerErrorCategory::INSTANCE;
-
-} //namespace error
-} //namespace CryptoNote
+namespace cryptonote
+{
+    namespace error
+    {
+        BlockchainExplorerErrorCategory BlockchainExplorerErrorCategory::INSTANCE;
+    }
+}
 

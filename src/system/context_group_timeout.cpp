@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "context_group_timeout.h"
-#include <System/InterruptedException.h>
+#include <system/interrupted_exception.h>
 
 using namespace system;
 

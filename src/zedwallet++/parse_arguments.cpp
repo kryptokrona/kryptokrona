@@ -3,16 +3,16 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////////////
-#include <zedwallet++/ParseArguments.h>
+#include <zedwallet++/parse_arguments.h>
 ///////////////////////////////////////
 
 #include <cxxopts.hpp>
 
-#include <config/CliHeader.h>
-#include <config/CryptoNoteConfig.h>
-#include <config/WalletConfig.h>
+#include <config/cli_header.h>
+#include <config/cryptonote_config.h>
+#include <config/wallet_config.h>
 
-#include <zedwallet++/Utilities.h>
+#include <zedwallet++/utilities.h>
 
 #include "version.h"
 

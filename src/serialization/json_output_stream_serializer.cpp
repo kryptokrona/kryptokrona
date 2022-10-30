@@ -18,29 +18,29 @@
 #include "json_output_stream_serializer.h"
 #include <cassert>
 #include <stdexcept>
-#include "Common/StringTools.h"
+#include "common/string_tools.h"
 
 using common::JsonValue;
 using namespace cryptonote;
 
-namespace cryptonote {
-std::ostream& operator<<(std::ostream& out, const JsonOutputStreamSerializer& enumerator) {
-  out << enumerator.root;
-  return out;
-}
-}
-
-namespace {
-
-template <typename T>
-void insertOrPush(JsonValue& js, Common::StringView name, const T& value) {
-  if (js.isArray()) {
-    js.pushBack(JsonValue(value));
-  } else {
-    js.insert(std::string(name), JsonValue(value));
-  }
+namespace cryptonote
+{
+    std::ostream& operator<<(std::ostream& out, const JsonOutputStreamSerializer& enumerator) {
+      out << enumerator.root;
+      return out;
+    }
 }
 
+namespace
+{
+    template <typename T>
+    void insertOrPush(JsonValue& js, Common::StringView name, const T& value) {
+      if (js.isArray()) {
+        js.pushBack(JsonValue(value));
+      } else {
+        js.insert(std::string(name), JsonValue(value));
+      }
+    }
 }
 
 JsonOutputStreamSerializer::JsonOutputStreamSerializer() : root(JsonValue::OBJECT) {

@@ -15,27 +15,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Serialization/JsonInputStreamSerializer.h"
+#include "serialization/json_input_stream_serializer.h"
 
 #include <ctype.h>
 #include <exception>
 
-namespace cryptonote {
+namespace cryptonote
+{
+    namespace
+    {
+        Common::JsonValue getJsonValueFromStreamHelper(std::istream& stream) {
+          Common::JsonValue value;
+          stream >> value;
+          return value;
+        }
+    }
 
-namespace {
+    JsonInputStreamSerializer::JsonInputStreamSerializer(std::istream& stream) : JsonInputValueSerializer(getJsonValueFromStreamHelper(stream)) {
+    }
 
-Common::JsonValue getJsonValueFromStreamHelper(std::istream& stream) {
-  Common::JsonValue value;
-  stream >> value;
-  return value;
+    JsonInputStreamSerializer::~JsonInputStreamSerializer() {
+    }
+
 }
-
-}
-
-JsonInputStreamSerializer::JsonInputStreamSerializer(std::istream& stream) : JsonInputValueSerializer(getJsonValueFromStreamHelper(stream)) {
-}
-
-JsonInputStreamSerializer::~JsonInputStreamSerializer() {
-}
-
-} //namespace CryptoNote

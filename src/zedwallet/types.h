@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
-#include <Serialization/ISerializer.h>
+#include <serialization/iserializer.h>
 
-#include <Wallet/WalletGreen.h>
+#include <wallet/wallet_green.h>
 
 struct WalletInfo
 {

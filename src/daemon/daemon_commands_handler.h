@@ -5,17 +5,17 @@
 
 #pragma once
 
-#include "Common/ConsoleHandler.h"
+#include "common/console_handler.h"
+#include <logging/logger_ref.h>
+#include <logging/logger_manager.h>
+#include "rpc/rpc_server.h"
+#include "rpc/core_rpc_server_commands_definitions.h"
+#include "rpc/json_rpc.h"
 
-#include <Logging/LoggerRef.h>
-#include <Logging/LoggerManager.h>
-#include "Rpc/RpcServer.h"
-#include "Rpc/CoreRpcServerCommandsDefinitions.h"
-#include "Rpc/JsonRpc.h"
-
-namespace cryptonote {
-class Core;
-class NodeServer;
+namespace cryptonote
+{
+    class Core;
+    class NodeServer;
 }
 
 class DaemonCommandsHandler

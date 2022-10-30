@@ -6,7 +6,7 @@
 
 #include <string>
 #include <vector>
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 class Command
 {

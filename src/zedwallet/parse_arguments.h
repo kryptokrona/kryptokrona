@@ -4,6 +4,6 @@
 
 #pragma once
 
-#include <zedwallet/Types.h>
+#include <zedwallet/types.h>
 
 Config parseArguments(int argc, char **argv);

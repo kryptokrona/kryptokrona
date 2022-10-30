@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 #include "crypto/crypto.h"
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   class ISerializer;
 
   /************************************************************************/

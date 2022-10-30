@@ -3,7 +3,7 @@
 
 #define PROJECT_NAME "kryptokrona"
 #define PROJECT_SITE "https://www.kryptokrona.org"
-#define PROJECT_COPYRIGHT "Copyright 2019, Kryptokrona"
+#define PROJECT_COPYRIGHT "Copyright 2019, kryptokrona"
 #define APP_VER_MAJOR 0
 #define APP_VER_MINOR 1
 #define APP_VER_REV 0

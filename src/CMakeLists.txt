@@ -73,7 +73,7 @@ add_library(transfers STATIC ${transfers})
 add_library(utilities STATIC ${utilities})
 add_library(wallet STATIC ${wallet})
 add_library(wallet_backend STATIC ${wallet_backend})
-add_library(wallet_service STATIC ${wallet_service})
+add_library(wallet_service STATIC ${service})
 
 if(MSVC)
   set(DAEMON_SOURCES_OS

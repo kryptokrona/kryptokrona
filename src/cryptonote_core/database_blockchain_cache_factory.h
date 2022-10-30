@@ -18,23 +18,22 @@
 #pragma once
 
 #include "iblockchain_cache_factory.h"
-#include <Logging/LoggerMessage.h>
+#include <logging/logger_message.h>
 
-namespace cryptonote {
+namespace cryptonote
+{
+    class IDataBase;
 
-class IDataBase;
+    class DatabaseBlockchainCacheFactory: public IBlockchainCacheFactory {
+    public:
+      explicit DatabaseBlockchainCacheFactory(IDataBase& database, std::shared_ptr<Logging::ILogger> logger);
+      virtual ~DatabaseBlockchainCacheFactory();
 
-class DatabaseBlockchainCacheFactory: public IBlockchainCacheFactory {
-public:
-  explicit DatabaseBlockchainCacheFactory(IDataBase& database, std::shared_ptr<Logging::ILogger> logger);
-  virtual ~DatabaseBlockchainCacheFactory();
+      virtual std::unique_ptr<IBlockchainCache> createRootBlockchainCache(const Currency& currency) override;
+      virtual std::unique_ptr<IBlockchainCache> createBlockchainCache(const Currency& currency, IBlockchainCache* parent, uint32_t startIndex = 0) override;
 
-  virtual std::unique_ptr<IBlockchainCache> createRootBlockchainCache(const Currency& currency) override;
-  virtual std::unique_ptr<IBlockchainCache> createBlockchainCache(const Currency& currency, IBlockchainCache* parent, uint32_t startIndex = 0) override;
-
-private:
-  IDataBase& database;
-  std::shared_ptr<Logging::ILogger> logger;
-};
-
-} //namespace CryptoNote
+    private:
+      IDataBase& database;
+      std::shared_ptr<Logging::ILogger> logger;
+    };
+}

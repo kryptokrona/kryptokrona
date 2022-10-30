@@ -4,17 +4,17 @@
 
 #include <atomic>
 
-#include <Common/SignalHandler.h>
+#include <common/signal_handler.h>
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 
 #include <iostream>
 
 #include <thread>
 #include <chrono>
 
-#include <WalletApi/ApiDispatcher.h>
-#include <WalletApi/ParseArguments.h>
+#include <wallet_api/api_dispatcher.h>
+#include <wallet_api/parse_arguments.h>
 
 int main(int argc, char **argv)
 {

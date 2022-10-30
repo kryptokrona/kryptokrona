@@ -18,12 +18,11 @@
 #include "cryptonote_basic.h"
 #include "crypto/crypto.h"
 
-namespace CryptoNote {
-
-KeyPair generateKeyPair() {
-  KeyPair k;
-  Crypto::generate_keys(k.publicKey, k.secretKey);
-  return k;
-}
-
+namespace cryptonote
+{
+    KeyPair generateKeyPair() {
+      KeyPair k;
+      Crypto::generate_keys(k.publicKey, k.secretKey);
+      return k;
+    }
 }

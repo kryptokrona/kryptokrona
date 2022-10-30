@@ -7,15 +7,15 @@
 
 #include <future>
 
-#include "Common/SignalHandler.h"
-#include "Common/Util.h"
-#include "Logging/LoggerRef.h"
+#include "common/signal_handler.h"
+#include "common/util.h"
+#include "logging/logger_ref.h"
 #include "payment_service_json_rpc_server.h"
 
-#include "Common/ScopeExit.h"
-#include "NodeRpcProxy/NodeRpcProxy.h"
-#include <System/Context.h>
-#include "Wallet/WalletGreen.h"
+#include "common/scope_exit.h"
+#include "node_rpc_proxy/node_rpc_proxy.h"
+#include <system/context.h>
+#include "wallet/wallet_green.h"
 
 #ifdef ERROR
 #undef ERROR

@@ -3,23 +3,23 @@
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////
-#include <zedwallet++/Open.h>
+#include <zedwallet++/open.h>
 /////////////////////////////
 
-#include <Common/FileSystemShim.h>
+#include <common/file_system_shim.h>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <iostream>
 
-#include <Mnemonics/Mnemonics.h>
+#include <mnemonics/mnemonics.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
-#include <Utilities/ColouredMsg.h>
-#include <zedwallet++/CommandImplementations.h>
-#include <zedwallet++/PasswordContainer.h>
-#include <zedwallet++/Utilities.h>
+#include <utilities/coloured_msg.h>
+#include <zedwallet++/command_implementations.h>
+#include <zedwallet++/password_container.h>
+#include <zedwallet++/utilities.h>
 
 std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 {

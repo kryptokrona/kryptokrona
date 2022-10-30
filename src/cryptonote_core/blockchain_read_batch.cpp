@@ -23,13 +23,10 @@
 
 using namespace cryptonote;
 
-
 BlockchainReadBatch::BlockchainReadBatch() {
-
 }
 
 BlockchainReadBatch::~BlockchainReadBatch() {
-
 }
 
 BlockchainReadBatch& BlockchainReadBatch::requestSpentKeyImagesByBlock(uint32_t blockIndex) {

@@ -7,22 +7,22 @@
 
 #include <ctime>
 
-#include <CryptoNoteCore/Core.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/Currency.h>
+#include <cryptonote_core/core.h>
+#include <cryptonote_core/cryptonote_format_utils.h>
+#include <cryptonote_core/currency.h>
 
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
+#include <cryptonote_protocol/cryptonote_protocol_handler.h>
 
-#include <Daemon/DaemonCommandsHandler.h>
+#include <daemon/daemon_commands_handler.h>
 
-#include <P2p/NetNode.h>
+#include <p2p/net_node.h>
 
-#include <Rpc/JsonRpc.h>
+#include <rpc/json_rpc.h>
 
-#include <Serialization/SerializationTools.h>
+#include <serialization/serialization_tools.h>
 
-#include <Utilities/FormatTools.h>
-#include <Utilities/ColouredMsg.h>
+#include <utilities/format_tools.h>
+#include <utilities/coloured_msg.h>
 
 #include "version.h"
 

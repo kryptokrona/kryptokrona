@@ -15,23 +15,22 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <CryptoNoteCore/CryptoNoteSerialization.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/DatabaseCacheData.h>
-#include <Serialization/SerializationOverloads.h>
+#include <cryptonote_core/cryptonote_serialization.h>
+#include <cryptonote_core/cryptonote_tools.h>
+#include <cryptonote_core/database_cache_data.h>
+#include <serialization/serialization_overloads.h>
 
-namespace cryptonote {
+namespace cryptonote
+{
+    void ExtendedTransactionInfo::serialize(CryptoNote::ISerializer& s) {
+      s(static_cast<CachedTransactionInfo&>(*this), "cached_transaction");
+      s(amountToKeyIndexes, "key_indexes");
+    }
 
-void ExtendedTransactionInfo::serialize(CryptoNote::ISerializer& s) {
-  s(static_cast<CachedTransactionInfo&>(*this), "cached_transaction");
-  s(amountToKeyIndexes, "key_indexes");
-}
-
-void KeyOutputInfo::serialize(ISerializer& s) {
-  s(publicKey, "public_key");
-  s(transactionHash, "transaction_hash");
-  s(unlockTime, "unlock_time");
-  s(outputIndex, "output_index");
-}
-
+    void KeyOutputInfo::serialize(ISerializer& s) {
+      s(publicKey, "public_key");
+      s(transactionHash, "transaction_hash");
+      s(unlockTime, "unlock_time");
+      s(outputIndex, "output_index");
+    }
 }

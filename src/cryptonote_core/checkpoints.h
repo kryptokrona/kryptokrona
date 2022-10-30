@@ -18,7 +18,7 @@
 #pragma once
 #include <map>
 #include "cryptonote_basic_impl.h"
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 
 namespace cryptonote
 {

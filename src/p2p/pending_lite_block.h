@@ -6,11 +6,12 @@
 
 #include <unordered_set>
 
-#include "CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
+#include "cryptonote_protocol/cryptonote_protocol_definitions.h"
 
-namespace cryptonote {
-struct PendingLiteBlock {
-  NOTIFY_NEW_LITE_BLOCK_request request;
-  std::unordered_set<Crypto::Hash> missed_transactions;
-};
+namespace cryptonote
+{
+    struct PendingLiteBlock {
+      NOTIFY_NEW_LITE_BLOCK_request request;
+      std::unordered_set<Crypto::Hash> missed_transactions;
+    };
 }

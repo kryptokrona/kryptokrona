@@ -20,15 +20,15 @@
 #include "cryptonote_tools.h"
 #include "cryptonote_serialization.h"
 
-#include "Common/Base58.h"
+#include "common/base58.h"
 #include "crypto/hash.h"
-#include "Common/int-util.h"
+#include "common/int_util.h"
 
 using namespace crypto;
 using namespace common;
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   /************************************************************************/
   /* CryptoNote helper functions                                          */
   /************************************************************************/

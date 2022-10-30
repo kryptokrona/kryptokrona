@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "ITransaction.h"
+#include "itransaction.h"
 #include "transaction_api_extra.h"
 #include "transaction_utils.h"
 
 #include "account.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include <config/CryptoNoteConfig.h>
+#include "cryptonote_core/cryptonote_tools.h"
+#include <config/cryptonote_config.h>
 
 #include <boost/optional.hpp>
 #include <numeric>
@@ -30,8 +30,8 @@
 
 using namespace crypto;
 
-namespace {
-
+namespace
+{
   using namespace cryptonote;
 
   void derivePublicKey(const AccountPublicAddress& to, const SecretKey& txKey, size_t outputIndex, PublicKey& ephemeralKey) {
@@ -39,11 +39,10 @@ namespace {
     generate_key_derivation(to.viewPublicKey, txKey, derivation);
     derive_public_key(derivation, outputIndex, to.spendPublicKey, ephemeralKey);
   }
-
 }
 
-namespace cryptonote {
-
+namespace cryptonote
+{
   using namespace crypto;
 
   ////////////////////////////////////////////////////////////////////////

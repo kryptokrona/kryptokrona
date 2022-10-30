@@ -23,7 +23,7 @@
 #include <unistd.h>
 #endif
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 
 namespace Tools
 {

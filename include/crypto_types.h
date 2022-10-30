@@ -19,7 +19,7 @@
 
 #include <algorithm>
 
-#include <Common/StringTools.h>
+#include <common/string_tools.h>
 
 #include <cstdint>
 
@@ -31,7 +31,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-namespace Crypto
+namespace crypto
 {
     struct Hash
     {
