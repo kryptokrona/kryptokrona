@@ -17,20 +17,12 @@
 
 #pragma once
 
-<<<<<<<< HEAD:src/p2p/p2p_context_owner.h
 #include <list>
 #include <memory>
 
 namespace cryptonote
 {
     class P2pContext;
-========
-#include "iupgrade_manager.h"
-
-#include <memory>
-
-#include "iupgrade_detector.h"
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/upgrade_manager.h
 
     class P2pContextOwner {
     public:

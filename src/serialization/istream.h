@@ -20,24 +20,12 @@
 #include <cstdint>
 #include <memory>
 
-<<<<<<<< HEAD:src/serialization/istream.h
 namespace cryptonote
 {
     class IInputStream {
     public:
       virtual uint64_t read(char* data, uint64_t size) = 0;
     };
-========
-namespace cryptonote {
-
-class IUpgradeManager {
-public:
-  virtual ~IUpgradeManager() {}
-
-  virtual void addMajorBlockVersion(uint8_t targetVersion, uint32_t upgradeHeight) = 0;
-  virtual uint8_t getBlockMajorVersion(uint32_t blockIndex) const = 0;
-};
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/iupgrade_manager.h
 
     class IOutputStream {
     public:

@@ -17,21 +17,10 @@
 
 #include "database_errors.h"
 
-<<<<<<<< HEAD:src/cryptonote_core/database_errors.cpp
 namespace cryptonote
 {
     namespace error
     {
         DataBaseErrorCategory DataBaseErrorCategory::INSTANCE;
     }
-========
-namespace cryptonote {
-class ITxPoolObserver {
-public:
-  virtual ~ITxPoolObserver() {
-  }
-
-  virtual void txDeletedFromPool() = 0;
-};
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/itx_pool_observer.h
 }

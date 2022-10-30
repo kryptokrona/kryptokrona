@@ -20,11 +20,7 @@
 #include <cstdint>
 #include <memory>
 
-<<<<<<<< HEAD:src/p2p/p2p_interfaces.h
 #include <cryptonote.h>
-========
-namespace cryptonote {
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/iupgrade_detector.h
 
 namespace cryptonote
 {

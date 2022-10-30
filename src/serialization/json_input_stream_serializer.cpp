@@ -15,24 +15,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-<<<<<<<< HEAD:src/serialization/json_input_stream_serializer.cpp
 #include "serialization/json_input_stream_serializer.h"
 
 #include <ctype.h>
 #include <exception>
-========
-#include "blockchain_utils.h"
-
-namespace cryptonote {
-namespace utils {
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/blockchain_utils.cpp
 
 namespace cryptonote
 {
     namespace
     {
-        common::JsonValue getJsonValueFromStreamHelper(std::istream& stream) {
-          common::JsonValue value;
+        Common::JsonValue getJsonValueFromStreamHelper(std::istream& stream) {
+          Common::JsonValue value;
           stream >> value;
           return value;
         }

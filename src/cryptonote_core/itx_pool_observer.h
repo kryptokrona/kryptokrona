@@ -17,23 +17,12 @@
 
 #pragma once
 
-<<<<<<<< HEAD:src/cryptonote_core/itx_pool_observer.h
 namespace cryptonote
 {
     class ITxPoolObserver {
     public:
       virtual ~ITxPoolObserver() {
       }
-========
-namespace cryptonote {
-
-class ICoreObserver {
-public:
-  virtual ~ICoreObserver() {};
-  virtual void blockchainUpdated() {};
-  virtual void poolUpdated() {};
-};
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/icore_observer.h
 
       virtual void txDeletedFromPool() = 0;
     };

@@ -23,16 +23,12 @@
 #include "../common/json_value.h"
 #include "logger_group.h"
 
-<<<<<<<< HEAD:src/logging/logger_manager.h
 namespace logging
-========
-namespace cryptonote
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/once_inInterval.h
 {
     class LoggerManager : public LoggerGroup {
     public:
       LoggerManager();
-      void configure(const common::JsonValue& val);
+      void configure(const Common::JsonValue& val);
       virtual void operator()(const std::string& category, Level level, boost::posix_time::ptime time, const std::string& body) override;
 
     private:

@@ -15,15 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-<<<<<<<< HEAD:src/platform/linux/sys/error_message.h
 #pragma once
-========
-#include "add_block_errors.h"
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/add_block_errors.cpp
 
 #include <string>
 
-namespace sys
+namespace system
 {
     std::string lastErrorMessage();
     std::string errorMessage(int);

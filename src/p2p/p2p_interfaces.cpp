@@ -15,16 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-<<<<<<<< HEAD:src/p2p/p2p_interfaces.cpp
 #include "p2p_interfaces.h"
-========
-#include "core_errors.h"
-
-namespace cryptonote {
-namespace error {
-
-CoreErrorCategory CoreErrorCategory::INSTANCE;
->>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/core_errors.cpp
 
 namespace cryptonote
 {
