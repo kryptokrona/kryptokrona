@@ -15,7 +15,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
+<<<<<<<< HEAD:src/http/http_parser_error_codes.cpp
 #include "http_parser_error_codes.h"
+========
+#include "block_validation_errors.h"
+
+namespace cryptonote {
+namespace error {
+
+BlockValidationErrorCategory BlockValidationErrorCategory::INSTANCE;
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/block_validation_errors.cpp
 
 namespace cryptonote
 {

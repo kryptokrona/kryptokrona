@@ -15,4 +15,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
+<<<<<<<< HEAD:src/serialization/memory_stream.cpp
 #include "memory_stream.h"
+========
+#include "itime_provider.h"
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/itime_provider.cpp

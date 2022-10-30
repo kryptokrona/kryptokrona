@@ -23,7 +23,11 @@
 #include "../common/json_value.h"
 #include "logger_group.h"
 
+<<<<<<<< HEAD:src/logging/logger_manager.h
 namespace logging
+========
+namespace cryptonote
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/once_inInterval.h
 {
     class LoggerManager : public LoggerGroup {
     public:

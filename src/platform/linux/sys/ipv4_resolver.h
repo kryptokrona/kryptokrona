@@ -19,10 +19,14 @@
 
 #include <string>
 
+<<<<<<<< HEAD:src/platform/linux/sys/ipv4_resolver.h
 namespace sys
 {
     class Dispatcher;
     class Ipv4Address;
+========
+namespace cryptonote {
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/core_statistics.h
 
     class Ipv4Resolver {
     public:

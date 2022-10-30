@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
+<<<<<<<< HEAD:src/cryptonote_core/add_block_error_condition.cpp
 #include "add_block_error_condition.h"
 
 namespace cryptonote
@@ -22,6 +23,12 @@ namespace cryptonote
     namespace error
     {
         AddBlockErrorConditionCategory AddBlockErrorConditionCategory::INSTANCE;
+========
+#include "transaction_validation_errors.h"
+
+namespace cryptonote {
+namespace error {
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/transaction_validation_errors.cpp
 
 
         std::error_condition make_error_condition(AddBlockErrorCondition e) {

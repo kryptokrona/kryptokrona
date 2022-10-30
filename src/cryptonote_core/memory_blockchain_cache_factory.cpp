@@ -23,8 +23,12 @@ namespace cryptonote
       filename(filename), logger(logger) {
     }
 
+<<<<<<<< HEAD:src/cryptonote_core/memory_blockchain_cache_factory.cpp
     MemoryBlockchainCacheFactory::~MemoryBlockchainCacheFactory() {
     }
+========
+namespace cryptonote {
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/memory_blockchain_storage.h
 
     std::unique_ptr<IBlockchainCache> MemoryBlockchainCacheFactory::createRootBlockchainCache(const Currency& currency) {
       return createBlockchainCache(currency, nullptr, 0);

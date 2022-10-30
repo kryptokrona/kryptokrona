@@ -19,6 +19,7 @@
 
 #include <vector>
 
+<<<<<<<< HEAD:src/cryptonote_core/ikey_value_storage.h
 namespace cryptonote
 {
     class WriteBatch;
@@ -28,6 +29,14 @@ namespace cryptonote
     public:
       virtual ~IKeyValueStorage() {
       }
+========
+#include "cached_transaction.h"
+#include "CryptoNote.h"
+#include "cryptonote_tools.h"
+
+namespace cryptonote {
+namespace utils {
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/blockchain_utils.h
 
       virtual bool insert(const WriteBatch& batch, bool sync = false) = 0;
       virtual void read(const ReadBatch& batch) const = 0;

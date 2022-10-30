@@ -15,14 +15,22 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
+<<<<<<<< HEAD:src/platform/windows/sys/error_message.cpp
 #include "error_message.h"
+========
+#include "upgrade_manager.h"
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/upgrade_manager.cpp
 
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
 
+<<<<<<<< HEAD:src/platform/windows/sys/error_message.cpp
 #include <cstddef>
 #include <windows.h>
+========
+namespace cryptonote {
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/upgrade_manager.cpp
 
 namespace sys
 {

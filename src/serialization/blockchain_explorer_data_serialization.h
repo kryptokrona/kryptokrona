@@ -17,9 +17,17 @@
 
 #pragma once
 
+<<<<<<<< HEAD:src/serialization/blockchain_explorer_data_serialization.h
 #include "blockchain_explorer_data.h"
 
 #include "serialization/iserializer.h"
+========
+#include "imain_chain_storage.h"
+#include "currency.h"
+#include "swapped_vector.h"
+
+namespace cryptonote {
+>>>>>>>> 20dc9b25 (Refactoring cryptonote package):src/cryptonote_core/main_chain_storage.h
 
 namespace cryptonote
 {
