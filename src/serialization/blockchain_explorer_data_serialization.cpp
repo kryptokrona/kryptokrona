@@ -33,31 +33,31 @@ namespace cryptonote
     namespace
     {
         struct BinaryVariantTagGetter: boost::static_visitor<uint8_t> {
-          uint8_t operator()(const cryptonote::BaseInputDetails) { return static_cast<uint8_t>(SerializationTag::Base); }
-          uint8_t operator()(const cryptonote::KeyInputDetails) { return static_cast<uint8_t>(SerializationTag::Key); }
+          uint8_t operator()(const CryptoNote::BaseInputDetails) { return static_cast<uint8_t>(SerializationTag::Base); }
+          uint8_t operator()(const CryptoNote::KeyInputDetails) { return static_cast<uint8_t>(SerializationTag::Key); }
         };
 
         struct VariantSerializer : boost::static_visitor<> {
-          VariantSerializer(cryptonote::ISerializer& serializer, const std::string& name) : s(serializer), name(name) {}
+          VariantSerializer(CryptoNote::ISerializer& serializer, const std::string& name) : s(serializer), name(name) {}
 
           template <typename T>
           void operator() (T& param) { s(param, name); }
 
-          cryptonote::ISerializer& s;
+          CryptoNote::ISerializer& s;
           const std::string name;
         };
 
-        void getVariantValue(cryptonote::ISerializer& serializer, uint8_t tag, boost::variant<cryptonote::BaseInputDetails,
-                                                                                              cryptonote::KeyInputDetails>& in) {
+        void getVariantValue(CryptoNote::ISerializer& serializer, uint8_t tag, boost::variant<CryptoNote::BaseInputDetails,
+                                                                                              CryptoNote::KeyInputDetails>& in) {
           switch (static_cast<SerializationTag>(tag)) {
           case SerializationTag::Base: {
-            cryptonote::BaseInputDetails v;
+            CryptoNote::BaseInputDetails v;
             serializer(v, "data");
             in = v;
             break;
           }
           case SerializationTag::Key: {
-            cryptonote::KeyInputDetails v;
+            CryptoNote::KeyInputDetails v;
             serializer(v, "data");
             in = v;
             break;
@@ -68,10 +68,12 @@ namespace cryptonote
         }
 
         template <typename T>
-        bool serializePod(T& v, common::StringView name, cryptonote::ISerializer& serializer) {
+        bool serializePod(T& v, Common::StringView name, CryptoNote::ISerializer& serializer) {
           return serializer.binary(&v, sizeof(v), name);
         }
     }
+
+    //namespace CryptoNote {
 
     void serialize(TransactionOutputDetails& output, ISerializer& serializer) {
       serializer(output.output, "output");
@@ -135,7 +137,7 @@ namespace cryptonote
 
       //serializer(transaction.signatures, "signatures");
       if (serializer.type() == ISerializer::OUTPUT) {
-        std::vector<std::pair<uint64_t, crypto::Signature>> signaturesForSerialization;
+        std::vector<std::pair<uint64_t, Crypto::Signature>> signaturesForSerialization;
         signaturesForSerialization.reserve(transaction.signatures.size());
         uint64_t ctr = 0;
         for (const auto& signaturesV : transaction.signatures) {
@@ -152,7 +154,7 @@ namespace cryptonote
         serializer(size, "signaturesSize");
         transaction.signatures.resize(size);
 
-        std::vector<std::pair<uint64_t, crypto::Signature>> signaturesForSerialization;
+        std::vector<std::pair<uint64_t, Crypto::Signature>> signaturesForSerialization;
         serializer(signaturesForSerialization, "signatures");
 
         for (const auto& signatureWithIndex : signaturesForSerialization) {

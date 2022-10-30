@@ -24,14 +24,14 @@
 
 namespace crypto
 {
-    bool serialize(PublicKey& pubKey, common::StringView name, cryptonote::ISerializer& serializer);
-    bool serialize(SecretKey& secKey, common::StringView name, cryptonote::ISerializer& serializer);
-    bool serialize(Hash& h, common::StringView name, cryptonote::ISerializer& serializer);
-    bool serialize(chacha8_iv& chacha, common::StringView name, cryptonote::ISerializer& serializer);
-    bool serialize(KeyImage& keyImage, common::StringView name, cryptonote::ISerializer& serializer);
-    bool serialize(Signature& sig, common::StringView name, cryptonote::ISerializer& serializer);
-    bool serialize(EllipticCurveScalar& ecScalar, common::StringView name, cryptonote::ISerializer& serializer);
-    bool serialize(EllipticCurvePoint& ecPoint, common::StringView name, cryptonote::ISerializer& serializer);
+    bool serialize(PublicKey& pubKey, Common::StringView name, CryptoNote::ISerializer& serializer);
+    bool serialize(SecretKey& secKey, Common::StringView name, CryptoNote::ISerializer& serializer);
+    bool serialize(Hash& h, Common::StringView name, CryptoNote::ISerializer& serializer);
+    bool serialize(chacha8_iv& chacha, Common::StringView name, CryptoNote::ISerializer& serializer);
+    bool serialize(KeyImage& keyImage, Common::StringView name, CryptoNote::ISerializer& serializer);
+    bool serialize(Signature& sig, Common::StringView name, CryptoNote::ISerializer& serializer);
+    bool serialize(EllipticCurveScalar& ecScalar, Common::StringView name, CryptoNote::ISerializer& serializer);
+    bool serialize(EllipticCurvePoint& ecPoint, Common::StringView name, CryptoNote::ISerializer& serializer);
 }
 
 namespace cryptonote

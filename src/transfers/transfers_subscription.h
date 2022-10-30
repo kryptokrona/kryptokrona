@@ -27,7 +27,7 @@ namespace cryptonote
 {
     class TransfersSubscription : public IObservableImpl < ITransfersObserver, ITransfersSubscription > {
     public:
-      TransfersSubscription(const cryptonote::Currency& currency, std::shared_ptr<logging::ILogger> logger, const AccountSubscription& sub);
+      TransfersSubscription(const CryptoNote::Currency& currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription& sub);
 
       SynchronizationStart getSyncStart();
       void onBlockchainDetach(uint32_t height);
@@ -37,15 +37,15 @@ namespace cryptonote
       bool addTransaction(const TransactionBlockInfo& blockInfo, const ITransactionReader& tx,
                           const std::vector<TransactionOutputInformationIn>& transfers);
 
-      void deleteUnconfirmedTransaction(const crypto::Hash& transactionHash);
-      void markTransactionConfirmed(const TransactionBlockInfo& block, const crypto::Hash& transactionHash, const std::vector<uint32_t>& globalIndices);
+      void deleteUnconfirmedTransaction(const Crypto::Hash& transactionHash);
+      void markTransactionConfirmed(const TransactionBlockInfo& block, const Crypto::Hash& transactionHash, const std::vector<uint32_t>& globalIndices);
 
       // ITransfersSubscription
       virtual AccountPublicAddress getAddress() override;
       virtual ITransfersContainer& getContainer() override;
 
     private:
-      logging::LoggerRef logger;
+      Logging::LoggerRef logger;
       TransfersContainer transfers;
       AccountSubscription subscription;
       std::string m_address;

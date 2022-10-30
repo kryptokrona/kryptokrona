@@ -25,16 +25,16 @@
 namespace cryptonote
 {
     struct BlockFullInfo : public RawBlock {
-      crypto::Hash block_id;
+      Crypto::Hash block_id;
     };
 
     struct TransactionPrefixInfo {
-      crypto::Hash txHash;
+      Crypto::Hash txHash;
       TransactionPrefix txPrefix;
     };
 
     struct BlockShortInfo {
-      crypto::Hash blockId;
+      Crypto::Hash blockId;
       BinaryArray block;
       std::vector<TransactionPrefixInfo> txPrefixes;
     };
@@ -43,8 +43,8 @@ namespace cryptonote
     void serialize(TransactionPrefixInfo&, ISerializer&);
     void serialize(BlockShortInfo&, ISerializer&);
 
-    void serialize(wallet_types::WalletBlockInfo &walletBlockInfo, ISerializer &s);
-    void serialize(wallet_types::RawTransaction &rawTransaction, ISerializer &s);
-    void serialize(wallet_types::RawCoinbaseTransaction &rawCoinbaseTransaction, ISerializer &s);
-    void serialize(wallet_types::KeyOutput &keyOutput, ISerializer &s);
+    void serialize(WalletTypes::WalletBlockInfo &walletBlockInfo, ISerializer &s);
+    void serialize(WalletTypes::RawTransaction &rawTransaction, ISerializer &s);
+    void serialize(WalletTypes::RawCoinbaseTransaction &rawCoinbaseTransaction, ISerializer &s);
+    void serialize(WalletTypes::KeyOutput &keyOutput, ISerializer &s);
 }

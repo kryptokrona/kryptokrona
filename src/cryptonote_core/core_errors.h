@@ -57,8 +57,8 @@ namespace cryptonote
           }
         };
 
-        inline std::error_code make_error_code(cryptonote::error::CoreErrorCode e) {
-          return std::error_code(static_cast<int>(e), cryptonote::error::CoreErrorCategory::INSTANCE);
+        inline std::error_code make_error_code(CryptoNote::error::CoreErrorCode e) {
+          return std::error_code(static_cast<int>(e), CryptoNote::error::CoreErrorCategory::INSTANCE);
         }
     }
 }
@@ -66,5 +66,5 @@ namespace cryptonote
 namespace std
 {
     template <>
-    struct is_error_code_enum<cryptonote::error::CoreErrorCode>: public true_type {};
+    struct is_error_code_enum<CryptoNote::error::CoreErrorCode>: public true_type {};
 }

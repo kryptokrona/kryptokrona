@@ -25,9 +25,9 @@ namespace cryptonote
 {
     class KVBinaryInputStreamSerializer : public JsonInputValueSerializer {
     public:
-      KVBinaryInputStreamSerializer(common::IInputStream& strm);
+      KVBinaryInputStreamSerializer(Common::IInputStream& strm);
 
-      virtual bool binary(void* value, uint64_t size, common::StringView name) override;
-      virtual bool binary(std::string& value, common::StringView name) override;
+      virtual bool binary(void* value, uint64_t size, Common::StringView name) override;
+      virtual bool binary(std::string& value, Common::StringView name) override;
     };
 }

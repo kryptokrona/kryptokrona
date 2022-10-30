@@ -23,7 +23,7 @@
 
 namespace logging
 {
-    using common::console::Color;
+    using Common::Console::Color;
 
     ConsoleLogger::ConsoleLogger(Level level) : CommonLogger(level) {
     }
@@ -60,7 +60,7 @@ namespace logging
           color += message[charPos];
           if (readingText) {
             auto it = colorMapping.find(color);
-            common::console::setTextColor(it == colorMapping.end() ? Color::Default : it->second);
+            Common::Console::setTextColor(it == colorMapping.end() ? Color::Default : it->second);
             changedColor = true;
             color.clear();
           }
@@ -72,7 +72,7 @@ namespace logging
       }
 
       if (changedColor) {
-        common::console::setTextColor(Color::Default);
+        Common::Console::setTextColor(Color::Default);
       }
     }
 }

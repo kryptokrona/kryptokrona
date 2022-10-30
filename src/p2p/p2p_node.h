@@ -21,11 +21,11 @@
 #include <list>
 
 #include <logging/logger_ref.h>
-#include <sys/context_group.h>
-#include <sys/dispatcher.h>
-#include <sys/event.h>
-#include <sys/tcp_listener.h>
-#include <sys/timer.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
+#include <system/tcp_listener.h>
+#include <system/timer.h>
 
 #include "ip2p_node_internal.h"
 #include "istream_serializable.h"
@@ -51,9 +51,9 @@ namespace cryptonote
 
       P2pNode(
         const P2pNodeConfig& cfg,
-        sys::Dispatcher& dispatcher,
-        std::shared_ptr<logging::ILogger> log,
-        const crypto::Hash& genesisHash,
+        System::Dispatcher& dispatcher,
+        std::shared_ptr<Logging::ILogger> log,
+        const Crypto::Hash& genesisHash,
         uint64_t peerId);
 
       ~P2pNode();
@@ -70,22 +70,22 @@ namespace cryptonote
       void serialize(ISerializer& s);
 
     private:
-      typedef std::unique_ptr<P2pContext> ContextPtr;
+      typedef std::unique_ptr<p2pContext> ContextPtr;
       typedef std::list<ContextPtr> ContextList;
 
-      logging::LoggerRef logger;
+      Logging::LoggerRef logger;
       bool m_stopRequested;
       const P2pNodeConfig m_cfg;
       const uint64_t m_myPeerId;
       const CORE_SYNC_DATA m_genesisPayload;
 
-      sys::Dispatcher& m_dispatcher;
-      sys::ContextGroup workingContextGroup;
-      sys::TcpListener m_listener;
-      sys::Timer m_connectorTimer;
+      System::Dispatcher& m_dispatcher;
+      System::ContextGroup workingContextGroup;
+      System::TcpListener m_listener;
+      System::Timer m_connectorTimer;
       PeerlistManager m_peerlist;
       ContextList m_contexts;
-      sys::Event m_queueEvent;
+      System::Event m_queueEvent;
       std::deque<std::unique_ptr<IP2pConnection>> m_connectionQueue;
 
       // IP2pNodeInternal
@@ -115,7 +115,7 @@ namespace cryptonote
       void makeExpectedConnectionsCount(const Peerlist& peerlist, size_t connectionsCount);
       bool makeNewConnectionFromPeerlist(const Peerlist& peerlist);
       void preprocessIncomingConnection(ContextPtr ctx);
-      void enqueueConnection(std::unique_ptr<P2pConnectionProxy> proxy);
-      std::unique_ptr<P2pConnectionProxy> createProxy(ContextPtr ctx);
+      void enqueueConnection(std::unique_ptr<p2pConnectionProxy> proxy);
+      std::unique_ptr<p2pConnectionProxy> createProxy(ContextPtr ctx);
     };
 }

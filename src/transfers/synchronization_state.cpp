@@ -93,7 +93,7 @@ namespace cryptonote
       m_blockchain.resize(height);
     }
 
-    void SynchronizationState::addBlocks(const crypto::Hash* blockHashes, uint32_t height, uint32_t count) {
+    void SynchronizationState::addBlocks(const Crypto::Hash* blockHashes, uint32_t height, uint32_t count) {
       assert(blockHashes);
       auto size = m_blockchain.size();
       if (size) {}
@@ -108,23 +108,23 @@ namespace cryptonote
       return static_cast<uint32_t>(m_blockchain.size());
     }
 
-    const std::vector<crypto::Hash>& SynchronizationState::getKnownBlockHashes() const {
+    const std::vector<Crypto::Hash>& SynchronizationState::getKnownBlockHashes() const {
       return m_blockchain;
     }
 
     void SynchronizationState::save(std::ostream& os) {
       StdOutputStream stream(os);
-      cryptonote::BinaryOutputStreamSerializer s(stream);
+      CryptoNote::BinaryOutputStreamSerializer s(stream);
       serialize(s, "state");
     }
 
     void SynchronizationState::load(std::istream& in) {
       StdInputStream stream(in);
-      cryptonote::BinaryInputStreamSerializer s(stream);
+      CryptoNote::BinaryInputStreamSerializer s(stream);
       serialize(s, "state");
     }
 
-    cryptonote::ISerializer& SynchronizationState::serialize(cryptonote::ISerializer& s, const std::string& name) {
+    CryptoNote::ISerializer& SynchronizationState::serialize(CryptoNote::ISerializer& s, const std::string& name) {
       s.beginObject(name);
       s(m_blockchain, "blockchain");
       s.endObject();

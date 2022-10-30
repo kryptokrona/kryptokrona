@@ -20,6 +20,6 @@ namespace cryptonote
     public:
       virtual ~ITransactionPoolCleanWrapper() {}
 
-      virtual std::vector<crypto::Hash> clean(const uint32_t height) = 0;
+      virtual std::vector<Crypto::Hash> clean(const uint32_t height) = 0;
     };
 }

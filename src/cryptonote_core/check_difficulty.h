@@ -24,5 +24,5 @@
 
 namespace cryptonote
 {
-    bool check_hash(const crypto::Hash &hash, uint64_t difficulty);
+    bool check_hash(const Crypto::Hash &hash, uint64_t difficulty);
 }

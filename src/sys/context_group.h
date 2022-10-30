@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <sys/dispatcher.h>
+#include <system/dispatcher.h>
 
-namespace sys
+namespace system
 {
     class ContextGroup {
     public:

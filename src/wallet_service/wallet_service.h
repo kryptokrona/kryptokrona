@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <sys/context_group.h>
-#include <sys/dispatcher.h>
-#include <sys/event.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
 #include "iwallet.h"
 #include "inode.h"
 #include "cryptonote_core/currency.h"
@@ -39,14 +39,14 @@ namespace payment_service
       uint64_t scanHeight;
     };
 
-    void generateNewWallet(const cryptonote::Currency& currency, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger, sys::Dispatcher& dispatcher);
+    void generateNewWallet(const CryptoNote::Currency& currency, const WalletConfiguration& conf, std::shared_ptr<Logging::ILogger> logger, System::Dispatcher& dispatcher);
 
     struct TransactionsInBlockInfoFilter;
 
     class WalletService {
     public:
-      WalletService(const cryptonote::Currency& currency, sys::Dispatcher& sys, cryptonote::INode& node, cryptonote::IWallet& wallet,
-        cryptonote::IFusionManager& fusionManager, const WalletConfiguration& conf, std::shared_ptr<logging::ILogger> logger);
+      WalletService(const CryptoNote::Currency& currency, System::Dispatcher& sys, CryptoNote::INode& node, CryptoNote::IWallet& wallet,
+        CryptoNote::IFusionManager& fusionManager, const WalletConfiguration& conf, std::shared_ptr<Logging::ILogger> logger);
       virtual ~WalletService();
 
       void init();
@@ -99,25 +99,25 @@ namespace payment_service
       void loadTransactionIdIndex();
       void getNodeFee();
 
-      std::vector<cryptonote::TransactionsInBlockInfo> getTransactions(const crypto::Hash& blockHash, size_t blockCount) const;
-      std::vector<cryptonote::TransactionsInBlockInfo> getTransactions(uint32_t firstBlockIndex, size_t blockCount) const;
+      std::vector<CryptoNote::TransactionsInBlockInfo> getTransactions(const Crypto::Hash& blockHash, size_t blockCount) const;
+      std::vector<CryptoNote::TransactionsInBlockInfo> getTransactions(uint32_t firstBlockIndex, size_t blockCount) const;
 
-      std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(const crypto::Hash& blockHash, size_t blockCount, const TransactionsInBlockInfoFilter& filter) const;
+      std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(const Crypto::Hash& blockHash, size_t blockCount, const TransactionsInBlockInfoFilter& filter) const;
       std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(uint32_t firstBlockIndex, size_t blockCount, const TransactionsInBlockInfoFilter& filter) const;
 
-      std::vector<TransactionsInBlockRpcInfo> getRpcTransactions(const crypto::Hash& blockHash, size_t blockCount, const TransactionsInBlockInfoFilter& filter) const;
+      std::vector<TransactionsInBlockRpcInfo> getRpcTransactions(const Crypto::Hash& blockHash, size_t blockCount, const TransactionsInBlockInfoFilter& filter) const;
       std::vector<TransactionsInBlockRpcInfo> getRpcTransactions(uint32_t firstBlockIndex, size_t blockCount, const TransactionsInBlockInfoFilter& filter) const;
 
-      const cryptonote::Currency& currency;
-      cryptonote::IWallet& wallet;
-      cryptonote::IFusionManager& fusionManager;
-      cryptonote::INode& node;
+      const CryptoNote::Currency& currency;
+      CryptoNote::IWallet& wallet;
+      CryptoNote::IFusionManager& fusionManager;
+      CryptoNote::INode& node;
       const WalletConfiguration& config;
       bool inited;
-      logging::LoggerRef logger;
-      sys::Dispatcher& dispatcher;
-      sys::Event readyEvent;
-      sys::ContextGroup refreshContext;
+      Logging::LoggerRef logger;
+      System::Dispatcher& dispatcher;
+      System::Event readyEvent;
+      System::ContextGroup refreshContext;
       std::string m_node_address;
       uint32_t m_node_fee;
 

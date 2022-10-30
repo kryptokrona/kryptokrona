@@ -40,7 +40,7 @@ namespace cryptonote
     };
 
     struct TransactionOutputReferenceDetails {
-      crypto::Hash transactionHash;
+      Crypto::Hash transactionHash;
       uint64_t number;
     };
 
@@ -58,13 +58,13 @@ namespace cryptonote
     typedef boost::variant<BaseInputDetails, KeyInputDetails> TransactionInputDetails;
 
     struct TransactionExtraDetails {
-      crypto::PublicKey publicKey;
+      Crypto::PublicKey publicKey;
       BinaryArray nonce;
       BinaryArray raw;
     };
 
     struct TransactionDetails {
-      crypto::Hash hash;
+      Crypto::Hash hash;
       uint64_t size = 0;
       uint64_t fee = 0;
       uint64_t totalInputsAmount = 0;
@@ -72,13 +72,13 @@ namespace cryptonote
       uint64_t mixin = 0;
       uint64_t unlockTime = 0;
       uint64_t timestamp = 0;
-      crypto::Hash paymentId;
+      Crypto::Hash paymentId;
       bool hasPaymentId = false;
       bool inBlockchain = false;
-      crypto::Hash blockHash;
+      Crypto::Hash blockHash;
       uint32_t blockIndex = 0;
       TransactionExtraDetails extra;
-      std::vector<std::vector<crypto::Signature>> signatures;
+      std::vector<std::vector<Crypto::Signature>> signatures;
       std::vector<TransactionInputDetails> inputs;
       std::vector<TransactionOutputDetails> outputs;
     };
@@ -87,11 +87,11 @@ namespace cryptonote
       uint8_t majorVersion = 0;
       uint8_t minorVersion = 0;
       uint64_t timestamp = 0;
-      crypto::Hash prevBlockHash;
+      Crypto::Hash prevBlockHash;
       uint32_t nonce = 0;
       bool isAlternative = false;
       uint32_t index = 0;
-      crypto::Hash hash;
+      Crypto::Hash hash;
       uint64_t difficulty = 0;
       uint64_t reward = 0;
       uint64_t baseReward = 0;

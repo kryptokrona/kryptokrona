@@ -17,7 +17,7 @@
 #include "inode.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
 
-namespace sys
+namespace system
 {
   class ContextGroup;
   class Dispatcher;
@@ -34,17 +34,17 @@ namespace cryptonote
       virtual void connectionStatusUpdated(bool connected) {}
     };
 
-    class NodeRpcProxy : public cryptonote::INode {
+    class NodeRpcProxy : public CryptoNote::INode {
     public:
-      NodeRpcProxy(const std::string& nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<logging::ILogger> logger);
+      NodeRpcProxy(const std::string& nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<Logging::ILogger> logger);
       NodeRpcProxy(const std::string& nodeHost, unsigned short nodePort, unsigned int initTimeout);
       virtual ~NodeRpcProxy();
 
-      virtual bool addObserver(cryptonote::INodeObserver* observer) override;
-      virtual bool removeObserver(cryptonote::INodeObserver* observer) override;
+      virtual bool addObserver(CryptoNote::INodeObserver* observer) override;
+      virtual bool removeObserver(CryptoNote::INodeObserver* observer) override;
 
-      virtual bool addObserver(cryptonote::INodeRpcProxyObserver* observer);
-      virtual bool removeObserver(cryptonote::INodeRpcProxyObserver* observer);
+      virtual bool addObserver(CryptoNote::INodeRpcProxyObserver* observer);
+      virtual bool removeObserver(CryptoNote::INodeRpcProxyObserver* observer);
 
       virtual void init(const Callback& callback) override;
       virtual bool shutdown() override;
@@ -58,36 +58,36 @@ namespace cryptonote
 
       virtual void getFeeInfo() override;
 
-      virtual void getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount, std::vector<crypto::Hash>& blockHashes, const Callback& callback) override;
-      virtual void getTransactionHashesByPaymentId(const crypto::Hash& paymentId, std::vector<crypto::Hash>& transactionHashes, const Callback& callback) override;
+      virtual void getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount, std::vector<Crypto::Hash>& blockHashes, const Callback& callback) override;
+      virtual void getTransactionHashesByPaymentId(const Crypto::Hash& paymentId, std::vector<Crypto::Hash>& transactionHashes, const Callback& callback) override;
 
       virtual BlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
 
-      virtual void relayTransaction(const cryptonote::Transaction& transaction, const Callback& callback) override;
+      virtual void relayTransaction(const CryptoNote::Transaction& transaction, const Callback& callback) override;
       virtual void getRandomOutsByAmounts(std::vector<uint64_t>&& amounts, uint16_t outsCount, std::vector<RandomOuts>& result, const Callback& callback) override;
-      virtual void getTransactionOutsGlobalIndices(const crypto::Hash& transactionHash, std::vector<uint32_t>& outsGlobalIndices, const Callback& callback) override;
+      virtual void getTransactionOutsGlobalIndices(const Crypto::Hash& transactionHash, std::vector<uint32_t>& outsGlobalIndices, const Callback& callback) override;
 
       virtual void getGlobalIndexesForRange(
         const uint64_t startHeight,
         const uint64_t endHeight,
-        std::unordered_map<crypto::Hash, std::vector<uint64_t>> &indexes,
+        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes,
         const Callback &callback) override;
 
       virtual void getTransactionsStatus(
-        const std::unordered_set<crypto::Hash> transactionHashes,
-        std::unordered_set<crypto::Hash> &transactionsInPool,
-        std::unordered_set<crypto::Hash> &transactionsInBlock,
-        std::unordered_set<crypto::Hash> &transactionsUnknown,
+        const std::unordered_set<Crypto::Hash> transactionHashes,
+        std::unordered_set<Crypto::Hash> &transactionsInPool,
+        std::unordered_set<Crypto::Hash> &transactionsInBlock,
+        std::unordered_set<Crypto::Hash> &transactionsUnknown,
         const Callback &callback) override;
 
-      virtual void queryBlocks(std::vector<crypto::Hash>&& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const Callback& callback) override;
-      virtual void getWalletSyncData(std::vector<crypto::Hash>&& knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<wallet_types::WalletBlockInfo>& newBlocks, const Callback& callback) override;
-      virtual void getPoolSymmetricDifference(std::vector<crypto::Hash>&& knownPoolTxIds, crypto::Hash knownBlockId, bool& isBcActual,
-              std::vector<std::unique_ptr<ITransactionReader>>& newTxs, std::vector<crypto::Hash>& deletedTxIds, const Callback& callback) override;
+      virtual void queryBlocks(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t timestamp, std::vector<BlockShortEntry>& newBlocks, uint32_t& startHeight, const Callback& callback) override;
+      virtual void getWalletSyncData(std::vector<Crypto::Hash>&& knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo>& newBlocks, const Callback& callback) override;
+      virtual void getPoolSymmetricDifference(std::vector<Crypto::Hash>&& knownPoolTxIds, Crypto::Hash knownBlockId, bool& isBcActual,
+              std::vector<std::unique_ptr<ITransactionReader>>& newTxs, std::vector<Crypto::Hash>& deletedTxIds, const Callback& callback) override;
       virtual void getBlocks(const std::vector<uint32_t>& blockHeights, std::vector<std::vector<BlockDetails>>& blocks, const Callback& callback) override;
-      virtual void getBlocks(const std::vector<crypto::Hash>& blockHashes, std::vector<BlockDetails>& blocks, const Callback& callback) override;
+      virtual void getBlocks(const std::vector<Crypto::Hash>& blockHashes, std::vector<BlockDetails>& blocks, const Callback& callback) override;
       virtual void getBlock(const uint32_t blockHeight, BlockDetails &block, const Callback& callback) override;
-      virtual void getTransactions(const std::vector<crypto::Hash>& transactionHashes, std::vector<TransactionDetails>& transactions, const Callback& callback) override;
+      virtual void getTransactions(const std::vector<Crypto::Hash>& transactionHashes, std::vector<TransactionDetails>& transactions, const Callback& callback) override;
       virtual void isSynchronized(bool& syncStatus, const Callback& callback) override;
       virtual std::string feeAddress() override;
       virtual uint32_t feeAmount() override;
@@ -99,44 +99,44 @@ namespace cryptonote
       void resetInternalState();
       void workerThread(const Callback& initialized_callback);
 
-      std::vector<crypto::Hash> getKnownTxsVector() const;
+      std::vector<Crypto::Hash> getKnownTxsVector() const;
       void pullNodeStatusAndScheduleTheNext();
       void updateNodeStatus();
       void updateBlockchainStatus();
       bool updatePoolStatus();
       void updatePeerCount(size_t peerCount);
-      void updatePoolState(const std::vector<std::unique_ptr<ITransactionReader>>& addedTxs, const std::vector<crypto::Hash>& deletedTxsIds);
+      void updatePoolState(const std::vector<std::unique_ptr<ITransactionReader>>& addedTxs, const std::vector<Crypto::Hash>& deletedTxsIds);
 
-      std::error_code doGetBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount, std::vector<crypto::Hash>& blockHashes);
-      std::error_code doRelayTransaction(const cryptonote::Transaction& transaction);
+      std::error_code doGetBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount, std::vector<Crypto::Hash>& blockHashes);
+      std::error_code doRelayTransaction(const CryptoNote::Transaction& transaction);
       std::error_code doGetRandomOutsByAmounts(std::vector<uint64_t>& amounts, uint16_t outsCount,
                                                std::vector<RandomOuts>& result);
-      std::error_code doGetTransactionOutsGlobalIndices(const crypto::Hash& transactionHash,
+      std::error_code doGetTransactionOutsGlobalIndices(const Crypto::Hash& transactionHash,
                                                         std::vector<uint32_t>& outsGlobalIndices);
 
       std::error_code doGetGlobalIndexesForRange(
         const uint64_t startHeight,
         const uint64_t endHeight,
-        std::unordered_map<crypto::Hash, std::vector<uint64_t>> &indexes);
+        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes);
 
       std::error_code doGetTransactionsStatus(
-        const std::unordered_set<crypto::Hash> transactionHashes,
-        std::unordered_set<crypto::Hash> &transactionsInPool,
-        std::unordered_set<crypto::Hash> &transactionsInBlock,
-        std::unordered_set<crypto::Hash> &transactionsUnknown);
+        const std::unordered_set<Crypto::Hash> transactionHashes,
+        std::unordered_set<Crypto::Hash> &transactionsInPool,
+        std::unordered_set<Crypto::Hash> &transactionsInBlock,
+        std::unordered_set<Crypto::Hash> &transactionsUnknown);
 
-      std::error_code doQueryBlocksLite(const std::vector<crypto::Hash>& knownBlockIds, uint64_t timestamp,
-        std::vector<cryptonote::BlockShortEntry>& newBlocks, uint32_t& startHeight);
+      std::error_code doQueryBlocksLite(const std::vector<Crypto::Hash>& knownBlockIds, uint64_t timestamp,
+        std::vector<CryptoNote::BlockShortEntry>& newBlocks, uint32_t& startHeight);
 
-      std::error_code doGetWalletSyncData(const std::vector<crypto::Hash>& knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<wallet_types::WalletBlockInfo>& newBlocks);
+      std::error_code doGetWalletSyncData(const std::vector<Crypto::Hash>& knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo>& newBlocks);
 
-      std::error_code doGetPoolSymmetricDifference(std::vector<crypto::Hash>&& knownPoolTxIds, crypto::Hash knownBlockId, bool& isBcActual,
-              std::vector<std::unique_ptr<ITransactionReader>>& newTxs, std::vector<crypto::Hash>& deletedTxIds);
+      std::error_code doGetPoolSymmetricDifference(std::vector<Crypto::Hash>&& knownPoolTxIds, Crypto::Hash knownBlockId, bool& isBcActual,
+              std::vector<std::unique_ptr<ITransactionReader>>& newTxs, std::vector<Crypto::Hash>& deletedTxIds);
       std::error_code doGetBlocksByHeight(const std::vector<uint32_t>& blockHeights, std::vector<std::vector<BlockDetails>>& blocks);
-      std::error_code doGetBlocksByHash(const std::vector<crypto::Hash>& blockHashes, std::vector<BlockDetails>& blocks);
+      std::error_code doGetBlocksByHash(const std::vector<Crypto::Hash>& blockHashes, std::vector<BlockDetails>& blocks);
       std::error_code doGetBlock(const uint32_t blockHeight, BlockDetails& block);
-      std::error_code doGetTransactionHashesByPaymentId(const crypto::Hash& paymentId, std::vector<crypto::Hash>& transactionHashes);
-      std::error_code doGetTransactions(const std::vector<crypto::Hash>& transactionHashes, std::vector<TransactionDetails>& transactions);
+      std::error_code doGetTransactionHashesByPaymentId(const Crypto::Hash& paymentId, std::vector<Crypto::Hash>& transactionHashes);
+      std::error_code doGetTransactions(const std::vector<Crypto::Hash>& transactionHashes, std::vector<TransactionDetails>& transactions);
 
       void scheduleRequest(std::function<std::error_code()>&& procedure, const Callback& callback);
       template <typename Request, typename Response>
@@ -153,22 +153,22 @@ namespace cryptonote
       };
 
     private:
-      logging::LoggerRef m_logger;
+      Logging::LoggerRef m_logger;
       State m_state = STATE_NOT_INITIALIZED;
       mutable std::mutex m_mutex;
       std::condition_variable m_cv_initialized;
       std::thread m_workerThread;
-      sys::Dispatcher* m_dispatcher = nullptr;
-      sys::ContextGroup* m_context_group = nullptr;
-      tools::ObserverManager<cryptonote::INodeObserver> m_observerManager;
-      tools::ObserverManager<cryptonote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
+      System::Dispatcher* m_dispatcher = nullptr;
+      System::ContextGroup* m_context_group = nullptr;
+      Tools::ObserverManager<CryptoNote::INodeObserver> m_observerManager;
+      Tools::ObserverManager<CryptoNote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
 
       const std::string m_nodeHost;
       const unsigned short m_nodePort;
       unsigned int m_rpcTimeout;
       unsigned int m_initTimeout;
       HttpClient* m_httpClient = nullptr;
-      sys::Event* m_httpEvent = nullptr;
+      System::Event* m_httpEvent = nullptr;
 
       uint64_t m_pullInterval;
 
@@ -180,7 +180,7 @@ namespace cryptonote
 
       BlockHeaderInfo lastLocalBlockHeaderInfo;
       //protect it with mutex if decided to add worker threads
-      std::unordered_set<crypto::Hash> m_knownTxs;
+      std::unordered_set<Crypto::Hash> m_knownTxs;
 
       bool m_connected;
       std::string m_fee_address;

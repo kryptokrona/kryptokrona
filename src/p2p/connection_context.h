@@ -50,8 +50,8 @@ namespace cryptonote
 
       state m_state = state_befor_handshake;
       std::optional<PendingLiteBlock> m_pending_lite_block;
-      std::list<crypto::Hash> m_needed_objects;
-      std::unordered_set<crypto::Hash> m_requested_objects;
+      std::list<Crypto::Hash> m_needed_objects;
+      std::unordered_set<Crypto::Hash> m_requested_objects;
       uint32_t m_remote_blockchain_height = 0;
       uint32_t m_last_response_height = 0;
     };
@@ -80,8 +80,8 @@ namespace cryptonote
 
 namespace std
 {
-    inline std::ostream& operator << (std::ostream& s, const cryptonote::CryptoNoteConnectionContext& context) {
-      return s << "[" << common::ipAddressToString(context.m_remote_ip) << ":" <<
+    inline std::ostream& operator << (std::ostream& s, const CryptoNote::CryptoNoteConnectionContext& context) {
+      return s << "[" << Common::ipAddressToString(context.m_remote_ip) << ":" <<
         context.m_remote_port << (context.m_is_income ? " INC" : " OUT") << "] ";
     }
 }

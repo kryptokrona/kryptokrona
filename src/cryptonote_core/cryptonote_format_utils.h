@@ -31,12 +31,12 @@ namespace logging {
 
 namespace cryptonote
 {
-    bool is_out_to_acc(const AccountKeys& acc, const KeyOutput& out_key, const crypto::KeyDerivation& derivation, size_t keyIndex);
-    bool lookup_acc_outs(const AccountKeys& acc, const Transaction& tx, const crypto::PublicKey& tx_pub_key, std::vector<size_t>& outs, uint64_t& money_transfered);
+    bool is_out_to_acc(const AccountKeys& acc, const KeyOutput& out_key, const Crypto::KeyDerivation& derivation, size_t keyIndex);
+    bool lookup_acc_outs(const AccountKeys& acc, const Transaction& tx, const Crypto::PublicKey& tx_pub_key, std::vector<size_t>& outs, uint64_t& money_transfered);
     bool lookup_acc_outs(const AccountKeys& acc, const Transaction& tx, std::vector<size_t>& outs, uint64_t& money_transfered);
     bool get_tx_fee(const Transaction& tx, uint64_t & fee);
     uint64_t get_tx_fee(const Transaction& tx);
-    bool generate_key_image_helper(const AccountKeys& ack, const crypto::PublicKey& tx_public_key, size_t real_output_index, KeyPair& in_ephemeral, crypto::KeyImage& ki);
+    bool generate_key_image_helper(const AccountKeys& ack, const Crypto::PublicKey& tx_public_key, size_t real_output_index, KeyPair& in_ephemeral, Crypto::KeyImage& ki);
     bool checkInputTypesSupported(const TransactionPrefix& tx);
     bool checkOutsValid(const TransactionPrefix& tx, std::string* error = nullptr);
     bool checkInputsOverflow(const TransactionPrefix &tx);

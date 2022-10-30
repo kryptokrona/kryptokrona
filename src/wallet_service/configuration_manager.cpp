@@ -19,7 +19,7 @@
 namespace payment_service
 {
     ConfigurationManager::ConfigurationManager() {
-      rpcSecret = crypto::Hash();
+      rpcSecret = Crypto::Hash();
     }
 
     bool ConfigurationManager::init(int argc, char** argv)
@@ -68,7 +68,7 @@ namespace payment_service
 
       if (serviceConfig.dumpConfig)
       {
-        std::cout << cryptonote::getProjectCLIHeader() << asString(serviceConfig) << std::endl;
+        std::cout << CryptoNote::getProjectCLIHeader() << asString(serviceConfig) << std::endl;
         exit(0);
       }
       else if (!serviceConfig.outputFile.empty())
@@ -76,12 +76,12 @@ namespace payment_service
         try
         {
           asFile(serviceConfig, serviceConfig.outputFile);
-          std::cout << cryptonote::getProjectCLIHeader() << "Configuration saved to: " << serviceConfig.outputFile << std::endl;
+          std::cout << CryptoNote::getProjectCLIHeader() << "Configuration saved to: " << serviceConfig.outputFile << std::endl;
           exit(0);
         }
         catch (std::exception& e)
         {
-          std::cout << cryptonote::getProjectCLIHeader() << "Could not save configuration to: " << serviceConfig.outputFile
+          std::cout << CryptoNote::getProjectCLIHeader() << "Could not save configuration to: " << serviceConfig.outputFile
             << std::endl << e.what() << std::endl;
           exit(1);
         }
@@ -92,9 +92,9 @@ namespace payment_service
         throw std::runtime_error("It's impossible to use both --register-service and --unregister-service at the same time");
       }
 
-      if (serviceConfig.logLevel > logging::TRACE)
+      if (serviceConfig.logLevel > Logging::TRACE)
       {
-        throw std::runtime_error("log-level must be between " + std::to_string(logging::FATAL) +  ".." + std::to_string(logging::TRACE));
+        throw std::runtime_error("log-level must be between " + std::to_string(Logging::FATAL) +  ".." + std::to_string(Logging::TRACE));
       }
 
       if (serviceConfig.containerFile.empty())
@@ -150,7 +150,7 @@ namespace payment_service
       if (!serviceConfig.rpcPassword.empty())
       {
         std::vector<uint8_t> rawData(serviceConfig.rpcPassword.begin(), serviceConfig.rpcPassword.end());
-        crypto::cn_slow_hash_v0(rawData.data(), rawData.size(), rpcSecret);
+        Crypto::cn_slow_hash_v0(rawData.data(), rawData.size(), rpcSecret);
         serviceConfig.rpcPassword = "";
       }
 

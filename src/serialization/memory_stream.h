@@ -25,7 +25,7 @@
 
 namespace cryptonote
 {
-    class MemoryStream: public common::IOutputStream {
+    class MemoryStream: public Common::IOutputStream {
     public:
 
       MemoryStream() : m_writePos(0) {

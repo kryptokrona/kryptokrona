@@ -21,9 +21,9 @@
 #include "p2p_context.h"
 #include "p2p_node.h"
 
-#include <sys/interrupted_exception.h>
+#include <system/interrupted_exception.h>
 
-using namespace sys;
+using namespace system;
 
 namespace cryptonote
 {

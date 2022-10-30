@@ -27,13 +27,13 @@ namespace payment_service
 {
     class NodeFactory {
     public:
-      static cryptonote::INode* createNode(const std::string& daemonAddress, uint16_t daemonPort, uint16_t initTimeout, std::shared_ptr<logging::ILogger> logger);
-      static cryptonote::INode* createNodeStub();
+      static CryptoNote::INode* createNode(const std::string& daemonAddress, uint16_t daemonPort, uint16_t initTimeout, std::shared_ptr<Logging::ILogger> logger);
+      static CryptoNote::INode* createNodeStub();
     private:
       NodeFactory();
       ~NodeFactory();
 
-      cryptonote::INode* getNode(const std::string& daemonAddress, uint16_t daemonPort);
+      CryptoNote::INode* getNode(const std::string& daemonAddress, uint16_t daemonPort);
 
       static NodeFactory factory;
     };

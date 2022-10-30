@@ -30,25 +30,25 @@ using namespace cryptonote;
 namespace
 {
     template <typename T>
-    T readPod(common::IInputStream& s) {
+    T readPod(Common::IInputStream& s) {
       T v;
       read(s, &v, sizeof(T));
       return v;
     }
 
     template <typename T, typename JsonT = T>
-    JsonValue readPodJson(common::IInputStream& s) {
+    JsonValue readPodJson(Common::IInputStream& s) {
       JsonValue jv;
       jv = static_cast<JsonT>(readPod<T>(s));
       return jv;
     }
 
     template <typename T>
-    JsonValue readIntegerJson(common::IInputStream& s) {
+    JsonValue readIntegerJson(Common::IInputStream& s) {
       return readPodJson<T, int64_t>(s);
     }
 
-    uint64_t readVarint(common::IInputStream& s) {
+    uint64_t readVarint(Common::IInputStream& s) {
       uint8_t b = read<uint8_t>(s);
       uint8_t size_mask = b & PORTABLE_RAW_SIZE_MARK_MASK;
       uint64_t bytesLeft = 0;
@@ -79,7 +79,7 @@ namespace
       return value;
     }
 
-    std::string readString(common::IInputStream& s) {
+    std::string readString(Common::IInputStream& s) {
       auto size = readVarint(s);
       std::string str;
       str.resize(size);
@@ -89,11 +89,11 @@ namespace
       return str;
     }
 
-    JsonValue readStringJson(common::IInputStream& s) {
+    JsonValue readStringJson(Common::IInputStream& s) {
       return JsonValue(readString(s));
     }
 
-    void readName(common::IInputStream& s, std::string& name) {
+    void readName(Common::IInputStream& s, std::string& name) {
       uint8_t len = readPod<uint8_t>(s);
       if (len) {
         name.resize(len);
@@ -101,13 +101,13 @@ namespace
       }
     }
 
-    JsonValue loadValue(common::IInputStream& stream, uint8_t type);
-    JsonValue loadSection(common::IInputStream& stream);
-    JsonValue loadEntry(common::IInputStream& stream);
-    JsonValue loadArray(common::IInputStream& stream, uint8_t itemType);
+    JsonValue loadValue(Common::IInputStream& stream, uint8_t type);
+    JsonValue loadSection(Common::IInputStream& stream);
+    JsonValue loadEntry(Common::IInputStream& stream);
+    JsonValue loadArray(Common::IInputStream& stream, uint8_t itemType);
 
 
-    JsonValue loadSection(common::IInputStream& stream) {
+    JsonValue loadSection(Common::IInputStream& stream) {
       JsonValue sec(JsonValue::OBJECT);
       uint64_t count = readVarint(stream);
       std::string name;
@@ -120,7 +120,7 @@ namespace
       return sec;
     }
 
-    JsonValue loadValue(common::IInputStream& stream, uint8_t type) {
+    JsonValue loadValue(Common::IInputStream& stream, uint8_t type) {
       switch (type) {
       case BIN_KV_SERIALIZE_TYPE_INT64:  return readIntegerJson<int64_t>(stream);
       case BIN_KV_SERIALIZE_TYPE_INT32:  return readIntegerJson<int32_t>(stream);
@@ -141,7 +141,7 @@ namespace
       }
     }
 
-    JsonValue loadEntry(common::IInputStream& stream) {
+    JsonValue loadEntry(Common::IInputStream& stream) {
       uint8_t type = readPod<uint8_t>(stream);
 
       if (type & BIN_KV_SERIALIZE_FLAG_ARRAY) {
@@ -152,7 +152,7 @@ namespace
       return loadValue(stream, type);
     }
 
-    JsonValue loadArray(common::IInputStream& stream, uint8_t itemType) {
+    JsonValue loadArray(Common::IInputStream& stream, uint8_t itemType) {
       JsonValue arr(JsonValue::ARRAY);
       uint64_t count = readVarint(stream);
 
@@ -164,7 +164,7 @@ namespace
     }
 
 
-    JsonValue parseBinary(common::IInputStream& stream) {
+    JsonValue parseBinary(Common::IInputStream& stream) {
       auto hdr = readPod<KVBinaryStorageBlockHeader>(stream);
 
       if (
@@ -181,10 +181,10 @@ namespace
     }
 }
 
-KVBinaryInputStreamSerializer::KVBinaryInputStreamSerializer(common::IInputStream& strm) : JsonInputValueSerializer(parseBinary(strm)) {
+KVBinaryInputStreamSerializer::KVBinaryInputStreamSerializer(Common::IInputStream& strm) : JsonInputValueSerializer(parseBinary(strm)) {
 }
 
-bool KVBinaryInputStreamSerializer::binary(void* value, uint64_t size, common::StringView name) {
+bool KVBinaryInputStreamSerializer::binary(void* value, uint64_t size, Common::StringView name) {
   std::string str;
 
   if (!(*this)(str, name)) {
@@ -199,7 +199,7 @@ bool KVBinaryInputStreamSerializer::binary(void* value, uint64_t size, common::S
   return true;
 }
 
-bool KVBinaryInputStreamSerializer::binary(std::string& value, common::StringView name) {
+bool KVBinaryInputStreamSerializer::binary(std::string& value, Common::StringView name) {
   return (*this)(value, name); // load as string
 }
 

@@ -29,25 +29,25 @@ namespace cryptonote
         // immutable messages
         struct NewBlock {
           uint32_t blockIndex;
-          crypto::Hash blockHash;
+          Crypto::Hash blockHash;
         };
 
         struct NewAlternativeBlock {
           uint32_t blockIndex;
-          crypto::Hash blockHash;
+          Crypto::Hash blockHash;
         };
 
         struct ChainSwitch {
           uint32_t commonRootIndex;
-          std::vector<crypto::Hash> blocksFromCommonRoot;
+          std::vector<Crypto::Hash> blocksFromCommonRoot;
         };
 
         struct AddTransaction {
-          std::vector<crypto::Hash> hashes;
+          std::vector<Crypto::Hash> hashes;
         };
 
         struct DeleteTransaction {
-          std::vector<crypto::Hash> hashes;
+          std::vector<Crypto::Hash> hashes;
           enum class Reason {
             InBlock,
             Outdated,
@@ -66,11 +66,11 @@ namespace cryptonote
         DeleteTransaction
       };
 
-      using NewBlock = messages::NewBlock;
-      using NewAlternativeBlock = messages::NewAlternativeBlock;
-      using ChainSwitch = messages::ChainSwitch;
-      using AddTransaction = messages::AddTransaction;
-      using DeleteTransaction = messages::DeleteTransaction;
+      using NewBlock = Messages::NewBlock;
+      using NewAlternativeBlock = Messages::NewAlternativeBlock;
+      using ChainSwitch = Messages::ChainSwitch;
+      using AddTransaction = Messages::AddTransaction;
+      using DeleteTransaction = Messages::DeleteTransaction;
 
       BlockchainMessage(const NewBlock& message);
       BlockchainMessage(const NewAlternativeBlock& message);
@@ -107,9 +107,9 @@ namespace cryptonote
     };
 
     // factory functions
-    BlockchainMessage makeChainSwitchMessage(uint32_t index, std::vector<crypto::Hash>&& hashes);
-    BlockchainMessage makeNewAlternativeBlockMessage(uint32_t index, const crypto::Hash& hash);
-    BlockchainMessage makeNewBlockMessage(uint32_t index, const crypto::Hash& hash);
-    BlockchainMessage makeAddTransactionMessage(std::vector<crypto::Hash>&& hash);
-    BlockchainMessage makeDelTransactionMessage(std::vector<crypto::Hash>&& hash, messages::DeleteTransaction::Reason r);
+    BlockchainMessage makeChainSwitchMessage(uint32_t index, std::vector<Crypto::Hash>&& hashes);
+    BlockchainMessage makeNewAlternativeBlockMessage(uint32_t index, const Crypto::Hash& hash);
+    BlockchainMessage makeNewBlockMessage(uint32_t index, const Crypto::Hash& hash);
+    BlockchainMessage makeAddTransactionMessage(std::vector<Crypto::Hash>&& hash);
+    BlockchainMessage makeDelTransactionMessage(std::vector<Crypto::Hash>&& hash, Messages::DeleteTransaction::Reason r);
 }

@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <string>
 
-namespace sys
+namespace system
 {
     class Dispatcher;
     class Ipv4Address;
@@ -39,7 +39,7 @@ namespace sys
 
     private:
       Dispatcher* dispatcher;
-      int listener;
+      size_t listener;
       void* context;
     };
 }

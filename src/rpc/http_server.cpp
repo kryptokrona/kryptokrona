@@ -19,21 +19,21 @@
 #include <boost/scope_exit.hpp>
 
 #include <http/http_parser.h>
-#include <sys/interrupted_exception.h>
-#include <sys/tcp_stream.h>
-#include <sys/ipv4_address.h>
+#include <system/interrupted_exception.h>
+#include <system/tcp_stream.h>
+#include <system/ipv4_address.h>
 
 using namespace logging;
 
 namespace cryptonote
 {
-    HttpServer::HttpServer(sys::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log)
+    HttpServer::HttpServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log)
       : m_dispatcher(dispatcher), workingContextGroup(dispatcher), logger(log, "HttpServer") {
 
     }
 
     void HttpServer::start(const std::string& address, uint16_t port) {
-      m_listener = sys::TcpListener(m_dispatcher, sys::Ipv4Address(address), port);
+      m_listener = System::TcpListener(m_dispatcher, System::Ipv4Address(address), port);
       workingContextGroup.spawn(std::bind(&HttpServer::acceptLoop, this));
     }
 
@@ -44,14 +44,14 @@ namespace cryptonote
 
     void HttpServer::acceptLoop() {
       try {
-        sys::TcpConnection connection;
+        System::TcpConnection connection;
         bool accepted = false;
 
         while (!accepted) {
           try {
             connection = m_listener.accept();
             accepted = true;
-          } catch (sys::InterruptedException&) {
+          } catch (System::InterruptedException&) {
             throw;
           } catch (std::exception&) {
             // try again
@@ -68,7 +68,7 @@ namespace cryptonote
 
         logger(DEBUGGING) << "Incoming connection from " << addr.first.toDottedDecimal() << ":" << addr.second;
 
-        sys::TcpStreambuf streambuf(connection);
+        System::TcpStreambuf streambuf(connection);
         std::iostream stream(&streambuf);
         HttpParser parser;
 
@@ -89,7 +89,7 @@ namespace cryptonote
 
         logger(DEBUGGING) << "Closing connection from " << addr.first.toDottedDecimal() << ":" << addr.second << " total=" << m_connections.size();
 
-      } catch (sys::InterruptedException&) {
+      } catch (System::InterruptedException&) {
       } catch (std::exception& e) {
         logger(DEBUGGING) << "Connection error: " << e.what();
       }

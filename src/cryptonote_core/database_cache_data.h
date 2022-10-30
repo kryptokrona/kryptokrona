@@ -23,12 +23,12 @@
 namespace cryptonote
 {
     struct KeyOutputInfo {
-      crypto::PublicKey publicKey;
-      crypto::Hash transactionHash;
+      Crypto::PublicKey publicKey;
+      Crypto::Hash transactionHash;
       uint64_t unlockTime;
       uint16_t outputIndex;
 
-      void serialize(cryptonote::ISerializer& s);
+      void serialize(CryptoNote::ISerializer& s);
     };
 
     // inherit here to avoid breaking IBlockchainCache interface

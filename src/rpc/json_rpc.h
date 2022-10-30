@@ -62,17 +62,17 @@ namespace cryptonote
           std::string message;
         };
 
-        typedef boost::optional<common::JsonValue> OptionalId;
-        typedef boost::optional<common::JsonValue> OptionalPassword;
+        typedef boost::optional<Common::JsonValue> OptionalId;
+        typedef boost::optional<Common::JsonValue> OptionalPassword;
 
         class JsonRpcRequest {
         public:
 
-          JsonRpcRequest() : psReq(common::JsonValue::OBJECT) {}
+          JsonRpcRequest() : psReq(Common::JsonValue::OBJECT) {}
 
           bool parseRequest(const std::string& requestBody) {
             try {
-              psReq = common::JsonValue::fromString(requestBody);
+              psReq = Common::JsonValue::fromString(requestBody);
             } catch (std::exception&) {
               throw JsonRpcError(errParseError);
             }
@@ -97,7 +97,7 @@ namespace cryptonote
           template <typename T>
           bool loadParams(T& v) const {
             loadFromJsonValue(v, psReq.contains("params") ?
-              psReq("params") : common::JsonValue(common::JsonValue::NIL));
+              psReq("params") : Common::JsonValue(Common::JsonValue::NIL));
             return true;
           }
 
@@ -131,7 +131,7 @@ namespace cryptonote
 
         private:
 
-          common::JsonValue psReq;
+          Common::JsonValue psReq;
           OptionalId id;
           OptionalPassword password;
           std::string method;
@@ -141,11 +141,11 @@ namespace cryptonote
         class JsonRpcResponse {
         public:
 
-          JsonRpcResponse() : psResp(common::JsonValue::OBJECT) {}
+          JsonRpcResponse() : psResp(Common::JsonValue::OBJECT) {}
 
           void parse(const std::string& responseBody) {
             try {
-              psResp = common::JsonValue::fromString(responseBody);
+              psResp = Common::JsonValue::fromString(responseBody);
             } catch (std::exception&) {
               throw JsonRpcError(errParseError);
             }
@@ -192,7 +192,7 @@ namespace cryptonote
           }
 
         private:
-          common::JsonValue psResp;
+          Common::JsonValue psResp;
         };
 
 
@@ -216,15 +216,15 @@ namespace cryptonote
           Request req;
           Response res;
 
-          if (!std::is_same<Request, cryptonote::EMPTY_STRUCT>::value && !jsReq.loadParams(req)) {
-            throw JsonRpcError(json_rpc::errInvalidParams);
+          if (!std::is_same<Request, CryptoNote::EMPTY_STRUCT>::value && !jsReq.loadParams(req)) {
+            throw JsonRpcError(JsonRpc::errInvalidParams);
           }
 
           bool result = handler(req, res);
 
           if (result) {
             if (!jsRes.setResult(res)) {
-              throw JsonRpcError(json_rpc::errInternalError);
+              throw JsonRpcError(JsonRpc::errInternalError);
             }
           }
           return result;
@@ -235,7 +235,7 @@ namespace cryptonote
         template <typename Class, typename Params, typename Result>
         JsonMemberMethod makeMemberMethod(bool (Class::*handler)(const Params&, Result&)) {
           return [handler](void* obj, const JsonRpcRequest& req, JsonRpcResponse& res) {
-            return json_rpc::invokeMethod<Params, Result>(
+            return JsonRpc::invokeMethod<Params, Result>(
               req, res, std::bind(handler, static_cast<Class*>(obj), std::placeholders::_1, std::placeholders::_2));
           };
         }

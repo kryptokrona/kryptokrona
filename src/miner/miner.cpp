@@ -18,13 +18,13 @@
 #include "cryptonote_core/check_difficulty.h"
 #include "cryptonote_core/cryptonote_format_utils.h"
 
-#include <sys/interrupted_exception.h>
+#include <system/interrupted_exception.h>
 
 #include <utilities/coloured_msg.h>
 
 namespace cryptonote
 {
-    Miner::Miner(sys::Dispatcher& dispatcher) :
+    Miner::Miner(System::Dispatcher& dispatcher) :
         m_dispatcher(dispatcher),
         m_miningStopped(dispatcher),
         m_state(MiningState::MINING_STOPPED)
@@ -50,7 +50,7 @@ namespace cryptonote
 
         if (m_state == MiningState::MINING_STOPPED)
         {
-            throw sys::InterruptedException();
+            throw System::InterruptedException();
         }
 
         return m_block;
@@ -75,12 +75,12 @@ namespace cryptonote
 
         try
         {
-            blockMiningParameters.blockTemplate.nonce = rdm::randomValue<uint32_t>();
+            blockMiningParameters.blockTemplate.nonce = Random::randomValue<uint32_t>();
 
             for (size_t i = 0; i < threadCount; ++i)
             {
-                m_workers.emplace_back(std::unique_ptr<sys::RemoteContext<void>> (
-                    new sys::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount))))
+                m_workers.emplace_back(std::unique_ptr<System::RemoteContext<void>> (
+                    new System::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount))))
                 );
 
                 blockMiningParameters.blockTemplate.nonce++;
@@ -108,7 +108,7 @@ namespace cryptonote
             while (m_state == MiningState::MINING_IN_PROGRESS)
             {
                 CachedBlock cachedBlock(block);
-                crypto::Hash hash = cachedBlock.getBlockLongHash();
+                Crypto::Hash hash = cachedBlock.getBlockLongHash();
 
                 if (check_hash(hash, difficulty))
                 {

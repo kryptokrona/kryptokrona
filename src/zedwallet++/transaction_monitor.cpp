@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include <utilities/coloured_msg.h>
+#include <Utilities/coloured_msg.h>
 #include <zedwallet++/command_implementations.h>
 #include <zedwallet++/get_input.h>
 

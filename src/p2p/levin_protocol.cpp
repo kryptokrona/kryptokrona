@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "levin_protocol.h"
-#include <sys/tcp_connection.h>
+#include <system/tcp_connection.h>
 
 using namespace cryptonote;
 
@@ -47,7 +47,7 @@ bool LevinProtocol::Command::needReply() const {
   return !(isNotify || isResponse);
 }
 
-LevinProtocol::LevinProtocol(sys::TcpConnection& connection) 
+LevinProtocol::LevinProtocol(System::TcpConnection& connection) 
   : m_conn(connection) {}
 
 void LevinProtocol::sendMessage(uint32_t command, const BinaryArray& out, bool needResponse) {
@@ -63,7 +63,7 @@ void LevinProtocol::sendMessage(uint32_t command, const BinaryArray& out, bool n
   BinaryArray writeBuffer;
   writeBuffer.reserve(sizeof(head) + out.size());
 
-  common::VectorOutputStream stream(writeBuffer);
+  Common::VectorOutputStream stream(writeBuffer);
   stream.writeSome(&head, sizeof(head));
   stream.writeSome(out.data(), out.size());
 
@@ -115,7 +115,7 @@ void LevinProtocol::sendReply(uint32_t command, const BinaryArray& out, int32_t 
   BinaryArray writeBuffer;
   writeBuffer.reserve(sizeof(head) + out.size());
 
-  common::VectorOutputStream stream(writeBuffer);
+  Common::VectorOutputStream stream(writeBuffer);
   stream.writeSome(&head, sizeof(head));
   stream.writeSome(out.data(), out.size());
 

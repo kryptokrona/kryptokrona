@@ -40,7 +40,7 @@ namespace cryptonote
     };
 
     struct TransactionExtraPublicKey {
-      crypto::PublicKey publicKey;
+      Crypto::PublicKey publicKey;
     };
 
     struct TransactionExtraNonce {
@@ -49,7 +49,7 @@ namespace cryptonote
 
     struct TransactionExtraMergeMiningTag {
       size_t depth;
-      crypto::Hash merkleRoot;
+      Crypto::Hash merkleRoot;
     };
 
     // tx_extra_field format, except tx_extra_padding and tx_extra_pub_key:
@@ -75,16 +75,16 @@ namespace cryptonote
     bool parseTransactionExtra(const std::vector<uint8_t>& tx_extra, std::vector<TransactionExtraField>& tx_extra_fields);
     bool writeTransactionExtra(std::vector<uint8_t>& tx_extra, const std::vector<TransactionExtraField>& tx_extra_fields);
 
-    crypto::PublicKey getTransactionPublicKeyFromExtra(const std::vector<uint8_t>& tx_extra);
-    bool addTransactionPublicKeyToExtra(std::vector<uint8_t>& tx_extra, const crypto::PublicKey& tx_pub_key);
+    Crypto::PublicKey getTransactionPublicKeyFromExtra(const std::vector<uint8_t>& tx_extra);
+    bool addTransactionPublicKeyToExtra(std::vector<uint8_t>& tx_extra, const Crypto::PublicKey& tx_pub_key);
     bool addExtraNonceToTransactionExtra(std::vector<uint8_t>& tx_extra, const BinaryArray& extra_nonce);
-    void setPaymentIdToTransactionExtraNonce(BinaryArray& extra_nonce, const crypto::Hash& payment_id);
-    bool getPaymentIdFromTransactionExtraNonce(const BinaryArray& extra_nonce, crypto::Hash& payment_id);
+    void setPaymentIdToTransactionExtraNonce(BinaryArray& extra_nonce, const Crypto::Hash& payment_id);
+    bool getPaymentIdFromTransactionExtraNonce(const BinaryArray& extra_nonce, Crypto::Hash& payment_id);
     bool appendMergeMiningTagToExtra(std::vector<uint8_t>& tx_extra, const TransactionExtraMergeMiningTag& mm_tag);
     bool getMergeMiningTagFromExtra(const std::vector<uint8_t>& tx_extra, TransactionExtraMergeMiningTag& mm_tag);
 
     bool createTxExtraWithPaymentId(const std::string& paymentIdString, std::vector<uint8_t>& extra);
     //returns false if payment id is not found or parse error
-    bool getPaymentIdFromTxExtra(const std::vector<uint8_t>& extra, crypto::Hash& paymentId);
-    bool parsePaymentId(const std::string& paymentIdString, crypto::Hash& paymentId);
+    bool getPaymentIdFromTxExtra(const std::vector<uint8_t>& extra, Crypto::Hash& paymentId);
+    bool parsePaymentId(const std::string& paymentIdString, Crypto::Hash& paymentId);
 }

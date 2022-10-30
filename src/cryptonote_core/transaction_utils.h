@@ -20,20 +20,20 @@
 
 namespace cryptonote
 {
-    bool checkInputsKeyimagesDiff(const cryptonote::TransactionPrefix& tx);
+    bool checkInputsKeyimagesDiff(const CryptoNote::TransactionPrefix& tx);
 
     // TransactionInput helper functions
     size_t getRequiredSignaturesCount(const TransactionInput& in);
     uint64_t getTransactionInputAmount(const TransactionInput& in);
-    transaction_types::InputType getTransactionInputType(const TransactionInput& in);
-    const TransactionInput& getInputChecked(const cryptonote::TransactionPrefix& transaction, size_t index);
-    const TransactionInput& getInputChecked(const cryptonote::TransactionPrefix& transaction, size_t index, transaction_types::InputType type);
+    TransactionTypes::InputType getTransactionInputType(const TransactionInput& in);
+    const TransactionInput& getInputChecked(const CryptoNote::TransactionPrefix& transaction, size_t index);
+    const TransactionInput& getInputChecked(const CryptoNote::TransactionPrefix& transaction, size_t index, TransactionTypes::InputType type);
 
     // TransactionOutput helper functions
-    transaction_types::OutputType getTransactionOutputType(const TransactionOutputTarget& out);
-    const TransactionOutput& getOutputChecked(const cryptonote::TransactionPrefix& transaction, size_t index);
-    const TransactionOutput& getOutputChecked(const cryptonote::TransactionPrefix& transaction, size_t index, transaction_types::OutputType type);
+    TransactionTypes::OutputType getTransactionOutputType(const TransactionOutputTarget& out);
+    const TransactionOutput& getOutputChecked(const CryptoNote::TransactionPrefix& transaction, size_t index);
+    const TransactionOutput& getOutputChecked(const CryptoNote::TransactionPrefix& transaction, size_t index, TransactionTypes::OutputType type);
 
-    bool findOutputsToAccount(const cryptonote::TransactionPrefix& transaction, const AccountPublicAddress& addr,
-            const crypto::SecretKey& viewSecretKey, std::vector<uint32_t>& out, uint64_t& amount);
+    bool findOutputsToAccount(const CryptoNote::TransactionPrefix& transaction, const AccountPublicAddress& addr,
+            const Crypto::SecretKey& viewSecretKey, std::vector<uint32_t>& out, uint64_t& amount);
 }

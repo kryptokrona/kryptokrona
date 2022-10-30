@@ -21,8 +21,8 @@
 
 #include <http/http_request.h>
 #include <http/http_response.h>
-#include <sys/tcp_connection.h>
-#include <sys/tcp_stream.h>
+#include <system/tcp_connection.h>
+#include <system/tcp_stream.h>
 
 #include "serialization/serialization_tools.h"
 
@@ -36,7 +36,7 @@ namespace cryptonote
     class HttpClient {
     public:
 
-      HttpClient(sys::Dispatcher& dispatcher, const std::string& address, uint16_t port);
+      HttpClient(System::Dispatcher& dispatcher, const std::string& address, uint16_t port);
       ~HttpClient();
       void request(const HttpRequest& req, HttpResponse& res);
 
@@ -50,9 +50,9 @@ namespace cryptonote
       const uint16_t m_port;
 
       bool m_connected = false;
-      sys::Dispatcher& m_dispatcher;
-      sys::TcpConnection m_connection;
-      std::unique_ptr<sys::TcpStreambuf> m_streamBuf;
+      System::Dispatcher& m_dispatcher;
+      System::TcpConnection m_connection;
+      std::unique_ptr<System::TcpStreambuf> m_streamBuf;
 
       /* Don't send two requests at once */
       std::mutex m_mutex;

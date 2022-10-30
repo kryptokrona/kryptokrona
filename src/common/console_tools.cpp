@@ -30,9 +30,9 @@
 #include <unistd.h>
 #endif
 
-namespace common
+namespace Common
 {
-    namespace console
+    namespace Console
     {
         bool isConsoleTty() {
         #if defined(WIN32)

@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "cryptonote.h"
+#include "crypto_note.h"
 #include <common/memory_input_stream.h>
 #include <common/vector_output_stream.h>
 #include "serialization/kv_binary_input_stream_serializer.h"
 #include "serialization/kv_binary_output_stream_serializer.h"
 
-namespace sys
+namespace system
 {
     class TcpConnection;
 }
@@ -46,7 +46,7 @@ namespace cryptonote
     class LevinProtocol {
     public:
 
-      LevinProtocol(sys::TcpConnection& connection);
+      LevinProtocol(System::TcpConnection& connection);
 
       template <typename Request, typename Response>
       bool invoke(uint32_t command, const Request& request, Response& response) {
@@ -84,7 +84,7 @@ namespace cryptonote
       template <typename T>
       static bool decode(const BinaryArray& buf, T& value) {
         try {
-          common::MemoryInputStream stream(buf.data(), buf.size());
+          Common::MemoryInputStream stream(buf.data(), buf.size());
           KVBinaryInputStreamSerializer serializer(stream);
           serialize(value, serializer);
         } catch (std::exception&) {
@@ -99,7 +99,7 @@ namespace cryptonote
         BinaryArray result;
         KVBinaryOutputStreamSerializer serializer;
         serialize(const_cast<T&>(value), serializer);
-        common::VectorOutputStream stream(result);
+        Common::VectorOutputStream stream(result);
         serializer.dump(stream);
         return result;
       }
@@ -108,6 +108,6 @@ namespace cryptonote
 
       bool readStrict(uint8_t* ptr, size_t size);
       void writeStrict(const uint8_t* ptr, size_t size);
-      sys::TcpConnection& m_conn;
+      System::TcpConnection& m_conn;
     };
 }

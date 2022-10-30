@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <streambuf>
 
-namespace sys
+namespace system
 {
     class TcpConnection;
 

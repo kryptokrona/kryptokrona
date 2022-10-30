@@ -234,7 +234,7 @@ namespace cryptonote
     }
 
     bool parsePaymentId(const std::string& paymentIdString, Hash& paymentId) {
-      return common::podFromHex(paymentIdString, paymentId);
+      return Common::podFromHex(paymentIdString, paymentId);
     }
 
     bool createTxExtraWithPaymentId(const std::string& paymentIdString, std::vector<uint8_t>& extra) {
@@ -245,9 +245,9 @@ namespace cryptonote
       }
 
       std::vector<uint8_t> extraNonce;
-      cryptonote::setPaymentIdToTransactionExtraNonce(extraNonce, paymentIdBin);
+      CryptoNote::setPaymentIdToTransactionExtraNonce(extraNonce, paymentIdBin);
 
-      if (!cryptonote::addExtraNonceToTransactionExtra(extra, extraNonce)) {
+      if (!CryptoNote::addExtraNonceToTransactionExtra(extra, extraNonce)) {
         return false;
       }
 

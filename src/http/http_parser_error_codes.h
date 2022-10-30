@@ -61,6 +61,6 @@ namespace cryptonote
     }
 }
 
-inline std::error_code make_error_code(cryptonote::error::HttpParserErrorCodes e) {
-  return std::error_code(static_cast<int>(e), cryptonote::error::HttpParserErrorCategory::INSTANCE);
+inline std::error_code make_error_code(CryptoNote::error::HttpParserErrorCodes e) {
+  return std::error_code(static_cast<int>(e), CryptoNote::error::HttpParserErrorCategory::INSTANCE);
 }

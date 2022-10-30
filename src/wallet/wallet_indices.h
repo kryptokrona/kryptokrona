@@ -38,9 +38,9 @@ namespace cryptonote
     const uint64_t ACCOUNT_CREATE_TIME_ACCURACY = 60 * 60 * 24;
 
     struct WalletRecord {
-      crypto::PublicKey spendPublicKey;
-      crypto::SecretKey spendSecretKey;
-      cryptonote::ITransfersContainer* container = nullptr;
+      Crypto::PublicKey spendPublicKey;
+      Crypto::SecretKey spendSecretKey;
+      CryptoNote::ITransfersContainer* container = nullptr;
       uint64_t pendingBalance = 0;
       uint64_t actualBalance = 0;
       time_t creationTimestamp;
@@ -48,9 +48,9 @@ namespace cryptonote
 
     #pragma pack(push, 1)
     struct EncryptedWalletRecord {
-      crypto::chacha8_iv iv;
+      Crypto::chacha8_iv iv;
       // Secret key, public key and creation timestamp
-      uint8_t data[sizeof(crypto::PublicKey) + sizeof(crypto::SecretKey) + sizeof(uint64_t)];
+      uint8_t data[sizeof(Crypto::PublicKey) + sizeof(Crypto::SecretKey) + sizeof(uint64_t)];
     };
     #pragma pack(pop)
 
@@ -71,16 +71,16 @@ namespace cryptonote
       boost::multi_index::indexed_by <
         boost::multi_index::random_access < boost::multi_index::tag <RandomAccessIndex> >,
         boost::multi_index::hashed_unique < boost::multi_index::tag <KeysIndex>,
-        BOOST_MULTI_INDEX_MEMBER(WalletRecord, crypto::PublicKey, spendPublicKey)>,
+        BOOST_MULTI_INDEX_MEMBER(WalletRecord, Crypto::PublicKey, spendPublicKey)>,
         boost::multi_index::hashed_unique < boost::multi_index::tag <TransfersContainerIndex>,
-          BOOST_MULTI_INDEX_MEMBER(WalletRecord, cryptonote::ITransfersContainer*, container) >
+          BOOST_MULTI_INDEX_MEMBER(WalletRecord, CryptoNote::ITransfersContainer*, container) >
       >
     > WalletsContainer;
 
     struct UnlockTransactionJob {
       uint32_t blockHeight;
-      cryptonote::ITransfersContainer* container;
-      crypto::Hash transactionHash;
+      CryptoNote::ITransfersContainer* container;
+      Crypto::Hash transactionHash;
     };
 
     typedef boost::multi_index_container <
@@ -90,38 +90,38 @@ namespace cryptonote
         BOOST_MULTI_INDEX_MEMBER(UnlockTransactionJob, uint32_t, blockHeight)
         >,
         boost::multi_index::hashed_non_unique < boost::multi_index::tag <TransactionHashIndex>,
-          BOOST_MULTI_INDEX_MEMBER(UnlockTransactionJob, crypto::Hash, transactionHash)
+          BOOST_MULTI_INDEX_MEMBER(UnlockTransactionJob, Crypto::Hash, transactionHash)
         >
       >
     > UnlockTransactionJobs;
 
     typedef boost::multi_index_container <
-      cryptonote::WalletTransaction,
+      CryptoNote::WalletTransaction,
       boost::multi_index::indexed_by <
         boost::multi_index::random_access < boost::multi_index::tag <RandomAccessIndex> >,
         boost::multi_index::hashed_unique < boost::multi_index::tag <TransactionIndex>,
-          boost::multi_index::member<cryptonote::WalletTransaction, crypto::Hash, &cryptonote::WalletTransaction::hash >
+          boost::multi_index::member<CryptoNote::WalletTransaction, Crypto::Hash, &CryptoNote::WalletTransaction::hash >
         >,
         boost::multi_index::ordered_non_unique < boost::multi_index::tag <BlockHeightIndex>,
-          boost::multi_index::member<cryptonote::WalletTransaction, uint32_t, &cryptonote::WalletTransaction::blockHeight >
+          boost::multi_index::member<CryptoNote::WalletTransaction, uint32_t, &CryptoNote::WalletTransaction::blockHeight >
         >
       >
     > WalletTransactions;
 
-    typedef common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
-    typedef std::pair<uint64_t, cryptonote::WalletTransfer> TransactionTransferPair;
+    typedef Common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
+    typedef std::pair<uint64_t, CryptoNote::WalletTransfer> TransactionTransferPair;
     typedef std::vector<TransactionTransferPair> WalletTransfers;
-    typedef std::map<uint64_t, cryptonote::Transaction> UncommitedTransactions;
+    typedef std::map<uint64_t, CryptoNote::Transaction> UncommitedTransactions;
 
     typedef boost::multi_index_container<
-      crypto::Hash,
+      Crypto::Hash,
       boost::multi_index::indexed_by <
         boost::multi_index::random_access<
           boost::multi_index::tag<BlockHeightIndex>
         >,
         boost::multi_index::hashed_unique<
           boost::multi_index::tag<BlockHashIndex>,
-          boost::multi_index::identity<crypto::Hash>
+          boost::multi_index::identity<Crypto::Hash>
         >
       >
     > BlockHashesContainer;

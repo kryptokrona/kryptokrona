@@ -110,7 +110,7 @@ namespace utilities
             }
         }
 
-        const float days = (next_fork - height) / cryptonote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+        const float days = (next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
 
         /* Next fork in < 30 days away */
         if (days < 30)
@@ -150,7 +150,7 @@ namespace utilities
             }
         }
 
-        const float days = (static_cast<float>(next_fork - height) / cryptonote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);
+        const float days = (static_cast<float>(next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);
 
         std::stringstream stream;
 
@@ -211,7 +211,7 @@ namespace utilities
         {
             if (upgrade > supported_height)
             {
-                return "The network forked at height " + std::to_string(upgrade) + ", please update your software: " + cryptonote::LATEST_VERSION_URL;
+                return "The network forked at height " + std::to_string(upgrade) + ", please update your software: " + CryptoNote::LATEST_VERSION_URL;
             }
         }
 
@@ -219,7 +219,7 @@ namespace utilities
         return std::string();
     }
 
-    std::string get_status_string(cryptonote::COMMAND_RPC_GET_INFO::response iresp) {
+    std::string get_status_string(CryptoNote::COMMAND_RPC_GET_INFO::response iresp) {
       std::stringstream ss;
       std::time_t uptime = std::time(nullptr) - iresp.start_time;
       auto forkStatus = get_fork_status(iresp.network_height, iresp.upgrade_heights, iresp.supported_height);
@@ -249,7 +249,7 @@ namespace utilities
        e.g. 100 for 2 decimal places */
     uint64_t getDivisor()
     {
-        return static_cast<uint64_t>(pow(10, wallet_config::numDecimalPlaces));
+        return static_cast<uint64_t>(pow(10, WalletConfig::numDecimalPlaces));
     }
 
     std::string formatDollars(const uint64_t amount)
@@ -305,7 +305,7 @@ namespace utilities
     std::string formatCents(const uint64_t amount)
     {
         std::stringstream stream;
-        stream << std::setfill('0') << std::setw(wallet_config::numDecimalPlaces)
+        stream << std::setfill('0') << std::setw(WalletConfig::numDecimalPlaces)
                << amount;
         return stream.str();
     }
@@ -317,7 +317,7 @@ namespace utilities
         const uint64_t cents = amount % divisor;
 
         return formatDollars(dollars) + "." + formatCents(cents) + " "
-             + wallet_config::ticker;
+             + WalletConfig::ticker;
     }
 
     std::string formatAmountBasic(const uint64_t amount)

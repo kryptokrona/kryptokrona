@@ -40,14 +40,14 @@ namespace cryptonote
       return ISerializer::INPUT;
     }
 
-    bool BinaryInputStreamSerializer::beginObject(common::StringView name) {
+    bool BinaryInputStreamSerializer::beginObject(Common::StringView name) {
       return true;
     }
 
     void BinaryInputStreamSerializer::endObject() {
     }
 
-    bool BinaryInputStreamSerializer::beginArray(uint64_t& size, common::StringView name) {
+    bool BinaryInputStreamSerializer::beginArray(uint64_t& size, Common::StringView name) {
       readVarintAs<uint64_t>(stream, size);
       return true;
     }
@@ -55,52 +55,52 @@ namespace cryptonote
     void BinaryInputStreamSerializer::endArray() {
     }
 
-    bool BinaryInputStreamSerializer::operator()(uint8_t& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(uint8_t& value, Common::StringView name) {
       readVarint(stream, value);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(uint16_t& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(uint16_t& value, Common::StringView name) {
       readVarint(stream, value);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(int16_t& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(int16_t& value, Common::StringView name) {
       readVarintAs<uint16_t>(stream, value);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(uint32_t& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(uint32_t& value, Common::StringView name) {
       readVarint(stream, value);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(int32_t& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(int32_t& value, Common::StringView name) {
       readVarintAs<uint32_t>(stream, value);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(int64_t& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(int64_t& value, Common::StringView name) {
       readVarintAs<uint64_t>(stream, value);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(uint64_t& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(uint64_t& value, Common::StringView name) {
       readVarint(stream, value);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(bool& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(bool& value, Common::StringView name) {
       value = read<uint8_t>(stream) != 0;
       return true;
     }
 
-    bool BinaryInputStreamSerializer::operator()(std::string& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(std::string& value, Common::StringView name) {
       uint64_t size;
       readVarint(stream, size);
 
       /* Can't take up more than a block size */
-      if (size > cryptonote::parameters::MAX_EXTRA_SIZE && std::string(name.getData()) == "mm_tag")
+      if (size > CryptoNote::parameters::MAX_EXTRA_SIZE && std::string(name.getData()) == "mm_tag")
       {
         std::vector<char> temp;
         temp.resize(1);
@@ -129,16 +129,16 @@ namespace cryptonote
       return true;
     }
 
-    bool BinaryInputStreamSerializer::binary(void* value, uint64_t size, common::StringView name) {
+    bool BinaryInputStreamSerializer::binary(void* value, uint64_t size, Common::StringView name) {
       checkedRead(static_cast<char*>(value), size);
       return true;
     }
 
-    bool BinaryInputStreamSerializer::binary(std::string& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::binary(std::string& value, Common::StringView name) {
       return (*this)(value, name);
     }
 
-    bool BinaryInputStreamSerializer::operator()(double& value, common::StringView name) {
+    bool BinaryInputStreamSerializer::operator()(double& value, Common::StringView name) {
       assert(false); //the method is not supported for this type of serialization
       throw std::runtime_error("double serialization is not supported in BinaryInputStreamSerializer");
       return false;

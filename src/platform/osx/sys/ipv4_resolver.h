@@ -19,7 +19,7 @@
 
 #include <string>
 
-namespace sys
+namespace system
 {
     class Dispatcher;
     class Ipv4Address;
@@ -33,7 +33,7 @@ namespace sys
       ~Ipv4Resolver();
       Ipv4Resolver& operator=(const Ipv4Resolver&) = delete;
       Ipv4Resolver& operator=(Ipv4Resolver&& other);
-      Ipv4Address resolve(const std::string& host);
+          Ipv4Address resolve(const std::string& host);
 
     private:
       Dispatcher* dispatcher;

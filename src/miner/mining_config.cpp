@@ -74,7 +74,7 @@ namespace cryptonote
             }
 
             host = parts.at(0);
-            port = cryptonote::RPC_DEFAULT_PORT;
+            port = CryptoNote::RPC_DEFAULT_PORT;
             return true;
         }
     }
@@ -97,7 +97,7 @@ namespace cryptonote
             ("daemon-address", "The daemon [host:port] combination to use for node operations. This option overrides --daemon-host and --daemon-rpc-port",
               cxxopts::value<std::string>(daemonAddress), "<host:port>")
             ("daemon-host", "The daemon host to use for node operations", cxxopts::value<std::string>(daemonHost)->default_value("127.0.0.1"), "<host>")
-            ("daemon-rpc-port", "The daemon RPC port to use for node operations", cxxopts::value<int>(daemonPort)->default_value(std::to_string(cryptonote::RPC_DEFAULT_PORT)), "#")
+            ("daemon-rpc-port", "The daemon RPC port to use for node operations", cxxopts::value<int>(daemonPort)->default_value(std::to_string(CryptoNote::RPC_DEFAULT_PORT)), "#")
             ("scan-time", "Blockchain polling interval (seconds). How often miner will check the Blockchain for updates", cxxopts::value<size_t>(scanPeriod)->default_value("1"), "#");
 
         options.add_options("Mining")
@@ -147,7 +147,7 @@ namespace cryptonote
 
             std::cout << InformationMsg("What address do you want to mine to?: ");
             std::getline(std::cin, miningAddress);
-            common::trim(miningAddress);
+            Common::trim(miningAddress);
 
             error = validateAddresses({miningAddress}, integratedAddressesAllowed);
         }

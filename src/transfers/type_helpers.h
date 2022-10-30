@@ -31,8 +31,8 @@ namespace cryptonote
 namespace std
 {
     template<>
-    struct hash < cryptonote::AccountPublicAddress > {
-      size_t operator()(const cryptonote::AccountPublicAddress& val) const {
+    struct hash < CryptoNote::AccountPublicAddress > {
+      size_t operator()(const CryptoNote::AccountPublicAddress& val) const {
         size_t spend = *(reinterpret_cast<const size_t*>(&val.spendPublicKey));
         size_t view = *(reinterpret_cast<const size_t*>(&val.viewPublicKey));
         return spend ^ view;

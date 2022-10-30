@@ -146,7 +146,7 @@ namespace cryptonote
       bool m_cancelled;
     };
 
-    BlockchainExplorer::BlockchainExplorer(INode& node, std::shared_ptr<logging::ILogger> logger) :
+    BlockchainExplorer::BlockchainExplorer(INode& node, std::shared_ptr<Logging::ILogger> logger) :
       node(node),
       logger(logger, "blockchain_explorer"),
       state(NOT_INITIALIZED),
@@ -158,7 +158,7 @@ namespace cryptonote
 
     bool BlockchainExplorer::addObserver(IBlockchainObserver* observer) {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
       observersCounter.fetch_add(1);
       return observerManager.add(observer);
@@ -166,7 +166,7 @@ namespace cryptonote
 
     bool BlockchainExplorer::removeObserver(IBlockchainObserver* observer) {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
       if (observersCounter.load() != 0) {
         observersCounter.fetch_sub(1);
@@ -191,22 +191,22 @@ namespace cryptonote
     void BlockchainExplorer::init() {
       if (state.load() != NOT_INITIALIZED) {
         logger(ERROR) << "Init called on already initialized blockchain_explorer.";
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::ALREADY_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::ALREADY_INITIALIZED));
       }
 
       if (!getBlockchainTop(knownBlockchainTop, false)) {
         logger(ERROR) << "Can't get blockchain top.";
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
       }
 
-      std::vector<crypto::Hash> knownPoolTransactionHashes;
+      std::vector<Crypto::Hash> knownPoolTransactionHashes;
       bool isBlockchainActual;
       std::vector<TransactionDetails> newTransactions;
-      std::vector<crypto::Hash> removedTransactions;
+      std::vector<Crypto::Hash> removedTransactions;
       StateRollback stateRollback(state);
       if (!getPoolState(knownPoolTransactionHashes, knownBlockchainTop.hash, isBlockchainActual, newTransactions, removedTransactions)) {
         logger(ERROR) << "Can't get pool state.";
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
       }
 
       assert(removedTransactions.empty());
@@ -215,14 +215,14 @@ namespace cryptonote
         stateRollback.commit();
       } else {
         logger(ERROR) << "Can't add observer to node.";
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
       }
     }
 
     void BlockchainExplorer::shutdown() {
       if (state.load() != INITIALIZED) {
         logger(ERROR) << "Shutdown called on not initialized blockchain_explorer.";
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       node.removeObserver(this);
@@ -236,7 +236,7 @@ namespace cryptonote
 
     bool BlockchainExplorer::getBlocks(const std::vector<uint32_t>& blockIndexes, std::vector<std::vector<BlockDetails>>& blocks, bool checkInitialization) {
       if (checkInitialization && state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       if (blockIndexes.empty()) {
@@ -256,7 +256,7 @@ namespace cryptonote
 
     bool BlockchainExplorer::getBlocks(const std::vector<Hash>& blockHashes, std::vector<BlockDetails>& blocks) {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       if (blockHashes.empty()) {
@@ -277,11 +277,11 @@ namespace cryptonote
 
     bool BlockchainExplorer::getBlocks(uint64_t timestampBegin, uint64_t timestampEnd, uint32_t blocksNumberLimit, std::vector<BlockDetails>& blocks, uint32_t& blocksNumberWithinTimestamps) {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       if (timestampBegin > timestampEnd) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::REQUEST_ERROR), "timestampBegin must not be greater than timestampEnd");
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::REQUEST_ERROR), "timestampBegin must not be greater than timestampEnd");
       }
 
       logger(DEBUGGING) << "Get blocks by timestamp " << timestampBegin << " - " << timestampEnd << " request came.";
@@ -313,7 +313,7 @@ namespace cryptonote
 
     bool BlockchainExplorer::getBlockchainTop(BlockDetails& topBlock, bool checkInitialization) {
       if (checkInitialization && state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       logger(DEBUGGING) << "Get blockchain top request came.";
@@ -325,7 +325,7 @@ namespace cryptonote
       std::vector<std::vector<BlockDetails>> blocks;
       if (!getBlocks(indexes, blocks, checkInitialization)) {
         logger(ERROR) << "Can't get blockchain top.";
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
       }
       assert(blocks.size() == indexes.size() && blocks.size() == 1);
 
@@ -340,14 +340,14 @@ namespace cryptonote
 
       if (!gotMainchainBlock) {
         logger(ERROR) << "Can't get blockchain top: all blocks on index " << lastIndex << " are orphaned.";
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
       }
       return true;
     }
 
     bool BlockchainExplorer::getTransactions(const std::vector<Hash>& transactionHashes, std::vector<TransactionDetails>& transactions) {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       if (transactionHashes.empty()) {
@@ -367,12 +367,12 @@ namespace cryptonote
 
     bool BlockchainExplorer::getTransactionsByPaymentId(const Hash& paymentId, std::vector<TransactionDetails>& transactions) {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       logger(DEBUGGING) << "Get transactions by payment id " << paymentId << " request came.";
 
-      std::vector<crypto::Hash> transactionHashes;
+      std::vector<Crypto::Hash> transactionHashes;
       NodeRequest request([&](const INode::Callback& cb) { return node.getTransactionHashesByPaymentId(paymentId, transactionHashes, cb); });
 
       auto ec = request.performBlocking();
@@ -390,7 +390,7 @@ namespace cryptonote
 
     bool BlockchainExplorer::getPoolState(const std::vector<Hash>& knownPoolTransactionHashes, Hash knownBlockchainTopHash, bool& isBlockchainActual, std::vector<TransactionDetails>& newTransactions, std::vector<Hash>& removedTransactions) {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       logger(DEBUGGING) << "Get pool state request came.";
@@ -430,7 +430,7 @@ namespace cryptonote
 
     bool BlockchainExplorer::isSynchronized() {
       if (state.load() != INITIALIZED) {
-        throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
+        throw std::system_error(make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes::NOT_INITIALIZED));
       }
 
       logger(DEBUGGING) << "Synchronization status request came.";
@@ -540,7 +540,7 @@ namespace cryptonote
                   }
                 }
 
-                for (const std::pair<crypto::Hash, TransactionRemoveReason>& kv : *removedTransactionsHashesPtr) {
+                for (const std::pair<Crypto::Hash, TransactionRemoveReason>& kv : *removedTransactionsHashesPtr) {
                   auto iter = knownPoolState.find(kv.first);
                   if (iter != knownPoolState.end()) {
                     knownPoolState.erase(iter);

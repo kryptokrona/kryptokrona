@@ -21,13 +21,13 @@
 
 namespace
 {
-    const char* getStatusString(cryptonote::HttpResponse::HTTP_STATUS status) {
+    const char* getStatusString(CryptoNote::HttpResponse::HTTP_STATUS status) {
       switch (status) {
-      case cryptonote::HttpResponse::STATUS_200:
+      case CryptoNote::HttpResponse::STATUS_200:
         return "200 OK";
-      case cryptonote::HttpResponse::STATUS_404:
+      case CryptoNote::HttpResponse::STATUS_404:
         return "404 Not Found";
-      case cryptonote::HttpResponse::STATUS_500:
+      case CryptoNote::HttpResponse::STATUS_500:
         return "500 Internal Server Error";
       default:
         throw std::runtime_error("Unknown http status code is given");
@@ -36,11 +36,11 @@ namespace
       return ""; //unaccessible
     }
 
-    const char* getErrorBody(cryptonote::HttpResponse::HTTP_STATUS status) {
+    const char* getErrorBody(CryptoNote::HttpResponse::HTTP_STATUS status) {
       switch (status) {
-      case cryptonote::HttpResponse::STATUS_404:
+      case CryptoNote::HttpResponse::STATUS_404:
         return "Requested url is not found\n";
-      case cryptonote::HttpResponse::STATUS_500:
+      case CryptoNote::HttpResponse::STATUS_500:
         return "Internal server error is occurred\n";
       default:
         throw std::runtime_error("Error body for given status is not available");

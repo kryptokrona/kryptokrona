@@ -22,11 +22,11 @@
 #include <http/http_request.h>
 #include <http/http_response.h>
 
-#include <sys/context_group.h>
-#include <sys/dispatcher.h>
-#include <sys/tcp_listener.h>
-#include <sys/tcp_connection.h>
-#include <sys/event.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/tcp_listener.h>
+#include <system/tcp_connection.h>
+#include <system/event.h>
 
 #include <logging/logger_ref.h>
 
@@ -36,7 +36,7 @@ namespace cryptonote
 
     public:
 
-      HttpServer(sys::Dispatcher& dispatcher, std::shared_ptr<logging::ILogger> log);
+      HttpServer(System::Dispatcher& dispatcher, std::shared_ptr<Logging::ILogger> log);
 
       void start(const std::string& address, uint16_t port);
       void stop();
@@ -45,16 +45,16 @@ namespace cryptonote
 
     protected:
 
-      sys::Dispatcher& m_dispatcher;
+      System::Dispatcher& m_dispatcher;
 
     private:
 
       void acceptLoop();
-      void connectionHandler(sys::TcpConnection& conn);
+      void connectionHandler(System::TcpConnection&& conn);
 
-      sys::ContextGroup workingContextGroup;
-      logging::LoggerRef logger;
-      sys::TcpListener m_listener;
-      std::unordered_set<sys::TcpConnection*> m_connections;
+      System::ContextGroup workingContextGroup;
+      Logging::LoggerRef logger;
+      System::TcpListener m_listener;
+      std::unordered_set<System::TcpConnection*> m_connections;
     };
 }

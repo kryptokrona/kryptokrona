@@ -16,9 +16,9 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "context_group_timeout.h"
-#include <sys/interrupted_exception.h>
+#include <system/interrupted_exception.h>
 
-using namespace sys;
+using namespace system;
 
 ContextGroupTimeout::ContextGroupTimeout(Dispatcher& dispatcher, ContextGroup& contextGroup, std::chrono::nanoseconds timeout) :
   workingContextGroup(dispatcher),

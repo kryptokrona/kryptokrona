@@ -17,14 +17,14 @@
 
 #include "database_blockchain_cache_factory.h"
 
-#include "idatabase.h"
+#include "idataBase.h"
 
 #include "blockchain_cache.h"
 #include "database_blockchain_cache.h"
 
 namespace cryptonote
 {
-    DatabaseBlockchainCacheFactory::DatabaseBlockchainCacheFactory(IDataBase& database, std::shared_ptr<logging::ILogger> logger): database(database), logger(logger) {
+    DatabaseBlockchainCacheFactory::DatabaseBlockchainCacheFactory(IDataBase& database, std::shared_ptr<Logging::ILogger> logger): database(database), logger(logger) {
     }
 
     DatabaseBlockchainCacheFactory::~DatabaseBlockchainCacheFactory() {

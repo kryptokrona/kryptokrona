@@ -10,49 +10,49 @@
 
 namespace payment_service
 {
-    void Save::Request::serialize(cryptonote::ISerializer& /*serializer*/) {
+    void Save::Request::serialize(CryptoNote::ISerializer& /*serializer*/) {
     }
 
-    void Save::Response::serialize(cryptonote::ISerializer& /*serializer*/) {
+    void Save::Response::serialize(CryptoNote::ISerializer& /*serializer*/) {
     }
 
-    void Export::Request::serialize(cryptonote::ISerializer& serializer) {
+    void Export::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(fileName, "fileName")) {
         throw RequestSerializationError();
       }
     }
 
-    void Export::Response::serialize(cryptonote::ISerializer& serializer) {
+    void Export::Response::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void Reset::Request::serialize(cryptonote::ISerializer& serializer) {
+    void Reset::Request::serialize(CryptoNote::ISerializer& serializer) {
       serializer(scanHeight, "scanHeight");
     }
 
-    void Reset::Response::serialize(cryptonote::ISerializer& serializer) {
+    void Reset::Response::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void GetViewKey::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetViewKey::Request::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void GetViewKey::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetViewKey::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(viewSecretKey, "viewSecretKey");
     }
 
-    void GetMnemonicSeed::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetMnemonicSeed::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(address, "address")) {
         throw RequestSerializationError();
       }
     }
 
-    void GetMnemonicSeed::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetMnemonicSeed::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(mnemonicSeed, "mnemonicSeed");
     }
 
-    void GetStatus::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetStatus::Request::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void GetStatus::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetStatus::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(blockCount, "blockCount");
       serializer(knownBlockCount, "knownBlockCount");
       serializer(localDaemonBlockCount, "localDaemonBlockCount");
@@ -60,14 +60,14 @@ namespace payment_service
       serializer(peerCount, "peerCount");
     }
 
-    void GetAddresses::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetAddresses::Request::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void GetAddresses::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetAddresses::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(addresses, "addresses");
     }
 
-    void CreateAddress::Request::serialize(cryptonote::ISerializer& serializer) {
+    void CreateAddress::Request::serialize(CryptoNote::ISerializer& serializer) {
       bool hasSecretKey = serializer(spendSecretKey, "spendSecretKey");
       bool hasPublicKey = serializer(spendPublicKey, "spendPublicKey");
 
@@ -86,11 +86,11 @@ namespace payment_service
       }
     }
 
-    void CreateAddress::Response::serialize(cryptonote::ISerializer& serializer) {
+    void CreateAddress::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(address, "address");
     }
 
-    void CreateAddressList::Request::serialize(cryptonote::ISerializer& serializer) {
+    void CreateAddressList::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(spendSecretKeys, "spendSecretKeys")) {
         //TODO: replace it with error codes
         throw RequestSerializationError();
@@ -106,40 +106,40 @@ namespace payment_service
       }
     }
 
-    void CreateAddressList::Response::serialize(cryptonote::ISerializer& serializer) {
+    void CreateAddressList::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(addresses, "addresses");
     }
 
-    void DeleteAddress::Request::serialize(cryptonote::ISerializer& serializer) {
+    void DeleteAddress::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(address, "address")) {
         throw RequestSerializationError();
       }
     }
 
-    void DeleteAddress::Response::serialize(cryptonote::ISerializer& serializer) {
+    void DeleteAddress::Response::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void GetSpendKeys::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetSpendKeys::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(address, "address")) {
         throw RequestSerializationError();
       }
     }
 
-    void GetSpendKeys::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetSpendKeys::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(spendSecretKey, "spendSecretKey");
       serializer(spendPublicKey, "spendPublicKey");
     }
 
-    void GetBalance::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetBalance::Request::serialize(CryptoNote::ISerializer& serializer) {
       serializer(address, "address");
     }
 
-    void GetBalance::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetBalance::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(availableBalance, "availableBalance");
       serializer(lockedAmount, "lockedAmount");
     }
 
-    void GetBlockHashes::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetBlockHashes::Request::serialize(CryptoNote::ISerializer& serializer) {
       bool r = serializer(firstBlockIndex, "firstBlockIndex");
       r &= serializer(blockCount, "blockCount");
 
@@ -148,16 +148,16 @@ namespace payment_service
       }
     }
 
-    void GetBlockHashes::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetBlockHashes::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(blockHashes, "blockHashes");
     }
 
-    void TransactionHashesInBlockRpcInfo::serialize(cryptonote::ISerializer& serializer) {
+    void TransactionHashesInBlockRpcInfo::serialize(CryptoNote::ISerializer& serializer) {
       serializer(blockHash, "blockHash");
       serializer(transactionHashes, "transactionHashes");
     }
 
-    void GetTransactionHashes::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetTransactionHashes::Request::serialize(CryptoNote::ISerializer& serializer) {
       serializer(addresses, "addresses");
 
       if (serializer(blockHash, "blockHash") == serializer(firstBlockIndex, "firstBlockIndex")) {
@@ -171,17 +171,17 @@ namespace payment_service
       serializer(paymentId, "paymentId");
     }
 
-    void GetTransactionHashes::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetTransactionHashes::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(items, "items");
     }
 
-    void TransferRpcInfo::serialize(cryptonote::ISerializer& serializer) {
+    void TransferRpcInfo::serialize(CryptoNote::ISerializer& serializer) {
       serializer(type, "type");
       serializer(address, "address");
       serializer(amount, "amount");
     }
 
-    void TransactionRpcInfo::serialize(cryptonote::ISerializer& serializer) {
+    void TransactionRpcInfo::serialize(CryptoNote::ISerializer& serializer) {
       serializer(state, "state");
       serializer(transactionHash, "transactionHash");
       serializer(blockIndex, "blockIndex");
@@ -195,22 +195,22 @@ namespace payment_service
       serializer(paymentId, "paymentId");
     }
 
-    void GetTransaction::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetTransaction::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(transactionHash, "transactionHash")) {
         throw RequestSerializationError();
       }
     }
 
-    void GetTransaction::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(transaction, "transaction");
     }
 
-    void TransactionsInBlockRpcInfo::serialize(cryptonote::ISerializer& serializer) {
+    void TransactionsInBlockRpcInfo::serialize(CryptoNote::ISerializer& serializer) {
       serializer(blockHash, "blockHash");
       serializer(transactions, "transactions");
     }
 
-    void GetTransactions::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetTransactions::Request::serialize(CryptoNote::ISerializer& serializer) {
       serializer(addresses, "addresses");
 
       if (serializer(blockHash, "blockHash") == serializer(firstBlockIndex, "firstBlockIndex")) {
@@ -224,19 +224,19 @@ namespace payment_service
       serializer(paymentId, "paymentId");
     }
 
-    void GetTransactions::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetTransactions::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(items, "items");
     }
 
-    void GetUnconfirmedTransactionHashes::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetUnconfirmedTransactionHashes::Request::serialize(CryptoNote::ISerializer& serializer) {
       serializer(addresses, "addresses");
     }
 
-    void GetUnconfirmedTransactionHashes::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetUnconfirmedTransactionHashes::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(transactionHashes, "transactionHashes");
     }
 
-    void WalletRpcOrder::serialize(cryptonote::ISerializer& serializer) {
+    void WalletRpcOrder::serialize(CryptoNote::ISerializer& serializer) {
       bool r = serializer(address, "address");
       r &= serializer(amount, "amount");
 
@@ -245,7 +245,7 @@ namespace payment_service
       }
     }
 
-    void SendTransaction::Request::serialize(cryptonote::ISerializer& serializer, const WalletService &service) {
+    void SendTransaction::Request::serialize(CryptoNote::ISerializer& serializer, const WalletService &service) {
       serializer(sourceAddresses, "addresses");
 
       if (!serializer(transfers, "transfers")) {
@@ -272,11 +272,11 @@ namespace payment_service
       serializer(unlockTime, "unlockTime");
     }
 
-    void SendTransaction::Response::serialize(cryptonote::ISerializer& serializer) {
+    void SendTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(transactionHash, "transactionHash");
     }
 
-    void CreateDelayedTransaction::Request::serialize(cryptonote::ISerializer& serializer, const WalletService &service) {
+    void CreateDelayedTransaction::Request::serialize(CryptoNote::ISerializer& serializer, const WalletService &service) {
       serializer(addresses, "addresses");
 
       if (!serializer(transfers, "transfers")) {
@@ -303,36 +303,36 @@ namespace payment_service
       serializer(unlockTime, "unlockTime");
     }
 
-    void CreateDelayedTransaction::Response::serialize(cryptonote::ISerializer& serializer) {
+    void CreateDelayedTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(transactionHash, "transactionHash");
     }
 
-    void GetDelayedTransactionHashes::Request::serialize(cryptonote::ISerializer& serializer) {
+    void GetDelayedTransactionHashes::Request::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void GetDelayedTransactionHashes::Response::serialize(cryptonote::ISerializer& serializer) {
+    void GetDelayedTransactionHashes::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(transactionHashes, "transactionHashes");
     }
 
-    void DeleteDelayedTransaction::Request::serialize(cryptonote::ISerializer& serializer) {
+    void DeleteDelayedTransaction::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(transactionHash, "transactionHash")) {
         throw RequestSerializationError();
       }
     }
 
-    void DeleteDelayedTransaction::Response::serialize(cryptonote::ISerializer& serializer) {
+    void DeleteDelayedTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void SendDelayedTransaction::Request::serialize(cryptonote::ISerializer& serializer) {
+    void SendDelayedTransaction::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(transactionHash, "transactionHash")) {
         throw RequestSerializationError();
       }
     }
 
-    void SendDelayedTransaction::Response::serialize(cryptonote::ISerializer& serializer) {
+    void SendDelayedTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void SendFusionTransaction::Request::serialize(cryptonote::ISerializer& serializer, const WalletService &service) {
+    void SendFusionTransaction::Request::serialize(CryptoNote::ISerializer& serializer, const WalletService &service) {
       if (!serializer(threshold, "threshold")) {
         throw RequestSerializationError();
       }
@@ -345,11 +345,11 @@ namespace payment_service
       serializer(destinationAddress, "destinationAddress");
     }
 
-    void SendFusionTransaction::Response::serialize(cryptonote::ISerializer& serializer) {
+    void SendFusionTransaction::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(transactionHash, "transactionHash");
     }
 
-    void EstimateFusion::Request::serialize(cryptonote::ISerializer& serializer) {
+    void EstimateFusion::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(threshold, "threshold")) {
         throw RequestSerializationError();
       }
@@ -357,12 +357,12 @@ namespace payment_service
       serializer(addresses, "addresses");
     }
 
-    void EstimateFusion::Response::serialize(cryptonote::ISerializer& serializer) {
+    void EstimateFusion::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(fusionReadyCount, "fusionReadyCount");
       serializer(totalOutputCount, "totalOutputCount");
     }
 
-    void CreateIntegratedAddress::Request::serialize(cryptonote::ISerializer& serializer) {
+    void CreateIntegratedAddress::Request::serialize(CryptoNote::ISerializer& serializer) {
       if (!serializer(address, "address")) {
         throw RequestSerializationError();
       }
@@ -372,14 +372,14 @@ namespace payment_service
       }
     }
 
-    void CreateIntegratedAddress::Response::serialize(cryptonote::ISerializer& serializer) {
+    void CreateIntegratedAddress::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(integratedAddress, "integratedAddress");
     }
 
-    void NodeFeeInfo::Request::serialize(cryptonote::ISerializer& serializer) {
+    void NodeFeeInfo::Request::serialize(CryptoNote::ISerializer& serializer) {
     }
 
-    void NodeFeeInfo::Response::serialize(cryptonote::ISerializer& serializer) {
+    void NodeFeeInfo::Response::serialize(CryptoNote::ISerializer& serializer) {
       serializer(address, "address");
       serializer(amount, "amount");
     }

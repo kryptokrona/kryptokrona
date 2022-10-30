@@ -26,9 +26,9 @@ namespace
     void throwIfNotGood(std::istream& stream) {
       if (!stream.good()) {
         if (stream.eof()) {
-          throw std::system_error(make_error_code(cryptonote::error::HttpParserErrorCodes::END_OF_STREAM));
+          throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::END_OF_STREAM));
         } else {
-          throw std::system_error(make_error_code(cryptonote::error::HttpParserErrorCodes::STREAM_NOT_GOOD));
+          throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::STREAM_NOT_GOOD));
         }
       }
     }
@@ -37,13 +37,13 @@ namespace
 namespace cryptonote
 {
     HttpResponse::HTTP_STATUS HttpParser::parseResponseStatusFromString(const std::string& status) {
-      if (status == "200 OK" || status == "200 Ok") return cryptonote::HttpResponse::STATUS_200;
-      else if (status == "404 Not Found") return cryptonote::HttpResponse::STATUS_404;
-      else if (status == "500 Internal Server Error") return cryptonote::HttpResponse::STATUS_500;
-      else throw std::system_error(make_error_code(cryptonote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL),
+      if (status == "200 OK" || status == "200 Ok") return CryptoNote::HttpResponse::STATUS_200;
+      else if (status == "404 Not Found") return CryptoNote::HttpResponse::STATUS_404;
+      else if (status == "500 Internal Server Error") return CryptoNote::HttpResponse::STATUS_500;
+      else throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL),
           "Unknown http status code is given");
 
-      return cryptonote::HttpResponse::STATUS_200; //unaccessible
+      return CryptoNote::HttpResponse::STATUS_200; //unaccessible
     }
 
     void HttpParser::receiveRequest(std::istream& stream, HttpRequest& request) {
@@ -125,7 +125,7 @@ namespace cryptonote
       if (c == '\r') {
         stream.get(c);
         if (c != '\n') {
-          throw std::system_error(make_error_code(cryptonote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
+          throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
         }
       }
     }
@@ -155,7 +155,7 @@ namespace cryptonote
           }
 
           if (name.empty()) {
-            throw std::system_error(make_error_code(cryptonote::error::HttpParserErrorCodes::EMPTY_HEADER));
+            throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::EMPTY_HEADER));
           }
 
           if (isName) {
@@ -178,7 +178,7 @@ namespace cryptonote
 
       stream.get(c);
       if (c != '\n') {
-        throw std::system_error(make_error_code(cryptonote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
+        throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
       }
 
       std::transform(name.begin(), name.end(), name.begin(), ::tolower);
@@ -187,7 +187,7 @@ namespace cryptonote
       if (c == '\r') {
         stream.get(c).get(c);
         if (c != '\n') {
-          throw std::system_error(make_error_code(cryptonote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
+          throw std::system_error(make_error_code(CryptoNote::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
         }
 
         return false; //no more headers

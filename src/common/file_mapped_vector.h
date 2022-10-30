@@ -23,7 +23,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "sys/memory_mapped_file.h"
+#include "system/memory_mapped_file.h"
 
 #include "common/scope_exit.h"
 
@@ -299,7 +299,7 @@ namespace common
 
     private:
       std::string m_path;
-      sys::MemoryMappedFile m_file;
+      System::MemoryMappedFile m_file;
       uint64_t m_prefixSize;
       uint64_t m_suffixSize;
       bool m_autoFlush;
@@ -795,7 +795,7 @@ namespace common
         boost::filesystem::remove(bakPath);
       }
 
-      tools::ScopeExit tmpFileDeleter([&tmpPath] {
+      Tools::ScopeExit tmpFileDeleter([&tmpPath] {
         boost::system::error_code ignore;
         boost::filesystem::remove(tmpPath, ignore);
       });

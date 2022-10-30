@@ -7,8 +7,8 @@
 
 #include <system_error>
 
-#include <sys/dispatcher.h>
-#include <sys/event.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
 #include "logging/ilogger.h"
 #include "logging/logger_ref.h"
 #include "rpc/http_server.h"
@@ -25,7 +25,7 @@ namespace common
     class JsonValue;
 }
 
-namespace sys
+namespace system
 {
     class TcpConnection;
 }
@@ -34,28 +34,28 @@ namespace cryptonote
 {
     class JsonRpcServer : HttpServer {
     public:
-      JsonRpcServer(sys::Dispatcher& sys, sys::Event& stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, payment_service::ConfigurationManager& config);
+      JsonRpcServer(System::Dispatcher& sys, System::Event& stopEvent, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager& config);
       JsonRpcServer(const JsonRpcServer&) = delete;
 
       void start(const std::string& bindAddress, uint16_t bindPort);
 
     protected:
-      static void makeErrorResponse(const std::error_code& ec, common::JsonValue& resp);
-      static void makeMethodNotFoundResponse(common::JsonValue& resp);
-      static void makeInvalidPasswordResponse(common::JsonValue& resp);
-      static void makeGenericErrorReponse(common::JsonValue& resp, const char* what, int errorCode = -32001);
-      static void fillJsonResponse(const common::JsonValue& v, common::JsonValue& resp);
-      static void prepareJsonResponse(const common::JsonValue& req, common::JsonValue& resp);
-      static void makeJsonParsingErrorResponse(common::JsonValue& resp);
+      static void makeErrorResponse(const std::error_code& ec, Common::JsonValue& resp);
+      static void makeMethodNotFoundResponse(Common::JsonValue& resp);
+      static void makeInvalidPasswordResponse(Common::JsonValue& resp);
+      static void makeGenericErrorReponse(Common::JsonValue& resp, const char* what, int errorCode = -32001);
+      static void fillJsonResponse(const Common::JsonValue& v, Common::JsonValue& resp);
+      static void prepareJsonResponse(const Common::JsonValue& req, Common::JsonValue& resp);
+      static void makeJsonParsingErrorResponse(Common::JsonValue& resp);
 
-      virtual void processJsonRpcRequest(const common::JsonValue& req, common::JsonValue& resp) = 0;
-      payment_service::ConfigurationManager& config;
+      virtual void processJsonRpcRequest(const Common::JsonValue& req, Common::JsonValue& resp) = 0;
+      PaymentService::ConfigurationManager& config;
 
     private:
       // HttpServer
-      virtual void processRequest(const cryptonote::HttpRequest& request, cryptonote::HttpResponse& response) override;
+      virtual void processRequest(const CryptoNote::HttpRequest& request, CryptoNote::HttpResponse& response) override;
 
-      sys::Event& stopEvent;
-      logging::LoggerRef logger;
+      System::Event& stopEvent;
+      Logging::LoggerRef logger;
     };
 }

@@ -22,7 +22,7 @@ namespace cryptonote
 {
     KeyPair generateKeyPair() {
       KeyPair k;
-      crypto::generate_keys(k.publicKey, k.secretKey);
+      Crypto::generate_keys(k.publicKey, k.secretKey);
       return k;
     }
 }

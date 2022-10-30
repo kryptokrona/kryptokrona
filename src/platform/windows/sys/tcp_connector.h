@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <string>
 
-namespace sys
+namespace system
 {
     class Dispatcher;
     class Ipv4Address;
@@ -29,7 +29,7 @@ namespace sys
     class TcpConnector {
     public:
       TcpConnector();
-      explicit TcpConnector(Dispatcher& dispatcher);
+      TcpConnector(Dispatcher& dispatcher);
       TcpConnector(const TcpConnector&) = delete;
       TcpConnector(TcpConnector&& other);
       ~TcpConnector();
@@ -38,7 +38,7 @@ namespace sys
       TcpConnection connect(const Ipv4Address& address, uint16_t port);
 
     private:
-      Dispatcher* dispatcher;
       void* context;
+      Dispatcher* dispatcher;
     };
 }

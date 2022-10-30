@@ -7,13 +7,13 @@
 
 #include <mnemonics/crc32.h>
 #include <mnemonics/mnemonics.h>
-#include <mnemonics/wordlist.h>
+#include <mnemonics/word_list.h>
 
 #include <sstream>
 
 namespace mnemonics
 {
-    std::tuple<Error, crypto::SecretKey> MnemonicToPrivateKey(const std::string words)
+    std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::string words)
     {
         std::vector<std::string> wordsList;
 
@@ -30,7 +30,7 @@ namespace mnemonics
 
     /* Note - if the returned string is not empty, it is an error message, and
        the returned secret key is not initialized. */
-    std::tuple<Error, crypto::SecretKey> MnemonicToPrivateKey(const std::vector<std::string> words)
+    std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::vector<std::string> words)
     {
         const size_t len = words.size();
 
@@ -48,7 +48,7 @@ namespace mnemonics
                 wordPlural + " long."
             );
 
-            return {error, crypto::SecretKey()};
+            return {error, Crypto::SecretKey()};
         }
 
         /* All words must be present in the word list */
@@ -57,8 +57,8 @@ namespace mnemonics
             /* Convert to lower case */
             std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 
-            if (std::find(wordlist::English.begin(),
-                          wordlist::English.end(), word) == wordlist::English.end())
+            if (std::find(WordList::English.begin(),
+                          WordList::English.end(), word) == WordList::English.end())
             {
                 Error error(
                     MNEMONIC_INVALID_WORD,
@@ -66,14 +66,14 @@ namespace mnemonics
                     "in the english word list (" + word + ")."
                 );
 
-                return {error, crypto::SecretKey()};
+                return {error, Crypto::SecretKey()};
             }
         }
 
         /* The checksum must be correct */
         if (!HasValidChecksum(words))
         {
-            return {MNEMONIC_INVALID_CHECKSUM, crypto::SecretKey()};
+            return {MNEMONIC_INVALID_CHECKSUM, Crypto::SecretKey()};
         }
 
         auto wordIndexes = GetWordIndexes(words);
@@ -88,7 +88,7 @@ namespace mnemonics
             const uint32_t w3 = wordIndexes[i + 2];
 
             /* Word list length */
-            const size_t wlLen = wordlist::English.size();
+            const size_t wlLen = WordList::English.size();
 
             /* no idea what this does lol */
             const uint32_t val = static_cast<uint32_t>(
@@ -99,7 +99,7 @@ namespace mnemonics
             /* Don't know what this is testing either */
             if (!(val % wlLen == w1))
             {
-                return {INVALID_MNEMONIC, crypto::SecretKey()};
+                return {INVALID_MNEMONIC, Crypto::SecretKey()};
             }
 
             /* Interpret val as 4 uint8_t's */
@@ -112,7 +112,7 @@ namespace mnemonics
             }
         }
 
-        crypto::SecretKey key;
+        Crypto::SecretKey key;
 
         /* Copy the data to the secret key */
         std::copy(data.begin(), data.end(), key.data);
@@ -120,7 +120,7 @@ namespace mnemonics
         return {SUCCESS, key};
     }
 
-    std::string PrivateKeyToMnemonic(const crypto::SecretKey privateKey)
+    std::string PrivateKeyToMnemonic(const Crypto::SecretKey privateKey)
     {
         std::vector<std::string> words;
 
@@ -133,15 +133,15 @@ namespace mnemonics
                done the offset */
             const uint32_t val = ptr[0];
 
-            uint32_t wlLen = wordlist::English.size();
+            uint32_t wlLen = WordList::English.size();
 
             const uint32_t w1 = val % wlLen;
             const uint32_t w2 = ((val / wlLen) + w1) % wlLen;
             const uint32_t w3 = (((val / wlLen) / wlLen) + w2) % wlLen;
 
-            words.push_back(wordlist::English[w1]);
-            words.push_back(wordlist::English[w2]);
-            words.push_back(wordlist::English[w3]);
+            words.push_back(WordList::English[w1]);
+            words.push_back(WordList::English[w2]);
+            words.push_back(WordList::English[w3]);
         }
 
         words.push_back(GetChecksumWord(words));
@@ -186,7 +186,7 @@ namespace mnemonics
         }
 
         /* Hash the data */
-        uint64_t hash = crc32::crc32(trimmed);
+        uint64_t hash = CRC32::crc32(trimmed);
 
         /* Modulus the hash by the word length to get the index of the 
            checksum word */
@@ -200,12 +200,12 @@ namespace mnemonics
         for (const auto &word : words)
         {
             /* Find the iterator of our word in the wordlist */
-            const auto it = std::find(wordlist::English.begin(),
-                                      wordlist::English.end(), word);
+            const auto it = std::find(WordList::English.begin(),
+                                      WordList::English.end(), word);
 
             /* Take it away from the beginning of the vector, giving us the
                index of the item in the vector */
-            result.push_back(static_cast<int>(std::distance(wordlist::English.begin(), it)));
+            result.push_back(static_cast<int>(std::distance(WordList::English.begin(), it)));
         }
 
         return result;

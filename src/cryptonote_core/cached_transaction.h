@@ -28,16 +28,16 @@ namespace cryptonote
       explicit CachedTransaction(const Transaction& transaction);
       explicit CachedTransaction(const BinaryArray& transactionBinaryArray);
       const Transaction& getTransaction() const;
-      const crypto::Hash& getTransactionHash() const;
-      const crypto::Hash& getTransactionPrefixHash() const;
+      const Crypto::Hash& getTransactionHash() const;
+      const Crypto::Hash& getTransactionPrefixHash() const;
       const BinaryArray& getTransactionBinaryArray() const;
       uint64_t getTransactionFee() const;
 
     private:
       Transaction transaction;
       mutable boost::optional<BinaryArray> transactionBinaryArray;
-      mutable boost::optional<crypto::Hash> transactionHash;
-      mutable boost::optional<crypto::Hash> transactionPrefixHash;
+      mutable boost::optional<Crypto::Hash> transactionHash;
+      mutable boost::optional<Crypto::Hash> transactionPrefixHash;
       mutable boost::optional<uint64_t> transactionFee;
     };
 }

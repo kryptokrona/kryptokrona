@@ -18,6 +18,6 @@ namespace payment_service
 
       WalletServiceConfiguration serviceConfig;
 
-      crypto::Hash rpcSecret;
+      Crypto::Hash rpcSecret;
     };
 }

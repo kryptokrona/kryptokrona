@@ -76,7 +76,7 @@ namespace cryptonote
       WalletTransactionState state;
       uint64_t timestamp;
       uint32_t blockHeight;
-      crypto::Hash hash;
+      Crypto::Hash hash;
       int64_t totalAmount;
       uint64_t fee;
       uint64_t creationTime;
@@ -124,7 +124,7 @@ namespace cryptonote
     };
 
     struct TransactionsInBlockInfo {
-      crypto::Hash blockHash;
+      Crypto::Hash blockHash;
       std::vector<WalletTransactionWithTransfers> transactions;
     };
 
@@ -132,7 +132,7 @@ namespace cryptonote
     public:
       virtual ~IWallet() {}
 
-      virtual void initializeWithViewKey(const std::string& path, const std::string& password, const crypto::SecretKey& viewSecretKey, const uint64_t scanHeight, const bool newAddress) = 0;
+      virtual void initializeWithViewKey(const std::string& path, const std::string& password, const Crypto::SecretKey& viewSecretKey, const uint64_t scanHeight, const bool newAddress) = 0;
       virtual void load(const std::string& path, const std::string& password, std::string& extra) = 0;
       virtual void load(const std::string& path, const std::string& password) = 0;
       virtual void shutdown() = 0;
@@ -149,10 +149,10 @@ namespace cryptonote
       virtual KeyPair getViewKey() const = 0;
 
       virtual std::string createAddress() = 0;
-      virtual std::string createAddress(const crypto::SecretKey& spendSecretKey, const uint64_t scanHeight, const bool newAddress) = 0;
-      virtual std::string createAddress(const crypto::PublicKey& spendPublicKey, const uint64_t scanHeight, const bool newAddress) = 0;
+      virtual std::string createAddress(const Crypto::SecretKey& spendSecretKey, const uint64_t scanHeight, const bool newAddress) = 0;
+      virtual std::string createAddress(const Crypto::PublicKey& spendPublicKey, const uint64_t scanHeight, const bool newAddress) = 0;
 
-      virtual std::vector<std::string> createAddressList(const std::vector<crypto::SecretKey>& spendSecretKeys, const uint64_t scanHeight, const bool newAddress) = 0;
+      virtual std::vector<std::string> createAddressList(const std::vector<Crypto::SecretKey>& spendSecretKeys, const uint64_t scanHeight, const bool newAddress) = 0;
 
       virtual void deleteAddress(const std::string& address) = 0;
 
@@ -164,10 +164,10 @@ namespace cryptonote
       virtual size_t getTransactionCount() const = 0;
       virtual WalletTransaction getTransaction(size_t transactionIndex) const = 0;
 
-      virtual WalletTransactionWithTransfers getTransaction(const crypto::Hash& transactionHash) const = 0;
-      virtual std::vector<TransactionsInBlockInfo> getTransactions(const crypto::Hash& blockHash, size_t count) const = 0;
+      virtual WalletTransactionWithTransfers getTransaction(const Crypto::Hash& transactionHash) const = 0;
+      virtual std::vector<TransactionsInBlockInfo> getTransactions(const Crypto::Hash& blockHash, size_t count) const = 0;
       virtual std::vector<TransactionsInBlockInfo> getTransactions(uint32_t blockIndex, size_t count) const = 0;
-      virtual std::vector<crypto::Hash> getBlockHashes(uint32_t blockIndex, size_t count) const = 0;
+      virtual std::vector<Crypto::Hash> getBlockHashes(uint32_t blockIndex, size_t count) const = 0;
       virtual uint32_t getBlockCount() const  = 0;
       virtual std::vector<WalletTransactionWithTransfers> getUnconfirmedTransactions() const = 0;
       virtual std::vector<size_t> getDelayedTransactionIds() const = 0;

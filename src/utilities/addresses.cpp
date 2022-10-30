@@ -21,9 +21,9 @@ namespace utilities
 
        Please note this function does not accept integrated addresses. Please
        extract the payment ID from them before calling this function. */
-    std::vector<crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses)
+    std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses)
     {
-        std::vector<crypto::PublicKey> spendKeys;
+        std::vector<Crypto::PublicKey> spendKeys;
 
         for (const auto &address : addresses)
         {
@@ -34,9 +34,9 @@ namespace utilities
         return spendKeys;
     }
 
-    std::tuple<crypto::PublicKey, crypto::PublicKey> addressToKeys(const std::string address)
+    std::tuple<Crypto::PublicKey, Crypto::PublicKey> addressToKeys(const std::string address)
     {
-        cryptonote::AccountPublicAddress parsedAddress;
+        CryptoNote::AccountPublicAddress parsedAddress;
 
         uint64_t prefix;
 
@@ -47,7 +47,7 @@ namespace utilities
         }
 
         /* Incorrect prefix */
-        if (prefix != cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
+        if (prefix != CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
         {
             throw std::invalid_argument("Address is not valid!");
         }
@@ -64,7 +64,7 @@ namespace utilities
         std::string decoded;
 
         /* Decode from base58 */
-        tools::base58::decode_addr(address, ignore, decoded);
+        Tools::Base58::decode_addr(address, ignore, decoded);
 
         const uint64_t paymentIDLen = 64;
 
@@ -75,16 +75,16 @@ namespace utilities
         std::string keys = decoded.substr(paymentIDLen, std::string::npos);
 
         /* Convert keys as string to binary array */
-        cryptonote::BinaryArray ba = common::asBinaryArray(keys);
+        CryptoNote::BinaryArray ba = Common::asBinaryArray(keys);
 
-        cryptonote::AccountPublicAddress addr;
+        CryptoNote::AccountPublicAddress addr;
 
         /* Convert from binary array to public keys */
-        cryptonote::fromBinaryArray(addr, ba);
+        CryptoNote::fromBinaryArray(addr, ba);
 
         /* Convert the set of extracted keys back into an address */
-        const std::string actualAddress = cryptonote::getAccountAddressAsStr(
-            cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        const std::string actualAddress = CryptoNote::getAccountAddressAsStr(
+            CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
             addr
         );
 
@@ -92,28 +92,28 @@ namespace utilities
     }
 
     std::string publicKeysToAddress(
-        const crypto::PublicKey publicSpendKey,
-        const crypto::PublicKey publicViewKey)
+        const Crypto::PublicKey publicSpendKey,
+        const Crypto::PublicKey publicViewKey)
     {
-        return cryptonote::getAccountAddressAsStr(
-            cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        return CryptoNote::getAccountAddressAsStr(
+            CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
             { publicSpendKey, publicViewKey }
         );
     }
 
     /* Generates a public address from the given private keys */
     std::string privateKeysToAddress(
-        const crypto::SecretKey privateSpendKey,
-        const crypto::SecretKey privateViewKey)
+        const Crypto::SecretKey privateSpendKey,
+        const Crypto::SecretKey privateViewKey)
     {
-        crypto::PublicKey publicSpendKey;
-        crypto::PublicKey publicViewKey;
+        Crypto::PublicKey publicSpendKey;
+        Crypto::PublicKey publicViewKey;
 
-        crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
-        crypto::secret_key_to_public_key(privateViewKey, publicViewKey);
+        Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
+        Crypto::secret_key_to_public_key(privateViewKey, publicViewKey);
 
-        return cryptonote::getAccountAddressAsStr(
-            cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        return CryptoNote::getAccountAddressAsStr(
+            CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
             { publicSpendKey, publicViewKey }
         );
     }

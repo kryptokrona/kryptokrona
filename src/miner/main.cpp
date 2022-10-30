@@ -5,24 +5,24 @@
 
 #include "miner_manager.h"
 
-#include <sys/dispatcher.h>
+#include <system/dispatcher.h>
 
 int main(int argc, char **argv)
 {
     while (true)
     {
-        cryptonote::MiningConfig config;
+        CryptoNote::MiningConfig config;
         config.parse(argc, argv);
 
         try
         {
-            sys::Dispatcher dispatcher;
+            System::Dispatcher dispatcher;
 
             auto httpClient = std::make_shared<httplib::Client>(
                 config.daemonHost.c_str(), config.daemonPort, 10 /* 10 second timeout */
             );
 
-            miner::MinerManager app(dispatcher, config, httpClient);
+            Miner::MinerManager app(dispatcher, config, httpClient);
 
             app.start();
         }

@@ -17,10 +17,10 @@
 
 #pragma once 
 #include <chrono>
-#include <sys/context_group.h>
-#include <sys/timer.h>
+#include <system/context_group.h>
+#include <system/timer.h>
 
-namespace sys
+namespace system
 {
     class ContextGroupTimeout {
     public:

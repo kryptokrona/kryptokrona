@@ -31,7 +31,7 @@ using namespace logging;
 
 namespace cryptonote
 {
-    void serialize(TransactionInformation& ti, cryptonote::ISerializer& s) {
+    void serialize(TransactionInformation& ti, CryptoNote::ISerializer& s) {
       s(ti.transactionHash, "");
       s(ti.publicKey, "");
       serializeBlockHeight(s, ti.blockHeight, "");
@@ -103,14 +103,14 @@ namespace cryptonote
 
 
     SpentOutputDescriptor::SpentOutputDescriptor() :
-        m_type(transaction_types::OutputType::Invalid) {
+        m_type(TransactionTypes::OutputType::Invalid) {
     }
 
     SpentOutputDescriptor::SpentOutputDescriptor(const TransactionOutputInformationIn& transactionInfo) :
         m_type(transactionInfo.type),
         m_amount(0),
         m_globalOutputIndex(0) {
-      if (m_type == transaction_types::OutputType::Key) {
+      if (m_type == TransactionTypes::OutputType::Key) {
         m_keyImage = &transactionInfo.keyImage;
       } else {
         assert(false);
@@ -122,12 +122,12 @@ namespace cryptonote
     }
 
     void SpentOutputDescriptor::assign(const KeyImage* keyImage) {
-      m_type = transaction_types::OutputType::Key;
+      m_type = TransactionTypes::OutputType::Key;
       m_keyImage = keyImage;
     }
 
     bool SpentOutputDescriptor::operator==(const SpentOutputDescriptor& other) const {
-      if (m_type == transaction_types::OutputType::Key) {
+      if (m_type == TransactionTypes::OutputType::Key) {
         return other.m_type == m_type && *other.m_keyImage == *m_keyImage;
       } else {
         assert(false);
@@ -136,7 +136,7 @@ namespace cryptonote
     }
 
     size_t SpentOutputDescriptor::hash() const {
-      if (m_type == transaction_types::OutputType::Key) {
+      if (m_type == TransactionTypes::OutputType::Key) {
         static_assert(sizeof(size_t) < sizeof(*m_keyImage), "sizeof(size_t) < sizeof(*m_keyImage)");
         return *reinterpret_cast<const size_t*>(m_keyImage->data);
       } else {
@@ -146,7 +146,7 @@ namespace cryptonote
     }
 
 
-    TransfersContainer::TransfersContainer(const Currency& currency, std::shared_ptr<logging::ILogger> logger, size_t transactionSpendableAge) :
+    TransfersContainer::TransfersContainer(const Currency& currency, std::shared_ptr<Logging::ILogger> logger, size_t transactionSpendableAge) :
       m_currentHeight(0),
       m_currency(currency),
       m_logger(logger, "TransfersContainer"),
@@ -253,7 +253,7 @@ namespace cryptonote
           (void)result; // Disable unused warning
           assert(result.second);
         } else {
-          if (info.type == transaction_types::OutputType::Key) {
+          if (info.type == TransactionTypes::OutputType::Key) {
             bool duplicate = false;
             SpentOutputDescriptor descriptor(transfer);
 
@@ -284,7 +284,7 @@ namespace cryptonote
           assert(result.second);
         }
 
-        if (info.type == transaction_types::OutputType::Key) {
+        if (info.type == TransactionTypes::OutputType::Key) {
           updateTransfersVisibility(info.keyImage);
         }
 
@@ -303,7 +303,7 @@ namespace cryptonote
       for (size_t i = 0; i < tx.getInputCount(); ++i) {
         auto inputType = tx.getInputType(i);
 
-        if (inputType == transaction_types::InputType::Key) {
+        if (inputType == TransactionTypes::InputType::Key) {
           KeyInput input;
           tx.getInput(i, input);
 
@@ -369,7 +369,7 @@ namespace cryptonote
 
           inputsAdded = true;
         } else {
-          assert(inputType == transaction_types::InputType::Generating);
+          assert(inputType == TransactionTypes::InputType::Generating);
         }
       }
 
@@ -437,7 +437,7 @@ namespace cryptonote
 
           transferIt = m_unconfirmedTransfers.get<ContainingTransactionIndex>().erase(transferIt);
 
-          if (transfer.type == transaction_types::OutputType::Key) {
+          if (transfer.type == TransactionTypes::OutputType::Key) {
             updateTransfersVisibility(transfer.keyImage);
           }
         }
@@ -475,7 +475,7 @@ namespace cryptonote
 
           transferIt = m_availableTransfers.get<ContainingTransactionIndex>().erase(transferIt);
 
-          if (unconfirmedTransfer.type == transaction_types::OutputType::Key) {
+          if (unconfirmedTransfer.type == TransactionTypes::OutputType::Key) {
             updateTransfersVisibility(unconfirmedTransfer.keyImage);
           }
         }
@@ -511,14 +511,14 @@ namespace cryptonote
         assert(result.second);
         it = spendingTransactionIndex.erase(it);
 
-        if (result.first->type == transaction_types::OutputType::Key) {
+        if (result.first->type == TransactionTypes::OutputType::Key) {
           updateTransfersVisibility(result.first->keyImage);
         }
       }
 
       auto unconfirmedTransfersRange = m_unconfirmedTransfers.get<ContainingTransactionIndex>().equal_range(transactionHash);
       for (auto it = unconfirmedTransfersRange.first; it != unconfirmedTransfersRange.second;) {
-        if (it->type == transaction_types::OutputType::Key) {
+        if (it->type == TransactionTypes::OutputType::Key) {
           KeyImage keyImage = it->keyImage;
           it = m_unconfirmedTransfers.get<ContainingTransactionIndex>().erase(it);
           updateTransfersVisibility(keyImage);
@@ -530,7 +530,7 @@ namespace cryptonote
       auto& transactionTransfersIndex = m_availableTransfers.get<ContainingTransactionIndex>();
       auto transactionTransfersRange = transactionTransfersIndex.equal_range(transactionHash);
       for (auto it = transactionTransfersRange.first; it != transactionTransfersRange.second;) {
-        if (it->type == transaction_types::OutputType::Key) {
+        if (it->type == TransactionTypes::OutputType::Key) {
           KeyImage keyImage = it->keyImage;
           it = transactionTransfersIndex.erase(it);
           updateTransfersVisibility(keyImage);
@@ -796,12 +796,12 @@ namespace cryptonote
       return result;
     }
 
-    void TransfersContainer::getUnconfirmedTransactions(std::vector<crypto::Hash>& transactions) const {
+    void TransfersContainer::getUnconfirmedTransactions(std::vector<Crypto::Hash>& transactions) const {
       std::lock_guard<std::mutex> lk(m_mutex);
       transactions.clear();
       for (auto& element : m_transactions) {
         if (element.blockHeight == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) {
-          transactions.push_back(*reinterpret_cast<const crypto::Hash*>(&element.transactionHash));
+          transactions.push_back(*reinterpret_cast<const Crypto::Hash*>(&element.transactionHash));
         }
       }
     }
@@ -809,7 +809,7 @@ namespace cryptonote
     void TransfersContainer::save(std::ostream& os) {
       std::lock_guard<std::mutex> lk(m_mutex);
       StdOutputStream stream(os);
-      cryptonote::BinaryOutputStreamSerializer s(stream);
+      CryptoNote::BinaryOutputStreamSerializer s(stream);
 
       s(const_cast<uint32_t&>(TRANSFERS_CONTAINER_STORAGE_VERSION), "version");
 
@@ -823,7 +823,7 @@ namespace cryptonote
     void TransfersContainer::load(std::istream& in) {
       std::lock_guard<std::mutex> lk(m_mutex);
       StdInputStream stream(in);
-      cryptonote::BinaryInputStreamSerializer s(stream);
+      CryptoNote::BinaryInputStreamSerializer s(stream);
 
       uint32_t version = 0;
       s(version, "version");
@@ -879,11 +879,11 @@ namespace cryptonote
       return isIncluded(info.type, state, flags);
     }
 
-    bool TransfersContainer::isIncluded(transaction_types::OutputType type, uint32_t state, uint32_t flags) {
+    bool TransfersContainer::isIncluded(TransactionTypes::OutputType type, uint32_t state, uint32_t flags) {
       return
         // filter by type
         (
-        ((flags & IncludeTypeKey) != 0 && type == transaction_types::OutputType::Key)
+        ((flags & IncludeTypeKey) != 0 && type == TransactionTypes::OutputType::Key)
         )
         &&
         // filter by state

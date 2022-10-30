@@ -50,13 +50,13 @@ namespace cryptonote
       // inputs
       virtual size_t getInputCount() const override;
       virtual uint64_t getInputTotalAmount() const override;
-      virtual transaction_types::InputType getInputType(size_t index) const override;
+      virtual TransactionTypes::InputType getInputType(size_t index) const override;
       virtual void getInput(size_t index, KeyInput& input) const override;
 
       // outputs
       virtual size_t getOutputCount() const override;
       virtual uint64_t getOutputTotalAmount() const override;
-      virtual transaction_types::OutputType getOutputType(size_t index) const override;
+      virtual TransactionTypes::OutputType getOutputType(size_t index) const override;
       virtual void getOutput(size_t index, KeyOutput& output, uint64_t& amount) const override;
 
       // signatures
@@ -91,7 +91,7 @@ namespace cryptonote
     }
 
     PublicKey TransactionPrefixImpl::getTransactionPublicKey() const {
-      crypto::PublicKey pk(NULL_PUBLIC_KEY);
+      Crypto::PublicKey pk(NULL_PUBLIC_KEY);
       m_extra.getPublicKey(pk);
       return pk;
     }
@@ -104,7 +104,7 @@ namespace cryptonote
       BinaryArray nonce;
 
       if (getExtraNonce(nonce)) {
-        crypto::Hash paymentId;
+        Crypto::Hash paymentId;
         if (getPaymentIdFromTransactionExtraNonce(nonce, paymentId)) {
           hash = reinterpret_cast<const Hash&>(paymentId);
           return true;
@@ -138,12 +138,12 @@ namespace cryptonote
         return val + getTransactionInputAmount(in); });
     }
 
-    transaction_types::InputType TransactionPrefixImpl::getInputType(size_t index) const {
+    TransactionTypes::InputType TransactionPrefixImpl::getInputType(size_t index) const {
       return getTransactionInputType(getInputChecked(m_txPrefix, index));
     }
 
     void TransactionPrefixImpl::getInput(size_t index, KeyInput& input) const {
-      input = boost::get<KeyInput>(getInputChecked(m_txPrefix, index, transaction_types::InputType::Key));
+      input = boost::get<KeyInput>(getInputChecked(m_txPrefix, index, TransactionTypes::InputType::Key));
     }
 
     size_t TransactionPrefixImpl::getOutputCount() const {
@@ -155,22 +155,22 @@ namespace cryptonote
         return val + out.amount; });
     }
 
-    transaction_types::OutputType TransactionPrefixImpl::getOutputType(size_t index) const {
+    TransactionTypes::OutputType TransactionPrefixImpl::getOutputType(size_t index) const {
       return getTransactionOutputType(getOutputChecked(m_txPrefix, index).target);
     }
 
     void TransactionPrefixImpl::getOutput(size_t index, KeyOutput& output, uint64_t& amount) const {
-      const auto& out = getOutputChecked(m_txPrefix, index, transaction_types::OutputType::Key);
+      const auto& out = getOutputChecked(m_txPrefix, index, TransactionTypes::OutputType::Key);
       output = boost::get<KeyOutput>(out.target);
       amount = out.amount;
     }
 
     size_t TransactionPrefixImpl::getRequiredSignaturesCount(size_t inputIndex) const {
-      return ::cryptonote::getRequiredSignaturesCount(getInputChecked(m_txPrefix, inputIndex));
+      return ::CryptoNote::getRequiredSignaturesCount(getInputChecked(m_txPrefix, inputIndex));
     }
 
     bool TransactionPrefixImpl::findOutputsToAccount(const AccountPublicAddress& addr, const SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const {
-      return ::cryptonote::findOutputsToAccount(m_txPrefix, addr, viewSecretKey, outs, outputAmount);
+      return ::CryptoNote::findOutputsToAccount(m_txPrefix, addr, viewSecretKey, outs, outputAmount);
     }
 
     BinaryArray TransactionPrefixImpl::getTransactionData() const {

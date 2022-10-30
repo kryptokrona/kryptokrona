@@ -40,23 +40,23 @@
 #include <unistd.h>
 #endif
 
-using common::JsonValue;
+using common::json_value;
 using namespace cryptonote;
 using namespace logging;
 using namespace daemon_config;
 
 void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const bool blockExplorerMode, std::shared_ptr<LoggerManager> logManager)
 {
-  std::vector<cryptonote::AccountPublicAddress> rewardTargets;
+  std::vector<CryptoNote::AccountPublicAddress> rewardTargets;
 
-  cryptonote::CurrencyBuilder currencyBuilder(logManager);
+  CryptoNote::CurrencyBuilder currencyBuilder(logManager);
   currencyBuilder.isBlockexplorer(blockExplorerMode);
 
-  cryptonote::Currency currency = currencyBuilder.currency();
+  CryptoNote::Currency currency = currencyBuilder.currency();
 
   for (const auto& rewardAddress : rewardAddresses)
   {
-    cryptonote::AccountPublicAddress address;
+    CryptoNote::AccountPublicAddress address;
     if (!currency.parseAccountAddressString(rewardAddress, address))
     {
       std::cout << "Failed to parse genesis reward address: " << rewardAddress << std::endl;
@@ -65,23 +65,23 @@ void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const 
     rewardTargets.emplace_back(std::move(address));
   }
 
-  cryptonote::Transaction transaction;
+  CryptoNote::Transaction transaction;
 
   if (rewardTargets.empty())
   {
-    if (cryptonote::parameters::GENESIS_BLOCK_REWARD > 0)
+    if (CryptoNote::parameters::GENESIS_BLOCK_REWARD > 0)
     {
       std::cout << "Error: Genesis Block Reward Addresses are not defined" << std::endl;
       return;
     }
-    transaction = cryptonote::CurrencyBuilder(logManager).generateGenesisTransaction();
+    transaction = CryptoNote::CurrencyBuilder(logManager).generateGenesisTransaction();
   }
   else
   {
-    transaction = cryptonote::CurrencyBuilder(logManager).generateGenesisTransaction(rewardTargets);
+    transaction = CryptoNote::CurrencyBuilder(logManager).generateGenesisTransaction(rewardTargets);
   }
 
-  std::string transactionHex = common::toHex(cryptonote::toBinaryArray(transaction));
+  std::string transactionHex = Common::toHex(CryptoNote::toBinaryArray(transaction));
   std::cout << getProjectCLIHeader() << std::endl << std::endl
     << "Replace the current GENESIS_COINBASE_TX_HEX line in src/config/CryptoNoteConfig.h with this one:" << std::endl
     << "const char GENESIS_COINBASE_TX_HEX[] = \"" << transactionHex << "\";" << std::endl;
@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
       }
     }
 
-    Level cfgLogLevel = static_cast<Level>(static_cast<int>(logging::ERROR) + config.logLevel);
+    Level cfgLogLevel = static_cast<Level>(static_cast<int>(Logging::ERROR) + config.logLevel);
 
     // configure logging
     logManager->configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile.string()));
@@ -210,29 +210,29 @@ int main(int argc, char* argv[])
     logger(INFO) << "Program Working Directory: " << cwdPath;
 
     //create objects and link them
-    cryptonote::CurrencyBuilder currencyBuilder(logManager);
+    CryptoNote::CurrencyBuilder currencyBuilder(logManager);
     currencyBuilder.isBlockexplorer(config.enableBlockExplorer);
 
     try {
       currencyBuilder.currency();
     } catch (std::exception&) {
-      std::cout << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: " << cryptonote::CRYPTONOTE_NAME << "d --print-genesis-tx" << std::endl;
+      std::cout << "GENESIS_COINBASE_TX_HEX constant has an incorrect value. Please launch: " << CryptoNote::CRYPTONOTE_NAME << "d --print-genesis-tx" << std::endl;
       return 1;
     }
-    cryptonote::Currency currency = currencyBuilder.currency();
+    CryptoNote::Currency currency = currencyBuilder.currency();
 
     bool use_checkpoints = !config.checkPoints.empty();
-    cryptonote::Checkpoints checkpoints(logManager);
+    CryptoNote::Checkpoints checkpoints(logManager);
 
     if (use_checkpoints) {
       logger(INFO) << "Loading Checkpoints for faster initial sync...";
       if (config.checkPoints == "default")
       {
-        for (const auto& cp : cryptonote::CHECKPOINTS)
+        for (const auto& cp : CryptoNote::CHECKPOINTS)
         {
           checkpoints.addCheckpoint(cp.index, cp.blockId);
         }
-          logger(INFO) << "Loaded " << cryptonote::CHECKPOINTS.size() << " default checkpoints";
+          logger(INFO) << "Loaded " << CryptoNote::CHECKPOINTS.size() << " default checkpoints";
       }
       else
       {
@@ -254,14 +254,14 @@ int main(int argc, char* argv[])
 
     if (dbConfig.isConfigFolderDefaulted())
     {
-      if (!tools::create_directories_if_necessary(dbConfig.getDataDir()))
+      if (!Tools::create_directories_if_necessary(dbConfig.getDataDir()))
       {
         throw std::runtime_error("Can't create directory: " + dbConfig.getDataDir());
       }
     }
     else
     {
-      if (!tools::directoryExists(dbConfig.getDataDir()))
+      if (!Tools::directoryExists(dbConfig.getDataDir()))
       {
         throw std::runtime_error("Directory does not exist: " + dbConfig.getDataDir());
       }
@@ -269,7 +269,7 @@ int main(int argc, char* argv[])
 
     RocksDBWrapper database(logManager);
     database.init(dbConfig);
-    tools::ScopeExit dbShutdownOnExit([&database] () { database.shutdown(); });
+    Tools::ScopeExit dbShutdownOnExit([&database] () { database.shutdown(); });
 
     if (!DatabaseBlockchainCache::checkDBSchemeVersion(database, logManager))
     {
@@ -282,9 +282,9 @@ int main(int argc, char* argv[])
       dbShutdownOnExit.resume();
     }
 
-    sys::Dispatcher dispatcher;
+    System::Dispatcher dispatcher;
     logger(INFO) << "Initializing core...";
-    cryptonote::Core ccore(
+    CryptoNote::Core ccore(
       currency,
       logManager,
       std::move(checkpoints),
@@ -295,9 +295,9 @@ int main(int argc, char* argv[])
     ccore.load();
     logger(INFO) << "Core initialized OK";
 
-    cryptonote::CryptoNoteProtocolHandler cprotocol(currency, dispatcher, ccore, nullptr, logManager);
-    cryptonote::NodeServer p2psrv(dispatcher, cprotocol, logManager);
-    cryptonote::RpcServer rpcServer(dispatcher, logManager, ccore, p2psrv, cprotocol);
+    CryptoNote::CryptoNoteProtocolHandler cprotocol(currency, dispatcher, ccore, nullptr, logManager);
+    CryptoNote::NodeServer p2psrv(dispatcher, cprotocol, logManager);
+    CryptoNote::RpcServer rpcServer(dispatcher, logManager, ccore, p2psrv, cprotocol);
 
     cprotocol.set_p2p_endpoint(&p2psrv);
     DaemonCommandsHandler dch(ccore, p2psrv, logManager, &rpcServer);
@@ -323,7 +323,7 @@ int main(int argc, char* argv[])
     rpcServer.start(config.rpcInterface, config.rpcPort);
     logger(INFO) << "Core rpc server started ok";
 
-    tools::SignalHandler::install([&dch] {
+    Tools::SignalHandler::install([&dch] {
        dch.exit({});
        dch.stop_handling();
     });

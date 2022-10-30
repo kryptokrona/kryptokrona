@@ -7,9 +7,9 @@
 
 #include "common/string_tools.h"
 
-#include <sys/event_lock.h>
-#include <sys/timer.h>
-#include <sys/interrupted_exception.h>
+#include <system/event_lock.h>
+#include <system/timer.h>
+#include <system/interrupted_exception.h>
 
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/json_rpc.h"
@@ -19,7 +19,7 @@
 using json = nlohmann::json;
 
 BlockchainMonitor::BlockchainMonitor(
-    sys::Dispatcher& dispatcher,
+    System::Dispatcher& dispatcher,
     const size_t pollingInterval,
     const std::shared_ptr<httplib::Client> httpClient):
 
@@ -46,7 +46,7 @@ void BlockchainMonitor::waitBlockchainUpdate()
     {
         m_sleepingContext.spawn([this] ()
         {
-            sys::Timer timer(m_dispatcher);
+            System::Timer timer(m_dispatcher);
             timer.sleep(std::chrono::seconds(m_pollingInterval));
         });
 
@@ -67,7 +67,7 @@ void BlockchainMonitor::waitBlockchainUpdate()
 
     if (m_stopped)
     {
-        throw sys::InterruptedException();
+        throw System::InterruptedException();
     }
 }
 
@@ -79,7 +79,7 @@ void BlockchainMonitor::stop()
     m_sleepingContext.wait();
 }
 
-std::optional<crypto::Hash> BlockchainMonitor::requestLastBlockHash()
+std::optional<Crypto::Hash> BlockchainMonitor::requestLastBlockHash()
 {
     json j = {
         {"jsonrpc", "2.0"},
@@ -127,7 +127,7 @@ std::optional<crypto::Hash> BlockchainMonitor::requestLastBlockHash()
             return std::nullopt;
         }
 
-        return j.at("result").at("block_header").at("hash").get<crypto::Hash>();
+        return j.at("result").at("block_header").at("hash").get<Crypto::Hash>();
     }
     catch (const json::exception &e)
     {

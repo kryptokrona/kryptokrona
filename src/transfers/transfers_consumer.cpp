@@ -24,8 +24,8 @@ using namespace crypto;
 using namespace logging;
 using namespace common;
 
-std::unordered_set<crypto::Hash> transactions_hash_seen;
-std::unordered_set<crypto::PublicKey> public_keys_seen;
+std::unordered_set<Crypto::Hash> transactions_hash_seen;
+std::unordered_set<Crypto::PublicKey> public_keys_seen;
 std::mutex seen_mutex;
 
 namespace
@@ -34,7 +34,7 @@ namespace
 
     class MarkTransactionConfirmedException : public std::exception {
     public:
-        MarkTransactionConfirmedException(const crypto::Hash& txHash) {
+        MarkTransactionConfirmedException(const Crypto::Hash& txHash) {
         }
 
         const Hash& getTxHash() const {
@@ -42,7 +42,7 @@ namespace
         }
 
     private:
-        crypto::Hash m_txHash;
+        Crypto::Hash m_txHash;
     };
 
     void checkOutputKey(
@@ -82,7 +82,7 @@ namespace
 
         auto outType = tx.getOutputType(size_t(idx));
 
-        if (outType == transaction_types::OutputType::Key) {
+        if (outType == TransactionTypes::OutputType::Key) {
 
           uint64_t amount;
           KeyOutput out;
@@ -94,8 +94,8 @@ namespace
       }
     }
 
-    std::vector<crypto::Hash> getBlockHashes(const cryptonote::CompleteBlock* blocks, size_t count) {
-      std::vector<crypto::Hash> result;
+    std::vector<Crypto::Hash> getBlockHashes(const CryptoNote::CompleteBlock* blocks, size_t count) {
+      std::vector<Crypto::Hash> result;
       result.reserve(count);
 
       for (size_t i = 0; i < count; ++i) {
@@ -108,7 +108,7 @@ namespace
 
 namespace cryptonote
 {
-    TransfersConsumer::TransfersConsumer(const cryptonote::Currency& currency, INode& node, std::shared_ptr<logging::ILogger> logger, const SecretKey& viewSecret) :
+    TransfersConsumer::TransfersConsumer(const CryptoNote::Currency& currency, INode& node, std::shared_ptr<Logging::ILogger> logger, const SecretKey& viewSecret) :
       m_node(node), m_viewSecret(viewSecret), m_currency(currency), m_logger(logger, "TransfersConsumer") {
       updateSyncStart();
     }
@@ -154,9 +154,9 @@ namespace cryptonote
       }
     }
 
-    void TransfersConsumer::initTransactionPool(const std::unordered_set<crypto::Hash>& uncommitedTransactions) {
+    void TransfersConsumer::initTransactionPool(const std::unordered_set<Crypto::Hash>& uncommitedTransactions) {
       for (auto itSubscriptions = m_subscriptions.begin(); itSubscriptions != m_subscriptions.end(); ++itSubscriptions) {
-        std::vector<crypto::Hash> unconfirmedTransactions;
+        std::vector<Crypto::Hash> unconfirmedTransactions;
         itSubscriptions->second->getContainer().getUnconfirmedTransactions(unconfirmedTransactions);
 
         for (auto itTransactions = unconfirmedTransactions.begin(); itTransactions != unconfirmedTransactions.end(); ++itTransactions) {
@@ -302,7 +302,7 @@ namespace cryptonote
         return 0;
       }
 
-      std::vector<crypto::Hash> blockHashes = getBlockHashes(blocks, count);
+      std::vector<Crypto::Hash> blockHashes = getBlockHashes(blocks, count);
       m_observerManager.notify(&IBlockchainConsumerObserver::onBlocksAdded, this, blockHashes);
 
       // sort by block height and transaction index in block
@@ -385,7 +385,7 @@ namespace cryptonote
       return std::error_code();
     }
 
-    const std::unordered_set<crypto::Hash>& TransfersConsumer::getKnownPoolTxIds() const {
+    const std::unordered_set<Crypto::Hash>& TransfersConsumer::getKnownPoolTxIds() const {
       return m_poolTxs;
     }
 
@@ -398,7 +398,7 @@ namespace cryptonote
       return processTransaction(unconfirmedBlockInfo, transaction);
     }
 
-    void TransfersConsumer::removeUnconfirmedTransaction(const crypto::Hash& transactionHash) {
+    void TransfersConsumer::removeUnconfirmedTransaction(const Crypto::Hash& transactionHash) {
       m_observerManager.notify(&IBlockchainConsumerObserver::onTransactionDeleteBegin, this, transactionHash);
       for (auto& subscription : m_subscriptions) {
         subscription.second->deleteUnconfirmedTransaction(transactionHash);
@@ -406,7 +406,7 @@ namespace cryptonote
       m_observerManager.notify(&IBlockchainConsumerObserver::onTransactionDeleteEnd, this, transactionHash);
     }
 
-    void TransfersConsumer::addPublicKeysSeen(const crypto::Hash& transactionHash, const crypto::PublicKey& outputKey) {
+    void TransfersConsumer::addPublicKeysSeen(const Crypto::Hash& transactionHash, const Crypto::PublicKey& outputKey) {
         std::lock_guard<std::mutex> lk(seen_mutex);
         transactions_hash_seen.insert(transactionHash);
         public_keys_seen.insert(outputKey);
@@ -419,7 +419,7 @@ namespace cryptonote
       const std::vector<uint32_t>& outputs,
       const std::vector<uint32_t>& globalIdxs,
       std::vector<TransactionOutputInformationIn>& transfers,
-      logging::LoggerRef& m_logger)
+      Logging::LoggerRef& m_logger)
     {
 
       auto txPubKey = tx.getTransactionPublicKey();
@@ -437,7 +437,7 @@ namespace cryptonote
 
         auto outType = tx.getOutputType(size_t(idx));
 
-        if (outType != transaction_types::OutputType::Key)
+        if (outType != TransactionTypes::OutputType::Key)
         {
           continue;
         }
@@ -450,14 +450,14 @@ namespace cryptonote
         info.globalOutputIndex = (blockInfo.height == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT) ?
           UNCONFIRMED_TRANSACTION_GLOBAL_OUTPUT_INDEX : globalIdxs[idx];
 
-        if (outType == transaction_types::OutputType::Key)
+        if (outType == TransactionTypes::OutputType::Key)
         {
           uint64_t amount;
           KeyOutput out;
           tx.getOutput(idx, out, amount);
 
-          cryptonote::KeyPair in_ephemeral;
-          cryptonote::generate_key_image_helper(
+          CryptoNote::KeyPair in_ephemeral;
+          CryptoNote::generate_key_image_helper(
             account,
             txPubKey,
             idx,
@@ -470,7 +470,7 @@ namespace cryptonote
           {
             if (public_keys_seen.find(out.key) != public_keys_seen.end())
             {
-              m_logger(WARNING, BRIGHT_RED) << "A duplicate public key was found in " << common::podToHex(tx.getTransactionHash());
+              m_logger(WARNING, BRIGHT_RED) << "A duplicate public key was found in " << Common::podToHex(tx.getTransactionHash());
               isDuplicate = true;
             }
             else
@@ -502,7 +502,7 @@ namespace cryptonote
       }
       catch (const std::exception& e)
       {
-        m_logger(WARNING, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << common::podToHex(tx.getTransactionHash());
+        m_logger(WARNING, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << Common::podToHex(tx.getTransactionHash());
         return std::error_code();
       }
 

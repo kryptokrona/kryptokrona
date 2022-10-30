@@ -19,7 +19,7 @@
 #include <cerrno>
 #include <cstring>
 
-namespace sys
+namespace system
 {
     std::string lastErrorMessage() {
       return errorMessage(errno);

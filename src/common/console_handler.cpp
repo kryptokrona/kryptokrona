@@ -33,7 +33,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using common::console::Color;
+using common::Console::Color;
 
 namespace common
 {
@@ -151,7 +151,7 @@ namespace common
     stop();
   }
 
-  void ConsoleHandler::start(bool startThread, const std::string& prompt, console::Color promptColor) {
+  void ConsoleHandler::start(bool startThread, const std::string& prompt, Console::Color promptColor) {
     m_prompt = prompt;
     m_promptColor = promptColor;
     m_consoleReader.start();
@@ -245,14 +245,14 @@ namespace common
       try {
         if (!m_prompt.empty()) {
           if (m_promptColor != Color::Default) {
-            console::setTextColor(m_promptColor);
+            Console::setTextColor(m_promptColor);
           }
 
           std::cout << m_prompt;
           std::cout.flush();
 
           if (m_promptColor != Color::Default) {
-            console::setTextColor(Color::Default);
+            Console::setTextColor(Color::Default);
           }
         }
 

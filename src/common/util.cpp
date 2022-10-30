@@ -309,7 +309,7 @@ namespace tools
         std::string config_folder;
         #ifdef WIN32
         // windows
-        config_folder = get_special_folder_path(CSIDL_APPDATA, true) + "/" + cryptonote::CRYPTONOTE_NAME;
+        config_folder = get_special_folder_path(CSIDL_APPDATA, true) + "/" + CryptoNote::CRYPTONOTE_NAME;
         #else
         std::string pathRet;
         char* pszHome = getenv("HOME");
@@ -320,10 +320,10 @@ namespace tools
         #ifdef MAC_OSX
         // Mac
         pathRet /= "Library/Application Support";
-        config_folder =  (pathRet + "/" + cryptonote::CRYPTONOTE_NAME);
+        config_folder =  (pathRet + "/" + CryptoNote::CRYPTONOTE_NAME);
         #else
         // Unix
-        config_folder = (pathRet + "/." + cryptonote::CRYPTONOTE_NAME);
+        config_folder = (pathRet + "/." + CryptoNote::CRYPTONOTE_NAME);
         #endif
         #endif
 

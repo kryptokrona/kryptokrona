@@ -16,9 +16,9 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "event_lock.h"
-#include <sys/event.h>
+#include <system/event.h>
 
-namespace sys
+namespace system
 {
     EventLock::EventLock(Event& event) : event(event) {
       while (!event.get()) {

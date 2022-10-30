@@ -65,9 +65,9 @@ namespace cryptonote
 
       template <class Value>
       std::string serialize(const Value& value, const std::string& name) {
-        cryptonote::KVBinaryOutputStreamSerializer serializer;
+        CryptoNote::KVBinaryOutputStreamSerializer serializer;
         std::stringstream ss;
-        common::StdOutputStream stream(ss);
+        Common::StdOutputStream stream(ss);
 
         serializer(const_cast<Value&>(value), name);
         serializer.dump(stream);
@@ -79,19 +79,19 @@ namespace cryptonote
 
       template <class Key, class Value>
       std::pair<std::string, std::string> serialize(const std::string& keyPrefix, const Key& key, const Value& value) {
-        return { db::serialize(std::make_pair(keyPrefix, key), keyPrefix), db::serialize(value, keyPrefix) };
+        return{ DB::serialize(std::make_pair(keyPrefix, key), keyPrefix), DB::serialize(value, keyPrefix) };
       }
 
       template <class Key>
       std::string serializeKey(const std::string& keyPrefix, const Key& key) {
-        return db::serialize(std::make_pair(keyPrefix, key), keyPrefix);
+        return DB::serialize(std::make_pair(keyPrefix, key), keyPrefix);
       }
 
       template <class Value>
       void deserialize(const std::string& serialized, Value& value, const std::string& name) {
         std::stringstream ss(serialized);
-        common::StdInputStream stream(ss);
-        cryptonote::KVBinaryInputStreamSerializer serializer(stream);
+        Common::StdInputStream stream(ss);
+        CryptoNote::KVBinaryInputStreamSerializer serializer(stream);
         serializer(value, name);
       }
 
@@ -100,7 +100,7 @@ namespace cryptonote
       template <class Key, class Value>
       void serializeKeys(std::vector<std::string>& rawKeys, const std::string keyPrefix, const std::unordered_map<Key, Value>& map) {
         for (const std::pair<Key, Value> kv : map) {
-          rawKeys.emplace_back(db::serializeKey(keyPrefix, kv.first));
+          rawKeys.emplace_back(DB::serializeKey(keyPrefix, kv.first));
         }
       }
 
@@ -108,7 +108,7 @@ namespace cryptonote
       void deserializeValues(std::unordered_map<Key, Value>& map, Iterator& serializedValuesIter, const std::string& name) {
         for (auto iter = map.begin(); iter != map.end(); ++serializedValuesIter) {
           if (boost::get<1>(*serializedValuesIter)) {
-            db::deserialize(boost::get<0>(*serializedValuesIter), iter->second, name);
+            DB::deserialize(boost::get<0>(*serializedValuesIter), iter->second, name);
             ++iter;
           } else {
             iter = map.erase(iter);
@@ -120,7 +120,7 @@ namespace cryptonote
       void deserializeValue(std::pair<Value, bool>& pair, Iterator& serializedValuesIter, const std::string& name) {
         if (pair.second) {
           if (boost::get<1>(*serializedValuesIter)) {
-            db::deserialize(boost::get<0>(*serializedValuesIter), pair.first, name);
+            DB::deserialize(boost::get<0>(*serializedValuesIter), pair.first, name);
           } else {
             pair = { Value {}, false };
           }

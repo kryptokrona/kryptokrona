@@ -16,7 +16,7 @@ namespace cryptonote
     {
         bool parsePeerFromString(NetworkAddress& pe, const std::string& node_addr)
         {
-          return common::parseIpAddressAndPort(pe.ip, pe.port, node_addr);
+          return Common::parseIpAddressAndPort(pe.ip, pe.port, node_addr);
         }
 
         bool parsePeersAndAddToNetworkContainer(const std::vector<std::string> peerList, std::vector<NetworkAddress>& container)
@@ -38,7 +38,7 @@ namespace cryptonote
           for (const std::string& peer : peerList)
           {
             PeerlistEntry peerListEntry = PeerlistEntry();
-            peerListEntry.id = rdm::randomValue<uint64_t>();
+            peerListEntry.id = Random::randomValue<uint64_t>();
             if (!parsePeerFromString(peerListEntry.adr, peer))
             {
               return false;
@@ -56,7 +56,7 @@ namespace cryptonote
       externalPort = 0;
       allowLocalIp = false;
       hideMyPort = false;
-      configFolder = tools::getDefaultDataDirectory();
+      configFolder = Tools::getDefaultDataDirectory();
       testnet = false;
     }
 
@@ -71,7 +71,7 @@ namespace cryptonote
       allowLocalIp = localIp;
       hideMyPort = hidePort;
       configFolder = dataDir;
-      p2pStateFilename = cryptonote::parameters::P2P_NET_DATA_FILENAME;
+      p2pStateFilename = CryptoNote::parameters::P2P_NET_DATA_FILENAME;
 
       if (!addPeers.empty())
       {
