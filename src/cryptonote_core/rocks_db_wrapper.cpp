@@ -33,7 +33,7 @@ namespace
     const std::string TESTNET_DB_NAME = "testnet_DB";
 }
 
-RocksDBWrapper::RocksDBWrapper(std::shared_ptr<Logging::ILogger> logger) : logger(logger, "RocksDBWrapper"), state(NOT_INITIALIZED){
+RocksDBWrapper::RocksDBWrapper(std::shared_ptr<logging::ILogger> logger) : logger(logger, "RocksDBWrapper"), state(NOT_INITIALIZED){
 }
 
 RocksDBWrapper::~RocksDBWrapper() {
@@ -41,7 +41,7 @@ RocksDBWrapper::~RocksDBWrapper() {
 
 void RocksDBWrapper::init(const DataBaseConfig& config) {
   if (state.load() != NOT_INITIALIZED) {
-    throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::ALREADY_INITIALIZED));
+    throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::ALREADY_INITIALIZED));
   }
   
   std::string dataDir = getDataDir(config);
@@ -60,14 +60,14 @@ void RocksDBWrapper::init(const DataBaseConfig& config) {
     rocksdb::Status status = rocksdb::DB::Open(dbOptions, dataDir, &dbPtr);
     if (!status.ok()) {
       logger(ERROR) << "DB Error. DB can't be created in " << dataDir << ". Error: " << status.ToString();
-      throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::INTERNAL_ERROR));
+      throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::INTERNAL_ERROR));
     }
   } else if (status.IsIOError()) {
     logger(ERROR) << "DB Error. DB can't be opened in " << dataDir << ". Error: " << status.ToString();
-    throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::IO_ERROR));
+    throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::IO_ERROR));
   } else {
     logger(ERROR) << "DB Error. DB can't be opened in " << dataDir << ". Error: " << status.ToString();
-    throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::INTERNAL_ERROR));
+    throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::INTERNAL_ERROR));
   }
 
   db.reset(dbPtr);
@@ -76,7 +76,7 @@ void RocksDBWrapper::init(const DataBaseConfig& config) {
 
 void RocksDBWrapper::shutdown() {
   if (state.load() != INITIALIZED) {
-    throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::NOT_INITIALIZED));
+    throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::NOT_INITIALIZED));
   }
 
   logger(INFO) << "Closing DB.";
@@ -88,7 +88,7 @@ void RocksDBWrapper::shutdown() {
 
 void RocksDBWrapper::destroy(const DataBaseConfig& config) {
   if (state.load() != NOT_INITIALIZED) {
-    throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::ALREADY_INITIALIZED));
+    throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::ALREADY_INITIALIZED));
   }
 
   std::string dataDir = getDataDir(config);
@@ -102,13 +102,13 @@ void RocksDBWrapper::destroy(const DataBaseConfig& config) {
     logger(WARNING) << "DB destroyed in " << dataDir;
   } else {
     logger(ERROR) << "DB Error. DB can't be destroyed in " << dataDir << ". Error: " << status.ToString();
-    throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::INTERNAL_ERROR));
+    throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::INTERNAL_ERROR));
   }
 }
 
 std::error_code RocksDBWrapper::write(IWriteBatch& batch) {
   if (state.load() != INITIALIZED) {
-    throw std::system_error(make_error_code(CryptoNote::error::DataBaseErrorCodes::NOT_INITIALIZED));
+    throw std::system_error(make_error_code(cryptonote::error::DataBaseErrorCodes::NOT_INITIALIZED));
   }
 
   return write(batch, false);
@@ -133,7 +133,7 @@ std::error_code RocksDBWrapper::write(IWriteBatch& batch, bool sync) {
 
   if (!status.ok()) {
     logger(ERROR) << "Can't write to DB. " << status.ToString();
-    return make_error_code(CryptoNote::error::DataBaseErrorCodes::INTERNAL_ERROR);
+    return make_error_code(cryptonote::error::DataBaseErrorCodes::INTERNAL_ERROR);
   } else {
     return std::error_code();
   }
@@ -161,7 +161,7 @@ std::error_code RocksDBWrapper::read(IReadBatch& batch) {
   std::vector<bool> resultStates;
   for (const rocksdb::Status& status : statuses) {
     if (!status.ok() && !status.IsNotFound()) {
-      return make_error_code(CryptoNote::error::DataBaseErrorCodes::INTERNAL_ERROR);
+      return make_error_code(cryptonote::error::DataBaseErrorCodes::INTERNAL_ERROR);
     }
     resultStates.push_back(status.ok());
   }

@@ -55,33 +55,33 @@ namespace
     }
 
     struct BinaryVariantTagGetter: boost::static_visitor<uint8_t> {
-      uint8_t operator()(const CryptoNote::BaseInput) { return  0xff; }
-      uint8_t operator()(const CryptoNote::KeyInput) { return  0x2; }
-      uint8_t operator()(const CryptoNote::KeyOutput) { return  0x2; }
-      uint8_t operator()(const CryptoNote::Transaction) { return  0xcc; }
-      uint8_t operator()(const CryptoNote::BlockTemplate) { return  0xbb; }
+      uint8_t operator()(const cryptonote::BaseInput) { return  0xff; }
+      uint8_t operator()(const cryptonote::KeyInput) { return  0x2; }
+      uint8_t operator()(const cryptonote::KeyOutput) { return  0x2; }
+      uint8_t operator()(const cryptonote::Transaction) { return  0xcc; }
+      uint8_t operator()(const cryptonote::BlockTemplate) { return  0xbb; }
     };
 
     struct VariantSerializer : boost::static_visitor<> {
-      VariantSerializer(CryptoNote::ISerializer& serializer, const std::string& name) : s(serializer), name(name) {}
+      VariantSerializer(cryptonote::ISerializer& serializer, const std::string& name) : s(serializer), name(name) {}
 
       template <typename T>
       void operator() (T& param) { s(param, name); }
 
-      CryptoNote::ISerializer& s;
+      cryptonote::ISerializer& s;
       std::string name;
     };
 
-    void getVariantValue(CryptoNote::ISerializer& serializer, uint8_t tag, CryptoNote::TransactionInput& in) {
+    void getVariantValue(cryptonote::ISerializer& serializer, uint8_t tag, cryptonote::TransactionInput& in) {
       switch(tag) {
       case 0xff: {
-        CryptoNote::BaseInput v;
+        cryptonote::BaseInput v;
         serializer(v, "value");
         in = v;
         break;
       }
       case 0x2: {
-        CryptoNote::KeyInput v;
+        cryptonote::KeyInput v;
         serializer(v, "value");
         in = v;
         break;
@@ -91,10 +91,10 @@ namespace
       }
     }
 
-    void getVariantValue(CryptoNote::ISerializer& serializer, uint8_t tag, CryptoNote::TransactionOutputTarget& out) {
+    void getVariantValue(cryptonote::ISerializer& serializer, uint8_t tag, cryptonote::TransactionOutputTarget& out) {
       switch(tag) {
       case 0x2: {
-        CryptoNote::KeyOutput v;
+        cryptonote::KeyOutput v;
         serializer(v, "data");
         out = v;
         break;
@@ -105,11 +105,11 @@ namespace
     }
 
     template <typename T>
-    bool serializePod(T& v, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serializePod(T& v, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializer.binary(&v, sizeof(v), name);
     }
 
-    bool serializeVarintVector(std::vector<uint32_t>& vector, CryptoNote::ISerializer& serializer, Common::StringView name) {
+    bool serializeVarintVector(std::vector<uint32_t>& vector, cryptonote::ISerializer& serializer, common::StringView name) {
       uint64_t size = vector.size();
 
       if (!serializer.beginArray(size, name)) {
@@ -131,35 +131,35 @@ namespace
 
     namespace Crypto {
 
-    bool serialize(PublicKey& pubKey, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(PublicKey& pubKey, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(pubKey, name, serializer);
     }
 
-    bool serialize(SecretKey& secKey, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(SecretKey& secKey, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(secKey, name, serializer);
     }
 
-    bool serialize(Hash& h, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(Hash& h, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(h, name, serializer);
     }
 
-    bool serialize(KeyImage& keyImage, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(KeyImage& keyImage, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(keyImage, name, serializer);
     }
 
-    bool serialize(chacha8_iv& chacha, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(chacha8_iv& chacha, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(chacha, name, serializer);
     }
 
-    bool serialize(Signature& sig, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(Signature& sig, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(sig, name, serializer);
     }
 
-    bool serialize(EllipticCurveScalar& ecScalar, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(EllipticCurveScalar& ecScalar, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(ecScalar, name, serializer);
     }
 
-    bool serialize(EllipticCurvePoint& ecPoint, Common::StringView name, CryptoNote::ISerializer& serializer) {
+    bool serialize(EllipticCurvePoint& ecPoint, common::StringView name, cryptonote::ISerializer& serializer) {
       return serializePod(ecPoint, name, serializer);
     }
 
@@ -225,13 +225,13 @@ namespace
             throw std::runtime_error("serialization error: unexpected signatures size");
           }
 
-          for (Crypto::Signature& sig : tx.signatures[i]) {
+          for (crypto::Signature& sig : tx.signatures[i]) {
             serializePod(sig, "", serializer);
           }
 
         } else {
-          std::vector<Crypto::Signature> signatures(signatureSize);
-          for (Crypto::Signature& sig : signatures) {
+          std::vector<crypto::Signature> signatures(signatureSize);
+          for (crypto::Signature& sig : signatures) {
             serializePod(sig, "", serializer);
           }
 
@@ -301,13 +301,13 @@ namespace
       serializer.binary(&pbs.m_nonce, sizeof(pbs.m_nonce), "nonce");
 
       if (pbs.m_hashingSerialization) {
-        Crypto::Hash minerTxHash;
+        crypto::Hash minerTxHash;
         if (!getBaseTransactionHash(pbs.m_parentBlock.baseTransaction, minerTxHash)) {
           throw std::runtime_error("Get transaction hash error");
         }
 
-        Crypto::Hash merkleRoot;
-        Crypto::tree_hash_from_branch(pbs.m_parentBlock.baseTransactionBranch.data(), pbs.m_parentBlock.baseTransactionBranch.size(), minerTxHash, 0, merkleRoot);
+        crypto::Hash merkleRoot;
+        crypto::tree_hash_from_branch(pbs.m_parentBlock.baseTransactionBranch.data(), pbs.m_parentBlock.baseTransactionBranch.size(), minerTxHash, 0, merkleRoot);
 
         serializer(merkleRoot, "merkleRoot");
       }
@@ -323,7 +323,7 @@ namespace
         return;
       }
 
-      uint64_t branchSize = Crypto::tree_depth(pbs.m_parentBlock.transactionCount);
+      uint64_t branchSize = crypto::tree_depth(pbs.m_parentBlock.transactionCount);
       if (serializer.type() == ISerializer::OUTPUT) {
         if (pbs.m_parentBlock.baseTransactionBranch.size() != branchSize) {
           throw std::runtime_error("Wrong miner transaction branch size");
@@ -334,7 +334,7 @@ namespace
 
     //  serializer(m_parentBlock.baseTransactionBranch, "baseTransactionBranch");
       //TODO: Make arrays with computable size! This code won't work with json serialization!
-      for (Crypto::Hash& hash: pbs.m_parentBlock.baseTransactionBranch) {
+      for (crypto::Hash& hash: pbs.m_parentBlock.baseTransactionBranch) {
         serializer(hash, "");
       }
 
@@ -345,7 +345,7 @@ namespace
         throw std::runtime_error("Can't get extra merge mining tag");
       }
 
-      if (mmTag.depth > 8 * sizeof(Crypto::Hash)) {
+      if (mmTag.depth > 8 * sizeof(crypto::Hash)) {
         throw std::runtime_error("Wrong merge mining tag depth");
       }
 
@@ -359,7 +359,7 @@ namespace
 
     //  serializer(m_parentBlock.blockchainBranch, "blockchainBranch");
       //TODO: Make arrays with computable size! This code won't work with json serialization!
-      for (Crypto::Hash& hash: pbs.m_parentBlock.blockchainBranch) {
+      for (crypto::Hash& hash: pbs.m_parentBlock.blockchainBranch) {
         serializer(hash, "");
       }
     }

@@ -28,8 +28,8 @@
 
 namespace cryptonote
 {
-    void getBinaryArrayHash(const BinaryArray& binaryArray, Crypto::Hash& hash);
-    Crypto::Hash getBinaryArrayHash(const BinaryArray& binaryArray);
+    void getBinaryArrayHash(const BinaryArray& binaryArray, crypto::Hash& hash);
+    crypto::Hash getBinaryArrayHash(const BinaryArray& binaryArray);
 
     // noexcept
     template<class T>
@@ -100,7 +100,7 @@ namespace cryptonote
     }
 
     template<class T>
-    bool getObjectHash(const T& object, Crypto::Hash& hash) {
+    bool getObjectHash(const T& object, crypto::Hash& hash) {
       BinaryArray ba;
       if (!toBinaryArray(object, ba)) {
         hash = NULL_HASH;
@@ -112,7 +112,7 @@ namespace cryptonote
     }
 
     template<class T>
-    bool getObjectHash(const T& object, Crypto::Hash& hash, size_t& size) {
+    bool getObjectHash(const T& object, crypto::Hash& hash, size_t& size) {
       BinaryArray ba;
       if (!toBinaryArray(object, ba)) {
         hash = NULL_HASH;
@@ -126,18 +126,18 @@ namespace cryptonote
     }
 
     template<class T>
-    Crypto::Hash getObjectHash(const T& object) {
-      Crypto::Hash hash;
+    crypto::Hash getObjectHash(const T& object) {
+      crypto::Hash hash;
       getObjectHash(object, hash);
       return hash;
     }
 
-    inline bool getBaseTransactionHash(const BaseTransaction& tx, Crypto::Hash& hash) {
+    inline bool getBaseTransactionHash(const BaseTransaction& tx, crypto::Hash& hash) {
       if (tx.version < TRANSACTION_VERSION_2) {
         return getObjectHash(tx, hash);
       } else {
         BinaryArray data{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xbc, 0x36, 0x78, 0x9e, 0x7a, 0x1e, 0x28, 0x14, 0x36, 0x46, 0x42, 0x29, 0x82, 0x8f, 0x81, 0x7d, 0x66, 0x12, 0xf7, 0xb4, 0x77, 0xd6, 0x65, 0x91, 0xff, 0x96, 0xa9, 0xe0, 0x64, 0xbc, 0xc9, 0x8a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }};
-        if (getObjectHash(static_cast<const TransactionPrefix&>(tx), *reinterpret_cast<Crypto::Hash*>(data.data()))) {
+        if (getObjectHash(static_cast<const TransactionPrefix&>(tx), *reinterpret_cast<crypto::Hash*>(data.data()))) {
           hash = getBinaryArrayHash(data);
           return true;
         } else {

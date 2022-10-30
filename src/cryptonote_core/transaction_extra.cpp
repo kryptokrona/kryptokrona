@@ -245,9 +245,9 @@ namespace cryptonote
       }
 
       std::vector<uint8_t> extraNonce;
-      CryptoNote::setPaymentIdToTransactionExtraNonce(extraNonce, paymentIdBin);
+      cryptonote::setPaymentIdToTransactionExtraNonce(extraNonce, paymentIdBin);
 
-      if (!CryptoNote::addExtraNonceToTransactionExtra(extra, extraNonce)) {
+      if (!cryptonote::addExtraNonceToTransactionExtra(extra, extraNonce)) {
         return false;
       }
 

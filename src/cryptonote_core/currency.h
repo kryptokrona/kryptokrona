@@ -30,9 +30,9 @@ namespace cryptonote
 
       size_t timestampCheckWindow(uint32_t blockHeight) const
       {
-          if (blockHeight >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V3)
+          if (blockHeight >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V3)
           {
-              return CryptoNote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3;
+              return cryptonote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3;
           }
           else
           {
@@ -42,13 +42,13 @@ namespace cryptonote
 
       uint64_t blockFutureTimeLimit(uint32_t blockHeight) const
       {
-          if (blockHeight >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
+          if (blockHeight >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
           {
-              return CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4;
+              return cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4;
           }
-          else if (blockHeight >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+          else if (blockHeight >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
           {
-              return CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3;
+              return cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3;
           }
           else
           {
@@ -73,17 +73,17 @@ namespace cryptonote
 
       uint64_t minimumFee() const { return m_mininumFee; }
       uint64_t defaultDustThreshold(uint32_t height) const {
-          if (height >= CryptoNote::parameters::DUST_THRESHOLD_V2_HEIGHT)
+          if (height >= cryptonote::parameters::DUST_THRESHOLD_V2_HEIGHT)
           {
-              return CryptoNote::parameters::DEFAULT_DUST_THRESHOLD_V2;
+              return cryptonote::parameters::DEFAULT_DUST_THRESHOLD_V2;
           }
 
           return m_defaultDustThreshold;
       }
       uint64_t defaultFusionDustThreshold(uint32_t height) const {
-          if (height >= CryptoNote::parameters::FUSION_DUST_THRESHOLD_HEIGHT_V2)
+          if (height >= cryptonote::parameters::FUSION_DUST_THRESHOLD_HEIGHT_V2)
           {
-              return CryptoNote::parameters::DEFAULT_DUST_THRESHOLD_V2;
+              return cryptonote::parameters::DEFAULT_DUST_THRESHOLD_V2;
           }
 
           return m_defaultDustThreshold;
@@ -130,7 +130,7 @@ namespace cryptonote
       bool isTestnet() const { return m_testnet; }
 
       const BlockTemplate& genesisBlock() const { return cachedGenesisBlock->getBlock(); }
-      const Crypto::Hash& genesisBlockHash() const { return cachedGenesisBlock->getBlockHash(); }
+      const crypto::Hash& genesisBlockHash() const { return cachedGenesisBlock->getBlockHash(); }
 
       bool getBlockReward(uint8_t blockMajorVersion, size_t medianSize, size_t currentBlockSize, uint64_t alreadyGeneratedCoins, uint64_t fee,
         uint64_t& reward, int64_t& emissionChange) const;
@@ -168,7 +168,7 @@ namespace cryptonote
       static const std::vector<uint64_t> PRETTY_AMOUNTS;
 
     private:
-      Currency(std::shared_ptr<Logging::ILogger> log) : logger(log, "currency") {
+      Currency(std::shared_ptr<logging::ILogger> log) : logger(log, "currency") {
       }
 
       bool init();
@@ -242,14 +242,14 @@ namespace cryptonote
       BlockTemplate genesisBlockTemplate;
       std::unique_ptr<CachedBlock> cachedGenesisBlock;
 
-      Logging::LoggerRef logger;
+      logging::LoggerRef logger;
 
       friend class CurrencyBuilder;
     };
 
     class CurrencyBuilder : boost::noncopyable {
     public:
-      CurrencyBuilder(std::shared_ptr<Logging::ILogger> log);
+      CurrencyBuilder(std::shared_ptr<logging::ILogger> log);
 
       Currency currency() {
         if (!m_currency.init()) {
