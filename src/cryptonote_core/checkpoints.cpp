@@ -24,12 +24,12 @@ using namespace logging;
 namespace cryptonote
 {
     //---------------------------------------------------------------------------
-    Checkpoints::Checkpoints(std::shared_ptr<Logging::ILogger> log) : logger(log, "checkpoints") {}
+    Checkpoints::Checkpoints(std::shared_ptr<logging::ILogger> log) : logger(log, "checkpoints") {}
     //---------------------------------------------------------------------------
     bool Checkpoints::addCheckpoint(uint32_t index, const std::string &hash_str) {
-      Crypto::Hash h = NULL_HASH;
+      crypto::Hash h = NULL_HASH;
 
-      if (!Common::podFromHex(hash_str, h)) {
+      if (!common::podFromHex(hash_str, h)) {
         logger(ERROR, BRIGHT_RED) << "INVALID HASH IN CHECKPOINTS!";
         return false;
       }
@@ -112,7 +112,7 @@ namespace cryptonote
       return !points.empty() && (index <= (--points.end())->first);
     }
     //---------------------------------------------------------------------------
-    bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h,
+    bool Checkpoints::checkBlock(uint32_t index, const crypto::Hash &h,
                                 bool& isCheckpoint) const {
       auto it = points.find(index);
       isCheckpoint = it != points.end();
@@ -121,19 +121,19 @@ namespace cryptonote
 
       if (it->second == h) {
         if (index % 100 == 0) {
-          logger(Logging::INFO, BRIGHT_GREEN)
+          logger(logging::INFO, BRIGHT_GREEN)
             << "CHECKPOINT PASSED FOR INDEX " << index << " " << h;
         }
         return true;
       } else {
-        logger(Logging::WARNING, BRIGHT_YELLOW) << "CHECKPOINT FAILED FOR HEIGHT " << index
+        logger(logging::WARNING, BRIGHT_YELLOW) << "CHECKPOINT FAILED FOR HEIGHT " << index
                                                 << ". EXPECTED HASH: " << it->second
                                                 << ", FETCHED HASH: " << h;
         return false;
       }
     }
     //---------------------------------------------------------------------------
-    bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h) const {
+    bool Checkpoints::checkBlock(uint32_t index, const crypto::Hash &h) const {
       bool ignored;
       return checkBlock(index, h, ignored);
     }

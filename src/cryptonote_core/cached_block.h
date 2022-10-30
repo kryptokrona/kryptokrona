@@ -15,10 +15,10 @@ namespace cryptonote
     public:
       explicit CachedBlock(const BlockTemplate& block);
       const BlockTemplate& getBlock() const;
-      const Crypto::Hash& getTransactionTreeHash() const;
-      const Crypto::Hash& getBlockHash() const;
-      const Crypto::Hash& getBlockLongHash() const;
-      const Crypto::Hash& getAuxiliaryBlockHeaderHash() const;
+      const crypto::Hash& getTransactionTreeHash() const;
+      const crypto::Hash& getBlockHash() const;
+      const crypto::Hash& getBlockLongHash() const;
+      const crypto::Hash& getAuxiliaryBlockHeaderHash() const;
       const BinaryArray& getBlockHashingBinaryArray() const;
       const BinaryArray& getParentBlockBinaryArray(bool headerOnly) const;
       const BinaryArray& getParentBlockHashingBinaryArray(bool headerOnly) const;
@@ -32,9 +32,9 @@ namespace cryptonote
       mutable boost::optional<BinaryArray> parentBlockBinaryArrayHeaderOnly;
       mutable boost::optional<BinaryArray> parentBlockHashingBinaryArrayHeaderOnly;
       mutable boost::optional<uint32_t> blockIndex;
-      mutable boost::optional<Crypto::Hash> transactionTreeHash;
-      mutable boost::optional<Crypto::Hash> blockHash;
-      mutable boost::optional<Crypto::Hash> blockLongHash;
-      mutable boost::optional<Crypto::Hash> auxiliaryBlockHeaderHash;
+      mutable boost::optional<crypto::Hash> transactionTreeHash;
+      mutable boost::optional<crypto::Hash> blockHash;
+      mutable boost::optional<crypto::Hash> blockLongHash;
+      mutable boost::optional<crypto::Hash> auxiliaryBlockHeaderHash;
     };
 }

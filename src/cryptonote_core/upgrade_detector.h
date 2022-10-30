@@ -140,7 +140,7 @@ namespace cryptonote
             strftime(upgradeTimeStr, 40, "%H:%M:%S %Y.%m.%d", upgradeTime);
             cryptonote::CachedBlock cachedBlock(m_blockchain.back().bl);
 
-            logger(logging::TRACE, logging::BRIGHT_GREEN) << "###### UPGRADE is going to happen after block index " << upgradeHeight() << " at about " <<
+            logger(Logging::TRACE, Logging::BRIGHT_GREEN) << "###### UPGRADE is going to happen after block index " << upgradeHeight() << " at about " <<
               upgradeTimeStr << " (in " << common::timeIntervalToString(interval) << ")! Current last block index " << (m_blockchain.size() - 1) <<
               ", hash " << cachedBlock.getBlockHash();
           }

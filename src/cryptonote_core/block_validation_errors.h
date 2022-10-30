@@ -77,8 +77,8 @@ namespace cryptonote
           }
         };
 
-        inline std::error_code make_error_code(CryptoNote::error::BlockValidationError e) {
-          return std::error_code(static_cast<int>(e), CryptoNote::error::BlockValidationErrorCategory::INSTANCE);
+        inline std::error_code make_error_code(cryptonote::error::BlockValidationError e) {
+          return std::error_code(static_cast<int>(e), cryptonote::error::BlockValidationErrorCategory::INSTANCE);
         }
     }
 }
@@ -86,5 +86,5 @@ namespace cryptonote
 namespace std
 {
     template <>
-    struct is_error_code_enum<CryptoNote::error::BlockValidationError>: public true_type {};
+    struct is_error_code_enum<cryptonote::error::BlockValidationError>: public true_type {};
 }

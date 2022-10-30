@@ -72,10 +72,10 @@ namespace cryptonote
           }
 
         private:
-          std::unordered_set<Crypto::KeyImage> alreadSpentKeyImages;
+          std::unordered_set<crypto::KeyImage> alreadSpentKeyImages;
         };
 
-        inline IBlockchainCache* findIndexInChain(IBlockchainCache* blockSegment, const Crypto::Hash& blockHash) {
+        inline IBlockchainCache* findIndexInChain(IBlockchainCache* blockSegment, const crypto::Hash& blockHash) {
           assert(blockSegment != nullptr);
           while (blockSegment != nullptr) {
             if (blockSegment->hasBlock(blockHash)) {
@@ -117,7 +117,7 @@ namespace cryptonote
           return blockTemplate;
         }
 
-        Crypto::Hash getBlockHash(const RawBlock& block) {
+        crypto::Hash getBlockHash(const RawBlock& block) {
           BlockTemplate blockTemplate = extractBlockTemplate(block);
           return CachedBlock(blockTemplate).getBlockHash();
         }
@@ -157,7 +157,7 @@ namespace cryptonote
           int64_t emissionChange = 0;
           auto alreadyGeneratedCoins = segment.getAlreadyGeneratedCoins(previousBlockIndex);
           auto lastBlocksSizes = segment.getLastBlocksSizes(currency.rewardBlocksWindow(), previousBlockIndex, addGenesisBlock);
-          auto blocksSizeMedian = Common::medianValue(lastBlocksSizes);
+          auto blocksSizeMedian = common::medianValue(lastBlocksSizes);
           if (!currency.getBlockReward(cachedBlock.getBlock().majorVersion, blocksSizeMedian,
                                        cumulativeSize, alreadyGeneratedCoins, cumulativeFee, reward, emissionChange)) {
             throw std::system_error(make_error_code(error::BlockValidationError::CUMULATIVE_BLOCK_SIZE_TOO_BIG));
@@ -191,7 +191,7 @@ namespace cryptonote
 
     }
 
-    Core::Core(const Currency& currency, std::shared_ptr<Logging::ILogger> logger, Checkpoints&& checkpoints, System::Dispatcher& dispatcher,
+    Core::Core(const Currency& currency, std::shared_ptr<logging::ILogger> logger, Checkpoints&& checkpoints, system::Dispatcher& dispatcher,
                std::unique_ptr<IBlockchainCacheFactory>&& blockchainCacheFactory, std::unique_ptr<IMainChainStorage>&& mainchainStorage)
         : currency(currency), dispatcher(dispatcher), contextGroup(dispatcher), logger(logger, "Core"), checkpoints(std::move(checkpoints)),
           upgradeManager(new UpgradeManager()), blockchainCacheFactory(std::move(blockchainCacheFactory)),
@@ -229,7 +229,7 @@ namespace cryptonote
         }
         return true;
       } catch (std::exception& e) {
-        logger(Logging::WARNING) << "failed to notify observers: " << e.what();
+        logger(logging::WARNING) << "failed to notify observers: " << e.what();
         return false;
       }
     }
@@ -242,7 +242,7 @@ namespace cryptonote
       return chainsLeaves[0]->getTopBlockIndex();
     }
 
-    Crypto::Hash Core::getTopBlockHash() const {
+    crypto::Hash Core::getTopBlockHash() const {
       assert(!chainsStorage.empty());
       assert(!chainsLeaves.empty());
 
@@ -251,7 +251,7 @@ namespace cryptonote
       return chainsLeaves[0]->getTopBlockHash();
     }
 
-    Crypto::Hash Core::getBlockHashByIndex(uint32_t blockIndex) const {
+    crypto::Hash Core::getBlockHashByIndex(uint32_t blockIndex) const {
       assert(!chainsStorage.empty());
       assert(!chainsLeaves.empty());
       assert(blockIndex <= getTopBlockIndex());
@@ -274,7 +274,7 @@ namespace cryptonote
       return timestamps[0];
     }
 
-    bool Core::hasBlock(const Crypto::Hash& blockHash) const {
+    bool Core::hasBlock(const crypto::Hash& blockHash) const {
       throwIfNotInitialized();
       return findSegmentContainingBlock(blockHash) != nullptr;
     }
@@ -291,7 +291,7 @@ namespace cryptonote
       return restoreBlockTemplate(segment, index);
     }
 
-    BlockTemplate Core::getBlockByHash(const Crypto::Hash& blockHash) const {
+    BlockTemplate Core::getBlockByHash(const crypto::Hash& blockHash) const {
       assert(!chainsStorage.empty());
       assert(!chainsLeaves.empty());
 
@@ -307,9 +307,9 @@ namespace cryptonote
       return restoreBlockTemplate(segment, blockIndex);
     }
 
-    std::vector<Crypto::Hash> Core::buildSparseChain() const {
+    std::vector<crypto::Hash> Core::buildSparseChain() const {
       throwIfNotInitialized();
-      Crypto::Hash topBlockHash = chainsLeaves[0]->getTopBlockHash();
+      crypto::Hash topBlockHash = chainsLeaves[0]->getTopBlockHash();
       return doBuildSparseChain(topBlockHash);
     }
 
@@ -347,8 +347,8 @@ namespace cryptonote
       return blocks;
     }
 
-    void Core::getBlocks(const std::vector<Crypto::Hash>& blockHashes, std::vector<RawBlock>& blocks,
-                         std::vector<Crypto::Hash>& missedHashes) const {
+    void Core::getBlocks(const std::vector<crypto::Hash>& blockHashes, std::vector<RawBlock>& blocks,
+                         std::vector<crypto::Hash>& missedHashes) const {
       throwIfNotInitialized();
 
       for (const auto& hash : blockHashes) {
@@ -379,7 +379,7 @@ namespace cryptonote
       }
     }
 
-    bool Core::queryBlocks(const std::vector<Crypto::Hash>& blockHashes, uint64_t timestamp, uint32_t& startIndex,
+    bool Core::queryBlocks(const std::vector<crypto::Hash>& blockHashes, uint64_t timestamp, uint32_t& startIndex,
                            uint32_t& currentIndex, uint32_t& fullOffset, std::vector<BlockFullInfo>& entries) const {
       assert(entries.empty());
       assert(!chainsLeaves.empty());
@@ -412,7 +412,7 @@ namespace cryptonote
       }
     }
 
-    bool Core::queryBlocksLite(const std::vector<Crypto::Hash>& knownBlockHashes, uint64_t timestamp, uint32_t& startIndex,
+    bool Core::queryBlocksLite(const std::vector<crypto::Hash>& knownBlockHashes, uint64_t timestamp, uint32_t& startIndex,
                                uint32_t& currentIndex, uint32_t& fullOffset, std::vector<BlockShortInfo>& entries) const {
       assert(entries.empty());
       assert(!chainsLeaves.empty());
@@ -454,12 +454,12 @@ namespace cryptonote
 
         return true;
       } catch (std::exception& e) {
-        logger(Logging::ERROR) << "Failed to query blocks: " << e.what();
+        logger(logging::ERROR) << "Failed to query blocks: " << e.what();
         return false;
       }
     }
 
-    bool Core::queryBlocksDetailed(const std::vector<Crypto::Hash>& knownBlockHashes, uint64_t timestamp, uint64_t& startIndex,
+    bool Core::queryBlocksDetailed(const std::vector<crypto::Hash>& knownBlockHashes, uint64_t timestamp, uint64_t& startIndex,
                                uint64_t& currentIndex, uint64_t& fullOffset, std::vector<BlockDetails>& entries, uint32_t blockCount) const {
       assert(entries.empty());
       assert(!chainsLeaves.empty());
@@ -519,7 +519,7 @@ namespace cryptonote
 
         return true;
       } catch (std::exception& e) {
-        logger(Logging::ERROR) << "Failed to query blocks: " << e.what();
+        logger(logging::ERROR) << "Failed to query blocks: " << e.what();
         return false;
       }
     }
@@ -529,10 +529,10 @@ namespace cryptonote
        transactions in block - We'll add hashes to this if the transaction is in a block
        transactions unknown - We'll add hashes to this if we don't know about them - possibly fell out the tx pool */
     bool Core::getTransactionsStatus(
-        std::unordered_set<Crypto::Hash> transactionHashes,
-        std::unordered_set<Crypto::Hash> &transactionsInPool,
-        std::unordered_set<Crypto::Hash> &transactionsInBlock,
-        std::unordered_set<Crypto::Hash> &transactionsUnknown) const
+        std::unordered_set<crypto::Hash> transactionHashes,
+        std::unordered_set<crypto::Hash> &transactionsInPool,
+        std::unordered_set<crypto::Hash> &transactionsInBlock,
+        std::unordered_set<crypto::Hash> &transactionsUnknown) const
     {
         throwIfNotInitialized();
 
@@ -541,7 +541,7 @@ namespace cryptonote
             const auto txs = transactionPool->getTransactionHashes();
 
             /* Pop into a set for quicker .find() */
-            std::unordered_set<Crypto::Hash> poolTransactions(txs.begin(), txs.end());
+            std::unordered_set<crypto::Hash> poolTransactions(txs.begin(), txs.end());
 
             for (const auto hash : transactionHashes)
             {
@@ -566,7 +566,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to get transactions status: " << e.what();
+            logger(logging::ERROR) << "Failed to get transactions status: " << e.what();
             return false;
         }
     }
@@ -575,7 +575,7 @@ namespace cryptonote
        Timestamp = The timestamp to start giving blocks from, if knownBlockHashes is empty. Used for syncing a new wallet.
        walletBlocks = The returned vector of blocks */
     bool Core::getWalletSyncData(
-        const std::vector<Crypto::Hash> &knownBlockHashes,
+        const std::vector<crypto::Hash> &knownBlockHashes,
         const uint64_t startHeight,
         const uint64_t startTimestamp,
         const uint64_t blockCount,
@@ -637,7 +637,7 @@ namespace cryptonote
                start and end, whichever is smaller */
             uint64_t endIndex = std::min(actualBlockCount, blockDifference + 1) + startIndex;
 
-            logger(Logging::DEBUGGING)
+            logger(logging::DEBUGGING)
                 << "\n\n"
                 << "\n============================================="
                 << "\n========= GetWalletSyncData summary ========="
@@ -694,13 +694,13 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to get wallet sync data: " << e.what();
+            logger(logging::ERROR) << "Failed to get wallet sync data: " << e.what();
             return false;
         }
     }
 
     WalletTypes::RawCoinbaseTransaction Core::getRawCoinbaseTransaction(
-        const CryptoNote::Transaction &t)
+        const cryptonote::Transaction &t)
     {
         WalletTypes::RawCoinbaseTransaction transaction;
 
@@ -716,7 +716,7 @@ namespace cryptonote
             WalletTypes::KeyOutput keyOutput;
 
             keyOutput.amount = output.amount;
-            keyOutput.key = boost::get<CryptoNote::KeyOutput>(output.target).key;
+            keyOutput.key = boost::get<cryptonote::KeyOutput>(output.target).key;
 
             transaction.keyOutputs.push_back(keyOutput);
         }
@@ -752,7 +752,7 @@ namespace cryptonote
             WalletTypes::KeyOutput keyOutput;
 
             keyOutput.amount = output.amount;
-            keyOutput.key = boost::get<CryptoNote::KeyOutput>(output.target).key;
+            keyOutput.key = boost::get<cryptonote::KeyOutput>(output.target).key;
 
             transaction.keyOutputs.push_back(keyOutput);
         }
@@ -760,7 +760,7 @@ namespace cryptonote
         /* Simplify the inputs */
         for (const auto &input : t.inputs)
         {
-            transaction.keyInputs.push_back(boost::get<CryptoNote::KeyInput>(input));
+            transaction.keyInputs.push_back(boost::get<cryptonote::KeyInput>(input));
         }
 
         return transaction;
@@ -771,9 +771,9 @@ namespace cryptonote
        [...data...] 0x01 [public key] [...data...]
 
     */
-    Crypto::PublicKey Core::getPubKeyFromExtra(const std::vector<uint8_t> &extra)
+    crypto::PublicKey Core::getPubKeyFromExtra(const std::vector<uint8_t> &extra)
     {
-        Crypto::PublicKey publicKey;
+        crypto::PublicKey publicKey;
 
         const int TX_EXTRA_PUBKEY_IDENTIFIER = 0x01;
 
@@ -847,13 +847,13 @@ namespace cryptonote
                     const auto dataBegin = extra.begin() + i + 3;
                     const auto dataEnd = dataBegin + paymentIDSize;
 
-                    Crypto::Hash paymentIDHash;
+                    crypto::Hash paymentIDHash;
 
                     /* Copy the payment ID into the hash */
                     std::copy(dataBegin, dataEnd, std::begin(paymentIDHash.data));
 
                     /* Convert to a string */
-                    std::string paymentID = Common::podToHex(paymentIDHash);
+                    std::string paymentID = common::podToHex(paymentIDHash);
 
                     /* Convert it to lower case */
                     std::transform(paymentID.begin(), paymentID.end(),
@@ -868,7 +868,7 @@ namespace cryptonote
         return std::string();
     }
 
-    std::optional<BinaryArray> Core::getTransaction(const Crypto::Hash& hash) const {
+    std::optional<BinaryArray> Core::getTransaction(const crypto::Hash& hash) const {
         throwIfNotInitialized();
         auto segment = findSegmentContainingTransaction(hash);
         if(segment != nullptr) {
@@ -880,8 +880,8 @@ namespace cryptonote
         }
     }
 
-    void Core::getTransactions(const std::vector<Crypto::Hash>& transactionHashes, std::vector<BinaryArray>& transactions,
-                               std::vector<Crypto::Hash>& missedHashes) const {
+    void Core::getTransactions(const std::vector<crypto::Hash>& transactionHashes, std::vector<BinaryArray>& transactions,
+                               std::vector<crypto::Hash>& missedHashes) const {
       assert(!chainsLeaves.empty());
       assert(!chainsStorage.empty());
       throwIfNotInitialized();
@@ -889,11 +889,11 @@ namespace cryptonote
       IBlockchainCache* segment = chainsLeaves[0];
       assert(segment != nullptr);
 
-      std::vector<Crypto::Hash> leftTransactions = transactionHashes;
+      std::vector<crypto::Hash> leftTransactions = transactionHashes;
 
       // find in main chain
       do {
-        std::vector<Crypto::Hash> missedTransactions;
+        std::vector<crypto::Hash> missedTransactions;
         segment->getRawTransactions(leftTransactions, transactions, missedTransactions);
 
         leftTransactions = std::move(missedTransactions);
@@ -909,7 +909,7 @@ namespace cryptonote
         segment = chainsLeaves[chain];
 
         while (mainChainSet.count(segment) == 0 && !leftTransactions.empty()) {
-          std::vector<Crypto::Hash> missedTransactions;
+          std::vector<crypto::Hash> missedTransactions;
           segment->getRawTransactions(leftTransactions, transactions, missedTransactions);
 
           leftTransactions = std::move(missedTransactions);
@@ -949,7 +949,7 @@ namespace cryptonote
       return currency.getNextDifficulty(nextBlockMajorVersion, topBlockIndex, timestamps, difficulties);
     }
 
-    std::vector<Crypto::Hash> Core::findBlockchainSupplement(const std::vector<Crypto::Hash>& remoteBlockIds,
+    std::vector<crypto::Hash> Core::findBlockchainSupplement(const std::vector<crypto::Hash>& remoteBlockIds,
                                                              size_t maxCount, uint32_t& totalBlockCount,
                                                              uint32_t& startBlockIndex) const {
       assert(!remoteBlockIds.empty());
@@ -965,14 +965,14 @@ namespace cryptonote
     std::error_code Core::addBlock(const CachedBlock& cachedBlock, RawBlock&& rawBlock) {
       throwIfNotInitialized();
       uint32_t blockIndex = cachedBlock.getBlockIndex();
-      Crypto::Hash blockHash = cachedBlock.getBlockHash();
+      crypto::Hash blockHash = cachedBlock.getBlockHash();
       std::ostringstream os;
       os << blockIndex << " (" << blockHash << ")";
       std::string blockStr = os.str();
 
-      logger(Logging::DEBUGGING) << "Request to add block " << blockStr;
+      logger(logging::DEBUGGING) << "Request to add block " << blockStr;
       if (hasBlock(cachedBlock.getBlockHash())) {
-        logger(Logging::DEBUGGING) << "Block " << blockStr << " already exists";
+        logger(logging::DEBUGGING) << "Block " << blockStr << " already exists";
         return error::AddBlockErrorCode::ALREADY_EXISTS;
       }
 
@@ -983,14 +983,14 @@ namespace cryptonote
 
       auto cache = findSegmentContainingBlock(previousBlockHash);
       if (cache == nullptr) {
-        logger(Logging::DEBUGGING) << "Block " << blockStr << " rejected as orphaned";
+        logger(logging::DEBUGGING) << "Block " << blockStr << " rejected as orphaned";
         return error::AddBlockErrorCode::REJECTED_AS_ORPHANED;
       }
 
       std::vector<CachedTransaction> transactions;
       uint64_t cumulativeSize = 0;
       if (!extractTransactions(rawBlock.transactions, transactions, cumulativeSize)) {
-        logger(Logging::DEBUGGING) << "Couldn't deserialize raw block transactions in block " << blockStr;
+        logger(logging::DEBUGGING) << "Couldn't deserialize raw block transactions in block " << blockStr;
         return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
       }
 
@@ -1004,20 +1004,20 @@ namespace cryptonote
       bool addOnTop = cache->getTopBlockIndex() == previousBlockIndex;
       auto maxBlockCumulativeSize = currency.maxBlockCumulativeSize(previousBlockIndex + 1);
       if (cumulativeBlockSize > maxBlockCumulativeSize) {
-        logger(Logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
+        logger(logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
         return error::BlockValidationError::CUMULATIVE_BLOCK_SIZE_TOO_BIG;
       }
 
       uint64_t minerReward = 0;
       auto blockValidationResult = validateBlock(cachedBlock, cache, minerReward);
       if (blockValidationResult) {
-        logger(Logging::DEBUGGING) << "Failed to validate block " << blockStr << ": " << blockValidationResult.message();
+        logger(logging::DEBUGGING) << "Failed to validate block " << blockStr << ": " << blockValidationResult.message();
         return blockValidationResult;
       }
 
       auto currentDifficulty = cache->getDifficultyForNextBlock(previousBlockIndex);
       if (currentDifficulty == 0) {
-        logger(Logging::DEBUGGING) << "Block " << blockStr << " has difficulty overhead";
+        logger(logging::DEBUGGING) << "Block " << blockStr << " has difficulty overhead";
         return error::BlockValidationError::DIFFICULTY_OVERHEAD;
       }
 
@@ -1025,9 +1025,9 @@ namespace cryptonote
       // that may be using older mixin rules on the network. This helps to clear out the transaction
       // pool during a network soft fork that requires a mixin lower or upper bound change
       uint32_t mixinChangeWindow = blockIndex;
-      if (mixinChangeWindow > CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
+      if (mixinChangeWindow > cryptonote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
       {
-        mixinChangeWindow = mixinChangeWindow - CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
+        mixinChangeWindow = mixinChangeWindow - cryptonote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
       }
 
       auto [success, error] = Mixins::validate(transactions, blockIndex);
@@ -1039,7 +1039,7 @@ namespace cryptonote
 
         if (!success)
         {
-          logger(Logging::DEBUGGING) << error;
+          logger(logging::DEBUGGING) << error;
           return error::TransactionValidationError::INVALID_MIXIN;
         }
       }
@@ -1050,7 +1050,7 @@ namespace cryptonote
         uint64_t fee = 0;
         auto transactionValidationResult = validateTransaction(transaction, validatorState, cache, fee, previousBlockIndex);
         if (transactionValidationResult) {
-          logger(Logging::DEBUGGING) << "Failed to validate transaction " << transaction.getTransactionHash() << ": " << transactionValidationResult.message();
+          logger(logging::DEBUGGING) << "Failed to validate transaction " << transaction.getTransactionHash() << ": " << transactionValidationResult.message();
           return transactionValidationResult;
         }
 
@@ -1061,27 +1061,27 @@ namespace cryptonote
       int64_t emissionChange = 0;
       auto alreadyGeneratedCoins = cache->getAlreadyGeneratedCoins(previousBlockIndex);
       auto lastBlocksSizes = cache->getLastBlocksSizes(currency.rewardBlocksWindow(), previousBlockIndex, addGenesisBlock);
-      auto blocksSizeMedian = Common::medianValue(lastBlocksSizes);
+      auto blocksSizeMedian = common::medianValue(lastBlocksSizes);
 
       if (!currency.getBlockReward(cachedBlock.getBlock().majorVersion, blocksSizeMedian,
                                    cumulativeBlockSize, alreadyGeneratedCoins, cumulativeFee, reward, emissionChange)) {
-        logger(Logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
+        logger(logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
         return error::BlockValidationError::CUMULATIVE_BLOCK_SIZE_TOO_BIG;
       }
 
       if (minerReward != reward) {
-        logger(Logging::DEBUGGING) << "Block reward mismatch for block " << blockStr
+        logger(logging::DEBUGGING) << "Block reward mismatch for block " << blockStr
                                  << ". Expected reward: " << reward << ", got reward: " << minerReward;
         return error::BlockValidationError::BLOCK_REWARD_MISMATCH;
       }
 
       if (checkpoints.isInCheckpointZone(cachedBlock.getBlockIndex())) {
         if (!checkpoints.checkBlock(cachedBlock.getBlockIndex(), cachedBlock.getBlockHash())) {
-          logger(Logging::WARNING) << "Checkpoint block hash mismatch for block " << blockStr;
+          logger(logging::WARNING) << "Checkpoint block hash mismatch for block " << blockStr;
           return error::BlockValidationError::CHECKPOINT_BLOCK_HASH_MISMATCH;
         }
       } else if (!currency.checkProofOfWork(cachedBlock, currentDifficulty)) {
-        logger(Logging::WARNING) << "Proof of work too weak for block " << blockStr;
+        logger(logging::WARNING) << "Proof of work too weak for block " << blockStr;
         return error::BlockValidationError::PROOF_OF_WORK_TOO_WEAK;
       }
 
@@ -1090,7 +1090,7 @@ namespace cryptonote
       if (addOnTop) {
         if (cache->getChildCount() == 0) {
           // add block on top of leaf segment.
-          auto hashes = preallocateVector<Crypto::Hash>(transactions.size());
+          auto hashes = preallocateVector<crypto::Hash>(transactions.size());
 
           // TODO: exception safety
           if (cache == chainsLeaves[0]) {
@@ -1102,15 +1102,15 @@ namespace cryptonote
             actualizePoolTransactionsLite(validatorState);
 
             ret = error::AddBlockErrorCode::ADDED_TO_MAIN;
-            logger(Logging::DEBUGGING) << "Block " << blockStr << " added to main chain.";
+            logger(logging::DEBUGGING) << "Block " << blockStr << " added to main chain.";
             if ((previousBlockIndex + 1) % 100 == 0) {
-              logger(Logging::INFO) << "Block " << blockStr << " added to main chain";
+              logger(logging::INFO) << "Block " << blockStr << " added to main chain";
             }
 
             notifyObservers(makeDelTransactionMessage(std::move(hashes), Messages::DeleteTransaction::Reason::InBlock));
           } else {
             cache->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange, currentDifficulty, std::move(rawBlock));
-            logger(Logging::DEBUGGING) << "Block " << blockStr << " added to alternative chain.";
+            logger(logging::DEBUGGING) << "Block " << blockStr << " added to alternative chain.";
 
             auto mainChainCache = chainsLeaves[0];
             if (cache->getCurrentCumulativeDifficulty() > mainChainCache->getCurrentCumulativeDifficulty()) {
@@ -1129,7 +1129,7 @@ namespace cryptonote
 
               ret = error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED;
 
-              logger(Logging::INFO) << "Resolved: " << blockStr
+              logger(logging::INFO) << "Resolved: " << blockStr
                                     << ", Previous: " << chainsLeaves[endpointIndex]->getTopBlockIndex() << " ("
                                     << chainsLeaves[endpointIndex]->getTopBlockHash() << ")";
             }
@@ -1143,7 +1143,7 @@ namespace cryptonote
           chainsStorage.emplace_back(std::move(newCache));
           chainsLeaves.push_back(newlyForkedChainPtr);
 
-          logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
+          logger(logging::DEBUGGING) << "Resolving: " << blockStr;
 
           newlyForkedChainPtr->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange,
                                          currentDifficulty, std::move(rawBlock));
@@ -1152,7 +1152,7 @@ namespace cryptonote
           updateBlockMedianSize();
         }
       } else {
-        logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
+        logger(logging::DEBUGGING) << "Resolving: " << blockStr;
 
         auto upperSegment = cache->split(previousBlockIndex + 1);
         //[cache] is lower segment now
@@ -1184,7 +1184,7 @@ namespace cryptonote
         updateMainChainSet();
       }
 
-      logger(Logging::DEBUGGING) << "Block: " << blockStr << " successfully added";
+      logger(logging::DEBUGGING) << "Block: " << blockStr << " successfully added";
       notifyOnSuccess(ret, previousBlockIndex, cachedBlock, *cache);
 
       return ret;
@@ -1274,7 +1274,7 @@ namespace cryptonote
       BlockTemplate blockTemplate;
       bool result = fromBinaryArray(blockTemplate, rawBlockTemplate);
       if (!result) {
-        logger(Logging::WARNING) << "Couldn't deserialize block template";
+        logger(logging::WARNING) << "Couldn't deserialize block template";
         return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
       }
 
@@ -1284,7 +1284,7 @@ namespace cryptonote
       rawBlock.transactions.reserve(blockTemplate.transactionHashes.size());
       for (const auto& transactionHash : blockTemplate.transactionHashes) {
         if (!transactionPool->checkIfTransactionPresent(transactionHash)) {
-          logger(Logging::WARNING) << "The transaction " << Common::podToHex(transactionHash)
+          logger(logging::WARNING) << "The transaction " << common::podToHex(transactionHash)
                                    << " is absent in transaction pool";
           return error::BlockValidationError::TRANSACTION_ABSENT_IN_POOL;
         }
@@ -1296,7 +1296,7 @@ namespace cryptonote
       return addBlock(cachedBlock, std::move(rawBlock));
     }
 
-    bool Core::getTransactionGlobalIndexes(const Crypto::Hash& transactionHash,
+    bool Core::getTransactionGlobalIndexes(const crypto::Hash& transactionHash,
                                            std::vector<uint32_t>& globalIndexes) const {
       throwIfNotInitialized();
       IBlockchainCache* segment = chainsLeaves[0];
@@ -1323,7 +1323,7 @@ namespace cryptonote
     }
 
     bool Core::getRandomOutputs(uint64_t amount, uint16_t count, std::vector<uint32_t>& globalIndexes,
-                                std::vector<Crypto::PublicKey>& publicKeys) const {
+                                std::vector<crypto::PublicKey>& publicKeys) const {
       throwIfNotInitialized();
 
       if (count == 0) {
@@ -1332,13 +1332,13 @@ namespace cryptonote
 
       auto upperBlockLimit = getTopBlockIndex() - currency.minedMoneyUnlockWindow();
       if (upperBlockLimit < currency.minedMoneyUnlockWindow()) {
-        logger(Logging::DEBUGGING) << "Blockchain height is less than mined unlock window";
+        logger(logging::DEBUGGING) << "Blockchain height is less than mined unlock window";
         return false;
       }
 
       globalIndexes = chainsLeaves[0]->getRandomOutsByAmount(amount, count, getTopBlockIndex());
       if (globalIndexes.empty()) {
-        logger(Logging::ERROR) << "Failed to get any matching outputs for amount "
+        logger(logging::ERROR) << "Failed to get any matching outputs for amount "
                                << amount << " (" << Utilities::formatAmount(amount)
                                << "). Further explanation here: "
                                << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c\n"
@@ -1354,10 +1354,10 @@ namespace cryptonote
         case ExtractOutputKeysResult::SUCCESS:
           return true;
         case ExtractOutputKeysResult::INVALID_GLOBAL_INDEX:
-          logger(Logging::DEBUGGING) << "Invalid global index is given";
+          logger(logging::DEBUGGING) << "Invalid global index is given";
           return false;
         case ExtractOutputKeysResult::OUTPUT_LOCKED:
-          logger(Logging::DEBUGGING) << "Output is locked";
+          logger(logging::DEBUGGING) << "Output is locked";
           return false;
       }
 
@@ -1367,7 +1367,7 @@ namespace cryptonote
     bool Core::getGlobalIndexesForRange(
         const uint64_t startHeight,
         const uint64_t endHeight,
-        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> &indexes) const
+        std::unordered_map<crypto::Hash, std::vector<uint64_t>> &indexes) const
     {
         throwIfNotInitialized();
 
@@ -1375,7 +1375,7 @@ namespace cryptonote
         {
             IBlockchainCache *mainChain = chainsLeaves[0];
 
-            std::vector<Crypto::Hash> transactionHashes;
+            std::vector<crypto::Hash> transactionHashes;
 
             for (const auto& rawBlock : mainChain->getBlocksByHeight(startHeight, endHeight))
             {
@@ -1399,7 +1399,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to get global indexes: " << e.what();
+            logger(logging::ERROR) << "Failed to get global indexes: " << e.what();
             return false;
         }
     }
@@ -1409,7 +1409,7 @@ namespace cryptonote
 
       Transaction transaction;
       if (!fromBinaryArray<Transaction>(transaction, transactionBinaryArray)) {
-        logger(Logging::WARNING) << "Couldn't add transaction to pool due to deserialization error";
+        logger(logging::WARNING) << "Couldn't add transaction to pool due to deserialization error";
         return false;
       }
 
@@ -1434,11 +1434,11 @@ namespace cryptonote
       auto transactionHash = cachedTransaction.getTransactionHash();
 
       if (!transactionPool->pushTransaction(std::move(cachedTransaction), std::move(validatorState))) {
-        logger(Logging::DEBUGGING) << "Failed to push transaction " << transactionHash << " to pool, already exists";
+        logger(logging::DEBUGGING) << "Failed to push transaction " << transactionHash << " to pool, already exists";
         return false;
       }
 
-      logger(Logging::DEBUGGING) << "Transaction " << transactionHash << " has been added to pool";
+      logger(logging::DEBUGGING) << "Transaction " << transactionHash << " has been added to pool";
       return true;
     }
 
@@ -1450,9 +1450,9 @@ namespace cryptonote
           return false;
       }
 
-      if (cachedTransaction.getTransaction().extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_POOL)
+      if (cachedTransaction.getTransaction().extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_POOL)
       {
-          logger(Logging::TRACE) << "Not adding transaction "
+          logger(logging::TRACE) << "Not adding transaction "
                                  << cachedTransaction.getTransactionHash()
                                  << " to pool, extra too large.";
 
@@ -1462,14 +1462,14 @@ namespace cryptonote
       uint64_t fee;
 
       if (auto validationResult = validateTransaction(cachedTransaction, validatorState, chainsLeaves[0], fee, getTopBlockIndex())) {
-        logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
+        logger(logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
           << " is not valid. Reason: " << validationResult.message();
         return false;
       }
 
       auto maxTransactionSize = getMaximumTransactionAllowedSize(blockMedianSize, currency);
       if (cachedTransaction.getTransactionBinaryArray().size() > maxTransactionSize) {
-        logger(Logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
+        logger(logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
           << " is not valid. Reason: transaction is too big (" << cachedTransaction.getTransactionBinaryArray().size()
           << "). Maximum allowed size is " << maxTransactionSize;
         return false;
@@ -1478,7 +1478,7 @@ namespace cryptonote
       bool isFusion = fee == 0 && currency.isFusionTransaction(cachedTransaction.getTransaction(), cachedTransaction.getTransactionBinaryArray().size(), getTopBlockIndex());
 
       if (!isFusion && fee < currency.minimumFee()) {
-        logger(Logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
+        logger(logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
           << " is not valid. Reason: fee is too small and it's not a fusion transaction";
         return false;
       }
@@ -1486,13 +1486,13 @@ namespace cryptonote
       return true;
     }
 
-    std::vector<Crypto::Hash> Core::getPoolTransactionHashes() const {
+    std::vector<crypto::Hash> Core::getPoolTransactionHashes() const {
       throwIfNotInitialized();
 
       return transactionPool->getTransactionHashes();
     }
 
-    std::tuple<bool, CryptoNote::BinaryArray> Core::getPoolTransaction(const Crypto::Hash& transactionHash) const {
+    std::tuple<bool, cryptonote::BinaryArray> Core::getPoolTransaction(const crypto::Hash& transactionHash) const {
       if (transactionPool->checkIfTransactionPresent(transactionHash)) {
         return {true, transactionPool->getTransaction(transactionHash).getTransactionBinaryArray()};
       }
@@ -1501,12 +1501,12 @@ namespace cryptonote
       }
     }
 
-    bool Core::getPoolChanges(const Crypto::Hash& lastBlockHash, const std::vector<Crypto::Hash>& knownHashes,
+    bool Core::getPoolChanges(const crypto::Hash& lastBlockHash, const std::vector<crypto::Hash>& knownHashes,
                               std::vector<BinaryArray>& addedTransactions,
-                              std::vector<Crypto::Hash>& deletedTransactions) const {
+                              std::vector<crypto::Hash>& deletedTransactions) const {
       throwIfNotInitialized();
 
-      std::vector<Crypto::Hash> newTransactions;
+      std::vector<crypto::Hash> newTransactions;
       getTransactionPoolDifference(knownHashes, newTransactions, deletedTransactions);
 
       addedTransactions.reserve(newTransactions.size());
@@ -1517,12 +1517,12 @@ namespace cryptonote
       return getTopBlockHash() == lastBlockHash;
     }
 
-    bool Core::getPoolChangesLite(const Crypto::Hash& lastBlockHash, const std::vector<Crypto::Hash>& knownHashes,
+    bool Core::getPoolChangesLite(const crypto::Hash& lastBlockHash, const std::vector<crypto::Hash>& knownHashes,
                                   std::vector<TransactionPrefixInfo>& addedTransactions,
-                                  std::vector<Crypto::Hash>& deletedTransactions) const {
+                                  std::vector<crypto::Hash>& deletedTransactions) const {
       throwIfNotInitialized();
 
-      std::vector<Crypto::Hash> newTransactions;
+      std::vector<crypto::Hash> newTransactions;
       getTransactionPoolDifference(knownHashes, newTransactions, deletedTransactions);
 
       addedTransactions.reserve(newTransactions.size());
@@ -1544,7 +1544,7 @@ namespace cryptonote
       height = getTopBlockIndex() + 1;
       difficulty = getDifficultyForNextBlock();
       if (difficulty == 0) {
-        logger(Logging::ERROR, Logging::BRIGHT_RED) << "difficulty overhead.";
+        logger(logging::ERROR, logging::BRIGHT_RED) << "difficulty overhead.";
         return false;
       }
 
@@ -1566,7 +1566,7 @@ namespace cryptonote
 
         TransactionExtraMergeMiningTag mmTag = boost::value_initialized<decltype(mmTag)>();
         if (!appendMergeMiningTagToExtra(b.parentBlock.baseTransaction.extra, mmTag)) {
-          logger(Logging::ERROR, Logging::BRIGHT_RED)
+          logger(logging::ERROR, logging::BRIGHT_RED)
               << "Failed to append merge mining tag to extra of the parent block miner transaction";
           return false;
         }
@@ -1596,13 +1596,13 @@ namespace cryptonote
       /* How many blocks we look in the past to calculate the median timestamp */
       uint64_t blockchain_timestamp_check_window;
 
-      if (height >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+      if (height >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
       {
-          blockchain_timestamp_check_window = CryptoNote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3;
+          blockchain_timestamp_check_window = cryptonote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3;
       }
       else
       {
-          blockchain_timestamp_check_window = CryptoNote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW;
+          blockchain_timestamp_check_window = cryptonote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW;
       }
 
       /* Skip the first N blocks, we don't have enough blocks to calculate a
@@ -1617,7 +1617,7 @@ namespace cryptonote
               timestamps.push_back(getBlockTimestampByIndex(offset));
           }
 
-          uint64_t medianTimestamp = Common::medianValue(timestamps);
+          uint64_t medianTimestamp = common::medianValue(timestamps);
 
           if (b.timestamp < medianTimestamp)
           {
@@ -1645,7 +1645,7 @@ namespace cryptonote
       bool r = currency.constructMinerTx(b.majorVersion, height, medianSize, alreadyGeneratedCoins, transactionsSize, fee, adr,
                                          b.baseTransaction, extraNonce, 11);
       if (!r) {
-        logger(Logging::ERROR, Logging::BRIGHT_RED) << "Failed to construct miner tx, first chance";
+        logger(logging::ERROR, logging::BRIGHT_RED) << "Failed to construct miner tx, first chance";
         return false;
       }
 
@@ -1655,7 +1655,7 @@ namespace cryptonote
         r = currency.constructMinerTx(b.majorVersion, height, medianSize, alreadyGeneratedCoins, cumulativeSize, fee, adr,
                                       b.baseTransaction, extraNonce, 11);
         if (!r) {
-          logger(Logging::ERROR, Logging::BRIGHT_RED) << "Failed to construct miner tx, second chance";
+          logger(logging::ERROR, logging::BRIGHT_RED) << "Failed to construct miner tx, second chance";
           return false;
         }
 
@@ -1672,7 +1672,7 @@ namespace cryptonote
           // to 2-bytes len.
           if (cumulativeSize != transactionsSize + getObjectBinarySize(b.baseTransaction)) {
             if (!(cumulativeSize + 1 == transactionsSize + getObjectBinarySize(b.baseTransaction))) {
-              logger(Logging::ERROR, Logging::BRIGHT_RED)
+              logger(logging::ERROR, logging::BRIGHT_RED)
                   << "unexpected case: cumulative_size=" << cumulativeSize
                   << " + 1 is not equal txs_cumulative_size=" << transactionsSize
                   << " + get_object_blobsize(b.baseTransaction)=" << getObjectBinarySize(b.baseTransaction);
@@ -1683,18 +1683,18 @@ namespace cryptonote
             if (cumulativeSize != transactionsSize + getObjectBinarySize(b.baseTransaction)) {
               // fuck, not lucky, -1 makes varint-counter size smaller, in that case we continue to grow with
               // cumulative_size
-              logger(Logging::TRACE, Logging::BRIGHT_RED)
+              logger(logging::TRACE, logging::BRIGHT_RED)
                   << "miner tx creation have no luck with delta_extra size = " << delta << " and " << delta - 1;
               cumulativeSize += delta - 1;
               continue;
             }
 
-            logger(Logging::DEBUGGING, Logging::BRIGHT_GREEN)
+            logger(logging::DEBUGGING, logging::BRIGHT_GREEN)
                 << "Setting extra for block: " << b.baseTransaction.extra.size() << ", try_count=" << tryCount;
           }
         }
         if (!(cumulativeSize == transactionsSize + getObjectBinarySize(b.baseTransaction))) {
-          logger(Logging::ERROR, Logging::BRIGHT_RED)
+          logger(logging::ERROR, logging::BRIGHT_RED)
               << "unexpected case: cumulative_size=" << cumulativeSize
               << " is not equal txs_cumulative_size=" << transactionsSize
               << " + get_object_blobsize(b.baseTransaction)=" << getObjectBinarySize(b.baseTransaction);
@@ -1704,7 +1704,7 @@ namespace cryptonote
         return true;
       }
 
-      logger(Logging::ERROR, Logging::BRIGHT_RED) << "Failed to create_block_template with " << TRIES_COUNT << " tries";
+      logger(logging::ERROR, logging::BRIGHT_RED) << "Failed to create_block_template with " << TRIES_COUNT << " tries";
       return false;
     }
 
@@ -1751,7 +1751,7 @@ namespace cryptonote
       try {
         for (auto& rawTransaction : rawTransactions) {
           if (rawTransaction.size() > currency.maxTxSize()) {
-            logger(Logging::INFO) << "Raw transaction size " << rawTransaction.size() << " is too big.";
+            logger(logging::INFO) << "Raw transaction size " << rawTransaction.size() << " is too big.";
             return false;
           }
 
@@ -1759,7 +1759,7 @@ namespace cryptonote
           transactions.emplace_back(rawTransaction);
         }
       } catch (std::runtime_error& e) {
-        logger(Logging::INFO) << e.what();
+        logger(logging::INFO) << e.what();
         return false;
       }
 
@@ -1806,7 +1806,7 @@ namespace cryptonote
               return error::TransactionValidationError::INPUT_SPEND_LOCKED_OUT;
             }
 
-            if (!Crypto::crypto_ops::checkRingSignature(cachedTransaction.getTransactionPrefixHash(), in.keyImage, outputKeys, transaction.signatures[inputIndex])) {
+            if (!crypto::crypto_ops::checkRingSignature(cachedTransaction.getTransactionPrefixHash(), in.keyImage, outputKeys, transaction.signatures[inputIndex])) {
               return error::TransactionValidationError::INPUT_INVALID_SIGNATURES;
             }
           }
@@ -1829,9 +1829,9 @@ namespace cryptonote
 
       /* Small buffer until enforcing - helps clear out tx pool with old, previously
          valid transactions */
-      if (blockIndex >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2_HEIGHT + CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
+      if (blockIndex >= cryptonote::parameters::MAX_EXTRA_SIZE_V2_HEIGHT + cryptonote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
       {
-          if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
+          if (transaction.extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_V2)
           {
               return error::TransactionValidationError::EXTRA_TOO_LARGE;
           }
@@ -1859,13 +1859,13 @@ namespace cryptonote
       }
 
         // parameters used for the additional key_image check
-        static const Crypto::KeyImage Z = { {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
+        static const crypto::KeyImage Z = { {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
         if (Z == Z) {}
-        static const Crypto::KeyImage I = { {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
-        static const Crypto::KeyImage L = { {0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 } };
+        static const crypto::KeyImage I = { {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
+        static const crypto::KeyImage L = { {0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10 } };
 
       uint64_t summaryInputAmount = 0;
-      std::unordered_set<Crypto::KeyImage> ki;
+      std::unordered_set<crypto::KeyImage> ki;
       std::set<std::pair<uint64_t, uint32_t>> outputsUsage;
       for (const auto& input : transaction.inputs) {
         uint64_t amount = 0;
@@ -1910,7 +1910,7 @@ namespace cryptonote
       return error::TransactionValidationError::VALIDATION_SUCCESS;
     }
 
-    uint32_t Core::findBlockchainSupplement(const std::vector<Crypto::Hash>& remoteBlockIds) const {
+    uint32_t Core::findBlockchainSupplement(const std::vector<crypto::Hash>& remoteBlockIds) const {
       /* Requester doesn't know anything about the chain yet */
       if (remoteBlockIds.empty())
       {
@@ -1928,7 +1928,7 @@ namespace cryptonote
       throw std::runtime_error("Genesis block hash was not found.");
     }
 
-    std::vector<Crypto::Hash> CryptoNote::Core::getBlockHashes(uint32_t startBlockIndex, uint32_t maxCount) const {
+    std::vector<crypto::Hash> cryptonote::Core::getBlockHashes(uint32_t startBlockIndex, uint32_t maxCount) const {
       return chainsLeaves[0]->getBlockHashes(startBlockIndex, maxCount);
     }
 
@@ -1945,7 +1945,7 @@ namespace cryptonote
 
       if (block.majorVersion >= BLOCK_MAJOR_VERSION_2) {
         if (block.majorVersion == BLOCK_MAJOR_VERSION_2 && block.parentBlock.majorVersion > BLOCK_MAJOR_VERSION_1) {
-          logger(Logging::ERROR, Logging::BRIGHT_RED) << "Parent block of block " << cachedBlock.getBlockHash() << " has wrong major version: "
+          logger(logging::ERROR, logging::BRIGHT_RED) << "Parent block of block " << cachedBlock.getBlockHash() << " has wrong major version: "
                                     << static_cast<int>(block.parentBlock.majorVersion) << ", at index " << cachedBlock.getBlockIndex()
                                     << " expected version is " << static_cast<int>(BLOCK_MAJOR_VERSION_1);
           return error::BlockValidationError::PARENT_BLOCK_WRONG_VERSION;
@@ -1962,7 +1962,7 @@ namespace cryptonote
 
       auto timestamps = cache->getLastTimestamps(currency.timestampCheckWindow(previousBlockIndex+1), previousBlockIndex, addGenesisBlock);
       if (timestamps.size() >= currency.timestampCheckWindow(previousBlockIndex+1)) {
-        auto median_ts = Common::medianValue(timestamps);
+        auto median_ts = common::medianValue(timestamps);
         if (block.timestamp < median_ts) {
           return error::BlockValidationError::TIMESTAMP_TOO_FAR_IN_PAST;
         }
@@ -2007,7 +2007,7 @@ namespace cryptonote
       return error::BlockValidationError::VALIDATION_SUCCESS;
     }
 
-    uint64_t CryptoNote::Core::getAdjustedTime() const {
+    uint64_t cryptonote::Core::getAdjustedTime() const {
       return time(NULL);
     }
 
@@ -2031,26 +2031,26 @@ namespace cryptonote
       auto dbBlocksCount = chainsLeaves[0]->getTopBlockIndex() + 1;
       auto storageBlocksCount = mainChainStorage->getBlockCount();
 
-      logger(Logging::DEBUGGING) << "Blockchain storage blocks count: " << storageBlocksCount << ", DB blocks count: " << dbBlocksCount;
+      logger(logging::DEBUGGING) << "Blockchain storage blocks count: " << storageBlocksCount << ", DB blocks count: " << dbBlocksCount;
 
       assert(storageBlocksCount != 0); //we assume the storage has at least genesis block
 
       if (storageBlocksCount > dbBlocksCount) {
-        logger(Logging::INFO) << "Importing blocks from blockchain storage";
+        logger(logging::INFO) << "Importing blocks from blockchain storage";
         importBlocksFromStorage();
       } else if (storageBlocksCount < dbBlocksCount) {
         auto cutFrom = findCommonRoot(*mainChainStorage, *chainsLeaves[0]) + 1;
 
-        logger(Logging::INFO) << "DB has more blocks than blockchain storage, cutting from block index: " << cutFrom;
+        logger(logging::INFO) << "DB has more blocks than blockchain storage, cutting from block index: " << cutFrom;
         cutSegment(*chainsLeaves[0], cutFrom);
 
         assert(chainsLeaves[0]->getTopBlockIndex() + 1 == mainChainStorage->getBlockCount());
       } else if (getBlockHash(mainChainStorage->getBlockByIndex(storageBlocksCount - 1)) != chainsLeaves[0]->getTopBlockHash()) {
-        logger(Logging::INFO) << "Blockchain storage and root segment are on different chains. "
+        logger(logging::INFO) << "Blockchain storage and root segment are on different chains. "
                                  << "Cutting root segment to common block index " << findCommonRoot(*mainChainStorage, *chainsLeaves[0]) << " and reimporting blocks";
         importBlocksFromStorage();
       } else {
-        logger(Logging::DEBUGGING) << "Blockchain storage and root segment are on the same height and chain";
+        logger(logging::DEBUGGING) << "Blockchain storage and root segment are on the same height and chain";
       }
 
       initialized = true;
@@ -2087,7 +2087,7 @@ namespace cryptonote
         CachedBlock cachedBlock(blockTemplate);
 
         if (blockTemplate.previousBlockHash != previousBlockHash) {
-          logger(Logging::ERROR) << "Corrupted blockchain. Block with index " << i << " and hash " << cachedBlock.getBlockHash()
+          logger(logging::ERROR) << "Corrupted blockchain. Block with index " << i << " and hash " << cachedBlock.getBlockHash()
                                  << " has previous block hash " << blockTemplate.previousBlockHash << ", but parent has hash " << previousBlockHash
                                  << ". Resynchronize your daemon please.";
           throw std::system_error(make_error_code(error::CoreErrorCode::CORRUPTED_BLOCKCHAIN));
@@ -2098,7 +2098,7 @@ namespace cryptonote
         std::vector<CachedTransaction> transactions;
         uint64_t cumulativeSize = 0;
         if (!extractTransactions(rawBlock.transactions, transactions, cumulativeSize)) {
-          logger(Logging::ERROR) << "Couldn't deserialize raw block transactions in block " << cachedBlock.getBlockHash();
+          logger(logging::ERROR) << "Couldn't deserialize raw block transactions in block " << cachedBlock.getBlockHash();
           throw std::system_error(make_error_code(error::AddBlockErrorCode::DESERIALIZATION_FAILED));
         }
 
@@ -2114,7 +2114,7 @@ namespace cryptonote
         chainsLeaves[0]->pushBlock(cachedBlock, transactions, spentOutputs, cumulativeSize, emissionChange, currentDifficulty, std::move(rawBlock));
 
         if (i % 1000 == 0) {
-          logger(Logging::INFO) << "Imported block with index " << i << " / " << (blockCount - 1);
+          logger(logging::INFO) << "Imported block with index " << i << " / " << (blockCount - 1);
         }
       }
     }
@@ -2124,7 +2124,7 @@ namespace cryptonote
         return;
       }
 
-      logger(Logging::INFO) << "Cutting root segment from index " << startIndex;
+      logger(logging::INFO) << "Cutting root segment from index " << startIndex;
       auto childCache = segment.split(startIndex);
       segment.deleteChild(childCache.get());
     }
@@ -2139,7 +2139,7 @@ namespace cryptonote
       } while (chainPtr != nullptr);
     }
 
-    IBlockchainCache* Core::findSegmentContainingBlock(const Crypto::Hash& blockHash) const {
+    IBlockchainCache* Core::findSegmentContainingBlock(const crypto::Hash& blockHash) const {
       assert(chainsLeaves.size() > 0);
 
       // first search in main chain
@@ -2166,14 +2166,14 @@ namespace cryptonote
     }
 
 
-    IBlockchainCache* Core::findAlternativeSegmentContainingBlock(const Crypto::Hash& blockHash) const {
+    IBlockchainCache* Core::findAlternativeSegmentContainingBlock(const crypto::Hash& blockHash) const {
       IBlockchainCache* cache = nullptr;
       std::find_if(++chainsLeaves.begin(), chainsLeaves.end(),
                    [&](IBlockchainCache* chain) { return cache = findIndexInChain(chain, blockHash); });
       return cache;
     }
 
-    IBlockchainCache* Core::findMainChainSegmentContainingBlock(const Crypto::Hash& blockHash) const {
+    IBlockchainCache* Core::findMainChainSegmentContainingBlock(const crypto::Hash& blockHash) const {
       return findIndexInChain(chainsLeaves[0], blockHash);
     }
 
@@ -2200,13 +2200,13 @@ namespace cryptonote
       return block;
     }
 
-    std::vector<Crypto::Hash> Core::doBuildSparseChain(const Crypto::Hash& blockHash) const {
+    std::vector<crypto::Hash> Core::doBuildSparseChain(const crypto::Hash& blockHash) const {
       IBlockchainCache* chain = findSegmentContainingBlock(blockHash);
 
       uint32_t blockIndex = chain->getBlockIndex(blockHash);
 
       // TODO reserve ceil(log(blockIndex))
-      std::vector<Crypto::Hash> sparseChain;
+      std::vector<crypto::Hash> sparseChain;
       sparseChain.push_back(blockHash);
 
       for (uint32_t i = 1; i < blockIndex; i *= 2) {
@@ -2235,7 +2235,7 @@ namespace cryptonote
       if (itemsCount == 0) {
         return 0;
       }
-      std::vector<Crypto::Hash> blockIds = getBlockHashes(startIndex, itemsCount);
+      std::vector<crypto::Hash> blockIds = getBlockHashes(startIndex, itemsCount);
       entries.reserve(entries.size() + blockIds.size());
       for (auto& blockHash : blockIds) {
         BlockShortInfo entry;
@@ -2253,7 +2253,7 @@ namespace cryptonote
       if (itemsCount == 0) {
         return 0;
       }
-      std::vector<Crypto::Hash> blockIds = getBlockHashes(startIndex, itemsCount);
+      std::vector<crypto::Hash> blockIds = getBlockHashes(startIndex, itemsCount);
       entries.reserve(entries.size() + blockIds.size());
       for (auto& blockHash : blockIds) {
         BlockDetails entry;
@@ -2271,7 +2271,7 @@ namespace cryptonote
       if (itemsCount == 0) {
         return 0;
       }
-      std::vector<Crypto::Hash> blockIds = getBlockHashes(startIndex, itemsCount);
+      std::vector<crypto::Hash> blockIds = getBlockHashes(startIndex, itemsCount);
       entries.reserve(entries.size() + blockIds.size());
       for (auto& blockHash : blockIds) {
         BlockFullInfo entry;
@@ -2344,19 +2344,19 @@ namespace cryptonote
 
       for (uint32_t blockIndex = fullOffset; blockIndex < fullOffset + fullBlocksCount; ++blockIndex) {
         IBlockchainCache* segment = findMainChainSegmentContainingBlock(blockIndex);
-        Crypto::Hash blockHash = segment->getBlockHash(blockIndex);
+        crypto::Hash blockHash = segment->getBlockHash(blockIndex);
         BlockDetails block = getBlockDetails(blockHash);
         entries.emplace_back(std::move(block));
       }
     }
 
-    void Core::getTransactionPoolDifference(const std::vector<Crypto::Hash>& knownHashes,
-                                            std::vector<Crypto::Hash>& newTransactions,
-                                            std::vector<Crypto::Hash>& deletedTransactions) const {
+    void Core::getTransactionPoolDifference(const std::vector<crypto::Hash>& knownHashes,
+                                            std::vector<crypto::Hash>& newTransactions,
+                                            std::vector<crypto::Hash>& deletedTransactions) const {
       auto t = transactionPool->getTransactionHashes();
 
-      std::unordered_set<Crypto::Hash> poolTransactions(t.begin(), t.end());
-      std::unordered_set<Crypto::Hash> knownTransactions(knownHashes.begin(), knownHashes.end());
+      std::unordered_set<crypto::Hash> poolTransactions(t.begin(), t.end());
+      std::unordered_set<crypto::Hash> knownTransactions(knownHashes.begin(), knownHashes.end());
 
       for (auto it = poolTransactions.begin(), end = poolTransactions.end(); it != end;) {
         auto knownTransactionIt = knownTransactions.find(*it);
@@ -2384,7 +2384,7 @@ namespace cryptonote
       assert(!chainsLeaves.empty());
       // FIXME: skip gensis here?
       auto sizes = chainsLeaves[0]->getLastBlocksSizes(currency.rewardBlocksWindow());
-      uint64_t median = Common::medianValue(sizes);
+      uint64_t median = common::medianValue(sizes);
       if (median <= nextBlockGrantedFullRewardZone) {
         median = nextBlockGrantedFullRewardZone;
       }
@@ -2400,9 +2400,9 @@ namespace cryptonote
     {
         const auto &transaction = cachedTransaction.getTransaction();
 
-        if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_BLOCK)
+        if (transaction.extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
         {
-            logger(Logging::TRACE) << "Not adding transaction "
+            logger(logging::TRACE) << "Not adding transaction "
                                    << cachedTransaction.getTransactionHash()
                                    << " to block template, extra too large.";
             return false;
@@ -2413,7 +2413,7 @@ namespace cryptonote
 
         if (!success)
         {
-            logger(Logging::TRACE) << "Not adding transaction "
+            logger(logging::TRACE) << "Not adding transaction "
                                    << cachedTransaction.getTransactionHash()
                                    << " to block template, " << error;
             return false;
@@ -2453,12 +2453,12 @@ namespace cryptonote
               std::time_t currentTime = std::time(0);
               uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(transaction.getTransactionHash());
 
-              logger(Logging::INFO) << "Transaction age is "
+              logger(Logging::DEBUGGING) << "Transaction age is "
                                      << transactionAge;
 
-              if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+              if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
               {
-                logger(Logging::INFO) << "Removing.. ";
+                logger(logging::INFO) << "Removing.. ";
                 transactionPool->removeTransaction(transaction.getTransactionHash());
 
               }
@@ -2469,7 +2469,7 @@ namespace cryptonote
         if (!spentInputsChecker.haveSpentInputs(transaction.getTransaction())) {
           block.transactionHashes.emplace_back(transaction.getTransactionHash());
           transactionsSize += transactionBlobSize;
-          logger(Logging::TRACE) << "Fusion transaction " << transaction.getTransactionHash() << " included to block template";
+          logger(logging::TRACE) << "Fusion transaction " << transaction.getTransactionHash() << " included to block template";
         }
       }
 
@@ -2485,12 +2485,12 @@ namespace cryptonote
           std::time_t currentTime = std::time(0);
           uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
 
-          logger(Logging::INFO) << "Transaction age is "
+          logger(logging::INFO) << "Transaction age is "
                                  << transactionAge;
 
-          if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+          if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
           {
-            logger(Logging::INFO) << "Removing.. ";
+            logger(logging::INFO) << "Removing.. ";
 
             transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
 
@@ -2503,9 +2503,9 @@ namespace cryptonote
           transactionsSize += cachedTransaction.getTransactionBinaryArray().size();
           fee += cachedTransaction.getTransactionFee();
           block.transactionHashes.emplace_back(cachedTransaction.getTransactionHash());
-          logger(Logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " included to block template";
+          logger(logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " included to block template";
         } else {
-          logger(Logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " is failed to include to block template";
+          logger(logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " is failed to include to block template";
         }
       }
     }
@@ -2592,13 +2592,13 @@ namespace cryptonote
 
         BlockTemplate block;
         if (!fromBinaryArray(block, info.rawBlock.block)) {
-          logger(Logging::WARNING) << "mergeSegments error: Couldn't deserialize block";
+          logger(logging::WARNING) << "mergeSegments error: Couldn't deserialize block";
           throw std::runtime_error("Couldn't deserialize block");
         }
 
         std::vector<CachedTransaction> transactions;
         if (!Utils::restoreCachedTransactions(info.rawBlock.transactions, transactions)) {
-          logger(Logging::WARNING) << "mergeSegments error: Couldn't deserialize transactions";
+          logger(logging::WARNING) << "mergeSegments error: Couldn't deserialize transactions";
           throw std::runtime_error("Couldn't deserialize transactions");
         }
 
@@ -2618,7 +2618,7 @@ namespace cryptonote
       return getBlockDetails(segment->getBlockHash(blockHeight));
     }
 
-    BlockDetails Core::getBlockDetails(const Crypto::Hash& blockHash) const {
+    BlockDetails Core::getBlockDetails(const crypto::Hash& blockHash) const {
       throwIfNotInitialized();
 
       IBlockchainCache* segment = findSegmentContainingBlock(blockHash);
@@ -2662,7 +2662,7 @@ namespace cryptonote
       blockDetails.sizeMedian = 0;
       if (blockDetails.index > 0) {
         auto lastBlocksSizes = segment->getLastBlocksSizes(currency.rewardBlocksWindow(), blockDetails.index - 1, addGenesisBlock);
-        blockDetails.sizeMedian = Common::medianValue(lastBlocksSizes);
+        blockDetails.sizeMedian = common::medianValue(lastBlocksSizes);
         prevBlockGeneratedCoins = segment->getAlreadyGeneratedCoins(blockDetails.index - 1);
       }
 
@@ -2688,7 +2688,7 @@ namespace cryptonote
       blockDetails.transactions.push_back(getTransactionDetails(cachedBaseTx.getTransactionHash(), segment, false));
 
       blockDetails.totalFeeAmount = 0;
-      for (const Crypto::Hash& transactionHash : blockTemplate.transactionHashes) {
+      for (const crypto::Hash& transactionHash : blockTemplate.transactionHashes) {
         blockDetails.transactions.push_back(getTransactionDetails(transactionHash, segment, false));
         blockDetails.totalFeeAmount += blockDetails.transactions.back().fee;
       }
@@ -2696,7 +2696,7 @@ namespace cryptonote
       return blockDetails;
     }
 
-    TransactionDetails Core::getTransactionDetails(const Crypto::Hash& transactionHash) const {
+    TransactionDetails Core::getTransactionDetails(const crypto::Hash& transactionHash) const {
       throwIfNotInitialized();
 
       IBlockchainCache* segment = findSegmentContainingTransaction(transactionHash);
@@ -2708,7 +2708,7 @@ namespace cryptonote
       return getTransactionDetails(transactionHash, segment, foundInPool);
     }
 
-    TransactionDetails Core::getTransactionDetails(const Crypto::Hash& transactionHash, IBlockchainCache* segment, bool foundInPool) const {
+    TransactionDetails Core::getTransactionDetails(const crypto::Hash& transactionHash, IBlockchainCache* segment, bool foundInPool) const {
       assert((segment != nullptr) != foundInPool);
       if (segment == nullptr) {
         segment = chainsLeaves[0];
@@ -2718,9 +2718,9 @@ namespace cryptonote
       Transaction rawTransaction;
       TransactionDetails transactionDetails;
       if (!foundInPool) {
-        std::vector<Crypto::Hash> transactionsHashes;
+        std::vector<crypto::Hash> transactionsHashes;
         std::vector<BinaryArray> rawTransactions;
-        std::vector<Crypto::Hash> missedTransactionsHashes;
+        std::vector<crypto::Hash> missedTransactionsHashes;
         transactionsHashes.push_back(transactionHash);
 
         segment->getRawTransactions(transactionsHashes, rawTransactions, missedTransactionsHashes);
@@ -2775,7 +2775,7 @@ namespace cryptonote
         }
       }
 
-      transactionDetails.paymentId = boost::value_initialized<Crypto::Hash>();
+      transactionDetails.paymentId = boost::value_initialized<crypto::Hash>();
       if (transaction->getPaymentId(transactionDetails.paymentId)) {
         transactionDetails.hasPaymentId = true;
       }
@@ -2796,7 +2796,7 @@ namespace cryptonote
         } else if (transaction->getInputType(i) == TransactionTypes::InputType::Key) {
           KeyInputDetails txInToKeyDetails;
           txInToKeyDetails.input = boost::get<KeyInput>(rawTransaction.inputs[i]);
-          std::vector<std::pair<Crypto::Hash, size_t>> outputReferences;
+          std::vector<std::pair<crypto::Hash, size_t>> outputReferences;
           outputReferences.reserve(txInToKeyDetails.input.outputIndexes.size());
           std::vector<uint32_t> globalIndexes = relativeOutputOffsetsToAbsolute(txInToKeyDetails.input.outputIndexes);
           ExtractOutputKeysResult result = segment->extractKeyOtputReferences(txInToKeyDetails.input.amount, { globalIndexes.data(), globalIndexes.size() }, outputReferences);
@@ -2834,16 +2834,16 @@ namespace cryptonote
       return transactionDetails;
     }
 
-    std::vector<Crypto::Hash> Core::getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const {
+    std::vector<crypto::Hash> Core::getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const {
       throwIfNotInitialized();
 
-      logger(Logging::DEBUGGING) << "getBlockHashesByTimestamps request with timestamp "
+      logger(logging::DEBUGGING) << "getBlockHashesByTimestamps request with timestamp "
                                  << timestampBegin << " and seconds count " << secondsCount;
 
       auto mainChain = chainsLeaves[0];
 
       if (timestampBegin + static_cast<uint64_t>(secondsCount) < timestampBegin) {
-        logger(Logging::WARNING) << "Timestamp overflow occured. Timestamp begin: " << timestampBegin
+        logger(logging::WARNING) << "Timestamp overflow occured. Timestamp begin: " << timestampBegin
                                  << ", timestamp end: " << (timestampBegin + static_cast<uint64_t>(secondsCount));
 
         throw std::runtime_error("Timestamp overflow");
@@ -2852,15 +2852,15 @@ namespace cryptonote
       return mainChain->getBlockHashesByTimestamps(timestampBegin, secondsCount);
     }
 
-    std::vector<Crypto::Hash> Core::getTransactionHashesByPaymentId(const Hash& paymentId) const {
+    std::vector<crypto::Hash> Core::getTransactionHashesByPaymentId(const Hash& paymentId) const {
       throwIfNotInitialized();
 
-      logger(Logging::DEBUGGING) << "getTransactionHashesByPaymentId request with paymentId " << paymentId;
+      logger(logging::DEBUGGING) << "getTransactionHashesByPaymentId request with paymentId " << paymentId;
 
       auto mainChain = chainsLeaves[0];
 
-      std::vector<Crypto::Hash> hashes = mainChain->getTransactionHashesByPaymentId(paymentId);
-      std::vector<Crypto::Hash> poolHashes = transactionPool->getTransactionHashesByPaymentId(paymentId);
+      std::vector<crypto::Hash> hashes = mainChain->getTransactionHashesByPaymentId(paymentId);
+      std::vector<crypto::Hash> poolHashes = transactionPool->getTransactionHashesByPaymentId(paymentId);
 
       hashes.reserve(hashes.size() + poolHashes.size());
       std::move(poolHashes.begin(), poolHashes.end(), std::back_inserter(hashes));
@@ -2874,7 +2874,7 @@ namespace cryptonote
       }
     }
 
-    IBlockchainCache* Core::findSegmentContainingTransaction(const Crypto::Hash& transactionHash) const {
+    IBlockchainCache* Core::findSegmentContainingTransaction(const crypto::Hash& transactionHash) const {
       assert(!chainsLeaves.empty());
       assert(!chainsStorage.empty());
 
@@ -2906,82 +2906,82 @@ namespace cryptonote
       return nullptr;
     }
 
-    bool Core::hasTransaction(const Crypto::Hash& transactionHash) const {
+    bool Core::hasTransaction(const crypto::Hash& transactionHash) const {
       throwIfNotInitialized();
       return findSegmentContainingTransaction(transactionHash) != nullptr || transactionPool->checkIfTransactionPresent(transactionHash);
     }
 
     void Core::transactionPoolCleaningProcedure() {
-      System::Timer timer(dispatcher);
+      system::Timer timer(dispatcher);
 
       try {
         for (;;) {
           timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
 
 
-          logger(Logging::INFO) << "Running pool transaction cleaning sequence.. "
+          logger(logging::INFO) << "Running pool transaction cleaning sequence.. "
                                  << " ";
 
           auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
 
-          logger(Logging::INFO) << "Got some bad transactions.. "
+          logger(logging::INFO) << "Got some bad transactions.. "
                                        << " ";
           notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
         }
-      } catch (System::InterruptedException&) {
-        logger(Logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
+      } catch (system::InterruptedException&) {
+        logger(logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
       } catch (std::exception& e) {
-        logger(Logging::INFO) << "Error occurred while cleaning transactions pool: " << e.what();
+        logger(logging::INFO) << "Error occurred while cleaning transactions pool: " << e.what();
       }
     }
 
 
     void Core::huginCleaningProcedure() {
-      System::Timer timer(dispatcher);
+      system::Timer timer(dispatcher);
 
       try {
         for (;;) {
           timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
 
-          logger(Logging::INFO) << "Running Hugin cleaner sequence.. "
+          logger(Logging::DEBUGGING) << "Running Hugin cleaner sequence.. "
                                  << " ";
 
           std::vector<CachedTransaction> poolTransactions = transactionPool->getPoolTransactions();
           for (const auto& cachedTransaction : poolTransactions) {
-            logger(Logging::INFO) << "Found transaction.. "
+            logger(Logging::DEBUGGING) << "Found transaction.. "
             << " ";
 
 
-          logger(Logging::INFO) << "Checking transaction "
+          logger(Logging::DEBUGGING) << "Checking transaction "
                                  << cachedTransaction.getTransactionHash();
 
               uint64_t height = getTopBlockIndex() + 1;
 
 
-                                  logger(Logging::INFO) << "Height is "
+                                  logger(Logging::DEBUGGING) << "Height is "
                                                          << height;
 
           if (!validateBlockTemplateTransaction(cachedTransaction, height))
           {
 
-                logger(Logging::INFO) << "tx is invalid "
+                logger(Logging::DEBUGGING) << "tx is invalid "
                                        << cachedTransaction.getTransactionHash();
 
 
                 std::time_t currentTime = std::time(0);
 
 
-                logger(Logging::INFO) << "Current time is "
+                logger(Logging::DEBUGGING) << "Current time is "
                                        << currentTime;
 
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
 
-                logger(Logging::INFO) << "Transaction age is "
+                logger(Logging::DEBUGGING) << "Transaction age is "
                                        << transactionAge;
 
-                if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+                if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                 {
-                  logger(Logging::INFO) << "Removing.. ";
+                  logger(Logging::DEBUGGING) << "Removing.. ";
                   transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
 
                 }
@@ -2995,10 +2995,10 @@ namespace cryptonote
           // notifyObservers(ma>keDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
         }
 
-      } catch (System::InterruptedException&) {
-        logger(Logging::DEBUGGING) << "transactionPoolCleaningProcedure has been interrupted";
+      } catch (system::InterruptedException&) {
+        logger(logging::DEBUGGING) << "transactionPoolCleaningProcedure has been interrupted";
       } catch (std::exception& e) {
-        logger(Logging::ERROR) << "Error occurred while cleaning transactions pool: " << e.what();
+        logger(logging::ERROR) << "Error occurred while cleaning transactions pool: " << e.what();
       }
     }
 
@@ -3010,7 +3010,7 @@ namespace cryptonote
 
       auto lastBlockSizes = mainChain->getLastBlocksSizes(currency.rewardBlocksWindow());
 
-      blockMedianSize = std::max(Common::medianValue(lastBlockSizes), static_cast<uint64_t>(nextBlockGrantedFullRewardZone));
+      blockMedianSize = std::max(common::medianValue(lastBlockSizes), static_cast<uint64_t>(nextBlockGrantedFullRewardZone));
     }
 
     uint64_t Core::get_current_blockchain_height() const
