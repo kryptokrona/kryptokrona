@@ -21,11 +21,11 @@
 using namespace cryptonote;
 
 template<>
-bool CryptoNote::toBinaryArray(const BinaryArray& object, BinaryArray& binaryArray) {
+bool cryptonote::toBinaryArray(const BinaryArray& object, BinaryArray& binaryArray) {
   try {
-    Common::VectorOutputStream stream(binaryArray);
+    common::VectorOutputStream stream(binaryArray);
     BinaryOutputStreamSerializer serializer(stream);
-    std::string oldBlob = Common::asString(object);
+    std::string oldBlob = common::asString(object);
     serializer(oldBlob, "");
   } catch (std::exception&) {
     return false;
@@ -34,17 +34,17 @@ bool CryptoNote::toBinaryArray(const BinaryArray& object, BinaryArray& binaryArr
   return true;
 }
 
-void CryptoNote::getBinaryArrayHash(const BinaryArray& binaryArray, Crypto::Hash& hash) {
+void cryptonote::getBinaryArrayHash(const BinaryArray& binaryArray, crypto::Hash& hash) {
   cn_fast_hash(binaryArray.data(), binaryArray.size(), hash);
 }
 
-Crypto::Hash CryptoNote::getBinaryArrayHash(const BinaryArray& binaryArray) {
-  Crypto::Hash hash;
+crypto::Hash cryptonote::getBinaryArrayHash(const BinaryArray& binaryArray) {
+  crypto::Hash hash;
   getBinaryArrayHash(binaryArray, hash);
   return hash;
 }
 
-uint64_t CryptoNote::getInputAmount(const Transaction& transaction) {
+uint64_t cryptonote::getInputAmount(const Transaction& transaction) {
   uint64_t amount = 0;
   for (auto& input : transaction.inputs) {
     if (input.type() == typeid(KeyInput)) {
@@ -55,7 +55,7 @@ uint64_t CryptoNote::getInputAmount(const Transaction& transaction) {
   return amount;
 }
 
-std::vector<uint64_t> CryptoNote::getInputsAmounts(const Transaction& transaction) {
+std::vector<uint64_t> cryptonote::getInputsAmounts(const Transaction& transaction) {
   std::vector<uint64_t> inputsAmounts;
   inputsAmounts.reserve(transaction.inputs.size());
 
@@ -68,7 +68,7 @@ std::vector<uint64_t> CryptoNote::getInputsAmounts(const Transaction& transactio
   return inputsAmounts;
 }
 
-uint64_t CryptoNote::getOutputAmount(const Transaction& transaction) {
+uint64_t cryptonote::getOutputAmount(const Transaction& transaction) {
   uint64_t amount = 0;
   for (auto& output : transaction.outputs) {
     amount += output.amount;
@@ -77,7 +77,7 @@ uint64_t CryptoNote::getOutputAmount(const Transaction& transaction) {
   return amount;
 }
 
-void CryptoNote::decomposeAmount(uint64_t amount, uint64_t dustThreshold, std::vector<uint64_t>& decomposedAmounts) {
+void cryptonote::decomposeAmount(uint64_t amount, uint64_t dustThreshold, std::vector<uint64_t>& decomposedAmounts) {
   decompose_amount_into_digits(amount, dustThreshold,
     [&](uint64_t amount) {
     decomposedAmounts.push_back(amount);

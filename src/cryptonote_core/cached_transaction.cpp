@@ -39,7 +39,7 @@ const Transaction& CachedTransaction::getTransaction() const {
   return transaction;
 }
 
-const Crypto::Hash& CachedTransaction::getTransactionHash() const {
+const crypto::Hash& CachedTransaction::getTransactionHash() const {
   if (!transactionHash.is_initialized()) {
     transactionHash = getBinaryArrayHash(getTransactionBinaryArray());
   }
@@ -47,7 +47,7 @@ const Crypto::Hash& CachedTransaction::getTransactionHash() const {
   return transactionHash.get();
 }
 
-const Crypto::Hash& CachedTransaction::getTransactionPrefixHash() const {
+const crypto::Hash& CachedTransaction::getTransactionPrefixHash() const {
   if (!transactionPrefixHash.is_initialized()) {
     transactionPrefixHash = getObjectHash(static_cast<const TransactionPrefix&>(transaction));
   }

@@ -66,14 +66,14 @@ namespace cryptonote
     bool r = toBinaryArray(adr, ba);
     if (r) {}
     assert(r);
-    return Tools::Base58::encode_addr(prefix, Common::asString(ba));
+    return tools::Base58::encode_addr(prefix, common::asString(ba));
   }
   //-----------------------------------------------------------------------
   bool parseAccountAddressString(uint64_t& prefix, AccountPublicAddress& adr, const std::string& str) {
     std::string data;
 
     return
-      Tools::Base58::decode_addr(str, prefix, data) &&
+      tools::Base58::decode_addr(str, prefix, data) &&
       fromBinaryArray(adr, asBinaryArray(data)) &&
       // ::serialization::parse_binary(data, adr) &&
       check_key(adr.spendPublicKey) &&
@@ -91,6 +91,6 @@ namespace cryptonote
 }
 
 //--------------------------------------------------------------------------------
-bool parse_hash256(const std::string& str_hash, Crypto::Hash& hash) {
-  return Common::podFromHex(str_hash, hash);
+bool parse_hash256(const std::string& str_hash, crypto::Hash& hash) {
+  return common::podFromHex(str_hash, hash);
 }

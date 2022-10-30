@@ -36,30 +36,30 @@ namespace cryptonote
 {
     class TransactionPool : public ITransactionPool {
     public:
-      TransactionPool(std::shared_ptr<Logging::ILogger> logger);
+      TransactionPool(std::shared_ptr<logging::ILogger> logger);
 
       virtual bool pushTransaction(CachedTransaction&& transaction, TransactionValidatorState&& transactionState) override;
-      virtual const CachedTransaction& getTransaction(const Crypto::Hash& hash) const override;
-      virtual bool removeTransaction(const Crypto::Hash& hash) override;
+      virtual const CachedTransaction& getTransaction(const crypto::Hash& hash) const override;
+      virtual bool removeTransaction(const crypto::Hash& hash) override;
 
       virtual size_t getTransactionCount() const override;
-      virtual std::vector<Crypto::Hash> getTransactionHashes() const override;
-      virtual bool checkIfTransactionPresent(const Crypto::Hash& hash) const override;
+      virtual std::vector<crypto::Hash> getTransactionHashes() const override;
+      virtual bool checkIfTransactionPresent(const crypto::Hash& hash) const override;
 
       virtual const TransactionValidatorState& getPoolTransactionValidationState() const override;
       virtual std::vector<CachedTransaction> getPoolTransactions() const override;
 
-      virtual uint64_t getTransactionReceiveTime(const Crypto::Hash& hash) const override;
-      virtual std::vector<Crypto::Hash> getTransactionHashesByPaymentId(const Crypto::Hash& paymentId) const override;
+      virtual uint64_t getTransactionReceiveTime(const crypto::Hash& hash) const override;
+      virtual std::vector<crypto::Hash> getTransactionHashesByPaymentId(const crypto::Hash& paymentId) const override;
     private:
       TransactionValidatorState poolState;
 
       struct PendingTransactionInfo {
         uint64_t receiveTime;
         CachedTransaction cachedTransaction;
-        boost::optional<Crypto::Hash> paymentId;
+        boost::optional<crypto::Hash> paymentId;
 
-        const Crypto::Hash& getTransactionHash() const;
+        const crypto::Hash& getTransactionHash() const;
       };
 
       struct TransactionPriorityComparator {
@@ -81,18 +81,18 @@ namespace cryptonote
         boost::multi_index::tag<TransactionHashTag>,
         boost::multi_index::const_mem_fun<
           PendingTransactionInfo,
-          const Crypto::Hash&,
+          const crypto::Hash&,
           &PendingTransactionInfo::getTransactionHash
         >
       > TransactionHashIndex;
 
       struct PaymentIdHasher {
-        size_t operator() (const boost::optional<Crypto::Hash>& paymentId) const;
+        size_t operator() (const boost::optional<crypto::Hash>& paymentId) const;
       };
 
       typedef boost::multi_index::hashed_non_unique<
         boost::multi_index::tag<PaymentIdTag>,
-        BOOST_MULTI_INDEX_MEMBER(PendingTransactionInfo, boost::optional<Crypto::Hash>, paymentId),
+        BOOST_MULTI_INDEX_MEMBER(PendingTransactionInfo, boost::optional<crypto::Hash>, paymentId),
         PaymentIdHasher
       > PaymentIdIndex;
 
@@ -110,6 +110,6 @@ namespace cryptonote
       TransactionsContainer::index<TransactionCostTag>::type& transactionCostIndex;
       TransactionsContainer::index<PaymentIdTag>::type& paymentIdIndex;
 
-      Logging::LoggerRef logger;
+      logging::LoggerRef logger;
     };
 }

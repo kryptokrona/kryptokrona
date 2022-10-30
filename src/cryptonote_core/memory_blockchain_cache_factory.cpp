@@ -19,7 +19,7 @@
 
 namespace cryptonote
 {
-    MemoryBlockchainCacheFactory::MemoryBlockchainCacheFactory(const std::string& filename, std::shared_ptr<Logging::ILogger> logger):
+    MemoryBlockchainCacheFactory::MemoryBlockchainCacheFactory(const std::string& filename, std::shared_ptr<logging::ILogger> logger):
       filename(filename), logger(logger) {
     }
 

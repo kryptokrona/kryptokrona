@@ -78,7 +78,7 @@ namespace cryptonote
     bool Currency::generateGenesisBlock() {
       genesisBlockTemplate = boost::value_initialized<BlockTemplate>();
 
-      std::string genesisCoinbaseTxHex = CryptoNote::parameters::GENESIS_COINBASE_TX_HEX;
+      std::string genesisCoinbaseTxHex = cryptonote::parameters::GENESIS_COINBASE_TX_HEX;
       BinaryArray minerTxBlob;
 
       bool r =
@@ -106,9 +106,9 @@ namespace cryptonote
       if (blockMajorVersion >= BLOCK_MAJOR_VERSION_3) {
         return m_difficultyWindow;
       } else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2) {
-        return CryptoNote::parameters::DIFFICULTY_WINDOW_V2;
+        return cryptonote::parameters::DIFFICULTY_WINDOW_V2;
       } else {
-        return CryptoNote::parameters::DIFFICULTY_WINDOW_V1;
+        return cryptonote::parameters::DIFFICULTY_WINDOW_V1;
       }
     }
 
@@ -116,9 +116,9 @@ namespace cryptonote
       if (blockMajorVersion >= BLOCK_MAJOR_VERSION_3) {
         return m_difficultyLag;
       } else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2) {
-        return CryptoNote::parameters::DIFFICULTY_LAG_V2;
+        return cryptonote::parameters::DIFFICULTY_LAG_V2;
       } else {
-        return CryptoNote::parameters::DIFFICULTY_LAG_V1;
+        return cryptonote::parameters::DIFFICULTY_LAG_V1;
       }
     }
 
@@ -126,17 +126,17 @@ namespace cryptonote
       if (blockMajorVersion >= BLOCK_MAJOR_VERSION_3) {
         return m_difficultyCut;
       } else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2) {
-        return CryptoNote::parameters::DIFFICULTY_CUT_V2;
+        return cryptonote::parameters::DIFFICULTY_CUT_V2;
       } else {
-        return CryptoNote::parameters::DIFFICULTY_CUT_V1;
+        return cryptonote::parameters::DIFFICULTY_CUT_V1;
       }
     }
 
     size_t Currency::difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion, uint32_t height) const
     {
-        if (height >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+        if (height >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
         {
-            return CryptoNote::parameters::DIFFICULTY_BLOCKS_COUNT_V3;
+            return cryptonote::parameters::DIFFICULTY_BLOCKS_COUNT_V3;
         }
 
         return difficultyWindowByBlockVersion(blockMajorVersion) + difficultyLagByBlockVersion(blockMajorVersion);
@@ -146,9 +146,9 @@ namespace cryptonote
       if (blockMajorVersion >= BLOCK_MAJOR_VERSION_3) {
         return m_blockGrantedFullRewardZone;
       } else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2) {
-        return CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
+        return cryptonote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
       } else {
-        return CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+        return cryptonote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
       }
     }
 
@@ -238,10 +238,10 @@ namespace cryptonote
 
       uint64_t summaryAmounts = 0;
       for (size_t no = 0; no < outAmounts.size(); no++) {
-        Crypto::KeyDerivation derivation = boost::value_initialized<Crypto::KeyDerivation>();
-        Crypto::PublicKey outEphemeralPubKey = boost::value_initialized<Crypto::PublicKey>();
+        crypto::KeyDerivation derivation = boost::value_initialized<crypto::KeyDerivation>();
+        crypto::PublicKey outEphemeralPubKey = boost::value_initialized<crypto::PublicKey>();
 
-        bool r = Crypto::generate_key_derivation(minerAddress.viewPublicKey, txkey.secretKey, derivation);
+        bool r = crypto::generate_key_derivation(minerAddress.viewPublicKey, txkey.secretKey, derivation);
 
         if (!(r)) {
           logger(ERROR, BRIGHT_RED)
@@ -250,7 +250,7 @@ namespace cryptonote
           return false;
         }
 
-        r = Crypto::derive_public_key(derivation, no, minerAddress.spendPublicKey, outEphemeralPubKey);
+        r = crypto::derive_public_key(derivation, no, minerAddress.spendPublicKey, outEphemeralPubKey);
 
         if (!(r)) {
           logger(ERROR, BRIGHT_RED)
@@ -360,7 +360,7 @@ namespace cryptonote
 
     bool Currency::parseAccountAddressString(const std::string& str, AccountPublicAddress& addr) const {
       uint64_t prefix;
-      if (!CryptoNote::parseAccountAddressString(prefix, addr, str)) {
+      if (!cryptonote::parseAccountAddressString(prefix, addr, str)) {
         return false;
       }
 
@@ -429,19 +429,19 @@ namespace cryptonote
     uint64_t Currency::getNextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<uint64_t> cumulativeDifficulties) const
     {
         /* nextDifficultyV3 and above are defined in src/cryptonote_core/Difficulty.cpp */
-        if (blockIndex >= CryptoNote::parameters::LWMA_3_DIFFICULTY_BLOCK_INDEX)
+        if (blockIndex >= cryptonote::parameters::LWMA_3_DIFFICULTY_BLOCK_INDEX)
         {
             return nextDifficultyV6(timestamps, cumulativeDifficulties);
         }
-        else if (blockIndex >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V3)
+        else if (blockIndex >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V3)
         {
             return nextDifficultyV5(timestamps, cumulativeDifficulties);
         }
-        else if (blockIndex >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
+        else if (blockIndex >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
         {
             return nextDifficultyV4(timestamps, cumulativeDifficulties);
         }
-        else if (blockIndex >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+        else if (blockIndex >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
         {
             return nextDifficultyV3(timestamps, cumulativeDifficulties);
         }
@@ -603,8 +603,8 @@ namespace cryptonote
         return false;
       }
 
-      Crypto::Hash auxBlocksMerkleRoot;
-      Crypto::tree_hash_from_branch(block.parentBlock.blockchainBranch.data(), block.parentBlock.blockchainBranch.size(),
+      crypto::Hash auxBlocksMerkleRoot;
+      crypto::tree_hash_from_branch(block.parentBlock.blockchainBranch.data(), block.parentBlock.blockchainBranch.size(),
         cachedBlock.getAuxiliaryBlockHeaderHash(), &cachedGenesisBlock->getBlockHash(), auxBlocksMerkleRoot);
 
       if (auxBlocksMerkleRoot != mmTag.merkleRoot) {
@@ -632,17 +632,17 @@ namespace cryptonote
     }
 
     size_t Currency::getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount) {
-      const size_t KEY_IMAGE_SIZE = sizeof(Crypto::KeyImage);
+      const size_t KEY_IMAGE_SIZE = sizeof(crypto::KeyImage);
       const size_t OUTPUT_KEY_SIZE = sizeof(decltype(KeyOutput::key));
       const size_t AMOUNT_SIZE = sizeof(uint64_t) + 2; //varint
       const size_t GLOBAL_INDEXES_VECTOR_SIZE_SIZE = sizeof(uint8_t);//varint
       const size_t GLOBAL_INDEXES_INITIAL_VALUE_SIZE = sizeof(uint32_t);//varint
       const size_t GLOBAL_INDEXES_DIFFERENCE_SIZE = sizeof(uint32_t);//varint
-      const size_t SIGNATURE_SIZE = sizeof(Crypto::Signature);
+      const size_t SIGNATURE_SIZE = sizeof(crypto::Signature);
       const size_t EXTRA_TAG_SIZE = sizeof(uint8_t);
       const size_t INPUT_TAG_SIZE = sizeof(uint8_t);
       const size_t OUTPUT_TAG_SIZE = sizeof(uint8_t);
-      const size_t PUBLIC_KEY_SIZE = sizeof(Crypto::PublicKey);
+      const size_t PUBLIC_KEY_SIZE = sizeof(crypto::PublicKey);
       const size_t TRANSACTION_VERSION_SIZE = sizeof(uint8_t);
       const size_t TRANSACTION_UNLOCK_TIME_SIZE = sizeof(uint64_t);
 
@@ -706,7 +706,7 @@ namespace cryptonote
     logger(currency.logger) {
     }
 
-    CurrencyBuilder::CurrencyBuilder(std::shared_ptr<Logging::ILogger> log) : m_currency(log) {
+    CurrencyBuilder::CurrencyBuilder(std::shared_ptr<logging::ILogger> log) : m_currency(log) {
       maxBlockNumber(parameters::CRYPTONOTE_MAX_BLOCK_NUMBER);
       maxBlockBlobSize(parameters::CRYPTONOTE_MAX_BLOCK_BLOB_SIZE);
       maxTxSize(parameters::CRYPTONOTE_MAX_TX_SIZE);
@@ -769,15 +769,15 @@ namespace cryptonote
     }
 
     Transaction CurrencyBuilder::generateGenesisTransaction() {
-      CryptoNote::Transaction tx;
-      CryptoNote::AccountPublicAddress ac = boost::value_initialized<CryptoNote::AccountPublicAddress>();
+      cryptonote::Transaction tx;
+      cryptonote::AccountPublicAddress ac = boost::value_initialized<cryptonote::AccountPublicAddress>();
       m_currency.constructMinerTx(1, 0, 0, 0, 0, 0, ac, tx); // zero fee in genesis
       return tx;
     }
      Transaction CurrencyBuilder::generateGenesisTransaction(const std::vector<AccountPublicAddress>& targets) {
         assert(!targets.empty());
 
-        CryptoNote::Transaction tx;
+        cryptonote::Transaction tx;
         tx.inputs.clear();
         tx.outputs.clear();
         tx.extra.clear();
@@ -792,13 +792,13 @@ namespace cryptonote
         uint64_t target_amount = block_reward / targets.size();
         uint64_t first_target_amount = target_amount + block_reward % targets.size();
         for (size_t i = 0; i < targets.size(); ++i) {
-          Crypto::KeyDerivation derivation = boost::value_initialized<Crypto::KeyDerivation>();
-          Crypto::PublicKey outEphemeralPubKey = boost::value_initialized<Crypto::PublicKey>();
-          bool r = Crypto::generate_key_derivation(targets[i].viewPublicKey, txkey.secretKey, derivation);
+          crypto::KeyDerivation derivation = boost::value_initialized<crypto::KeyDerivation>();
+          crypto::PublicKey outEphemeralPubKey = boost::value_initialized<crypto::PublicKey>();
+          bool r = crypto::generate_key_derivation(targets[i].viewPublicKey, txkey.secretKey, derivation);
           if (r) {}
           assert(r == true);
     //      CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to generate_key_derivation(" << targets[i].viewPublicKey << ", " << txkey.sec << ")");
-          r = Crypto::derive_public_key(derivation, i, targets[i].spendPublicKey, outEphemeralPubKey);
+          r = crypto::derive_public_key(derivation, i, targets[i].spendPublicKey, outEphemeralPubKey);
           assert(r == true);
      //     CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to derive_public_key(" << derivation << ", " << i << ", " << targets[i].spendPublicKey << ")");
           KeyOutput tk;

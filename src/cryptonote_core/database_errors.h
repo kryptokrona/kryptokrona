@@ -61,6 +61,6 @@ namespace cryptonote
     }
 }
 
-inline std::error_code make_error_code(CryptoNote::error::DataBaseErrorCodes e) {
-  return std::error_code(static_cast<int>(e), CryptoNote::error::DataBaseErrorCategory::INSTANCE);
+inline std::error_code make_error_code(cryptonote::error::DataBaseErrorCodes e) {
+  return std::error_code(static_cast<int>(e), cryptonote::error::DataBaseErrorCategory::INSTANCE);
 }

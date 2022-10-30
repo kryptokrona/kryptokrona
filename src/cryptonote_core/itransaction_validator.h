@@ -23,7 +23,7 @@ namespace cryptonote
 {
   struct BlockInfo {
     uint32_t height;
-    Crypto::Hash id;
+    crypto::Hash id;
 
     BlockInfo() {
       clear();
@@ -31,11 +31,11 @@ namespace cryptonote
 
     void clear() {
       height = 0;
-      id = CryptoNote::NULL_HASH;
+      id = cryptonote::NULL_HASH;
     }
 
     bool empty() const {
-      return id == CryptoNote::NULL_HASH;
+      return id == cryptonote::NULL_HASH;
     }
   };
 
@@ -43,9 +43,9 @@ namespace cryptonote
   public:
     virtual ~ITransactionValidator() {}
     
-    virtual bool checkTransactionInputs(const CryptoNote::Transaction& tx, BlockInfo& maxUsedBlock) = 0;
-    virtual bool checkTransactionInputs(const CryptoNote::Transaction& tx, BlockInfo& maxUsedBlock, BlockInfo& lastFailed) = 0;
-    virtual bool haveSpentKeyImages(const CryptoNote::Transaction& tx) = 0;
+    virtual bool checkTransactionInputs(const cryptonote::Transaction& tx, BlockInfo& maxUsedBlock) = 0;
+    virtual bool checkTransactionInputs(const cryptonote::Transaction& tx, BlockInfo& maxUsedBlock, BlockInfo& lastFailed) = 0;
+    virtual bool haveSpentKeyImages(const cryptonote::Transaction& tx) = 0;
     virtual bool checkTransactionSize(size_t blobSize) = 0;
   };
 }
