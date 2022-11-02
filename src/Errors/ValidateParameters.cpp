@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////////
@@ -33,7 +33,7 @@ Error validateFusionTransaction(
     {
         return error;
     }
-    
+
     /* Verify the subwallets to take from are valid and exist in the subwallets */
     if (Error error = validateOurAddresses({subWalletsToTakeFrom}, subWallets); error != SUCCESS)
     {
@@ -81,7 +81,8 @@ Error validateTransaction(
 
     /* Validate we have enough money for the transaction */
     if (Error error = validateAmount(destinations, fee,
-            subWalletsToTakeFrom, subWallets, currentHeight); error != SUCCESS)
+                                     subWalletsToTakeFrom, subWallets, currentHeight);
+        error != SUCCESS)
     {
         return error;
     }
@@ -111,7 +112,7 @@ Error validateIntegratedAddresses(
     const std::vector<std::pair<std::string, uint64_t>> destinations,
     std::string paymentID)
 {
-    for (const auto &[address, amount] : destinations)
+    for (const auto [address, amount] : destinations)
     {
         if (address.length() != WalletConfig::integratedAddressLength)
         {
@@ -119,8 +120,7 @@ Error validateIntegratedAddresses(
         }
 
         /* Grab the address + pid from the integrated address */
-        const auto [extractedAddress, extractedPaymentID] 
-            = Utilities::extractIntegratedAddressData(address);
+        const auto [extractedAddress, extractedPaymentID] = Utilities::extractIntegratedAddressData(address);
 
         /* No payment ID given, set it to the extracted one */
         if (paymentID == "")
@@ -144,7 +144,7 @@ Error validateHash(const std::string hash)
     }
 
     std::regex hexRegex("[a-zA-Z0-9]{64}");
-    
+
     if (!std::regex_match(hash, hexRegex))
     {
         return HASH_INVALID;
@@ -166,7 +166,7 @@ Error validatePaymentID(const std::string paymentID)
     }
 
     std::regex hexRegex("[a-zA-Z0-9]{64}");
-    
+
     if (!std::regex_match(paymentID, hexRegex))
     {
         return PAYMENT_ID_INVALID;
@@ -184,8 +184,8 @@ Error validateMixin(const uint64_t mixin, const uint64_t height)
         return Error(
             MIXIN_TOO_SMALL,
             "The mixin value given (" + std::to_string(mixin) + ") is lower "
-            "than the minimum mixin allowed (" + std::to_string(minMixin) + ")"
-        );
+                                                                "than the minimum mixin allowed (" +
+                std::to_string(minMixin) + ")");
     }
 
     if (mixin > maxMixin)
@@ -193,8 +193,8 @@ Error validateMixin(const uint64_t mixin, const uint64_t height)
         return Error(
             MIXIN_TOO_BIG,
             "The mixin value given (" + std::to_string(mixin) + ") is greater "
-            "than the maximum mixin allowed (" + std::to_string(maxMixin) + ")"
-        );
+                                                                "than the maximum mixin allowed (" +
+                std::to_string(maxMixin) + ")");
     }
 
     return SUCCESS;
@@ -218,19 +218,18 @@ Error validateAmount(
         Utilities::addressesToSpendKeys(subWalletsToTakeFrom),
         /* Take from all if no subwallets specified */
         subWalletsToTakeFrom.empty(),
-        currentHeight
-    );
+        currentHeight);
 
     /* Get the total amount of the transaction */
     uint64_t totalAmount = Utilities::getTransactionSum(destinations) + fee;
 
-    std::vector<uint64_t> amounts { fee };
+    std::vector<uint64_t> amounts{fee};
 
     std::transform(destinations.begin(), destinations.end(), std::back_inserter(amounts),
-    [](const auto destination)
-    {
-        return destination.second;
-    });
+                   [](const auto destination)
+                   {
+                       return destination.second;
+                   });
 
     /* Check the total amount we're sending is not >= uint64_t */
     if (Utilities::sumWillOverflow(amounts))
@@ -257,7 +256,7 @@ Error validateDestinations(
 
     std::vector<std::string> destinationAddresses;
 
-    for (const auto & [destination, amount] : destinations)
+    for (const auto &[destination, amount] : destinations)
     {
         /* Check all of the amounts are > 0 */
         if (amount == 0)
@@ -273,7 +272,7 @@ Error validateDestinations(
     {
         return error;
     }
-    
+
     return SUCCESS;
 }
 
@@ -311,9 +310,8 @@ Error validateAddresses(
                 return Error(
                     ADDRESS_IS_INTEGRATED,
                     "The address given (" + address + ") is an integrated "
-                    "address, but integrated addresses aren't valid for "
-                    "this parameter."
-                );
+                                                      "address, but integrated addresses aren't valid for "
+                                                      "this parameter.");
             }
 
             std::string decoded;
@@ -357,8 +355,7 @@ Error validateAddresses(
                verify that as a normal address */
             address = CryptoNote::getAccountAddressAsStr(
                 CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
-                addr
-            );
+                addr);
         }
 
         /* Not used */
@@ -386,7 +383,7 @@ Error validateOurAddresses(
         return error;
     }
 
-    for (const auto& address : addresses)
+    for (const auto address : addresses)
     {
         const auto [spendKey, viewKey] = Utilities::addressToKeys(address);
 
@@ -397,8 +394,7 @@ Error validateOurAddresses(
             return Error(
                 ADDRESS_NOT_IN_WALLET,
                 "The address given (" + address + ") does not exist in the "
-                "wallet container, but it is required to exist for this operation."
-            );
+                                                  "wallet container, but it is required to exist for this operation.");
         }
     }
 

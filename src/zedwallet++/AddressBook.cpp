@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////
@@ -39,7 +39,8 @@ const std::string getAddressBookName(const std::vector<AddressBookEntry> address
         {
             std::cout << WarningMsg("An address book entry with this ")
                       << WarningMsg("name already exists!")
-                      << std::endl << std::endl;
+                      << std::endl
+                      << std::endl;
 
             continue;
         }
@@ -52,7 +53,8 @@ void addToAddressBook()
 {
     std::cout << InformationMsg("Note: You can type cancel at any time to "
                                 "cancel adding someone to your address book.")
-              << std::endl << std::endl;
+              << std::endl
+              << std::endl;
 
     auto addressBook = getAddressBook();
 
@@ -69,8 +71,7 @@ void addToAddressBook()
 
     const std::string address = getAddress(
         "\nWhat address does this user have?: ", integratedAddressesAllowed,
-        cancelAllowed
-    );
+        cancelAllowed);
 
     if (address == "cancel")
     {
@@ -88,8 +89,8 @@ void addToAddressBook()
 
         paymentID = getPaymentID(
             "\nDoes this address book entry have a payment ID associated "
-            "with it?\n", cancelAllowed
-        );
+            "with it?\n",
+            cancelAllowed);
 
         if (paymentID == "cancel")
         {
@@ -182,12 +183,12 @@ const std::tuple<bool, AddressBookEntry> getAddressBookEntry(
                       << WarningMsg("Could not find a user with the name of ")
                       << InformationMsg(friendlyName)
                       << WarningMsg(" in your address book!")
-                      << std::endl << std::endl;
+                      << std::endl
+                      << std::endl;
         }
 
         const bool list = ZedUtilities::confirm(
-            "Would you like to list everyone in your address book?"
-        );
+            "Would you like to list everyone in your address book?");
 
         std::cout << "\n";
 
@@ -222,8 +223,7 @@ void sendFromAddressBook(const std::shared_ptr<WalletBackend> walletBackend)
 
     const auto [success, amount] = getAmountToAtomic(
         "How much " + WalletConfig::ticker + " do you want to send?: ",
-        cancelAllowed
-    );
+        cancelAllowed);
 
     if (!success)
     {
@@ -232,8 +232,7 @@ void sendFromAddressBook(const std::shared_ptr<WalletBackend> walletBackend)
 
     sendTransaction(
         walletBackend, addressBookEntry.address, amount,
-        addressBookEntry.paymentID
-    );
+        addressBookEntry.paymentID);
 }
 
 bool isAddressBookEmpty(const std::vector<AddressBookEntry> addressBook)
@@ -302,8 +301,7 @@ void deleteFromAddressBook()
                   << WarningMsg(" in your address book!\n\n");
 
         const bool list = ZedUtilities::confirm(
-            "Would you like to list everyone in your address book?"
-        );
+            "Would you like to list everyone in your address book?");
 
         std::cout << "\n";
 
@@ -325,7 +323,7 @@ void listAddressBook()
 
     size_t i = 1;
 
-    for (const auto& entry : addressBook)
+    for (const auto entry : addressBook)
     {
         std::cout << InformationMsg("Address Book Entry: ")
                   << InformationMsg(i) << InformationMsg(" | ")
