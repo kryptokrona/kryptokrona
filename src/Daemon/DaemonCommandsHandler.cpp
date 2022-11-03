@@ -104,7 +104,7 @@ DaemonCommandsHandler::DaemonCommandsHandler(
 std::string DaemonCommandsHandler::get_commands_str()
 {
     std::stringstream ss;
-    ss << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION_LONG << ENDL;
+    ss << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << ENDL;
     ss << "Commands: " << ENDL;
     std::string usage = m_consoleHandler.getUsage();
     boost::replace_all(usage, "\n", "\n  ");

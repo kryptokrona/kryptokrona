@@ -7,12 +7,10 @@
 ////////////////////////
 
 #include <config/CryptoNoteConfig.h>
-
 #include <CryptoNoteCore/CryptoNoteTools.h>
-
 #include <Errors/ValidateParameters.h>
-
 #include <Utilities/Utilities.h>
+#include <version.h>
 
 using json = nlohmann::json;
 
