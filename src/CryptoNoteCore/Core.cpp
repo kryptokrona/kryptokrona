@@ -3353,7 +3353,8 @@ namespace CryptoNote
                         uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
                         logger(Logging::DEBUGGING) << "Transaction age is " << transactionAge;
 
-                        if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+                        if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
+                            cachedTransaction.getTransaction().extra.size() > CryptoNote::parameters::MAX_EXTRA_SIZE_POOL)
                         {
                             logger(Logging::DEBUGGING) << "Removing.. ";
                             transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
