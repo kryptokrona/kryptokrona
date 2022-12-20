@@ -3336,32 +3336,41 @@ namespace CryptoNote
 
                 for (const auto &cachedTransaction : transactionPool->getPoolTransactions())
                 {
-                    logger(Logging::DEBUGGING) << "Found transaction.. "
-                                               << " ";
-                    logger(Logging::DEBUGGING) << "Checking transaction " << cachedTransaction.getTransactionHash();
+					try
+					{
+						logger(Logging::DEBUGGING) << "Found transaction.. "
+												   << " ";
+						logger(Logging::DEBUGGING) << "Checking transaction " << cachedTransaction.getTransactionHash();
 
-                    uint64_t height = getTopBlockIndex() + 1;
-                    logger(Logging::DEBUGGING) << "Height is " << height;
+						uint64_t height = getTopBlockIndex() + 1;
+						logger(Logging::DEBUGGING) << "Height is " << height;
 
-                    if (!validateBlockTemplateTransaction(cachedTransaction, height))
-                    {
-                        logger(Logging::DEBUGGING) << "Tx is invalid " << cachedTransaction.getTransactionHash();
+					  	if (!validateBlockTemplateTransaction(cachedTransaction, height))
+						{
+							logger(Logging::DEBUGGING) << "Tx is invalid " << cachedTransaction.getTransactionHash();
 
-                        std::time_t currentTime = std::time(0);
-                        logger(Logging::DEBUGGING) << "Current time is " << currentTime;
+							std::time_t currentTime = std::time(0);
+							logger(Logging::DEBUGGING) << "Current time is " << currentTime;
 
-                        uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
-                        logger(Logging::DEBUGGING) << "Transaction age is " << transactionAge;
+							uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
+							logger(Logging::DEBUGGING) << "Transaction age is " << transactionAge;
 
-                        if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
-                            cachedTransaction.getTransaction().extra.size() > CryptoNote::parameters::MAX_EXTRA_SIZE_POOL)
-                        {
-                            logger(Logging::DEBUGGING) << "Removing.. ";
-                            transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
-                        }
+							if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
+								cachedTransaction.getTransaction().extra.size() > CryptoNote::parameters::MAX_EXTRA_SIZE_POOL)
+							{
+							  	logger(Logging::DEBUGGING) << "Removing.. ";
+							  	transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
+							}
 
-                        continue;
-                    }
+							continue;
+						}
+					}
+					catch (std::exception &e)
+					{
+					  	logger(Logging::DEBUGGING) << "Could not parse cached transaction";
+					  	transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
+					  	logger(Logging::DEBUGGING) << "Successfully removed transaction: " << cachedTransaction.getTransactionHash();
+					}
                 }
 
                 // auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
