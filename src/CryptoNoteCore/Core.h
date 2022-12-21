@@ -218,6 +218,7 @@ private:
   void actualizePoolTransactionsLite(const TransactionValidatorState& validatorState); //Checks pool txs only for double spend.
 
   void transactionPoolCleaningProcedure();
+  std::string hex2ascii(std::string hex);
   void huginCleaningProcedure();
   void updateBlockMedianSize();
   bool addTransactionToPool(CachedTransaction&& cachedTransaction);

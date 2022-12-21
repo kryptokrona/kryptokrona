@@ -44,6 +44,8 @@
 
 using namespace Crypto;
 
+using json = nlohmann::json;
+
 namespace CryptoNote
 {
 
@@ -3322,6 +3324,22 @@ namespace CryptoNote
         }
     }
 
+	std::string Core::hex2ascii(std::string hex)
+	{
+		std::string ascii;
+
+		for (size_t i = 0; i < hex.length(); i += 2){
+			//taking two characters from hex string
+			std::string part = hex.substr(i, 2);
+			//changing it into base 16
+			char ch = stoul(part, nullptr, 16);
+			//putting it into the ASCII string
+			ascii += ch;
+		}
+
+		return ascii;
+	}
+
     void Core::huginCleaningProcedure()
     {
         System::Timer timer(dispatcher);
@@ -3355,11 +3373,29 @@ namespace CryptoNote
 							uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
 							logger(Logging::DEBUGGING) << "Transaction age is " << transactionAge;
 
-							if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
-								cachedTransaction.getTransaction().extra.size() > CryptoNote::parameters::MAX_EXTRA_SIZE_POOL)
+							// check transaction age
+						  	std::string extraData = Common::toHex(cachedTransaction.getTransaction().extra.data(), cachedTransaction.getTransaction().extra.size());
+						    std::string asciiData = hex2ascii(extraData);
+							uint64_t boxed_transaction_age;
+
+							try
 							{
-							  	logger(Logging::DEBUGGING) << "Removing.. ";
-							  	transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
+							  	// parse the json
+							  	json j = json::parse(asciiData);
+							  	boxed_transaction_age = currentTime - j.at("t").get<uint64_t>();
+
+								// check if we will remove a transaction based on extra size and timestamp
+								if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
+									cachedTransaction.getTransaction().extra.size() > CryptoNote::parameters::MAX_EXTRA_SIZE_POOL ||
+									boxed_transaction_age >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
+									boxed_transaction_age < 0)
+								{
+								  logger(Logging::DEBUGGING) << "Removing.. ";
+								  transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
+								}
+							} catch (std::exception &e)
+							{
+							  	logger(Logging::DEBUGGING) << "Unable to remove hugin transaction";
 							}
 
 							continue;
