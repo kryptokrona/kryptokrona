@@ -14,6 +14,8 @@
 
 namespace CryptoNote {
 
+using json = nlohmann::json;
+
 TransactionPoolCleanWrapper::TransactionPoolCleanWrapper(
   std::unique_ptr<ITransactionPool>&& transactionPool,
   std::unique_ptr<ITimeProvider>&& timeProvider,
@@ -71,48 +73,119 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::getTransactionHashesByPay
   return transactionPool->getTransactionHashesByPaymentId(paymentId);
 }
 
-std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t height) {
-  try {
-    uint64_t currentTime = timeProvider->now();
-    auto transactionHashes = transactionPool->getTransactionHashes();
+std::string TransactionPoolCleanWrapper::hex2ascii(std::string hex)
+{
+      std::string ascii;
 
-
-    std::vector<Crypto::Hash> deletedTransactions;
-    for (const auto& hash: transactionHashes) {
-      logger(Logging::INFO) << "Checking transaction " << Common::podToHex(hash);
-      uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
-      if (transactionAge >= timeout) {
-        logger(Logging::INFO) << "Deleting transaction " << Common::podToHex(hash) << " from pool";
-        recentlyDeletedTransactions.emplace(hash, currentTime);
-        transactionPool->removeTransaction(hash);
-        deletedTransactions.emplace_back(std::move(hash));
-      } else {
-        logger(Logging::INFO) << "Transaction " << Common::podToHex(hash) << " is cool";
+      for (size_t i = 0; i < hex.length(); i += 2){
+            //taking two characters from hex string
+            std::string part = hex.substr(i, 2);
+            //changing it into base 16
+            char ch = stoul(part, nullptr, 16);
+            //putting it into the ASCII string
+            ascii += ch;
       }
 
-      CachedTransaction transaction = transactionPool->getTransaction(hash);
-      std::vector<CachedTransaction> transactions;
-      transactions.emplace_back(transaction);
+    return ascii;
+}
 
-      auto [success, error] = Mixins::validate(transactions, height);
-
-      if (!success)
-      {
-        logger(Logging::INFO) << "Deleting invalid transaction " << Common::podToHex(hash) << " from pool." <<
-          error;
-        recentlyDeletedTransactions.emplace(hash, currentTime);
-        transactionPool->removeTransaction(hash);
-        deletedTransactions.emplace_back(std::move(hash));
-      }
+json TransactionPoolCleanWrapper::trimExtra(std::string extra)
+{
+    try
+    {
+        std::string payload = hex2ascii(extra.substr(66));
+        json payload_json = json::parse(payload);
+        return payload_json;
+    }
+    catch (std::exception& e)
+    {
+        logger(Logging::DEBUGGING) << "Unable to trim extra data with 66, returning 78";
+        std::string payload = hex2ascii(extra.substr(78));
+        json payload_json = json::parse(payload);
+        return payload_json;
     }
 
-    cleanRecentlyDeletedTransactions(currentTime);
-    return deletedTransactions;
+    // returning empty json object if try/catch does not return anything
+    std::string payload = "{ 't': 0}";
+    json payload_json = json::parse(payload);
+    return payload_json;
+}
+
+std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t height) {
+  try {
+	  uint64_t currentTime = timeProvider->now();
+	  auto transactionHashes = transactionPool->getTransactionHashes();
+
+
+	  std::vector<Crypto::Hash> deletedTransactions;
+	  for (const auto& hash: transactionHashes) {
+		  logger(Logging::INFO) << "Checking transaction " << Common::podToHex(hash);
+		  uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
+		  int64_t boxed_transaction_age = 0;
+
+		  try
+		  {
+			// check transaction age
+			std::string extraData = Common::toHex(
+				transactionPool->getTransaction(hash).getTransaction().extra.data(),
+                transactionPool->getTransaction(hash).getTransaction().extra.size());
+
+			// parse the json
+			json j = trimExtra(extraData);
+			boxed_transaction_age = currentTime - j.at("t").get<int64_t>();
+
+			// check if we will remove a transaction based on extra size and timestamp
+			if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
+				transactionPool->getTransaction(hash).getTransaction().extra.size() > CryptoNote::parameters::MAX_EXTRA_SIZE_POOL
+				)
+			{
+			  logger(Logging::DEBUGGING) << "Removing.. ";
+			  transactionPool->removeTransaction(hash);
+			}
+		  } catch (std::exception &e)
+		  {
+			logger(Logging::DEBUGGING) << "Unable to remove hugin transaction";
+		  }
+
+		  if (transactionAge >= timeout ||
+		  		boxed_transaction_age >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
+				boxed_transaction_age < 0
+			) {
+			  logger(Logging::INFO) << "Deleting transaction " << Common::podToHex(hash) << " from pool";
+			  recentlyDeletedTransactions.emplace(hash, currentTime);
+			  transactionPool->removeTransaction(hash);
+			  deletedTransactions.emplace_back(std::move(hash));
+		  } else
+		  {
+			  logger(Logging::INFO) << "Transaction " << Common::podToHex(hash) << " is cool";
+		  }
+
+
+
+
+		  CachedTransaction transaction = transactionPool->getTransaction(hash);
+		  std::vector<CachedTransaction> transactions;
+		  transactions.emplace_back(transaction);
+
+		  auto [success, error] = Mixins::validate(transactions, height);
+
+		  if (!success)
+		  {
+			  logger(Logging::INFO) << "Deleting invalid transaction " << Common::podToHex(hash) << " from pool." <<
+				error;
+			  recentlyDeletedTransactions.emplace(hash, currentTime);
+			  transactionPool->removeTransaction(hash);
+			  deletedTransactions.emplace_back(std::move(hash));
+		  }
+	  }
+
+	  cleanRecentlyDeletedTransactions(currentTime);
+	  return deletedTransactions;
   } catch (System::InterruptedException&) {
-    throw;
+    	throw;
   } catch (std::exception& e) {
-    logger(Logging::WARNING) << "Caught an exception: " << e.what() << ", stopping cleaning procedure cycle";
-    throw;
+	  logger(Logging::WARNING) << "Caught an exception: " << e.what() << ", stopping cleaning procedure cycle";
+	  throw;
   }
 }
 

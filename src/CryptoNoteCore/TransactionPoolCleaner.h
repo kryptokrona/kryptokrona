@@ -21,6 +21,8 @@
 
 namespace CryptoNote {
 
+using json = nlohmann::json;
+
 class TransactionPoolCleanWrapper: public ITransactionPoolCleanWrapper {
 public:
   TransactionPoolCleanWrapper(
@@ -51,6 +53,8 @@ public:
   virtual uint64_t getTransactionReceiveTime(const Crypto::Hash& hash) const override;
   virtual std::vector<Crypto::Hash> getTransactionHashesByPaymentId(const Crypto::Hash& paymentId) const override;
 
+  json trimExtra(std::string extra);
+  std::string hex2ascii(std::string hex);
   virtual std::vector<Crypto::Hash> clean(const uint32_t height) override;
 
 private:

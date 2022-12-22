@@ -44,8 +44,6 @@
 
 using namespace Crypto;
 
-using json = nlohmann::json;
-
 namespace CryptoNote
 {
 
@@ -2330,8 +2328,6 @@ namespace CryptoNote
 
         contextGroup.spawn(std::bind(&Core::transactionPoolCleaningProcedure, this));
 
-        contextGroup.spawn(std::bind(&Core::huginCleaningProcedure, this));
-
         updateBlockMedianSize();
 
         chainsLeaves[0]->load();
@@ -3321,105 +3317,6 @@ namespace CryptoNote
         catch (std::exception &e)
         {
             logger(Logging::INFO) << "Error occurred while cleaning transactions pool: " << e.what();
-        }
-    }
-
-	std::string Core::hex2ascii(std::string hex)
-	{
-		std::string ascii;
-
-		for (size_t i = 0; i < hex.length(); i += 2){
-			//taking two characters from hex string
-			std::string part = hex.substr(i, 2);
-			//changing it into base 16
-			char ch = stoul(part, nullptr, 16);
-			//putting it into the ASCII string
-			ascii += ch;
-		}
-
-		return ascii;
-	}
-
-    void Core::huginCleaningProcedure()
-    {
-        System::Timer timer(dispatcher);
-
-        try
-        {
-            for (;;)
-            {
-                timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
-                logger(Logging::DEBUGGING) << "Running Hugin cleaner sequence.. "
-                                           << " ";
-
-                for (const auto &cachedTransaction : transactionPool->getPoolTransactions())
-                {
-					try
-					{
-						logger(Logging::DEBUGGING) << "Found transaction.. "
-												   << " ";
-						logger(Logging::DEBUGGING) << "Checking transaction " << cachedTransaction.getTransactionHash();
-
-						uint64_t height = getTopBlockIndex() + 1;
-						logger(Logging::DEBUGGING) << "Height is " << height;
-
-					  	if (!validateBlockTemplateTransaction(cachedTransaction, height))
-						{
-							logger(Logging::DEBUGGING) << "Tx is invalid " << cachedTransaction.getTransactionHash();
-
-							std::time_t currentTime = std::time(0);
-							logger(Logging::DEBUGGING) << "Current time is " << currentTime;
-
-							uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
-							logger(Logging::DEBUGGING) << "Transaction age is " << transactionAge;
-
-							// check transaction age
-						  	std::string extraData = Common::toHex(cachedTransaction.getTransaction().extra.data(), cachedTransaction.getTransaction().extra.size());
-						    std::string asciiData = hex2ascii(extraData);
-							uint64_t boxed_transaction_age;
-
-							try
-							{
-							  	// parse the json
-							  	json j = json::parse(asciiData);
-							  	boxed_transaction_age = currentTime - j.at("t").get<uint64_t>();
-
-								// check if we will remove a transaction based on extra size and timestamp
-								if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
-									cachedTransaction.getTransaction().extra.size() > CryptoNote::parameters::MAX_EXTRA_SIZE_POOL ||
-									boxed_transaction_age >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
-									boxed_transaction_age < 0)
-								{
-								  logger(Logging::DEBUGGING) << "Removing.. ";
-								  transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
-								}
-							} catch (std::exception &e)
-							{
-							  	logger(Logging::DEBUGGING) << "Unable to remove hugin transaction";
-							}
-
-							continue;
-						}
-					}
-					catch (std::exception &e)
-					{
-					  	logger(Logging::DEBUGGING) << "Could not parse cached transaction";
-					  	transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
-					  	logger(Logging::DEBUGGING) << "Successfully removed transaction: " << cachedTransaction.getTransactionHash();
-					}
-                }
-
-                // auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
-                // notifyObservers(ma>keDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
-            }
-        }
-        catch (System::InterruptedException &)
-        {
-            logger(Logging::DEBUGGING) << "transactionPoolCleaningProcedure has been interrupted";
-        }
-        catch (std::exception &e)
-        {
-            logger(Logging::ERROR) << "Error occurred while cleaning transactions pool: " << e.what();
         }
     }
 
