@@ -99,14 +99,22 @@ json TransactionPoolCleanWrapper::trimExtra(std::string extra)
     }
     catch (std::exception& e)
     {
-        logger(Logging::DEBUGGING) << "Unable to trim extra data with 66, returning 78";
+        logger(Logging::DEBUGGING) << "Unable to trim extra data with 66";
+    }
+
+    try
+    {
         std::string payload = hex2ascii(extra.substr(78));
         json payload_json = json::parse(payload);
         return payload_json;
     }
+    catch (std::exception& e)
+    {
+        logger(Logging::DEBUGGING) << "Unable to trim extra data with 78";
+    }
 
     // returning empty json object if try/catch does not return anything
-    std::string payload = "{ 't': 0}";
+    std::string payload = "{ 't': 0 }";
     json payload_json = json::parse(payload);
     return payload_json;
 }
@@ -115,13 +123,13 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t heig
   try {
 	  uint64_t currentTime = timeProvider->now();
 	  auto transactionHashes = transactionPool->getTransactionHashes();
-
-
 	  std::vector<Crypto::Hash> deletedTransactions;
+      uint64_t boxed_transaction_age;
+
 	  for (const auto& hash: transactionHashes) {
 		  logger(Logging::INFO) << "Checking transaction " << Common::podToHex(hash);
 		  uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
-		  int64_t boxed_transaction_age = 0;
+          boxed_transaction_age = 0;
 
 		  try
 		  {
@@ -132,7 +140,8 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t heig
 
 			// parse the json
 			json j = trimExtra(extraData);
-			boxed_transaction_age = currentTime - j.at("t").get<int64_t>();
+            uint64_t box_time = j.at("t").get<uint64_t>();
+			boxed_transaction_age = currentTime - box_time;
 
 			// check if we will remove a transaction based on extra size and timestamp
 			if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME ||
@@ -140,7 +149,9 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t heig
 				)
 			{
 			  logger(Logging::DEBUGGING) << "Removing.. ";
-			  transactionPool->removeTransaction(hash);
+              recentlyDeletedTransactions.emplace(hash, currentTime);
+              transactionPool->removeTransaction(hash);
+              deletedTransactions.emplace_back(std::move(hash));
 			}
 		  } catch (std::exception &e)
 		  {
@@ -159,9 +170,6 @@ std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t heig
 		  {
 			  logger(Logging::INFO) << "Transaction " << Common::podToHex(hash) << " is cool";
 		  }
-
-
-
 
 		  CachedTransaction transaction = transactionPool->getTransaction(hash);
 		  std::vector<CachedTransaction> transactions;
