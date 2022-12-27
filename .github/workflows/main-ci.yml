@@ -38,17 +38,17 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Dependencies
-        if: matrix.config.os == 'ubuntu-22.04'
+        if: matrix.config.name == 'ubuntu-20.04' || matrix.config.name == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
       - name: mkdir build
-        if: matrix.config.os == 'ubuntu-22.04'
+        if: matrix.config.name == 'ubuntu-20.04' || matrix.config.name == 'ubuntu-22.04'
         run: mkdir build
 
       - name: Build Ubuntu Target
-        if: matrix.config.os == 'ubuntu-22.04'
+        if: matrix.config.name == 'ubuntu-20.04' || matrix.config.name == 'ubuntu-22.04'
         run: |
           cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64 .. # add flag -DBoost_DEBUG=ON to debug
           make -j$(nproc) --ignore-errors
