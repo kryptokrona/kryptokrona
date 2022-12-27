@@ -3300,13 +3300,12 @@ namespace CryptoNote
             {
                 timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
 
-                logger(Logging::INFO) << "Running pool transaction cleaning sequence.. "
-                                      << " ";
+                logger(Logging::INFO) << "Running pool transaction cleaning sequence... ";
 
                 auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
 
-                logger(Logging::INFO) << "Got some bad transactions.. "
-                                      << " ";
+                logger(Logging::INFO) << "Pool transaction cleaning sequence, done... ";
+
                 notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
             }
         }
