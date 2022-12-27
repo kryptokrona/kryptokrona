@@ -139,7 +139,6 @@ namespace CryptoNote
             uint64_t currentTime = timeProvider->now();
             auto transactionHashes = transactionPool->getTransactionHashes();
             std::vector<Crypto::Hash> deletedTransactions;
-            // deletedTransactions.reserve(20000);
             uint64_t boxed_transaction_age;
             uint64_t transaction_extra_data_size;
 
