@@ -1,71 +1,34 @@
 name: Kryptokrona Pull Request Pipeline
 
-on: [ pull_request ]
+on: [pull_request]
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
+    name: "Build: ${{ matrix.config.name }} / ${{ matrix.platform }}"
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: true
       matrix:
         config:
-          # - {
-          #   name: "Windows Latest MSVC", artifact: "Windows-MSVC.7z",
-          #   os: windows-latest,
-          #   cc: "cl", cxx: "cl",
-          #   environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          # }
-          # - {
-          #   name: "Windows Latest MinGW", artifact: "Windows-MinGW.7z",
-          #   os: windows-latest,
-          #   cc: "gcc", cxx: "g++"
-          # }
           - {
-            name: "Ubuntu Latest GCC", artifact: "Linux.7z",
-            os: ubuntu-22.04,
-            cc: "gcc", cxx: "g++"
-          }
-    #       - {
-    #         name: "macOS Latest Clang", artifact: "macOS.7z",
-    #         os: macos-latest,
-    #         cc: "clang", cxx: "clang++"
-    #       }
+              name: "Ubuntu 20.04 GCC",
+              artifact: "kryptokrona-ubuntu-20.zip",
+              os: ubuntu-20.04,
+              cc: "gcc",
+              cxx: "g++",
+              platform: x64,
+            }
+          - {
+              name: "Ubuntu 22.04 GCC",
+              artifact: "kryptokrona-ubuntu-22.zip",
+              os: ubuntu-22.04,
+              cc: "gcc",
+              cxx: "g++",
+              platform: x64,
+            }
     steps:
       - uses: actions/checkout@v2
 
-      # # Windows MSVC
-      # - name: Install Dependencies
-      #   if: matrix.config.os == 'windows-latest'
-      #   uses: microsoft/setup-msbuild@v1.1
-      #   with:
-      #     msbuild-architecture: x64
-
-      # # need to test this on a windows computer first (do not extract the files yet)
-      # - name: Install Boost
-      #   if: matrix.config.os == 'windows-latest'
-      #   run: |
-      #     Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip -OutFile 'c:\boost_1_74_0.zip'
-      #     Expand-Archive c:\boost_1_74_0.zip -DestinationPath c:\Boost\boost_1_74_0
-      #     Start-Process -FilePath "c:\Boost\boost_1_74_0\boost_1_74_0\tools\build\bootstrap.bat" -ArgumentList 'mingw' -Wait -NoNewWindow
-      #     b2 variant=release address-model=64 link=static,shared
-
-      # - name: mkdir build
-      #   if: matrix.config.os == 'windows-latest'
-      #   run: mkdir build
-
-      # - name: Build Windows Target using Visual C++
-      #   if: matrix.config.os == 'windows-latest'
-      #   working-directory: build
-      #   run: |
-      #     cmake -G "Visual Studio 17 2022" -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBOOST_ROOT=C:/Boost/boost_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
-
-      # Windows MinGW
-      #- name: Install Dependencies
-      #  if: matrix.config.os == 'windows-latest'
-      #  run: d
-
-      # Ubuntu 22.04
       - name: Install Dependencies
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
@@ -83,16 +46,10 @@ jobs:
           make -j$(nproc) --ignore-errors
         working-directory: build
 
-      # MacOS
-      #- name: Install Dependencies
-      #  if: matrix.config.os == 'ubuntu-22.04'
-      #  run: d
-
-
   test:
     name: Tests
     runs-on: ubuntu-22.04
-    needs: [ build ]
+    needs: [build]
     steps:
       - uses: actions/checkout@v2
 
