@@ -11,6 +11,14 @@ jobs:
       matrix:
         config:
           - {
+              name: "Windows 2019 MSVC",
+              artifact: "windows-MSVC.7z",
+              os: windows-2019,
+              cc: "cl",
+              cxx: "cl",
+              environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            }
+          - {
               name: "Ubuntu 20.04 GCC",
               artifact: "kryptokrona-ubuntu-20.zip",
               os: ubuntu-20.04,
@@ -29,6 +37,35 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      # Windows
+      - name: Install Dependencies
+        if: matrix.config.os == 'windows-2019'
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
+
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.4.3
+        if: matrix.config.os == 'windows-2019'
+        id: install-boost
+        with:
+          boost_version: 1.74.0
+          boost_install_dir: C:\boost_1_74_0
+          platform_version: 2019
+
+      - name: Build windows Target using Visual C++
+        if: matrix.config.os == 'windows-2019'
+        run: |
+          cmake . -G "Visual Studio 16 2019" -B build -DCMAKE_BUILD_TYPE=Release -DBoost_LIBRARY_DIRS=${{ steps.install-boost.outputs.BOOST_ROOT }}\lib -DBoost_INCLUDE_DIR=${{ steps.install-boost.outputs.BOOST_ROOT }}\include\boost-1_74\boost -DBOOST_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }}
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+
+      - name: Make
+        if: matrix.config.os == 'windows-2019'
+        run: cmake --build . --config Release
+        working-directory: build
+
+      # Ubuntu
       - name: "Install ${{ matrix.config.name }} Dependencies "
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
