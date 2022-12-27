@@ -26,69 +26,76 @@
 
 #include "Serialization/SerializationTools.h"
 
-namespace CryptoNote {
+namespace CryptoNote
+{
 
-class ConnectException : public std::runtime_error  {
-public:
-  ConnectException(const std::string& whatArg);
-};
+    class ConnectException : public std::runtime_error
+    {
+    public:
+        ConnectException(const std::string &whatArg);
+    };
 
-class HttpClient {
-public:
+    class HttpClient
+    {
+    public:
+        HttpClient(System::Dispatcher &dispatcher, const std::string &address, uint16_t port);
+        ~HttpClient();
+        void request(const HttpRequest &req, HttpResponse &res);
 
-  HttpClient(System::Dispatcher& dispatcher, const std::string& address, uint16_t port);
-  ~HttpClient();
-  void request(const HttpRequest& req, HttpResponse& res);
-  
-  bool isConnected() const;
+        bool isConnected() const;
 
-private:
-  void connect();
-  void disconnect();
+    private:
+        void connect();
+        void disconnect();
 
-  const std::string m_address;
-  const uint16_t m_port;
+        const std::string m_address;
+        const uint16_t m_port;
 
-  bool m_connected = false;
-  System::Dispatcher& m_dispatcher;
-  System::TcpConnection m_connection;
-  std::unique_ptr<System::TcpStreambuf> m_streamBuf;
-  
-  /* Don't send two requests at once */
-  std::mutex m_mutex;
-};
+        bool m_connected = false;
+        System::Dispatcher &m_dispatcher;
+        System::TcpConnection m_connection;
+        std::unique_ptr<System::TcpStreambuf> m_streamBuf;
 
-template <typename Request, typename Response>
-void invokeJsonCommand(HttpClient& client, const std::string& url, const Request& req, Response& res) {
-  HttpRequest hreq;
-  HttpResponse hres;
+        /* Don't send two requests at once */
+        std::mutex m_mutex;
+    };
 
-  hreq.addHeader("Content-Type", "application/json");
-  hreq.setUrl(url);
-  hreq.setBody(storeToJson(req));
-  client.request(hreq, hres);
+    template <typename Request, typename Response>
+    void invokeJsonCommand(HttpClient &client, const std::string &url, const Request &req, Response &res)
+    {
+        HttpRequest hreq;
+        HttpResponse hres;
 
-  if (hres.getStatus() != HttpResponse::STATUS_200) {
-    throw std::runtime_error("HTTP status: " + std::to_string(hres.getStatus()));
-  }
+        hreq.addHeader("Content-Type", "application/json");
+        hreq.setUrl(url);
+        hreq.setBody(storeToJson(req));
+        client.request(hreq, hres);
 
-  if (!loadFromJson(res, hres.getBody())) {
-    throw std::runtime_error("Failed to parse JSON response");
-  }
-}
+        if (hres.getStatus() != HttpResponse::STATUS_200)
+        {
+            throw std::runtime_error("HTTP status: " + std::to_string(hres.getStatus()));
+        }
 
-template <typename Request, typename Response>
-void invokeBinaryCommand(HttpClient& client, const std::string& url, const Request& req, Response& res) {
-  HttpRequest hreq;
-  HttpResponse hres;
+        if (!loadFromJson(res, hres.getBody()))
+        {
+            throw std::runtime_error("Failed to parse JSON response");
+        }
+    }
 
-  hreq.setUrl(url);
-  hreq.setBody(storeToBinaryKeyValue(req));
-  client.request(hreq, hres);
+    template <typename Request, typename Response>
+    void invokeBinaryCommand(HttpClient &client, const std::string &url, const Request &req, Response &res)
+    {
+        HttpRequest hreq;
+        HttpResponse hres;
 
-  if (!loadFromBinaryKeyValue(res, hres.getBody())) {
-    throw std::runtime_error("Failed to parse binary response");
-  }
-}
+        hreq.setUrl(url);
+        hreq.setBody(storeToBinaryKeyValue(req));
+        client.request(hreq, hres);
+
+        if (!loadFromBinaryKeyValue(res, hres.getBody()))
+        {
+            throw std::runtime_error("Failed to parse binary response");
+        }
+    }
 
 }

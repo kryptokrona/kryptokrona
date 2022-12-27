@@ -20,16 +20,18 @@
 #include <ostream>
 #include "IOutputStream.h"
 
-namespace Common {
+namespace Common
+{
 
-class StdOutputStream : public IOutputStream {
-public:
-  StdOutputStream(std::ostream& out);
-  StdOutputStream& operator=(const StdOutputStream&) = delete;
-  uint64_t writeSome(const void* data, uint64_t size) override;
+    class StdOutputStream : public IOutputStream
+    {
+    public:
+        StdOutputStream(std::ostream &out);
+        StdOutputStream &operator=(const StdOutputStream &) = delete;
+        uint64_t writeSome(const void *data, uint64_t size) override;
 
-private:
-  std::ostream& out;
-};
+    private:
+        std::ostream &out;
+    };
 
 }

@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////
@@ -15,7 +15,7 @@
 #include <zedwallet/Sync.h>
 #include <zedwallet/Tools.h>
 
-template<typename T>
+template <typename T>
 std::string parseCommand(const std::vector<T> &printableCommands,
                          const std::vector<T> &availableCommands,
                          std::string prompt,
@@ -27,8 +27,7 @@ std::string parseCommand(const std::vector<T> &printableCommands,
         /* Get the input, and refresh the wallet in the background if desired
            (This will be done on the main screen, but not the launch screen) */
         std::string selection = getInputAndWorkInBackground(
-            availableCommands, prompt, backgroundRefresh, walletInfo
-        );
+            availableCommands, prompt, backgroundRefresh, walletInfo);
 
         /* Convert to lower case */
         std::transform(selection.begin(), selection.end(), selection.begin(),
@@ -114,8 +113,8 @@ std::string parseCommand(const std::vector<T> &printableCommands,
 }
 
 std::tuple<bool, std::shared_ptr<WalletInfo>>
-    selectionScreen(Config &config, CryptoNote::WalletGreen &wallet,
-                    CryptoNote::INode &node)
+selectionScreen(Config &config, CryptoNote::WalletGreen &wallet,
+                CryptoNote::INode &node)
 {
     while (true)
     {
@@ -130,8 +129,7 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
 
         /* Handle the user input */
         std::shared_ptr<WalletInfo> walletInfo = handleLaunchCommand(
-            wallet, launchCommand, config
-        );
+            wallet, launchCommand, config);
 
         /* Action failed, for example wallet file is corrupted. */
         if (walletInfo == nullptr)
@@ -147,7 +145,7 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
         {
             return {true, nullptr};
         }
-    
+
         /* If we're creating a wallet, don't print the lengthy sync process */
         if (launchCommand == "create")
         {
@@ -172,12 +170,11 @@ std::tuple<bool, std::shared_ptr<WalletInfo>>
             bool alreadyShuttingDown = false;
 
             Tools::SignalHandler::install([&]
-            {
+                                          {
                 if (shutdown(walletInfo, node, alreadyShuttingDown))
                 {
                     exit(0);
-                }
-            });
+                } });
 
             syncWallet(node, walletInfo);
         }
@@ -194,15 +191,18 @@ bool checkNodeStatus(CryptoNote::INode &node)
         std::stringstream msg;
 
         msg << "It looks like " << WalletConfig::daemonName << " isn't open!"
-            << std::endl << std::endl
+            << std::endl
+            << std::endl
             << "Ensure " << WalletConfig::daemonName
             << " is open and has finished initializing." << std::endl
             << "If it's still not working, try restarting "
             << WalletConfig::daemonName << "."
             << "The daemon sometimes gets stuck."
-            << std::endl << "Alternatively, perhaps "
+            << std::endl
+            << "Alternatively, perhaps "
             << WalletConfig::daemonName << " can't communicate with any peers."
-            << std::endl << std::endl
+            << std::endl
+            << std::endl
             << "The wallet can't function fully until it can communicate with "
             << "the network.";
 
@@ -261,7 +261,7 @@ void mainLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node)
     {
         printCommands(basicCommands());
     }
-    
+
     while (true)
     {
         std::string command;
@@ -273,8 +273,7 @@ void mainLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node)
                 allViewWalletCommands(),
                 getPrompt(walletInfo),
                 true,
-                walletInfo
-            );
+                walletInfo);
         }
         else
         {
@@ -283,8 +282,7 @@ void mainLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node)
                 allCommands(),
                 getPrompt(walletInfo),
                 true,
-                walletInfo
-            );
+                walletInfo);
         }
 
         /* User exited */
@@ -295,7 +293,7 @@ void mainLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node)
     }
 }
 
-template<typename T>
+template <typename T>
 void printCommands(const std::vector<T> &commands, size_t offset)
 {
     size_t i = 1 + offset;
@@ -318,22 +316,18 @@ void printCommands(const std::vector<T> &commands, size_t offset)
 
 /* Template instantations that we are going to use - this allows us to have
    the template implementation in the .cpp file. */
-template
-std::string parseCommand(const std::vector<Command> &printableCommands,
-                         const std::vector<Command> &availableCommands,
-                         std::string prompt,
-                         bool backgroundRefresh,
-                         std::shared_ptr<WalletInfo> walletInfo);
+template std::string parseCommand(const std::vector<Command> &printableCommands,
+                                  const std::vector<Command> &availableCommands,
+                                  std::string prompt,
+                                  bool backgroundRefresh,
+                                  std::shared_ptr<WalletInfo> walletInfo);
 
-template
-std::string parseCommand(const std::vector<AdvancedCommand> &printableCommands,
-                         const std::vector<AdvancedCommand> &availableCommands,
-                         std::string prompt,
-                         bool backgroundRefresh,
-                         std::shared_ptr<WalletInfo> walletInfo);
+template std::string parseCommand(const std::vector<AdvancedCommand> &printableCommands,
+                                  const std::vector<AdvancedCommand> &availableCommands,
+                                  std::string prompt,
+                                  bool backgroundRefresh,
+                                  std::shared_ptr<WalletInfo> walletInfo);
 
-template
-void printCommands(const std::vector<Command> &commands, size_t offset);
+template void printCommands(const std::vector<Command> &commands, size_t offset);
 
-template
-void printCommands(const std::vector<AdvancedCommand> &commands, size_t offset);
+template void printCommands(const std::vector<AdvancedCommand> &commands, size_t offset);

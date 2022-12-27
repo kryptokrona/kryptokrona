@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////
@@ -33,7 +33,7 @@ void transfer(
                                 "cancel the transaction\n\n");
 
     const bool integratedAddressesAllowed(true), cancelAllowed(true);
-    
+
     const auto unlockedBalance = walletBackend->getTotalUnlockedBalance();
 
     if (sendAll && unlockedBalance <= WalletConfig::minimumSend)
@@ -46,14 +46,13 @@ void transfer(
                << Utilities::formatAmount(unlockedBalance) << "!\n";
 
         std::cout << WarningMsg(stream.str());
-        
+
         return cancel();
     }
 
     std::string address = getAddress(
         "What address do you want to transfer to?: ",
-        integratedAddressesAllowed, cancelAllowed
-    );
+        integratedAddressesAllowed, cancelAllowed);
 
     if (address == "cancel")
     {
@@ -69,8 +68,7 @@ void transfer(
         paymentID = getPaymentID(
             "What payment ID do you want to use?\n"
             "These are usually used for sending to exchanges.",
-            cancelAllowed
-        );
+            cancelAllowed);
 
         if (paymentID == "cancel")
         {
@@ -95,8 +93,7 @@ void transfer(
 
         std::tie(success, amount) = getAmountToAtomic(
             "How much " + WalletConfig::ticker + " do you want to send?: ",
-            cancelAllowed
-        );
+            cancelAllowed);
 
         std::cout << "\n";
 
@@ -152,8 +149,7 @@ void sendTransaction(
     Crypto::Hash hash;
 
     std::tie(error, hash) = walletBackend->sendTransactionBasic(
-        address, amount, paymentID
-    );
+        address, amount, paymentID);
 
     if (error == TOO_MANY_INPUTS_TO_FIT_IN_BLOCK)
     {
@@ -169,8 +165,7 @@ void sendTransaction(
 
         /* Resend the transaction */
         std::tie(error, hash) = walletBackend->sendTransactionBasic(
-            address, amount, paymentID
-        );
+            address, amount, paymentID);
 
         /* Still too big, split it up (with users approval) */
         if (error == TOO_MANY_INPUTS_TO_FIT_IN_BLOCK)
@@ -270,8 +265,7 @@ void splitTX(
         }
 
         const auto [error, hash] = walletBackend->sendTransactionBasic(
-            address, splitAmount, paymentID
-        );
+            address, splitAmount, paymentID);
 
         /* Still too big, reduce amount */
         if (error == TOO_MANY_INPUTS_TO_FIT_IN_BLOCK)
@@ -331,7 +325,7 @@ bool confirmTransaction(
 
     std::cout << "You are sending "
               << SuccessMsg(Utilities::formatAmount(amount))
-              << ", with a network fee of " 
+              << ", with a network fee of "
               << SuccessMsg(Utilities::formatAmount(WalletConfig::defaultFee))
               << ",\nand a node fee of "
               << SuccessMsg(Utilities::formatAmount(nodeFee));
@@ -344,7 +338,7 @@ bool confirmTransaction(
     {
         std::cout << ".";
     }
-    
+
     std::cout << "\n\nFROM: " << SuccessMsg(walletBackend->getWalletLocation())
               << "\nTO: " << SuccessMsg(address) << "\n\n";
 

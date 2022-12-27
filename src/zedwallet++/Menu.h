@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #pragma once
@@ -21,7 +21,7 @@ void mainLoop(
     const std::shared_ptr<WalletBackend> walletBackend,
     const std::shared_ptr<std::mutex> mutex);
 
-template<typename T>
+template <typename T>
 std::string parseCommand(
     const std::vector<T> &printableCommands,
     const std::vector<T> &availableCommands,
@@ -42,7 +42,7 @@ std::string parseCommand(
         }
 
         int selectionNum;
-        
+
         bool isNumericInput;
 
         try
@@ -90,10 +90,10 @@ std::string parseCommand(
         {
             /* Find the command by command name */
             auto it = std::find_if(availableCommands.begin(), availableCommands.end(),
-            [&selection](const auto command)
-            {
-                return command.commandName == selection;
-            });
+                                   [&selection](const auto command)
+                                   {
+                                       return command.commandName == selection;
+                                   });
 
             /* Command doesn't exist in availableCommands */
             if (it == availableCommands.end())
@@ -112,7 +112,7 @@ std::string parseCommand(
     }
 }
 
-template<typename T>
+template <typename T>
 void printCommands(const std::vector<T> &commands, size_t offset = 0)
 {
     size_t i = 1 + offset;

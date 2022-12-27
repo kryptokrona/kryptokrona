@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
             app.start();
         }
-        catch (const std::exception& e)
+        catch (const std::exception &e)
         {
             std::cout << "Unhandled exception caught: " << e.what()
                       << "\nAttempting to relaunch..." << std::endl;

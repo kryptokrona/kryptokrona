@@ -31,13 +31,13 @@ int main(int argc, char **argv)
     try
     {
         /* Trigger the shutdown signal if ctrl+c is used */
-        Tools::SignalHandler::install([&ctrl_c] { ctrl_c = true; });
+        Tools::SignalHandler::install([&ctrl_c]
+                                      { ctrl_c = true; });
 
         /* Init the API */
         api = std::make_shared<ApiDispatcher>(
             config.port, config.rpcBindIp, config.rpcPassword,
-            config.corsHeader
-        );
+            config.corsHeader);
 
         /* Launch the API */
         apiThread = std::thread(&ApiDispatcher::start, api.get());

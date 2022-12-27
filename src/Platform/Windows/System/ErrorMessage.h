@@ -19,9 +19,10 @@
 
 #include <string>
 
-namespace System {
+namespace System
+{
 
-std::string lastErrorMessage();
-std::string errorMessage(int);
+    std::string lastErrorMessage();
+    std::string errorMessage(int);
 
 }

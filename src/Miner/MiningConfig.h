@@ -10,25 +10,26 @@
 #include <cstdint>
 #include <string>
 
-namespace CryptoNote {
-
-struct MiningConfig
+namespace CryptoNote
 {
-    MiningConfig();
 
-    void parse(int argc, char** argv);
+    struct MiningConfig
+    {
+        MiningConfig();
 
-    std::string miningAddress;
-    std::string daemonAddress;
-    std::string daemonHost;
-    int daemonPort;
-    size_t threadCount;
-    size_t scanPeriod;
-    size_t blocksLimit;
-    uint64_t firstBlockTimestamp;
-    int64_t blockTimestampInterval;
-    bool help;
-    bool version;
-};
+        void parse(int argc, char **argv);
 
-} //namespace CryptoNote
+        std::string miningAddress;
+        std::string daemonAddress;
+        std::string daemonHost;
+        int daemonPort;
+        size_t threadCount;
+        size_t scanPeriod;
+        size_t blocksLimit;
+        uint64_t firstBlockTimestamp;
+        int64_t blockTimestampInterval;
+        bool help;
+        bool version;
+    };
+
+} // namespace CryptoNote

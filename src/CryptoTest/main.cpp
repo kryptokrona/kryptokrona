@@ -16,7 +16,7 @@
 #include "Common/StringTools.h"
 #include "crypto/crypto.h"
 
-#define PERFORMANCE_ITERATIONS  1000
+#define PERFORMANCE_ITERATIONS 1000
 #define PERFORMANCE_ITERATIONS_LONG_MULTIPLIER 10
 
 using namespace Crypto;
@@ -50,102 +50,98 @@ const std::string CN_TURTLE_LITE_SLOW_HASH_V0 = "5e1891a15d5d85c09baf4a3bbe33675
 const std::string CN_TURTLE_LITE_SLOW_HASH_V1 = "ae7f864a7a2f2b07dcef253581e60a014972b9655a152341cb989164761c180a";
 const std::string CN_TURTLE_LITE_SLOW_HASH_V2 = "b2172ec9466e1aee70ec8572a14c233ee354582bcb93f869d429744de5726a26";
 
-
 const std::string CN_SOFT_SHELL_V0[] = {
-  "5e1891a15d5d85c09baf4a3bbe33675cfa3f77229c8ad66c01779e590528d6d3",
-  "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
-  "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
-  "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
-  "d33da3541960046e846530dcc9872b1914a62c09c7d732bff03bec481866ae48",
-  "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
-  "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
-  "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
-  "5e1891a15d5d85c09baf4a3bbe33675cfa3f77229c8ad66c01779e590528d6d3",
-  "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
-  "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
-  "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
-  "d33da3541960046e846530dcc9872b1914a62c09c7d732bff03bec481866ae48",
-  "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
-  "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
-  "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
-  "5e1891a15d5d85c09baf4a3bbe33675cfa3f77229c8ad66c01779e590528d6d3"
-};
+    "5e1891a15d5d85c09baf4a3bbe33675cfa3f77229c8ad66c01779e590528d6d3",
+    "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
+    "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
+    "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
+    "d33da3541960046e846530dcc9872b1914a62c09c7d732bff03bec481866ae48",
+    "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
+    "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
+    "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
+    "5e1891a15d5d85c09baf4a3bbe33675cfa3f77229c8ad66c01779e590528d6d3",
+    "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
+    "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
+    "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
+    "d33da3541960046e846530dcc9872b1914a62c09c7d732bff03bec481866ae48",
+    "8be48f7955eb3f9ac2275e445fe553f3ef359ea5c065cde98ff83011f407a0ec",
+    "118a03801c564d12f7e68972419303fe06f7a54ab8f44a8ce7deafbc6b1b5183",
+    "e1239347694df77cab780b7ec8920ec6f7e48ecef1d8c368e06708c08e1455f1",
+    "5e1891a15d5d85c09baf4a3bbe33675cfa3f77229c8ad66c01779e590528d6d3"};
 
 const std::string CN_SOFT_SHELL_V1[] = {
-  "ae7f864a7a2f2b07dcef253581e60a014972b9655a152341cb989164761c180a",
-  "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
-  "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
-  "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
-  "d37e2785ab7b3d0a222940bf675248e7b96054de5c82c5f0b141014e136eadbc",
-  "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
-  "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
-  "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
-  "ae7f864a7a2f2b07dcef253581e60a014972b9655a152341cb989164761c180a",
-  "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
-  "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
-  "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
-  "d37e2785ab7b3d0a222940bf675248e7b96054de5c82c5f0b141014e136eadbc",
-  "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
-  "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
-  "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
-  "ae7f864a7a2f2b07dcef253581e60a014972b9655a152341cb989164761c180a"
-};
+    "ae7f864a7a2f2b07dcef253581e60a014972b9655a152341cb989164761c180a",
+    "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
+    "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
+    "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
+    "d37e2785ab7b3d0a222940bf675248e7b96054de5c82c5f0b141014e136eadbc",
+    "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
+    "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
+    "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
+    "ae7f864a7a2f2b07dcef253581e60a014972b9655a152341cb989164761c180a",
+    "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
+    "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
+    "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
+    "d37e2785ab7b3d0a222940bf675248e7b96054de5c82c5f0b141014e136eadbc",
+    "02576f9873dc9c8b1b0fc14962982734dfdd41630fc936137a3562b8841237e1",
+    "ddb6011d400ac8725995fb800af11646bb2fef0d8b6136b634368ad28272d7f4",
+    "ce8687bdd08c49bd1da3a6a74bf28858670232c1a0173ceb2466655250f9c56d",
+    "ae7f864a7a2f2b07dcef253581e60a014972b9655a152341cb989164761c180a"};
 
 const std::string CN_SOFT_SHELL_V2[] = {
-  "b2172ec9466e1aee70ec8572a14c233ee354582bcb93f869d429744de5726a26",
-  "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
-  "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
-  "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
-  "3fedc7ab0f8d14122fc26062de1af7a6165755fcecdf0f12fa3ccb3ff63629d0",
-  "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
-  "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
-  "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
-  "b2172ec9466e1aee70ec8572a14c233ee354582bcb93f869d429744de5726a26",
-  "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
-  "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
-  "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
-  "3fedc7ab0f8d14122fc26062de1af7a6165755fcecdf0f12fa3ccb3ff63629d0",
-  "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
-  "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
-  "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
-  "b2172ec9466e1aee70ec8572a14c233ee354582bcb93f869d429744de5726a26"
-};
+    "b2172ec9466e1aee70ec8572a14c233ee354582bcb93f869d429744de5726a26",
+    "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
+    "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
+    "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
+    "3fedc7ab0f8d14122fc26062de1af7a6165755fcecdf0f12fa3ccb3ff63629d0",
+    "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
+    "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
+    "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
+    "b2172ec9466e1aee70ec8572a14c233ee354582bcb93f869d429744de5726a26",
+    "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
+    "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
+    "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
+    "3fedc7ab0f8d14122fc26062de1af7a6165755fcecdf0f12fa3ccb3ff63629d0",
+    "4646f9919791c28f0915bc0005ed619bee31d42359f7a8af5de5e1807e875364",
+    "141878a7b58b0f57d00b8fc2183cce3517d9d68becab6fee52abb3c1c7d0805b",
+    "b2623a2b041dc5ae3132b964b75e193558c7095e725d882a3946aae172179cf1",
+    "b2172ec9466e1aee70ec8572a14c233ee354582bcb93f869d429744de5726a26"};
 
 static inline bool CompareHashes(const Hash leftHash, const std::string right)
 {
-  Hash rightHash = Hash();
-  if (!Common::podFromHex(right, rightHash)) {
-    return false;
-  }
+    Hash rightHash = Hash();
+    if (!Common::podFromHex(right, rightHash))
+    {
+        return false;
+    }
 
-  return (leftHash == rightHash);
+    return (leftHash == rightHash);
 }
 
 /* Check if we're testing a v1 or v2 hash function */
 /* Hacky as fuck lmao */
 bool need43BytesOfData(std::string hashFunctionName)
 {
-    return (hashFunctionName.find("v1") != std::string::npos 
-        || hashFunctionName.find("v2") != std::string::npos);
+    return (hashFunctionName.find("v1") != std::string::npos || hashFunctionName.find("v2") != std::string::npos);
 }
 
 /* Bit of hackery so we can get the variable name of the passed in function.
    This way we can print the test we are currently performing. */
 #define TEST_HASH_FUNCTION(hashFunction, expectedOutput) \
-   testHashFunction(hashFunction, expectedOutput, #hashFunction, -1)
+    testHashFunction(hashFunction, expectedOutput, #hashFunction, -1)
 
 #define TEST_HASH_FUNCTION_WITH_HEIGHT(hashFunction, expectedOutput, height) \
     testHashFunction(hashFunction, expectedOutput, #hashFunction, height, height)
 
-template<typename T, typename ...Args>
+template <typename T, typename... Args>
 void testHashFunction(
     T hashFunction,
     std::string expectedOutput,
     std::string hashFunctionName,
     int64_t height,
-    Args && ... args)
+    Args &&...args)
 {
-    const BinaryArray& rawData = Common::fromHex(INPUT_DATA);
+    const BinaryArray &rawData = Common::fromHex(INPUT_DATA);
 
     if (need43BytesOfData(hashFunctionName) && rawData.size() < 43)
     {
@@ -173,12 +169,12 @@ void testHashFunction(
 /* Bit of hackery so we can get the variable name of the passed in function.
    This way we can print the test we are currently performing. */
 #define BENCHMARK(hashFunction, iterations) \
-   benchmark(hashFunction, #hashFunction, iterations)
+    benchmark(hashFunction, #hashFunction, iterations)
 
-template<typename T>
+template <typename T>
 void benchmark(T hashFunction, std::string hashFunctionName, uint64_t iterations)
 {
-    const BinaryArray& rawData = Common::fromHex(INPUT_DATA);
+    const BinaryArray &rawData = Common::fromHex(INPUT_DATA);
 
     if (need43BytesOfData(hashFunctionName) && rawData.size() < 43)
     {
@@ -262,29 +258,26 @@ void benchmarkGenerateKeyDerivation()
     std::cout << "Time to perform generateKeyDerivation: " << timePerDerivation / 1000.0 << " ms" << std::endl;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     bool o_help, o_version, o_benchmark;
     int o_iterations;
 
     cxxopts::Options options(argv[0], getProjectCLIHeader());
 
-    options.add_options("Core")
-        ("h,help", "Display this help message", cxxopts::value<bool>(o_help)->implicit_value("true"))
-        ("v,version", "Output software version information", cxxopts::value<bool>(o_version)->default_value("false")->implicit_value("true"));
+    options.add_options("Core")("h,help", "Display this help message", cxxopts::value<bool>(o_help)->implicit_value("true"))("v,version", "Output software version information", cxxopts::value<bool>(o_version)->default_value("false")->implicit_value("true"));
 
-    options.add_options("Performance Testing")
-        ("b,benchmark", "Run quick performance benchmark", cxxopts::value<bool>(o_benchmark)->default_value("false")->implicit_value("true"))
-        ("i,iterations", "The number of iterations for the benchmark test. Minimum of 1,000 iterations required.",
-            cxxopts::value<int>(o_iterations)->default_value(std::to_string(PERFORMANCE_ITERATIONS)), "#");
+    options.add_options("Performance Testing")("b,benchmark", "Run quick performance benchmark", cxxopts::value<bool>(o_benchmark)->default_value("false")->implicit_value("true"))("i,iterations", "The number of iterations for the benchmark test. Minimum of 1,000 iterations required.",
+                                                                                                                                                                                    cxxopts::value<int>(o_iterations)->default_value(std::to_string(PERFORMANCE_ITERATIONS)), "#");
 
     try
     {
         auto result = options.parse(argc, argv);
     }
-    catch (const cxxopts::OptionException& e)
+    catch (const cxxopts::OptionException &e)
     {
-        std::cout << "Error: Unable to parse command line argument options: " << e.what() << std::endl << std::endl;
+        std::cout << "Error: Unable to parse command line argument options: " << e.what() << std::endl
+                  << std::endl;
         std::cout << options.help({}) << std::endl;
         exit(1);
     }
@@ -302,7 +295,8 @@ int main(int argc, char** argv)
 
     if (o_iterations < 1000 && o_benchmark)
     {
-        std::cout << std::endl << "Error: The number of --iterations should be at least 1,000 for reasonable accuracy" << std::endl;
+        std::cout << std::endl
+                  << "Error: The number of --iterations should be at least 1,000 for reasonable accuracy" << std::endl;
         exit(1);
     }
 
@@ -312,12 +306,13 @@ int main(int argc, char** argv)
     {
         std::cout << getProjectCLIHeader() << std::endl;
 
-        std::cout << "Input: " << INPUT_DATA << std::endl << std::endl;
+        std::cout << "Input: " << INPUT_DATA << std::endl
+                  << std::endl;
 
         TEST_HASH_FUNCTION(cn_slow_hash_v0, CN_SLOW_HASH_V0);
         TEST_HASH_FUNCTION(cn_slow_hash_v1, CN_SLOW_HASH_V1);
         TEST_HASH_FUNCTION(cn_slow_hash_v2, CN_SLOW_HASH_V2);
-        
+
         std::cout << std::endl;
 
         TEST_HASH_FUNCTION(cn_lite_slow_hash_v0, CN_LITE_SLOW_HASH_V0);
@@ -335,7 +330,7 @@ int main(int argc, char** argv)
         TEST_HASH_FUNCTION(cn_dark_lite_slow_hash_v0, CN_DARK_LITE_SLOW_HASH_V0);
         TEST_HASH_FUNCTION(cn_dark_lite_slow_hash_v1, CN_DARK_LITE_SLOW_HASH_V1);
         TEST_HASH_FUNCTION(cn_dark_lite_slow_hash_v2, CN_DARK_LITE_SLOW_HASH_V2);
-        
+
         std::cout << std::endl;
 
         TEST_HASH_FUNCTION(cn_turtle_slow_hash_v0, CN_TURTLE_SLOW_HASH_V0);
@@ -371,7 +366,7 @@ int main(int argc, char** argv)
 
         if (o_benchmark)
         {
-            std::cout <<  "\nPerformance Tests: Please wait, this may take a while depending on your system...\n\n";
+            std::cout << "\nPerformance Tests: Please wait, this may take a while depending on your system...\n\n";
 
             benchmarkUnderivePublicKey();
             benchmarkGenerateKeyDerivation();
@@ -401,8 +396,9 @@ int main(int argc, char** argv)
             BENCHMARK(cn_turtle_lite_slow_hash_v2, o_iterations_long);
         }
     }
-    catch (std::exception& e)
+    catch (std::exception &e)
     {
-        std::cout << "Something went terribly wrong...\n" << e.what() << "\n\n";
+        std::cout << "Something went terribly wrong...\n"
+                  << e.what() << "\n\n";
     }
 }

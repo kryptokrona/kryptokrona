@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////
@@ -31,8 +31,7 @@ std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Con
 
         /* Handle the user input */
         std::shared_ptr<WalletBackend> walletBackend = handleLaunchCommand(
-            launchCommand, config
-        );
+            launchCommand, config);
 
         /* Action failed, for example wallet file is corrupted. */
         if (walletBackend == nullptr)
@@ -91,7 +90,7 @@ std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Con
         }
 
         const bool exit(false), sync(true);
-    
+
         /* Return the wallet info */
         return {exit, sync, walletBackend};
     }
@@ -127,8 +126,7 @@ bool checkNodeStatus(const std::shared_ptr<WalletBackend> walletBackend)
         /* See what the user wants to do */
         std::string command = parseCommand(
             nodeDownCommands(), nodeDownCommands(),
-            "What would you like to do?: "
-        );
+            "What would you like to do?: ");
 
         /* If they want to try again, check the node height again */
         if (command == "try_again")
@@ -173,8 +171,7 @@ std::string getAction(const Config &config)
     printCommands(startupCommands());
 
     return parseCommand(
-        startupCommands(), startupCommands(), "What would you like to do?: "
-    );
+        startupCommands(), startupCommands(), "What would you like to do?: ");
 }
 
 void mainLoop(
@@ -189,7 +186,7 @@ void mainLoop(
     {
         printCommands(basicCommands());
     }
-    
+
     while (true)
     {
         std::string command;
@@ -198,14 +195,12 @@ void mainLoop(
         {
             command = parseCommand(
                 basicViewWalletCommands(), allViewWalletCommands(),
-                getPrompt(walletBackend)
-            );
+                getPrompt(walletBackend));
         }
         else
         {
             command = parseCommand(
-                basicCommands(), allCommands(), getPrompt(walletBackend)
-            );
+                basicCommands(), allCommands(), getPrompt(walletBackend));
         }
 
         /* User exited */

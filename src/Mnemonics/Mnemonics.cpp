@@ -44,9 +44,9 @@ namespace Mnemonics
             Error error(
                 MNEMONIC_WRONG_LENGTH,
                 "The mnemonic seed given is the wrong length. It should be "
-                "25 words long, but it is " + std::to_string(len) + " " +
-                wordPlural + " long."
-            );
+                "25 words long, but it is " +
+                    std::to_string(len) + " " +
+                    wordPlural + " long.");
 
             return {error, Crypto::SecretKey()};
         }
@@ -63,8 +63,8 @@ namespace Mnemonics
                 Error error(
                     MNEMONIC_INVALID_WORD,
                     "The mnemonic seed given has a word that is not present "
-                    "in the english word list (" + word + ")."
-                );
+                    "in the english word list (" +
+                        word + ").");
 
                 return {error, Crypto::SecretKey()};
             }
@@ -92,9 +92,7 @@ namespace Mnemonics
 
             /* no idea what this does lol */
             const uint32_t val = static_cast<uint32_t>(
-                w1 + wlLen * (((wlLen - w1) + w2) % wlLen) + wlLen 
-                           * wlLen * (((wlLen - w2) + w3) % wlLen)
-            );
+                w1 + wlLen * (((wlLen - w1) + w2) % wlLen) + wlLen * wlLen * (((wlLen - w2) + w3) % wlLen));
 
             /* Don't know what this is testing either */
             if (!(val % wlLen == w1))
@@ -129,7 +127,7 @@ namespace Mnemonics
             /* Read the array as a uint32_t array */
             auto ptr = (uint32_t *)&privateKey.data[i];
 
-            /* Take the first element of the array (since we have already 
+            /* Take the first element of the array (since we have already
                done the offset */
             const uint32_t val = ptr[0];
 
@@ -188,7 +186,7 @@ namespace Mnemonics
         /* Hash the data */
         uint64_t hash = CRC32::crc32(trimmed);
 
-        /* Modulus the hash by the word length to get the index of the 
+        /* Modulus the hash by the word length to get the index of the
            checksum word */
         return words[hash % words.size()];
     }

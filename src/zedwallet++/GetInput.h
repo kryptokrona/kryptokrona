@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #pragma once
@@ -27,7 +27,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
     const std::string msg,
     const bool cancelAllowed);
 
-template<typename T>
+template <typename T>
 std::string getInput(
     const std::vector<T> &availableCommands,
     const std::string prompt);

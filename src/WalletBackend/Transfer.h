@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #include <CryptoNote.h>
@@ -95,7 +95,7 @@ namespace SendTransaction
         /* The transaction outputs, before converted into boost uglyness, used
            for determining key inputs from the tx that belong to us */
         std::vector<WalletTypes::KeyOutput> outputs;
-        
+
         /* The random key pair we generated */
         CryptoNote::KeyPair txKeyPair;
     };

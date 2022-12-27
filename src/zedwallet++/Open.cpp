@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////
@@ -35,7 +35,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
     {
         return nullptr;
     }
-    
+
     Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
 
     std::string address;
@@ -75,8 +75,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
     auto [error, walletBackend] = WalletBackend::importViewWallet(
         privateViewKey, address, walletFileName, walletPass, scanHeight,
-        config.host, config.port
-    );
+        config.host, config.port);
 
     if (error)
     {
@@ -92,7 +91,6 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
     std::cout << InformationMsg(stream.str()) << std::endl;
 
-
     viewWalletMsg();
 
     return walletBackend;
@@ -100,11 +98,9 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
 std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
 {
-    const Crypto::SecretKey privateSpendKey
-        = getPrivateKey("Enter your private spend key: ");
+    const Crypto::SecretKey privateSpendKey = getPrivateKey("Enter your private spend key: ");
 
-    const Crypto::SecretKey privateViewKey
-        = getPrivateKey("Enter your private view key: ");
+    const Crypto::SecretKey privateViewKey = getPrivateKey("Enter your private view key: ");
 
     const std::string walletFileName = getNewWalletFileName();
 
@@ -118,8 +114,7 @@ std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
 
     const auto [error, walletBackend] = WalletBackend::importWalletFromKeys(
         privateSpendKey, privateViewKey, walletFileName, walletPass,
-        scanHeight, config.host, config.port
-    );
+        scanHeight, config.host, config.port);
 
     if (error)
     {
@@ -149,7 +144,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
         std::getline(std::cin, mnemonicSeed);
 
         Common::trim(mnemonicSeed);
-        
+
         /* Just to check if it's valid */
         auto [error, privateSpendKey] = Mnemonics::MnemonicToPrivateKey(mnemonicSeed);
 
@@ -160,7 +155,8 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
 
         std::cout << std::endl
                   << WarningMsg(error.getErrorMessage())
-                  << std::endl << std::endl;
+                  << std::endl
+                  << std::endl;
     }
 
     const std::string walletFileName = getNewWalletFileName();
@@ -175,8 +171,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
 
     auto [error, walletBackend] = WalletBackend::importWalletFromSeed(
         mnemonicSeed, walletFileName, walletPass, scanHeight,
-        config.host, config.port
-    );
+        config.host, config.port);
 
     if (error)
     {
@@ -206,8 +201,7 @@ std::shared_ptr<WalletBackend> createWallet(const Config &config)
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 
     const auto [error, walletBackend] = WalletBackend::createWallet(
-        walletFileName, walletPass, config.host, config.port
-    );
+        walletFileName, walletPass, config.host, config.port);
 
     if (error)
     {
@@ -223,7 +217,8 @@ std::shared_ptr<WalletBackend> createWallet(const Config &config)
 
     std::cout << WarningMsg("If you lose these your wallet cannot be ")
               << WarningMsg("recreated!")
-              << std::endl << std::endl;
+              << std::endl
+              << std::endl;
 
     return walletBackend;
 }
@@ -252,17 +247,17 @@ std::shared_ptr<WalletBackend> openWallet(const Config &config)
         }
 
         const auto [error, walletBackend] = WalletBackend::openWallet(
-            walletFileName, walletPass, config.host, config.port
-        );
+            walletFileName, walletPass, config.host, config.port);
 
         if (error == WRONG_PASSWORD)
         {
             /* Don't reuse cli password */
             initial = false;
 
-            std::cout << std::endl 
+            std::cout << std::endl
                       << WarningMsg("Incorrect password! Try again.")
-                      << std::endl << std::endl;
+                      << std::endl
+                      << std::endl;
 
             continue;
         }
@@ -312,18 +307,19 @@ Crypto::SecretKey getPrivateKey(const std::string outputMsg)
 
             continue;
         }
-        else if (!Common::fromHex(privateKeyString, &privateKeyHash, 
-                  sizeof(privateKeyHash), size)
-               || size != sizeof(privateKeyHash))
+        else if (!Common::fromHex(privateKeyString, &privateKeyHash,
+                                  sizeof(privateKeyHash), size) ||
+                 size != sizeof(privateKeyHash))
         {
             std::cout << WarningMsg("Invalid private key, it is not a valid ")
                       << WarningMsg("hex string! Try again.")
-                      << std::endl << std::endl;
+                      << std::endl
+                      << std::endl;
 
             continue;
         }
 
-        privateKey = *(struct Crypto::SecretKey *) &privateKeyHash;
+        privateKey = *(struct Crypto::SecretKey *)&privateKeyHash;
 
         /* Just used for verification */
         if (!Crypto::secret_key_to_public_key(privateKey, publicKey))
@@ -333,7 +329,8 @@ Crypto::SecretKey getPrivateKey(const std::string outputMsg)
                       << WarningMsg("ed25519 curve!") << std::endl
                       << WarningMsg("Probably a typo - ensure you entered ")
                       << WarningMsg("it correctly.")
-                      << std::endl << std::endl;
+                      << std::endl
+                      << std::endl;
 
             continue;
         }
@@ -417,17 +414,19 @@ std::string getNewWalletFileName()
             if (fs::exists(walletFileName))
             {
                 std::cout << std::endl
-                          << WarningMsg("A wallet with the filename " )
+                          << WarningMsg("A wallet with the filename ")
                           << InformationMsg(walletFileName)
                           << WarningMsg(" already exists!")
                           << std::endl
-                          << "Try another name." << std::endl << std::endl;
+                          << "Try another name." << std::endl
+                          << std::endl;
             }
             else if (walletName == "")
             {
                 std::cout << std::endl
                           << WarningMsg("Wallet name can't be blank! Try again.")
-                          << std::endl << std::endl;
+                          << std::endl
+                          << std::endl;
             }
             else
             {
@@ -461,7 +460,8 @@ void viewWalletMsg()
 void promptSaveKeys(const std::shared_ptr<WalletBackend> walletBackend)
 {
     std::cout << "Welcome to your new wallet, here is your payment address:"
-              << "\n" << InformationMsg(walletBackend->getPrimaryAddress())
+              << "\n"
+              << InformationMsg(walletBackend->getPrimaryAddress())
               << "\n\nPlease copy your secret keys and mnemonic seed and store "
               << "them in a secure location:\n\n";
 

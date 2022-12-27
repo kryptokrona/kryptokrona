@@ -20,11 +20,13 @@
 #include <cstddef>
 #include <initializer_list>
 
-namespace CryptoNote {
-struct CheckpointData {
-  uint32_t index;
-  const char* blockId;
-};
+namespace CryptoNote
+{
+    struct CheckpointData
+    {
+        uint32_t index;
+        const char *blockId;
+    };
 
-const std::initializer_list<CheckpointData> CHECKPOINTS = { };
+    const std::initializer_list<CheckpointData> CHECKPOINTS = {};
 }

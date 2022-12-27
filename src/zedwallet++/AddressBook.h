@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #include "json.hpp"
@@ -22,10 +22,9 @@ struct AddressBookEntry
     AddressBookEntry(
         const std::string friendlyName,
         const std::string address,
-        const std::string paymentID) :
-        friendlyName(friendlyName),
-        address(address),
-        paymentID(paymentID) {}
+        const std::string paymentID) : friendlyName(friendlyName),
+                                       address(address),
+                                       paymentID(paymentID) {}
 
     /* Friendly name for this address book entry */
     std::string friendlyName;

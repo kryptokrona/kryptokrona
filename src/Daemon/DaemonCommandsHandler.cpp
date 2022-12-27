@@ -26,10 +26,10 @@
 
 #include "version.h"
 
-
 namespace
 {
-    template<typename T> static bool print_as_json(const T &obj)
+    template <typename T>
+    static bool print_as_json(const T &obj)
     {
         std::cout << CryptoNote::storeToJson(obj) << ENDL;
         return true;
@@ -50,7 +50,8 @@ namespace
     {
         std::stringstream ss;
         ss << printTransactionShortInfo(transaction);
-        ss << "JSON: \n" << CryptoNote::storeToJson(transaction.getTransaction()) << std::endl;
+        ss << "JSON: \n"
+           << CryptoNote::storeToJson(transaction.getTransaction()) << std::endl;
 
         return ss.str();
     }
@@ -61,12 +62,11 @@ DaemonCommandsHandler::DaemonCommandsHandler(
     CryptoNote::Core &core,
     CryptoNote::NodeServer &srv,
     std::shared_ptr<Logging::LoggerManager> log,
-    CryptoNote::RpcServer *prpc_server):
-    m_core(core),
-    m_srv(srv),
-    logger(log, "daemon"),
-    m_logManager(log),
-    m_prpc_server(prpc_server)
+    CryptoNote::RpcServer *prpc_server) : m_core(core),
+                                          m_srv(srv),
+                                          logger(log, "daemon"),
+                                          m_logManager(log),
+                                          m_prpc_server(prpc_server)
 {
     m_consoleHandler.setHandler("exit", std::bind(&DaemonCommandsHandler::exit, this, std::placeholders::_1), "Shutdown the daemon");
     m_consoleHandler.setHandler("help", std::bind(&DaemonCommandsHandler::help, this, std::placeholders::_1), "Show this help");

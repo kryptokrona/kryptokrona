@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////
@@ -32,13 +32,14 @@ const std::string getAddressBookName(AddressBook addressBook)
         trim(friendlyName);
 
         const auto it = std::find(addressBook.begin(), addressBook.end(),
-                            AddressBookEntry(friendlyName));
+                                  AddressBookEntry(friendlyName));
 
         if (it != addressBook.end())
         {
             std::cout << WarningMsg("An address book entry with this ")
                       << WarningMsg("name already exists!")
-                      << std::endl << std::endl;
+                      << std::endl
+                      << std::endl;
 
             continue;
         }
@@ -62,7 +63,8 @@ void addToAddressBook()
 {
     std::cout << InformationMsg("Note: You can type cancel at any time to "
                                 "cancel adding someone to your address book")
-              << std::endl << std::endl;
+              << std::endl
+              << std::endl;
 
     auto addressBook = getAddressBook();
 
@@ -145,7 +147,8 @@ const Maybe<const AddressBookEntry> getAddressBookEntry(AddressBook addressBook)
                   << WarningMsg("Could not find a user with the name of ")
                   << InformationMsg(friendlyName)
                   << WarningMsg(" in your address book!")
-                  << std::endl << std::endl;
+                  << std::endl
+                  << std::endl;
 
         const bool list = confirm("Would you like to list everyone in your "
                                   "address book?");

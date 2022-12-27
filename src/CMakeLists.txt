@@ -76,24 +76,24 @@ add_library(WalletBackend STATIC ${WalletBackend})
 add_library(WalletService STATIC ${service})
 
 if(MSVC)
-  set(DAEMON_SOURCES_OS
-    BinaryInfo/daemon.rc
-  )
-  set(ZED_WALLET_SOURCES_OS
-    BinaryInfo/zedwallet.rc
-  )
-  set(MINER_SOURCES_OS
-    BinaryInfo/miner.rc
-  )
-  set(PG_SOURCES_OS
-    BinaryInfo/service.rc
-  )
-  set(CT_SOURCES_OS
-    BinaryInfo/cryptotest.rc
-  )
-  set(WALLET_API_SOURCES_OS
-    BinaryInfo/walletapi.rc
-  )
+    set(DAEMON_SOURCES_OS
+        BinaryInfo/daemon.rc
+    )
+    set(ZED_WALLET_SOURCES_OS
+        BinaryInfo/zedwallet.rc
+    )
+    set(MINER_SOURCES_OS
+        BinaryInfo/miner.rc
+    )
+    set(PG_SOURCES_OS
+        BinaryInfo/service.rc
+    )
+    set(CT_SOURCES_OS
+        BinaryInfo/cryptotest.rc
+    )
+    set(WALLET_API_SOURCES_OS
+        BinaryInfo/walletapi.rc
+    )
 endif()
 
 add_executable(cryptotest ${CryptoTest} ${CT_SOURCES_OS})
@@ -108,23 +108,23 @@ if(MSVC)
     target_link_libraries(System ws2_32)
     target_link_libraries(kryptokronad Rpcrt4)
     target_link_libraries(service Rpcrt4)
-endif ()
+endif()
 
 # A bit of hackery so we don't have to do the if/else/ for every target that
 # wants to use filesystem
 add_library(__filesystem INTERFACE)
 
 # Windows works out of the box
-if (APPLE)
+if(APPLE)
     target_link_libraries(__filesystem INTERFACE /usr/local/opt/llvm/lib/libc++fs.a)
-elseif (UNIX)
+elseif(UNIX)
     target_link_libraries(__filesystem INTERFACE stdc++fs)
 endif()
 
 if(MSVC)
-	target_link_libraries(kryptokronad System CryptoNoteCore rocksdb ${Boost_LIBRARIES})
+    target_link_libraries(kryptokronad System CryptoNoteCore rocksdb ${Boost_LIBRARIES})
 else()
-	target_link_libraries(kryptokronad System CryptoNoteCore rocksdblib ${Boost_LIBRARIES})
+    target_link_libraries(kryptokronad System CryptoNoteCore rocksdblib ${Boost_LIBRARIES})
 endif()
 
 # Add the dependencies we need

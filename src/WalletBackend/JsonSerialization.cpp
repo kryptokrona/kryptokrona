@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////////////
@@ -27,7 +27,7 @@ namespace WalletTypes
 
     void to_json(json &j, const Transaction &t)
     {
-        j = json {
+        j = json{
             {"transfers", transfersToVector(t.transfers)},
             {"hash", t.hash},
             {"fee", t.fee},
@@ -74,8 +74,7 @@ void to_json(json &j, const TxPrivateKey &t)
 {
     j = {
         {"transactionHash", t.txHash},
-        {"txPrivateKey", t.txPrivateKey}
-    };
+        {"txPrivateKey", t.txPrivateKey}};
 }
 
 void from_json(const json &j, TxPrivateKey &t)
@@ -85,7 +84,7 @@ void from_json(const json &j, TxPrivateKey &t)
 }
 
 /* std::map / std::unordered_map don't work great in json - they get serialized
-   like this for example: 
+   like this for example:
 
 "transfers": [
     [
@@ -108,7 +107,7 @@ std::vector<Transfer> transfersToVector(
 {
     std::vector<Transfer> vector;
 
-    for (const auto & [publicKey, amount] : transfers)
+    for (const auto &[publicKey, amount] : transfers)
     {
         Transfer t;
         t.publicKey = publicKey;

@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #pragma once
@@ -16,7 +16,7 @@
 
 #include <zedwallet/Types.h>
 
-void confirmPassword(const std::string &walletPass, const std::string &msg="");
+void confirmPassword(const std::string &walletPass, const std::string &msg = "");
 
 void removeCharFromString(std::string &str, const char c);
 
@@ -58,11 +58,10 @@ std::vector<T> filter(const std::vector<T> &input, Function predicate)
     std::vector<T> result;
 
     std::copy_if(
-        input.begin(), input.end(), std::back_inserter(result), predicate
-    );
+        input.begin(), input.end(), std::back_inserter(result), predicate);
 
     return result;
 }
 
-std::vector<std::string> split(const std::string& str, char delim);
-bool parseDaemonAddressFromString(std::string& host, int& port, const std::string& address);
+std::vector<std::string> split(const std::string &str, char delim);
+bool parseDaemonAddressFromString(std::string &host, int &port, const std::string &address);

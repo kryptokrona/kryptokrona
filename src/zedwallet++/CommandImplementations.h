@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #pragma once
@@ -41,7 +41,7 @@ void save(const std::shared_ptr<WalletBackend> walletBackend);
 
 void listTransfers(
     const bool incoming,
-    const bool outgoing, 
+    const bool outgoing,
     const std::shared_ptr<WalletBackend> walletBackend);
 
 void printOutgoingTransfer(const WalletTypes::Transaction t);

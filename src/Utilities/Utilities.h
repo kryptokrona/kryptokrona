@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #pragma once
@@ -46,7 +46,7 @@ namespace Utilities
     /* Verify that a + b will not overflow when added. */
     /* 2 positive numbers - should always get greater (or equal) when summed. */
     /* Any negative numbers - should always get smaller (or equal) when summed. */
-    template<typename T>
+    template <typename T>
     bool additionWillOverflow(T a, T b)
     {
         static_assert(std::is_integral<T>::value, "additionWillOverflow can only be used for integral inputs!");
@@ -69,7 +69,7 @@ namespace Utilities
         return result < larger;
     }
 
-    template<typename T>
+    template <typename T>
     bool subtractionWillOverflow(T a, T b)
     {
         /* Subtraction is just addition where the second param is negated */
@@ -77,7 +77,7 @@ namespace Utilities
     }
 
     /* Verify the sum of the vector amounts will not overflow */
-    template<typename T>
+    template <typename T>
     bool sumWillOverflow(std::vector<T> amounts)
     {
         T sum = 0;

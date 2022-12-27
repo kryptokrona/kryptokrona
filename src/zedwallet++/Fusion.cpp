@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////
@@ -82,7 +82,7 @@ bool optimizeRound(const std::shared_ptr<WalletBackend> walletBackend)
     uint64_t currentBalance = walletBackend->getTotalUnlockedBalance();
 
     /* Wait for balance to unlock, so sending transactions can proceed */
-    while(currentBalance < initialBalance)
+    while (currentBalance < initialBalance)
     {
         std::cout << InformationMsg("Waiting for balance to return and unlock:\n"
                                     "\nTotal balance: ")

@@ -6,37 +6,42 @@ typedef int32_t fe[10];
 
 /* From ge.h */
 
-typedef struct {
-  fe X;
-  fe Y;
-  fe Z;
+typedef struct
+{
+    fe X;
+    fe Y;
+    fe Z;
 } ge_p2;
 
-typedef struct {
-  fe X;
-  fe Y;
-  fe Z;
-  fe T;
+typedef struct
+{
+    fe X;
+    fe Y;
+    fe Z;
+    fe T;
 } ge_p3;
 
-typedef struct {
-  fe X;
-  fe Y;
-  fe Z;
-  fe T;
+typedef struct
+{
+    fe X;
+    fe Y;
+    fe Z;
+    fe T;
 } ge_p1p1;
 
-typedef struct {
-  fe yplusx;
-  fe yminusx;
-  fe xy2d;
+typedef struct
+{
+    fe yplusx;
+    fe yminusx;
+    fe xy2d;
 } ge_precomp;
 
-typedef struct {
-  fe YplusX;
-  fe YminusX;
-  fe Z;
-  fe T2d;
+typedef struct
+{
+    fe YplusX;
+    fe YminusX;
+    fe Z;
+    fe T2d;
 } ge_cached;
 
 /* From ge_add.c */

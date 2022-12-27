@@ -22,14 +22,17 @@
 #include <System/Dispatcher.h>
 #include <System/Event.h>
 
-namespace System {
+namespace System
+{
 
-RemoteEventLock::RemoteEventLock(Dispatcher& dispatcher, Event& event) : dispatcher(dispatcher), event(event) {
-  std::mutex mutex;
-  std::condition_variable condition;
-  bool locked = false;
+    RemoteEventLock::RemoteEventLock(Dispatcher &dispatcher, Event &event) : dispatcher(dispatcher), event(event)
+    {
+        std::mutex mutex;
+        std::condition_variable condition;
+        bool locked = false;
 
-  dispatcher.remoteSpawn([&]() {
+        dispatcher.remoteSpawn([&]()
+                               {
     while (!event.get()) {
       event.wait();
     }
@@ -38,35 +41,37 @@ RemoteEventLock::RemoteEventLock(Dispatcher& dispatcher, Event& event) : dispatc
     mutex.lock();
     locked = true;
     condition.notify_one();
-    mutex.unlock();
-  });
+    mutex.unlock(); });
 
-  std::unique_lock<std::mutex> lock(mutex);
-  while (!locked) {
-    condition.wait(lock);
-  }
-}
+        std::unique_lock<std::mutex> lock(mutex);
+        while (!locked)
+        {
+            condition.wait(lock);
+        }
+    }
 
-RemoteEventLock::~RemoteEventLock() {
-  std::mutex mutex;
-  std::condition_variable condition;
-  bool locked = true;
+    RemoteEventLock::~RemoteEventLock()
+    {
+        std::mutex mutex;
+        std::condition_variable condition;
+        bool locked = true;
 
-  Event* eventPointer = &event;
-  dispatcher.remoteSpawn([&]() {
+        Event *eventPointer = &event;
+        dispatcher.remoteSpawn([&]()
+                               {
     assert(!eventPointer->get());
     eventPointer->set();
 
     mutex.lock();
     locked = false;
     condition.notify_one();
-    mutex.unlock();
-  });
+    mutex.unlock(); });
 
-  std::unique_lock<std::mutex> lock(mutex);
-  while (locked) {
-    condition.wait(lock);
-  }
-}
+        std::unique_lock<std::mutex> lock(mutex);
+        while (locked)
+        {
+            condition.wait(lock);
+        }
+    }
 
 }

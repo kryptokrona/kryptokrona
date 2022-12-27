@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #include <iostream>
@@ -39,8 +39,8 @@ void shutdown(
         /* Delete the walletbackend - this will call the deconstructor,
            which will set the appropriate m_shouldStop flag. Since this
            function gets triggered from a signal handler, we can't just call
-           save() - The data may be in an invalid state. 
-           
+           save() - The data may be in an invalid state.
+
            Obviously, calling delete on a shared pointer is undefined
            behaviour if we continue using it in another thread - fortunately,
            we're exiting right now. */
@@ -103,14 +103,13 @@ int main(int argc, char **argv)
 
         /* Launch the thread which watches for the shutdown signal */
         ctrlCWatcher = std::thread([&ctrl_c, &stop, &walletBackend = walletBackend]
-        {
-            shutdown(ctrl_c, stop, walletBackend);
-        });
+                                   { shutdown(ctrl_c, stop, walletBackend); });
 
         /* Trigger the shutdown signal if ctrl+c is used
            We do the actual handling in a separate thread to handle stuff not
            being re-entrant. */
-        Tools::SignalHandler::install([&ctrl_c] { ctrl_c = true; });
+        Tools::SignalHandler::install([&ctrl_c]
+                                      { ctrl_c = true; });
 
         /* Don't explicitly sync in foreground if it's a new wallet */
         if (sync)
@@ -129,7 +128,7 @@ int main(int argc, char **argv)
 
         /* Cleanup the threads */
         cleanup(txMonitorThread, ctrlCWatcher, stop, txMonitor);
-        
+
         std::cout << InformationMsg("\nSaving and shutting down...\n");
 
         /* Wallet backend destructor gets called here, which saves */
@@ -148,6 +147,6 @@ int main(int argc, char **argv)
         /* Cleanup the threads */
         cleanup(txMonitorThread, ctrlCWatcher, stop, txMonitor);
     }
-        
+
     std::cout << "Thanks for stopping by..." << std::endl;
 }

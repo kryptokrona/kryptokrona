@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////////////////
@@ -64,7 +64,7 @@ void SynchronizationStatus::storeBlockHash(
    are most likely going to be quite shallow forks, usually 1 or 2 blocks max),
    and then we store one hash every 5000 blocks, in case we have a very
    deep fork.
-   
+
    Note that the first items in this vector are the latest block. On the
    daemon side, it loops through the vector, looking for the hash in its
    database, then returns the height it found. So, if you put your earliest

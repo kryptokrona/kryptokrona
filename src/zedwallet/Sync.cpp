@@ -1,5 +1,5 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////
@@ -25,11 +25,10 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
 
     if (newTransactionCount != walletInfo->knownTransactionCount)
     {
-        for (size_t i = walletInfo->knownTransactionCount; 
-                    i < newTransactionCount; i++)
+        for (size_t i = walletInfo->knownTransactionCount;
+             i < newTransactionCount; i++)
         {
-            const CryptoNote::WalletTransaction t 
-                = walletInfo->wallet.getTransaction(i);
+            const CryptoNote::WalletTransaction t = walletInfo->wallet.getTransaction(i);
 
             /* Don't print outgoing or fusion transfers */
             if (t.totalAmount > 0 && t.fee != 0)
@@ -41,8 +40,7 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
                           << std::endl
                           << SuccessMsg("Hash: " + Common::podToHex(t.hash))
                           << std::endl
-                          << SuccessMsg("Amount: "
-                                      + formatAmount(t.totalAmount))
+                          << SuccessMsg("Amount: " + formatAmount(t.totalAmount))
                           << std::endl
                           << InformationMsg(getPrompt(walletInfo))
                           << std::flush;
@@ -72,7 +70,8 @@ void syncWallet(CryptoNote::INode &node,
                   << "transactions,"
                   << std::endl
                   << "and your balance may be missing or "
-                  << "incorrect!" << std::endl << std::endl;
+                  << "incorrect!" << std::endl
+                  << std::endl;
     }
 
     /* If we open a legacy wallet then it will load the transactions but not
@@ -81,7 +80,8 @@ void syncWallet(CryptoNote::INode &node,
     if (walletHeight == 1 && transactionCount != 0)
     {
         std::cout << "Upgrading your wallet from an older version of the "
-                  << "software..." << std::endl << "Unfortunately, we have "
+                  << "software..." << std::endl
+                  << "Unfortunately, we have "
                   << "to rescan the chain to find your transactions."
                   << std::endl;
 
@@ -95,7 +95,8 @@ void syncWallet(CryptoNote::INode &node,
         std::cout << "Scanning through the blockchain to find transactions "
                   << "that belong to you." << std::endl
                   << "Please wait, this will take some time."
-                  << std::endl << std::endl;
+                  << std::endl
+                  << std::endl;
     }
     else
     {
@@ -105,7 +106,8 @@ void syncWallet(CryptoNote::INode &node,
                   << "whilst your wallet wasn't open."
                   << std::endl
                   << "Please wait, this may take some time."
-                  << std::endl << std::endl;
+                  << std::endl
+                  << std::endl;
     }
 
     int counter = 1;
@@ -132,7 +134,8 @@ void syncWallet(CryptoNote::INode &node,
         {
             std::cout << std::endl
                       << InformationMsg("Saving current progress...")
-                      << std::endl << std::endl;
+                      << std::endl
+                      << std::endl;
 
             walletInfo->wallet.save();
         }
@@ -171,21 +174,21 @@ void syncWallet(CryptoNote::INode &node,
             walletHeight = tmpWalletHeight;
 
             const size_t tmpTransactionCount = walletInfo
-                                             ->wallet.getTransactionCount();
+                                                   ->wallet.getTransactionCount();
 
             if (tmpTransactionCount != transactionCount)
             {
                 for (size_t i = transactionCount; i < tmpTransactionCount; i++)
                 {
-                    CryptoNote::WalletTransaction t
-                        = walletInfo->wallet.getTransaction(i);
+                    CryptoNote::WalletTransaction t = walletInfo->wallet.getTransaction(i);
 
                     /* Don't print out fusion transactions */
                     if (t.totalAmount != 0)
                     {
                         std::cout << std::endl
                                   << InformationMsg("New transaction found!")
-                                  << std::endl << std::endl;
+                                  << std::endl
+                                  << std::endl;
 
                         if (t.totalAmount < 0)
                         {

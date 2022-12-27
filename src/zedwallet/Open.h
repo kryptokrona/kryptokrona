@@ -1,12 +1,12 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 #pragma once
 
 #include <zedwallet/Types.h>
 
-std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet, 
+std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
                                            Crypto::SecretKey privateSpendKey,
                                            Crypto::SecretKey privateViewKey);
 
@@ -19,8 +19,8 @@ std::shared_ptr<WalletInfo> importWallet(CryptoNote::WalletGreen &wallet);
 
 std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet);
 
-std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen 
-                                                 &wallet);
+std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
+                                                     &wallet);
 
 std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet);
 
@@ -32,7 +32,7 @@ std::string getExistingWalletFileName(Config &config);
 
 std::string getWalletPassword(bool verifyPwd, std::string msg);
 
-bool isValidMnemonic(std::string &mnemonic_phrase, 
+bool isValidMnemonic(std::string &mnemonic_phrase,
                      Crypto::SecretKey &private_spend_key);
 
 void logIncorrectMnemonicWords(std::vector<std::string> words);
