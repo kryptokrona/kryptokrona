@@ -175,7 +175,7 @@ namespace CryptoNote
                         // parse the json
                         json j = trimExtra(extraData);
                         uint64_t box_time = j.at("t").get<uint64_t>();
-                        boxed_transaction_age = currentTime - box_time;
+                        boxed_transaction_age = currentTime - (box_time / 1000);
 
                         if (
                             (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || boxed_transaction_age >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME) &&
