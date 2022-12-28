@@ -50,12 +50,14 @@ jobs:
         if: matrix.config.os == 'windows-2019'
         run: |
           Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip -OutFile 'C:\boost_1_74_0.zip'
-          Expand-Archive C:\boost_1_74_0.zip -DestinationPath c:\Boost\boost_1_74_0
-          Set-Location -Path "C:\Boost\boost_1_74_0\boost_1_74_0\tools\build"
+          Expand-Archive C:\boost_1_74_0.zip -DestinationPath C:\Tmp\boost_1_74_0
+          Set-Location -Path "C:\Tmp\boost_1_74_0\boost_1_74_0\tools\build"
           (Resolve-Path .\).Path
           Get-ChildItem
           Start-Process ".\bootstrap.bat" -Wait -NoNewWindow
           b2 variant=release address-model=64 link=shared toolset=msvc
+          b2 --prefix=C:\Boost\boost_1_74_0 install
+          $env:PATH += ";C:\Boost\boost_1_74_0\bin"
 
       - name: "Creating Build Dir"
         if: matrix.config.os == 'windows-2019'
