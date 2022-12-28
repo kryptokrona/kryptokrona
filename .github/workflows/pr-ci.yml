@@ -12,11 +12,12 @@ jobs:
         config:
           - {
               name: "Windows 2019 MSVC",
-              artifact: "windows-MSVC.7z",
+              artifact: "kryptokrona-windows-19-msvc",
               os: windows-2019,
               cc: "cl",
               cxx: "cl",
               environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+              platform: x64,
             }
           - {
               name: "Ubuntu 20.04 GCC",
@@ -38,49 +39,49 @@ jobs:
       - uses: actions/checkout@v2
 
       # Windows MSVC
-      - name: Install Dependencies
-        if: matrix.config.os == 'windows-latest'
+      - name: "Install ${{ matrix.config.name }} Dependencies"
+        if: matrix.config.os == 'windows-2019'
         uses: microsoft/setup-msbuild@v1.1
         with:
           msbuild-architecture: x64
 
       # need to test this on a windows computer first (do not extract the files yet)
-      - name: Install Boost
-        if: matrix.config.os == 'windows-latest'
+      - name: "Install ${{ matrix.config.name }} Boost"
+        if: matrix.config.os == 'windows-2019'
         run: |
           Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.74.0/source/boost_1_74_0.zip -OutFile 'c:\boost_1_74_0.zip'
           Expand-Archive c:\boost_1_74_0.zip -DestinationPath c:\Boost\boost_1_74_0
           Start-Process -FilePath "c:\Boost\boost_1_74_0\boost_1_74_0\tools\build\bootstrap.bat" -ArgumentList 'mingw' -Wait -NoNewWindow
           b2 variant=release address-model=64 link=static,shared
 
-      - name: mkdir build
-        if: matrix.config.os == 'windows-latest'
+      - name: "mkdir build on ${{ matrix.config.name }}"
+        if: matrix.config.os == 'windows-2019'
         run: mkdir build
 
-      - name: Build Windows Target using Visual C++
-        if: matrix.config.os == 'windows-latest'
+      - name: "Build ${{ matrix.config.name }} Target using Visual C++"
+        if: matrix.config.os == 'windows-2019'
         working-directory: build
         run: |
           cmake -G "Visual Studio 17 2022" -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBOOST_ROOT=C:/Boost/boost_1_74_0 -DBoost_ARCHITECTURE=-x64 ..
 
       # Ubuntu
-      - name: "Install ${{ matrix.config.name }} Dependencies "
+      - name: "Install ${{ matrix.config.name }} Dependencies"
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 libboost-date-time1.71.0 libboost-chrono1.71.0 libboost-regex1.71.0 libboost-serialization1.71.0 libboost-program-options1.71.0 libicu66
 
-      - name: "Install ${{ matrix.config.name }} Dependencies "
+      - name: "Install ${{ matrix.config.name }} Dependencies"
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
-      - name: mkdir build
+      - name: "mkdir build on ${{ matrix.config.name }}"
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: mkdir build
 
-      - name: Build Ubuntu Target
+      - name: "Build ${{ matrix.config.name }} Target"
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: |
           cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64 .. # add flag -DBoost_DEBUG=ON to debug
