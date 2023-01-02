@@ -45,4 +45,4 @@ EXPOSE 11898
 
 # --data-dir is binded to a volume - this volume is binded when starting the container
 # to start the container follow instructions on readme or in article published by marcus cvjeticanin on https://mjovanc.com
-CMD [ "/bin/sh", "-c", "./kryptokronad --data-dir ~/.kryptokrona --p2p-bind-ip 0.0.0.0 --rpc-bind-ip 0.0.0.0" ]
+CMD [ "/bin/sh", "-c", "./kryptokronad" ]
