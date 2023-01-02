@@ -28,6 +28,8 @@ RUN apt-get update && \
       libboost-serialization1.74.0 \
       libboost-program-options1.74.0 \
       libicu70
+      
+RUN chmod +x start.sh
 
 # create the build directory
 RUN mkdir build
