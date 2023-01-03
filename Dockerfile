@@ -47,4 +47,4 @@ EXPOSE 11898
 
 # --data-dir is binded to a volume - this volume is binded when starting the container
 # to start the container follow instructions on readme or in article published by marcus cvjeticanin on https://mjovanc.com
-CMD [ "/bin/sh", "-c", "./kryptokronad" ]
+CMD [ "/bin/sh", "-c", "./kryptokronad --enable-cors=* --rpc-bind-ip=127.0.0.1 --rpc-bind-port=11898" ]
