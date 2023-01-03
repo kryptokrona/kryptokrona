@@ -50,7 +50,7 @@
     hugin_api_name: hugin_api
     hugin_api_port: 3000
 
-    hugin_node_server: "{{ docker_hugin_api_container_name }}:11898"
+    hugin_node_server: "127.0.0.1:11898"
 
     sys_criteria_users_include: ''
     sys_criteria_users_exclude: ''
