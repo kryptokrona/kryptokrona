@@ -1,0 +1,56 @@
+---
+- name: Checkout Repo
+  git: repo=https://github.com/kryptokrona/hugin-api.git
+    dest=/root/tmp/checkout
+    update=yes
+    accept_hostkey=yes
+    clone=false
+    update=false
+  register: gitresult
+
+- name: Create Hugin API Container
+  docker_container:
+    name: "{{ docker_hugin_api_container_name }}"
+    image: "{{ docker_hugin_api_image }}:{{ gitresult.after[:7] }}"
+    command: /bin/echo success
+    state: present
+    force_kill: yes
+    recreate: yes
+    networks:
+      - name: "host"
+
+- name: Start Hugin API Container
+  docker_container:
+    name: "{{ docker_hugin_api_container_name }}"
+    image: "{{ docker_hugin_api_image }}:{{ gitresult.after[:7] }}"
+    command: "./start.sh"
+    env:
+      {
+        DATABASE_URL: "postgres://{{ vault_postgres_db_user }}:{{ vault_postgres_db_password }}@127.0.0.1:5432/{{ vault_postgres_db_name }}",
+        SYS_HUGIN_NODE_SERVER: "{{ docker_node_container_name }}",
+        SYS_CRITERIA_USERS_INCLUDE: "",
+        SYS_CRITERIA_USERS_EXCLUDE: "",
+        SYS_CRITERIA_BOARDS_INCLUDE: "",
+        SYS_CRITERIA_BOARDS_EXCLUDE: "",
+        SYS_CRITERIA_KEYWORDS_INCLUDE: "",
+        SYS_CRITERIA_KEYWORDS_EXCLUDE: "",
+        SYS_CRITERIA_KEYWORDS_CURSEWORDS: "false",
+        SYS_SWAGGER_CONTACT_NAME: "{{ sys_swagger_contact_name }}",
+        SYS_SWAGGER_CONTACT_EMAIL: "{{ sys_swagger_contact_email }}",
+        SYS_SWAGGER_CONTACT_URL: "{{ sys_swagger_contact_url }}",
+        SYS_PROJECT_NAME: "{{ sys_project_name }}",
+        SYS_API_PORT: "{{ sys_api_port }}",
+        SYS_WS_PORT: "{{ sys_ws_port }}",
+        SYS_HUGIN_SYNCER_SLEEP: "{{ sys_hugin_syncer_sleep }}",
+        SYS_RATELIMIT_WINDOW_MS: "{{ sys_ratelimit_window_ms }}",
+        SYS_RATELIMIT_MAX: "{{ sys_ratelimit_max }}",
+        SYS_RATELIMIT_POST_MESSAGE_WINDOW_MS: "{{ sys_ratelimit_post_message_window_ms }}",
+        SYS_RATELIMIT_POST_MESSAGE_MAX: "{{ sys_ratelimit_post_message_max }}",
+        SYS_ALERT_MY_ADDRESS: "{{ vault_alert_my_address }}",
+        SYS_ALERT_PRIVATE_KEY: "{{ vault_alert_private_key }}",
+        SYS_ALERT_GROUP: "{{ vault_alert_group }}",
+        SYS_ALERT_NICKNAME: "change_me",
+        SYS_ALERT_HOSTNAME: "{{ domain_name }}",
+      }
+    networks:
+      - name: "host"

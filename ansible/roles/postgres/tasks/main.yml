@@ -1,0 +1,60 @@
+---
+- name: Install dependencies for PostgreSQL
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: latest
+  with_items:
+    - bash
+    - openssl
+    - libssl-dev
+    - libssl-doc
+
+- name: Install PostgreSQL
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - libpq-dev
+    - python3-psycopg2
+
+- name: Create the Hugin API DB
+  become_user: postgres
+  postgresql_db:
+    name: "{{ vault_postgres_db_name }}"
+    template: "template0"
+    state: present
+
+- name: Ensure User has access to the new Hugin API DB
+  become_user: postgres
+  postgresql_user:
+    db: "{{ vault_postgres_db_name }}"
+    name: "{{ vault_postgres_db_user }}"
+    password: "{{ vault_postgres_db_password }}"
+    priv: ALL
+    state: present
+
+- name: Ensure the PostgreSQL service is running
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Copy SQL Delete Posts Query
+  template:
+    src: templates/remove_data.sql.j2
+    dest: /home/{{ vault_vps_user }}/remove_data.sql
+    mode: 0755
+
+# TASK [postgres : Remove Data] ******************************************************************************************************************************************************************************************************************************************************************
+# fatal: [cache.hugin.chat]: FAILED! => {"changed": false, "msg": "missing required arguments: name"}
+# - name: "Remove Data"
+#   cron:
+#     state: present
+#     user: "root"
+#     minute: "*"
+#     hour: "24"
+#     job: "psql {{ vault_postgres_db_user }} -h 127.0.0.1 -d {{ vault_postgres_db_name }} -f /home/{{ vault_vps_user }}/remove_data.sql"

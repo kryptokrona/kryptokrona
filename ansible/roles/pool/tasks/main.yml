@@ -1,0 +1,24 @@
+---
+- name: Checkout Repo
+  git: repo=https://github.com/kryptokrona/hugin-api.git
+    dest=/root/tmp/checkout
+    update=yes
+    accept_hostkey=yes
+    clone=false
+    update=false
+  register: gitresult
+
+- name: Create Hugin API Container
+  docker_container:
+    name: "{{ docker_pool_container_name }}"
+    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    command: /bin/echo success
+    state: present
+    force_kill: yes
+    recreate: yes
+
+- name: Start Hugin API Container
+  docker_container:
+    name: "{{ docker_pool_container_name }}"
+    image: "{{ docker_image }}:{{ gitresult.after[:7] }}"
+    command: "./start.sh"

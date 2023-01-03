@@ -1,0 +1,89 @@
+---
+- hosts: vps
+  remote_user: ubuntu
+  become: true
+  gather_facts: yes
+  vars:
+    username: "ubuntu"
+    # Docker GitHub Container Registry
+    docker_hugin_api_image: "ghcr.io/kryptokrona/hugin-api"
+    docker_kryptokona_image: "ghcr.io/kryptokrona/kryptokrona"
+
+    # A list of users who will be added to the docker group.
+    docker_users: [
+      "kryptokrona_docker"
+    ]
+
+    # Docker Container names
+    docker_hugin_api_container_name: hugin-api
+    docker_node_container_name: kryptokrona-node
+    docker_pool_container_name: kryptokrona-pool
+
+    # Docker daemon options as a dict
+    docker_daemon_options: { }
+
+    # Node configuration
+    kryptokrona_node_name: krytokrona_node
+
+    # please use a different URL here below if you want to download the bootstrap from a different source
+    kryptokrona_node_boostrap: "http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-2022-11-13.7z"
+
+    # Prometheus configuration
+    prometheus_targets:
+      node:
+      - targets:
+        - "{{ domain_name }}:9100"
+        labels:
+          env: prod
+
+    node_exporter_version: "{{ exporter_version }}"
+
+    website_name: hugin_api
+    web_server_ip: "{{ domain_name }}"
+    web_server_port: "443"
+    hidden_service_port: "443"
+
+    # DO NOT CONFIGURE THE ABOVE YOURSELF
+    removal_interval: '1 years 2 months 3 days 2 hours 1 minutes 1 second'
+    
+    # Hugin API settings
+    hugin_api_name: hugin_api
+    hugin_api_port: 3000
+
+    hugin_node_server: "{{ docker_hugin_api_container_name }}:11898"
+
+    sys_criteria_users_include: ''
+    sys_criteria_users_exclude: ''
+    sys_criteria_boards_include: ''
+    sys_criteria_boards_exclude: ''
+    sys_criteria_keywords_include: ''
+    sys_criteria_keywords_exclude: ''
+    sys_criteria_keywords_cursewords: 'false'
+    sys_ratelimit_window_ms: '900000'
+    sys_ratelimit_max: '1000'
+    sys_ratelimit_post_message_window_ms: '60000'
+    sys_ratelimit_post_message_max: '10'
+
+    sys_alert_nickname: 'change_me'
+    sys_alert_hostname: "{{ domain_name }}"
+
+    sys_swagger_contact_name: 'Marcus Cvjeticanin'
+    sys_swagger_contact_email: 'mjovanc@protonmail.com'
+    sys_swagger_contact_url: 'https://github.com/kryptokrona/hugin-api/issues'
+
+    sys_api_port: '3000'
+    sys_ws_port: '8080'
+    sys_hugin_syncer_sleep: '2000'
+
+    sys_project_name: 'Hugin API'
+
+  roles:
+  - base
+  - postgres
+  - docker
+  - node
+  #- pool
+  - hugin-api
+  - nginx
+  - prometheus
+  - onion
