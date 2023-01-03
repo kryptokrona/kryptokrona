@@ -27,7 +27,7 @@
     env:
       {
         DATABASE_URL: "postgres://{{ vault_postgres_db_user }}:{{ vault_postgres_db_password }}@127.0.0.1:5432/{{ vault_postgres_db_name }}",
-        SYS_HUGIN_NODE_SERVER: "{{ docker_node_container_name }}",
+        SYS_HUGIN_NODE_SERVER: "{{ hugin_node_server }}",
         SYS_CRITERIA_USERS_INCLUDE: "",
         SYS_CRITERIA_USERS_EXCLUDE: "",
         SYS_CRITERIA_BOARDS_INCLUDE: "",
