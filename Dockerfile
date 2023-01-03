@@ -9,26 +9,26 @@ WORKDIR /usr/src/kryptokrona
 # install build dependencies
 RUN apt-get update && \
     apt-get install -y \
-      build-essential \
-      libssl-dev \
-      libffi-dev \
-      python3-dev \
-      gcc-11 \
-      g++-11 \
-      git \
-      cmake \
-      librocksdb-dev \
-      libboost-all-dev \
-      libboost-system1.74.0 \
-      libboost-filesystem1.74.0 \
-      libboost-thread1.74.0 \
-      libboost-date-time1.74.0 \
-      libboost-chrono1.74.0 \
-      libboost-regex1.74.0 \
-      libboost-serialization1.74.0 \
-      libboost-program-options1.74.0 \
-      libicu70
-      
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    gcc-11 \
+    g++-11 \
+    git \
+    cmake \
+    librocksdb-dev \
+    libboost-all-dev \
+    libboost-system1.74.0 \
+    libboost-filesystem1.74.0 \
+    libboost-thread1.74.0 \
+    libboost-date-time1.74.0 \
+    libboost-chrono1.74.0 \
+    libboost-regex1.74.0 \
+    libboost-serialization1.74.0 \
+    libboost-program-options1.74.0 \
+    libicu70
+
 RUN chmod +x start.sh
 
 # create the build directory

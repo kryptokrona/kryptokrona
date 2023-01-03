@@ -1,0 +1,8 @@
+vault_vps_user: ansible
+vault_vps_password: <password>
+vault_postgres_db_user: <db_user>
+vault_postgres_db_password: <password>
+vault_postgres_db_name: <db_name>
+vault_alert_my_address: <wallet address>
+vault_alert_private_key: <your private key>
+vault_alert_group: <hugin group id>
