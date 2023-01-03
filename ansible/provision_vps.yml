@@ -78,10 +78,10 @@
     sys_project_name: 'Hugin API'
 
   roles:
-  #- base
-  #- postgres
-  #- docker
-  #- node
+  - base
+  - postgres
+  - docker
+  - node
   #- pool
   - hugin-api
   - nginx
