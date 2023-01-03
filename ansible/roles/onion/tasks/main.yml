@@ -52,17 +52,9 @@
     name: "deb.torproject.org-keyring"
     state: latest
 
-- name: Test node
-  uri:
-    url: "https://{{ domain_name }}/getinfo"
-
 - name: Test Hugin API
   uri:
     url: "https://{{ domain_name }}/api/v1/posts"
-
-- name: Test Kryptokrona Node
-  uri:
-    url: "https://{{ domain_name }}/info"
 
 - name: Configure your Tor Onion Service (HiddenServiceDir).
   become: true

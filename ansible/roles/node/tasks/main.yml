@@ -19,25 +19,18 @@
 
 - name: Check that the bootstrap already exists
   stat:
-    path: "/home/{{ username }}/bootstrap.7z"
+    path: "/root/bootstrap.7z"
   register: stat_result
 
 - name: Download Boostrap
   when: kryptokrona_node_boostrap | length > 0 and not stat_result.stat.exists
   get_url:
     url: "{{ kryptokrona_node_boostrap }}"
-    dest: "/home/{{ username }}/bootstrap.7z"
-    mode: 0755
-
-- name: Recursively Change Ownership of .kryptokrona Directory
-  file:
-    path: "/home/{{ username }}/.kryptokrona"
-    owner: "{{ username }}"
-    group: "{{ username }}"
+    dest: "/root/bootstrap.7z"
 
 - name: Extract Boostrap
   when: kryptokrona_node_boostrap | length > 0 and not stat_result.stat.exists
-  shell: "7z x *.7z -o/home/{{ username }}"
+  shell: "7z x *.7z"
 
 - name: Create Kryptokrona Node Container
   docker_container:
@@ -48,7 +41,7 @@
     force_kill: yes
     recreate: yes
     volumes:
-      - "/home/{{ username }}/.kryptokrona:/home/root/.kryptokrona"
+      - "/root/.kryptokrona:/root/.kryptokrona"
     networks:
       - name: "host"
 
@@ -58,6 +51,6 @@
     image: "{{ docker_kryptokona_image }}:{{ gitresult.after[:7] }}"
     command: "/usr/src/kryptokrona/start.sh"
     volumes:
-      - "/home/{{ username }}/.kryptokrona:/home/root/.kryptokrona"
+      - "/root/.kryptokrona:/root/.kryptokrona"
     networks:
       - name: "host"

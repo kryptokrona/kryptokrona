@@ -32,13 +32,14 @@
     daemon_reload: yes
     name: sshd
 
-- name: Install ACL
+- name: Install Packages
   apt:
     name: "{{ item }}"
     update_cache: true
     state: present
   with_items:
     - acl
+    - iptables
 
 - name: Iptables port 22
   shell: iptables -C INPUT -s 0/0 -p tcp --dport 22 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 22 -j ACCEPT

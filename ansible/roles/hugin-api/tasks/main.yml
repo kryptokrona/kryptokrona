@@ -46,9 +46,9 @@
         SYS_RATELIMIT_MAX: "{{ sys_ratelimit_max }}",
         SYS_RATELIMIT_POST_MESSAGE_WINDOW_MS: "{{ sys_ratelimit_post_message_window_ms }}",
         SYS_RATELIMIT_POST_MESSAGE_MAX: "{{ sys_ratelimit_post_message_max }}",
-        SYS_ALERT_MY_ADDRESS: "{{ vault_alert_my_address }}",
-        SYS_ALERT_PRIVATE_KEY: "{{ vault_alert_private_key }}",
-        SYS_ALERT_GROUP: "{{ vault_alert_group }}",
+        SYS_ALERT_MY_ADDRESS: "{{ vault_alert_my_address | default('') }}",
+        SYS_ALERT_PRIVATE_KEY: "{{ vault_alert_private_key | default('') }}",
+        SYS_ALERT_GROUP: "{{ vault_alert_group | default('') }}",
         SYS_ALERT_NICKNAME: "change_me",
         SYS_ALERT_HOSTNAME: "{{ domain_name }}",
       }
