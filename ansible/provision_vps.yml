@@ -1,10 +1,10 @@
 ---
 - hosts: vps
-  remote_user: ubuntu
+  remote_user: root
   become: true
   gather_facts: yes
   vars:
-    username: "ubuntu"
+    username: "root"
     # Docker GitHub Container Registry
     docker_hugin_api_image: "ghcr.io/kryptokrona/hugin-api"
     docker_kryptokona_image: "ghcr.io/kryptokrona/kryptokrona"
@@ -78,10 +78,10 @@
     sys_project_name: 'Hugin API'
 
   roles:
-  - base
-  - postgres
-  - docker
-  - node
+  #- base
+  #- postgres
+  #- docker
+  #- node
   #- pool
   - hugin-api
   - nginx

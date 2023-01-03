@@ -8,7 +8,7 @@
   apt:
     name: letsencrypt
     state: latest
-  
+
 - name: Create Let's Encrypt Directory
   file:
     name: /var/www/letsencrypt
@@ -43,7 +43,7 @@
   shell: openssl dhparam -out /etc/nginx/dhparams.pem 2048
   args:
     creates: /etc/nginx/dhparams.pem
-  
+
 - name: Install NGINX Site For Specified Site
   template:
     src: templates/nginx-le.j2
@@ -78,7 +78,17 @@
     src: templates/style.css
     dest: /var/www/html/style.css
 
-- name: Add favicon 
+- name: Copy fonts
+  copy:
+    src: "{{ item }}"
+    dest: /var/www/html/
+  with_fileglob:
+    - templates/icomoon.eot
+    - templates/icomoon.svg
+    - templates/icomoon.woff
+    - templates/icomoon.ttf
+
+- name: Add favicon
   template:
     src: templates/favicon.ico
     dest: /var/www/html/favicon.ico
