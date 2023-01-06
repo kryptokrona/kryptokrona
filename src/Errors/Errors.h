@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <ostream>
 
 /* Note: Putting the number of the error is not needed, as they auto increment,
    however, it makes it easier to see at a glance what error you got, whilst
