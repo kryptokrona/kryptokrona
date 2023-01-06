@@ -31,7 +31,9 @@
 #include <windows.h>
 #include <shlobj.h>
 #include <strsafe.h>
-#else
+#elif __APPLE__
+#include <sys/utsname.h>
+#elif __LINUX__
 #include <sys/utsname.h>
 #endif
 
