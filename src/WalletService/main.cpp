@@ -13,7 +13,7 @@
 #include "PaymentGateService.h"
 #include "version.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif

@@ -63,7 +63,7 @@ jobs:
         if: matrix.config.os == 'windows-2019'
         working-directory: build
         run: |
-          cmake -G "Visual Studio 16 2019" -DCMAKE_CXX_FLAGS="-std=gnu++17" -DBOOST_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}\include -DBOOST_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}\lib ..
+          cmake -G "Visual Studio 16 2019" -DBOOST_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}\include -DBOOST_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}\lib ..
         env:
           BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 

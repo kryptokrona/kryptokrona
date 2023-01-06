@@ -24,16 +24,14 @@
 
 #include <config/CryptoNoteConfig.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
 #include <windows.h>
 #include <shlobj.h>
 #include <strsafe.h>
-#elif __APPLE__
-#include <sys/utsname.h>
-#elif __LINUX__
+#else
 #include <sys/utsname.h>
 #endif
 
