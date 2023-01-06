@@ -259,7 +259,7 @@ set(Boost_NO_BOOST_CMAKE ON)
 set(Boost_USE_STATIC_LIBS ON)
 
 if(DEFINED ENV{CI} AND MSVC)
-    set(Boost_USE_STATIC_RUNTIME OFF)
+    set(Boost_USE_STATIC_RUNTIME ON)
 else()
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
