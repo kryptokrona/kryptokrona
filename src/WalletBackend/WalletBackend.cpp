@@ -34,7 +34,7 @@
 
 #include "JsonHelper.h"
 
-#include <Mnemonics/Mnemonics.h>
+#include <Mnemonics/mnemonics.h>
 
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"

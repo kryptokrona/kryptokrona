@@ -5,9 +5,9 @@
 
 #include <algorithm>
 
-#include <Mnemonics/CRC32.h>
-#include <Mnemonics/Mnemonics.h>
-#include <Mnemonics/WordList.h>
+#include <Mnemonics/crc32.h>
+#include <Mnemonics/mnemonics.h>
+#include <Mnemonics/wordlist.h>
 
 #include <sstream>
 

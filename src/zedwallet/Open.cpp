@@ -9,7 +9,7 @@
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 
-#include <Mnemonics/Mnemonics.h>
+#include <Mnemonics/mnemonics.h>
 
 #include <Wallet/WalletErrors.h>
 

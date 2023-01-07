@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#include <Mnemonics/Mnemonics.h>
+#include <Mnemonics/mnemonics.h>
 
 #include <Errors/ValidateParameters.h>
 
