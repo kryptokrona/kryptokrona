@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <NodeRpcProxy/NodeRpcProxy.h>
+#include <node_rpc_proxy/node_rpc_proxy.h>
 
 #include <zedwallet/Types.h>
 
