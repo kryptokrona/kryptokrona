@@ -15,7 +15,7 @@
 #include "CryptoNoteProtocol/cryptonote_protocol_definitions.h"
 #include "CryptoNoteProtocol/cryptonote_protocol_handler_common.h"
 #include "CryptoNoteProtocol/icryptonote_protocol_observer.h"
-#include "CryptoNoteProtocol/ICryptoNoteProtocolQuery.h"
+#include "CryptoNoteProtocol/icryptonote_protocol_query.h"
 
 #include "P2p/P2pProtocolDefinitions.h"
 #include "P2p/NetNodeCommon.h"
