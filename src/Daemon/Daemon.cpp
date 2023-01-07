@@ -30,7 +30,7 @@
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
 
-#include <config/CryptoNoteCheckpoints.h>
+#include <config/cryptonote_checkpoints.h>
 #include <Logging/LoggerManager.h>
 
 #if defined(WIN32)
