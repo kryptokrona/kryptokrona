@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <Common/StreamTools.h>
 #include "SerializationOverloads.h"
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 using namespace Common;
 

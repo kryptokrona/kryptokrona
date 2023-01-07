@@ -5,7 +5,7 @@
 #pragma once
 
 #include <sstream>
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 #include <config/ascii.h>
 #include <version.h>
 

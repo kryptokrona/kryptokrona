@@ -5,7 +5,7 @@
 #pragma once
 
 #include <json.hpp>
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 #include <Logging/ILogger.h>
 #include "Common/PathTools.h"
 #include "Common/Util.h"

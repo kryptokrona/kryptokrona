@@ -27,7 +27,7 @@
 #include <System/TcpConnector.h>
 
 #include "version.h"
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
 #include "Common/Util.h"

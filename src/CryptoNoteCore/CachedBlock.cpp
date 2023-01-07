@@ -6,7 +6,7 @@
 
 #include "CachedBlock.h"
 #include <Common/Varint.h>
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 #include "CryptoNoteTools.h"
 
 using namespace Crypto;

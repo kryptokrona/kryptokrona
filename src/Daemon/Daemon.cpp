@@ -84,7 +84,7 @@ void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const 
     std::string transactionHex = Common::toHex(CryptoNote::toBinaryArray(transaction));
     std::cout << getProjectCLIHeader() << std::endl
               << std::endl
-              << "Replace the current GENESIS_COINBASE_TX_HEX line in src/config/CryptoNoteConfig.h with this one:" << std::endl
+              << "Replace the current GENESIS_COINBASE_TX_HEX line in src/config/cryptonote_config.h with this one:" << std::endl
               << "const char GENESIS_COINBASE_TX_HEX[] = \"" << transactionHex << "\";" << std::endl;
 
     return;

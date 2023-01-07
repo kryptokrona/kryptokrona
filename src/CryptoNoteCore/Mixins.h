@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 #include <CryptoNoteCore/CachedTransaction.h>
 #include <CryptoNoteCore/TransactionApi.h>

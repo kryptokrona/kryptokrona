@@ -22,7 +22,7 @@
 
 #include <Common/FileSystemShim.h>
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 #ifdef WIN32
 #ifndef NOMINMAX

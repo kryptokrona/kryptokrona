@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 /* Make sure everything in here is const - or it won't compile! */
 namespace WalletConfig

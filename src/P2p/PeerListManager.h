@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 
 #include <list>
 

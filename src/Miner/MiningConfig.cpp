@@ -16,7 +16,7 @@
 #include <cxxopts.hpp>
 #include <config/cli_header.h>
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 #include "Common/StringTools.h"
 #include <Common/Util.h>
 

@@ -288,9 +288,9 @@ The binaries will be in the `src` folder when you are complete.
 
 ## Change config
 
-Before we start we just need to change slight a bit on the `CryptoNoteConfig.h` header file with some constants so we don't use our main net to test on.
+Before we start we just need to change slight a bit on the `cryptonote_config.h` header file with some constants so we don't use our main net to test on.
 
-Open up `src/config/CryptoNoteConfig.h`
+Open up `src/config/cryptonote_config.h`
 
 Then we need to change the constants **P2P_DEFAULT_PORT** and **RPC_DEFAULT_PORT** to:
 
@@ -438,7 +438,7 @@ Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project,
 
 # Copypasta for license when editing files
 
-Hi kryptokrona contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/CryptoNoteConfig.h](https://github.com/turtlecoin/turtlecoin/commit/28cfef2575f2d767f6e512f2a4017adbf44e610e) for an example.
+Hi kryptokrona contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/cryptonote_config.h](https://github.com/turtlecoin/turtlecoin/commit/28cfef2575f2d767f6e512f2a4017adbf44e610e) for an example.
 
 ```
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
