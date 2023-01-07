@@ -11,7 +11,7 @@
 
 #include <Mnemonics/mnemonics.h>
 
-#include <Wallet/WalletErrors.h>
+#include <wallet/wallet_errors.h>
 
 #include <utilities/coloured_msg.h>
 #include <zedwallet/CommandImplementations.h>

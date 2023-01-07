@@ -8,7 +8,7 @@
 
 #include <Serialization/ISerializer.h>
 
-#include <Wallet/WalletGreen.h>
+#include <wallet/wallet_green.h>
 
 struct WalletInfo
 {

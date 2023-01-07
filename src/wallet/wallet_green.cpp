@@ -6,7 +6,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "WalletGreen.h"
+#include "wallet_green.h"
 
 #include <algorithm>
 #include <ctime>
@@ -40,9 +40,9 @@
 #include "crypto/crypto.h"
 #include <crypto/random.h>
 #include "Transfers/TransfersContainer.h"
-#include "WalletSerializationV2.h"
-#include "WalletErrors.h"
-#include "WalletUtils.h"
+#include "wallet_serialization_v2.h"
+#include "wallet_errors.h"
+#include "wallet_utils.h"
 
 using namespace Common;
 using namespace Crypto;

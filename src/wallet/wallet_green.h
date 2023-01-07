@@ -22,8 +22,8 @@
 #include <queue>
 #include <unordered_map>
 
-#include "IFusionManager.h"
-#include "WalletIndices.h"
+#include "ifusion_manager.h"
+#include "wallet_indices.h"
 
 #include "Logging/LoggerRef.h"
 #include <System/Dispatcher.h>

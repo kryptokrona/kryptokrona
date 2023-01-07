@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "WalletSerializationV2.h"
+#include "wallet_serialization_v2.h"
 
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
 #include "Serialization/BinaryInputStreamSerializer.h"

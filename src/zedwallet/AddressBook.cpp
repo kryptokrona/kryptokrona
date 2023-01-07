@@ -12,7 +12,7 @@
 
 #include <Serialization/SerializationTools.h>
 
-#include <Wallet/WalletUtils.h>
+#include <wallet/wallet_utils.h>
 
 #include <utilities/coloured_msg.h>
 #include <zedwallet/Tools.h>

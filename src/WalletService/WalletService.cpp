@@ -34,9 +34,9 @@
 #include "PaymentServiceJsonRpcMessages.h"
 #include "NodeFactory.h"
 
-#include "Wallet/WalletGreen.h"
-#include "Wallet/WalletErrors.h"
-#include "Wallet/WalletUtils.h"
+#include "wallet/wallet_green.h"
+#include "wallet/wallet_errors.h"
+#include "wallet/wallet_utils"
 #include "WalletServiceErrorCategory.h"
 
 #include "Mnemonics/Mnemonics.h"

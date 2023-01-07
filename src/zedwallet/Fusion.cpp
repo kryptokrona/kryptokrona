@@ -10,8 +10,8 @@
 
 #include <config/cryptonote_config.h>
 
-#include <Wallet/WalletGreen.h>
-#include <Wallet/WalletUtils.h>
+#include <wallet/wallet_green.h>
+#include <wallet/wallet_utils.h>
 
 #include <utilities/coloured_msg.h>
 #include <zedwallet/Tools.h>

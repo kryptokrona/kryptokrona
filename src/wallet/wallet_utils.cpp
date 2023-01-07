@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "WalletUtils.h"
+#include "wallet_utils.h"
 
 #include "CryptoNote.h"
 #include "crypto/crypto.h"
-#include "Wallet/WalletErrors.h"
+#include "wallet/wallet_errors.h"
 
 namespace CryptoNote
 {

@@ -35,7 +35,7 @@ file(GLOB_RECURSE sub_wallets sub_wallets/*)
 file(GLOB_RECURSE Transfers Transfers/*)
 file(GLOB_RECURSE kryptokronad Daemon/*)
 file(GLOB_RECURSE utilities utilities/*)
-file(GLOB_RECURSE Wallet Wallet/*)
+file(GLOB_RECURSE wallet wallet/*)
 file(GLOB_RECURSE wallet_api wallet_api/*)
 file(GLOB_RECURSE WalletBackend WalletBackend/*)
 file(GLOB_RECURSE zedwallet zedwallet/*)
@@ -50,7 +50,7 @@ else()
 endif()
 
 # Group the files together in IDEs
-source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${kryptokronad} ${json_rpc_server} ${http} ${Logging} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${wallet_api} ${WalletBackend} ${zedwallet} ${zedwallet++} ${crypto_test} ${Errors} ${utilities} ${SubWallets})
+source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${kryptokronad} ${json_rpc_server} ${http} ${Logging} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${rpc} ${Serialization} ${System} ${Transfers} ${wallet} ${wallet_api} ${WalletBackend} ${zedwallet} ${zedwallet++} ${crypto_test} ${Errors} ${utilities} ${SubWallets})
 
 # Define a group of files as a library to link against
 add_library(blockchain_explorer STATIC ${blockchain_explorer})
@@ -71,7 +71,7 @@ add_library(sub_wallets STATIC ${sub_wallets})
 add_library(System STATIC ${System})
 add_library(Transfers STATIC ${Transfers})
 add_library(utilities STATIC ${utilities})
-add_library(Wallet STATIC ${Wallet})
+add_library(wallet STATIC ${wallet})
 add_library(WalletBackend STATIC ${WalletBackend})
 add_library(WalletService STATIC ${service})
 
@@ -137,13 +137,13 @@ target_link_libraries(miner CryptoNoteCore rpc System http Crypto Errors utiliti
 target_link_libraries(nigel Errors)
 target_link_libraries(P2P CryptoNoteCore upnpc-static)
 target_link_libraries(rpc P2P utilities)
-target_link_libraries(service json_rpc_server Wallet mnemonics Errors)
+target_link_libraries(service json_rpc_server wallet mnemonics Errors)
 target_link_libraries(sub_wallets utilities CryptoNoteCore)
-target_link_libraries(Wallet node_rpc_proxy Transfers CryptoNoteCore Common ${Boost_LIBRARIES})
+target_link_libraries(wallet node_rpc_proxy Transfers CryptoNoteCore Common ${Boost_LIBRARIES})
 target_link_libraries(wallet_api WalletBackend)
 target_link_libraries(WalletBackend mnemonics CryptoNoteCore nigel cryptopp-static __filesystem utilities sub_wallets)
 target_link_libraries(WalletService mnemonics)
-target_link_libraries(zedwallet mnemonics Wallet Errors utilities)
+target_link_libraries(zedwallet mnemonics wallet Errors utilities)
 target_link_libraries(zedwallet++ WalletBackend)
 
 # Add dependencies means we have to build the latter before we build the former

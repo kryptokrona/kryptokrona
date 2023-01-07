@@ -21,7 +21,7 @@
 #include "Common/IOutputStream.h"
 #include "Serialization/ISerializer.h"
 #include "Transfers/TransfersSynchronizer.h"
-#include "Wallet/WalletIndices.h"
+#include "wallet/wallet_indices.h"
 
 namespace CryptoNote
 {

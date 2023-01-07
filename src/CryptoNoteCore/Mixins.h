@@ -10,7 +10,7 @@
 #include <CryptoNoteCore/CachedTransaction.h>
 #include <CryptoNoteCore/TransactionApi.h>
 
-#include <Wallet/WalletErrors.h>
+#include <wallet/wallet_errors.h>
 
 namespace CryptoNote
 {

@@ -26,10 +26,10 @@
 #include <zedwallet/Tools.h>
 #include <config/wallet_config.h>
 
-#include <Wallet/WalletErrors.h>
+#include <wallet/wallet_errors.h>
 
-#include <Wallet/WalletGreen.h>
-#include <Wallet/WalletUtils.h>
+#include <wallet/wallet_green.h>
+#include <wallet/wallet_utils.h>
 
 bool parseAmount(std::string strAmount, uint64_t &amount)
 {

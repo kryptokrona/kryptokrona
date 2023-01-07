@@ -28,7 +28,7 @@
 #include "Common/ObserverManager.h"
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
-#include "Wallet/WalletAsyncContextCounter.h"
+#include "wallet/wallet_async_context_counter.h"
 
 #include "Logging/LoggerRef.h"
 
