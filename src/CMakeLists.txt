@@ -18,7 +18,7 @@ file(GLOB_RECURSE Common Common/*)
 file(GLOB_RECURSE Crypto crypto/*)
 file(GLOB_RECURSE CryptoNoteCore CryptoNoteCore/* CryptoNoteConfig.h)
 file(GLOB_RECURSE CryptoNoteProtocol CryptoNoteProtocol/*)
-file(GLOB_RECURSE CryptoTest CryptoTest/*)
+file(GLOB_RECURSE crypto_test crypto_test/*)
 file(GLOB_RECURSE Errors Errors/*)
 file(GLOB_RECURSE http http/*)
 file(GLOB_RECURSE json_rpc_server json_rpc_server/*)
@@ -50,7 +50,7 @@ else()
 endif()
 
 # Group the files together in IDEs
-source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${kryptokronad} ${json_rpc_server} ${http} ${Logging} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${wallet_api} ${WalletBackend} ${zedwallet} ${zedwallet++} ${CryptoTest} ${Errors} ${Utilities} ${SubWallets})
+source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${kryptokronad} ${json_rpc_server} ${http} ${Logging} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${wallet_api} ${WalletBackend} ${zedwallet} ${zedwallet++} ${crypto_test} ${Errors} ${Utilities} ${SubWallets})
 
 # Define a group of files as a library to link against
 add_library(blockchain_explorer STATIC ${blockchain_explorer})
@@ -96,7 +96,7 @@ if(MSVC)
     )
 endif()
 
-add_executable(cryptotest ${CryptoTest} ${CT_SOURCES_OS})
+add_executable(crypto_test ${crypto_test} ${CT_SOURCES_OS})
 add_executable(miner ${miner} ${MINER_SOURCES_OS})
 add_executable(service ${service} ${PG_SOURCES_OS})
 add_executable(kryptokronad ${kryptokronad} ${DAEMON_SOURCES_OS})
@@ -130,7 +130,7 @@ endif()
 # Add the dependencies we need
 target_link_libraries(Common __filesystem)
 target_link_libraries(CryptoNoteCore Common Logging Crypto P2P Rpc http Serialization System ${Boost_LIBRARIES})
-target_link_libraries(cryptotest Crypto Common)
+target_link_libraries(crypto_test Crypto Common)
 target_link_libraries(Errors sub_wallets)
 target_link_libraries(Logging Common)
 target_link_libraries(miner CryptoNoteCore Rpc System http Crypto Errors Utilities)
@@ -149,7 +149,7 @@ target_link_libraries(zedwallet++ WalletBackend)
 # Add dependencies means we have to build the latter before we build the former
 # In this case it's because we need to have the current version name rather
 # than a cached one
-add_dependencies(cryptotest version)
+add_dependencies(crypto_test version)
 add_dependencies(miner version)
 add_dependencies(json_rpc_server version)
 add_dependencies(P2P version)
@@ -166,7 +166,7 @@ set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "xkrwallet")
 set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "xkrwallet-beta")
 set_property(TARGET service PROPERTY OUTPUT_NAME "kryptokrona-service")
 set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
-set_property(TARGET cryptotest PROPERTY OUTPUT_NAME "cryptotest")
+set_property(TARGET crypto_test PROPERTY OUTPUT_NAME "crypto_test")
 set_property(TARGET wallet_api PROPERTY OUTPUT_NAME "wallet-api")
 
 # Additional make targets, can be used to build a subset of the targets
