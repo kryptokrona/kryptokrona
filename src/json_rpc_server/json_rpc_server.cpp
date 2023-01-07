@@ -18,7 +18,7 @@
 #include <System/Ipv4Address.h>
 #include "http/http_parser.h"
 #include "http/http_response.h"
-#include "Rpc/JsonRpc.h"
+#include "rpc/json_rpc.h"
 
 #include "Common/JsonValue.h"
 #include "Serialization/JsonInputValueSerializer.h"

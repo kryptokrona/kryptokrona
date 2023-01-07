@@ -11,7 +11,7 @@
 #include <System/Event.h>
 #include "Logging/ILogger.h"
 #include "Logging/LoggerRef.h"
-#include "Rpc/HttpServer.h"
+#include "rpc/http_server.h"
 #include "WalletService/ConfigurationManager.h"
 
 namespace CryptoNote

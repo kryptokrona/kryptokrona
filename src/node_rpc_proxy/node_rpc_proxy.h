@@ -15,7 +15,7 @@
 #include "Common/ObserverManager.h"
 #include "Logging/LoggerRef.h"
 #include "INode.h"
-#include "Rpc/CoreRpcServerCommandsDefinitions.h"
+#include "rpc/core_rpc_server_commands_definitions.h"
 
 namespace System
 {

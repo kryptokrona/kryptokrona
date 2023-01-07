@@ -26,9 +26,9 @@
 
 #include <Logging/DummyLogger.h>
 
-#include "Rpc/CoreRpcServerCommandsDefinitions.h"
-#include "Rpc/HttpClient.h"
-#include "Rpc/JsonRpc.h"
+#include "rpc/core_rpc_server_commands_definitions.h"
+#include "rpc/http_client.h"
+#include "rpc/json_rpc.h"
 
 #ifndef AUTO_VAL_INIT
 #define AUTO_VAL_INIT(n) boost::value_initialized<decltype(n)>()

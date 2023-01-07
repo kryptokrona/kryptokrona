@@ -16,7 +16,7 @@
 #include "Serialization/JsonInputValueSerializer.h"
 #include "Serialization/JsonOutputStreamSerializer.h"
 
-#include "Rpc/JsonRpc.h"
+#include "rpc/json_rpc.h"
 
 namespace PaymentService
 {

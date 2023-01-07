@@ -26,7 +26,7 @@
 #include "cryptonote_protocol/cryptonote_protocol_handler.h"
 #include "P2p/NetNode.h"
 #include "P2p/NetNodeConfig.h"
-#include "Rpc/RpcServer.h"
+#include "rpc/rpc_server.h"
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
 

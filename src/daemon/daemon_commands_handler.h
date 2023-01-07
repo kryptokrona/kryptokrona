@@ -9,9 +9,9 @@
 
 #include <Logging/LoggerRef.h>
 #include <Logging/LoggerManager.h>
-#include "Rpc/RpcServer.h"
-#include "Rpc/CoreRpcServerCommandsDefinitions.h"
-#include "Rpc/JsonRpc.h"
+#include "rpc/rpc_server.h"
+#include "rpc/core_rpc_server_commands_definitions.h"
+#include "rpc/json_rpc.h"
 
 namespace CryptoNote
 {

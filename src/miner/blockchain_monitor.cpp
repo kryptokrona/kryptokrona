@@ -11,8 +11,8 @@
 #include <System/Timer.h>
 #include <System/InterruptedException.h>
 
-#include "Rpc/CoreRpcServerCommandsDefinitions.h"
-#include "Rpc/JsonRpc.h"
+#include "rpc/core_rpc_server_commands_definitions.h"
+#include "rpc/json_rpc.h"
 
 #include <utilities/coloured_msg.h>
 
