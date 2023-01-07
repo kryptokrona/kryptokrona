@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////
-#include <WalletApi/ApiDispatcher.h>
+#include <wallet_api/api_dispatcher.h>
 ////////////////////////////////////
 
 #include <config/cryptonote_config.h>
@@ -24,7 +24,7 @@
 
 #include "json.hpp"
 
-#include <WalletApi/Constants.h>
+#include <wallet_api/constants.h>
 
 #include <WalletBackend/JsonSerialization.h>
 
