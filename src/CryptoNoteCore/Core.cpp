@@ -29,7 +29,7 @@
 #include <CryptoNoteCore/TransactionPoolCleaner.h>
 #include <CryptoNoteCore/UpgradeManager.h>
 
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h>
+#include <CryptoNoteProtocol/cryptonote_protocol_handler_common.h>
 
 #include <set>
 
