@@ -13,7 +13,7 @@
 
 #include <CryptoNoteProtocol/cryptonote_protocol_handler.h>
 
-#include <Daemon/DaemonCommandsHandler.h>
+#include <Daemon/daemon_commands_handler.h>
 
 #include <P2p/NetNode.h>
 

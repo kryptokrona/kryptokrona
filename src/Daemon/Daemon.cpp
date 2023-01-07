@@ -6,8 +6,8 @@
 
 #include <config/cli_header.h>
 
-#include "DaemonConfiguration.h"
-#include "DaemonCommandsHandler.h"
+#include "daemon_configuration.h"
+#include "daemon_commands_handler.h"
 #include "Common/ScopeExit.h"
 #include "Common/SignalHandler.h"
 #include "Common/StdOutputStream.h"
