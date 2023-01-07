@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <boost/utility.hpp>
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 #include "crypto/hash.h"
 #include "Logging/LoggerRef.h"
 #include "CachedBlock.h"

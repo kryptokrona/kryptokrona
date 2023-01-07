@@ -12,7 +12,7 @@
 
 #include <ctime>
 
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 
 #include <CryptoNoteCore/Core.h>
 

@@ -9,7 +9,7 @@
 #include <Common/Base58.h>
 #include <Common/FileSystemShim.h>
 
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 
 #include <crypto/random.h>
 

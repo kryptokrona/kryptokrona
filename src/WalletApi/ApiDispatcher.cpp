@@ -6,7 +6,7 @@
 #include <WalletApi/ApiDispatcher.h>
 ////////////////////////////////////
 
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 
 #include <CryptoNoteCore/Mixins.h>
 

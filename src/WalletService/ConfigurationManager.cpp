@@ -10,7 +10,7 @@
 
 #include <CryptoTypes.h>
 #include <config/cli_header.h>
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 
 #include "Common/Util.h"
 #include "crypto/hash.h"

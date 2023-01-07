@@ -10,7 +10,7 @@
 #include <boost/uuid/uuid.hpp>
 
 #include "crypto/crypto.h"
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 #include "CryptoNoteCore/CoreStatistics.h"
 
 // new serialization

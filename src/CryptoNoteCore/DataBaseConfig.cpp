@@ -8,7 +8,7 @@
 #include <Common/Util.h>
 #include "Common/StringTools.h"
 #include "crypto/crypto.h"
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 
 using namespace CryptoNote;
 

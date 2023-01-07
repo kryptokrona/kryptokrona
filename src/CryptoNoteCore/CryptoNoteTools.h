@@ -23,7 +23,7 @@
 #include "Common/VectorOutputStream.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
 #include "Serialization/BinaryInputStreamSerializer.h"
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 #include "CryptoNoteSerialization.h"
 
 namespace CryptoNote

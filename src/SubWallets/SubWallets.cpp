@@ -6,7 +6,7 @@
 #include <SubWallets/SubWallets.h>
 //////////////////////////////////
 
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 
 #include <CryptoNoteCore/Currency.h>
 

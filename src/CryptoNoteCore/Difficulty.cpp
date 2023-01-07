@@ -6,7 +6,7 @@
 
 #include "Difficulty.h"
 
-#include <config/cryptonote_config>
+#include <config/cryptonote_config.h>
 
 // LWMA-3 difficulty algorithm
 // Copyright (c) 2017-2018 Zawy, MIT License
