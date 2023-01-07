@@ -23,7 +23,7 @@
 #include "CryptoNoteCore/DatabaseBlockchainCacheFactory.h"
 #include "CryptoNoteCore/MainChainStorage.h"
 #include "CryptoNoteCore/RocksDBWrapper.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
+#include "cryptonote_protocol/cryptonote_protocol_handler.h"
 #include "P2p/NetNode.h"
 #include "P2p/NetNodeConfig.h"
 #include "Rpc/RpcServer.h"

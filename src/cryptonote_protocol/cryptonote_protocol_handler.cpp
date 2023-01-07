@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "CryptoNoteProtocolHandler.h"
+#include "cryptonote_protocol_handler.h"
 
 #include <future>
 #include <boost/scope_exit.hpp>

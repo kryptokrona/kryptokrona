@@ -11,7 +11,7 @@
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/Currency.h>
 
-#include <CryptoNoteProtocol/CryptoNoteProtocolHandler.h>
+#include <cryptonote_protocol/cryptonote_protocol_handler.h>
 
 #include <Daemon/DaemonCommandsHandler.h>
 
