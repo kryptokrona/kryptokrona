@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <CryptoNoteProtocol/icryptonote_protocol_query.h>
+#include <cryptonote_protocol/icryptonote_protocol_query.h>
 #include <CryptoNote.h>
 
 #include <vector>

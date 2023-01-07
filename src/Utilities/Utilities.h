@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include <Errors/errors.h>
+#include <errors/errors.h>
 
 namespace Utilities
 {

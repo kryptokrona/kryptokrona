@@ -8,7 +8,7 @@
 
 #include <config/cryptonote_config.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>
-#include <Errors/validate_parameters.h>
+#include <errors/validate_parameters.h>
 #include <Utilities/Utilities.h>
 #include <version.h>
 

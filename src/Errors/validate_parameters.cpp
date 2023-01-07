@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////////
-#include <Errors/validate_parameters.h>
+#include <errors/validate_parameters.h>
 //////////////////////////////////////
 
 #include <Common/Base58.h>

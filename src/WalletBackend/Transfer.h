@@ -6,7 +6,7 @@
 
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 
-#include <Errors/errors.h>
+#include <errors/errors.h>
 
 #include <Nigel/Nigel.h>
 

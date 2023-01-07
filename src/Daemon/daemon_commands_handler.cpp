@@ -11,9 +11,9 @@
 #include <CryptoNoteCore/CryptoNoteFormatUtils.h>
 #include <CryptoNoteCore/Currency.h>
 
-#include <CryptoNoteProtocol/cryptonote_protocol_handler.h>
+#include <cryptonote_protocol/cryptonote_protocol_handler.h>
 
-#include <Daemon/daemon_commands_handler.h>
+#include <daemon/daemon_commands_handler.h>
 
 #include <P2p/NetNode.h>
 

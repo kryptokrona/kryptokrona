@@ -8,7 +8,7 @@
 
 #include <config/wallet_config.h>
 
-#include <Errors/validate_parameters.h>
+#include <errors/validate_parameters.h>
 
 #include <fstream>
 
