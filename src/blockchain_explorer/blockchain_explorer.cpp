@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "BlockchainExplorer.h"
+#include "blockchain_explorer.h"
 
 #include <future>
 #include <functional>
 #include <memory>
 #include <utility>
 
-#include "BlockchainExplorerErrors.h"
+#include "blockchain_explorer_errors.h"
 #include "Common/StdOutputStream.h"
 #include "Common/StdInputStream.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"

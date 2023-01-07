@@ -21,10 +21,10 @@
 #include <atomic>
 #include <unordered_set>
 
-#include "IBlockchainExplorer.h"
+#include "Iblockchain_explorer.h"
 #include "INode.h"
 
-#include "BlockchainExplorerErrors.h"
+#include "blockchain_explorer_errors.h"
 #include "Common/ObserverManager.h"
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
