@@ -18,7 +18,7 @@
 #include "HttpServer.h"
 #include <boost/scope_exit.hpp>
 
-#include <HTTP/HttpParser.h>
+#include <http/http_parser.h>
 #include <System/InterruptedException.h>
 #include <System/TcpStream.h>
 #include <System/Ipv4Address.h>

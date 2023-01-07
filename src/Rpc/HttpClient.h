@@ -19,8 +19,8 @@
 
 #include <memory>
 
-#include <HTTP/HttpRequest.h>
-#include <HTTP/HttpResponse.h>
+#include <http/http_request.h>
+#include <http/http_response.h>
 #include <System/TcpConnection.h>
 #include <System/TcpStream.h>
 

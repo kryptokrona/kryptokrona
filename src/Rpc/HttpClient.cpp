@@ -17,7 +17,7 @@
 
 #include "HttpClient.h"
 
-#include <HTTP/HttpParser.h>
+#include <http/http_parser.h>
 #include <System/Ipv4Resolver.h>
 #include <System/Ipv4Address.h>
 #include <System/TcpConnector.h>
