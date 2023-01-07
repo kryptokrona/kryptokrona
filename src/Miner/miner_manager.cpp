@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "MinerManager.h"
+#include "miner_manager.h"
 
 #include <System/EventLock.h>
 #include <System/InterruptedException.h>

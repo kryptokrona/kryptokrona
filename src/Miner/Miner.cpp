@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "Miner.h"
+#include "miner.h"
 
 #include <iostream>
 

@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "MiningConfig.h"
+#include "mining_config.h"
 
 #include <iostream>
 #include <thread>
