@@ -321,7 +321,7 @@ Now we are good to go to start with Docker. So if we want to setup our own testn
 
 ## Install Docker
 
-On Windows or Mac it's enough to install Docker Desktop and we will have everything we need in order to setup. For GNU/Linux however there is a slight different process. We are going through the steps for doing it on a Ubuntu distribution, it should work on all Debian derived distributions. Read below.
+On Windows or Mac it's enough to install Docker Desktop and we will have everything we need in order to setup. For GNU/Linux however there is a slightly different process. We are going through the steps for doing it on a Ubuntu distribution, it should work on all Debian derived distributions. Read below.
 
 Update our headers:
 
@@ -329,7 +329,7 @@ Update our headers:
 sudo apt-get update
 ```
 
-Installing neccessary dependencies for Docker:
+Installing necessary dependencies for Docker:
 
 ```bash
 sudo apt-get -y install \
@@ -377,7 +377,7 @@ To start:
 
 - `./setup-testnet.sh`
 
-So now the first time when starting the script it will take a while to compile and link all the files (around 15-20 minutes dependening on how powerful computer you have). So when it's done you will see a lot of output of the Daemons starting on three nodes. The miner do not have any output on the terminal.
+So now the first time when starting the script it will take a while to compile and link all the files (around 15-20 minutes depending on how powerful computer you have). So when it's done you will see a lot of output of the Daemons starting on three nodes. The miner do not have any output on the terminal.
 
 ## Stop all Docker containers
 
