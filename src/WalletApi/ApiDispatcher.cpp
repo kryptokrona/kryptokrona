@@ -16,7 +16,7 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/pwdbased.h>
 
-#include <Errors/ValidateParameters.h>
+#include <Errors/validate_parameters.h>
 
 #include <iomanip>
 
