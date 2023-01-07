@@ -6,7 +6,7 @@
 
 #include <unordered_set>
 
-#include "CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
+#include "CryptoNoteProtocol/cryptonote_protocol_definitions.h"
 
 namespace CryptoNote
 {

@@ -13,7 +13,7 @@
 
 #include "crypto/crypto.h"
 #include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
+#include "CryptoNoteProtocol/cryptonote_protocol_definitions.h"
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 
 #include "BlockchainExplorerData.h"

@@ -12,7 +12,7 @@
 
 #include "CryptoNoteCore/ICore.h"
 
-#include "CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
+#include "CryptoNoteProtocol/cryptonote_protocol_definitions.h"
 #include "CryptoNoteProtocol/CryptoNoteProtocolHandlerCommon.h"
 #include "CryptoNoteProtocol/ICryptoNoteProtocolObserver.h"
 #include "CryptoNoteProtocol/ICryptoNoteProtocolQuery.h"
