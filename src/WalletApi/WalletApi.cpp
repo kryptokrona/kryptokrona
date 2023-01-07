@@ -6,7 +6,7 @@
 
 #include <Common/SignalHandler.h>
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 
 #include <iostream>
 

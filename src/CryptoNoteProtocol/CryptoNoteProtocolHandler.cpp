@@ -21,7 +21,7 @@
 
 #include <config/Ascii.h>
 #include <config/CryptoNoteConfig.h>
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 using namespace Logging;
 using namespace Common;

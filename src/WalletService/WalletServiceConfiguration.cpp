@@ -7,7 +7,7 @@
 #include <fstream>
 #include <string>
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 #include <config/CryptoNoteConfig.h>
 #include <Logging/ILogger.h>
 

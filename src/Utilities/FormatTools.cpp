@@ -18,7 +18,7 @@
 
 #include <Rpc/CoreRpcServerCommandsDefinitions.h>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 namespace Utilities
 {

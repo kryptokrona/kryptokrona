@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 namespace ApiConstants
 {

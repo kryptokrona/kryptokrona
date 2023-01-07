@@ -9,7 +9,7 @@
 #include <Common/Base58.h>
 
 #include <config/CryptoNoteConfig.h>
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>

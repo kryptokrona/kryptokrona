@@ -6,7 +6,7 @@
 #include <WalletBackend/Transfer.h>
 ///////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <CryptoNoteCore/CryptoNoteTools.h>
 #include <CryptoNoteCore/Currency.h>

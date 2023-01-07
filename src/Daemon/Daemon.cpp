@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 
 #include "DaemonConfiguration.h"
 #include "DaemonCommandsHandler.h"
@@ -30,7 +30,7 @@
 #include "Serialization/BinaryInputStreamSerializer.h"
 #include "Serialization/BinaryOutputStreamSerializer.h"
 
-#include <config/CryptoNoteCheckpoints.h>
+#include <config/cryptonote_checkpoints.h>
 #include <Logging/LoggerManager.h>
 
 #if defined(WIN32)

@@ -24,7 +24,7 @@
 #include <Utilities/ColouredMsg.h>
 #include <zedwallet/Fusion.h>
 #include <zedwallet/Tools.h>
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <Wallet/WalletErrors.h>
 

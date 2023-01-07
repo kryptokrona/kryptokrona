@@ -6,7 +6,7 @@
 #include <zedwallet++/Transfer.h>
 /////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <iostream>
 

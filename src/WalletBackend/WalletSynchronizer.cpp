@@ -8,7 +8,7 @@
 
 #include <Common/StringTools.h>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <crypto/crypto.h>
 
