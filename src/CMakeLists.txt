@@ -77,22 +77,22 @@ add_library(WalletService STATIC ${service})
 
 if(MSVC)
     set(DAEMON_SOURCES_OS
-        BinaryInfo/daemon.rc
+            binary_info/daemon.rc
     )
     set(ZED_WALLET_SOURCES_OS
-        BinaryInfo/zedwallet.rc
+            binary_info/zedwallet.rc
     )
     set(MINER_SOURCES_OS
-        BinaryInfo/miner.rc
+            binary_info/miner.rc
     )
     set(PG_SOURCES_OS
-        BinaryInfo/service.rc
+            binary_info/service.rc
     )
     set(CT_SOURCES_OS
-        BinaryInfo/cryptotest.rc
+            binary_info/cryptotest.rc
     )
     set(WALLET_API_SOURCES_OS
-        BinaryInfo/walletapi.rc
+            binary_info/walletapi.rc
     )
 endif()
 
