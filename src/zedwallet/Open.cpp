@@ -13,7 +13,7 @@
 
 #include <Wallet/WalletErrors.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet/CommandImplementations.h>
 #include <zedwallet/Tools.h>
 #include <zedwallet/Transfer.h>

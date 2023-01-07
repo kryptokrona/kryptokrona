@@ -20,7 +20,7 @@
 
 #include <System/InterruptedException.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 
 namespace CryptoNote
 {

@@ -39,8 +39,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include <Utilities/Addresses.h>
-#include <Utilities/Utilities.h>
+#include <utilities/addresses.h>
+#include <utilities/utilities.h>
 
 #include <WalletBackend/Constants.h>
 #include <WalletBackend/Transfer.h>

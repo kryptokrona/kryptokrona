@@ -17,7 +17,7 @@
 #include "CryptoNoteCore/Currency.h"
 #include "P2p/LevinProtocol.h"
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
 #include <config/ascii.h>
 #include <config/cryptonote_config.h>

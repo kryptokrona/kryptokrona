@@ -14,7 +14,7 @@
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 #include "Rpc/JsonRpc.h"
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 
 using json = nlohmann::json;
 

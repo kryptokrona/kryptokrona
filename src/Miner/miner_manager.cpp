@@ -22,9 +22,9 @@
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 #include "Rpc/JsonRpc.h"
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 
 using namespace CryptoNote;
 

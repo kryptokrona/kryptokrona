@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include <Utilities/Utilities.h>
+#include <utilities/utilities.h>
 
 #include <WalletBackend/Constants.h>
 

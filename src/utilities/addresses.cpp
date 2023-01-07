@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////
-#include <Utilities/Addresses.h>
+#include <utilities/addresses.h>
 ////////////////////////////////
 
 #include <Common/Base58.h>

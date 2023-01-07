@@ -25,7 +25,7 @@
 
 #include <Errors/ValidateParameters.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 
 namespace CryptoNote
 {

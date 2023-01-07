@@ -18,8 +18,8 @@
 
 #include <regex>
 
-#include <Utilities/Addresses.h>
-#include <Utilities/Utilities.h>
+#include <utilities/addresses.h>
+#include <utilities/utilities.h>
 
 Error validateFusionTransaction(
     const uint64_t mixin,

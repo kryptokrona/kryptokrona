@@ -16,7 +16,7 @@
 #include <windows.h>
 #endif
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet/Menu.h>
 #include <zedwallet/ParseArguments.h>
 #include <zedwallet/Tools.h>

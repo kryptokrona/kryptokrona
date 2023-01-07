@@ -10,7 +10,7 @@
 
 #include <Common/StringTools.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet/CommandImplementations.h>
 #include <zedwallet/GetInput.h>
 #include <zedwallet/Tools.h>

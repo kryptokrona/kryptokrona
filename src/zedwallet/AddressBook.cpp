@@ -14,7 +14,7 @@
 
 #include <Wallet/WalletUtils.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet/Tools.h>
 #include <zedwallet/Transfer.h>
 #include <config/wallet_config.h>

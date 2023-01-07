@@ -35,8 +35,8 @@
 
 #include <System/Timer.h>
 
-#include <Utilities/FormatTools.h>
-#include <Utilities/LicenseCanary.h>
+#include <utilities/format_tools.h>
+#include <utilities/license_canary.h>
 
 #include <unordered_set>
 

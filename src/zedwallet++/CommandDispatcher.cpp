@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include <zedwallet++/AddressBook.h>
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet++/CommandImplementations.h>
 #include <zedwallet++/Open.h>
 #include <zedwallet++/Transfer.h>

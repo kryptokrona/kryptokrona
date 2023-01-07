@@ -16,8 +16,8 @@
 
 #include <random>
 
-#include <Utilities/Addresses.h>
-#include <Utilities/Utilities.h>
+#include <utilities/addresses.h>
+#include <utilities/utilities.h>
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */

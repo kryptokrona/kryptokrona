@@ -15,9 +15,9 @@
 
 #include <Errors/ValidateParameters.h>
 
-#include <Utilities/Addresses.h>
-#include <Utilities/FormatTools.h>
-#include <Utilities/Utilities.h>
+#include <utilities/addresses.h>
+#include <utilities/format_tools.h>
+#include <utilities/utilities.h>
 
 #include <WalletBackend/WalletBackend.h>
 

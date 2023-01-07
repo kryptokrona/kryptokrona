@@ -5,7 +5,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 //////////////////////////////////
 
 #include <cstdio>

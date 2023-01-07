@@ -12,9 +12,9 @@
 
 #include "linenoise.hpp"
 
-#include <Utilities/FormatTools.h>
+#include <utilities/format_tools.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet++/Commands.h>
 #include <zedwallet++/Utilities.h>
 

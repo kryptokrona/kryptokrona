@@ -21,8 +21,8 @@
 
 #include <Serialization/SerializationTools.h>
 
-#include <Utilities/FormatTools.h>
-#include <Utilities/ColouredMsg.h>
+#include <utilities/format_tools.h>
+#include <utilities/coloured_msg.h>
 
 #include "version.h"
 

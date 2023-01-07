@@ -21,7 +21,7 @@
 
 #include <node_rpc_proxy/node_errors.h>
 
-#include <Utilities/ColouredMsg.h>
+#include <utilities/coloured_msg.h>
 #include <zedwallet/Fusion.h>
 #include <zedwallet/Tools.h>
 #include <config/wallet_config.h>
