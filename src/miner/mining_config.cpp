@@ -23,7 +23,7 @@
 #include "Logging/ILogger.h"
 #include "version.h"
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include <utilities/coloured_msg.h>
 

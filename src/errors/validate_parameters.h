@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Errors/Errors.h>
+#include <errors/errors.h>
 
 #include <memory>
 

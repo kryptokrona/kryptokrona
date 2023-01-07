@@ -8,7 +8,7 @@
 
 #include "CryptoTypes.h"
 
-#include <Errors/Errors.h>
+#include <errors/errors.h>
 
 #include "rapidjson/document.h"
 

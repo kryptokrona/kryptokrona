@@ -14,7 +14,7 @@
 
 #include <Mnemonics/mnemonics.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include <utilities/coloured_msg.h>
 #include <zedwallet++/CommandImplementations.h>

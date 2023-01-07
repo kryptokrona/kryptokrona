@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#include <Errors/Errors.h>
+#include <errors/errors.h>
 
 namespace Mnemonics
 {

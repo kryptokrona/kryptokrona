@@ -13,7 +13,7 @@
 #include <CryptoNoteCore/Mixins.h>
 #include <CryptoNoteCore/TransactionExtra.h>
 
-#include <Errors/ValidateParameters.h>
+#include <errors/validate_parameters.h>
 
 #include <utilities/addresses.h>
 #include <utilities/format_tools.h>
