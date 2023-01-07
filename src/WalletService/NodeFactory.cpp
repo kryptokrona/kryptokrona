@@ -5,7 +5,7 @@
 
 #include "NodeFactory.h"
 
-#include "NodeRpcProxy/NodeRpcProxy.h"
+#include "NodeRpcProxy/node_rpc_proxy.h"
 #include <memory>
 #include <future>
 

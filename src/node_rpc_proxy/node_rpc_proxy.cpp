@@ -3,8 +3,8 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "NodeRpcProxy.h"
-#include "NodeErrors.h"
+#include "node_rpc_proxy.h"
+#include "node_errors.h"
 
 #include <atomic>
 #include <ctime>

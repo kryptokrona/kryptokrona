@@ -13,7 +13,7 @@
 #include "PaymentServiceJsonRpcServer.h"
 
 #include "Common/ScopeExit.h"
-#include "NodeRpcProxy/NodeRpcProxy.h"
+#include "NodeRpcProxy/node_rpc_proxy.h"
 #include <System/Context.h>
 #include "Wallet/WalletGreen.h"
 

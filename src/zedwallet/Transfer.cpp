@@ -19,7 +19,7 @@
 
 #include "IWallet.h"
 
-#include <NodeRpcProxy/NodeErrors.h>
+#include <NodeRpcProxy/node_errors.h>
 
 #include <Utilities/ColouredMsg.h>
 #include <zedwallet/Fusion.h>
