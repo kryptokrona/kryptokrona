@@ -16,7 +16,7 @@
 #include <System/TcpConnection.h>
 #include <System/TcpConnector.h>
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 #include <crypto/random.h>
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"

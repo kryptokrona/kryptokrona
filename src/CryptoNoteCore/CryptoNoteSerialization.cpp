@@ -33,7 +33,7 @@
 #include "crypto/crypto.h"
 
 #include "Account.h"
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 #include "CryptoNoteFormatUtils.h"
 #include "CryptoNoteTools.h"
 #include "TransactionExtra.h"

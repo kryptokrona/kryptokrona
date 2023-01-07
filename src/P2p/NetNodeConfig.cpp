@@ -7,7 +7,7 @@
 
 #include <Common/Util.h>
 #include "Common/StringTools.h"
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 #include <crypto/random.h>
 
 namespace CryptoNote

@@ -9,7 +9,7 @@
 #include <sstream>
 
 #include <config/cli_header.h>
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config.h>
 #include <Logging/ILogger.h>
 #include "Common/PathTools.h"
 #include "Common/Util.h"

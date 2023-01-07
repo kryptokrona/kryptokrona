@@ -8,7 +8,7 @@
 
 #include <thread>
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 
 #include <Wallet/WalletGreen.h>
 #include <Wallet/WalletUtils.h>

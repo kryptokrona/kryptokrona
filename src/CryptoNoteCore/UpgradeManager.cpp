@@ -17,7 +17,7 @@
 
 #include "UpgradeManager.h"
 
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 
 namespace CryptoNote
 {

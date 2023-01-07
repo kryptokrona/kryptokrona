@@ -25,7 +25,7 @@
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/Currency.h"
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 #include <Logging/LoggerRef.h>
 
 namespace CryptoNote

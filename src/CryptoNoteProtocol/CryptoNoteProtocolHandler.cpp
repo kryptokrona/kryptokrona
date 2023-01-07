@@ -20,7 +20,7 @@
 #include <Utilities/FormatTools.h>
 
 #include <config/Ascii.h>
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 #include <config/wallet_config.h>
 
 using namespace Logging;

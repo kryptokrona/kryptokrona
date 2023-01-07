@@ -27,7 +27,7 @@
 #include "Common/StdInputStream.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include <config/CryptoNoteConfig.h>
+#include <config/cryptonote_config>
 
 #include "ITransaction.h"
 
