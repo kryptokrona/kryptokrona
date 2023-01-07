@@ -3,21 +3,21 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "JsonRpcServer.h"
+#include "json_rpc_server.h"
 
 #include <fstream>
 #include <future>
 #include <system_error>
 #include <memory>
 #include <sstream>
-#include "HTTP/HttpParserErrorCodes.h"
+#include "http/http_parser_error_codes.h"
 
 #include <System/TcpConnection.h>
 #include <System/TcpListener.h>
 #include <System/TcpStream.h>
 #include <System/Ipv4Address.h>
-#include "HTTP/HttpParser.h"
-#include "HTTP/HttpResponse.h"
+#include "http/http_parser.h"
+#include "http/http_response.h"
 #include "Rpc/JsonRpc.h"
 
 #include "Common/JsonValue.h"
