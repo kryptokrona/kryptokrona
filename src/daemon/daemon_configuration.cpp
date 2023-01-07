@@ -2,7 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "DaemonConfiguration.h"
+#include "daemon_configuration.h"
 #include <cxxopts.hpp>
 #include <json.hpp>
 #include <fstream>
