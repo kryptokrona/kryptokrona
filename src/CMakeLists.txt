@@ -13,7 +13,7 @@ include_directories(${CMAKE_SOURCE_DIR}/external/cryptopp)
 # Show cmake where the source files are
 # Note, if you add remove a source file, you will need to re-run cmake so it
 # can find the new file
-file(GLOB_RECURSE BlockchainExplorer BlockchainExplorer/*)
+file(GLOB_RECURSE blockchain_explorer blockchain_explorer/*)
 file(GLOB_RECURSE Common Common/*)
 file(GLOB_RECURSE Crypto crypto/*)
 file(GLOB_RECURSE CryptoNoteCore CryptoNoteCore/* cryptonote_config.h)
@@ -53,7 +53,7 @@ endif()
 source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${kryptokronad} ${JsonRpcServer} ${Http} ${Logging} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${System} ${Transfers} ${Wallet} ${WalletApi} ${WalletBackend} ${zedwallet} ${zedwallet++} ${CryptoTest} ${Errors} ${Utilities} ${SubWallets})
 
 # Define a group of files as a library to link against
-add_library(BlockchainExplorer STATIC ${BlockchainExplorer})
+add_library(blockchain_explorer STATIC ${blockchain_explorer})
 add_library(Common STATIC ${Common})
 add_library(Crypto STATIC ${Crypto})
 add_library(CryptoNoteCore STATIC ${CryptoNoteCore})
