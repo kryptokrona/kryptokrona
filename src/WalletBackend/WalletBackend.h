@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include <Nigel/Nigel.h>
+#include <nigel/nigel.h>
 
 #include <SubWallets/SubWallets.h>
 

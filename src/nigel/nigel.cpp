@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////
-#include <Nigel/Nigel.h>
+#include <nigel/nigel.h>
 ////////////////////////
 
 #include <config/cryptonote_config.h>
