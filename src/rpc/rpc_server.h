@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include "HttpServer.h"
+#include "http_server.h"
 
 #include <functional>
 #include <unordered_map>
 
 #include <Logging/LoggerRef.h>
 #include "Common/Math.h"
-#include "CoreRpcServerCommandsDefinitions.h"
-#include "JsonRpc.h"
+#include "core_rpc_server_commands_definitions.h"
+#include "json_rpc.h"
 
 namespace CryptoNote
 {

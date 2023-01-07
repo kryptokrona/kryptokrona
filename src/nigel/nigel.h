@@ -8,7 +8,7 @@
 
 #include "httplib.h"
 
-#include <Rpc/CoreRpcServerCommandsDefinitions.h>
+#include <rpc/core_rpc_server_commands_definitions.h>
 
 #include <string>
 

@@ -5,7 +5,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////
-#include <Rpc/RpcServer.h>
+#include <rpc/rpc_server.h>
 //////////////////////////
 
 #include <cmath>
@@ -24,8 +24,8 @@
 
 #include <P2p/NetNode.h>
 
-#include <Rpc/CoreRpcServerErrorCodes.h>
-#include <Rpc/JsonRpc.h>
+#include <rpc/core_rpc_server_error_codes.h>
+#include <rpc/json_rpc.h>
 
 #include "version.h"
 

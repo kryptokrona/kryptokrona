@@ -21,7 +21,7 @@
 #include <boost/foreach.hpp>
 #include <functional>
 
-#include "CoreRpcServerCommandsDefinitions.h"
+#include "core_rpc_server_commands_definitions.h"
 #include <Common/JsonValue.h>
 #include "Serialization/ISerializer.h"
 #include "Serialization/SerializationTools.h"
