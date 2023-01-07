@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   build:
-    name: "Build: ${{ matrix.config.name }} / ${{ matrix.config.platform }} (${{GITHUB_SHA::6}})"
+    name: "Build: ${{ matrix.config.name }} / ${{ matrix.config.platform }}"
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: true
