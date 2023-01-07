@@ -48,6 +48,6 @@ jobs:
       - name: Build Ubuntu Target
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: |
-          cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DBoost_ARCHITECTURE=-x64 .. # add flag -DBoost_DEBUG=ON to debug
+          cmake -DBoost_ARCHITECTURE=-x64 ..
           make -j$(nproc) --ignore-errors
         working-directory: build
