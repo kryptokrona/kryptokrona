@@ -20,7 +20,7 @@
 #include <zedwallet/Menu.h>
 #include <zedwallet/ParseArguments.h>
 #include <zedwallet/Tools.h>
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 int main(int argc, char **argv)
 {

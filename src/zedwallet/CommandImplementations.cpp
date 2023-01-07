@@ -10,7 +10,7 @@
 
 #include <Common/StringTools.h>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <CryptoNoteCore/Account.h>
 #include <CryptoNoteCore/TransactionExtra.h>

@@ -22,7 +22,7 @@
 
 #include <Utilities/ColouredMsg.h>
 #include <zedwallet/PasswordContainer.h>
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 void confirmPassword(const std::string &walletPass, const std::string &msg)
 {

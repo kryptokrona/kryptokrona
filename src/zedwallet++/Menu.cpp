@@ -6,7 +6,7 @@
 #include <zedwallet++/Menu.h>
 /////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <Utilities/FormatTools.h>
 

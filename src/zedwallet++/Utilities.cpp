@@ -8,7 +8,7 @@
 
 #include <cmath>
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <fstream>
 

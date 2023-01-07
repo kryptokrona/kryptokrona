@@ -6,7 +6,7 @@
 #include <zedwallet++/Commands.h>
 /////////////////////////////////
 
-#include <config/WalletConfig.h>
+#include <config/wallet_config.h>
 
 #include <zedwallet++/Utilities.h>
 
