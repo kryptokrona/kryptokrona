@@ -7,7 +7,7 @@
 
 #include "ConfigurationManager.h"
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 #include "Logging/ConsoleLogger.h"
 #include "Logging/LoggerGroup.h"
 #include "Logging/StreamLogger.h"

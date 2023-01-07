@@ -19,7 +19,7 @@
 
 #include <Utilities/FormatTools.h>
 
-#include <config/Ascii.h>
+#include <config/ascii.h>
 #include <config/CryptoNoteConfig.h>
 #include <config/WalletConfig.h>
 

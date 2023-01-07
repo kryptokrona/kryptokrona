@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 
 #include "DaemonConfiguration.h"
 #include "DaemonCommandsHandler.h"

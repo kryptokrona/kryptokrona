@@ -6,7 +6,7 @@
 #include <zedwallet/ZedWallet.h>
 ////////////////////////////////
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 #include <Common/SignalHandler.h>
 #include <CryptoNoteCore/Currency.h>
 #include <Logging/FileLogger.h>

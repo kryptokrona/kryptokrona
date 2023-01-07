@@ -9,7 +9,7 @@
 #include <assert.h>
 
 #include <cxxopts.hpp>
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 
 #include "CryptoNote.h"
 #include "CryptoTypes.h"

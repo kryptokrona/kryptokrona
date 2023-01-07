@@ -9,7 +9,7 @@
 #include <fstream>
 
 #include <CryptoTypes.h>
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 #include <config/CryptoNoteConfig.h>
 
 #include "Common/Util.h"

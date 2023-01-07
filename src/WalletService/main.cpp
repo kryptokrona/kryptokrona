@@ -9,7 +9,7 @@
 
 #include <string.h>
 
-#include <config/CliHeader.h>
+#include <config/cli_header.h>
 #include "PaymentGateService.h"
 #include "version.h"
 
