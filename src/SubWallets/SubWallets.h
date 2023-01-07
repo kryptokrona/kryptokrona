@@ -6,7 +6,7 @@
 
 #include <crypto/crypto.h>
 
-#include <SubWallets/SubWallet.h>
+#include <sub_wallets/sub_wallet.h>
 
 class SubWallets
 {

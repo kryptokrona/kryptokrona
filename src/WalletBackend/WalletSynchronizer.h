@@ -8,7 +8,7 @@
 
 #include <nigel/nigel.h>
 
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 
 #include <WalletBackend/EventHandler.h>
 #include <WalletBackend/ThreadSafeQueue.h>

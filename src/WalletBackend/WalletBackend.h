@@ -18,7 +18,7 @@
 
 #include <nigel/nigel.h>
 
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 
 #include <WalletBackend/WalletSynchronizer.h>
 #include <WalletBackend/WalletSynchronizerRAIIWrapper.h>

@@ -12,7 +12,7 @@
 
 #include "json.hpp"
 
-#include <SubWallets/SubWallet.h>
+#include <sub_wallets/sub_wallet.h>
 
 #include <WalletBackend/WalletBackend.h>
 

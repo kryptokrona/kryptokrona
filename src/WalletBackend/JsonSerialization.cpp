@@ -10,7 +10,7 @@
 
 #include <tuple>
 
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 
 #include <WalletBackend/Constants.h>
 #include <WalletBackend/SynchronizationStatus.h>

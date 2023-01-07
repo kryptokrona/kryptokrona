@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 
 Error validateFusionTransaction(
     const uint64_t mixin,

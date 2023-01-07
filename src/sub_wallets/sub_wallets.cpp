@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////
-#include <SubWallets/SubWallets.h>
+#include <sub_wallets/sub_wallets.h>
 //////////////////////////////////
 
 #include <config/cryptonote_config.h>
