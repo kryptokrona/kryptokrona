@@ -23,7 +23,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "platform/sys/memory_mapped_file.h"
+#include "sys/memory_mapped_file.h"
 
 #include "common/ScopeExit.h"
 
