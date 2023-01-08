@@ -14,7 +14,7 @@
 #include <chrono>
 
 #include <wallet_api/api_dispatcher.h>
-#include <WalletApi/ParseArguments.h>
+#include <wallet_api/parse_arguments.h>
 
 int main(int argc, char **argv)
 {

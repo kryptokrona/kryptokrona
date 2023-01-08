@@ -39,7 +39,7 @@
 #include "wallet/wallet_utils"
 #include "WalletServiceErrorCategory.h"
 
-#include "Mnemonics/Mnemonics.h"
+#include "mnemonics/mnemonics.h"
 
 namespace PaymentService
 {

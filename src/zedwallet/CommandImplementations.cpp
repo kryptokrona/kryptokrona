@@ -19,7 +19,7 @@
 #include <fstream>
 #endif
 
-#include <Mnemonics/mnemonics.h>
+#include <mnemonics/mnemonics.h>
 
 #include <utilities/format_tools.h>
 

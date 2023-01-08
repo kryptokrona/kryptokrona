@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 //////////////////////////////////////
-#include "wallet/wallet_utils"ValidateParameters.h>
+#include <errors/validate_parameters.h>
 //////////////////////////////////////
 
 #include <Common/Base58.h>
