@@ -2,7 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "PeerListManager.h"
+#include "peer_list_manager.h"
 
 #include <algorithm>
 

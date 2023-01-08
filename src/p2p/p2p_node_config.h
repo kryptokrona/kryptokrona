@@ -19,7 +19,7 @@
 
 #include <boost/uuid/uuid.hpp>
 #include <chrono>
-#include "NetNodeConfig.h"
+#include "net_node_config.h"
 
 namespace CryptoNote
 {

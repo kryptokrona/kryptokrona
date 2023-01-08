@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "P2pContext.h"
+#include "p2p_context.h"
 
 #include <system/event_lock.h>
 #include <system/interrupted_exception.h>
 #include <system/ipv4_address.h>
 #include <System/OperationTimeout.h>
 
-#include "LevinProtocol.h"
+#include "levin_protocol.h"
 
 using namespace System;
 

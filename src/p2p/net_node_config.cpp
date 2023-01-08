@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "NetNodeConfig.h"
+#include "net_node_config.h"
 
 #include <Common/Util.h>
 #include "Common/StringTools.h"

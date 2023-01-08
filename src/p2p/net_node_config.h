@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-#include "P2pProtocolTypes.h"
+#include "p2p_protocol_types.h"
 
 namespace CryptoNote
 {

@@ -15,27 +15,4 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include <list>
-#include "P2pProtocolDefinitions.h"
-
-namespace CryptoNote
-{
-
-    class P2pContext;
-
-    class IP2pNodeInternal
-    {
-    public:
-        virtual const CORE_SYNC_DATA &getGenesisPayload() const = 0;
-        virtual std::list<PeerlistEntry> getLocalPeerList() = 0;
-        virtual basic_node_data getNodeData() const = 0;
-        virtual uint64_t getPeerId() const = 0;
-
-        virtual void handleNodeData(const basic_node_data &node, P2pContext &ctx) = 0;
-        virtual bool handleRemotePeerList(const std::list<PeerlistEntry> &peerlist, time_t local_time) = 0;
-        virtual void tryPing(P2pContext &ctx) = 0;
-    };
-
-}
+#include "ip2p_node_internal.h"

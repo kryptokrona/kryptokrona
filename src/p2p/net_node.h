@@ -23,12 +23,12 @@
 #include "cryptonote_protocol/cryptonote_protocol_handler.h"
 #include "logging/logger_ref.h"
 
-#include "ConnectionContext.h"
-#include "LevinProtocol.h"
-#include "NetNodeCommon.h"
-#include "NetNodeConfig.h"
-#include "P2pProtocolDefinitions.h"
-#include "PeerListManager.h"
+#include "connection_context.h"
+#include "levin_protocol.h"
+#include "net_node_common.h"
+#include "net_node_config.h"
+#include "p2p_protocol_definitions.h"
+#include "peer_list_manager.h"
 
 namespace System
 {
