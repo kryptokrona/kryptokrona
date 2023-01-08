@@ -13,11 +13,11 @@
 
 #include <http/http_request.h>
 #include <http/http_response.h>
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/Event.h>
-#include <System/EventLock.h>
-#include <System/Timer.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
+#include <system/event_lock.h>
+#include <system/timer.h>
 #include <CryptoNoteCore/TransactionApi.h>
 
 #include "Common/StringTools.h"

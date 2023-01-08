@@ -19,9 +19,9 @@
 #include <boost/scope_exit.hpp>
 
 #include <http/http_parser.h>
-#include <System/InterruptedException.h>
-#include <System/TcpStream.h>
-#include <System/Ipv4Address.h>
+#include <system/interrupted_exception.h>
+#include <system/tcp_stream.h>
+#include <system/ipv4_address.h>
 
 using namespace Logging;
 

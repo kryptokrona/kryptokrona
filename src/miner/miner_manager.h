@@ -8,8 +8,8 @@
 
 #include <queue>
 
-#include <System/ContextGroup.h>
-#include <System/Event.h>
+#include <system/context_group.h>
+#include <system/event.h>
 
 #include "blockchain_monitor.h"
 #include "logging/logger_ref.h"

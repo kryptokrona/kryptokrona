@@ -17,9 +17,9 @@
 
 #include "P2pContext.h"
 
-#include <System/EventLock.h>
-#include <System/InterruptedException.h>
-#include <System/Ipv4Address.h>
+#include <system/event_lock.h>
+#include <system/interrupted_exception.h>
+#include <system/ipv4_address.h>
 #include <System/OperationTimeout.h>
 
 #include "LevinProtocol.h"

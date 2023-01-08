@@ -15,25 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "EventLock.h"
-#include <System/Event.h>
+#include "interrupted_exception.h"
 
-namespace System
+namespace
 {
-
-    EventLock::EventLock(Event &event) : event(event)
-    {
-        while (!event.get())
-        {
-            event.wait();
-        }
-
-        event.clear();
-    }
-
-    EventLock::~EventLock()
-    {
-        event.set();
-    }
-
+#ifdef MSVC
+    char suppressMSVCWarningLNK4221;
+#endif
 }

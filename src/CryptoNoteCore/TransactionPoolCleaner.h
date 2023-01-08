@@ -17,7 +17,7 @@
 #include "logging/ilogger.h"
 #include "logging/logger_ref.h"
 
-#include <System/ContextGroup.h>
+#include <system/context_group.h>
 
 namespace CryptoNote
 {

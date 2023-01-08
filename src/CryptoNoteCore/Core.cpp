@@ -33,7 +33,7 @@
 
 #include <set>
 
-#include <System/Timer.h>
+#include <system/timer.h>
 
 #include <utilities/format_tools.h>
 #include <utilities/license_canary.h>

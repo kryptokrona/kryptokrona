@@ -22,10 +22,10 @@
 
 #include <netdb.h>
 
-#include <System/Dispatcher.h>
-#include <System/ErrorMessage.h>
-#include <System/InterruptedException.h>
-#include <System/Ipv4Address.h>
+#include <system/dispatcher.h>
+#include <system/error_message.h>
+#include <system/interrupted_exception.h>
+#include <system/ipv4_address.h>
 
 namespace System
 {

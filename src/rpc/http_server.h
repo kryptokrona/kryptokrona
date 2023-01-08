@@ -22,11 +22,11 @@
 #include <http/http_request.h>
 #include <http/http_response.h>
 
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/TcpListener.h>
-#include <System/TcpConnection.h>
-#include <System/Event.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/tcp_listener.h>
+#include <system/tcp_connection.h>
+#include <system/event.h>
 
 #include <logging/logger_ref.h>
 

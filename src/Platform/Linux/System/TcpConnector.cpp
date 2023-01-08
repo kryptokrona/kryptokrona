@@ -24,8 +24,8 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 
-#include <System/InterruptedException.h>
-#include <System/Ipv4Address.h>
+#include <system/interrupted_exception.h>
+#include <system/ipv4_address.h>
 #include "Dispatcher.h"
 #include "ErrorMessage.h"
 #include "TcpConnection.h"

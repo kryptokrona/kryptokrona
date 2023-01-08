@@ -17,13 +17,13 @@
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 
-#include <System/Context.h>
+#include <system/context.h>
 #include <System/ContextGroupTimeout.h>
-#include <System/EventLock.h>
-#include <System/InterruptedException.h>
-#include <System/Ipv4Address.h>
+#include <system/event_lock.h>
+#include <system/interrupted_exception.h>
+#include <system/ipv4_address.h>
 #include <System/Ipv4Resolver.h>
-#include <System/TcpListener.h>
+#include <system/tcp_listener.h>
 #include <System/TcpConnector.h>
 
 #include "version.h"

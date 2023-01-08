@@ -25,9 +25,9 @@
 #include <unistd.h>
 
 #include "Dispatcher.h"
-#include <System/ErrorMessage.h>
-#include <System/InterruptedException.h>
-#include <System/Ipv4Address.h>
+#include <system/error_message.h>
+#include <system/interrupted_exception.h>
+#include <system/ipv4_address.h>
 
 namespace System
 {

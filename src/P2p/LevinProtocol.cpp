@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "LevinProtocol.h"
-#include <System/TcpConnection.h>
+#include <system/tcp_connection.h>
 
 using namespace CryptoNote;
 

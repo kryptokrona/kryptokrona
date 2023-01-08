@@ -19,7 +19,7 @@
 
 #include <http/http_parser.h>
 #include <System/Ipv4Resolver.h>
-#include <System/Ipv4Address.h>
+#include <system/ipv4_address.h>
 #include <System/TcpConnector.h>
 
 namespace CryptoNote

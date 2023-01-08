@@ -15,11 +15,19 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "InterruptedException.h"
+#include "context_group_timeout.h"
+#include <system/interrupted_exception.h>
 
-namespace
+using namespace System;
+
+ContextGroupTimeout::ContextGroupTimeout(Dispatcher &dispatcher, ContextGroup &contextGroup, std::chrono::nanoseconds timeout) : workingContextGroup(dispatcher),
+                                                                                                                                 timeoutTimer(dispatcher)
 {
-#ifdef MSVC
-    char suppressMSVCWarningLNK4221;
-#endif
+    workingContextGroup.spawn([&, timeout]
+                              {
+    try {
+      timeoutTimer.sleep(timeout);
+      contextGroup.interrupt();
+    } catch (InterruptedException&) {
+    } });
 }

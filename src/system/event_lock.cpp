@@ -15,19 +15,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "ContextGroupTimeout.h"
-#include <System/InterruptedException.h>
+#include "event_lock.h"
+#include <system/event.h>
 
-using namespace System;
-
-ContextGroupTimeout::ContextGroupTimeout(Dispatcher &dispatcher, ContextGroup &contextGroup, std::chrono::nanoseconds timeout) : workingContextGroup(dispatcher),
-                                                                                                                                 timeoutTimer(dispatcher)
+namespace System
 {
-    workingContextGroup.spawn([&, timeout]
-                              {
-    try {
-      timeoutTimer.sleep(timeout);
-      contextGroup.interrupt();
-    } catch (InterruptedException&) {
-    } });
+
+    EventLock::EventLock(Event &event) : event(event)
+    {
+        while (!event.get())
+        {
+            event.wait();
+        }
+
+        event.clear();
+    }
+
+    EventLock::~EventLock()
+    {
+        event.set();
+    }
+
 }

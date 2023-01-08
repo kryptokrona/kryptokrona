@@ -16,21 +16,28 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
-#include <chrono>
-#include <System/ContextGroup.h>
-#include <System/Timer.h>
+
+#include <system/dispatcher.h>
 
 namespace System
 {
 
-    class ContextGroupTimeout
+    class ContextGroup
     {
     public:
-        ContextGroupTimeout(Dispatcher &, ContextGroup &, std::chrono::nanoseconds);
+        explicit ContextGroup(Dispatcher &dispatcher);
+        ContextGroup(const ContextGroup &) = delete;
+        ContextGroup(ContextGroup &&other);
+        ~ContextGroup();
+        ContextGroup &operator=(const ContextGroup &) = delete;
+        ContextGroup &operator=(ContextGroup &&other);
+        void interrupt();
+        void spawn(std::function<void()> &&procedure);
+        void wait();
 
     private:
-        Timer timeoutTimer;
-        ContextGroup workingContextGroup;
+        Dispatcher *dispatcher;
+        NativeContextGroup contextGroup;
     };
 
 }

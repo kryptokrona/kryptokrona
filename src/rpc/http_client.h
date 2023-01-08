@@ -21,8 +21,8 @@
 
 #include <http/http_request.h>
 #include <http/http_response.h>
-#include <System/TcpConnection.h>
-#include <System/TcpStream.h>
+#include <system/tcp_connection.h>
+#include <system/tcp_stream.h>
 
 #include "Serialization/SerializationTools.h"
 

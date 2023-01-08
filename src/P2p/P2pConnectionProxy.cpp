@@ -21,7 +21,7 @@
 #include "P2pContext.h"
 #include "P2pNode.h"
 
-#include <System/InterruptedException.h>
+#include <system/interrupted_exception.h>
 
 using namespace System;
 

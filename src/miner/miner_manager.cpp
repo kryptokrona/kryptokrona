@@ -6,9 +6,9 @@
 
 #include "miner_manager.h"
 
-#include <System/EventLock.h>
-#include <System/InterruptedException.h>
-#include <System/Timer.h>
+#include <system/event_lock.h>
+#include <system/interrupted_exception.h>
+#include <system/timer.h>
 #include <thread>
 #include <chrono>
 

@@ -10,9 +10,9 @@
 #include <thread>
 #include <mutex>
 
-#include <System/Dispatcher.h>
-#include <System/Event.h>
-#include <System/RemoteContext.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
+#include <system/remote_context.h>
 
 #include "CryptoNote.h"
 

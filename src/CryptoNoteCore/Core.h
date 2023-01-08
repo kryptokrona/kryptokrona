@@ -25,7 +25,7 @@
 #include "MessageQueue.h"
 #include "TransactionValidatiorState.h"
 
-#include <System/ContextGroup.h>
+#include <system/context_group.h>
 
 #include <WalletTypes.h>
 

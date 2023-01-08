@@ -21,11 +21,11 @@
 #include <list>
 
 #include <logging/logger_ref.h>
-#include <System/ContextGroup.h>
-#include <System/Dispatcher.h>
-#include <System/Event.h>
-#include <System/TcpListener.h>
-#include <System/Timer.h>
+#include <system/context_group.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
+#include <system/tcp_listener.h>
+#include <system/timer.h>
 
 #include "IP2pNodeInternal.h"
 #include "IStreamSerializable.h"

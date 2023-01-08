@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "RemoteEventLock.h"
+#include "remote_event_lock.h"
 #include <cassert>
 #include <mutex>
 #include <condition_variable>
-#include <System/Dispatcher.h>
-#include <System/Event.h>
+#include <system/dispatcher.h>
+#include <system/event.h>
 
 namespace System
 {
