@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "WalletService.h"
+#include "wallet_service.h"
 
 #include <future>
 #include <assert.h>
@@ -31,13 +31,13 @@
 #include <System/EventLock.h>
 #include <System/RemoteContext.h>
 
-#include "PaymentServiceJsonRpcMessages.h"
-#include "NodeFactory.h"
+#include "payment_service_json_rpc_messages.h"
+#include "node_factory.h"
 
 #include "wallet/wallet_green.h"
 #include "wallet/wallet_errors.h"
 #include "wallet/wallet_utils"
-#include "WalletServiceErrorCategory.h"
+#include "wallet_service_error_category.h"
 
 #include "mnemonics/mnemonics.h"
 

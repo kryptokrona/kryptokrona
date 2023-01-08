@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "NodeFactory.h"
+#include "node_factory.h"
 
 #include "node_rpc_proxy/mode_rpc_proxy.h"
 #include <memory>

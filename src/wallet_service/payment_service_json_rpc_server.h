@@ -10,7 +10,7 @@
 
 #include "Common/JsonValue.h"
 #include "json_rpc_server/json_rpc_server"
-#include "PaymentServiceJsonRpcMessages.h"
+#include "payment_service_json_rpc_messages.h"
 #include "Serialization/JsonInputValueSerializer.h"
 #include "Serialization/JsonOutputStreamSerializer.h"
 

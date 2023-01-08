@@ -12,7 +12,7 @@
 #include "IWallet.h"
 #include "INode.h"
 #include "CryptoNoteCore/Currency.h"
-#include "PaymentServiceJsonRpcMessages.h"
+#include "payment_service_json_rpc_messages.h"
 #undef ERROR // TODO: workaround for windows build. fix it
 #include "Logging/LoggerRef.h"
 

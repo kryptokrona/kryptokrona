@@ -30,7 +30,7 @@ file(GLOB_RECURSE node_rpc_proxy node_rpc_proxy/*)
 file(GLOB_RECURSE P2p P2p/*)
 file(GLOB_RECURSE rpc rpc/*)
 file(GLOB_RECURSE Serialization Serialization/*)
-file(GLOB_RECURSE service WalletService/*)
+file(GLOB_RECURSE service wallet_service/*)
 file(GLOB_RECURSE sub_wallets sub_wallets/*)
 file(GLOB_RECURSE Transfers Transfers/*)
 file(GLOB_RECURSE kryptokronad daemon/*)
@@ -50,7 +50,7 @@ else()
 endif()
 
 # Group the files together in IDEs
-source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${cryptonote_protocol} ${kryptokronad} ${json_rpc_server} ${http} ${logging} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${rpc} ${Serialization} ${System} ${Transfers} ${wallet} ${wallet_api} ${WalletBackend} ${zedwallet} ${zedwallet++} ${crypto_test} ${errors} ${utilities} ${SubWallets})
+source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${cryptonote_protocol} ${kryptokronad} ${json_rpc_server} ${http} ${logging} ${miner} ${Mnemonics} ${Nigel} ${NodeRpcProxy} ${P2p} ${rpc} ${Serialization} ${System} ${Transfers} ${wallet} ${wallet_api} ${WalletBackend} ${zedwallet} ${zedwallet++} ${crypto_test} ${errors} ${utilities} ${sub_wallets})
 
 # Define a group of files as a library to link against
 add_library(blockchain_explorer STATIC ${blockchain_explorer})
@@ -73,7 +73,7 @@ add_library(Transfers STATIC ${Transfers})
 add_library(utilities STATIC ${utilities})
 add_library(wallet STATIC ${wallet})
 add_library(WalletBackend STATIC ${WalletBackend})
-add_library(WalletService STATIC ${service})
+add_library(wallet_service STATIC ${service})
 
 if(MSVC)
     set(DAEMON_SOURCES_OS
@@ -142,7 +142,7 @@ target_link_libraries(sub_wallets utilities CryptoNoteCore)
 target_link_libraries(wallet node_rpc_proxy Transfers CryptoNoteCore Common ${Boost_LIBRARIES})
 target_link_libraries(wallet_api WalletBackend)
 target_link_libraries(WalletBackend mnemonics CryptoNoteCore nigel cryptopp-static __filesystem utilities sub_wallets)
-target_link_libraries(WalletService mnemonics)
+target_link_libraries(wallet_service mnemonics)
 target_link_libraries(zedwallet mnemonics wallet errors utilities)
 target_link_libraries(zedwallet++ WalletBackend)
 
@@ -157,7 +157,7 @@ add_dependencies(rpc version)
 add_dependencies(service version)
 add_dependencies(kryptokronad version)
 add_dependencies(wallet_api version)
-add_dependencies(WalletService version)
+add_dependencies(wallet_service version)
 add_dependencies(zedwallet version)
 
 # Finally build the binaries

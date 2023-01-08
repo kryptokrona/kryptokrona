@@ -3,14 +3,14 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "PaymentGateService.h"
+#include "payment_gate_service.h"
 
 #include <future>
 
 #include "Common/SignalHandler.h"
 #include "Common/Util.h"
 #include "Logging/LoggerRef.h"
-#include "PaymentServiceJsonRpcServer.h"
+#include "payment_service_json_rpc_server.h"
 
 #include "Common/ScopeExit.h"
 #include "node_rpc_proxy/mode_rpc_proxy.h"

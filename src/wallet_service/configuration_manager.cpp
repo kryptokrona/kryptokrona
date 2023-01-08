@@ -3,7 +3,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "ConfigurationManager.h"
+#include "configuration_manager.h"
 
 #include <iostream>
 #include <fstream>

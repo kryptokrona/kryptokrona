@@ -1,7 +1,7 @@
 // Copyright (c) 2018, The TurtleCoin Developers
 //
 // Please see the included LICENSE file for more information.
-#include "WalletServiceConfiguration.h"
+#include "wallet_service_configuration.h"
 #include <cxxopts.hpp>
 #include <json.hpp>
 #include <fstream>
