@@ -20,7 +20,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
-#include "../Common/JsonValue.h"
+#include "common/JsonValue.h"
 #include "logger_group.h"
 
 namespace Logging
