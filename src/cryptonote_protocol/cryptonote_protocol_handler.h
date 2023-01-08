@@ -17,9 +17,9 @@
 #include "cryptonoteProtocol/icryptonote_protocol_observer.h"
 #include "cryptonoteProtocol/icryptonote_protocol_query.h"
 
-#include "P2p/P2pProtocolDefinitions.h"
-#include "P2p/NetNodeCommon.h"
-#include "P2p/ConnectionContext.h"
+#include "p2p/p2p_protocol_definitions.h"
+#include "p2p/net_node_common.h"
+#include "p2p/connection_context.h"
 
 #include <logging/logger_ref.h>
 

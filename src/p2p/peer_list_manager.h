@@ -8,8 +8,8 @@
 
 #include <list>
 
-#include <P2p/P2pProtocolTypes.h>
-#include <P2p/Peerlist.h>
+#include <p2p/p2p_protocol_types.h>
+#include <p2p/peerlist.h>
 
 #include <serialization/iserializer.h>
 

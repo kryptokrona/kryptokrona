@@ -22,7 +22,7 @@
 
 #include <future>
 
-#include <P2p/NetNode.h>
+#include <p2p/net_node.h>
 
 #include <rpc/core_rpc_server_error_codes.h>
 #include <rpc/json_rpc.h>

@@ -15,7 +15,7 @@
 
 #include <daemon/daemon_commands_handler.h>
 
-#include <P2p/NetNode.h>
+#include <p2p/net_node.h>
 
 #include <rpc/json_rpc.h>
 

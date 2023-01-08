@@ -2,7 +2,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include <P2p/Peerlist.h>
+#include <p2p/peerlist.h>
 
 #include <algorithm>
 

@@ -7,7 +7,7 @@
 
 #include <CryptoTypes.h>
 #include "wallet_service_configuration.h"
-#include "P2p/NetNodeConfig.h"
+#include "p2p/net_node_config.h"
 
 namespace PaymentService
 {

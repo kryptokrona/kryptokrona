@@ -31,11 +31,11 @@
 #include "IStreamSerializable.h"
 #include "net_node_config.h"
 
-#include <P2p/P2pInterfaces.h>
-#include <P2p/P2pNodeConfig.h>
-#include <P2p/P2pProtocolDefinitions.h>
-#include <P2p/PeerListManager.h>
-#include <P2p/Peerlist.h>
+#include <p2p/p2p_interfaces.h>
+#include <p2p/p2p_node_config.h>
+#include <p2p/p2p_protocol_definitions.h>
+#include <p2p/peer_list_manager.h>
+#include <p2p/peerlist.h>
 
 namespace CryptoNote
 {

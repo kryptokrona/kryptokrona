@@ -15,7 +15,7 @@
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/CryptoNoteTools.h"
 #include "CryptoNoteCore/Currency.h"
-#include "P2p/LevinProtocol.h"
+#include "p2p/levin_protocol.h"
 
 #include <utilities/format_tools.h>
 
