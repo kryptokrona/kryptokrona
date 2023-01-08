@@ -20,11 +20,11 @@
 #include <chrono>
 #include <vector>
 
-#include <system/context_group.h>
-#include <system/dispatcher.h>
-#include <system/event.h>
-#include <system/tcp_connection.h>
-#include <system/timer.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
+#include <sys/tcp_connection.h>
+#include <sys/timer.h>
 
 #include <config/cryptonote_config.h>
 #include "levin_protocol.h"

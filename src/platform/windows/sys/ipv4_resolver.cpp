@@ -18,14 +18,14 @@
 #include "ipv4_resolver.h"
 #include <cassert>
 #include <random>
-#include <stdexcept>
-
-#include <netdb.h>
-
-#include <system/dispatcher.h>
-#include <system/error_message.h>
-#include <system/interrupted_exception.h>
-#include <system/ipv4_address.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <ws2tcpip.h>
+#include <sys/dispatcher.h>
+#include <sys/error_message.h>
+#include <sys/interrupted_exception.h>
+#include <sys/ipv4_address.h>
 
 namespace System
 {
@@ -77,21 +77,21 @@ namespace System
             throw std::runtime_error("Ipv4Resolver::resolve, getaddrinfo failed, " + errorMessage(result));
         }
 
-        std::size_t count = 0;
+        size_t count = 0;
         for (addrinfo *addressInfo = addressInfos; addressInfo != nullptr; addressInfo = addressInfo->ai_next)
         {
             ++count;
         }
 
         std::mt19937 generator{std::random_device()()};
-        std::size_t index = std::uniform_int_distribution<std::size_t>(0, count - 1)(generator);
+        size_t index = std::uniform_int_distribution<size_t>(0, count - 1)(generator);
         addrinfo *addressInfo = addressInfos;
-        for (std::size_t i = 0; i < index; ++i)
+        for (size_t i = 0; i < index; ++i)
         {
             addressInfo = addressInfo->ai_next;
         }
 
-        Ipv4Address address(ntohl(reinterpret_cast<sockaddr_in *>(addressInfo->ai_addr)->sin_addr.s_addr));
+        Ipv4Address address(ntohl(reinterpret_cast<sockaddr_in *>(addressInfo->ai_addr)->sin_addr.S_un.S_addr));
         freeaddrinfo(addressInfo);
         return address;
     }

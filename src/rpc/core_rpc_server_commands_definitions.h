@@ -14,7 +14,7 @@
 #include "BlockchainExplorerData.h"
 
 #include "serialization/serialization_overloads.h"
-#include "Serialization/BlockchainExplorerDataSerialization.h"
+#include "serialization/blockchain_explorer_data_serialization.h"
 #include <CryptoNoteCore/ICoreDefinitions.h>
 
 #include <WalletTypes.h>

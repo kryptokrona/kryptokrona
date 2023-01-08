@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <system/context_group.h>
-#include <system/dispatcher.h>
-#include <system/event.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
 #include "IWallet.h"
 #include "INode.h"
 #include "CryptoNoteCore/Currency.h"

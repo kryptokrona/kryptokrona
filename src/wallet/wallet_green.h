@@ -26,8 +26,8 @@
 #include "wallet_indices.h"
 
 #include "logging/logger_ref.h"
-#include <system/dispatcher.h>
-#include <system/event.h>
+#include <sys/dispatcher.h>
+#include <sys/event.h>
 #include "transfers/transfers_synchronizer.h"
 #include "transfers/blockchain_synchronizer.h"
 

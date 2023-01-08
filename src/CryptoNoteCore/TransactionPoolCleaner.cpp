@@ -9,8 +9,8 @@
 
 #include "Common/StringTools.h"
 
-#include <system/interrupted_exception.h>
-#include <system/timer.h>
+#include <sys/interrupted_exception.h>
+#include <sys/timer.h>
 
 namespace CryptoNote
 {

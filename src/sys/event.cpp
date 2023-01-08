@@ -17,8 +17,8 @@
 
 #include "event.h"
 #include <cassert>
-#include <system/dispatcher.h>
-#include <system/interrupted_exception.h>
+#include <sys/dispatcher.h>
+#include <sys/interrupted_exception.h>
 
 namespace System
 {

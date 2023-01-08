@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Serialization/JsonInputStreamSerializer.h"
+#include "serialization/json_input_stream_serializer.h"
 
 #include <ctype.h>
 #include <exception>

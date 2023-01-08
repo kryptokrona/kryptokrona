@@ -14,7 +14,7 @@
 
 #include "Common/ScopeExit.h"
 #include "node_rpc_proxy/node_rpc_proxy.h"
-#include <system/context.h>
+#include <sys/context.h>
 #include "wallet/wallet_green.h"
 
 #ifdef ERROR

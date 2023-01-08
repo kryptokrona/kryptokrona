@@ -23,9 +23,9 @@
 
 #include <boost/filesystem.hpp>
 
-#include "platform/system/MemoryMappedFile.h"
+#include "platform/sys/memory_mapped_file.h"
 
-#include "Common/ScopeExit.h"
+#include "common/ScopeExit.h"
 
 namespace Common
 {

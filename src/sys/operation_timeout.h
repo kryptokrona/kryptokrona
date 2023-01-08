@@ -17,27 +17,38 @@
 
 #pragma once
 
-#include <system/dispatcher.h>
+#include <sys/context_group.h>
+#include <sys/dispatcher.h>
+#include <sys/timer.h>
 
 namespace System
 {
 
-    class ContextGroup
+    template <typename T>
+    class OperationTimeout
     {
     public:
-        explicit ContextGroup(Dispatcher &dispatcher);
-        ContextGroup(const ContextGroup &) = delete;
-        ContextGroup(ContextGroup &&other);
-        ~ContextGroup();
-        ContextGroup &operator=(const ContextGroup &) = delete;
-        ContextGroup &operator=(ContextGroup &&other);
-        void interrupt();
-        void spawn(std::function<void()> &&procedure);
-        void wait();
+        OperationTimeout(Dispatcher &dispatcher, T &object, std::chrono::nanoseconds timeout) : object(object), timerContext(dispatcher), timeoutTimer(dispatcher)
+        {
+            timerContext.spawn([this, timeout]()
+                               {
+      try {
+        timeoutTimer.sleep(timeout);
+        timerContext.interrupt();
+      } catch (...) {
+      } });
+        }
+
+        ~OperationTimeout()
+        {
+            timerContext.interrupt();
+            timerContext.wait();
+        }
 
     private:
-        Dispatcher *dispatcher;
-        NativeContextGroup contextGroup;
+        T &object;
+        ContextGroup timerContext;
+        Timer timeoutTimer;
     };
 
 }

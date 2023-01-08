@@ -12,17 +12,17 @@
 #include <sstream>
 #include "http/http_parser_error_codes.h"
 
-#include <system/tcp_connection.h>
-#include <system/tcp_listener.h>
-#include <system/tcp_stream.h>
-#include <system/ipv4_address.h>
+#include <sys/tcp_connection.h>
+#include <sys/tcp_listener.h>
+#include <sys/tcp_stream.h>
+#include <sys/ipv4_address.h>
 #include "http/http_parser.h"
 #include "http/http_response.h"
 #include "rpc/json_rpc.h"
 
 #include "Common/JsonValue.h"
-#include "Serialization/JsonInputValueSerializer.h"
-#include "Serialization/JsonOutputStreamSerializer.h"
+#include "serialization/json_input_value_serializer.h"
+#include "serialization/json_output_stream_serializer.h"
 
 namespace CryptoNote
 {

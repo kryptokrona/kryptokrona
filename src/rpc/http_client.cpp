@@ -18,9 +18,9 @@
 #include "http_client.h"
 
 #include <http/http_parser.h>
-#include <System/Ipv4Resolver.h>
-#include <system/ipv4_address.h>
-#include <System/TcpConnector.h>
+#include <sys/Ipv4Resolver.h>
+#include <sys/ipv4_address.h>
+#include <sys/TcpConnector.h>
 
 namespace CryptoNote
 {

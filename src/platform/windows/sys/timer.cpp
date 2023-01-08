@@ -17,35 +17,45 @@
 
 #include "timer.h"
 #include <cassert>
-#include <stdexcept>
 #include <string>
-
-#include <sys/errno.h>
-#include <sys/event.h>
-#include <sys/time.h>
-#include <unistd.h>
-
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#include <sys/interrupted_exception.h>
 #include "dispatcher.h"
-#include <system/error_message.h>
-#include <system/interrupted_exception.h>
 
 namespace System
 {
+
+    namespace
+    {
+
+        struct TimerContext
+        {
+            uint64_t time;
+            NativeContext *context;
+            bool interrupted;
+        };
+
+    }
 
     Timer::Timer() : dispatcher(nullptr)
     {
     }
 
-    Timer::Timer(Dispatcher &dispatcher) : dispatcher(&dispatcher), context(nullptr), timer(-1)
+    Timer::Timer(Dispatcher &dispatcher) : dispatcher(&dispatcher), context(nullptr)
     {
     }
 
     Timer::Timer(Timer &&other) : dispatcher(other.dispatcher)
     {
-        if (other.dispatcher != nullptr)
+        if (dispatcher != nullptr)
         {
             assert(other.context == nullptr);
-            timer = other.timer;
             context = nullptr;
             other.dispatcher = nullptr;
         }
@@ -60,13 +70,11 @@ namespace System
     {
         assert(dispatcher == nullptr || context == nullptr);
         dispatcher = other.dispatcher;
-        if (other.dispatcher != nullptr)
+        if (dispatcher != nullptr)
         {
             assert(other.context == nullptr);
-            timer = other.timer;
             context = nullptr;
             other.dispatcher = nullptr;
-            other.timer = -1;
         }
 
         return *this;
@@ -81,48 +89,33 @@ namespace System
             throw InterruptedException();
         }
 
-        OperationContext timerContext;
-        timerContext.context = dispatcher->getCurrentContext();
-        timerContext.interrupted = false;
-        timer = dispatcher->getTimer();
-
-        struct kevent event;
-        EV_SET(&event, timer, EVFILT_TIMER, EV_ADD | EV_ENABLE | EV_ONESHOT, NOTE_NSECONDS, duration.count(), &timerContext);
-
-        if (kevent(dispatcher->getKqueue(), &event, 1, NULL, 0, NULL) == -1)
-        {
-            throw std::runtime_error("Timer::stop, kevent failed, " + lastErrorMessage());
-        }
-
+        LARGE_INTEGER frequency;
+        LARGE_INTEGER ticks;
+        QueryPerformanceCounter(&ticks);
+        QueryPerformanceFrequency(&frequency);
+        uint64_t currentTime = ticks.QuadPart / (frequency.QuadPart / 1000);
+        uint64_t time = currentTime + duration.count() / 1000000;
+        TimerContext timerContext{time, dispatcher->getCurrentContext(), false};
         context = &timerContext;
-        dispatcher->getCurrentContext()->interruptProcedure = [&]
+        dispatcher->addTimer(time, dispatcher->getCurrentContext());
+        dispatcher->getCurrentContext()->interruptProcedure = [&]()
         {
             assert(dispatcher != nullptr);
             assert(context != nullptr);
-            OperationContext *timerContext = static_cast<OperationContext *>(context);
+            TimerContext *timerContext = static_cast<TimerContext *>(context);
             if (!timerContext->interrupted)
             {
-                struct kevent event;
-                EV_SET(&event, timer, EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
-
-                if (kevent(dispatcher->getKqueue(), &event, 1, NULL, 0, NULL) == -1)
-                {
-                    throw std::runtime_error("Timer::stop, kevent failed, " + lastErrorMessage());
-                }
-
-                dispatcher->pushContext(timerContext->context);
+                dispatcher->interruptTimer(timerContext->time, timerContext->context);
                 timerContext->interrupted = true;
             }
         };
 
         dispatcher->dispatch();
         dispatcher->getCurrentContext()->interruptProcedure = nullptr;
-        assert(dispatcher != nullptr);
         assert(timerContext.context == dispatcher->getCurrentContext());
+        assert(dispatcher != nullptr);
         assert(context == &timerContext);
         context = nullptr;
-        timerContext.context = nullptr;
-        dispatcher->pushTimer(timer);
         if (timerContext.interrupted)
         {
             throw InterruptedException();

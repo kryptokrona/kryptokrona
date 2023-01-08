@@ -15,19 +15,29 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "context_group_timeout.h"
-#include <system/interrupted_exception.h>
+#pragma once
 
-using namespace System;
+#include <sys/dispatcher.h>
 
-ContextGroupTimeout::ContextGroupTimeout(Dispatcher &dispatcher, ContextGroup &contextGroup, std::chrono::nanoseconds timeout) : workingContextGroup(dispatcher),
-                                                                                                                                 timeoutTimer(dispatcher)
+namespace System
 {
-    workingContextGroup.spawn([&, timeout]
-                              {
-    try {
-      timeoutTimer.sleep(timeout);
-      contextGroup.interrupt();
-    } catch (InterruptedException&) {
-    } });
+
+    class ContextGroup
+    {
+    public:
+        explicit ContextGroup(Dispatcher &dispatcher);
+        ContextGroup(const ContextGroup &) = delete;
+        ContextGroup(ContextGroup &&other);
+        ~ContextGroup();
+        ContextGroup &operator=(const ContextGroup &) = delete;
+        ContextGroup &operator=(ContextGroup &&other);
+        void interrupt();
+        void spawn(std::function<void()> &&procedure);
+        void wait();
+
+    private:
+        Dispatcher *dispatcher;
+        NativeContextGroup contextGroup;
+    };
+
 }

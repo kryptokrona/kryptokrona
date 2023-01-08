@@ -18,8 +18,8 @@
 #include <tuple>
 #include <utility>
 
-#include <system/event_lock.h>
-#include <system/remote_context.h>
+#include <sys/event_lock.h>
+#include <sys/remote_context.h>
 
 #include "ITransaction.h"
 
