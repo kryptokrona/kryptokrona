@@ -21,12 +21,12 @@
 #include <sstream>
 
 #include "Common/StdOutputStream.h"
-#include "Serialization/KVBinaryOutputStreamSerializer.h"
-#include "Serialization/SerializationOverloads.h"
+#include "serialization/kv_binary_output_stream_serializer.h"
+#include "serialization/serialization_overloads.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
 #include "Common/StdInputStream.h"
-#include "Serialization/KVBinaryInputStreamSerializer.h"
+#include "serialization/kv_binary_input_stream_serializer.h"
 
 namespace CryptoNote
 {

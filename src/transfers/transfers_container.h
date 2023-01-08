@@ -32,8 +32,8 @@
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
 #include "CryptoNoteCore/Currency.h"
 #include "logging/logger_ref.h"
-#include "Serialization/ISerializer.h"
-#include "Serialization/SerializationOverloads.h"
+#include "serialization/iserializer.h"
+#include "serialization/serialization_overloads.h"
 
 #include "ITransaction.h"
 #include "ITransfersContainer.h"

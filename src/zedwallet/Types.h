@@ -6,7 +6,7 @@
 
 #include <config/cryptonote_config.h>
 
-#include <Serialization/ISerializer.h>
+#include <serialization/iserializer.h>
 
 #include <wallet/wallet_green.h>
 

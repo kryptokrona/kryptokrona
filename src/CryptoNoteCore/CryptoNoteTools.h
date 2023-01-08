@@ -21,8 +21,8 @@
 #include "Common/MemoryInputStream.h"
 #include "Common/StringTools.h"
 #include "Common/VectorOutputStream.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
+#include "serialization/binary_output_stream_serializer.h"
+#include "serialization/binary_input_stream_serializer.h"
 #include <config/cryptonote_config.h>
 #include "CryptoNoteSerialization.h"
 

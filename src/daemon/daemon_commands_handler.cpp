@@ -19,7 +19,7 @@
 
 #include <rpc/json_rpc.h>
 
-#include <Serialization/SerializationTools.h>
+#include <serialization/serialization_tools.h>
 
 #include <utilities/format_tools.h>
 #include <utilities/coloured_msg.h>

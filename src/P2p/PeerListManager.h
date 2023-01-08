@@ -11,7 +11,7 @@
 #include <P2p/P2pProtocolTypes.h>
 #include <P2p/Peerlist.h>
 
-#include <Serialization/ISerializer.h>
+#include <serialization/iserializer.h>
 
 class PeerlistManager
 {

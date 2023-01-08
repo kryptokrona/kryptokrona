@@ -26,8 +26,8 @@
 
 #include "blockchain_explorer_errors.h"
 #include "Common/ObserverManager.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
+#include "serialization/binary_input_stream_serializer.h"
+#include "serialization/binary_output_stream_serializer.h"
 #include "wallet/wallet_async_context_counter.h"
 
 #include "logging/logger_ref.h"

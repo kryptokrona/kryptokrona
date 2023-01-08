@@ -18,8 +18,8 @@
 #include "wallet_serialization_v2.h"
 
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
+#include "serialization/binary_input_stream_serializer.h"
+#include "serialization/binary_output_stream_serializer.h"
 
 using namespace Common;
 using namespace Crypto;

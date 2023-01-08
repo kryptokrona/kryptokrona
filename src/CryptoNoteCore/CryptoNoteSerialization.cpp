@@ -24,10 +24,10 @@
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
-#include "Serialization/ISerializer.h"
-#include "Serialization/SerializationOverloads.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
+#include "serialization/iserializer.h"
+#include "serialization/serialization_overloads.h"
+#include "serialization/binary_input_stream_serializer.h"
+#include "serialization/binary_output_stream_serializer.h"
 
 #include "Common/StringOutputStream.h"
 #include "crypto/crypto.h"

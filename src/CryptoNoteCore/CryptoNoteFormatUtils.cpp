@@ -21,8 +21,8 @@
 #include <logging/logger_ref.h>
 #include <Common/Varint.h>
 
-#include "Serialization/BinaryOutputStreamSerializer.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
+#include "serialization/binary_output_stream_serializer.h"
+#include "serialization/binary_input_stream_serializer.h"
 
 #include "Account.h"
 #include "CryptoNoteBasicImpl.h"

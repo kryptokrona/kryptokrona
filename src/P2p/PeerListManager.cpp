@@ -9,7 +9,7 @@
 #include <time.h>
 #include <system/ipv4_address.h>
 
-#include "Serialization/SerializationOverloads.h"
+#include "serialization/serialization_overloads.h"
 
 void PeerlistManager::serialize(CryptoNote::ISerializer &s)
 {

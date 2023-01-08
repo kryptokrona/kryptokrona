@@ -5,7 +5,7 @@
 // Please see the included LICENSE file for more information.
 
 #include "payment_service_json_rpc_messages.h"
-#include "Serialization/SerializationOverloads.h"
+#include "serialization/serialization_overloads.h"
 #include "wallet_service.h"
 
 namespace PaymentService

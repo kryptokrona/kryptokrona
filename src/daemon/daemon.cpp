@@ -27,8 +27,8 @@
 #include "P2p/NetNode.h"
 #include "P2p/NetNodeConfig.h"
 #include "rpc/rpc_server.h"
-#include "Serialization/BinaryInputStreamSerializer.h"
-#include "Serialization/BinaryOutputStreamSerializer.h"
+#include "serialization/binary_input_stream_serializer.h"
+#include "serialization/binary_output_stream_serializer.h"
 
 #include <config/cryptonote_checkpoints.h>
 #include <logging/logger_manager.h>

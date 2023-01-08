@@ -24,7 +24,7 @@
 
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
 
-#include "Serialization/SerializationOverloads.h"
+#include "serialization/serialization_overloads.h"
 
 namespace CryptoNote
 {

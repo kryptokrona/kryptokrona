@@ -22,7 +22,7 @@
 #include "CryptoNoteCore/CryptoNoteSerialization.h"
 #include "ICoreDefinitions.h"
 #include "MemoryBlockchainStorage.h"
-#include "Serialization/SerializationOverloads.h"
+#include "serialization/serialization_overloads.h"
 
 namespace CryptoNote
 {
