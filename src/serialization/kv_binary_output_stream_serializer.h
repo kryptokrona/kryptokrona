@@ -17,21 +17,23 @@
 
 #pragma once
 
-#include "Common/JsonValue.h"
-#include "ISerializer.h"
+#include <vector>
+#include <Common/IOutputStream.h>
+#include "iserializer.h"
+#include "memory_stream.h"
 
 namespace CryptoNote
 {
 
-    // deserialization
-    class JsonInputValueSerializer : public ISerializer
+    class KVBinaryOutputStreamSerializer : public ISerializer
     {
     public:
-        JsonInputValueSerializer(const Common::JsonValue &value);
-        JsonInputValueSerializer(Common::JsonValue &&value);
-        virtual ~JsonInputValueSerializer();
+        KVBinaryOutputStreamSerializer();
+        virtual ~KVBinaryOutputStreamSerializer() {}
 
-        SerializerType type() const override;
+        void dump(Common::IOutputStream &target);
+
+        virtual ISerializer::SerializerType type() const override;
 
         virtual bool beginObject(Common::StringView name) override;
         virtual void endObject() override;
@@ -59,25 +61,39 @@ namespace CryptoNote
         }
 
     private:
-        Common::JsonValue value;
-        std::vector<const Common::JsonValue *> chain;
-        std::vector<uint64_t> idxs;
+        void writeElementPrefix(uint8_t type, Common::StringView name);
+        void checkArrayPreamble(uint8_t type);
+        void updateState(uint8_t type);
+        MemoryStream &stream();
 
-        const Common::JsonValue *getValue(Common::StringView name);
-
-        template <typename T>
-        bool getNumber(Common::StringView name, T &v)
+        enum class State
         {
-            auto ptr = getValue(name);
+            Root,
+            Object,
+            ArrayPrefix,
+            Array
+        };
 
-            if (!ptr)
+        struct Level
+        {
+            State state;
+            std::string name;
+            uint64_t count;
+
+            Level(Common::StringView nm) : name(nm), state(State::Object), count(0) {}
+
+            Level(Common::StringView nm, uint64_t arraySize) : name(nm), state(State::ArrayPrefix), count(arraySize) {}
+
+            Level(Level &&rv)
             {
-                return false;
+                state = rv.state;
+                name = std::move(rv.name);
+                count = rv.count;
             }
+        };
 
-            v = static_cast<T>(ptr->getInteger());
-            return true;
-        }
+        std::vector<MemoryStream> m_objectsStack;
+        std::vector<Level> m_stack;
     };
 
 }

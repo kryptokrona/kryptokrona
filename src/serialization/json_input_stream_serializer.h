@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 #include "../Common/JsonValue.h"
-#include "JsonInputValueSerializer.h"
+#include "json_input_value_serializer.h"
 
 namespace CryptoNote
 {

@@ -16,8 +16,8 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <CryptoNote.h>
-#include "BinaryInputStreamSerializer.h"
-#include "BinaryOutputStreamSerializer.h"
+#include "binary_input_stream_serializer.h"
+#include "binary_output_stream_serializer.h"
 #include "Common/MemoryInputStream.h"
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"

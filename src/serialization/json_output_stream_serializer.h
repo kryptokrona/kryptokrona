@@ -19,7 +19,7 @@
 
 #include <iostream>
 #include "../Common/JsonValue.h"
-#include "ISerializer.h"
+#include "iserializer.h"
 
 namespace CryptoNote
 {

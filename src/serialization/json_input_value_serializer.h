@@ -17,20 +17,21 @@
 
 #pragma once
 
-#include <Common/IInputStream.h>
-#include "ISerializer.h"
-#include "SerializationOverloads.h"
+#include "Common/JsonValue.h"
+#include "iserializer.h"
 
 namespace CryptoNote
 {
 
-    class BinaryInputStreamSerializer : public ISerializer
+    // deserialization
+    class JsonInputValueSerializer : public ISerializer
     {
     public:
-        BinaryInputStreamSerializer(Common::IInputStream &strm) : stream(strm) {}
-        virtual ~BinaryInputStreamSerializer() {}
+        JsonInputValueSerializer(const Common::JsonValue &value);
+        JsonInputValueSerializer(Common::JsonValue &&value);
+        virtual ~JsonInputValueSerializer();
 
-        virtual ISerializer::SerializerType type() const override;
+        SerializerType type() const override;
 
         virtual bool beginObject(Common::StringView name) override;
         virtual void endObject() override;
@@ -58,8 +59,25 @@ namespace CryptoNote
         }
 
     private:
-        void checkedRead(char *buf, uint64_t size);
-        Common::IInputStream &stream;
+        Common::JsonValue value;
+        std::vector<const Common::JsonValue *> chain;
+        std::vector<uint64_t> idxs;
+
+        const Common::JsonValue *getValue(Common::StringView name);
+
+        template <typename T>
+        bool getNumber(Common::StringView name, T &v)
+        {
+            auto ptr = getValue(name);
+
+            if (!ptr)
+            {
+                return false;
+            }
+
+            v = static_cast<T>(ptr->getInteger());
+            return true;
+        }
     };
 
 }
