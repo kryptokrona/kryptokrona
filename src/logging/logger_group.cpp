@@ -15,24 +15,30 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include <mutex>
-#include "CommonLogger.h"
+#include "logger_group.h"
+#include <algorithm>
 
 namespace Logging
 {
 
-    class ConsoleLogger : public CommonLogger
+    LoggerGroup::LoggerGroup(Level level) : CommonLogger(level)
     {
-    public:
-        ConsoleLogger(Level level = DEBUGGING);
+    }
 
-    protected:
-        virtual void doLogString(const std::string &message) override;
+    void LoggerGroup::addLogger(ILogger &logger)
+    {
+        loggers.push_back(&logger);
+    }
 
-    private:
-        std::mutex mutex;
-    };
+    void LoggerGroup::operator()(const std::string &category, Level level, boost::posix_time::ptime time, const std::string &body)
+    {
+        if (level <= logLevel && disabledCategories.count(category) == 0)
+        {
+            for (auto &logger : loggers)
+            {
+                (*logger)(category, level, time, body);
+            }
+        }
+    }
 
 }

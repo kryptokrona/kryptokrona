@@ -15,19 +15,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "FileLogger.h"
+#pragma once
+
+#include <vector>
+#include "common_logger.h"
 
 namespace Logging
 {
 
-    FileLogger::FileLogger(Level level) : StreamLogger(level)
+    class LoggerGroup : public CommonLogger
     {
-    }
+    public:
+        LoggerGroup(Level level = DEBUGGING);
 
-    void FileLogger::init(const std::string &fileName)
-    {
-        fileStream.open(fileName, std::ios::app);
-        StreamLogger::attachToStream(fileStream);
-    }
+        void addLogger(ILogger &logger);
+        void removeLogger(ILogger &logger);
+        virtual void operator()(const std::string &category, Level level, boost::posix_time::ptime time, const std::string &body) override;
+
+    protected:
+        std::vector<ILogger *> loggers;
+    };
 
 }

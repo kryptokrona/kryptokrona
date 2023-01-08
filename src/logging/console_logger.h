@@ -17,25 +17,22 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
 #include <mutex>
-#include "../Common/JsonValue.h"
-#include "LoggerGroup.h"
+#include "common_logger.h"
 
 namespace Logging
 {
 
-    class LoggerManager : public LoggerGroup
+    class ConsoleLogger : public CommonLogger
     {
     public:
-        LoggerManager();
-        void configure(const Common::JsonValue &val);
-        virtual void operator()(const std::string &category, Level level, boost::posix_time::ptime time, const std::string &body) override;
+        ConsoleLogger(Level level = DEBUGGING);
+
+    protected:
+        virtual void doLogString(const std::string &message) override;
 
     private:
-        std::vector<std::unique_ptr<CommonLogger>> loggers;
-        std::mutex reconfigureLock;
+        std::mutex mutex;
     };
 
 }

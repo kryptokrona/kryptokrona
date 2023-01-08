@@ -15,23 +15,27 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "LoggerRef.h"
+#pragma once
+
+#include <list>
+#include <memory>
+#include <mutex>
+#include "../Common/JsonValue.h"
+#include "logger_group.h"
 
 namespace Logging
 {
 
-    LoggerRef::LoggerRef(std::shared_ptr<ILogger> logger, const std::string &category) : logger(logger), category(category)
+    class LoggerManager : public LoggerGroup
     {
-    }
+    public:
+        LoggerManager();
+        void configure(const Common::JsonValue &val);
+        virtual void operator()(const std::string &category, Level level, boost::posix_time::ptime time, const std::string &body) override;
 
-    LoggerMessage LoggerRef::operator()(Level level, const std::string &color) const
-    {
-        return LoggerMessage(logger, category, level, color);
-    }
-
-    std::shared_ptr<ILogger> LoggerRef::getLogger() const
-    {
-        return logger;
-    }
+    private:
+        std::vector<std::unique_ptr<CommonLogger>> loggers;
+        std::mutex reconfigureLock;
+    };
 
 }

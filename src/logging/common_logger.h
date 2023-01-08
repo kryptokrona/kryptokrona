@@ -17,32 +17,30 @@
 
 #pragma once
 
-#include <iostream>
-#include "ILogger.h"
+#include <set>
+#include "ilogger.h"
 
 namespace Logging
 {
 
-    class LoggerMessage : public std::ostream, std::streambuf
+    class CommonLogger : public ILogger
     {
     public:
-        LoggerMessage(std::shared_ptr<ILogger> logger, const std::string &category, Level level, const std::string &color);
-        ~LoggerMessage();
-        LoggerMessage(const LoggerMessage &) = delete;
-        LoggerMessage &operator=(const LoggerMessage &) = delete;
-        LoggerMessage(LoggerMessage &&other);
+        virtual ~CommonLogger(){};
 
-    private:
-        int sync() override;
-        std::streamsize xsputn(const char *s, std::streamsize n) override;
-        int overflow(int c) override;
+        virtual void operator()(const std::string &category, Level level, boost::posix_time::ptime time, const std::string &body) override;
+        virtual void disableCategory(const std::string &category);
+        virtual void setMaxLevel(Level level);
 
-        std::string message;
-        const std::string category;
+        void setPattern(const std::string &pattern);
+
+    protected:
+        std::set<std::string> disabledCategories;
         Level logLevel;
-        std::shared_ptr<ILogger> logger;
-        boost::posix_time::ptime timestamp;
-        bool gotText;
+        std::string pattern;
+
+        CommonLogger(Level level);
+        virtual void doLogString(const std::string &message);
     };
 
 }

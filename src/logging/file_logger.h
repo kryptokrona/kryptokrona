@@ -17,22 +17,20 @@
 
 #pragma once
 
-#include "ILogger.h"
-#include "LoggerMessage.h"
+#include <fstream>
+#include "stream_logger.h"
 
 namespace Logging
 {
 
-    class LoggerRef
+    class FileLogger : public StreamLogger
     {
     public:
-        LoggerRef(std::shared_ptr<ILogger> logger, const std::string &category);
-        LoggerMessage operator()(Level level = INFO, const std::string &color = DEFAULT) const;
-        std::shared_ptr<ILogger> getLogger() const;
+        FileLogger(Level level = DEBUGGING);
+        void init(const std::string &filename);
 
     private:
-        std::shared_ptr<ILogger> logger;
-        std::string category;
+        std::ofstream fileStream;
     };
 
 }
