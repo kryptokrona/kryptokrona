@@ -19,8 +19,8 @@
 
 #include <list>
 #include <vector>
-#include <Common/MemoryInputStream.h>
-#include <Common/StringOutputStream.h>
+#include <common/MemoryInputStream.h>
+#include <common/StringOutputStream.h>
 #include "json_input_stream_serializer.h"
 #include "json_output_stream_serializer.h"
 #include "kv_binary_input_stream_serializer.h"

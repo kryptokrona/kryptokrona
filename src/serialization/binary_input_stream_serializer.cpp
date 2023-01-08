@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <cassert>
 #include <stdexcept>
-#include <Common/StreamTools.h>
+#include <common/StreamTools.h>
 #include "serialization_overloads.h"
 #include <config/cryptonote_config.h>
 

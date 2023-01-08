@@ -7,12 +7,12 @@
 
 #include <future>
 
-#include "Common/SignalHandler.h"
-#include "Common/Util.h"
+#include "common/SignalHandler.h"
+#include "common/Util.h"
 #include "logging/logger_ref.h"
 #include "payment_service_json_rpc_server.h"
 
-#include "Common/ScopeExit.h"
+#include "common/ScopeExit.h"
 #include "node_rpc_proxy/node_rpc_proxy.h"
 #include <sys/context.h>
 #include "wallet/wallet_green.h"

@@ -7,7 +7,7 @@
 ////////////////////////////////
 
 #include <config/cli_header.h>
-#include <Common/SignalHandler.h>
+#include <common/SignalHandler.h>
 #include <CryptoNoteCore/Currency.h>
 #include <logging/file_logger.h>
 #include <logging/logger_manager.h>

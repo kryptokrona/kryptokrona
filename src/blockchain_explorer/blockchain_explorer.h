@@ -25,7 +25,7 @@
 #include "INode.h"
 
 #include "blockchain_explorer_errors.h"
-#include "Common/ObserverManager.h"
+#include "common/ObserverManager.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
 #include "wallet/wallet_async_context_counter.h"

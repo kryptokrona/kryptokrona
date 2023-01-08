@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "Common/StringView.h"
+#include "common/StringView.h"
 #include "Currency.h"
 #include "IBlockchainCache.h"
 #include "CryptoNoteCore/UpgradeManager.h"

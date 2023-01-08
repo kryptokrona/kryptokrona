@@ -20,9 +20,9 @@
 #include "CryptoNoteTools.h"
 #include "CryptoNoteSerialization.h"
 
-#include "Common/Base58.h"
+#include "common/Base58.h"
 #include "crypto/hash.h"
-#include "Common/int-util.h"
+#include "common/int-util.h"
 
 using namespace Crypto;
 using namespace Common;

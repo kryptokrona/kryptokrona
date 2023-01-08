@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include <Common/SignalHandler.h>
+#include <common/SignalHandler.h>
 
 #include <config/cli_header.h>
 

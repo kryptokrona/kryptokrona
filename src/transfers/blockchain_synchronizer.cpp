@@ -23,8 +23,8 @@
 #include <thread>
 #include <unordered_set>
 
-#include "Common/StreamTools.h"
-#include "Common/StringTools.h"
+#include "common/StreamTools.h"
+#include "common/StringTools.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/TransactionApi.h"

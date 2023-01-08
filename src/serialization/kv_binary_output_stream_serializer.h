@@ -18,7 +18,7 @@
 #pragma once
 
 #include <vector>
-#include <Common/IOutputStream.h>
+#include <common/IOutputStream.h>
 #include "iserializer.h"
 #include "memory_stream.h"
 

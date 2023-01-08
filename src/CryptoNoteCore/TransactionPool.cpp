@@ -17,7 +17,7 @@
 
 #include "TransactionPool.h"
 
-#include "Common/int-util.h"
+#include "common/int-util.h"
 #include "CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/TransactionExtra.h"
 

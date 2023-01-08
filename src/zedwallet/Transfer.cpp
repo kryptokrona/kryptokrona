@@ -8,8 +8,8 @@
 
 #include <thread>
 
-#include <Common/Base58.h>
-#include <Common/StringTools.h>
+#include <common/Base58.h>
+#include <common/StringTools.h>
 
 #include <config/cryptonote_config.h>
 

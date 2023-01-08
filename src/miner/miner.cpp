@@ -10,7 +10,7 @@
 
 #include <functional>
 #include <mutex>
-#include "Common/StringTools.h"
+#include "common/StringTools.h"
 
 #include "crypto/crypto.h"
 #include <crypto/random.h>

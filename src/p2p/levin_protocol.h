@@ -18,8 +18,8 @@
 #pragma once
 
 #include "CryptoNote.h"
-#include <Common/MemoryInputStream.h>
-#include <Common/VectorOutputStream.h>
+#include <common/MemoryInputStream.h>
+#include <common/VectorOutputStream.h>
 #include "serialization/kv_binary_input_stream_serializer.h"
 #include "serialization/kv_binary_output_stream_serializer.h"
 

@@ -5,8 +5,8 @@
 
 #include "DataBaseConfig.h"
 
-#include <Common/Util.h>
-#include "Common/StringTools.h"
+#include <common/Util.h>
+#include "common/StringTools.h"
 #include "crypto/crypto.h"
 #include <config/cryptonote_config.h>
 

@@ -11,7 +11,7 @@
 #include <future>
 
 #include "common_types.h"
-#include "Common/BlockingQueue.h"
+#include "common/BlockingQueue.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/TransactionApi.h"

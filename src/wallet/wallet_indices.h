@@ -30,7 +30,7 @@
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include "Common/FileMappedVector.h"
+#include "common/FileMappedVector.h"
 #include "crypto/chacha8.h"
 
 namespace CryptoNote

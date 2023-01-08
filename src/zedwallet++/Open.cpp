@@ -6,7 +6,7 @@
 #include <zedwallet++/Open.h>
 /////////////////////////////
 
-#include <Common/FileSystemShim.h>
+#include <common/FileSystemShim.h>
 
 #include <config/wallet_config.h>
 

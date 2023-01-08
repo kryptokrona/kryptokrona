@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <ctime>
 
-#include "Common/StringTools.h"
+#include "common/StringTools.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/Currency.h"

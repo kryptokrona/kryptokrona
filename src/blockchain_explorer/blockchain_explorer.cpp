@@ -23,8 +23,8 @@
 #include <utility>
 
 #include "blockchain_explorer_errors.h"
-#include "Common/StdOutputStream.h"
-#include "Common/StdInputStream.h"
+#include "common/StdOutputStream.h"
+#include "common/StdInputStream.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include <config/cryptonote_config.h>

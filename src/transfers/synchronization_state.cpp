@@ -17,8 +17,8 @@
 
 #include "synchronization_state.h"
 
-#include "Common/StdInputStream.h"
-#include "Common/StdOutputStream.h"
+#include "common/StdInputStream.h"
+#include "common/StdOutputStream.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
 #include "CryptoNoteCore/CryptoNoteSerialization.h"

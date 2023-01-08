@@ -18,7 +18,7 @@
 #include "console_logger.h"
 #include <iostream>
 #include <unordered_map>
-#include <Common/ConsoleTools.h>
+#include <common/ConsoleTools.h>
 
 namespace Logging
 {

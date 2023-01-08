@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Checkpoints.h"
-#include "Common/StringTools.h"
+#include "common/StringTools.h"
 #include <fstream>
 
 using namespace Logging;

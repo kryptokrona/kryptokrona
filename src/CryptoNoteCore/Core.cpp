@@ -9,9 +9,9 @@
 #include <numeric>
 #include <iostream>
 #include <ctime>
-#include <Common/ShuffleGenerator.h>
-#include <Common/Math.h>
-#include <Common/MemoryInputStream.h>
+#include <common/ShuffleGenerator.h>
+#include <common/Math.h>
+#include <common/MemoryInputStream.h>
 
 #include <CryptoNoteCore/BlockchainCache.h>
 #include <CryptoNoteCore/BlockchainStorage.h>

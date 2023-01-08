@@ -22,7 +22,7 @@
 #include <functional>
 
 #include "core_rpc_server_commands_definitions.h"
-#include <Common/JsonValue.h>
+#include <common/JsonValue.h>
 #include "serialization/iserializer.h"
 #include "serialization/serialization_tools.h"
 

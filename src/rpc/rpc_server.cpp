@@ -10,7 +10,7 @@
 
 #include <cmath>
 
-#include <Common/StringTools.h>
+#include <common/StringTools.h>
 
 #include <config/cryptonote_config.h>
 

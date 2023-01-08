@@ -18,10 +18,10 @@
 #include <CryptoNote.h>
 #include "binary_input_stream_serializer.h"
 #include "binary_output_stream_serializer.h"
-#include "Common/MemoryInputStream.h"
-#include "Common/StdInputStream.h"
-#include "Common/StdOutputStream.h"
-#include "Common/VectorOutputStream.h"
+#include "common/MemoryInputStream.h"
+#include "common/StdInputStream.h"
+#include "common/StdOutputStream.h"
+#include "common/VectorOutputStream.h"
 
 #include <fstream>
 

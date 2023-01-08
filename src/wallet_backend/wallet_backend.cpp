@@ -6,8 +6,8 @@
 #include <wallet_backend/wallet_backend.h>
 ////////////////////////////////////////
 
-#include <Common/Base58.h>
-#include <Common/FileSystemShim.h>
+#include <common/Base58.h>
+#include <common/FileSystemShim.h>
 
 #include <config/cryptonote_config.h>
 

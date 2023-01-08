@@ -29,7 +29,7 @@
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
 
-#include "Common/StringOutputStream.h"
+#include "common/StringOutputStream.h"
 #include "crypto/crypto.h"
 
 #include "Account.h"

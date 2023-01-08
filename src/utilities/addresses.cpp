@@ -6,7 +6,7 @@
 #include <utilities/addresses.h>
 ////////////////////////////////
 
-#include <Common/Base58.h>
+#include <common/Base58.h>
 
 #include <config/cryptonote_config.h>
 

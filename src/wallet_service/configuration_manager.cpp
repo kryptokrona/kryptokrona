@@ -12,7 +12,7 @@
 #include <config/cli_header.h>
 #include <config/cryptonote_config.h>
 
-#include "Common/Util.h"
+#include "common/Util.h"
 #include "crypto/hash.h"
 #include "logging/ilogger.h"
 

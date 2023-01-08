@@ -16,8 +16,8 @@
 
 #include <sys/timer.h>
 #include <sys/interrupted_exception.h>
-#include "Common/Base58.h"
-#include "Common/Util.h"
+#include "common/Base58.h"
+#include "common/Util.h"
 
 #include "crypto/crypto.h"
 #include "CryptoNote.h"

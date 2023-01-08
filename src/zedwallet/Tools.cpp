@@ -9,8 +9,8 @@
 #include <cmath>
 #include <thread>
 
-#include <Common/Base58.h>
-#include <Common/StringTools.h>
+#include <common/Base58.h>
+#include <common/StringTools.h>
 
 #include <CryptoNoteCore/CryptoNoteBasicImpl.h>
 #include <CryptoNoteCore/CryptoNoteTools.h>

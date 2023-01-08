@@ -7,7 +7,7 @@
 #include "Core.h"
 #include "Mixins.h"
 
-#include "Common/StringTools.h"
+#include "common/StringTools.h"
 
 #include <sys/interrupted_exception.h>
 #include <sys/timer.h>

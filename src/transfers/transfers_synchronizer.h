@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "Common/ObserverManager.h"
+#include "common/ObserverManager.h"
 #include "ITransfersSynchronizer.h"
 #include "iblockchain_synchronizer.h"
 #include "type_helpers.h"

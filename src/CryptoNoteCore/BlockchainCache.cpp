@@ -11,9 +11,9 @@
 
 #include <boost/functional/hash.hpp>
 
-#include "Common/StdInputStream.h"
-#include "Common/StdOutputStream.h"
-#include "Common/ShuffleGenerator.h"
+#include "common/StdInputStream.h"
+#include "common/StdOutputStream.h"
+#include "common/ShuffleGenerator.h"
 
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteSerialization.h"

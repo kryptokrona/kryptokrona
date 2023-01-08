@@ -6,7 +6,7 @@
 #include <zedwallet/Menu.h>
 ///////////////////////////
 
-#include <Common/SignalHandler.h>
+#include <common/SignalHandler.h>
 
 #include <utilities/coloured_msg.h>
 #include <zedwallet/CommandDispatcher.h>

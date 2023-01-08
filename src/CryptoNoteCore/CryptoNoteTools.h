@@ -18,9 +18,9 @@
 #pragma once
 
 #include <limits>
-#include "Common/MemoryInputStream.h"
-#include "Common/StringTools.h"
-#include "Common/VectorOutputStream.h"
+#include "common/MemoryInputStream.h"
+#include "common/StringTools.h"
+#include "common/VectorOutputStream.h"
 #include "serialization/binary_output_stream_serializer.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include <config/cryptonote_config.h>

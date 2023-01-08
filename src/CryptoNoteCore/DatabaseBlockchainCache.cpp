@@ -11,7 +11,7 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 
-#include <Common/ShuffleGenerator.h>
+#include <common/ShuffleGenerator.h>
 
 #include "BlockchainUtils.h"
 
