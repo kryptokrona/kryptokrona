@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 namespace PaymentService
 {

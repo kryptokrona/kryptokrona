@@ -9,7 +9,7 @@
 
 #include "Common/SignalHandler.h"
 #include "Common/Util.h"
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 #include "payment_service_json_rpc_server.h"
 
 #include "Common/ScopeExit.h"

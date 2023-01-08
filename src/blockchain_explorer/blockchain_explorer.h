@@ -30,7 +30,7 @@
 #include "Serialization/BinaryOutputStreamSerializer.h"
 #include "wallet/wallet_async_context_counter.h"
 
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 namespace CryptoNote
 {

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <Logging/ILogger.h>
+#include <logging/ilogger.h>
 
 namespace Logging
 {

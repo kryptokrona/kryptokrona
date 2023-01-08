@@ -28,7 +28,7 @@
 #include <atomic>
 #include <future>
 
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 namespace CryptoNote
 {

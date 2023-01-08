@@ -26,7 +26,7 @@
 #include "IDataBase.h"
 #include "DataBaseConfig.h"
 
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 
 namespace CryptoNote
 {

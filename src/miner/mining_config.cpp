@@ -20,7 +20,7 @@
 #include "Common/StringTools.h"
 #include <Common/Util.h>
 
-#include "Logging/ILogger.h"
+#include "logging/ilogger.h"
 #include "version.h"
 
 #include <errors/validate_parameters.h>

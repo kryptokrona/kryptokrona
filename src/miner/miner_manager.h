@@ -12,7 +12,7 @@
 #include <System/Event.h>
 
 #include "blockchain_monitor.h"
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 #include "miner.h"
 #include "miner_event.h"
 #include "mining_config.h"

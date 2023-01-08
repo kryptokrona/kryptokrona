@@ -14,7 +14,7 @@
 
 #include "Common/Util.h"
 #include "crypto/hash.h"
-#include "Logging/ILogger.h"
+#include "logging/ilogger.h"
 
 namespace PaymentService
 {

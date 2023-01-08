@@ -7,8 +7,8 @@
 
 #include "Common/ConsoleHandler.h"
 
-#include <Logging/LoggerRef.h>
-#include <Logging/LoggerManager.h>
+#include <logging/logger_ref.h>
+#include <logging/logger_manager.h>
 #include "rpc/rpc_server.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/json_rpc.h"

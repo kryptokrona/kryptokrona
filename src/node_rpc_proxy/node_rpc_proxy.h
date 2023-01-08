@@ -13,7 +13,7 @@
 #include <unordered_set>
 
 #include "Common/ObserverManager.h"
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 #include "INode.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
 

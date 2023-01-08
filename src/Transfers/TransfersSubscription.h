@@ -21,7 +21,7 @@
 #include "TransfersContainer.h"
 #include "IObservableImpl.h"
 
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 namespace CryptoNote
 {

@@ -9,8 +9,8 @@
 
 #include <System/Dispatcher.h>
 #include <System/Event.h>
-#include "Logging/ILogger.h"
-#include "Logging/LoggerRef.h"
+#include "logging/ilogger.h"
+#include "logging/logger_ref.h"
 #include "rpc/http_server.h"
 #include "WalletService/ConfigurationManager.h"
 

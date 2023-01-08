@@ -18,7 +18,7 @@
 #include "CryptoNoteFormatUtils.h"
 
 #include <set>
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 #include <Common/Varint.h>
 
 #include "Serialization/BinaryOutputStreamSerializer.h"

@@ -24,7 +24,7 @@
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 #include "CryptoNoteCore/CryptoNoteTools.h"
 
-#include <Logging/DummyLogger.h>
+#include <logging/dummy_logger.h>
 
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/http_client.h"

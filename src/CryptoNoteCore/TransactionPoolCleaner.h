@@ -14,8 +14,8 @@
 
 #include "CryptoNoteCore/ITimeProvider.h"
 #include "ITransactionPool.h"
-#include "Logging/ILogger.h"
-#include "Logging/LoggerRef.h"
+#include "logging/ilogger.h"
+#include "logging/logger_ref.h"
 
 #include <System/ContextGroup.h>
 

@@ -28,7 +28,7 @@
 #include <System/TcpConnection.h>
 #include <System/Event.h>
 
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 
 namespace CryptoNote
 {

@@ -21,7 +21,7 @@
 #include "ITransactionPool.h"
 #include "ITransactionPoolCleaner.h"
 #include "IUpgradeManager.h"
-#include <Logging/LoggerMessage.h>
+#include <logging/logger_message.h>
 #include "MessageQueue.h"
 #include "TransactionValidatiorState.h"
 

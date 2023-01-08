@@ -21,7 +21,7 @@
 
 #include "CryptoNoteCore/OnceInInterval.h"
 #include "cryptonote_protocol/cryptonote_protocol_handler.h"
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 #include "ConnectionContext.h"
 #include "LevinProtocol.h"

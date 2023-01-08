@@ -7,7 +7,7 @@
 #include <json.hpp>
 #include <string>
 #include <config/cryptonote_config.h>
-#include <Logging/ILogger.h>
+#include <logging/ilogger.h>
 
 using nlohmann::json;
 

@@ -21,7 +21,7 @@
 #include "P2p/NetNodeCommon.h"
 #include "P2p/ConnectionContext.h"
 
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 
 namespace System
 {

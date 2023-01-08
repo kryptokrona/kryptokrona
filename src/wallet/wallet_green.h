@@ -25,7 +25,7 @@
 #include "ifusion_manager.h"
 #include "wallet_indices.h"
 
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 #include <System/Dispatcher.h>
 #include <System/Event.h>
 #include "Transfers/TransfersSynchronizer.h"

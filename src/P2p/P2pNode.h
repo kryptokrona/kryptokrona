@@ -20,7 +20,7 @@
 #include <functional>
 #include <list>
 
-#include <Logging/LoggerRef.h>
+#include <logging/logger_ref.h>
 #include <System/ContextGroup.h>
 #include <System/Dispatcher.h>
 #include <System/Event.h>

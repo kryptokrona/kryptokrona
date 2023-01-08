@@ -16,7 +16,7 @@
 #include <memory>
 #include <cstring>
 
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 namespace CryptoNote
 {

@@ -13,7 +13,7 @@
 #include "TypeHelpers.h"
 
 #include "crypto/crypto.h"
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 #include "IObservableImpl.h"
 

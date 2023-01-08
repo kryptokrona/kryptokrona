@@ -9,8 +9,8 @@
 #include <config/cli_header.h>
 #include <Common/SignalHandler.h>
 #include <CryptoNoteCore/Currency.h>
-#include <Logging/FileLogger.h>
-#include <Logging/LoggerManager.h>
+#include <logging/file_logger.h>
+#include <logging/logger_manager.h>
 
 #ifdef _WIN32
 #include <windows.h>

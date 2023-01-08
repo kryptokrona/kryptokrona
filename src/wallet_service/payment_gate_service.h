@@ -8,9 +8,9 @@
 #include "configuration_manager.h"
 
 #include <config/cli_header.h>
-#include "Logging/ConsoleLogger.h"
-#include "Logging/LoggerGroup.h"
-#include "Logging/StreamLogger.h"
+#include "logging/console_logger.h"
+#include "logging/logger_group.h"
+#include "logging/stream_logger.h"
 
 #include "WalletService/NodeFactory.h"
 #include "WalletService/WalletService.h"

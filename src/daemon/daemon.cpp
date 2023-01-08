@@ -31,7 +31,7 @@
 #include "Serialization/BinaryOutputStreamSerializer.h"
 
 #include <config/cryptonote_checkpoints.h>
-#include <Logging/LoggerManager.h>
+#include <logging/logger_manager.h>
 
 #if defined(WIN32)
 #include <crtdbg.h>

@@ -14,7 +14,7 @@
 #include "CryptoNoteCore/Currency.h"
 #include "payment_service_json_rpc_messages.h"
 #undef ERROR // TODO: workaround for windows build. fix it
-#include "Logging/LoggerRef.h"
+#include "logging/logger_ref.h"
 
 #include <fstream>
 #include <memory>

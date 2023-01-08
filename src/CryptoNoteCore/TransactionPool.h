@@ -28,8 +28,8 @@
 #include <boost/multi_index/ordered_index.hpp>
 
 #include "ITransactionPool.h"
-#include <Logging/LoggerMessage.h>
-#include <Logging/LoggerRef.h>
+#include <logging/logger_message.h>
+#include <logging/logger_ref.h>
 #include "TransactionValidatiorState.h"
 
 namespace CryptoNote
