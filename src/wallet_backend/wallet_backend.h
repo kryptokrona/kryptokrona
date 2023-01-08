@@ -20,8 +20,8 @@
 
 #include <sub_wallets/sub_wallets.h>
 
-#include <WalletBackend/WalletSynchronizer.h>
-#include <WalletBackend/WalletSynchronizerRAIIWrapper.h>
+#include <wallet_backend/wallet_synchronizer.h>
+#include <wallet_backend/wallet_synchronizer_raii_wrapper.h>
 
 class WalletBackend
 {

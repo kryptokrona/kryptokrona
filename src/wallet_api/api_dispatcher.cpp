@@ -26,7 +26,7 @@
 
 #include <wallet_api/constants.h>
 
-#include <WalletBackend/JsonSerialization.h>
+#include <wallet_backend/json_serialization.h>
 
 using namespace httplib;
 

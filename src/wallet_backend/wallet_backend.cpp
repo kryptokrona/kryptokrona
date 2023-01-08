@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ////////////////////////////////////////
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 ////////////////////////////////////////
 
 #include <Common/Base58.h>
@@ -42,8 +42,8 @@
 #include <utilities/addresses.h>
 #include <utilities/utilities.h>
 
-#include <WalletBackend/Constants.h>
-#include <WalletBackend/Transfer.h>
+#include <wallet_backend/constants.h>
+#include <wallet_backend/transfer.h>
 
 using namespace rapidjson;
 

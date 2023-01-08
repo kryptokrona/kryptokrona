@@ -10,9 +10,9 @@
 
 #include <sub_wallets/sub_wallets.h>
 
-#include <WalletBackend/EventHandler.h>
-#include <WalletBackend/ThreadSafeQueue.h>
-#include <WalletBackend/SynchronizationStatus.h>
+#include <wallet_backend/event_handler.h>
+#include <wallet_backend/thread_safe_queue.h>
+#include <wallet_backend/synchronization_status.h>
 
 #include <WalletTypes.h>
 

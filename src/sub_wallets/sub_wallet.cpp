@@ -11,7 +11,7 @@
 
 #include <utilities/utilities.h>
 
-#include <WalletBackend/Constants.h>
+#include <wallet_backend/constants.h>
 
 ///////////////////////////////////
 /* CONSTRUCTORS / DECONSTRUCTORS */

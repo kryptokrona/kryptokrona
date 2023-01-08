@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <WalletBackend/WalletBackend.h>
+#include <wallet_backend/wallet_backend.h>
 
 #include <zedwallet++/ParseArguments.h>
 
