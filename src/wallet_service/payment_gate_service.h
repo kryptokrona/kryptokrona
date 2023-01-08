@@ -12,8 +12,8 @@
 #include "logging/logger_group.h"
 #include "logging/stream_logger.h"
 
-#include "WalletService/NodeFactory.h"
-#include "WalletService/WalletService.h"
+#include "wallet_service/node_factory.h"
+#include "wallet_service/wallet_service.h"
 
 class PaymentGateService
 {

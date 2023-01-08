@@ -12,7 +12,7 @@
 #include "logging/ilogger.h"
 #include "logging/logger_ref.h"
 #include "rpc/http_server.h"
-#include "WalletService/ConfigurationManager.h"
+#include "wallet_service/configuration_manager.h"
 
 namespace CryptoNote
 {
