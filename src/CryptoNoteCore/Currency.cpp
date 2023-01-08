@@ -8,9 +8,9 @@
 #include <cctype>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
-#include "../Common/Base58.h"
-#include "../Common/int-util.h"
-#include "../Common/StringTools.h"
+#include "common/Base58.h"
+#include "common/int-util.h"
+#include "common/StringTools.h"
 
 #include "Account.h"
 #include "CheckDifficulty.h"
