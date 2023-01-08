@@ -54,3 +54,19 @@
       - "/root/.kryptokrona:/root/.kryptokrona"
     networks:
       - name: "host"
+
+- name: Install Restart Node Script
+  template:
+    src: scripts/restart_node.sh
+    dest: /root/restart_node.sh
+
+- name: Change script ownership
+  ansible.builtin.file:
+    path: /root/restart_node.sh
+    mode: '0777'
+
+- name: CRON job to restart node weekly
+  cron:
+    name: "restart node"
+    special_time: "weekly"
+    job: "/root/restart_node.sh"
