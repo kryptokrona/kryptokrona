@@ -36,7 +36,7 @@
 
 #include "wallet/wallet_green.h"
 #include "wallet/wallet_errors.h"
-#include "wallet/wallet_utils"
+#include "wallet/wallet_utils.h"
 #include "wallet_service_error_category.h"
 
 #include "mnemonics/mnemonics.h"

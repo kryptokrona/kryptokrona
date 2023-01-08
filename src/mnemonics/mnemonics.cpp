@@ -7,7 +7,7 @@
 
 #include <mnemonics/crc32.h>
 #include <mnemonics/mnemonics.h>
-#include <Mnemonics/wordlist.h>
+#include <mnemonics/wordlist.h>
 
 #include <sstream>
 

@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 #include "Common/JsonValue.h"
-#include "json_rpc_server/json_rpc_server"
+#include "json_rpc_server/json_rpc_server.h"
 #include "payment_service_json_rpc_messages.h"
 #include "Serialization/JsonInputValueSerializer.h"
 #include "Serialization/JsonOutputStreamSerializer.h"
