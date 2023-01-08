@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "IWallet.h"
-#include "TransfersContainer.h"
+#include "transfers_container.h"
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"

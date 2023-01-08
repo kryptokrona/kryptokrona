@@ -5,8 +5,8 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "TransfersSynchronizer.h"
-#include "TransfersConsumer.h"
+#include "transfers_synchronizer.h"
+#include "transfers_consumer.h"
 
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"

@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "IWallet.h"
-#include "TransfersSubscription.h"
+#include "transfers_subscription.h"
 #include "CryptoNoteCore/CryptoNoteBasicImpl.h"
 
 using namespace Crypto;

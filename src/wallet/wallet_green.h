@@ -28,8 +28,8 @@
 #include "logging/logger_ref.h"
 #include <system/dispatcher.h>
 #include <system/event.h>
-#include "Transfers/TransfersSynchronizer.h"
-#include "Transfers/BlockchainSynchronizer.h"
+#include "transfers/transfers_synchronizer.h"
+#include "transfers/blockchain_synchronizer.h"
 
 namespace CryptoNote
 {

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "CommonTypes.h"
+#include "common_types.h"
 #include "IStreamSerializable.h"
 #include "Serialization/ISerializer.h"
 #include <vector>

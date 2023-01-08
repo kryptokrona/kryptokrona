@@ -9,8 +9,8 @@
 
 #include "Common/ObserverManager.h"
 #include "ITransfersSynchronizer.h"
-#include "IBlockchainSynchronizer.h"
-#include "TypeHelpers.h"
+#include "iblockchain_synchronizer.h"
+#include "type_helpers.h"
 
 #include <unordered_map>
 #include <memory>

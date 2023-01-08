@@ -39,7 +39,7 @@
 #include "CryptoNoteCore/TransactionApi.h"
 #include "crypto/crypto.h"
 #include <crypto/random.h>
-#include "Transfers/TransfersContainer.h"
+#include "transfers/transfers_container.h"
 #include "wallet_serialization_v2.h"
 #include "wallet_errors.h"
 #include "wallet_utils.h"

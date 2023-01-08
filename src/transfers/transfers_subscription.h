@@ -18,8 +18,8 @@
 #pragma once
 
 #include "ITransfersSynchronizer.h"
-#include "TransfersContainer.h"
-#include "IObservableImpl.h"
+#include "transfers_container.h"
+#include "iobservable_impl.h"
 
 #include "logging/logger_ref.h"
 
