@@ -11,13 +11,13 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/functional/hash.hpp>
 
-#include <sys/context.h>
-#include <sys/context_group.h>
-#include <sys/dispatcher.h>
-#include <sys/event.h>
-#include <sys/timer.h>
-#include <sys/tcp_connection.h>
-#include <sys/tcp_listener.h>
+#include <syst/context.h>
+#include <syst/context_group.h>
+#include <syst/dispatcher.h>
+#include <syst/event.h>
+#include <syst/timer.h>
+#include <syst/tcp_connection.h>
+#include <syst/tcp_listener.h>
 
 #include "CryptoNoteCore/OnceInInterval.h"
 #include "cryptonote_protocol/cryptonote_protocol_handler.h"

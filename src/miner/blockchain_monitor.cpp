@@ -7,9 +7,9 @@
 
 #include "common/StringTools.h"
 
-#include <sys/event_lock.h>
-#include <sys/timer.h>
-#include <sys/interrupted_exception.h>
+#include <syst/event_lock.h>
+#include <syst/timer.h>
+#include <syst/interrupted_exception.h>
 
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/json_rpc.h"

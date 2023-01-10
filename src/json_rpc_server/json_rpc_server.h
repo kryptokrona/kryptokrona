@@ -7,8 +7,8 @@
 
 #include <system_error>
 
-#include <sys/dispatcher.h>
-#include <sys/event.h>
+#include <syst/dispatcher.h>
+#include <syst/event.h>
 #include "logging/ilogger.h"
 #include "logging/logger_ref.h"
 #include "rpc/http_server.h"

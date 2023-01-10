@@ -22,10 +22,10 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <sys/epoll.h>
+#include <syst/epoll.h>
 
-#include <sys/interrupted_exception.h>
-#include <sys/ipv4_address.h>
+#include <syst/interrupted_exception.h>
+#include <syst/ipv4_address.h>
 #include "dispatcher.h"
 #include "error_message.h"
 #include "tcp_connection.h"

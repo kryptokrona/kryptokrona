@@ -18,10 +18,10 @@
 #include "dispatcher.h"
 #include <cassert>
 #include <string>
-#include <sys/errno.h>
-#include <sys/event.h>
-#include <sys/time.h>
-#include <sys/types.h>
+#include <syst/errno.h>
+#include <syst/event.h>
+#include <syst/time.h>
+#include <syst/types.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdio.h>

@@ -15,22 +15,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-#include <chrono>
-#include <sys/context_group.h>
-#include <sys/timer.h>
+#include "event_lock.h"
+#include <syst/event.h>
 
 namespace System
 {
 
-    class ContextGroupTimeout
+    EventLock::EventLock(Event &event) : event(event)
     {
-    public:
-        ContextGroupTimeout(Dispatcher &, ContextGroup &, std::chrono::nanoseconds);
+        while (!event.get())
+        {
+            event.wait();
+        }
 
-    private:
-        Timer timeoutTimer;
-        ContextGroup workingContextGroup;
-    };
+        event.clear();
+    }
+
+    EventLock::~EventLock()
+    {
+        event.set();
+    }
 
 }

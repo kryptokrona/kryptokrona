@@ -6,7 +6,7 @@ Public domain.
 
 #include <memory.h>
 #include <stdio.h>
-#include <sys/param.h>
+#include <syst/param.h>
 
 #include "chacha8.h"
 #include "common/int-util.h"

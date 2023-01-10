@@ -19,15 +19,15 @@
 #include <cassert>
 
 #include <netinet/in.h>
-#include <sys/event.h>
-#include <sys/errno.h>
-#include <sys/socket.h>
+#include <syst/event.h>
+#include <syst/errno.h>
+#include <syst/socket.h>
 #include <unistd.h>
 
 #include "dispatcher.h"
-#include <sys/error_message.h>
-#include <sys/interrupted_exception.h>
-#include <sys/ipv4_address.h>
+#include <syst/error_message.h>
+#include <syst/interrupted_exception.h>
+#include <syst/ipv4_address.h>
 
 namespace System
 {

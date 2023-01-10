@@ -19,8 +19,8 @@
 #include <cassert>
 #include <mutex>
 #include <condition_variable>
-#include <sys/dispatcher.h>
-#include <sys/event.h>
+#include <syst/dispatcher.h>
+#include <syst/event.h>
 
 namespace System
 {

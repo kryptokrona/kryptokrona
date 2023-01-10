@@ -241,7 +241,7 @@ extern int aesb_pseudo_round(const uint8_t *in, uint8_t *out, const uint8_t *exp
 #endif
 #else
 #include <wmmintrin.h>
-#include <sys/mman.h>
+#include <syst/mman.h>
 #define STATIC static
 #define INLINE inline
 #if !defined(RDATA_ALIGN16)

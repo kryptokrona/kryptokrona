@@ -17,14 +17,14 @@
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 
-#include <sys/context.h>
-#include <sys/context_group_timeout.h>
-#include <sys/event_lock.h>
-#include <sys/interrupted_exception.h>
-#include <sys/ipv4_address.h>
-#include <sys/Ipv4_resolver.h>
-#include <sys/tcp_listener.h>
-#include <sys/tcp_connector.h>
+#include <syst/context.h>
+#include <syst/context_group_timeout.h>
+#include <syst/event_lock.h>
+#include <syst/interrupted_exception.h>
+#include <syst/ipv4_address.h>
+#include <syst/Ipv4_resolver.h>
+#include <syst/tcp_listener.h>
+#include <syst/tcp_connector.h>
 
 #include "version.h"
 #include <config/cryptonote_config.h>

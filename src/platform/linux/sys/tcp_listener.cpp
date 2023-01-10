@@ -21,15 +21,15 @@
 
 #include <fcntl.h>
 #include <netdb.h>
-#include <sys/epoll.h>
+#include <syst/epoll.h>
 #include <unistd.h>
 #include <string.h>
 
 #include "dispatcher.h"
 #include "tcp_connection.h"
-#include <sys/error_message.h>
-#include <sys/interrupted_exception.h>
-#include <sys/ipv4_address.h>
+#include <syst/error_message.h>
+#include <syst/interrupted_exception.h>
+#include <syst/ipv4_address.h>
 
 namespace System
 {

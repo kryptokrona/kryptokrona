@@ -18,7 +18,7 @@
 #include "CryptoNoteCore/CheckDifficulty.h"
 #include "CryptoNoteCore/CryptoNoteFormatUtils.h"
 
-#include <sys/interrupted_exception.h>
+#include <syst/interrupted_exception.h>
 
 #include <utilities/coloured_msg.h>
 

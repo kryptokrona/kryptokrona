@@ -20,14 +20,14 @@
 #include <stdexcept>
 #include <string>
 
-#include <sys/errno.h>
-#include <sys/event.h>
-#include <sys/time.h>
+#include <syst/errno.h>
+#include <syst/event.h>
+#include <syst/time.h>
 #include <unistd.h>
 
 #include "dispatcher.h"
-#include <sys/error_message.h>
-#include <sys/interrupted_exception.h>
+#include <syst/error_message.h>
+#include <syst/interrupted_exception.h>
 
 namespace System
 {

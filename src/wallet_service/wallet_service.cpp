@@ -14,8 +14,8 @@
 
 #include <boost/filesystem/operations.hpp>
 
-#include <sys/timer.h>
-#include <sys/interrupted_exception.h>
+#include <syst/timer.h>
+#include <syst/interrupted_exception.h>
 #include "common/Base58.h"
 #include "common/Util.h"
 
@@ -28,8 +28,8 @@
 #include "CryptoNoteCore/Account.h"
 #include "CryptoNoteCore/Mixins.h"
 
-#include <sys/event_lock.h>
-#include <sys/remote_context.h>
+#include <syst/event_lock.h>
+#include <syst/remote_context.h>
 
 #include "payment_service_json_rpc_messages.h"
 #include "node_factory.h"

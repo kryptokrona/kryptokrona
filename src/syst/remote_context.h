@@ -21,9 +21,9 @@
 
 #include <future>
 
-#include <sys/dispatcher.h>
-#include <sys/event.h>
-#include <sys/interrupted_exception.h>
+#include <syst/dispatcher.h>
+#include <syst/event.h>
+#include <syst/interrupted_exception.h>
 
 namespace System
 {

@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/param.h>
+#include <syst/param.h>
 
 #if defined(_MSC_VER)
 #include <stdlib.h>

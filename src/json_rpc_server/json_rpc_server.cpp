@@ -12,10 +12,10 @@
 #include <sstream>
 #include "http/http_parser_error_codes.h"
 
-#include <sys/tcp_connection.h>
-#include <sys/tcp_listener.h>
-#include <sys/tcp_stream.h>
-#include <sys/ipv4_address.h>
+#include <syst/tcp_connection.h>
+#include <syst/tcp_listener.h>
+#include <syst/tcp_stream.h>
+#include <syst/ipv4_address.h>
 #include "http/http_parser.h"
 #include "http/http_response.h"
 #include "rpc/json_rpc.h"

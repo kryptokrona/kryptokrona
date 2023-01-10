@@ -21,17 +21,17 @@
 
 #include <fcntl.h>
 #include <netinet/in.h>
-#include <sys/errno.h>
-#include <sys/event.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include <syst/errno.h>
+#include <syst/event.h>
+#include <syst/socket.h>
+#include <syst/types.h>
 #include <unistd.h>
 
 #include "dispatcher.h"
 #include "tcp_connection.h"
-#include <sys/error_message.h>
-#include <sys/interrupted_exception.h>
-#include <sys/ipv4_address.h>
+#include <syst/error_message.h>
+#include <syst/interrupted_exception.h>
+#include <syst/ipv4_address.h>
 
 namespace System
 {

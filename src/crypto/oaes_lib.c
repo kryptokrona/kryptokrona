@@ -40,15 +40,15 @@
 
 // ANDROID, FreeBSD, and OpenBSD also don't need timeb.h
 #if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__ANDROID__)
-#include <sys/timeb.h>
+#include <syst/timeb.h>
 #else
-#include <sys/time.h>
+#include <syst/time.h>
 #endif
 
 #ifdef _WIN32
 #include <process.h>
 #else
-#include <sys/types.h>
+#include <syst/types.h>
 #include <unistd.h>
 #endif
 

@@ -19,13 +19,13 @@
 #include <cassert>
 #include <stdexcept>
 
-#include <sys/timerfd.h>
-#include <sys/epoll.h>
+#include <syst/timerfd.h>
+#include <syst/epoll.h>
 #include <unistd.h>
 
 #include "dispatcher.h"
-#include <sys/error_message.h>
-#include <sys/interrupted_exception.h>
+#include <syst/error_message.h>
+#include <syst/interrupted_exception.h>
 
 namespace System
 {

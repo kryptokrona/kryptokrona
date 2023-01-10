@@ -20,12 +20,12 @@
 #include <stdexcept>
 #include <arpa/inet.h>
 #include <cassert>
-#include <sys/epoll.h>
+#include <syst/epoll.h>
 #include <unistd.h>
 
-#include <sys/error_message.h>
-#include <sys/interrupted_exception.h>
-#include <sys/ipv4_address.h>
+#include <syst/error_message.h>
+#include <syst/interrupted_exception.h>
+#include <syst/ipv4_address.h>
 
 namespace System
 {

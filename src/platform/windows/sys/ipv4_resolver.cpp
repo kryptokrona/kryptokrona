@@ -22,10 +22,10 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <ws2tcpip.h>
-#include <sys/dispatcher.h>
-#include <sys/error_message.h>
-#include <sys/interrupted_exception.h>
-#include <sys/ipv4_address.h>
+#include <syst/dispatcher.h>
+#include <syst/error_message.h>
+#include <syst/interrupted_exception.h>
+#include <syst/ipv4_address.h>
 
 namespace System
 {
