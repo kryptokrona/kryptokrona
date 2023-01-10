@@ -9,12 +9,12 @@
 
 #include <random>
 
-#include <sys/ContextGroupTimeout.h>
+#include <sys/context_group_timeout.h>
 #include <sys/interrupted_exception.h>
 #include <sys/ipv4_address.h>
-#include <sys/OperationTimeout.h>
+#include <sys/operation_timeout.h>
 #include <sys/tcp_connection.h>
-#include <sys/TcpConnector.h>
+#include <sys/tcp_connector.h>
 
 #include <config/cryptonote_config.h>
 #include <crypto/random.h>

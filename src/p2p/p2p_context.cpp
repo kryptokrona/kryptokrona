@@ -20,7 +20,7 @@
 #include <sys/event_lock.h>
 #include <sys/interrupted_exception.h>
 #include <sys/ipv4_address.h>
-#include <sys/OperationTimeout.h>
+#include <sys/operation_timeout.h>
 
 #include "levin_protocol.h"
 

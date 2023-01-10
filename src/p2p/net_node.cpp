@@ -18,13 +18,13 @@
 #include <miniupnpc/upnpcommands.h>
 
 #include <sys/context.h>
-#include <sys/ContextGroupTimeout.h>
+#include <sys/context_group_timeout.h>
 #include <sys/event_lock.h>
 #include <sys/interrupted_exception.h>
 #include <sys/ipv4_address.h>
-#include <sys/Ipv4Resolver.h>
+#include <sys/Ipv4_resolver.h>
 #include <sys/tcp_listener.h>
-#include <sys/TcpConnector.h>
+#include <sys/tcp_connector.h>
 
 #include "version.h"
 #include <config/cryptonote_config.h>
