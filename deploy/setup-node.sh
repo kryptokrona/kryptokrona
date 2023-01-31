@@ -61,12 +61,12 @@ echo ""
 if [ -f "bootstrap.7z" ]; then
     echo "bootstrap.7z exists. No need to download. Skipping..."
 elif [ -d "bootstrap" ]; then
-    echo "boostrap directory exists. No need to extract it. Skipping..."
+    echo "bootstrap directory exists. No need to extract it. Skipping..."
 else
-    curl http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-20220426.7z --output bootstrap.7z
+    curl http://wasa.kryptokrona.se/xkr-bootstrap/bootstrap-2022-11-13.7z --output bootstrap.7z
 
     echo ""
-    echo "###### EXTRACING BOOSTRAP ######"
+    echo "###### EXTRACING BOOTSTRAP ######"
     echo ""
     7za x bootstrap.7z -o./bootstrap
 fi
@@ -85,7 +85,7 @@ docker network create kryptokrona
 echo ""
 echo "###### RUNNING DOCKER CONTAINER ######"
 echo ""
-docker run -d -p 11898:11898 --volume=$CURRENT_DIR/boostrap/.kryptokrona:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona kryptokrona/kryptokrona-node 
+docker run -d -p 11898:11898 --volume=$CURRENT_DIR/bootstrap/.kryptokrona:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona kryptokrona/kryptokrona-node 
 
 echo ""
 echo "###### SETTING UP NGINX AND LET'S ENCRYPT ######"
