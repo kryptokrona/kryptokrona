@@ -56,6 +56,7 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
   - [Start all Docker containers again](#start-all-docker-containers-again)
   - [Removing all data](#removing-all-data)
 - [Deploy node](#deploy-node)
+- [Checklist before release](#checklist-before-release)
 - [Help and Support](#help-and-support)
 - [Thanks](#thanks)
 - [Copypasta for license when editing files](#copypasta-for-license-when-editing-files)
@@ -427,6 +428,13 @@ Now run the file:
 Now this script will take care of basically everything. Just sit back and relax and grab a ☕.
 
 Check also out the article made by Marcus Cvjeticanin here: https://medium.com/coinsbench/deploy-your-own-kryptokrona-node-13253d5d39a3
+
+# Checklist before release
+
+1. Edit the file in `config/version.h.in` and bump up the version.
+2. Create PR and wait for review + merge.
+3. Create a tag on master `git tag v*.*.*`
+4. Push the changes `git push origin <tag_name>` to trigger a new build and to publish to various package managers.
 
 # Help and Support
 
