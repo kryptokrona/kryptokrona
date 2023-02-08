@@ -19,9 +19,9 @@
 #include <cassert>
 
 #include <stdexcept>
-#include <syst/epoll.h>
-#include <syst/eventfd.h>
-#include <syst/timerfd.h>
+#include <sys/epoll.h>
+#include <sys/eventfd.h>
+#include <sys/timerfd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <ucontext.h>

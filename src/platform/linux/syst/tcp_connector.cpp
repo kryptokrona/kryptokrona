@@ -22,7 +22,7 @@
 #include <fcntl.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <syst/epoll.h>
+#include <sys/epoll.h>
 
 #include <syst/interrupted_exception.h>
 #include <syst/ipv4_address.h>

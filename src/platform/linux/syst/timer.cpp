@@ -19,8 +19,8 @@
 #include <cassert>
 #include <stdexcept>
 
-#include <syst/timerfd.h>
-#include <syst/epoll.h>
+#include <sys/timerfd.h>
+#include <sys/epoll.h>
 #include <unistd.h>
 
 #include "dispatcher.h"

@@ -20,7 +20,7 @@
 #include <stdexcept>
 #include <arpa/inet.h>
 #include <cassert>
-#include <syst/epoll.h>
+#include <sys/epoll.h>
 #include <unistd.h>
 
 #include <syst/error_message.h>

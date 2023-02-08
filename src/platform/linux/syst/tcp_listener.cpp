@@ -21,7 +21,7 @@
 
 #include <fcntl.h>
 #include <netdb.h>
-#include <syst/epoll.h>
+#include <sys/epoll.h>
 #include <unistd.h>
 #include <string.h>
 
