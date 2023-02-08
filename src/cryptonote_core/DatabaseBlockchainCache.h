@@ -20,12 +20,12 @@
 #include "common/StringView.h"
 #include "Currency.h"
 #include "IBlockchainCache.h"
-#include "CryptoNoteCore/UpgradeManager.h"
+#include "cryptonote_core/UpgradeManager.h"
 #include <IDataBase.h>
-#include <CryptoNoteCore/BlockchainReadBatch.h>
-#include <CryptoNoteCore/BlockchainWriteBatch.h>
-#include <CryptoNoteCore/DatabaseCacheData.h>
-#include <CryptoNoteCore/IBlockchainCacheFactory.h>
+#include <cryptonote_core/BlockchainReadBatch.h>
+#include <cryptonote_core/BlockchainWriteBatch.h>
+#include <cryptonote_core/DatabaseCacheData.h>
+#include <cryptonote_core/IBlockchainCacheFactory.h>
 
 namespace CryptoNote
 {

@@ -23,8 +23,8 @@
 #include "common/StdOutputStream.h"
 #include "serialization/kv_binary_output_stream_serializer.h"
 #include "serialization/serialization_overloads.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteSerialization.h"
+#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/CryptoNoteSerialization.h"
 #include "common/StdInputStream.h"
 #include "serialization/kv_binary_input_stream_serializer.h"
 

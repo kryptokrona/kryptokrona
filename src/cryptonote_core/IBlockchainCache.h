@@ -23,9 +23,9 @@
 
 #include <CryptoNote.h>
 
-#include "CryptoNoteCore/CachedBlock.h"
-#include "CryptoNoteCore/CachedTransaction.h"
-#include "CryptoNoteCore/TransactionValidatiorState.h"
+#include "cryptonote_core/CachedBlock.h"
+#include "cryptonote_core/CachedTransaction.h"
+#include "cryptonote_core/TransactionValidatiorState.h"
 #include "common/ArrayView.h"
 
 namespace CryptoNote

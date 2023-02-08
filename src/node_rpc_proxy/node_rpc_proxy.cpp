@@ -18,11 +18,11 @@
 #include <syst/event.h>
 #include <syst/event_lock.h>
 #include <syst/timer.h>
-#include <CryptoNoteCore/TransactionApi.h>
+#include <cryptonote_core/TransactionApi.h>
 
 #include "common/StringTools.h"
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
+#include "cryptonote_core/CryptoNoteBasicImpl.h"
+#include "cryptonote_core/CryptoNoteTools.h"
 
 #include <logging/dummy_logger.h>
 

@@ -12,7 +12,7 @@
 
 #include "crypto/crypto.h"
 
-#include "CryptoNoteCore/ITimeProvider.h"
+#include "cryptonote_core/ITimeProvider.h"
 #include "ITransactionPool.h"
 #include "logging/ilogger.h"
 #include "logging/logger_ref.h"

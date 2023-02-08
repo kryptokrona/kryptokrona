@@ -8,10 +8,10 @@
 
 #include <config/wallet_config.h>
 
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/Currency.h>
-#include <CryptoNoteCore/Mixins.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/Currency.h>
+#include <cryptonote_core/Mixins.h>
+#include <cryptonote_core/TransactionExtra.h>
 
 #include <errors/validate_parameters.h>
 

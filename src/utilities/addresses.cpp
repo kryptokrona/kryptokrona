@@ -10,8 +10,8 @@
 
 #include <config/cryptonote_config.h>
 
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
+#include <cryptonote_core/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/CryptoNoteTools.h>
 
 namespace Utilities
 {

@@ -17,16 +17,28 @@
 
 #pragma once
 
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include <cryptonote_core/BlockchainCache.h>
+#include <map>
 
 namespace CryptoNote
 {
-    struct IMinerHandler
-    {
-        virtual bool handle_block_found(BlockTemplate &b) = 0;
-        virtual bool get_block_template(BlockTemplate &b, const AccountPublicAddress &adr, uint64_t &diffic, uint32_t &height, const BinaryArray &ex_nonce) = 0;
 
-    protected:
-        ~IMinerHandler(){};
+    struct KeyOutputInfo
+    {
+        Crypto::PublicKey publicKey;
+        Crypto::Hash transactionHash;
+        uint64_t unlockTime;
+        uint16_t outputIndex;
+
+        void serialize(CryptoNote::ISerializer &s);
     };
+
+    // inherit here to avoid breaking IBlockchainCache interface
+    struct ExtendedTransactionInfo : CachedTransactionInfo
+    {
+        // CachedTransactionInfo tx;
+        std::map<IBlockchainCache::Amount, std::vector<IBlockchainCache::GlobalOutputIndex>> amountToKeyIndexes; // global key output indexes spawned in this transaction
+        void serialize(ISerializer &s);
+    };
+
 }

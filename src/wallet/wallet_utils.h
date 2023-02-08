@@ -20,7 +20,7 @@
 #include <string>
 
 #include "IWallet.h"
-#include "CryptoNoteCore/Currency.h"
+#include "cryptonote_core/Currency.h"
 #include "wallet/wallet_green.h"
 
 namespace CryptoNote

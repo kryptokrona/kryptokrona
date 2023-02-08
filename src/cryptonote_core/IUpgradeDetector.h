@@ -16,29 +16,25 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
-
-#include <CryptoNoteCore/BlockchainCache.h>
-#include <map>
+#include <cstdint>
+#include <cryptonote_core/Currency.h>
 
 namespace CryptoNote
 {
 
-    struct KeyOutputInfo
+    class IUpgradeDetector
     {
-        Crypto::PublicKey publicKey;
-        Crypto::Hash transactionHash;
-        uint64_t unlockTime;
-        uint16_t outputIndex;
+    public:
+        enum : uint32_t
+        {
+            UNDEF_HEIGHT = static_cast<uint32_t>(-1)
+        };
 
-        void serialize(CryptoNote::ISerializer &s);
+        virtual uint8_t targetVersion() const = 0;
+        virtual uint32_t upgradeIndex() const = 0;
+        virtual ~IUpgradeDetector() {}
     };
 
-    // inherit here to avoid breaking IBlockchainCache interface
-    struct ExtendedTransactionInfo : CachedTransactionInfo
-    {
-        // CachedTransactionInfo tx;
-        std::map<IBlockchainCache::Amount, std::vector<IBlockchainCache::GlobalOutputIndex>> amountToKeyIndexes; // global key output indexes spawned in this transaction
-        void serialize(ISerializer &s);
-    };
+    std::unique_ptr<IUpgradeDetector> makeUpgradeDetector(uint8_t targetVersion, uint32_t upgradeIndex);
 
 }

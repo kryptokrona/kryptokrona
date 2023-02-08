@@ -11,12 +11,12 @@
 
 #include "crypto/crypto.h"
 #include <config/cryptonote_config.h>
-#include "CryptoNoteCore/CoreStatistics.h"
+#include "cryptonote_core/CoreStatistics.h"
 
 // new serialization
 #include "serialization/iserializer.h"
 #include "serialization/serialization_overloads.h"
-#include "CryptoNoteCore/CryptoNoteSerialization.h"
+#include "cryptonote_core/CryptoNoteSerialization.h"
 
 namespace CryptoNote
 {

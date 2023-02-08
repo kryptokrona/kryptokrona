@@ -4,7 +4,7 @@
 
 #include <CryptoNote.h>
 
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
+#include <cryptonote_core/CryptoNoteFormatUtils.h>
 
 #include <errors/errors.h>
 

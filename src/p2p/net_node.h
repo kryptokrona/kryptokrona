@@ -19,7 +19,7 @@
 #include <syst/tcp_connection.h>
 #include <syst/tcp_listener.h>
 
-#include "CryptoNoteCore/OnceInInterval.h"
+#include "cryptonote_core/OnceInInterval.h"
 #include "cryptonote_protocol/cryptonote_protocol_handler.h"
 #include "logging/logger_ref.h"
 

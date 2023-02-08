@@ -32,7 +32,7 @@
 #include "common/StringView.h"
 #include "Currency.h"
 #include "IBlockchainCache.h"
-#include "CryptoNoteCore/UpgradeManager.h"
+#include "cryptonote_core/UpgradeManager.h"
 
 namespace CryptoNote
 {

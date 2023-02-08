@@ -17,7 +17,7 @@
 
 #include "IWallet.h"
 #include "transfers_subscription.h"
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
+#include "cryptonote_core/CryptoNoteBasicImpl.h"
 
 using namespace Crypto;
 using namespace Logging;

@@ -15,11 +15,11 @@
 #include "common/StdOutputStream.h"
 #include "common/ShuffleGenerator.h"
 
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/CryptoNoteSerialization.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/BlockchainStorage.h"
-#include "CryptoNoteCore/TransactionExtra.h"
+#include "cryptonote_core/CryptoNoteBasicImpl.h"
+#include "cryptonote_core/CryptoNoteSerialization.h"
+#include "cryptonote_core/CryptoNoteTools.h"
+#include "cryptonote_core/BlockchainStorage.h"
+#include "cryptonote_core/TransactionExtra.h"
 
 #include "serialization/serialization_overloads.h"
 #include "TransactionValidatiorState.h"

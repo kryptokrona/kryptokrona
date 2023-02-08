@@ -19,7 +19,7 @@
 
 #include "common/int-util.h"
 #include "CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/TransactionExtra.h"
+#include "cryptonote_core/TransactionExtra.h"
 
 namespace CryptoNote
 {

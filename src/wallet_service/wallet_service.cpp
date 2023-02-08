@@ -21,12 +21,12 @@
 
 #include "crypto/crypto.h"
 #include "CryptoNote.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/TransactionExtra.h"
-#include "CryptoNoteCore/Account.h"
-#include "CryptoNoteCore/Mixins.h"
+#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/CryptoNoteBasicImpl.h"
+#include "cryptonote_core/CryptoNoteTools.h"
+#include "cryptonote_core/TransactionExtra.h"
+#include "cryptonote_core/Account.h"
+#include "cryptonote_core/Mixins.h"
 
 #include <syst/event_lock.h>
 #include <syst/remote_context.h>

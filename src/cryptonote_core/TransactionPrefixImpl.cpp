@@ -21,10 +21,10 @@
 #include <system_error>
 #include <memory>
 
-#include "CryptoNoteCore/CryptoNoteBasic.h"
-#include "CryptoNoteCore/TransactionApiExtra.h"
+#include "cryptonote_core/CryptoNoteBasic.h"
+#include "cryptonote_core/TransactionApiExtra.h"
 #include "TransactionUtils.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
+#include "cryptonote_core/CryptoNoteTools.h"
 
 using namespace Crypto;
 

@@ -10,7 +10,7 @@
 
 #include <common/ObserverManager.h>
 
-#include "CryptoNoteCore/ICore.h"
+#include "cryptonote_core/ICore.h"
 
 #include "cryptonote_protocol/cryptonote_protocol_definitions.h"
 #include "cryptonote_protocol/cryptonote_protocol_handler_common.h"

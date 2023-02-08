@@ -13,21 +13,21 @@
 #include <common/Math.h>
 #include <common/MemoryInputStream.h>
 
-#include <CryptoNoteCore/BlockchainCache.h>
-#include <CryptoNoteCore/BlockchainStorage.h>
-#include <CryptoNoteCore/BlockchainUtils.h>
-#include <CryptoNoteCore/Core.h>
-#include <CryptoNoteCore/CoreErrors.h>
-#include <CryptoNoteCore/CryptoNoteFormatUtils.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/ITimeProvider.h>
-#include <CryptoNoteCore/MemoryBlockchainStorage.h>
-#include <CryptoNoteCore/Mixins.h>
-#include <CryptoNoteCore/TransactionApi.h>
-#include <CryptoNoteCore/TransactionExtra.h>
-#include <CryptoNoteCore/TransactionPool.h>
-#include <CryptoNoteCore/TransactionPoolCleaner.h>
-#include <CryptoNoteCore/UpgradeManager.h>
+#include <cryptonote_core/BlockchainCache.h>
+#include <cryptonote_core/BlockchainStorage.h>
+#include <cryptonote_core/BlockchainUtils.h>
+#include <cryptonote_core/Core.h>
+#include <cryptonote_core/CoreErrors.h>
+#include <cryptonote_core/CryptoNoteFormatUtils.h>
+#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/ITimeProvider.h>
+#include <cryptonote_core/MemoryBlockchainStorage.h>
+#include <cryptonote_core/Mixins.h>
+#include <cryptonote_core/TransactionApi.h>
+#include <cryptonote_core/TransactionExtra.h>
+#include <cryptonote_core/TransactionPool.h>
+#include <cryptonote_core/TransactionPoolCleaner.h>
+#include <cryptonote_core/UpgradeManager.h>
 
 #include <cryptonote_protocol/cryptonote_protocol_handler_common.h>
 

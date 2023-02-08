@@ -14,7 +14,7 @@
 
 #include <config/cryptonote_config.h>
 
-#include <CryptoNoteCore/Core.h>
+#include <cryptonote_core/Core.h>
 
 #include <rpc/core_rpc_server_commands_definitions.h>
 

@@ -15,21 +15,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
-
-#include "common/StringTools.h"
-#include "crypto/crypto.h"
-#include "crypto/hash.h"
-#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include <cryptonote_core/CryptoNoteSerialization.h>
+#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/DatabaseCacheData.h>
+#include <serialization/serialization_overloads.h>
 
 namespace CryptoNote
 {
-    /************************************************************************/
-    /* CryptoNote helper functions                                          */
-    /************************************************************************/
-    uint64_t getPenalizedAmount(uint64_t amount, size_t medianSize, size_t currentBlockSize);
-    std::string getAccountAddressAsStr(uint64_t prefix, const AccountPublicAddress &adr);
-    bool parseAccountAddressString(uint64_t &prefix, AccountPublicAddress &adr, const std::string &str);
-}
 
-bool parse_hash256(const std::string &str_hash, Crypto::Hash &hash);
+    void ExtendedTransactionInfo::serialize(CryptoNote::ISerializer &s)
+    {
+        s(static_cast<CachedTransactionInfo &>(*this), "cached_transaction");
+        s(amountToKeyIndexes, "key_indexes");
+    }
+
+    void KeyOutputInfo::serialize(ISerializer &s)
+    {
+        s(publicKey, "public_key");
+        s(transactionHash, "transaction_hash");
+        s(unlockTime, "unlock_time");
+        s(outputIndex, "output_index");
+    }
+
+}

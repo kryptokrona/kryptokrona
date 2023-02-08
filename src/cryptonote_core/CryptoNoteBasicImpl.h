@@ -16,25 +16,20 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
-#include <cstdint>
-#include <CryptoNoteCore/Currency.h>
+
+#include "common/StringTools.h"
+#include "crypto/crypto.h"
+#include "crypto/hash.h"
+#include "cryptonote_core/CryptoNoteBasic.h"
 
 namespace CryptoNote
 {
-
-    class IUpgradeDetector
-    {
-    public:
-        enum : uint32_t
-        {
-            UNDEF_HEIGHT = static_cast<uint32_t>(-1)
-        };
-
-        virtual uint8_t targetVersion() const = 0;
-        virtual uint32_t upgradeIndex() const = 0;
-        virtual ~IUpgradeDetector() {}
-    };
-
-    std::unique_ptr<IUpgradeDetector> makeUpgradeDetector(uint8_t targetVersion, uint32_t upgradeIndex);
-
+    /************************************************************************/
+    /* CryptoNote helper functions                                          */
+    /************************************************************************/
+    uint64_t getPenalizedAmount(uint64_t amount, size_t medianSize, size_t currentBlockSize);
+    std::string getAccountAddressAsStr(uint64_t prefix, const AccountPublicAddress &adr);
+    bool parseAccountAddressString(uint64_t &prefix, AccountPublicAddress &adr, const std::string &str);
 }
+
+bool parse_hash256(const std::string &str_hash, Crypto::Hash &hash);

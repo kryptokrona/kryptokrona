@@ -12,9 +12,9 @@
 #include <common/Base58.h>
 #include <common/StringTools.h>
 
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <cryptonote_core/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/TransactionExtra.h>
 
 #include <fstream>
 

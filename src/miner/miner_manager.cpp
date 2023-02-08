@@ -14,10 +14,10 @@
 
 #include "common/StringTools.h"
 #include <config/cryptonote_config.h>
-#include "CryptoNoteCore/CachedBlock.h"
-#include "CryptoNoteCore/CryptoNoteTools.h"
-#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
-#include "CryptoNoteCore/TransactionExtra.h"
+#include "cryptonote_core/CachedBlock.h"
+#include "cryptonote_core/CryptoNoteTools.h"
+#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/TransactionExtra.h"
 #include "rpc/http_client.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/json_rpc.h"

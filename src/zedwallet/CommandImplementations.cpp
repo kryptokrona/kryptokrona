@@ -12,8 +12,8 @@
 
 #include <config/wallet_config.h>
 
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <cryptonote_core/Account.h>
+#include <cryptonote_core/TransactionExtra.h>
 
 #ifndef MSVC
 #include <fstream>

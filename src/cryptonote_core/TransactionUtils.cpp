@@ -20,7 +20,7 @@
 #include <unordered_set>
 
 #include "crypto/crypto.h"
-#include "CryptoNoteCore/Account.h"
+#include "cryptonote_core/Account.h"
 #include "CryptoNoteFormatUtils.h"
 #include "TransactionExtra.h"
 

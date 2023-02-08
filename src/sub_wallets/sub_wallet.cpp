@@ -6,8 +6,8 @@
 #include <sub_wallets/sub_wallet.h>
 /////////////////////////////////
 
-#include <CryptoNoteCore/Account.h>
-#include <CryptoNoteCore/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/Account.h>
+#include <cryptonote_core/CryptoNoteBasicImpl.h>
 
 #include <utilities/utilities.h>
 

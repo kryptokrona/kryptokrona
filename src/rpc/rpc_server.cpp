@@ -14,9 +14,9 @@
 
 #include <config/cryptonote_config.h>
 
-#include <CryptoNoteCore/Core.h>
-#include <CryptoNoteCore/CryptoNoteTools.h>
-#include <CryptoNoteCore/TransactionExtra.h>
+#include <cryptonote_core/Core.h>
+#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/TransactionExtra.h>
 
 #include <cryptonote_protocol/cryptonote_protocol_handler_common.h>
 

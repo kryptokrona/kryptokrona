@@ -11,7 +11,7 @@
 #include <syst/event.h>
 #include "IWallet.h"
 #include "INode.h"
-#include "CryptoNoteCore/Currency.h"
+#include "cryptonote_core/Currency.h"
 #include "payment_service_json_rpc_messages.h"
 #undef ERROR // TODO: workaround for windows build. fix it
 #include "logging/logger_ref.h"
