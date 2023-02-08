@@ -25,7 +25,7 @@
 #include "json_output_stream_serializer.h"
 #include "kv_binary_input_stream_serializer.h"
 #include "kv_binary_output_stream_serializer.h"
-#include <zedwallet/Types.h>
+#include <zedwallet/types.h>
 
 namespace Common
 {
