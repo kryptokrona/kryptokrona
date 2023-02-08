@@ -22,8 +22,8 @@
 #else
 #include <unistd.h>
 #include <signal.h>
-#include <syst/types.h>
-#include <syst/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #endif

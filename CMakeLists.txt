@@ -143,7 +143,7 @@ include_directories(include "${CMAKE_CURRENT_BINARY_DIR}/version" src external)
 
 # # Platform specific code base information is applied here
 if(MSVC)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/windows)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/windows)
     add_definitions("/bigobj /MP /W3 /GS- /D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4345 /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN /DGTEST_HAS_TR1_TUPLE=0 /D_VARIADIC_MAX=8 /D__SSE4_1__")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10485760")
 
@@ -155,12 +155,12 @@ if(MSVC)
 elseif(APPLE)
     include_directories(SYSTEM /usr/include/malloc)
     enable_language(ASM)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/osx)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/posix)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/osx)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/posix)
 
 else()
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/linux)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/posix)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/linux)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/platform/posix)
 endif()
 
 if(NOT MSVC)

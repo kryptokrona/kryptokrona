@@ -20,9 +20,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <syst/mman.h>
-#include <syst/stat.h>
-#include <syst/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <cassert>
 

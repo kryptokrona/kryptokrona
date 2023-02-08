@@ -22,7 +22,7 @@
 #include <syst/event_lock.h>
 #include <syst/interrupted_exception.h>
 #include <syst/ipv4_address.h>
-#include <syst/Ipv4_resolver.h>
+#include <syst/ipv4_resolver.h>
 #include <syst/tcp_listener.h>
 #include <syst/tcp_connector.h>
 

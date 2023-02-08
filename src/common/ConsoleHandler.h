@@ -28,7 +28,7 @@
 #include "ConsoleTools.h"
 
 #ifndef _WIN32
-#include <syst/select.h>
+#include <sys/select.h>
 #endif
 
 namespace Common

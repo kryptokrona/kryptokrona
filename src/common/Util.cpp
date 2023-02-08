@@ -32,7 +32,7 @@
 #include <shlobj.h>
 #include <strsafe.h>
 #else
-#include <syst/utsname.h>
+#include <sys/utsname.h>
 #endif
 
 namespace Tools
