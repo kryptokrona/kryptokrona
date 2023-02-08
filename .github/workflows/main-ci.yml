@@ -89,7 +89,7 @@ jobs:
 
       - name: Build Docker
         run: |
-          docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} .
+          docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} -f Dockerfile.test .
 
       - name: Publish Docker
         run: |
