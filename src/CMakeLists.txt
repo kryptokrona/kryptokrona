@@ -42,11 +42,11 @@ file(GLOB_RECURSE zedwallet zedwallet/*)
 file(GLOB_RECURSE zedwallet++ zedwallet++/*)
 
 if(MSVC)
-    file(GLOB_RECURSE syst syst/* platform/windows/sys/*)
+    file(GLOB_RECURSE syst syst/* platform/windows/syst/*)
 elseif(APPLE)
-    file(GLOB_RECURSE syst syst/* platform/osx/sys/* platform/posix/sys/*)
+    file(GLOB_RECURSE syst syst/* platform/osx/syst/* platform/posix/syst/*)
 else()
-    file(GLOB_RECURSE syst syst/* platform/linux/sys/* platform/posix/sys/*)
+    file(GLOB_RECURSE syst syst/* platform/linux/syst/* platform/posix/syst/*)
 endif()
 
 # Group the files together in IDEs
@@ -77,22 +77,22 @@ add_library(wallet_service STATIC ${service})
 
 if(MSVC)
     set(DAEMON_SOURCES_OS
-            binary_info/daemon.rc
+        binary_info/daemon.rc
     )
     set(ZED_WALLET_SOURCES_OS
-            binary_info/zedwallet.rc
+        binary_info/zedwallet.rc
     )
     set(MINER_SOURCES_OS
-            binary_info/miner.rc
+        binary_info/miner.rc
     )
     set(PG_SOURCES_OS
-            binary_info/service.rc
+        binary_info/service.rc
     )
     set(CT_SOURCES_OS
-            binary_info/cryptotest.rc
+        binary_info/cryptotest.rc
     )
     set(WALLET_API_SOURCES_OS
-            binary_info/walletapi.rc
+        binary_info/walletapi.rc
     )
 endif()
 
