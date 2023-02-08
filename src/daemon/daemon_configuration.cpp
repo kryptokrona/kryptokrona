@@ -11,7 +11,7 @@
 #include <config/cli_header.h>
 #include <config/cryptonote_config.h>
 #include <logging/ilogger.h>
-#include "common/PathTools.h"
+#include "common/path_tools.h"
 #include "common/util.h"
 
 using nlohmann::json;

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "common/ConsoleHandler.h"
+#include "common/console_handler.h"
 
 #include <logging/logger_ref.h>
 #include <logging/logger_manager.h>

@@ -4,7 +4,7 @@
 
 #include <atomic>
 
-#include <common/SignalHandler.h>
+#include <common/signal_handler.h>
 
 #include <config/cli_header.h>
 
