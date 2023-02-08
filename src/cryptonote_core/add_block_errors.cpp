@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "AddBlockErrors.h"
+#include "add_block_errors.h"
 
 namespace CryptoNote
 {

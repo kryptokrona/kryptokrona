@@ -14,7 +14,7 @@
 #include <syst/event.h>
 #include <syst/remote_context.h>
 
-#include "CryptoNote.h"
+#include "cryptonote.h"
 
 namespace CryptoNote
 {

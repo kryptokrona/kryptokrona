@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "IUpgradeManager.h"
+#include "iupgrade_manager.h"
 
 #include <memory>
 
-#include "IUpgradeDetector.h"
+#include "iupgrade_detector.h"
 
 namespace CryptoNote
 {

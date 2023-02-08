@@ -11,9 +11,9 @@
 #include <cxxopts.hpp>
 #include <config/cli_header.h>
 
-#include "CryptoNote.h"
+#include "cryptonote.h"
 #include "CryptoTypes.h"
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 #include "crypto/crypto.h"
 
 #define PERFORMANCE_ITERATIONS 1000

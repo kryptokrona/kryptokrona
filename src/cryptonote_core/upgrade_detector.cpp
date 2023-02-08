@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "UpgradeDetector.h"
-#include "IUpgradeDetector.h"
+#include "upgrade_detector.h"
+#include "iupgrade_detector.h"
 
 namespace CryptoNote
 {

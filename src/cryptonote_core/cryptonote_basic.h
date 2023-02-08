@@ -18,7 +18,7 @@
 #pragma once
 
 #include <boost/utility/value_init.hpp>
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
 namespace CryptoNote
 {

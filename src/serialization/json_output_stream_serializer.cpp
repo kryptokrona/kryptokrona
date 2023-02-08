@@ -18,7 +18,7 @@
 #include "json_output_stream_serializer.h"
 #include <cassert>
 #include <stdexcept>
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 
 using Common::JsonValue;
 using namespace CryptoNote;

@@ -28,14 +28,14 @@
 #include <boost/multi_index/ordered_index.hpp>
 
 #include "crypto/crypto.h"
-#include "cryptonote_core/CryptoNoteBasic.h"
-#include "cryptonote_core/CryptoNoteSerialization.h"
+#include "cryptonote_core/cryptonote_basic.h"
+#include "cryptonote_core/cryptonote_serialization.h"
 #include "cryptonote_core/Currency.h"
 #include "logging/logger_ref.h"
 #include "serialization/iserializer.h"
 #include "serialization/serialization_overloads.h"
 
-#include "ITransaction.h"
+#include "itransaction.h"
 #include "ITransfersContainer.h"
 
 namespace CryptoNote

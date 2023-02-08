@@ -8,7 +8,7 @@
 
 #include <config/cryptonote_config.h>
 
-#include <cryptonote_core/Mixins.h>
+#include <cryptonote_core/mixins.h>
 
 #include <crypto/random.h>
 

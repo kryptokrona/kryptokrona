@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "MemoryBlockchainStorage.h"
+#include "memory_blockchain_storage.h"
 #include <cassert>
 #include "serialization/serialization_overloads.h"
 

@@ -23,8 +23,8 @@
 
 #include "rocksdb/db.h"
 
-#include "IDataBase.h"
-#include "DataBaseConfig.h"
+#include "idatabase.h"
+#include "database_config.h"
 
 #include <logging/logger_ref.h>
 

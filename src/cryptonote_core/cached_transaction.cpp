@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "CachedTransaction.h"
+#include "cached_transaction.h"
 #include <common/Varint.h>
 #include <config/cryptonote_config.h>
-#include "CryptoNoteTools.h"
+#include "cryptonote_tools.h"
 
 using namespace Crypto;
 using namespace CryptoNote;

@@ -17,7 +17,7 @@
 #include <config/cli_header.h>
 
 #include <config/cryptonote_config.h>
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 #include <common/Util.h>
 
 #include "logging/ilogger.h"

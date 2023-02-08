@@ -6,7 +6,7 @@
 #include "net_node_config.h"
 
 #include <common/Util.h>
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 #include <config/cryptonote_config.h>
 #include <crypto/random.h>
 

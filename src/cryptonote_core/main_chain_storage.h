@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "IMainChainStorage.h"
-#include "Currency.h"
-#include "SwappedVector.h"
+#include "imain_chain_storage.h"
+#include "currency.h"
+#include "swapped_vector.h"
 
 namespace CryptoNote
 {

@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "ITransaction.h"
+#include "itransaction.h"
 
 #include <numeric>
 #include <system_error>
 #include <memory>
 
-#include "cryptonote_core/CryptoNoteBasic.h"
-#include "cryptonote_core/TransactionApiExtra.h"
-#include "TransactionUtils.h"
-#include "cryptonote_core/CryptoNoteTools.h"
+#include "cryptonote_core/cryptonote_basic.h"
+#include "cryptonote_core/transaction_api_extra.h"
+#include "transaction_utils.h"
+#include "cryptonote_core/cryptonote_tools.h"
 
 using namespace Crypto;
 

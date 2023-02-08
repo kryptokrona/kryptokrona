@@ -19,9 +19,9 @@
 
 #include <vector>
 
-#include "CachedTransaction.h"
-#include "CryptoNote.h"
-#include "CryptoNoteTools.h"
+#include "cached_transaction.h"
+#include "cryptonote.h"
+#include "cryptonote_tools.h"
 
 namespace CryptoNote
 {

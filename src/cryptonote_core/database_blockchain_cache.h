@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "common/StringView.h"
-#include "Currency.h"
-#include "IBlockchainCache.h"
-#include "cryptonote_core/UpgradeManager.h"
+#include "common/string_view.h"
+#include "currency.h"
+#include "iblockchain_cache.h"
+#include "cryptonote_core/upgrade_manager.h"
 #include <IDataBase.h>
 #include <cryptonote_core/BlockchainReadBatch.h>
 #include <cryptonote_core/BlockchainWriteBatch.h>

@@ -7,7 +7,7 @@
 ////////////////////////
 
 #include <config/cryptonote_config.h>
-#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/cryptonote_tools.h>
 #include <errors/validate_parameters.h>
 #include <utilities/utilities.h>
 #include <version.h>

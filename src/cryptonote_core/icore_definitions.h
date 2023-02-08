@@ -18,7 +18,7 @@
 #pragma once
 
 #include <vector>
-#include <CryptoNote.h>
+#include <cryptonote.h>
 #include <CryptoTypes.h>
 #include <WalletTypes.h>
 

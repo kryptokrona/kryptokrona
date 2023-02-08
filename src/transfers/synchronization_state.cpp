@@ -17,11 +17,11 @@
 
 #include "synchronization_state.h"
 
-#include "common/StdInputStream.h"
-#include "common/StdOutputStream.h"
+#include "common/std_input_stream.h"
+#include "common/std_output_stream.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
-#include "cryptonote_core/CryptoNoteSerialization.h"
+#include "cryptonote_core/cryptonote_serialization.h"
 
 using namespace Common;
 

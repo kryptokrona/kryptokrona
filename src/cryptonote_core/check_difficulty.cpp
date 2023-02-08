@@ -21,10 +21,10 @@
 #include <cstdint>
 #include <vector>
 
-#include "common/int-util.h"
+#include "common/int_util.h"
 #include "crypto/hash.h"
 #include <config/cryptonote_config.h>
-#include "CheckDifficulty.h"
+#include "check_difficulty.h"
 
 namespace CryptoNote
 {

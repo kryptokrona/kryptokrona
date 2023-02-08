@@ -3,11 +3,11 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "TransactionPoolCleaner.h"
-#include "Core.h"
-#include "Mixins.h"
+#include "transaction_pool_cleaner.h"
+#include "core.h"
+#include "mixins.h"
 
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 
 #include <syst/interrupted_exception.h>
 #include <syst/timer.h>

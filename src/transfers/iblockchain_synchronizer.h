@@ -23,7 +23,7 @@
 #include <unordered_set>
 
 #include "crypto/crypto.h"
-#include "cryptonote_core/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 
 #include "IObservable.h"
 #include "IStreamSerializable.h"

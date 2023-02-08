@@ -4,10 +4,10 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "CachedBlock.h"
+#include "cached_block.h"
 #include <common/Varint.h>
 #include <config/cryptonote_config.h>
-#include "CryptoNoteTools.h"
+#include "cryptonote_tools.h"
 
 using namespace Crypto;
 using namespace CryptoNote;

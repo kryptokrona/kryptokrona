@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 #include <functional>
 
 namespace CryptoNote

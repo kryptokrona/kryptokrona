@@ -11,16 +11,16 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 
-#include <common/ShuffleGenerator.h>
+#include <common/shuffle_generator.h>
 
-#include "BlockchainUtils.h"
+#include "blockchain_utils.h"
 
 #include "crypto/hash.h"
 
-#include <cryptonote_core/BlockchainStorage.h>
-#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/blockchain_storage.h>
+#include <cryptonote_core/cryptonote_tools.h>
 #include <cryptonote_core/CryptoNoteBasicImpl.h>
-#include "cryptonote_core/TransactionExtra.h"
+#include "cryptonote_core/transaction_extra.h"
 
 namespace CryptoNote
 {

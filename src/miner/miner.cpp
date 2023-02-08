@@ -10,11 +10,11 @@
 
 #include <functional>
 #include <mutex>
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 
 #include "crypto/crypto.h"
 #include <crypto/random.h>
-#include "cryptonote_core/CachedBlock.h"
+#include "cryptonote_core/cached_block.h"
 #include "cryptonote_core/CheckDifficulty.h"
 #include "cryptonote_core/CryptoNoteFormatUtils.h"
 

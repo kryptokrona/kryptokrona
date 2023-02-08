@@ -7,8 +7,8 @@
 
 #include <ctime>
 
-#include <cryptonote_core/Core.h>
-#include <cryptonote_core/CryptoNoteFormatUtils.h>
+#include <cryptonote_core/core.h>
+#include <cryptonote_core/cryptonote_format_utils.h>
 #include <cryptonote_core/Currency.h>
 
 #include <cryptonote_protocol/cryptonote_protocol_handler.h>

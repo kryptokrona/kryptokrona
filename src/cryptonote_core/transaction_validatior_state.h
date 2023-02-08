@@ -7,8 +7,8 @@
 #pragma once
 #include <set>
 #include <unordered_set>
-#include "CachedTransaction.h"
-#include <CryptoNote.h>
+#include "cached_transaction.h"
+#include <cryptonote.h>
 #include <crypto/crypto.h>
 
 namespace CryptoNote

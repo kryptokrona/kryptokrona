@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "ITransaction.h"
-#include "TransactionApiExtra.h"
-#include "TransactionUtils.h"
+#include "itransaction.h"
+#include "transaction_api_extra.h"
+#include "transaction_utils.h"
 
-#include "Account.h"
-#include "cryptonote_core/CryptoNoteTools.h"
+#include "account.h"
+#include "cryptonote_core/cryptonote_tools.h"
 #include <config/cryptonote_config.h>
 
 #include <boost/optional.hpp>

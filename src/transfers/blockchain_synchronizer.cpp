@@ -24,8 +24,8 @@
 #include <unordered_set>
 
 #include "common/StreamTools.h"
-#include "common/StringTools.h"
-#include "cryptonote_core/CryptoNoteBasicImpl.h"
+#include "common/string_tools.h"
+#include "cryptonote_core/cryptonote_basic_impl.h"
 #include "cryptonote_core/CryptoNoteFormatUtils.h"
 #include "cryptonote_core/TransactionApi.h"
 

@@ -7,12 +7,12 @@
 #pragma once
 
 #include <list>
-#include "cryptonote_core/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 
 // ISerializer-based serialization
 #include "serialization/iserializer.h"
 #include "serialization/serialization_overloads.h"
-#include "cryptonote_core/CryptoNoteSerialization.h"
+#include "cryptonote_core/cryptonote_serialization.h"
 
 namespace CryptoNote
 {

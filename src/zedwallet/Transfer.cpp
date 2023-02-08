@@ -14,8 +14,8 @@
 #include <config/cryptonote_config.h>
 
 #include <cryptonote_core/CryptoNoteBasicImpl.h>
-#include <cryptonote_core/CryptoNoteTools.h>
-#include <cryptonote_core/TransactionExtra.h>
+#include <cryptonote_core/cryptonote_tools.h>
+#include <cryptonote_core/transaction_extra.h>
 
 #include "IWallet.h"
 

@@ -7,8 +7,8 @@
 
 #include <config/cryptonote_config.h>
 
-#include <cryptonote_core/CachedTransaction.h>
-#include <cryptonote_core/TransactionApi.h>
+#include <cryptonote_core/cached_transaction.h>
+#include <cryptonote_core/transaction_api.h>
 
 #include <wallet/wallet_errors.h>
 

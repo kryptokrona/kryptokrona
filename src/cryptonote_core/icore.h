@@ -9,18 +9,18 @@
 #include <unordered_set>
 #include <vector>
 #include <optional>
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
-#include "AddBlockErrors.h"
-#include "AddBlockErrorCondition.h"
-#include "BlockchainExplorerData.h"
-#include "BlockchainMessages.h"
-#include "CachedBlock.h"
-#include "CachedTransaction.h"
-#include "CoreStatistics.h"
-#include "ICoreObserver.h"
-#include "ICoreDefinitions.h"
-#include "MessageQueue.h"
+#include "add_block_errors.h"
+#include "add_block_error_condition.h"
+#include "blockchain_explorer_data.h"
+#include "blockchain_messages.h"
+#include "cached_block.h"
+#include "cached_transaction.h"
+#include "core_statistics.h"
+#include "icore_observer.h"
+#include "icore_definitions.h"
+#include "message_queue.h"
 
 namespace CryptoNote
 {

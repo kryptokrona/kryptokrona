@@ -17,9 +17,9 @@
 
 #include "IWallet.h"
 #include "transfers_container.h"
-#include "common/StdInputStream.h"
-#include "common/StdOutputStream.h"
-#include "cryptonote_core/CryptoNoteBasicImpl.h"
+#include "common/std_input_stream.h"
+#include "common/std_output_stream.h"
+#include "cryptonote_core/cryptonote_basic_impl.h"
 #include "cryptonote_core/CryptoNoteFormatUtils.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"

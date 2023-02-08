@@ -3,10 +3,10 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "DataBaseConfig.h"
+#include "database_config.h"
 
 #include <common/Util.h>
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 #include "crypto/crypto.h"
 #include <config/cryptonote_config.h>
 

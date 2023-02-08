@@ -9,7 +9,7 @@ Public domain.
 #include <sys/param.h>
 
 #include "chacha8.h"
-#include "common/int-util.h"
+#include "common/int_util.h"
 
 /*
  * The following macros are used to obtain exact-width results.

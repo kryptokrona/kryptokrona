@@ -9,25 +9,25 @@
 #include <numeric>
 #include <iostream>
 #include <ctime>
-#include <common/ShuffleGenerator.h>
-#include <common/Math.h>
-#include <common/MemoryInputStream.h>
+#include <common/shuffle_generator.h>
+#include <common/math.h>
+#include <common/memory_input_stream.h>
 
-#include <cryptonote_core/BlockchainCache.h>
-#include <cryptonote_core/BlockchainStorage.h>
-#include <cryptonote_core/BlockchainUtils.h>
-#include <cryptonote_core/Core.h>
-#include <cryptonote_core/CoreErrors.h>
-#include <cryptonote_core/CryptoNoteFormatUtils.h>
-#include <cryptonote_core/CryptoNoteTools.h>
-#include <cryptonote_core/ITimeProvider.h>
-#include <cryptonote_core/MemoryBlockchainStorage.h>
-#include <cryptonote_core/Mixins.h>
-#include <cryptonote_core/TransactionApi.h>
-#include <cryptonote_core/TransactionExtra.h>
-#include <cryptonote_core/TransactionPool.h>
-#include <cryptonote_core/TransactionPoolCleaner.h>
-#include <cryptonote_core/UpgradeManager.h>
+#include <cryptonote_core/blockchain_cache.h>
+#include <cryptonote_core/blockchain_storage.h>
+#include <cryptonote_core/blockchain_utils.h>
+#include <cryptonote_core/core.h>
+#include <cryptonote_core/core_errors.h>
+#include <cryptonote_core/cryptonote_format_utils.h>
+#include <cryptonote_core/cryptonote_tools.h>
+#include <cryptonote_core/itime_provider.h>
+#include <cryptonote_core/memory_blockchain_storage.h>
+#include <cryptonote_core/mixins.h>
+#include <cryptonote_core/transaction_api.h>
+#include <cryptonote_core/transaction_extra.h>
+#include <cryptonote_core/transaction_pool.h>
+#include <cryptonote_core/transaction_pool_cleaner.h>
+#include <cryptonote_core/upgrade_manager.h>
 
 #include <cryptonote_protocol/cryptonote_protocol_handler_common.h>
 

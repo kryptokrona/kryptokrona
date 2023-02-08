@@ -13,8 +13,8 @@
 #include <config/cryptonote_config.h>
 #include "crypto/hash.h"
 #include "logging/logger_ref.h"
-#include "CachedBlock.h"
-#include "CryptoNoteBasic.h"
+#include "cached_block.h"
+#include "cryptonote_basic.h"
 
 namespace CryptoNote
 {

@@ -18,7 +18,7 @@
 #pragma once
 
 #include <memory>
-#include "ITransaction.h"
+#include "itransaction.h"
 
 namespace CryptoNote
 {

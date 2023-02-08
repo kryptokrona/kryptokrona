@@ -16,7 +16,7 @@
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
-#include "CachedTransaction.h"
+#include "cached_transaction.h"
 
 namespace CryptoNote
 {

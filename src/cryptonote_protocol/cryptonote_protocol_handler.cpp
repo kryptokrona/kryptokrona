@@ -11,9 +11,9 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <syst/dispatcher.h>
 
-#include "cryptonote_core/CryptoNoteBasicImpl.h"
+#include "cryptonote_core/cryptonote_basic_impl.h"
 #include "cryptonote_core/CryptoNoteFormatUtils.h"
-#include "cryptonote_core/CryptoNoteTools.h"
+#include "cryptonote_core/cryptonote_tools.h"
 #include "cryptonote_core/Currency.h"
 #include "p2p/levin_protocol.h"
 

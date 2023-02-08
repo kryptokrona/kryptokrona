@@ -19,7 +19,7 @@
 
 #include <list>
 #include <vector>
-#include <common/MemoryInputStream.h>
+#include <common/memory_input_stream.h>
 #include <common/StringOutputStream.h>
 #include "json_input_stream_serializer.h"
 #include "json_output_stream_serializer.h"

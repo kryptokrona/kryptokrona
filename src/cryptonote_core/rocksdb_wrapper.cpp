@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "RocksDBWrapper.h"
+#include "rocksdb_wrapper.h"
 
 #include "rocksdb/cache.h"
 #include "rocksdb/table.h"
 #include "rocksdb/db.h"
 #include "rocksdb/utilities/backupable_db.h"
 
-#include "DataBaseErrors.h"
+#include "database_errors.h"
 
 using namespace CryptoNote;
 using namespace Logging;

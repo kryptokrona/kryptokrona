@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include "ITransactionPoolCleaner.h"
+#include "itransaction_pool_cleaner.h"
 
 #include <chrono>
 #include <unordered_map>
 
 #include "crypto/crypto.h"
 
-#include "cryptonote_core/ITimeProvider.h"
-#include "ITransactionPool.h"
+#include "cryptonote_core/itime_provider.h"
+#include "itransaction_pool.h"
 #include "logging/ilogger.h"
 #include "logging/logger_ref.h"
 

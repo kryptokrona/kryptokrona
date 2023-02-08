@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "MainChainStorage.h"
+#include "main_chain_storage.h"
 
 #include <boost/filesystem.hpp>
 
-#include "CryptoNoteTools.h"
+#include "cryptonote_tools.h"
 
 namespace CryptoNote
 {

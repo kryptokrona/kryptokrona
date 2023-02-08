@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "cryptonote_core/ITransactionPool.h"
+#include "cryptonote_core/itransaction_pool.h"
 
 namespace Crypto
 {

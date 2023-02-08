@@ -21,12 +21,12 @@
 
 #include <vector>
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
-#include "cryptonote_core/CachedBlock.h"
-#include "cryptonote_core/CachedTransaction.h"
-#include "cryptonote_core/TransactionValidatiorState.h"
-#include "common/ArrayView.h"
+#include "cryptonote_core/cached_block.h"
+#include "cryptonote_core/cached_transaction.h"
+#include "cryptonote_core/transaction_validatior_state.h"
+#include "common/array_view.h"
 
 namespace CryptoNote
 {

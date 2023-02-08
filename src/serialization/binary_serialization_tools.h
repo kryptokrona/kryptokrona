@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 #include "binary_input_stream_serializer.h"
 #include "binary_output_stream_serializer.h"
-#include "common/MemoryInputStream.h"
-#include "common/StdInputStream.h"
-#include "common/StdOutputStream.h"
-#include "common/VectorOutputStream.h"
+#include "common/memory_input_stream.h"
+#include "common/std_input_stream.h"
+#include "common/std_output_stream.h"
+#include "common/vector_output_stream.h"
 
 #include <fstream>
 

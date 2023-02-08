@@ -12,12 +12,12 @@
 #include <thread>
 #include <chrono>
 
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 #include <config/cryptonote_config.h>
-#include "cryptonote_core/CachedBlock.h"
-#include "cryptonote_core/CryptoNoteTools.h"
+#include "cryptonote_core/cached_block.h"
+#include "cryptonote_core/cryptonote_tools.h"
 #include "cryptonote_core/CryptoNoteFormatUtils.h"
-#include "cryptonote_core/TransactionExtra.h"
+#include "cryptonote_core/transaction_extra.h"
 #include "rpc/http_client.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/json_rpc.h"

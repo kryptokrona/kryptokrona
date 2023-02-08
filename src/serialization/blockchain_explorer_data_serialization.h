@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "BlockchainExplorerData.h"
+#include "blockchain_explorer_data.h"
 
 #include "serialization/iserializer.h"
 

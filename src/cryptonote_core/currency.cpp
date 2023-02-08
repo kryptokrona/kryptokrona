@@ -4,22 +4,22 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include "Currency.h"
+#include "currency.h"
 #include <cctype>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
-#include "common/Base58.h"
-#include "common/int-util.h"
-#include "common/StringTools.h"
+#include "common/base58.h"
+#include "common/int_util.h"
+#include "common/string_tools.h"
 
-#include "Account.h"
-#include "CheckDifficulty.h"
-#include "CryptoNoteBasicImpl.h"
-#include "CryptoNoteFormatUtils.h"
-#include "CryptoNoteTools.h"
-#include "Difficulty.h"
-#include "TransactionExtra.h"
-#include "UpgradeDetector.h"
+#include "account.h"
+#include "check_difficulty.h"
+#include "cryptonote_basic_impl.h"
+#include "cryptonote_format_utils.h"
+#include "cryptonote_tools.h"
+#include "difficulty.h"
+#include "transaction_extra.h"
+#include "upgrade_detector.h"
 
 #undef ERROR
 

@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "cryptonote_core/CryptoNoteBasic.h"
-#include "ITransaction.h"
+#include "cryptonote_core/cryptonote_basic.h"
+#include "itransaction.h"
 
 namespace CryptoNote
 {

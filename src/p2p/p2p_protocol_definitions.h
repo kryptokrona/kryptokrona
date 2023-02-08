@@ -16,7 +16,7 @@
 // new serialization
 #include "serialization/iserializer.h"
 #include "serialization/serialization_overloads.h"
-#include "cryptonote_core/CryptoNoteSerialization.h"
+#include "cryptonote_core/cryptonote_serialization.h"
 
 namespace CryptoNote
 {

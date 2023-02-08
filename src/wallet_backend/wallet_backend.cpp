@@ -14,7 +14,7 @@
 #include <crypto/random.h>
 
 #include <cryptonote_core/Account.h>
-#include <cryptonote_core/CryptoNoteTools.h>
+#include <cryptonote_core/cryptonote_tools.h>
 #include <cryptonote_core/CryptoNoteBasicImpl.h>
 
 #include <cryptopp/aes.h>

@@ -27,10 +27,10 @@
 #include <boost/multi_index/mem_fun.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
-#include "ITransactionPool.h"
+#include "itransaction_pool.h"
 #include <logging/logger_message.h>
 #include <logging/logger_ref.h>
-#include "TransactionValidatiorState.h"
+#include "transaction_validatior_state.h"
 
 namespace CryptoNote
 {

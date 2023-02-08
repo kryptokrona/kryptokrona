@@ -27,8 +27,8 @@
 #include <string>
 #include <vector>
 
-#include "common/StdInputStream.h"
-#include "common/StdOutputStream.h"
+#include "common/std_input_stream.h"
+#include "common/std_output_stream.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
 

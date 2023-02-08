@@ -20,12 +20,12 @@
 #include <string>
 #include <sstream>
 
-#include "common/StdOutputStream.h"
+#include "common/std_output_stream.h"
 #include "serialization/kv_binary_output_stream_serializer.h"
 #include "serialization/serialization_overloads.h"
 #include "cryptonote_core/CryptoNoteFormatUtils.h"
-#include "cryptonote_core/CryptoNoteSerialization.h"
-#include "common/StdInputStream.h"
+#include "cryptonote_core/cryptonote_serialization.h"
+#include "common/std_input_stream.h"
 #include "serialization/kv_binary_input_stream_serializer.h"
 
 namespace CryptoNote

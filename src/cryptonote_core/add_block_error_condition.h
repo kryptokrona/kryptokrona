@@ -20,9 +20,9 @@
 #include <string>
 #include <system_error>
 
-#include "AddBlockErrors.h"
-#include "BlockValidationErrors.h"
-#include "TransactionValidationErrors.h"
+#include "add_block_errors.h"
+#include "block_validation_errors.h"
+#include "transaction_validation_errors.h"
 
 namespace CryptoNote
 {

@@ -8,7 +8,7 @@
 
 #include <chrono>
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
 #include <iomanip>
 

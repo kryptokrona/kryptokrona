@@ -19,7 +19,7 @@
 
 #include <queue>
 
-#include "IntrusiveLinkedList.h"
+#include "intrusive_linked_list.h"
 
 #include <syst/dispatcher.h>
 #include "syst/event.h"

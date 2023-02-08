@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "TransactionExtra.h"
+#include "transaction_extra.h"
 
-#include "common/MemoryInputStream.h"
+#include "common/memory_input_stream.h"
 #include "common/StreamTools.h"
-#include "common/StringTools.h"
-#include "CryptoNoteTools.h"
+#include "common/string_tools.h"
+#include "cryptonote_tools.h"
 #include "serialization/binary_output_stream_serializer.h"
 #include "serialization/binary_input_stream_serializer.h"
 

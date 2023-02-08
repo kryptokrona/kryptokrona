@@ -2,9 +2,9 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include <CryptoNote.h>
+#include <cryptonote.h>
 
-#include <cryptonote_core/CryptoNoteFormatUtils.h>
+#include <cryptonote_core/cryptonote_format_utils.h>
 
 #include <errors/errors.h>
 

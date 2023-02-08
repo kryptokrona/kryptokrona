@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "SwappedBlockchainStorage.h"
+#include "swapped_blockchain_storage.h"
 
 #include <cassert>
 
-#include "cryptonote_core/CryptoNoteSerialization.h"
-#include "ICoreDefinitions.h"
-#include "MemoryBlockchainStorage.h"
+#include "cryptonote_core/cryptonote_serialization.h"
+#include "icore_definitions.h"
+#include "memory_blockchain_storage.h"
 #include "serialization/serialization_overloads.h"
 
 namespace CryptoNote

@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
-#include "cryptonote_core/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 
 namespace CryptoNote
 {

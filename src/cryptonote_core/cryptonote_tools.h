@@ -18,13 +18,13 @@
 #pragma once
 
 #include <limits>
-#include "common/MemoryInputStream.h"
-#include "common/StringTools.h"
-#include "common/VectorOutputStream.h"
+#include "common/memory_input_stream.h"
+#include "common/string_tools.h"
+#include "common/vector_output_stream.h"
 #include "serialization/binary_output_stream_serializer.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include <config/cryptonote_config.h>
-#include "CryptoNoteSerialization.h"
+#include "cryptonote_serialization.h"
 
 namespace CryptoNote
 {

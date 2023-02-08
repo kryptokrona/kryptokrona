@@ -28,8 +28,8 @@
 
 #include "version.h"
 #include <config/cryptonote_config.h>
-#include "common/StdInputStream.h"
-#include "common/StdOutputStream.h"
+#include "common/std_input_stream.h"
+#include "common/std_output_stream.h"
 #include "common/Util.h"
 #include "crypto/crypto.h"
 #include <crypto/random.h>

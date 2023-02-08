@@ -7,11 +7,11 @@
 #pragma once
 
 #include "cryptonote_protocol/cryptonote_protocol_definitions.h"
-#include "cryptonote_core/CryptoNoteBasic.h"
+#include "cryptonote_core/cryptonote_basic.h"
 #include "cryptonote_core/Difficulty.h"
 #include "crypto/hash.h"
 
-#include "BlockchainExplorerData.h"
+#include "blockchain_explorer_data.h"
 
 #include "serialization/serialization_overloads.h"
 #include "serialization/blockchain_explorer_data_serialization.h"

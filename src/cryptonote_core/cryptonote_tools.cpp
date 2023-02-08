@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "CryptoNoteTools.h"
-#include "CryptoNoteFormatUtils.h"
+#include "cryptonote_tools.h"
+#include "cryptonote_format_utils.h"
 
 using namespace CryptoNote;
 

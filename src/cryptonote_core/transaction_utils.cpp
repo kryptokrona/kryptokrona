@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "TransactionUtils.h"
+#include "transaction_utils.h"
 
 #include <unordered_set>
 
 #include "crypto/crypto.h"
-#include "cryptonote_core/Account.h"
-#include "CryptoNoteFormatUtils.h"
-#include "TransactionExtra.h"
+#include "cryptonote_core/account.h"
+#include "cryptonote_format_utils.h"
+#include "transaction_extra.h"
 
 using namespace Crypto;
 

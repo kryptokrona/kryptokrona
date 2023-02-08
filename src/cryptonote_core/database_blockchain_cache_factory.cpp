@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "DatabaseBlockchainCacheFactory.h"
+#include "database_blockchain_cache_factory.h"
 
-#include "IDataBase.h"
+#include "idatabase.h"
 
-#include "BlockchainCache.h"
-#include "DatabaseBlockchainCache.h"
+#include "blockchain_cache.h"
+#include "database_blockchain_cache.h"
 
 namespace CryptoNote
 {

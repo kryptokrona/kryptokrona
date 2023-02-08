@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "TransactionPool.h"
+#include "transaction_pool.h"
 
-#include "common/int-util.h"
-#include "CryptoNoteBasicImpl.h"
-#include "cryptonote_core/TransactionExtra.h"
+#include "common/int_util.h"
+#include "cryptonote_basic_impl.h"
+#include "cryptonote_core/transaction_extra.h"
 
 namespace CryptoNote
 {

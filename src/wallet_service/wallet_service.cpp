@@ -16,15 +16,15 @@
 
 #include <syst/timer.h>
 #include <syst/interrupted_exception.h>
-#include "common/Base58.h"
+#include "common/base58.h"
 #include "common/Util.h"
 
 #include "crypto/crypto.h"
-#include "CryptoNote.h"
+#include "cryptonote.h"
 #include "cryptonote_core/CryptoNoteFormatUtils.h"
-#include "cryptonote_core/CryptoNoteBasicImpl.h"
-#include "cryptonote_core/CryptoNoteTools.h"
-#include "cryptonote_core/TransactionExtra.h"
+#include "cryptonote_core/cryptonote_basic_impl.h"
+#include "cryptonote_core/cryptonote_tools.h"
+#include "cryptonote_core/transaction_extra.h"
 #include "cryptonote_core/Account.h"
 #include "cryptonote_core/Mixins.h"
 

@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "Difficulty.h"
+#include "difficulty.h"
 
 #include <config/cryptonote_config.h>
 

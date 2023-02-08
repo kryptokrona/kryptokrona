@@ -19,10 +19,10 @@
 
 #include <boost/functional/hash.hpp>
 
-#include "IReadBatch.h"
-#include "CryptoNote.h"
-#include "BlockchainCache.h"
-#include "DatabaseCacheData.h"
+#include "iread_batch.h"
+#include "cryptonote.h"
+#include "blockchain_cache.h"
+#include "database_cache_data.h"
 
 namespace std
 {

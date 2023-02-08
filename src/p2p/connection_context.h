@@ -23,7 +23,7 @@
 #include <optional>
 
 #include <boost/uuid/uuid.hpp>
-#include "common/StringTools.h"
+#include "common/string_tools.h"
 #include "crypto/hash.h"
 
 #include "p2p/pending_lite_block.h"
