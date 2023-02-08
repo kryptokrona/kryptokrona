@@ -19,8 +19,8 @@
 
 #include <string>
 
-#include "IWallet.h"
-#include "cryptonote_core/Currency.h"
+#include "iwallet.h"
+#include "cryptonote_core/currency.h"
 #include "wallet/wallet_green.h"
 
 namespace CryptoNote

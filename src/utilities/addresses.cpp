@@ -6,11 +6,11 @@
 #include <utilities/addresses.h>
 ////////////////////////////////
 
-#include <common/Base58.h>
+#include <common/base58.h>
 
 #include <config/cryptonote_config.h>
 
-#include <cryptonote_core/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 #include <cryptonote_core/cryptonote_tools.h>
 
 namespace Utilities

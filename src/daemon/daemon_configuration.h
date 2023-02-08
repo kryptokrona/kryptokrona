@@ -8,7 +8,7 @@
 #include <config/cryptonote_config.h>
 #include <logging/ilogger.h>
 #include "common/PathTools.h"
-#include "common/Util.h"
+#include "common/util.h"
 
 using nlohmann::json;
 

@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <common/StringTools.h>
+#include <common/string_tools.h>
 
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 
-#include "IWallet.h"
+#include "iwallet.h"
 
 #include "json.hpp"
 

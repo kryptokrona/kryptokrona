@@ -40,7 +40,7 @@
 
 #include <unordered_set>
 
-#include <WalletTypes.h>
+#include <wallet_types.h>
 
 using namespace Crypto;
 

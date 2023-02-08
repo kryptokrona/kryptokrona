@@ -18,7 +18,7 @@
 
 #include <config/cryptonote_config.h>
 #include "common/string_tools.h"
-#include <common/Util.h>
+#include <common/util.h>
 
 #include "logging/ilogger.h"
 #include "version.h"

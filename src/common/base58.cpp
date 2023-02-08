@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "crypto/hash.h"
-#include "int-util.h"
-#include "Varint.h"
+#include "int_util.h"
+#include "varint.h"
 
 namespace Tools
 {

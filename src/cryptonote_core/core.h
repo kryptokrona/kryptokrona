@@ -27,7 +27,7 @@
 
 #include <syst/context_group.h>
 
-#include <WalletTypes.h>
+#include <wallet_types.h>
 
 namespace CryptoNote
 {

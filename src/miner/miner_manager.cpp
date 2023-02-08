@@ -16,7 +16,7 @@
 #include <config/cryptonote_config.h>
 #include "cryptonote_core/cached_block.h"
 #include "cryptonote_core/cryptonote_tools.h"
-#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
 #include "cryptonote_core/transaction_extra.h"
 #include "rpc/http_client.h"
 #include "rpc/core_rpc_server_commands_definitions.h"

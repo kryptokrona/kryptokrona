@@ -9,7 +9,7 @@
 #include <config/wallet_config.h>
 
 #include <cryptonote_core/cryptonote_tools.h>
-#include <cryptonote_core/Currency.h>
+#include <cryptonote_core/currency.h>
 #include <cryptonote_core/mixins.h>
 #include <cryptonote_core/transaction_extra.h>
 

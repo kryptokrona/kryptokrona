@@ -23,11 +23,11 @@
 #include <thread>
 #include <unordered_set>
 
-#include "common/StreamTools.h"
+#include "common/stream_tools.h"
 #include "common/string_tools.h"
 #include "cryptonote_core/cryptonote_basic_impl.h"
-#include "cryptonote_core/CryptoNoteFormatUtils.h"
-#include "cryptonote_core/TransactionApi.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
+#include "cryptonote_core/transaction_api.h"
 
 using namespace Common;
 using namespace Crypto;

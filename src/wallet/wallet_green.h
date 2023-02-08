@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "IWallet.h"
+#include "iwallet.h"
 
 #include <queue>
 #include <unordered_map>

@@ -11,13 +11,13 @@
 #include <future>
 
 #include "common_types.h"
-#include "common/BlockingQueue.h"
+#include "common/blocking_queue.h"
 #include "cryptonote_core/cryptonote_basic_impl.h"
-#include "cryptonote_core/CryptoNoteFormatUtils.h"
-#include "cryptonote_core/TransactionApi.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
+#include "cryptonote_core/transaction_api.h"
 
-#include "IWallet.h"
-#include "INode.h"
+#include "iwallet.h"
+#include "inode.h"
 #include <future>
 
 using namespace Crypto;

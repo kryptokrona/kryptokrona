@@ -8,11 +8,11 @@
 #include <iostream>
 #include <fstream>
 
-#include <CryptoTypes.h>
+#include <crypto_types.h>
 #include <config/cli_header.h>
 #include <config/cryptonote_config.h>
 
-#include "common/Util.h"
+#include "common/util.h"
 #include "crypto/hash.h"
 #include "logging/ilogger.h"
 

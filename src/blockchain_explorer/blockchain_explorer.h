@@ -21,11 +21,11 @@
 #include <atomic>
 #include <unordered_set>
 
-#include "IBlockchainExplorer.h"
-#include "INode.h"
+#include "iblockchain_explorer.h"
+#include "inode.h"
 
 #include "blockchain_explorer_errors.h"
-#include "common/ObserverManager.h"
+#include "common/observer_manager.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
 #include "wallet/wallet_async_context_counter.h"

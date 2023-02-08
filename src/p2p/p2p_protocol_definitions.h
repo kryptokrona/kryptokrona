@@ -11,7 +11,7 @@
 
 #include "crypto/crypto.h"
 #include <config/cryptonote_config.h>
-#include "cryptonote_core/CoreStatistics.h"
+#include "cryptonote_core/core_statistics.h"
 
 // new serialization
 #include "serialization/iserializer.h"

@@ -30,7 +30,7 @@
 #include <config/cryptonote_config.h>
 #include "common/std_input_stream.h"
 #include "common/std_output_stream.h"
-#include "common/Util.h"
+#include "common/util.h"
 #include "crypto/crypto.h"
 #include <crypto/random.h>
 

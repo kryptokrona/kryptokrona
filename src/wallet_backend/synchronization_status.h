@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 
 #include <deque>
 
 #include "json.hpp"
 
-#include "JsonHelper.h"
+#include "json_helper.h"
 
 #include <vector>
 

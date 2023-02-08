@@ -12,9 +12,9 @@
 #include <syst/dispatcher.h>
 
 #include "cryptonote_core/cryptonote_basic_impl.h"
-#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
 #include "cryptonote_core/cryptonote_tools.h"
-#include "cryptonote_core/Currency.h"
+#include "cryptonote_core/currency.h"
 #include "p2p/levin_protocol.h"
 
 #include <utilities/format_tools.h>

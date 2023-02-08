@@ -13,7 +13,7 @@
 #include <cstring>
 #include <memory>
 
-#include "common/Varint.h"
+#include "common/varint.h"
 #include "crypto.h"
 #include "hash.h"
 #include "random.h"

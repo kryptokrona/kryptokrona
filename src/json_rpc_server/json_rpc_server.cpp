@@ -20,7 +20,7 @@
 #include "http/http_response.h"
 #include "rpc/json_rpc.h"
 
-#include "common/JsonValue.h"
+#include "common/json_value.h"
 #include "serialization/json_input_value_serializer.h"
 #include "serialization/json_output_stream_serializer.h"
 

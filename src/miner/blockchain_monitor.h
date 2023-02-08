@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 
 #include "httplib.h"
 

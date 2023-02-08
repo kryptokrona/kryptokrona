@@ -8,7 +8,7 @@
 
 #include <functional>
 
-#include <CryptoTypes.h>
+#include <crypto_types.h>
 #include "crypto/hash.h"
 #include "payment_service_json_rpc_messages.h"
 #include "wallet_service.h"

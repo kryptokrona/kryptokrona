@@ -8,11 +8,11 @@
 
 #include <atomic>
 
-#include <common/StringTools.h>
+#include <common/string_tools.h>
 
 #include <config/wallet_config.h>
 
-#include <cryptonote_core/Account.h>
+#include <cryptonote_core/account.h>
 #include <cryptonote_core/transaction_extra.h>
 
 #ifndef MSVC

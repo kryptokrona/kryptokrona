@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "INode.h"
+#include "inode.h"
 
 #include <string>
 

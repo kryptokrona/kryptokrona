@@ -26,7 +26,7 @@
 
 #include <cassert>
 
-#include "common/ScopeExit.h"
+#include "common/scope_exit.h"
 
 namespace System
 {

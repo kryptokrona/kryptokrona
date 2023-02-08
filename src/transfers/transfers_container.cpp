@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "IWallet.h"
+#include "iwallet.h"
 #include "transfers_container.h"
 #include "common/std_input_stream.h"
 #include "common/std_output_stream.h"
 #include "cryptonote_core/cryptonote_basic_impl.h"
-#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
 #include "serialization/serialization_overloads.h"

@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <cstring> // memcpy
 #include <vector>
-#include <common/IOutputStream.h>
+#include <common/ioutput_stream.h>
 
 namespace CryptoNote
 {

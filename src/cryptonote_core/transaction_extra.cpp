@@ -18,7 +18,7 @@
 #include "transaction_extra.h"
 
 #include "common/memory_input_stream.h"
-#include "common/StreamTools.h"
+#include "common/stream_tools.h"
 #include "common/string_tools.h"
 #include "cryptonote_tools.h"
 #include "serialization/binary_output_stream_serializer.h"

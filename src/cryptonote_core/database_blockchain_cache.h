@@ -21,11 +21,11 @@
 #include "currency.h"
 #include "iblockchain_cache.h"
 #include "cryptonote_core/upgrade_manager.h"
-#include <IDataBase.h>
-#include <cryptonote_core/BlockchainReadBatch.h>
-#include <cryptonote_core/BlockchainWriteBatch.h>
-#include <cryptonote_core/DatabaseCacheData.h>
-#include <cryptonote_core/IBlockchainCacheFactory.h>
+#include <idatabase.h>
+#include <cryptonote_core/blockchain_read_batch.h>
+#include <cryptonote_core/blockchain_write_batch.h>
+#include <cryptonote_core/database_cache_data.h>
+#include <cryptonote_core/iblockchain_cache_factory.h>
 
 namespace CryptoNote
 {

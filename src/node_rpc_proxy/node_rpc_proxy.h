@@ -12,9 +12,9 @@
 #include <thread>
 #include <unordered_set>
 
-#include "common/ObserverManager.h"
+#include "common/observer_manager.h"
 #include "logging/logger_ref.h"
-#include "INode.h"
+#include "inode.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
 
 namespace System

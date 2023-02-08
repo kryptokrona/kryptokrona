@@ -20,7 +20,7 @@
 #include <string>
 #include <cstdint>
 
-#include <common/StringView.h>
+#include <common/string_view.h>
 
 namespace CryptoNote
 {

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <CryptoTypes.h>
+#include <crypto_types.h>
 #include "wallet_service_configuration.h"
 #include "p2p/net_node_config.h"
 

@@ -8,16 +8,16 @@
 
 #include "cryptonote_protocol/cryptonote_protocol_definitions.h"
 #include "cryptonote_core/cryptonote_basic.h"
-#include "cryptonote_core/Difficulty.h"
+#include "cryptonote_core/difficulty.h"
 #include "crypto/hash.h"
 
 #include "blockchain_explorer_data.h"
 
 #include "serialization/serialization_overloads.h"
 #include "serialization/blockchain_explorer_data_serialization.h"
-#include <cryptonote_core/ICoreDefinitions.h>
+#include <cryptonote_core/icore_definitions.h>
 
-#include <WalletTypes.h>
+#include <wallet_types.h>
 
 namespace CryptoNote
 {

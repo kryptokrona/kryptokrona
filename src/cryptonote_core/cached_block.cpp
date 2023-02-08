@@ -5,7 +5,7 @@
 // Please see the included LICENSE file for more information.
 
 #include "cached_block.h"
-#include <common/Varint.h>
+#include <common/varint.h>
 #include <config/cryptonote_config.h>
 #include "cryptonote_tools.h"
 

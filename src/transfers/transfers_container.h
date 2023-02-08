@@ -30,13 +30,13 @@
 #include "crypto/crypto.h"
 #include "cryptonote_core/cryptonote_basic.h"
 #include "cryptonote_core/cryptonote_serialization.h"
-#include "cryptonote_core/Currency.h"
+#include "cryptonote_core/currency.h"
 #include "logging/logger_ref.h"
 #include "serialization/iserializer.h"
 #include "serialization/serialization_overloads.h"
 
 #include "itransaction.h"
-#include "ITransfersContainer.h"
+#include "itransfers_container.h"
 
 namespace CryptoNote
 {

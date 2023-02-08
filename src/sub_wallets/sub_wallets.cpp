@@ -8,7 +8,7 @@
 
 #include <config/cryptonote_config.h>
 
-#include <cryptonote_core/Currency.h>
+#include <cryptonote_core/currency.h>
 
 #include <ctime>
 

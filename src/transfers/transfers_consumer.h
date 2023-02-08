@@ -8,7 +8,7 @@
 #pragma once
 
 #include "iblockchain_synchronizer.h"
-#include "ITransfersSynchronizer.h"
+#include "itransfers_synchronizer.h"
 #include "transfers_subscription.h"
 #include "type_helpers.h"
 

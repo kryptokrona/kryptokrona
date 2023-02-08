@@ -19,8 +19,8 @@
 
 #include <vector>
 #include <cryptonote.h>
-#include <CryptoTypes.h>
-#include <WalletTypes.h>
+#include <crypto_types.h>
+#include <wallet_types.h>
 
 namespace CryptoNote
 {

@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include <WalletTypes.h>
+#include <wallet_types.h>
 
 namespace SendTransaction
 {

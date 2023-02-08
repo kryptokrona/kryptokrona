@@ -9,7 +9,7 @@
 
 #include <cryptonote_core/core.h>
 #include <cryptonote_core/cryptonote_format_utils.h>
-#include <cryptonote_core/Currency.h>
+#include <cryptonote_core/currency.h>
 
 #include <cryptonote_protocol/cryptonote_protocol_handler.h>
 

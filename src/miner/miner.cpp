@@ -15,8 +15,8 @@
 #include "crypto/crypto.h"
 #include <crypto/random.h>
 #include "cryptonote_core/cached_block.h"
-#include "cryptonote_core/CheckDifficulty.h"
-#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/check_difficulty.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
 
 #include <syst/interrupted_exception.h>
 

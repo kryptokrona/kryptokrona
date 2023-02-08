@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "IWallet.h"
+#include "iwallet.h"
 #include "transfers_subscription.h"
 #include "cryptonote_core/cryptonote_basic_impl.h"
 

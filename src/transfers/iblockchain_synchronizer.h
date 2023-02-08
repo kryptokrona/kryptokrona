@@ -25,9 +25,9 @@
 #include "crypto/crypto.h"
 #include "cryptonote_core/cryptonote_basic.h"
 
-#include "IObservable.h"
-#include "IStreamSerializable.h"
-#include "ITransfersSynchronizer.h"
+#include "iobservable.h"
+#include "istream_serializable.h"
+#include "itransfers_synchronizer.h"
 
 namespace CryptoNote
 {

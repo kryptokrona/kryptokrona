@@ -21,7 +21,7 @@
 #include <cassert>
 #include <cstring>
 #include <stdexcept>
-#include <common/StreamTools.h>
+#include <common/stream_tools.h>
 #include "kv_binary_common.h"
 
 using namespace Common;

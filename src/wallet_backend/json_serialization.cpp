@@ -6,7 +6,7 @@
 #include <wallet_backend/json_serialization.h>
 ////////////////////////////////////////////
 
-#include <common/StringTools.h>
+#include <common/string_tools.h>
 
 #include <tuple>
 

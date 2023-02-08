@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <common/IInputStream.h>
+#include <common/iinput_stream.h>
 #include "iserializer.h"
 #include "json_input_value_serializer.h"
 

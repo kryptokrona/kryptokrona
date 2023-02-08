@@ -19,7 +19,7 @@
 
 #include <set>
 #include <logging/logger_ref.h>
-#include <common/Varint.h>
+#include <common/varint.h>
 
 #include "serialization/binary_output_stream_serializer.h"
 #include "serialization/binary_input_stream_serializer.h"

@@ -1,13 +1,13 @@
 // Copyright (c) 2018, The TurtleCoin Developers
-// 
+//
 // Please see the included LICENSE file for more information.
 
 /////////////////////////////////
 #include <sub_wallets/sub_wallet.h>
 /////////////////////////////////
 
-#include <cryptonote_core/Account.h>
-#include <cryptonote_core/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/account.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 
 #include <utilities/utilities.h>
 
@@ -25,12 +25,12 @@ SubWallet::SubWallet(
     const uint64_t scanTimestamp,
     const bool isPrimaryAddress) :
 
-    m_publicSpendKey(publicSpendKey),
-    m_address(address),
-    m_syncStartHeight(scanHeight),
-    m_syncStartTimestamp(scanTimestamp),
-    m_privateSpendKey(Constants::BLANK_SECRET_KEY),
-    m_isPrimaryAddress(isPrimaryAddress)
+                                   m_publicSpendKey(publicSpendKey),
+                                   m_address(address),
+                                   m_syncStartHeight(scanHeight),
+                                   m_syncStartTimestamp(scanTimestamp),
+                                   m_privateSpendKey(Constants::BLANK_SECRET_KEY),
+                                   m_isPrimaryAddress(isPrimaryAddress)
 {
 }
 
@@ -43,12 +43,12 @@ SubWallet::SubWallet(
     const uint64_t scanTimestamp,
     const bool isPrimaryAddress) :
 
-    m_publicSpendKey(publicSpendKey),
-    m_address(address),
-    m_syncStartHeight(scanHeight),
-    m_syncStartTimestamp(scanTimestamp),
-    m_privateSpendKey(privateSpendKey),
-    m_isPrimaryAddress(isPrimaryAddress)
+                                   m_publicSpendKey(publicSpendKey),
+                                   m_address(address),
+                                   m_syncStartHeight(scanHeight),
+                                   m_syncStartTimestamp(scanTimestamp),
+                                   m_privateSpendKey(privateSpendKey),
+                                   m_isPrimaryAddress(isPrimaryAddress)
 {
 }
 
@@ -73,19 +73,16 @@ Crypto::KeyImage SubWallet::getTxInputKeyImage(
         /* Get the tmp public key from the derivation, the index,
            and our public spend key */
         Crypto::derive_public_key(
-            derivation, outputIndex, m_publicSpendKey, tmp.publicKey
-        );
+            derivation, outputIndex, m_publicSpendKey, tmp.publicKey);
 
         /* Get the tmp private key from the derivation, the index,
            and our private spend key */
         Crypto::derive_secret_key(
-            derivation, outputIndex, m_privateSpendKey, tmp.secretKey
-        );
+            derivation, outputIndex, m_privateSpendKey, tmp.secretKey);
 
         /* Get the key image from the tmp public and private key */
         Crypto::generate_key_image(
-            tmp.publicKey, tmp.secretKey, keyImage
-        );
+            tmp.publicKey, tmp.secretKey, keyImage);
 
         return keyImage;
     }
@@ -105,10 +102,10 @@ void SubWallet::storeTransactionInput(
            sent ourselves, that are now returning as change. Remove from
            vector if found. */
         const auto it = std::remove_if(m_unconfirmedIncomingAmounts.begin(), m_unconfirmedIncomingAmounts.end(),
-        [&input](const auto storedInput)
-        {
-            return storedInput.key == input.key;
-        });
+                                       [&input](const auto storedInput)
+                                       {
+                                           return storedInput.key == input.key;
+                                       });
 
         if (it != m_unconfirmedIncomingAmounts.end())
         {
@@ -172,10 +169,10 @@ std::string SubWallet::address() const
 bool SubWallet::hasKeyImage(const Crypto::KeyImage keyImage) const
 {
     auto it = std::find_if(m_unspentInputs.begin(), m_unspentInputs.end(),
-    [&keyImage](const auto &input)
-    {
-        return input.keyImage == keyImage;
-    });
+                           [&keyImage](const auto &input)
+                           {
+                               return input.keyImage == keyImage;
+                           });
 
     /* Found the key image */
     if (it != m_unspentInputs.end())
@@ -185,10 +182,10 @@ bool SubWallet::hasKeyImage(const Crypto::KeyImage keyImage) const
 
     /* Didn't find it in unlocked inputs, check the locked inputs */
     it = std::find_if(m_lockedInputs.begin(), m_lockedInputs.end(),
-    [&keyImage](const auto &input)
-    {
-        return input.keyImage == keyImage;
-    });
+                      [&keyImage](const auto &input)
+                      {
+                          return input.keyImage == keyImage;
+                      });
 
     return it != m_lockedInputs.end();
 
@@ -214,10 +211,10 @@ void SubWallet::markInputAsSpent(
 {
     /* Find the input */
     auto it = std::find_if(m_unspentInputs.begin(), m_unspentInputs.end(),
-    [&keyImage](const auto x)
-    {
-        return x.keyImage == keyImage;
-    });
+                           [&keyImage](const auto x)
+                           {
+                               return x.keyImage == keyImage;
+                           });
 
     if (it != m_unspentInputs.end())
     {
@@ -235,10 +232,10 @@ void SubWallet::markInputAsSpent(
 
     /* Didn't find it, lets try in the locked inputs */
     it = std::find_if(m_lockedInputs.begin(), m_lockedInputs.end(),
-    [&keyImage](const auto x)
-    {
-        return x.keyImage == keyImage;
-    });
+                      [&keyImage](const auto x)
+                      {
+                          return x.keyImage == keyImage;
+                      });
 
     if (it != m_lockedInputs.end())
     {
@@ -253,7 +250,7 @@ void SubWallet::markInputAsSpent(
 
         return;
     }
-    
+
     /* Shouldn't happen */
     throw std::runtime_error("Could not find key image to remove!");
 }
@@ -262,10 +259,10 @@ void SubWallet::markInputAsLocked(const Crypto::KeyImage keyImage)
 {
     /* Find the input */
     auto it = std::find_if(m_unspentInputs.begin(), m_unspentInputs.end(),
-    [&keyImage](const auto x)
-    {
-        return x.keyImage == keyImage;
-    });
+                           [&keyImage](const auto x)
+                           {
+                               return x.keyImage == keyImage;
+                           });
 
     /* Shouldn't happen */
     if (it == m_unspentInputs.end())
@@ -288,10 +285,10 @@ void SubWallet::removeForkedInputs(const uint64_t forkHeight)
 
     /* Unspent inputs which we recieved in a block after the fork. Remove them. */
     auto it = std::remove_if(m_unspentInputs.begin(), m_unspentInputs.end(),
-    [forkHeight](const auto input)
-    {
-        return input.blockHeight >= forkHeight;
-    });
+                             [forkHeight](const auto input)
+                             {
+                                 return input.blockHeight >= forkHeight;
+                             });
 
     if (it != m_unspentInputs.end())
     {
@@ -301,21 +298,21 @@ void SubWallet::removeForkedInputs(const uint64_t forkHeight)
     /* If the input was spent after the fork height, but received before the
        fork height, then we keep it, but move it into the unspent vector */
     it = std::remove_if(m_spentInputs.begin(), m_spentInputs.end(),
-    [&forkHeight, this](auto &input)
-    {
-        if (input.spendHeight >= forkHeight)
-        {
-            /* Reset spend height */
-            input.spendHeight = 0;
+                        [&forkHeight, this](auto &input)
+                        {
+                            if (input.spendHeight >= forkHeight)
+                            {
+                                /* Reset spend height */
+                                input.spendHeight = 0;
 
-            /* Readd to the unspent vector */
-            m_unspentInputs.push_back(input);
+                                /* Readd to the unspent vector */
+                                m_unspentInputs.push_back(input);
 
-            return true;
-        }
+                                return true;
+                            }
 
-        return false;
-    });
+                            return false;
+                        });
 
     if (it != m_spentInputs.end())
     {
@@ -330,21 +327,21 @@ void SubWallet::removeCancelledTransactions(
 {
     /* Find the inputs used in the cancelled transactions */
     auto it = std::remove_if(m_lockedInputs.begin(), m_lockedInputs.end(),
-    [&cancelledTransactions, this](auto &input)
-    {
-        if (cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end())
-        {
-            input.spendHeight = 0;
+                             [&cancelledTransactions, this](auto &input)
+                             {
+                                 if (cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end())
+                                 {
+                                     input.spendHeight = 0;
 
-            /* Re-add the input to the unspent vector now it has been returned
-               to our wallet */
-            m_unspentInputs.push_back(input);
+                                     /* Re-add the input to the unspent vector now it has been returned
+                                        to our wallet */
+                                     m_unspentInputs.push_back(input);
 
-            return true;
-        }
+                                     return true;
+                                 }
 
-        return false;
-    });
+                                 return false;
+                             });
 
     /* Remove the inputs used in the cancelled tranactions */
     if (it != m_lockedInputs.end())
@@ -355,10 +352,10 @@ void SubWallet::removeCancelledTransactions(
     /* Find inputs that we 'received' in outgoing transfers (scanning our
        own sent transfer) and remove them */
     auto it2 = std::remove_if(m_unconfirmedIncomingAmounts.begin(), m_unconfirmedIncomingAmounts.end(),
-    [&cancelledTransactions](auto &input)
-    {
-        return cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end();
-    });
+                              [&cancelledTransactions](auto &input)
+                              {
+                                  return cancelledTransactions.find(input.parentTransactionHash) != cancelledTransactions.end();
+                              });
 
     if (it2 != m_unconfirmedIncomingAmounts.end())
     {

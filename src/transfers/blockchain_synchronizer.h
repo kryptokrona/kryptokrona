@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "INode.h"
+#include "inode.h"
 #include "synchronization_state.h"
 #include "iblockchain_synchronizer.h"
 #include "iobservable_impl.h"
-#include "IStreamSerializable.h"
+#include "istream_serializable.h"
 
 #include <condition_variable>
 #include <mutex>

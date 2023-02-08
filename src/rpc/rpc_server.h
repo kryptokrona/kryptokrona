@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #include <logging/logger_ref.h>
-#include "common/Math.h"
+#include "common/math.h"
 #include "core_rpc_server_commands_definitions.h"
 #include "json_rpc.h"
 

@@ -25,7 +25,7 @@
 #include "blockchain_explorer_errors.h"
 #include "common/std_output_stream.h"
 #include "common/std_input_stream.h"
-#include "cryptonote_core/CryptoNoteFormatUtils.h"
+#include "cryptonote_core/cryptonote_format_utils.h"
 #include "cryptonote_core/cryptonote_basic_impl.h"
 #include <config/cryptonote_config.h>
 

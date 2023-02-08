@@ -23,7 +23,7 @@
 
 #include <boost/optional.hpp>
 
-#include "INode.h"
+#include "inode.h"
 #include "itransaction.h"
 
 namespace CryptoNote

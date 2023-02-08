@@ -20,7 +20,7 @@
 #include <list>
 #include <vector>
 #include <common/memory_input_stream.h>
-#include <common/StringOutputStream.h>
+#include <common/string_output_stream.h>
 #include "json_input_stream_serializer.h"
 #include "json_output_stream_serializer.h"
 #include "kv_binary_input_stream_serializer.h"

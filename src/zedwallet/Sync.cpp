@@ -8,7 +8,7 @@
 
 #include <thread>
 
-#include <common/StringTools.h>
+#include <common/string_tools.h>
 
 #include <utilities/coloured_msg.h>
 #include <zedwallet/CommandImplementations.h>

@@ -8,16 +8,16 @@
 
 #include <thread>
 
-#include <common/Base58.h>
-#include <common/StringTools.h>
+#include <common/base58.h>
+#include <common/string_tools.h>
 
 #include <config/cryptonote_config.h>
 
-#include <cryptonote_core/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 #include <cryptonote_core/cryptonote_tools.h>
 #include <cryptonote_core/transaction_extra.h>
 
-#include "IWallet.h"
+#include "iwallet.h"
 
 #include <node_rpc_proxy/node_errors.h>
 

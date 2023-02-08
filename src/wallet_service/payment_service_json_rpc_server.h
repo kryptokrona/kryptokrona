@@ -8,7 +8,7 @@
 
 #include <unordered_map>
 
-#include "common/JsonValue.h"
+#include "common/json_value.h"
 #include "json_rpc_server/json_rpc_server.h"
 #include "payment_service_json_rpc_messages.h"
 #include "serialization/json_input_value_serializer.h"

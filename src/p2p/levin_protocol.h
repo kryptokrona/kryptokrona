@@ -19,7 +19,7 @@
 
 #include "cryptonote.h"
 #include <common/memory_input_stream.h>
-#include <common/VectorOutputStream.h>
+#include <common/vector_output_stream.h>
 #include "serialization/kv_binary_input_stream_serializer.h"
 #include "serialization/kv_binary_output_stream_serializer.h"
 

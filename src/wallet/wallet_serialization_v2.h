@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "common/IInputStream.h"
-#include "common/IOutputStream.h"
+#include "common/iinput_stream.h"
+#include "common/ioutput_stream.h"
 #include "serialization/iserializer.h"
 #include "transfers/transfers_synchronizer.h"
 #include "wallet/wallet_indices.h"

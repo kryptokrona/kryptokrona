@@ -19,7 +19,7 @@
 
 #include <string.h>
 #include <tuple>
-#include <common/StringTools.h>
+#include <common/string_tools.h>
 
 struct NetworkAddress
 {

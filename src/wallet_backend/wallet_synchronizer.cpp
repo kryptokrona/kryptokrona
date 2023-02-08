@@ -6,7 +6,7 @@
 #include <wallet_backend/wallet_synchronizer.h>
 /////////////////////////////////////////////
 
-#include <common/StringTools.h>
+#include <common/string_tools.h>
 
 #include <config/wallet_config.h>
 

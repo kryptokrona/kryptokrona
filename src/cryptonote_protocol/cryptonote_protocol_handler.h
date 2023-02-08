@@ -8,9 +8,9 @@
 
 #include <atomic>
 
-#include <common/ObserverManager.h>
+#include <common/observer_manager.h>
 
-#include "cryptonote_core/ICore.h"
+#include "cryptonote_core/icore.h"
 
 #include "cryptonote_protocol/cryptonote_protocol_definitions.h"
 #include "cryptonote_protocol/cryptonote_protocol_handler_common.h"

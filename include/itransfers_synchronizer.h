@@ -20,9 +20,9 @@
 #include <cstdint>
 #include <system_error>
 
-#include "ITransaction.h"
-#include "ITransfersContainer.h"
-#include "IStreamSerializable.h"
+#include "itransaction.h"
+#include "itransfers_container.h"
+#include "istream_serializable.h"
 
 namespace CryptoNote {
 

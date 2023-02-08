@@ -22,7 +22,7 @@
 #define NOMINMAX
 #include <windows.h>
 
-#include "common/ScopeExit.h"
+#include "common/scope_exit.h"
 
 namespace System
 {

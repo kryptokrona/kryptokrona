@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 
 #include <errors/errors.h>
 

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "ITransfersSynchronizer.h"
+#include "itransfers_synchronizer.h"
 #include "transfers_container.h"
 #include "iobservable_impl.h"
 

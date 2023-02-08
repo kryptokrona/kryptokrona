@@ -4,7 +4,7 @@
 //
 // Please see the included LICENSE file for more information.
 
-#include <cryptonote_core/DatabaseBlockchainCache.h>
+#include <cryptonote_core/database_blockchain_cache.h>
 
 #include <ctime>
 #include <cstdlib>
@@ -19,7 +19,7 @@
 
 #include <cryptonote_core/blockchain_storage.h>
 #include <cryptonote_core/cryptonote_tools.h>
-#include <cryptonote_core/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 #include "cryptonote_core/transaction_extra.h"
 
 namespace CryptoNote

@@ -6,7 +6,7 @@
 
 #include <crypto/crypto.h>
 
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 
 #include <errors/errors.h>
 
@@ -16,7 +16,7 @@
 
 #include <unordered_set>
 
-#include "WalletTypes.h"
+#include "wallet_types.h"
 
 class SubWallet
 {

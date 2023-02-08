@@ -6,16 +6,16 @@
 #include <wallet_backend/wallet_backend.h>
 ////////////////////////////////////////
 
-#include <common/Base58.h>
-#include <common/FileSystemShim.h>
+#include <common/base58.h>
+#include <common/file_system_shim.h>
 
 #include <config/cryptonote_config.h>
 
 #include <crypto/random.h>
 
-#include <cryptonote_core/Account.h>
+#include <cryptonote_core/account.h>
 #include <cryptonote_core/cryptonote_tools.h>
-#include <cryptonote_core/CryptoNoteBasicImpl.h>
+#include <cryptonote_core/cryptonote_basic_impl.h>
 
 #include <cryptopp/aes.h>
 #include <cryptopp/algparam.h>
@@ -32,7 +32,7 @@
 
 #include <iomanip>
 
-#include "JsonHelper.h"
+#include "json_helper.h"
 
 #include <mnemonics/mnemonics.h>
 

@@ -12,7 +12,7 @@
 #include <config/cli_header.h>
 
 #include "cryptonote.h"
-#include "CryptoTypes.h"
+#include "crypto_types.h"
 #include "common/string_tools.h"
 #include "crypto/crypto.h"
 
