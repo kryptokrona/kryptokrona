@@ -25,7 +25,7 @@
 
 #include "syst/memory_mapped_file.h"
 
-#include "common/ScopeExit.h"
+#include "common/scope_exit.h"
 
 namespace Common
 {

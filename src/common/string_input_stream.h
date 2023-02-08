@@ -18,7 +18,7 @@
 #pragma once
 
 #include <string>
-#include "IInputStream.h"
+#include "iinput_stream.h"
 
 namespace Common
 {
