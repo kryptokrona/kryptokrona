@@ -229,8 +229,14 @@ namespace CryptoNote
     const uint64_t BLOCKS_SYNCHRONIZING_DEFAULT_COUNT = 100;     // by default, blocks count in blocks downloading
     const size_t COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT = 1000;
 
+#ifdef USE_TESTNET
+    const int P2P_DEFAULT_PORT = 11898;
+    const int RPC_DEFAULT_PORT = 11899;
+#else
     const int P2P_DEFAULT_PORT = 11897;
     const int RPC_DEFAULT_PORT = 11898;
+#endif
+
     const int SERVICE_DEFAULT_PORT = 8070;
 
     const size_t P2P_LOCAL_WHITE_PEERLIST_LIMIT = 1000;
@@ -267,6 +273,14 @@ namespace CryptoNote
 
     const char LATEST_VERSION_URL[] = "https://github.com/kryptokrona/kryptokrona";
     const std::string LICENSE_URL = "https://github.com/kryptokrona/kryptokrona/blob/master/LICENSE";
+
+#ifdef USE_TESTNET
+    const static boost::uuids::uuid CRYPTONOTE_NETWORK =
+        {
+            {0xf1, 0x4c, 0xb8, 0xc8, 0xb3, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc}};
+
+    const char *const SEED_NODES[] = {};
+#else
     const static boost::uuids::uuid CRYPTONOTE_NETWORK =
         {
             {0xf1, 0x4b, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc}};
@@ -279,4 +293,6 @@ namespace CryptoNote
         "95.111.239.13:11897", // swepool
         "5.9.250.93:11987"     // gamersnest
     };
+#endif
+
 } // CryptoNote

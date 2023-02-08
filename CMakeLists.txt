@@ -14,6 +14,13 @@ project(Kryptokrona)
 enable_language(C)
 enable_language(CXX)
 
+option(TEST_NET "Compile a testnet version" OFF)
+
+if(TEST_NET)
+    message(STATUS "TEST_NET: ON")
+    add_definitions(-DUSE_TESTNET)
+endif()
+
 # Assert our compiler is good
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # GCC 7.0 or higher
