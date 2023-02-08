@@ -287,39 +287,6 @@ The binaries will be in the `src` folder when you are complete.
 
 # Setup testnet
 
-## Change config
-
-Before we start we just need to change slight a bit on the `CryptoNoteConfig.h` header file with some constants so we don't use our main net to test on.
-
-Open up `src/config/CryptoNoteConfig.h`
-
-Then we need to change the constants **P2P_DEFAULT_PORT** and **RPC_DEFAULT_PORT** to:
-
-```cpp
-const int      P2P_DEFAULT_PORT                              =  11898;
-const int      RPC_DEFAULT_PORT                              =  11899;
-```
-
-And put some different letter or number in one of these **CRYPTONOTE_NETWORK** uuids:
-
-```cpp
-const static   boost::uuids::uuid CRYPTONOTE_NETWORK         =
-{
-    {  0xf1, 0x4c, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc  }
-};
-```
-
-And also we need to comment out seed nodes:
-
-```cpp
-const char* const SEED_NODES[] = {
-  // "68.183.214.93:11897",//pool1
-  // "5.9.250.93:11898"//techy
-};
-```
-
-Now we are good to go to start with Docker. So if we want to setup our own testnet locally on our computer we will need to install Docker on our computer.
-
 ## Install Docker
 
 On Windows or Mac it's enough to install Docker Desktop and we will have everything we need in order to setup. For GNU/Linux however there is a slightly different process. We are going through the steps for doing it on a Ubuntu distribution, it should work on all Debian derived distributions. Read below.

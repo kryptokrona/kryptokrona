@@ -3,7 +3,7 @@
 // Please see the included LICENSE file for more information.
 
 ///////////////////////////////////////////////
-#include <zedwallet++/command_implmenentations.h>
+#include <zedwallet++/command_implementations.h>
 ///////////////////////////////////////////////
 
 #include <config/wallet_config.h>

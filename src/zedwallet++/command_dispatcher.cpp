@@ -10,7 +10,7 @@
 
 #include <zedwallet++/address_book.h>
 #include <utilities/coloured_msg.h>
-#include <zedwallet++/command_implmenentations.h>
+#include <zedwallet++/command_implementations.h>
 #include <zedwallet++/open.h>
 #include <zedwallet++/transfer.h>
 #include <zedwallet++/fusion.h>

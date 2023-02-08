@@ -15,7 +15,7 @@
 #include <thread>
 
 #include <utilities/coloured_msg.h>
-#include <zedwallet++/command_implmenentations.h>
+#include <zedwallet++/command_implementations.h>
 
 void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
 {

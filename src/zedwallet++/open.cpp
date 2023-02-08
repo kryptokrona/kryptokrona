@@ -17,7 +17,7 @@
 #include <errors/validate_parameters.h>
 
 #include <utilities/coloured_msg.h>
-#include <zedwallet++/command_implmenentations.h>
+#include <zedwallet++/command_implementations.h>
 #include <zedwallet++/password_container.h>
 #include <zedwallet++/utilities.h>
 

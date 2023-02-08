@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include <utilities/coloured_msg.h>
-#include <zedwallet++/command_implmenentations.h>
+#include <zedwallet++/command_implementations.h>
 #include <zedwallet++/get_input.h>
 
 void TransactionMonitor::start()
