@@ -5,7 +5,11 @@
 
 # build the docker image for the kryptokrona daemon, miner and xkrwallet etc 
 # (general build used for many purposes)
-docker build -t kryptokrona/kryptokrona-testnet -f Dockerfile.test .
+
+# uncomment the line below if you _need_ to compile it locally if you made some changes that is
+# not pushed to master 
+
+#docker build -t kryptokrona/kryptokrona-testnet -f Dockerfile.test .
 
 # start the testnet script
 ./start-testnet.sh 
