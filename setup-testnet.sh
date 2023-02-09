@@ -11,5 +11,8 @@
 
 #docker build -t kryptokrona/kryptokrona-testnet -f Dockerfile.test .
 
+# pull latest testnet image (uncomment this if you want to build yourself)
+docker pull ghcr.io/kryptokrona/kryptokrona-testnet:latest
+
 # start the testnet script
 ./start-testnet.sh 
