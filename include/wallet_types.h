@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <optional>
 
-namespace WalletTypes
+namespace wallet_types
 {
     struct KeyOutput
     {
