@@ -23,7 +23,7 @@
 
 #include "logging/logger_ref.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     class NodeFactory
@@ -41,4 +41,4 @@ namespace PaymentService
         static NodeFactory factory;
     };
 
-} // namespace PaymentService
+} // namespace payment_service

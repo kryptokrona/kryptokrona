@@ -12,7 +12,7 @@
 
 #include "serialization/iserializer.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     /* Forward declaration to avoid circular dependency from including "WalletService.h" */
@@ -542,4 +542,4 @@ namespace PaymentService
         };
     };
 
-} // namespace PaymentService
+} // namespace payment_service

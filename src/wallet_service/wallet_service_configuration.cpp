@@ -13,7 +13,7 @@
 
 using nlohmann::json;
 
-namespace PaymentService
+namespace payment_service
 {
 
     void handleSettings(int argc, char *argv[], WalletServiceConfiguration &config)

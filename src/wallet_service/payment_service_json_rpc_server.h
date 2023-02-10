@@ -14,7 +14,7 @@
 #include "serialization/json_input_value_serializer.h"
 #include "serialization/json_output_stream_serializer.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     class WalletService;
@@ -118,4 +118,4 @@ namespace PaymentService
         std::error_code handleNodeFeeInfo(const NodeFeeInfo::Request &request, NodeFeeInfo::Response &response);
     };
 
-} // namespace PaymentService
+} // namespace payment_service

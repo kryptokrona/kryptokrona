@@ -27,7 +27,7 @@
 #include <unistd.h>
 #endif
 
-using namespace PaymentService;
+using namespace payment_service;
 
 void changeDirectory(const std::string &path)
 {

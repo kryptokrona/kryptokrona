@@ -41,7 +41,7 @@
 
 #include "mnemonics/mnemonics.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     namespace
@@ -1691,4 +1691,4 @@ namespace PaymentService
         return convertTransactionsInBlockInfoToTransactionsInBlockRpcInfo(filteredTransactions);
     }
 
-} // namespace PaymentService
+} // namespace payment_service

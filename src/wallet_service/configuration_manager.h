@@ -9,7 +9,7 @@
 #include "wallet_service_configuration.h"
 #include "p2p/net_node_config.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     class ConfigurationManager
@@ -23,4 +23,4 @@ namespace PaymentService
         Crypto::Hash rpcSecret;
     };
 
-} // namespace PaymentService
+} // namespace payment_service

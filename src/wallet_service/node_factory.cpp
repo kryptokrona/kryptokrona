@@ -9,7 +9,7 @@
 #include <memory>
 #include <future>
 
-namespace PaymentService
+namespace payment_service
 {
 
     class NodeRpcStub : public cryptonote::INode

@@ -16,7 +16,7 @@
 #include "crypto/hash.h"
 #include "logging/ilogger.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     ConfigurationManager::ConfigurationManager()

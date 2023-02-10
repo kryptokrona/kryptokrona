@@ -18,7 +18,7 @@
 
 #include "rpc/json_rpc.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, WalletService &service, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config)

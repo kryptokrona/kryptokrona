@@ -8,7 +8,7 @@
 #include "serialization/serialization_overloads.h"
 #include "wallet_service.h"
 
-namespace PaymentService
+namespace payment_service
 {
 
     void Save::Request::serialize(cryptonote::ISerializer & /*serializer*/)
