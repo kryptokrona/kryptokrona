@@ -22,8 +22,8 @@ public:
 
     bool init(int argc, char **argv);
 
-    const PaymentService::ConfigurationManager &getConfig() const { return config; }
-    PaymentService::WalletConfiguration getWalletConfig() const;
+    const payment_service::ConfigurationManager &getConfig() const { return config; }
+    payment_service::WalletConfiguration getWalletConfig() const;
     const cryptonote::Currency getCurrency();
 
     void run();
@@ -39,8 +39,8 @@ private:
 
     syst::Dispatcher *dispatcher;
     syst::Event *stopEvent;
-    PaymentService::ConfigurationManager config;
-    PaymentService::WalletService *service;
+    payment_service::ConfigurationManager config;
+    payment_service::WalletService *service;
 
     std::shared_ptr<logging::LoggerGroup> logger = std::make_shared<logging::LoggerGroup>();
 

@@ -144,7 +144,7 @@ void PaymentGateService::runRpcProxy(logging::LoggerRef &log)
     cryptonote::Currency currency = currencyBuilder->currency();
 
     std::unique_ptr<cryptonote::INode> node(
-        PaymentService::NodeFactory::createNode(
+        payment_service::NodeFactory::createNode(
             config.serviceConfig.daemonAddress,
             config.serviceConfig.daemonPort,
             config.serviceConfig.initTimeout,
@@ -155,15 +155,15 @@ void PaymentGateService::runRpcProxy(logging::LoggerRef &log)
 
 void PaymentGateService::runWalletService(const cryptonote::Currency &currency, cryptonote::INode &node)
 {
-    PaymentService::WalletConfiguration walletConfiguration{
+    payment_service::WalletConfiguration walletConfiguration{
         config.serviceConfig.containerFile,
         config.serviceConfig.containerPassword,
         config.serviceConfig.syncFromZero};
 
     std::unique_ptr<cryptonote::WalletGreen> wallet(new cryptonote::WalletGreen(*dispatcher, currency, node, logger));
 
-    service = new PaymentService::WalletService(currency, *dispatcher, node, *wallet, *wallet, walletConfiguration, logger);
-    std::unique_ptr<PaymentService::WalletService> serviceGuard(service);
+    service = new payment_service::WalletService(currency, *dispatcher, node, *wallet, *wallet, walletConfiguration, logger);
+    std::unique_ptr<payment_service::WalletService> serviceGuard(service);
     try
     {
         service->init();
@@ -186,7 +186,7 @@ void PaymentGateService::runWalletService(const cryptonote::Currency &currency, 
     }
     else
     {
-        PaymentService::PaymentServiceJsonRpcServer rpcServer(*dispatcher, *stopEvent, *service, logger, config);
+        payment_service::PaymentServiceJsonRpcServer rpcServer(*dispatcher, *stopEvent, *service, logger, config);
         rpcServer.start(config.serviceConfig.bindAddress, config.serviceConfig.bindPort);
 
         logging::LoggerRef(logger, "PaymentGateService")(logging::INFO, logging::BRIGHT_WHITE) << "JSON-RPC server stopped, stopping wallet service...";
