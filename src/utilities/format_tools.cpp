@@ -20,7 +20,7 @@
 
 #include <config/wallet_config.h>
 
-namespace Utilities
+namespace utilities
 {
 
     std::string get_mining_speed(const uint64_t hashrate)
@@ -361,4 +361,4 @@ namespace Utilities
         return msg.str();
     }
 
-} // namespace Utilities
+} // namespace utilities

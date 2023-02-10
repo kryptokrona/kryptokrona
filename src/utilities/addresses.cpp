@@ -13,7 +13,7 @@
 #include <cryptonote_core/cryptonote_basic_impl.h>
 #include <cryptonote_core/cryptonote_tools.h>
 
-namespace Utilities
+namespace utilities
 {
 
     /* Will throw an exception if the addresses are invalid. Please check they
@@ -115,4 +115,4 @@ namespace Utilities
             {publicSpendKey, publicViewKey});
     }
 
-} // namespace Utilities
+} // namespace utilities

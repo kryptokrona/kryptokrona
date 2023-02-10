@@ -18,7 +18,7 @@
 
 #include <errors/errors.h>
 
-namespace Utilities
+namespace utilities
 {
     uint64_t getTransactionSum(const std::vector<std::pair<std::string, uint64_t>> destinations);
 
