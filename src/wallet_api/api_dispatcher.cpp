@@ -114,7 +114,7 @@ ApiDispatcher::ApiDispatcher(
         .Delete("/wallet", router(&ApiDispatcher::closeWallet, walletMustBeOpen, viewWalletsAllowed))
 
         /* Delete the given address */
-        .Delete("/addresses/" + ApiConstants::addressRegex, router(&ApiDispatcher::deleteAddress, walletMustBeOpen, viewWalletsAllowed))
+        .Delete("/addresses/" + api_constants::addressRegex, router(&ApiDispatcher::deleteAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* PUT */
 
@@ -136,10 +136,10 @@ ApiDispatcher::ApiDispatcher(
         .Get("/keys", router(&ApiDispatcher::getPrivateViewKey, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the spend keys for the given address */
-        .Get("/keys/" + ApiConstants::addressRegex, router(&ApiDispatcher::getSpendKeys, walletMustBeOpen, viewWalletsBanned))
+        .Get("/keys/" + api_constants::addressRegex, router(&ApiDispatcher::getSpendKeys, walletMustBeOpen, viewWalletsBanned))
 
         /* Get the mnemonic seed for the given address */
-        .Get("/keys/mnemonic/" + ApiConstants::addressRegex, router(&ApiDispatcher::getMnemonicSeed, walletMustBeOpen, viewWalletsBanned))
+        .Get("/keys/mnemonic/" + api_constants::addressRegex, router(&ApiDispatcher::getMnemonicSeed, walletMustBeOpen, viewWalletsBanned))
 
         /* Get the wallet status */
         .Get("/status", router(&ApiDispatcher::getStatus, walletMustBeOpen, viewWalletsAllowed))
@@ -151,7 +151,7 @@ ApiDispatcher::ApiDispatcher(
         .Get("/addresses/primary", router(&ApiDispatcher::getPrimaryAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Creates an integrated address from the given address and payment ID */
-        .Get("/addresses/" + ApiConstants::addressRegex + "/" + ApiConstants::hashRegex, router(
+        .Get("/addresses/" + api_constants::addressRegex + "/" + api_constants::hashRegex, router(
                                                                                              &ApiDispatcher::createIntegratedAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get all transactions */
@@ -161,7 +161,7 @@ ApiDispatcher::ApiDispatcher(
         .Get("/transactions/unconfirmed", router(&ApiDispatcher::getUnconfirmedTransactions, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get all (outgoing) unconfirmed transactions, belonging to the given address */
-        .Get("/transactions/unconfirmed/" + ApiConstants::addressRegex, router(
+        .Get("/transactions/unconfirmed/" + api_constants::addressRegex, router(
                                                                             &ApiDispatcher::getUnconfirmedTransactionsForAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the transactions starting at the given block, for 1000 blocks */
@@ -171,25 +171,25 @@ ApiDispatcher::ApiDispatcher(
         .Get("/transactions/\\d+/\\d+", router(&ApiDispatcher::getTransactionsFromHeightToHeight, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the transactions starting at the given block, for 1000 blocks, belonging to the given address */
-        .Get("/transactions/address/" + ApiConstants::addressRegex + "/\\d+", router(
+        .Get("/transactions/address/" + api_constants::addressRegex + "/\\d+", router(
                                                                                   &ApiDispatcher::getTransactionsFromHeightWithAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the transactions starting at the given block, and ending at the given block, belonging to the given address */
-        .Get("/transactions/address/" + ApiConstants::addressRegex + "/\\d+/\\d+", router(
+        .Get("/transactions/address/" + api_constants::addressRegex + "/\\d+/\\d+", router(
                                                                                        &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the transaction private key for the given hash */
-        .Get("/transactions/privatekey/" + ApiConstants::hashRegex, router(
+        .Get("/transactions/privatekey/" + api_constants::hashRegex, router(
                                                                         &ApiDispatcher::getTxPrivateKey, walletMustBeOpen, viewWalletsBanned))
 
         /* Get details for the given transaction hash, if known */
-        .Get("/transactions/hash/" + ApiConstants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
+        .Get("/transactions/hash/" + api_constants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get balance for the wallet */
         .Get("/balance", router(&ApiDispatcher::getBalance, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get balance for a specific address */
-        .Get("/balance/" + ApiConstants::addressRegex, router(&ApiDispatcher::getBalanceForAddress, walletMustBeOpen, viewWalletsAllowed))
+        .Get("/balance/" + api_constants::addressRegex, router(&ApiDispatcher::getBalanceForAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get balances for each address */
         .Get("/balances", router(&ApiDispatcher::getBalances, walletMustBeOpen, viewWalletsAllowed))
@@ -1557,7 +1557,7 @@ std::string ApiDispatcher::hashPassword(const std::string password) const
     /* Hash the password with pbkdf2 */
     pbkdf2.DeriveKey(
         key, sizeof(key), 0, (byte *)password.c_str(),
-        password.size(), m_salt, sizeof(m_salt), ApiConstants::PBKDF2_ITERATIONS);
+        password.size(), m_salt, sizeof(m_salt), api_constants::PBKDF2_ITERATIONS);
 
     return common::podToHex(key);
 }
