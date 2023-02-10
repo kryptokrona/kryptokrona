@@ -24,7 +24,7 @@
 #include "serialization_overloads.h"
 #include <config/cryptonote_config.h>
 
-using namespace Common;
+using namespace common;
 
 namespace cryptonote
 {

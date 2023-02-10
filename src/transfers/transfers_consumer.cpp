@@ -22,7 +22,7 @@
 
 using namespace Crypto;
 using namespace Logging;
-using namespace Common;
+using namespace common;
 
 std::unordered_set<Crypto::Hash> transactions_hash_seen;
 std::unordered_set<Crypto::PublicKey> public_keys_seen;

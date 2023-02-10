@@ -25,7 +25,7 @@
 #include "common/int_util.h"
 
 using namespace Crypto;
-using namespace Common;
+using namespace common;
 
 namespace cryptonote
 {

@@ -24,7 +24,7 @@
 #include <config/wallet_config.h>
 
 using namespace Logging;
-using namespace Common;
+using namespace common;
 
 namespace cryptonote
 {

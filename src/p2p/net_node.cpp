@@ -42,7 +42,7 @@
 #include "serialization/binary_output_stream_serializer.h"
 #include "serialization/serialization_overloads.h"
 
-using namespace Common;
+using namespace common;
 using namespace Logging;
 using namespace cryptonote;
 

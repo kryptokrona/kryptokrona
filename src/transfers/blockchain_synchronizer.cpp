@@ -29,7 +29,7 @@
 #include "cryptonote_core/cryptonote_format_utils.h"
 #include "cryptonote_core/transaction_api.h"
 
-using namespace Common;
+using namespace common;
 using namespace Crypto;
 using namespace Logging;
 

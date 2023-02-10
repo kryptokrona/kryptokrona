@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include "common/stream_tools.h"
 
-using namespace Common;
+using namespace common;
 
 namespace cryptonote
 {

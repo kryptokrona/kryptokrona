@@ -23,7 +23,7 @@
 #include <limits>
 #include <common/stream_tools.h>
 
-using namespace Common;
+using namespace common;
 using namespace cryptonote;
 
 namespace

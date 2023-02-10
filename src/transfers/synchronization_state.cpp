@@ -23,7 +23,7 @@
 #include "serialization/binary_output_stream_serializer.h"
 #include "cryptonote_core/cryptonote_serialization.h"
 
-using namespace Common;
+using namespace common;
 
 namespace cryptonote
 {

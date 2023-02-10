@@ -35,7 +35,7 @@
 #endif
 
 using namespace Crypto;
-using namespace Common;
+using namespace common;
 using namespace Logging;
 using namespace syst;
 

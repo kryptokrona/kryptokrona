@@ -38,13 +38,13 @@
 #include "cryptonote_tools.h"
 #include "transaction_extra.h"
 
-using namespace Common;
+using namespace common;
 
 namespace
 {
 
     using namespace cryptonote;
-    using namespace Common;
+    using namespace common;
 
     uint64_t getSignaturesCount(const TransactionInput &input)
     {

@@ -24,7 +24,7 @@
 #include <common/stream_tools.h>
 #include "kv_binary_common.h"
 
-using namespace Common;
+using namespace common;
 using namespace cryptonote;
 
 namespace

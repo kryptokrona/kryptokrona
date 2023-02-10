@@ -28,7 +28,7 @@
 #include "p2p_context.h"
 #include "p2p_context_owner.h"
 
-using namespace Common;
+using namespace common;
 using namespace Logging;
 using namespace syst;
 

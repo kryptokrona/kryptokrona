@@ -25,7 +25,7 @@
 #include "serialization/binary_input_stream_serializer.h"
 
 using namespace Crypto;
-using namespace Common;
+using namespace common;
 
 namespace cryptonote
 {
