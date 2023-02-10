@@ -22,7 +22,7 @@ namespace cryptonote
 
     const uint32_t TRANSFERS_STORAGE_ARCHIVE_VERSION = 0;
 
-    TransfersSyncronizer::TransfersSyncronizer(const cryptonote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, IBlockchainSynchronizer &sync, INode &node) : m_currency(currency), m_logger(logger, "TransfersSyncronizer"), m_sync(sync), m_node(node)
+    TransfersSyncronizer::TransfersSyncronizer(const cryptonote::Currency &currency, std::shared_ptr<logging::ILogger> logger, IBlockchainSynchronizer &sync, INode &node) : m_currency(currency), m_logger(logger, "TransfersSyncronizer"), m_sync(sync), m_node(node)
     {
     }
 
@@ -323,7 +323,7 @@ namespace cryptonote
                         }
                         else
                         {
-                            m_logger(Logging::DEBUGGING) << "Subscription not found: " << m_currency.accountAddressAsString(acc);
+                            m_logger(logging::DEBUGGING) << "Subscription not found: " << m_currency.accountAddressAsString(acc);
                         }
 
                         s.endObject();
@@ -333,7 +333,7 @@ namespace cryptonote
                 }
                 else
                 {
-                    m_logger(Logging::DEBUGGING) << "Consumer not found: " << viewKey;
+                    m_logger(logging::DEBUGGING) << "Consumer not found: " << viewKey;
                 }
 
                 s.endObject();

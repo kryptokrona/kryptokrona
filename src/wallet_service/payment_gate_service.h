@@ -29,11 +29,11 @@ public:
     void run();
     void stop();
 
-    std::shared_ptr<Logging::ILogger> getLogger() { return logger; }
+    std::shared_ptr<logging::ILogger> getLogger() { return logger; }
 
 private:
-    void runInProcess(Logging::LoggerRef &log);
-    void runRpcProxy(Logging::LoggerRef &log);
+    void runInProcess(logging::LoggerRef &log);
+    void runRpcProxy(logging::LoggerRef &log);
 
     void runWalletService(const cryptonote::Currency &currency, cryptonote::INode &node);
 
@@ -42,11 +42,11 @@ private:
     PaymentService::ConfigurationManager config;
     PaymentService::WalletService *service;
 
-    std::shared_ptr<Logging::LoggerGroup> logger = std::make_shared<Logging::LoggerGroup>();
+    std::shared_ptr<logging::LoggerGroup> logger = std::make_shared<logging::LoggerGroup>();
 
     std::shared_ptr<cryptonote::CurrencyBuilder> currencyBuilder;
 
     std::ofstream fileStream;
-    Logging::StreamLogger fileLogger;
-    Logging::ConsoleLogger consoleLogger;
+    logging::StreamLogger fileLogger;
+    logging::ConsoleLogger consoleLogger;
 };

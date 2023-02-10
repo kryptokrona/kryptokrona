@@ -133,7 +133,7 @@ namespace
 namespace cryptonote
 {
 
-    WalletGreen::WalletGreen(syst::Dispatcher &dispatcher, const Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, uint32_t transactionSoftLockTime) : m_dispatcher(dispatcher),
+    WalletGreen::WalletGreen(syst::Dispatcher &dispatcher, const Currency &currency, INode &node, std::shared_ptr<logging::ILogger> logger, uint32_t transactionSoftLockTime) : m_dispatcher(dispatcher),
                                                                                                                                                                                   m_currency(currency),
                                                                                                                                                                                   m_node(node),
                                                                                                                                                                                   m_logger(logger, "WalletGreen/empty"),
@@ -201,7 +201,7 @@ namespace cryptonote
 
         m_dispatcher.yield(); // let remote spawns finish
         m_logger(INFO, BRIGHT_WHITE) << "Container shut down";
-        m_logger = Logging::LoggerRef(m_logger.getLogger(), "WalletGreen/empty");
+        m_logger = logging::LoggerRef(m_logger.getLogger(), "WalletGreen/empty");
     }
 
     void WalletGreen::doShutdown()
@@ -385,7 +385,7 @@ namespace cryptonote
         m_viewSecretKey = viewSecretKey;
         m_password = password;
         m_path = path;
-        m_logger = Logging::LoggerRef(m_logger.getLogger(), "WalletGreen/" + podToHex(m_viewPublicKey).substr(0, 5));
+        m_logger = logging::LoggerRef(m_logger.getLogger(), "WalletGreen/" + podToHex(m_viewPublicKey).substr(0, 5));
 
         assert(m_blockchain.empty());
         m_blockchain.push_back(m_currency.genesisBlockHash());
@@ -615,7 +615,7 @@ namespace cryptonote
             uint64_t creationTimestamp;
             decryptKeyPair(prefix->encryptedViewKeys, m_viewPublicKey, m_viewSecretKey, creationTimestamp);
             throwIfKeysMismatch(m_viewSecretKey, m_viewPublicKey, "Restored view public key doesn't correspond to secret key");
-            m_logger = Logging::LoggerRef(m_logger.getLogger(), "WalletGreen/" + podToHex(m_viewPublicKey).substr(0, 5));
+            m_logger = logging::LoggerRef(m_logger.getLogger(), "WalletGreen/" + podToHex(m_viewPublicKey).substr(0, 5));
 
             loadSpendKeys();
 

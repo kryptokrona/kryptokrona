@@ -117,7 +117,7 @@ namespace cryptonote
 
     }
 
-    P2pNode::P2pNode(const P2pNodeConfig &cfg, Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log, const Crypto::Hash &genesisHash, uint64_t peerId) : logger(log, "P2pNode:" + std::to_string(cfg.getBindPort())),
+    P2pNode::P2pNode(const P2pNodeConfig &cfg, Dispatcher &dispatcher, std::shared_ptr<logging::ILogger> log, const Crypto::Hash &genesisHash, uint64_t peerId) : logger(log, "P2pNode:" + std::to_string(cfg.getBindPort())),
                                                                                                                                                                   m_stopRequested(false),
                                                                                                                                                                   m_cfg(cfg),
                                                                                                                                                                   m_myPeerId(peerId),
@@ -607,7 +607,7 @@ namespace cryptonote
         entry.last_seen = time(nullptr);
         m_peerlist.append_with_peer_white(entry);
       } else {
-        logger(Logging::DEBUGGING) << ctx << "back ping invoke wrong response \"" << response.status << "\" from"
+        logger(logging::DEBUGGING) << ctx << "back ping invoke wrong response \"" << response.status << "\" from"
           << peerAddress << ", expected peerId=" << ctx.getPeerId() << ", got " << response.peer_id;
       } });
         }

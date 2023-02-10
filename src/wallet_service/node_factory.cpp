@@ -143,7 +143,7 @@ namespace PaymentService
     {
     }
 
-    cryptonote::INode *NodeFactory::createNode(const std::string &daemonAddress, uint16_t daemonPort, uint16_t initTimeout, std::shared_ptr<Logging::ILogger> logger)
+    cryptonote::INode *NodeFactory::createNode(const std::string &daemonAddress, uint16_t daemonPort, uint16_t initTimeout, std::shared_ptr<logging::ILogger> logger)
     {
         std::unique_ptr<cryptonote::INode> node(new cryptonote::NodeRpcProxy(daemonAddress, daemonPort, initTimeout, logger));
 

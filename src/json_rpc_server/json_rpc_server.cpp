@@ -27,7 +27,7 @@
 namespace cryptonote
 {
 
-    JsonRpcServer::JsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config) : HttpServer(sys, loggerGroup),
+    JsonRpcServer::JsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config) : HttpServer(sys, loggerGroup),
                                                                                                                                                                                    stopEvent(stopEvent),
                                                                                                                                                                                    logger(loggerGroup, "JsonRpcServer"),
                                                                                                                                                                                    config(config)
@@ -45,7 +45,7 @@ namespace cryptonote
     {
         try
         {
-            logger(Logging::TRACE) << "HTTP request came: \n"
+            logger(logging::TRACE) << "HTTP request came: \n"
                                    << req;
 
             if (req.getUrl() == "/json_rpc")
@@ -60,7 +60,7 @@ namespace cryptonote
                 }
                 catch (std::runtime_error &)
                 {
-                    logger(Logging::DEBUGGING) << "Couldn't parse request: \"" << req.getBody() << "\"";
+                    logger(logging::DEBUGGING) << "Couldn't parse request: \"" << req.getBody() << "\"";
                     makeJsonParsingErrorResponse(jsonRpcResponse);
                     resp.setStatus(cryptonote::HttpResponse::STATUS_200);
                     resp.setBody(jsonRpcResponse.toString());
@@ -82,14 +82,14 @@ namespace cryptonote
             }
             else
             {
-                logger(Logging::WARNING) << "Requested url \"" << req.getUrl() << "\" is not found";
+                logger(logging::WARNING) << "Requested url \"" << req.getUrl() << "\" is not found";
                 resp.setStatus(cryptonote::HttpResponse::STATUS_404);
                 return;
             }
         }
         catch (std::exception &e)
         {
-            logger(Logging::WARNING) << "Error while processing http request: " << e.what();
+            logger(logging::WARNING) << "Error while processing http request: " << e.what();
             resp.setStatus(cryptonote::HttpResponse::STATUS_500);
         }
     }

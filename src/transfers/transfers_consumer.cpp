@@ -120,7 +120,7 @@ namespace
 namespace cryptonote
 {
 
-    TransfersConsumer::TransfersConsumer(const cryptonote::Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, const SecretKey &viewSecret) : m_node(node), m_viewSecret(viewSecret), m_currency(currency), m_logger(logger, "TransfersConsumer")
+    TransfersConsumer::TransfersConsumer(const cryptonote::Currency &currency, INode &node, std::shared_ptr<logging::ILogger> logger, const SecretKey &viewSecret) : m_node(node), m_viewSecret(viewSecret), m_currency(currency), m_logger(logger, "TransfersConsumer")
     {
         updateSyncStart();
     }
@@ -479,7 +479,7 @@ namespace cryptonote
         const std::vector<uint32_t> &outputs,
         const std::vector<uint32_t> &globalIdxs,
         std::vector<TransactionOutputInformationIn> &transfers,
-        Logging::LoggerRef &m_logger)
+        logging::LoggerRef &m_logger)
     {
 
         auto txPubKey = tx.getTransactionPublicKey();

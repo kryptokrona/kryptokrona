@@ -48,9 +48,9 @@ namespace cryptonote
          * BlockchainCache objects as children are supported.
          */
         DatabaseBlockchainCache(const Currency &currency, IDataBase &dataBase,
-                                IBlockchainCacheFactory &blockchainCacheFactory, std::shared_ptr<Logging::ILogger> logger);
+                                IBlockchainCacheFactory &blockchainCacheFactory, std::shared_ptr<logging::ILogger> logger);
 
-        static bool checkDBSchemeVersion(IDataBase &dataBase, std::shared_ptr<Logging::ILogger> logger);
+        static bool checkDBSchemeVersion(IDataBase &dataBase, std::shared_ptr<logging::ILogger> logger);
 
         /*
          * This methods splits cache, upper part (ie blocks with indexes larger than splitBlockIndex)
@@ -180,7 +180,7 @@ namespace cryptonote
         mutable boost::optional<uint32_t> keyOutputAmountsCount;
         mutable std::unordered_map<Amount, int32_t> keyOutputCountsForAmounts;
         std::vector<IBlockchainCache *> children;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         std::deque<CachedBlockInfo> unitsCache;
         const size_t unitsCacheSize = 1000;
 

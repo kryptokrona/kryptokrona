@@ -61,7 +61,7 @@ namespace
 DaemonCommandsHandler::DaemonCommandsHandler(
     cryptonote::Core &core,
     cryptonote::NodeServer &srv,
-    std::shared_ptr<Logging::LoggerManager> log,
+    std::shared_ptr<logging::LoggerManager> log,
     cryptonote::RpcServer *prpc_server) : m_core(core),
                                           m_srv(srv),
                                           logger(log, "daemon"),
@@ -122,7 +122,7 @@ bool DaemonCommandsHandler::exit(const std::vector<std::string> &args)
 
     /* Set log to max when exiting. Sometimes this takes a while, and it helps
        to let users know the daemon is still doing stuff */
-    m_logManager->setMaxLevel(Logging::TRACE);
+    m_logManager->setMaxLevel(logging::TRACE);
     m_consoleHandler.requestStop();
     m_srv.sendStopSignal();
     return true;
@@ -247,13 +247,13 @@ bool DaemonCommandsHandler::set_log(const std::vector<std::string> &args)
 
     ++l;
 
-    if (l > Logging::TRACE)
+    if (l > logging::TRACE)
     {
         std::cout << "wrong number range, use: set_log <log_level_number_0-4>" << ENDL;
         return true;
     }
 
-    m_logManager->setMaxLevel(static_cast<Logging::Level>(l));
+    m_logManager->setMaxLevel(static_cast<logging::Level>(l));
     return true;
 }
 

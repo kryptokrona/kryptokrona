@@ -37,7 +37,7 @@ namespace cryptonote
                                    public INodeObserver
     {
     public:
-        BlockchainSynchronizer(INode &node, std::shared_ptr<Logging::ILogger> logger, const Crypto::Hash &genesisBlockHash);
+        BlockchainSynchronizer(INode &node, std::shared_ptr<logging::ILogger> logger, const Crypto::Hash &genesisBlockHash);
         ~BlockchainSynchronizer();
 
         // IBlockchainSynchronizer
@@ -136,7 +136,7 @@ namespace cryptonote
 
         typedef std::map<IBlockchainConsumer *, std::shared_ptr<SynchronizationState>> ConsumersMap;
 
-        mutable Logging::LoggerRef m_logger;
+        mutable logging::LoggerRef m_logger;
         ConsumersMap m_consumers;
         INode &m_node;
         const Crypto::Hash m_genesisBlockHash;

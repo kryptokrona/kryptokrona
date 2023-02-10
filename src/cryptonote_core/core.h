@@ -35,7 +35,7 @@ namespace cryptonote
     class Core : public ICore, public ICoreInformation
     {
     public:
-        Core(const Currency &currency, std::shared_ptr<Logging::ILogger> logger, Checkpoints &&checkpoints, syst::Dispatcher &dispatcher,
+        Core(const Currency &currency, std::shared_ptr<logging::ILogger> logger, Checkpoints &&checkpoints, syst::Dispatcher &dispatcher,
              std::unique_ptr<IBlockchainCacheFactory> &&blockchainCacheFactory, std::unique_ptr<IMainChainStorage> &&mainChainStorage);
         virtual ~Core();
 
@@ -135,7 +135,7 @@ namespace cryptonote
         const Currency &currency;
         syst::Dispatcher &dispatcher;
         syst::ContextGroup contextGroup;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         Checkpoints checkpoints;
         std::unique_ptr<IUpgradeManager> upgradeManager;
         std::vector<std::unique_ptr<IBlockchainCache>> chainsStorage;

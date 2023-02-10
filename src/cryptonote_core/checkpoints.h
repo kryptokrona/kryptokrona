@@ -25,7 +25,7 @@ namespace cryptonote
     class Checkpoints
     {
     public:
-        Checkpoints(std::shared_ptr<Logging::ILogger> log);
+        Checkpoints(std::shared_ptr<logging::ILogger> log);
 
         bool addCheckpoint(uint32_t index, const std::string &hash_str);
         bool loadCheckpointsFromFile(const std::string &fileName);
@@ -35,6 +35,6 @@ namespace cryptonote
 
     private:
         std::map<uint32_t, Crypto::Hash> points;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
     };
 }

@@ -20,7 +20,7 @@ namespace cryptonote
     TransactionPoolCleanWrapper::TransactionPoolCleanWrapper(
         std::unique_ptr<ITransactionPool> &&transactionPool,
         std::unique_ptr<ITimeProvider> &&timeProvider,
-        std::shared_ptr<Logging::ILogger> logger,
+        std::shared_ptr<logging::ILogger> logger,
         uint64_t timeout)
         : transactionPool(std::move(transactionPool)),
           timeProvider(std::move(timeProvider)),
@@ -112,7 +112,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::DEBUGGING) << "Unable to trim extra data with 66";
+            logger(logging::DEBUGGING) << "Unable to trim extra data with 66";
         }
 
         try
@@ -123,7 +123,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::DEBUGGING) << "Unable to trim extra data with 78";
+            logger(logging::DEBUGGING) << "Unable to trim extra data with 78";
         }
 
         // returning empty json object if try/catch does not return anything
@@ -144,11 +144,11 @@ namespace cryptonote
 
             for (const auto &hash : transactionHashes)
             {
-                logger(Logging::INFO) << "Checking transaction " << common::podToHex(hash);
+                logger(logging::INFO) << "Checking transaction " << common::podToHex(hash);
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
                 boxed_transaction_age = 0;
                 transaction_extra_data_size = transactionPool->getTransaction(hash).getTransaction().extra.size();
-                logger(Logging::DEBUGGING) << "Transaction extra size: " << transactionPool->getTransaction(hash).getTransaction().extra.size();
+                logger(logging::DEBUGGING) << "Transaction extra size: " << transactionPool->getTransaction(hash).getTransaction().extra.size();
 
                 CachedTransaction transaction = transactionPool->getTransaction(hash);
                 std::vector<CachedTransaction> transactions;
@@ -158,7 +158,7 @@ namespace cryptonote
 
                 if (!success)
                 {
-                    logger(Logging::INFO) << "Deleting invalid mixin transaction " << common::podToHex(hash) << " from pool..." << error;
+                    logger(logging::INFO) << "Deleting invalid mixin transaction " << common::podToHex(hash) << " from pool..." << error;
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
@@ -181,7 +181,7 @@ namespace cryptonote
                             (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || boxed_transaction_age >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME) &&
                             transaction_extra_data_size > cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
                         {
-                            logger(Logging::INFO) << "Deleting hugin transaction...";
+                            logger(logging::INFO) << "Deleting hugin transaction...";
                             recentlyDeletedTransactions.emplace(hash, currentTime);
                             transactionPool->removeTransaction(hash);
                             deletedTransactions.emplace_back(std::move(hash));
@@ -189,23 +189,23 @@ namespace cryptonote
                     }
                     catch (std::exception &e)
                     {
-                        logger(Logging::INFO) << "Unable to remove hugin transaction, not a valid hugin transaction.";
+                        logger(logging::INFO) << "Unable to remove hugin transaction, not a valid hugin transaction.";
                     }
                 }
                 else if (transactionAge >= timeout)
                 {
-                    logger(Logging::INFO) << "Deleting transaction " << common::podToHex(hash) << " from pool.";
+                    logger(logging::INFO) << "Deleting transaction " << common::podToHex(hash) << " from pool.";
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
                 }
                 else
                 {
-                    logger(Logging::DEBUGGING) << "Transaction " << common::podToHex(hash) << " is cool...";
+                    logger(logging::DEBUGGING) << "Transaction " << common::podToHex(hash) << " is cool...";
                 }
             }
 
-            logger(Logging::DEBUGGING) << "Length of deleted transactions: " << deletedTransactions.size();
+            logger(logging::DEBUGGING) << "Length of deleted transactions: " << deletedTransactions.size();
 
             cleanRecentlyDeletedTransactions(currentTime);
             return deletedTransactions;
@@ -216,7 +216,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::WARNING) << "Caught an exception: " << e.what() << ", stopping cleaning procedure cycle";
+            logger(logging::WARNING) << "Caught an exception: " << e.what() << ", stopping cleaning procedure cycle";
             throw;
         }
     }

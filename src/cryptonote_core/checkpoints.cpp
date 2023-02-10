@@ -24,7 +24,7 @@ using namespace logging;
 namespace cryptonote
 {
     //---------------------------------------------------------------------------
-    Checkpoints::Checkpoints(std::shared_ptr<Logging::ILogger> log) : logger(log, "checkpoints") {}
+    Checkpoints::Checkpoints(std::shared_ptr<logging::ILogger> log) : logger(log, "checkpoints") {}
     //---------------------------------------------------------------------------
     bool Checkpoints::addCheckpoint(uint32_t index, const std::string &hash_str)
     {
@@ -127,14 +127,14 @@ namespace cryptonote
         {
             if (index % 100 == 0)
             {
-                logger(Logging::INFO, BRIGHT_GREEN)
+                logger(logging::INFO, BRIGHT_GREEN)
                     << "CHECKPOINT PASSED FOR INDEX " << index << " " << h;
             }
             return true;
         }
         else
         {
-            logger(Logging::WARNING, BRIGHT_YELLOW) << "CHECKPOINT FAILED FOR HEIGHT " << index
+            logger(logging::WARNING, BRIGHT_YELLOW) << "CHECKPOINT FAILED FOR HEIGHT " << index
                                                     << ". EXPECTED HASH: " << it->second
                                                     << ", FETCHED HASH: " << h;
             return false;

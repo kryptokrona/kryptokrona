@@ -169,7 +169,7 @@ namespace cryptonote
         // json rpc
         {"/json_rpc", {std::bind(&RpcServer::processJsonRpcRequest, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3), true}}};
 
-    RpcServer::RpcServer(syst::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log, Core &c, NodeServer &p2p, ICryptoNoteProtocolHandler &protocol) : HttpServer(dispatcher, log), logger(log, "RpcServer"), m_core(c), m_p2p(p2p), m_protocol(protocol)
+    RpcServer::RpcServer(syst::Dispatcher &dispatcher, std::shared_ptr<logging::ILogger> log, Core &c, NodeServer &p2p, ICryptoNoteProtocolHandler &protocol) : HttpServer(dispatcher, log), logger(log, "RpcServer"), m_core(c), m_p2p(p2p), m_protocol(protocol)
     {
     }
 

@@ -22,7 +22,7 @@ namespace PaymentService
             logFile = "service.log";
             daemonPort = cryptonote::RPC_DEFAULT_PORT;
             bindPort = cryptonote::SERVICE_DEFAULT_PORT;
-            logLevel = Logging::INFO;
+            logLevel = logging::INFO;
             legacySecurity = false;
             help = false;
             version = false;

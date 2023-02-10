@@ -225,7 +225,7 @@ namespace cryptonote
 
     }
 
-    Core::Core(const Currency &currency, std::shared_ptr<Logging::ILogger> logger, Checkpoints &&checkpoints, syst::Dispatcher &dispatcher,
+    Core::Core(const Currency &currency, std::shared_ptr<logging::ILogger> logger, Checkpoints &&checkpoints, syst::Dispatcher &dispatcher,
                std::unique_ptr<IBlockchainCacheFactory> &&blockchainCacheFactory, std::unique_ptr<IMainChainStorage> &&mainchainStorage)
         : currency(currency), dispatcher(dispatcher), contextGroup(dispatcher), logger(logger, "Core"), checkpoints(std::move(checkpoints)),
           upgradeManager(new UpgradeManager()), blockchainCacheFactory(std::move(blockchainCacheFactory)),
@@ -272,7 +272,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::WARNING) << "failed to notify observers: " << e.what();
+            logger(logging::WARNING) << "failed to notify observers: " << e.what();
             return false;
         }
     }
@@ -536,7 +536,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to query blocks: " << e.what();
+            logger(logging::ERROR) << "Failed to query blocks: " << e.what();
             return false;
         }
     }
@@ -609,7 +609,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to query blocks: " << e.what();
+            logger(logging::ERROR) << "Failed to query blocks: " << e.what();
             return false;
         }
     }
@@ -656,7 +656,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to get transactions status: " << e.what();
+            logger(logging::ERROR) << "Failed to get transactions status: " << e.what();
             return false;
         }
     }
@@ -727,7 +727,7 @@ namespace cryptonote
                start and end, whichever is smaller */
             uint64_t endIndex = std::min(actualBlockCount, blockDifference + 1) + startIndex;
 
-            logger(Logging::DEBUGGING)
+            logger(logging::DEBUGGING)
                 << "\n\n"
                 << "\n============================================="
                 << "\n========= GetWalletSyncData summary ========="
@@ -782,7 +782,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to get wallet sync data: " << e.what();
+            logger(logging::ERROR) << "Failed to get wallet sync data: " << e.what();
             return false;
         }
     }
@@ -1074,10 +1074,10 @@ namespace cryptonote
         os << blockIndex << " (" << blockHash << ")";
         std::string blockStr = os.str();
 
-        logger(Logging::DEBUGGING) << "Request to add block " << blockStr;
+        logger(logging::DEBUGGING) << "Request to add block " << blockStr;
         if (hasBlock(cachedBlock.getBlockHash()))
         {
-            logger(Logging::DEBUGGING) << "Block " << blockStr << " already exists";
+            logger(logging::DEBUGGING) << "Block " << blockStr << " already exists";
             return error::AddBlockErrorCode::ALREADY_EXISTS;
         }
 
@@ -1089,7 +1089,7 @@ namespace cryptonote
         auto cache = findSegmentContainingBlock(previousBlockHash);
         if (cache == nullptr)
         {
-            logger(Logging::DEBUGGING) << "Block " << blockStr << " rejected as orphaned";
+            logger(logging::DEBUGGING) << "Block " << blockStr << " rejected as orphaned";
             return error::AddBlockErrorCode::REJECTED_AS_ORPHANED;
         }
 
@@ -1097,7 +1097,7 @@ namespace cryptonote
         uint64_t cumulativeSize = 0;
         if (!extractTransactions(rawBlock.transactions, transactions, cumulativeSize))
         {
-            logger(Logging::DEBUGGING) << "Couldn't deserialize raw block transactions in block " << blockStr;
+            logger(logging::DEBUGGING) << "Couldn't deserialize raw block transactions in block " << blockStr;
             return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
         }
 
@@ -1112,7 +1112,7 @@ namespace cryptonote
         auto maxBlockCumulativeSize = currency.maxBlockCumulativeSize(previousBlockIndex + 1);
         if (cumulativeBlockSize > maxBlockCumulativeSize)
         {
-            logger(Logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
+            logger(logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
             return error::BlockValidationError::CUMULATIVE_BLOCK_SIZE_TOO_BIG;
         }
 
@@ -1120,14 +1120,14 @@ namespace cryptonote
         auto blockValidationResult = validateBlock(cachedBlock, cache, minerReward);
         if (blockValidationResult)
         {
-            logger(Logging::DEBUGGING) << "Failed to validate block " << blockStr << ": " << blockValidationResult.message();
+            logger(logging::DEBUGGING) << "Failed to validate block " << blockStr << ": " << blockValidationResult.message();
             return blockValidationResult;
         }
 
         auto currentDifficulty = cache->getDifficultyForNextBlock(previousBlockIndex);
         if (currentDifficulty == 0)
         {
-            logger(Logging::DEBUGGING) << "Block " << blockStr << " has difficulty overhead";
+            logger(logging::DEBUGGING) << "Block " << blockStr << " has difficulty overhead";
             return error::BlockValidationError::DIFFICULTY_OVERHEAD;
         }
 
@@ -1149,7 +1149,7 @@ namespace cryptonote
 
             if (!success)
             {
-                logger(Logging::DEBUGGING) << error;
+                logger(logging::DEBUGGING) << error;
                 return error::TransactionValidationError::INVALID_MIXIN;
             }
         }
@@ -1162,7 +1162,7 @@ namespace cryptonote
             auto transactionValidationResult = validateTransaction(transaction, validatorState, cache, fee, previousBlockIndex);
             if (transactionValidationResult)
             {
-                logger(Logging::DEBUGGING) << "Failed to validate transaction " << transaction.getTransactionHash() << ": " << transactionValidationResult.message();
+                logger(logging::DEBUGGING) << "Failed to validate transaction " << transaction.getTransactionHash() << ": " << transactionValidationResult.message();
                 return transactionValidationResult;
             }
 
@@ -1178,13 +1178,13 @@ namespace cryptonote
         if (!currency.getBlockReward(cachedBlock.getBlock().majorVersion, blocksSizeMedian,
                                      cumulativeBlockSize, alreadyGeneratedCoins, cumulativeFee, reward, emissionChange))
         {
-            logger(Logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
+            logger(logging::DEBUGGING) << "Block " << blockStr << " has too big cumulative size";
             return error::BlockValidationError::CUMULATIVE_BLOCK_SIZE_TOO_BIG;
         }
 
         if (minerReward != reward)
         {
-            logger(Logging::DEBUGGING) << "Block reward mismatch for block " << blockStr
+            logger(logging::DEBUGGING) << "Block reward mismatch for block " << blockStr
                                        << ". Expected reward: " << reward << ", got reward: " << minerReward;
             return error::BlockValidationError::BLOCK_REWARD_MISMATCH;
         }
@@ -1193,13 +1193,13 @@ namespace cryptonote
         {
             if (!checkpoints.checkBlock(cachedBlock.getBlockIndex(), cachedBlock.getBlockHash()))
             {
-                logger(Logging::WARNING) << "Checkpoint block hash mismatch for block " << blockStr;
+                logger(logging::WARNING) << "Checkpoint block hash mismatch for block " << blockStr;
                 return error::BlockValidationError::CHECKPOINT_BLOCK_HASH_MISMATCH;
             }
         }
         else if (!currency.checkProofOfWork(cachedBlock, currentDifficulty))
         {
-            logger(Logging::WARNING) << "Proof of work too weak for block " << blockStr;
+            logger(logging::WARNING) << "Proof of work too weak for block " << blockStr;
             return error::BlockValidationError::PROOF_OF_WORK_TOO_WEAK;
         }
 
@@ -1223,10 +1223,10 @@ namespace cryptonote
                     actualizePoolTransactionsLite(validatorState);
 
                     ret = error::AddBlockErrorCode::ADDED_TO_MAIN;
-                    logger(Logging::DEBUGGING) << "Block " << blockStr << " added to main chain.";
+                    logger(logging::DEBUGGING) << "Block " << blockStr << " added to main chain.";
                     if ((previousBlockIndex + 1) % 100 == 0)
                     {
-                        logger(Logging::INFO) << "Block " << blockStr << " added to main chain";
+                        logger(logging::INFO) << "Block " << blockStr << " added to main chain";
                     }
 
                     notifyObservers(makeDelTransactionMessage(std::move(hashes), Messages::DeleteTransaction::Reason::InBlock));
@@ -1234,7 +1234,7 @@ namespace cryptonote
                 else
                 {
                     cache->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange, currentDifficulty, std::move(rawBlock));
-                    logger(Logging::DEBUGGING) << "Block " << blockStr << " added to alternative chain.";
+                    logger(logging::DEBUGGING) << "Block " << blockStr << " added to alternative chain.";
 
                     auto mainChainCache = chainsLeaves[0];
                     if (cache->getCurrentCumulativeDifficulty() > mainChainCache->getCurrentCumulativeDifficulty())
@@ -1254,7 +1254,7 @@ namespace cryptonote
 
                         ret = error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED;
 
-                        logger(Logging::INFO) << "Resolved: " << blockStr
+                        logger(logging::INFO) << "Resolved: " << blockStr
                                               << ", Previous: " << chainsLeaves[endpointIndex]->getTopBlockIndex() << " ("
                                               << chainsLeaves[endpointIndex]->getTopBlockHash() << ")";
                     }
@@ -1270,7 +1270,7 @@ namespace cryptonote
                 chainsStorage.emplace_back(std::move(newCache));
                 chainsLeaves.push_back(newlyForkedChainPtr);
 
-                logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
+                logger(logging::DEBUGGING) << "Resolving: " << blockStr;
 
                 newlyForkedChainPtr->pushBlock(cachedBlock, transactions, validatorState, cumulativeBlockSize, emissionChange,
                                                currentDifficulty, std::move(rawBlock));
@@ -1281,7 +1281,7 @@ namespace cryptonote
         }
         else
         {
-            logger(Logging::DEBUGGING) << "Resolving: " << blockStr;
+            logger(logging::DEBUGGING) << "Resolving: " << blockStr;
 
             auto upperSegment = cache->split(previousBlockIndex + 1);
             //[cache] is lower segment now
@@ -1314,7 +1314,7 @@ namespace cryptonote
             updateMainChainSet();
         }
 
-        logger(Logging::DEBUGGING) << "Block: " << blockStr << " successfully added";
+        logger(logging::DEBUGGING) << "Block: " << blockStr << " successfully added";
         notifyOnSuccess(ret, previousBlockIndex, cachedBlock, *cache);
 
         return ret;
@@ -1420,7 +1420,7 @@ namespace cryptonote
         bool result = fromBinaryArray(blockTemplate, rawBlockTemplate);
         if (!result)
         {
-            logger(Logging::WARNING) << "Couldn't deserialize block template";
+            logger(logging::WARNING) << "Couldn't deserialize block template";
             return error::AddBlockErrorCode::DESERIALIZATION_FAILED;
         }
 
@@ -1432,7 +1432,7 @@ namespace cryptonote
         {
             if (!transactionPool->checkIfTransactionPresent(transactionHash))
             {
-                logger(Logging::WARNING) << "The transaction " << common::podToHex(transactionHash)
+                logger(logging::WARNING) << "The transaction " << common::podToHex(transactionHash)
                                          << " is absent in transaction pool";
                 return error::BlockValidationError::TRANSACTION_ABSENT_IN_POOL;
             }
@@ -1488,14 +1488,14 @@ namespace cryptonote
         auto upperBlockLimit = getTopBlockIndex() - currency.minedMoneyUnlockWindow();
         if (upperBlockLimit < currency.minedMoneyUnlockWindow())
         {
-            logger(Logging::DEBUGGING) << "Blockchain height is less than mined unlock window";
+            logger(logging::DEBUGGING) << "Blockchain height is less than mined unlock window";
             return false;
         }
 
         globalIndexes = chainsLeaves[0]->getRandomOutsByAmount(amount, count, getTopBlockIndex());
         if (globalIndexes.empty())
         {
-            logger(Logging::ERROR) << "Failed to get any matching outputs for amount "
+            logger(logging::ERROR) << "Failed to get any matching outputs for amount "
                                    << amount << " (" << Utilities::formatAmount(amount)
                                    << "). Further explanation here: "
                                    << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c\n"
@@ -1512,10 +1512,10 @@ namespace cryptonote
         case ExtractOutputKeysResult::SUCCESS:
             return true;
         case ExtractOutputKeysResult::INVALID_GLOBAL_INDEX:
-            logger(Logging::DEBUGGING) << "Invalid global index is given";
+            logger(logging::DEBUGGING) << "Invalid global index is given";
             return false;
         case ExtractOutputKeysResult::OUTPUT_LOCKED:
-            logger(Logging::DEBUGGING) << "Output is locked";
+            logger(logging::DEBUGGING) << "Output is locked";
             return false;
         }
 
@@ -1556,7 +1556,7 @@ namespace cryptonote
         }
         catch (std::exception &e)
         {
-            logger(Logging::ERROR) << "Failed to get global indexes: " << e.what();
+            logger(logging::ERROR) << "Failed to get global indexes: " << e.what();
             return false;
         }
     }
@@ -1568,7 +1568,7 @@ namespace cryptonote
         Transaction transaction;
         if (!fromBinaryArray<Transaction>(transaction, transactionBinaryArray))
         {
-            logger(Logging::WARNING) << "Couldn't add transaction to pool due to deserialization error";
+            logger(logging::WARNING) << "Couldn't add transaction to pool due to deserialization error";
             return false;
         }
 
@@ -1597,11 +1597,11 @@ namespace cryptonote
 
         if (!transactionPool->pushTransaction(std::move(cachedTransaction), std::move(validatorState)))
         {
-            logger(Logging::DEBUGGING) << "Failed to push transaction " << transactionHash << " to pool, already exists";
+            logger(logging::DEBUGGING) << "Failed to push transaction " << transactionHash << " to pool, already exists";
             return false;
         }
 
-        logger(Logging::DEBUGGING) << "Transaction " << transactionHash << " has been added to pool";
+        logger(logging::DEBUGGING) << "Transaction " << transactionHash << " has been added to pool";
         return true;
     }
 
@@ -1616,7 +1616,7 @@ namespace cryptonote
 
         if (cachedTransaction.getTransaction().extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_POOL)
         {
-            logger(Logging::TRACE) << "Not adding transaction "
+            logger(logging::TRACE) << "Not adding transaction "
                                    << cachedTransaction.getTransactionHash()
                                    << " to pool, extra too large.";
 
@@ -1627,7 +1627,7 @@ namespace cryptonote
 
         if (auto validationResult = validateTransaction(cachedTransaction, validatorState, chainsLeaves[0], fee, getTopBlockIndex()))
         {
-            logger(Logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
+            logger(logging::DEBUGGING) << "Transaction " << cachedTransaction.getTransactionHash()
                                        << " is not valid. Reason: " << validationResult.message();
             return false;
         }
@@ -1635,7 +1635,7 @@ namespace cryptonote
         auto maxTransactionSize = getMaximumTransactionAllowedSize(blockMedianSize, currency);
         if (cachedTransaction.getTransactionBinaryArray().size() > maxTransactionSize)
         {
-            logger(Logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
+            logger(logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
                                      << " is not valid. Reason: transaction is too big (" << cachedTransaction.getTransactionBinaryArray().size()
                                      << "). Maximum allowed size is " << maxTransactionSize;
             return false;
@@ -1645,7 +1645,7 @@ namespace cryptonote
 
         if (!isFusion && fee < currency.minimumFee())
         {
-            logger(Logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
+            logger(logging::WARNING) << "Transaction " << cachedTransaction.getTransactionHash()
                                      << " is not valid. Reason: fee is too small and it's not a fusion transaction";
             return false;
         }
@@ -1721,7 +1721,7 @@ namespace cryptonote
         difficulty = getDifficultyForNextBlock();
         if (difficulty == 0)
         {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "difficulty overhead.";
+            logger(logging::ERROR, logging::BRIGHT_RED) << "difficulty overhead.";
             return false;
         }
 
@@ -1750,7 +1750,7 @@ namespace cryptonote
             TransactionExtraMergeMiningTag mmTag = boost::value_initialized<decltype(mmTag)>();
             if (!appendMergeMiningTagToExtra(b.parentBlock.baseTransaction.extra, mmTag))
             {
-                logger(Logging::ERROR, Logging::BRIGHT_RED)
+                logger(logging::ERROR, logging::BRIGHT_RED)
                     << "Failed to append merge mining tag to extra of the parent block miner transaction";
                 return false;
             }
@@ -1830,7 +1830,7 @@ namespace cryptonote
                                            b.baseTransaction, extraNonce, 11);
         if (!r)
         {
-            logger(Logging::ERROR, Logging::BRIGHT_RED) << "Failed to construct miner tx, first chance";
+            logger(logging::ERROR, logging::BRIGHT_RED) << "Failed to construct miner tx, first chance";
             return false;
         }
 
@@ -1842,7 +1842,7 @@ namespace cryptonote
                                           b.baseTransaction, extraNonce, 11);
             if (!r)
             {
-                logger(Logging::ERROR, Logging::BRIGHT_RED) << "Failed to construct miner tx, second chance";
+                logger(logging::ERROR, logging::BRIGHT_RED) << "Failed to construct miner tx, second chance";
                 return false;
             }
 
@@ -1863,7 +1863,7 @@ namespace cryptonote
                 {
                     if (!(cumulativeSize + 1 == transactionsSize + getObjectBinarySize(b.baseTransaction)))
                     {
-                        logger(Logging::ERROR, Logging::BRIGHT_RED)
+                        logger(logging::ERROR, logging::BRIGHT_RED)
                             << "unexpected case: cumulative_size=" << cumulativeSize
                             << " + 1 is not equal txs_cumulative_size=" << transactionsSize
                             << " + get_object_blobsize(b.baseTransaction)=" << getObjectBinarySize(b.baseTransaction);
@@ -1875,19 +1875,19 @@ namespace cryptonote
                     {
                         // fuck, not lucky, -1 makes varint-counter size smaller, in that case we continue to grow with
                         // cumulative_size
-                        logger(Logging::TRACE, Logging::BRIGHT_RED)
+                        logger(logging::TRACE, logging::BRIGHT_RED)
                             << "Miner tx creation have no luck with delta_extra size = " << delta << " and " << delta - 1;
                         cumulativeSize += delta - 1;
                         continue;
                     }
 
-                    logger(Logging::DEBUGGING, Logging::BRIGHT_GREEN)
+                    logger(logging::DEBUGGING, logging::BRIGHT_GREEN)
                         << "Setting extra for block: " << b.baseTransaction.extra.size() << ", try_count=" << tryCount;
                 }
             }
             if (!(cumulativeSize == transactionsSize + getObjectBinarySize(b.baseTransaction)))
             {
-                logger(Logging::ERROR, Logging::BRIGHT_RED)
+                logger(logging::ERROR, logging::BRIGHT_RED)
                     << "unexpected case: cumulative_size=" << cumulativeSize
                     << " is not equal txs_cumulative_size=" << transactionsSize
                     << " + get_object_blobsize(b.baseTransaction)=" << getObjectBinarySize(b.baseTransaction);
@@ -1897,7 +1897,7 @@ namespace cryptonote
             return true;
         }
 
-        logger(Logging::ERROR, Logging::BRIGHT_RED) << "Failed to create_block_template with " << TRIES_COUNT << " tries";
+        logger(logging::ERROR, logging::BRIGHT_RED) << "Failed to create_block_template with " << TRIES_COUNT << " tries";
         return false;
     }
 
@@ -1953,7 +1953,7 @@ namespace cryptonote
             {
                 if (rawTransaction.size() > currency.maxTxSize())
                 {
-                    logger(Logging::INFO) << "Raw transaction size " << rawTransaction.size() << " is too big.";
+                    logger(logging::INFO) << "Raw transaction size " << rawTransaction.size() << " is too big.";
                     return false;
                 }
 
@@ -1963,7 +1963,7 @@ namespace cryptonote
         }
         catch (std::runtime_error &e)
         {
-            logger(Logging::INFO) << e.what();
+            logger(logging::INFO) << e.what();
             return false;
         }
 
@@ -2180,7 +2180,7 @@ namespace cryptonote
         {
             if (block.majorVersion == BLOCK_MAJOR_VERSION_2 && block.parentBlock.majorVersion > BLOCK_MAJOR_VERSION_1)
             {
-                logger(Logging::ERROR, Logging::BRIGHT_RED) << "Parent block of block " << cachedBlock.getBlockHash() << " has wrong major version: "
+                logger(logging::ERROR, logging::BRIGHT_RED) << "Parent block of block " << cachedBlock.getBlockHash() << " has wrong major version: "
                                                             << static_cast<int>(block.parentBlock.majorVersion) << ", at index " << cachedBlock.getBlockIndex()
                                                             << " expected version is " << static_cast<int>(BLOCK_MAJOR_VERSION_1);
                 return error::BlockValidationError::PARENT_BLOCK_WRONG_VERSION;
@@ -2285,33 +2285,33 @@ namespace cryptonote
         auto dbBlocksCount = chainsLeaves[0]->getTopBlockIndex() + 1;
         auto storageBlocksCount = mainChainStorage->getBlockCount();
 
-        logger(Logging::DEBUGGING) << "Blockchain storage blocks count: " << storageBlocksCount << ", DB blocks count: " << dbBlocksCount;
+        logger(logging::DEBUGGING) << "Blockchain storage blocks count: " << storageBlocksCount << ", DB blocks count: " << dbBlocksCount;
 
         assert(storageBlocksCount != 0); // we assume the storage has at least genesis block
 
         if (storageBlocksCount > dbBlocksCount)
         {
-            logger(Logging::INFO) << "Importing blocks from blockchain storage";
+            logger(logging::INFO) << "Importing blocks from blockchain storage";
             importBlocksFromStorage();
         }
         else if (storageBlocksCount < dbBlocksCount)
         {
             auto cutFrom = findCommonRoot(*mainChainStorage, *chainsLeaves[0]) + 1;
 
-            logger(Logging::INFO) << "DB has more blocks than blockchain storage, cutting from block index: " << cutFrom;
+            logger(logging::INFO) << "DB has more blocks than blockchain storage, cutting from block index: " << cutFrom;
             cutSegment(*chainsLeaves[0], cutFrom);
 
             assert(chainsLeaves[0]->getTopBlockIndex() + 1 == mainChainStorage->getBlockCount());
         }
         else if (getBlockHash(mainChainStorage->getBlockByIndex(storageBlocksCount - 1)) != chainsLeaves[0]->getTopBlockHash())
         {
-            logger(Logging::INFO) << "Blockchain storage and root segment are on different chains. "
+            logger(logging::INFO) << "Blockchain storage and root segment are on different chains. "
                                   << "Cutting root segment to common block index " << findCommonRoot(*mainChainStorage, *chainsLeaves[0]) << " and reimporting blocks";
             importBlocksFromStorage();
         }
         else
         {
-            logger(Logging::DEBUGGING) << "Blockchain storage and root segment are on the same height and chain";
+            logger(logging::DEBUGGING) << "Blockchain storage and root segment are on the same height and chain";
         }
 
         initialized = true;
@@ -2350,7 +2350,7 @@ namespace cryptonote
 
             if (blockTemplate.previousBlockHash != previousBlockHash)
             {
-                logger(Logging::ERROR) << "Corrupted blockchain. Block with index " << i << " and hash " << cachedBlock.getBlockHash()
+                logger(logging::ERROR) << "Corrupted blockchain. Block with index " << i << " and hash " << cachedBlock.getBlockHash()
                                        << " has previous block hash " << blockTemplate.previousBlockHash << ", but parent has hash " << previousBlockHash
                                        << ". Resynchronize your daemon please.";
                 throw std::system_error(make_error_code(error::CoreErrorCode::CORRUPTED_BLOCKCHAIN));
@@ -2362,7 +2362,7 @@ namespace cryptonote
             uint64_t cumulativeSize = 0;
             if (!extractTransactions(rawBlock.transactions, transactions, cumulativeSize))
             {
-                logger(Logging::ERROR) << "Couldn't deserialize raw block transactions in block " << cachedBlock.getBlockHash();
+                logger(logging::ERROR) << "Couldn't deserialize raw block transactions in block " << cachedBlock.getBlockHash();
                 throw std::system_error(make_error_code(error::AddBlockErrorCode::DESERIALIZATION_FAILED));
             }
 
@@ -2378,7 +2378,7 @@ namespace cryptonote
 
             if (i % 1000 == 0)
             {
-                logger(Logging::INFO) << "Imported block with index " << i << " / " << (blockCount - 1);
+                logger(logging::INFO) << "Imported block with index " << i << " / " << (blockCount - 1);
             }
         }
     }
@@ -2390,7 +2390,7 @@ namespace cryptonote
             return;
         }
 
-        logger(Logging::INFO) << "Cutting root segment from index " << startIndex;
+        logger(logging::INFO) << "Cutting root segment from index " << startIndex;
         auto childCache = segment.split(startIndex);
         segment.deleteChild(childCache.get());
     }
@@ -2710,7 +2710,7 @@ namespace cryptonote
 
         if (transaction.extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
         {
-            logger(Logging::TRACE) << "Not adding transaction "
+            logger(logging::TRACE) << "Not adding transaction "
                                    << cachedTransaction.getTransactionHash()
                                    << " to block template, extra too large.";
             return false;
@@ -2720,7 +2720,7 @@ namespace cryptonote
 
         if (!success)
         {
-            logger(Logging::TRACE) << "Not adding transaction "
+            logger(logging::TRACE) << "Not adding transaction "
                                    << cachedTransaction.getTransactionHash()
                                    << " to block template, " << error;
             return false;
@@ -2763,12 +2763,12 @@ namespace cryptonote
                 std::time_t currentTime = std::time(0);
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(transaction.getTransactionHash());
 
-                logger(Logging::DEBUGGING) << "Transaction age is "
+                logger(logging::DEBUGGING) << "Transaction age is "
                                            << transactionAge;
 
                 if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                 {
-                    logger(Logging::INFO) << "Removing.. ";
+                    logger(logging::INFO) << "Removing.. ";
                     transactionPool->removeTransaction(transaction.getTransactionHash());
                 }
 
@@ -2779,7 +2779,7 @@ namespace cryptonote
             {
                 block.transactionHashes.emplace_back(transaction.getTransactionHash());
                 transactionsSize += transactionBlobSize;
-                logger(Logging::TRACE) << "Fusion transaction " << transaction.getTransactionHash() << " included to block template";
+                logger(logging::TRACE) << "Fusion transaction " << transaction.getTransactionHash() << " included to block template";
             }
         }
 
@@ -2797,12 +2797,12 @@ namespace cryptonote
                 std::time_t currentTime = std::time(0);
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
 
-                logger(Logging::INFO) << "Transaction age is "
+                logger(logging::INFO) << "Transaction age is "
                                       << transactionAge;
 
                 if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                 {
-                    logger(Logging::INFO) << "Removing.. ";
+                    logger(logging::INFO) << "Removing.. ";
 
                     transactionPool->removeTransaction(cachedTransaction.getTransactionHash());
                 }
@@ -2815,11 +2815,11 @@ namespace cryptonote
                 transactionsSize += cachedTransaction.getTransactionBinaryArray().size();
                 fee += cachedTransaction.getTransactionFee();
                 block.transactionHashes.emplace_back(cachedTransaction.getTransactionHash());
-                logger(Logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " included to block template";
+                logger(logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " included to block template";
             }
             else
             {
-                logger(Logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " is failed to include to block template";
+                logger(logging::TRACE) << "Transaction " << cachedTransaction.getTransactionHash() << " is failed to include to block template";
             }
         }
     }
@@ -2928,14 +2928,14 @@ namespace cryptonote
             BlockTemplate block;
             if (!fromBinaryArray(block, info.rawBlock.block))
             {
-                logger(Logging::WARNING) << "mergeSegments error: Couldn't deserialize block";
+                logger(logging::WARNING) << "mergeSegments error: Couldn't deserialize block";
                 throw std::runtime_error("Couldn't deserialize block");
             }
 
             std::vector<CachedTransaction> transactions;
             if (!Utils::restoreCachedTransactions(info.rawBlock.transactions, transactions))
             {
-                logger(Logging::WARNING) << "mergeSegments error: Couldn't deserialize transactions";
+                logger(logging::WARNING) << "mergeSegments error: Couldn't deserialize transactions";
                 throw std::runtime_error("Couldn't deserialize transactions");
             }
 
@@ -3205,14 +3205,14 @@ namespace cryptonote
     {
         throwIfNotInitialized();
 
-        logger(Logging::DEBUGGING) << "getBlockHashesByTimestamps request with timestamp "
+        logger(logging::DEBUGGING) << "getBlockHashesByTimestamps request with timestamp "
                                    << timestampBegin << " and seconds count " << secondsCount;
 
         auto mainChain = chainsLeaves[0];
 
         if (timestampBegin + static_cast<uint64_t>(secondsCount) < timestampBegin)
         {
-            logger(Logging::WARNING) << "Timestamp overflow occured. Timestamp begin: " << timestampBegin
+            logger(logging::WARNING) << "Timestamp overflow occured. Timestamp begin: " << timestampBegin
                                      << ", timestamp end: " << (timestampBegin + static_cast<uint64_t>(secondsCount));
 
             throw std::runtime_error("Timestamp overflow");
@@ -3225,7 +3225,7 @@ namespace cryptonote
     {
         throwIfNotInitialized();
 
-        logger(Logging::DEBUGGING) << "getTransactionHashesByPaymentId request with paymentId " << paymentId;
+        logger(logging::DEBUGGING) << "getTransactionHashesByPaymentId request with paymentId " << paymentId;
 
         auto mainChain = chainsLeaves[0];
 
@@ -3300,22 +3300,22 @@ namespace cryptonote
             {
                 timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
 
-                logger(Logging::INFO) << "Running pool transaction cleaning sequence... ";
+                logger(logging::INFO) << "Running pool transaction cleaning sequence... ";
 
                 auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
 
-                logger(Logging::INFO) << "Pool transaction cleaning sequence, done... ";
+                logger(logging::INFO) << "Pool transaction cleaning sequence, done... ";
 
                 notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
             }
         }
         catch (syst::InterruptedException &)
         {
-            logger(Logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
+            logger(logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
         }
         catch (std::exception &e)
         {
-            logger(Logging::INFO) << "Error occurred while cleaning transactions pool: " << e.what();
+            logger(logging::INFO) << "Error occurred while cleaning transactions pool: " << e.what();
         }
     }
 

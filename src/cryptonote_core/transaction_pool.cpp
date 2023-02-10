@@ -62,7 +62,7 @@ namespace cryptonote
         return std::hash<Crypto::Hash>{}(*paymentId);
     }
 
-    TransactionPool::TransactionPool(std::shared_ptr<Logging::ILogger> logger) : transactionHashIndex(transactions.get<TransactionHashTag>()),
+    TransactionPool::TransactionPool(std::shared_ptr<logging::ILogger> logger) : transactionHashIndex(transactions.get<TransactionHashTag>()),
                                                                                  transactionCostIndex(transactions.get<TransactionCostTag>()),
                                                                                  paymentIdIndex(transactions.get<PaymentIdTag>()),
                                                                                  logger(logger, "TransactionPool")
@@ -81,19 +81,19 @@ namespace cryptonote
 
         if (transactionHashIndex.count(pendingTx.getTransactionHash()) > 0)
         {
-            logger(Logging::DEBUGGING) << "pushTransaction: transaction hash already present in index";
+            logger(logging::DEBUGGING) << "pushTransaction: transaction hash already present in index";
             return false;
         }
 
         if (hasIntersections(poolState, transactionState))
         {
-            logger(Logging::DEBUGGING) << "pushTransaction: failed to merge states, some keys already used";
+            logger(logging::DEBUGGING) << "pushTransaction: failed to merge states, some keys already used";
             return false;
         }
 
         mergeStates(poolState, transactionState);
 
-        logger(Logging::DEBUGGING) << "pushed transaction " << pendingTx.getTransactionHash() << " to pool";
+        logger(logging::DEBUGGING) << "pushed transaction " << pendingTx.getTransactionHash() << " to pool";
         return transactionHashIndex.insert(std::move(pendingTx)).second;
     }
 
@@ -110,14 +110,14 @@ namespace cryptonote
         auto it = transactionHashIndex.find(hash);
         if (it == transactionHashIndex.end())
         {
-            logger(Logging::DEBUGGING) << "removeTransaction: transaction not found";
+            logger(logging::DEBUGGING) << "removeTransaction: transaction not found";
             return false;
         }
 
         excludeFromState(poolState, it->cachedTransaction);
         transactionHashIndex.erase(it);
 
-        logger(Logging::DEBUGGING) << "transaction " << hash << " removed from pool";
+        logger(logging::DEBUGGING) << "transaction " << hash << " removed from pool";
         return true;
     }
 

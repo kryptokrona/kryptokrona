@@ -100,9 +100,9 @@ namespace PaymentService
             throw std::runtime_error("It's impossible to use both --register-service and --unregister-service at the same time");
         }
 
-        if (serviceConfig.logLevel > Logging::TRACE)
+        if (serviceConfig.logLevel > logging::TRACE)
         {
-            throw std::runtime_error("log-level must be between " + std::to_string(Logging::FATAL) + ".." + std::to_string(Logging::TRACE));
+            throw std::runtime_error("log-level must be between " + std::to_string(logging::FATAL) + ".." + std::to_string(logging::TRACE));
         }
 
         if (serviceConfig.containerFile.empty())

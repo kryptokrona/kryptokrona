@@ -39,7 +39,7 @@ namespace cryptonote
     class NodeRpcProxy : public cryptonote::INode
     {
     public:
-        NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<Logging::ILogger> logger);
+        NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<logging::ILogger> logger);
         NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout);
         virtual ~NodeRpcProxy();
 
@@ -157,7 +157,7 @@ namespace cryptonote
         };
 
     private:
-        Logging::LoggerRef m_logger;
+        logging::LoggerRef m_logger;
         State m_state = STATE_NOT_INITIALIZED;
         mutable std::mutex m_mutex;
         std::condition_variable m_cv_initialized;

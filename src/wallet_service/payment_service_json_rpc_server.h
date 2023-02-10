@@ -22,7 +22,7 @@ namespace PaymentService
     class PaymentServiceJsonRpcServer : public cryptonote::JsonRpcServer
     {
     public:
-        PaymentServiceJsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, WalletService &service, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config);
+        PaymentServiceJsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, WalletService &service, std::shared_ptr<logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config);
         PaymentServiceJsonRpcServer(const PaymentServiceJsonRpcServer &) = delete;
 
     protected:
@@ -30,7 +30,7 @@ namespace PaymentService
 
     private:
         WalletService &service;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
 
         typedef std::function<void(const common::JsonValue &jsonRpcParams, common::JsonValue &jsonResponse)> HandlerFunction;
 

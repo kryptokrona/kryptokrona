@@ -27,7 +27,7 @@ namespace cryptonote
     class TransfersConsumer : public IObservableImpl<IBlockchainConsumerObserver, IBlockchainConsumer>
     {
     public:
-        TransfersConsumer(const cryptonote::Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, const Crypto::SecretKey &viewSecret);
+        TransfersConsumer(const cryptonote::Currency &currency, INode &node, std::shared_ptr<logging::ILogger> logger, const Crypto::SecretKey &viewSecret);
 
         ITransfersSubscription &addSubscription(const AccountSubscription &subscription);
         // returns true if no subscribers left
@@ -83,7 +83,7 @@ namespace cryptonote
 
         INode &m_node;
         const cryptonote::Currency &m_currency;
-        Logging::LoggerRef m_logger;
+        logging::LoggerRef m_logger;
     };
 
 }

@@ -509,7 +509,7 @@ namespace cryptonote
         uint64_t timestamp;
     };
 
-    DatabaseBlockchainCache::DatabaseBlockchainCache(const Currency &curr, IDataBase &dataBase, IBlockchainCacheFactory &blockchainCacheFactory, std::shared_ptr<Logging::ILogger> _logger)
+    DatabaseBlockchainCache::DatabaseBlockchainCache(const Currency &curr, IDataBase &dataBase, IBlockchainCacheFactory &blockchainCacheFactory, std::shared_ptr<logging::ILogger> _logger)
         : currency(curr), database(dataBase), blockchainCacheFactory(blockchainCacheFactory), logger(_logger, "DatabaseBlockchainCache")
     {
         DatabaseVersionReadBatch readBatch;
@@ -522,7 +522,7 @@ namespace cryptonote
         auto version = readBatch.getDbSchemeVersion();
         if (!version)
         {
-            logger(Logging::DEBUGGING) << "DB scheme version not found, writing: " << CURRENT_DB_SCHEME_VERSION;
+            logger(logging::DEBUGGING) << "DB scheme version not found, writing: " << CURRENT_DB_SCHEME_VERSION;
 
             DatabaseVersionWriteBatch writeBatch(CURRENT_DB_SCHEME_VERSION);
             auto writeError = database.write(writeBatch);
@@ -533,19 +533,19 @@ namespace cryptonote
         }
         else
         {
-            logger(Logging::DEBUGGING) << "Current db scheme version: " << *version;
+            logger(logging::DEBUGGING) << "Current db scheme version: " << *version;
         }
 
         if (getTopBlockIndex() == 0)
         {
-            logger(Logging::DEBUGGING) << "top block index is nill, add genesis block";
+            logger(logging::DEBUGGING) << "top block index is nill, add genesis block";
             addGenesisBlock(CachedBlock(currency.genesisBlock()));
         }
     }
 
-    bool DatabaseBlockchainCache::checkDBSchemeVersion(IDataBase &database, std::shared_ptr<Logging::ILogger> _logger)
+    bool DatabaseBlockchainCache::checkDBSchemeVersion(IDataBase &database, std::shared_ptr<logging::ILogger> _logger)
     {
-        Logging::LoggerRef logger(_logger, "DatabaseBlockchainCache");
+        logging::LoggerRef logger(_logger, "DatabaseBlockchainCache");
 
         DatabaseVersionReadBatch readBatch;
         auto ec = database.read(readBatch);
@@ -562,12 +562,12 @@ namespace cryptonote
         }
         else if (*version < CURRENT_DB_SCHEME_VERSION)
         {
-            logger(Logging::WARNING) << "DB scheme version is less than expected. Expected version " << CURRENT_DB_SCHEME_VERSION << ". Actual version " << *version << ". DB will be destroyed and recreated from blocks.bin file.";
+            logger(logging::WARNING) << "DB scheme version is less than expected. Expected version " << CURRENT_DB_SCHEME_VERSION << ". Actual version " << *version << ". DB will be destroyed and recreated from blocks.bin file.";
             return false;
         }
         else if (*version > CURRENT_DB_SCHEME_VERSION)
         {
-            logger(Logging::ERROR) << "DB scheme version is greater than expected. Expected version " << CURRENT_DB_SCHEME_VERSION << ". Actual version " << *version << ". Please update your software.";
+            logger(logging::ERROR) << "DB scheme version is greater than expected. Expected version " << CURRENT_DB_SCHEME_VERSION << ". Actual version " << *version << ". Please update your software.";
             throw std::runtime_error("DB scheme version is greater than expected");
         }
         else
@@ -586,7 +586,7 @@ namespace cryptonote
         auto timestampResult = requestClosestBlockIndexByTimestamp(midnight, database);
         if (!timestampResult.second)
         {
-            logger(Logging::ERROR) << "deleteClosestTimestampBlockIndex error: get closest timestamp block index, database read failed";
+            logger(logging::ERROR) << "deleteClosestTimestampBlockIndex error: get closest timestamp block index, database read failed";
             throw std::runtime_error("Couldn't get closest timestamp block index");
         }
 
@@ -607,7 +607,7 @@ namespace cryptonote
             midnight += ONE_DAY_SECONDS;
         }
 
-        logger(Logging::TRACE) << "deleted closest timestamp";
+        logger(logging::TRACE) << "deleted closest timestamp";
     }
 
     /*
@@ -617,7 +617,7 @@ namespace cryptonote
     std::unique_ptr<IBlockchainCache> DatabaseBlockchainCache::split(uint32_t splitBlockIndex)
     {
         assert(splitBlockIndex <= getTopBlockIndex());
-        logger(Logging::DEBUGGING) << "split at index " << splitBlockIndex << " started, top block index: " << getTopBlockIndex();
+        logger(logging::DEBUGGING) << "split at index " << splitBlockIndex << " started, top block index: " << getTopBlockIndex();
 
         auto cache = blockchainCacheFactory.createBlockchainCache(currency, this, splitBlockIndex);
 
@@ -631,7 +631,7 @@ namespace cryptonote
             ExtendedPushedBlockInfo extendedInfo = getExtendedPushedBlockInfo(blockIndex);
 
             auto validatorState = extendedInfo.pushedBlockInfo.validatorState;
-            logger(Logging::DEBUGGING) << "pushing block " << blockIndex << " to child segment";
+            logger(logging::DEBUGGING) << "pushing block " << blockIndex << " to child segment";
             auto blockHash = pushBlockToAnotherCache(*cache, std::move(extendedInfo.pushedBlockInfo));
 
             deletingBlocks.emplace_back(blockIndex, blockHash, validatorState, extendedInfo.timestamp);
@@ -658,7 +658,7 @@ namespace cryptonote
         std::vector<ExtendedTransactionInfo> extendedTransactions;
         if (!requestExtendedTransactionInfos(deletingTransactionHashes, database, extendedTransactions))
         {
-            logger(Logging::ERROR) << "Error while split: failed to request extended transaction info";
+            logger(logging::ERROR) << "Error while split: failed to request extended transaction info";
             throw std::runtime_error("failed to request extended transaction info"); // TODO: make error codes
         }
 
@@ -674,26 +674,26 @@ namespace cryptonote
 
         deleteClosestTimestampBlockIndex(writeBatch, splitBlockIndex);
 
-        logger(Logging::DEBUGGING) << "Performing delete operations";
+        logger(logging::DEBUGGING) << "Performing delete operations";
         // all data and indexes are now copied, no errors detected, can now erase data from database
         auto err = database.write(writeBatch);
         if (err)
         {
-            logger(Logging::ERROR) << "split write failed, " << err.message();
+            logger(logging::ERROR) << "split write failed, " << err.message();
             throw std::runtime_error(err.message());
         }
 
         cutTail(unitsCache, currentTop + 1 - splitBlockIndex);
 
         children.push_back(cache.get());
-        logger(Logging::TRACE) << "Delete successfull";
+        logger(logging::TRACE) << "Delete successfull";
 
         // invalidate top block index and hash
         topBlockIndex = boost::none;
         topBlockHash = boost::none;
         transactionsCount = boost::none;
 
-        logger(Logging::DEBUGGING) << "split completed";
+        logger(logging::DEBUGGING) << "split completed";
         // return new cache
         return cache;
     }
@@ -729,7 +729,7 @@ namespace cryptonote
 
     std::vector<Crypto::Hash> DatabaseBlockchainCache::requestTransactionHashesFromBlockIndex(uint32_t splitBlockIndex)
     {
-        logger(Logging::DEBUGGING) << "Requesting transaction hashes starting from block index " << splitBlockIndex;
+        logger(logging::DEBUGGING) << "Requesting transaction hashes starting from block index " << splitBlockIndex;
 
         BlockchainReadBatch readBatch;
         for (uint32_t blockIndex = splitBlockIndex; blockIndex <= getTopBlockIndex(); ++blockIndex)
@@ -788,13 +788,13 @@ namespace cryptonote
         assert(count > 0);
         assert(count >= toDelete);
 
-        logger(Logging::DEBUGGING) << "Deleting last " << toDelete << " transaction hashes of payment id " << paymentId;
+        logger(logging::DEBUGGING) << "Deleting last " << toDelete << " transaction hashes of payment id " << paymentId;
         writeBatch.removePaymentId(paymentId, static_cast<uint32_t>(count - toDelete));
     }
 
     void DatabaseBlockchainCache::requestDeleteSpentOutputs(BlockchainWriteBatch &writeBatch, uint32_t blockIndex, const TransactionValidatorState &spentOutputs)
     {
-        logger(Logging::DEBUGGING) << "Deleting spent outputs for block index " << blockIndex;
+        logger(logging::DEBUGGING) << "Deleting spent outputs for block index " << blockIndex;
 
         std::vector<Crypto::KeyImage> spentKeys(spentOutputs.spentKeyImages.begin(), spentOutputs.spentKeyImages.end());
 
@@ -807,7 +807,7 @@ namespace cryptonote
         if (boundaries.empty())
         {
             // hardly possible
-            logger(Logging::DEBUGGING) << "No key output amounts...";
+            logger(logging::DEBUGGING) << "No key output amounts...";
             return;
         }
 
@@ -830,7 +830,7 @@ namespace cryptonote
     void DatabaseBlockchainCache::requestDeleteKeyOutputsAmount(BlockchainWriteBatch &writeBatch, IBlockchainCache::Amount amount,
                                                                 IBlockchainCache::GlobalOutputIndex boundary, uint32_t outputsCount)
     {
-        logger(Logging::DEBUGGING) << "Requesting delete for key output amount " << amount << " starting from global index " << boundary << " to " << (outputsCount - 1);
+        logger(logging::DEBUGGING) << "Requesting delete for key output amount " << amount << " starting from global index " << boundary << " to " << (outputsCount - 1);
 
         writeBatch.removeKeyOutputGlobalIndexes(amount, outputsCount - boundary, boundary);
         for (GlobalOutputIndex index = boundary; index < outputsCount; ++index)
@@ -857,12 +857,12 @@ namespace cryptonote
 
         if (indexes.empty())
         {
-            logger(Logging::DEBUGGING) << "Deleting timestamp " << timestamp;
+            logger(logging::DEBUGGING) << "Deleting timestamp " << timestamp;
             batch.removeTimestamp(timestamp);
         }
         else
         {
-            logger(Logging::DEBUGGING) << "Deleting block hash " << blockHash << " from timestamp " << timestamp;
+            logger(logging::DEBUGGING) << "Deleting block hash " << blockHash << " from timestamp " << timestamp;
             batch.insertTimestamp(timestamp, indexes);
         }
     }
@@ -873,7 +873,7 @@ namespace cryptonote
                                                   BlockchainWriteBatch &batch)
     {
 
-        logger(Logging::DEBUGGING) << "push transaction with hash " << cachedTransaction.getTransactionHash();
+        logger(logging::DEBUGGING) << "push transaction with hash " << cachedTransaction.getTransactionHash();
         const auto &tx = cachedTransaction.getTransaction();
 
         ExtendedTransactionInfo transactionCacheInfo;
@@ -945,7 +945,7 @@ namespace cryptonote
 
         batch.insertCachedTransaction(transactionCacheInfo, getCachedTransactionsCount() + 1);
         transactionsCount = *transactionsCount + 1;
-        logger(Logging::DEBUGGING) << "push transaction with hash " << cachedTransaction.getTransactionHash() << " finished";
+        logger(logging::DEBUGGING) << "push transaction with hash " << cachedTransaction.getTransactionHash() << " finished";
     }
 
     uint32_t DatabaseBlockchainCache::updateKeyOutputCount(Amount amount, int32_t diff) const
@@ -953,14 +953,14 @@ namespace cryptonote
         auto it = keyOutputCountsForAmounts.find(amount);
         if (it == keyOutputCountsForAmounts.end())
         {
-            logger(Logging::TRACE) << "updateKeyOutputCount: failed to found key for amount, request database";
+            logger(logging::TRACE) << "updateKeyOutputCount: failed to found key for amount, request database";
 
             BlockchainReadBatch batch;
             auto result = readDatabase(batch.requestKeyOutputGlobalIndexesCountForAmount(amount));
             auto found = result.getKeyOutputGlobalIndexesCountForAmounts().find(amount);
             auto val = found != result.getKeyOutputGlobalIndexesCountForAmounts().end() ? found->second : 0;
             it = keyOutputCountsForAmounts.insert({amount, val}).first;
-            logger(Logging::TRACE) << "updateKeyOutputCount: database replied: amount " << amount << " value " << val;
+            logger(logging::TRACE) << "updateKeyOutputCount: database replied: amount " << amount << " value " << val;
 
             if (val == 0)
             {
@@ -1024,7 +1024,7 @@ namespace cryptonote
                                             uint64_t generatedCoins, uint64_t blockDifficulty, RawBlock &&rawBlock)
     {
         BlockchainWriteBatch batch;
-        logger(Logging::DEBUGGING) << "push block with hash " << cachedBlock.getBlockHash() << ", and "
+        logger(logging::DEBUGGING) << "push block with hash " << cachedBlock.getBlockHash() << ", and "
                                    << cachedTransactions.size() + 1 << " transactions"; //+1 for base transaction
 
         // TODO: cache top block difficulty, size, timestamp, coins; use it here
@@ -1064,7 +1064,7 @@ namespace cryptonote
         auto closestBlockIndexDb = requestClosestBlockIndexByTimestamp(roundToMidnight(cachedBlock.getBlock().timestamp), database);
         if (!closestBlockIndexDb.second)
         {
-            logger(Logging::ERROR) << "push block " << cachedBlock.getBlockHash() << " request closest block index by timestamp failed";
+            logger(logging::ERROR) << "push block " << cachedBlock.getBlockHash() << " request closest block index by timestamp failed";
             throw std::runtime_error("Couldn't get closest to timestamp block index");
         }
 
@@ -1078,13 +1078,13 @@ namespace cryptonote
         auto res = database.write(batch);
         if (res)
         {
-            logger(Logging::ERROR) << "push block " << cachedBlock.getBlockHash() << " write failed: " << res.message();
+            logger(logging::ERROR) << "push block " << cachedBlock.getBlockHash() << " write failed: " << res.message();
             throw std::runtime_error(res.message());
         }
 
         topBlockIndex = *topBlockIndex + 1;
         topBlockHash = cachedBlock.getBlockHash();
-        logger(Logging::DEBUGGING) << "push block " << cachedBlock.getBlockHash() << " completed";
+        logger(logging::DEBUGGING) << "push block " << cachedBlock.getBlockHash() << " completed";
 
         unitsCache.push_back(blockInfo);
         if (unitsCache.size() > unitsCacheSize)
@@ -1104,7 +1104,7 @@ namespace cryptonote
         auto res = database.read(batch);
         if (res)
         {
-            logger(Logging::ERROR) << "checkIfSpent failed, request to database failed: " << res.message();
+            logger(logging::ERROR) << "checkIfSpent failed, request to database failed: " << res.message();
             return false;
         }
 
@@ -1152,7 +1152,7 @@ namespace cryptonote
         return extractKeyOutputs(amount, blockIndex, globalIndexes, [this, &publicKeys, blockIndex](const CachedTransactionInfo &info, PackedOutIndex index, uint32_t globalIndex)
                                  {
     if (!isTransactionSpendTimeUnlocked(info.unlockTime, blockIndex)) {
-      logger(Logging::DEBUGGING) << "extractKeyOutputKeys: output " << globalIndex << " is locked";
+      logger(logging::DEBUGGING) << "extractKeyOutputKeys: output " << globalIndex << " is locked";
       return ExtractOutputKeysResult::OUTPUT_LOCKED;
     }
 
@@ -1169,7 +1169,7 @@ namespace cryptonote
     {
         if (!requestPackedOutputs(amount, globalIndexes, database, outIndexes))
         {
-            logger(Logging::ERROR) << "extractKeyOtputIndexes failed: failed to read database";
+            logger(logging::ERROR) << "extractKeyOtputIndexes failed: failed to read database";
             return ExtractOutputKeysResult::INVALID_GLOBAL_INDEX;
         }
 
@@ -1196,14 +1196,14 @@ namespace cryptonote
 
             if (result)
             {
-                logger(Logging::ERROR) << "Failed to read top block index from database";
+                logger(logging::ERROR) << "Failed to read top block index from database";
                 throw std::system_error(result);
             }
 
             auto readResult = batch.extractResult();
             if (!readResult.getLastBlockIndex().second)
             {
-                logger(Logging::TRACE) << "Top block index does not exist in database";
+                logger(logging::TRACE) << "Top block index does not exist in database";
                 topBlockIndex = 0;
             }
 
@@ -1232,14 +1232,14 @@ namespace cryptonote
 
             if (result)
             {
-                logger(Logging::ERROR) << "Failed to read transactions count from database";
+                logger(logging::ERROR) << "Failed to read transactions count from database";
                 throw std::system_error(result);
             }
 
             auto readResult = batch.extractResult();
             if (!readResult.getTransactionsCount().second)
             {
-                logger(Logging::TRACE) << "Transactions count does not exist in database";
+                logger(logging::TRACE) << "Transactions count does not exist in database";
                 transactionsCount = 0;
             }
             else
@@ -1571,7 +1571,7 @@ namespace cryptonote
                                    { return output.blockIndex < blockIndex; });
 
         size_t result = static_cast<size_t>(std::distance(begin, it));
-        logger(Logging::DEBUGGING) << "Key outputs count for amount " << amount << " is " << result << " by block index " << blockIndex;
+        logger(logging::DEBUGGING) << "Key outputs count for amount " << amount << " is " << result << " by block index " << blockIndex;
 
         return result;
     }
@@ -1585,7 +1585,7 @@ namespace cryptonote
         /* Failed to read from DB */
         if (!success)
         {
-            logger(Logging::DEBUGGING) << "getTimestampLowerBoundBlockIndex failed: failed to read database";
+            logger(logging::DEBUGGING) << "getTimestampLowerBoundBlockIndex failed: failed to read database";
             throw std::runtime_error("Couldn't get closest to timestamp block index");
         }
 
@@ -1607,7 +1607,7 @@ namespace cryptonote
             auto dbRes = requestClosestBlockIndexByTimestamp(midnight, database);
             if (!dbRes.second)
             {
-                logger(Logging::DEBUGGING) << "getTimestampLowerBoundBlockIndex failed: failed to read database";
+                logger(logging::DEBUGGING) << "getTimestampLowerBoundBlockIndex failed: failed to read database";
                 throw std::runtime_error("Couldn't get closest to timestamp block index");
             }
 
@@ -1630,7 +1630,7 @@ namespace cryptonote
         auto result = database.read(batch);
         if (result)
         {
-            logger(Logging::DEBUGGING) << "getTransactionGlobalIndexes failed: failed to read database";
+            logger(logging::DEBUGGING) << "getTransactionGlobalIndexes failed: failed to read database";
             return false;
         }
 
@@ -1638,7 +1638,7 @@ namespace cryptonote
         auto it = readResult.getCachedTransactions().find(transactionHash);
         if (it == readResult.getCachedTransactions().end())
         {
-            logger(Logging::DEBUGGING) << "getTransactionGlobalIndexes failed: cached transaction for hash " << transactionHash << " not present";
+            logger(logging::DEBUGGING) << "getTransactionGlobalIndexes failed: cached transaction for hash " << transactionHash << " not present";
             return false;
         }
 
@@ -1715,7 +1715,7 @@ namespace cryptonote
             auto transactionIt = hashesMap.find(hash);
             if (transactionIt == hashesMap.end())
             {
-                logger(Logging::DEBUGGING) << "detected missing transaction for hash " << hash << " in getRawTransaction";
+                logger(logging::DEBUGGING) << "detected missing transaction for hash " << hash << " in getRawTransaction";
                 missedTransactions.push_back(hash);
                 continue;
             }
@@ -1723,7 +1723,7 @@ namespace cryptonote
             auto blockIt = blocksMap.find(transactionIt->second.blockIndex);
             if (blockIt == blocksMap.end())
             {
-                logger(Logging::DEBUGGING) << "detected missing transaction for hash " << hash << " in getRawTransaction";
+                logger(logging::DEBUGGING) << "detected missing transaction for hash " << hash << " in getRawTransaction";
                 missedTransactions.push_back(hash);
                 continue;
             }
@@ -1786,21 +1786,21 @@ namespace cryptonote
             }
             catch (const SequenceEnded &)
             {
-                logger(Logging::TRACE) << "getRandomOutsByAmount: generator reached sequence end";
+                logger(logging::TRACE) << "getRandomOutsByAmount: generator reached sequence end";
                 return resultOuts;
             }
 
             std::vector<PackedOutIndex> outputs;
             if (extractKeyOtputIndexes(amount, common::ArrayView<uint32_t>(globalIndexes.data(), globalIndexes.size()), outputs) != ExtractOutputKeysResult::SUCCESS)
             {
-                logger(Logging::DEBUGGING) << "getRandomOutsByAmount: failed to extract key output indexes";
+                logger(logging::DEBUGGING) << "getRandomOutsByAmount: failed to extract key output indexes";
                 throw std::runtime_error("Invalid output index"); // TODO: make error code
             }
 
             std::vector<ExtendedTransactionInfo> transactions;
             if (!requestExtendedTransactionInfos(outputs, database, transactions))
             {
-                logger(Logging::TRACE) << "getRandomOutsByAmount: requestExtendedTransactionInfos failed";
+                logger(logging::TRACE) << "getRandomOutsByAmount: requestExtendedTransactionInfos failed";
                 throw std::runtime_error("Error while requesting transactions"); // TODO: make error code
             }
 
@@ -1855,7 +1855,7 @@ namespace cryptonote
             auto ret = callback(tx, fakePoi, kv.first.second);
             if (ret != ExtractOutputKeysResult::SUCCESS)
             {
-                logger(Logging::DEBUGGING) << "extractKeyOutputs failed : callback returned error";
+                logger(logging::DEBUGGING) << "extractKeyOutputs failed : callback returned error";
                 return ret;
             }
         }
@@ -2012,7 +2012,7 @@ namespace cryptonote
         auto result = database.read(batch);
         if (result)
         {
-            logger(Logging::ERROR) << "failed to read database, error is " << result.message();
+            logger(logging::ERROR) << "failed to read database, error is " << result.message();
             throw std::runtime_error(result.message());
         }
 
@@ -2049,7 +2049,7 @@ namespace cryptonote
         auto res = database.write(batch);
         if (res)
         {
-            logger(Logging::ERROR) << "addGenesisBlock failed: failed to write to database, " << res.message();
+            logger(logging::ERROR) << "addGenesisBlock failed: failed to write to database, " << res.message();
             throw std::runtime_error(res.message());
         }
 

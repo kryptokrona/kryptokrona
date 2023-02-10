@@ -162,7 +162,7 @@ namespace cryptonote
     class TransfersContainer : public ITransfersContainer
     {
     public:
-        TransfersContainer(const cryptonote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, size_t transactionSpendableAge);
+        TransfersContainer(const cryptonote::Currency &currency, std::shared_ptr<logging::ILogger> logger, size_t transactionSpendableAge);
 
         bool addTransaction(const TransactionBlockInfo &block, const ITransactionReader &tx, const std::vector<TransactionOutputInformationIn> &transfers);
         bool deleteUnconfirmedTransaction(const Crypto::Hash &transactionHash);
@@ -287,7 +287,7 @@ namespace cryptonote
         size_t m_transactionSpendableAge;
         const cryptonote::Currency &m_currency;
         mutable std::mutex m_mutex;
-        Logging::LoggerRef m_logger;
+        logging::LoggerRef m_logger;
     };
 
 }

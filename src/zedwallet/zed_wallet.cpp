@@ -36,13 +36,13 @@ int main(int argc, char **argv)
 
     std::cout << InformationMsg(cryptonote::getProjectCLIHeader()) << std::endl;
 
-    const auto logManager = std::make_shared<Logging::LoggerManager>();
+    const auto logManager = std::make_shared<logging::LoggerManager>();
 
     if (config.debug)
     {
-        logManager->setMaxLevel(Logging::DEBUGGING);
+        logManager->setMaxLevel(logging::DEBUGGING);
 
-        Logging::FileLogger fileLogger;
+        logging::FileLogger fileLogger;
 
         fileLogger.init(WalletConfig::walletName + ".log");
         logManager->addLogger(fileLogger);

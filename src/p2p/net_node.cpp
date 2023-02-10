@@ -58,7 +58,7 @@ namespace
         return (x * x * x) / (max_index * max_index); // parabola \/
     }
 
-    void addPortMapping(Logging::LoggerRef &logger, uint32_t port)
+    void addPortMapping(logging::LoggerRef &logger, uint32_t port)
     {
         // Add UPnP port mapping
         logger(INFO) << "Attempting to add IGD port mapping.";
@@ -199,7 +199,7 @@ namespace cryptonote
         return ret;
     }
 
-    NodeServer::NodeServer(syst::Dispatcher &dispatcher, cryptonote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log) : m_dispatcher(dispatcher),
+    NodeServer::NodeServer(syst::Dispatcher &dispatcher, cryptonote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<logging::ILogger> log) : m_dispatcher(dispatcher),
                                                                                                                                                             m_workingContextGroup(dispatcher),
                                                                                                                                                             m_payload_handler(payload_handler),
                                                                                                                                                             m_allow_local_ip(false),
@@ -583,7 +583,7 @@ namespace cryptonote
 
         if (!proto.invoke(COMMAND_HANDSHAKE::ID, arg, rsp))
         {
-            logger(Logging::DEBUGGING) << context << "A daemon on the network has departed. MSG: Failed to invoke COMMAND_HANDSHAKE, closing connection.";
+            logger(logging::DEBUGGING) << context << "A daemon on the network has departed. MSG: Failed to invoke COMMAND_HANDSHAKE, closing connection.";
             return false;
         }
 
@@ -591,24 +591,24 @@ namespace cryptonote
 
         if (rsp.node_data.network_id != m_network_id)
         {
-            logger(Logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, wrong network! (" << rsp.node_data.network_id << "), closing connection.";
+            logger(logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, wrong network! (" << rsp.node_data.network_id << "), closing connection.";
             return false;
         }
 
         if (rsp.node_data.version < cryptonote::P2P_MINIMUM_VERSION)
         {
-            logger(Logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(rsp.node_data.version) << "), closing connection.";
+            logger(logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(rsp.node_data.version) << "), closing connection.";
             return false;
         }
         else if ((rsp.node_data.version - cryptonote::P2P_CURRENT_VERSION) >= cryptonote::P2P_UPGRADE_WINDOW)
         {
-            logger(Logging::WARNING) << context << "COMMAND_HANDSHAKE Warning, your software may be out of date. Please visit: "
+            logger(logging::WARNING) << context << "COMMAND_HANDSHAKE Warning, your software may be out of date. Please visit: "
                                      << cryptonote::LATEST_VERSION_URL << " for the latest version.";
         }
 
         if (!handle_remote_peerlist(rsp.local_peerlist, rsp.node_data.local_time, context))
         {
-            logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE: failed to handle_remote_peerlist(...), closing connection.";
+            logger(logging::ERROR) << context << "COMMAND_HANDSHAKE: failed to handle_remote_peerlist(...), closing connection.";
             return false;
         }
 
@@ -619,7 +619,7 @@ namespace cryptonote
 
         if (!m_payload_handler.process_payload_sync_data(rsp.payload_data, context, true))
         {
-            logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE invoked, but process_payload_sync_data returned false, dropping connection.";
+            logger(logging::ERROR) << context << "COMMAND_HANDSHAKE invoked, but process_payload_sync_data returned false, dropping connection.";
             return false;
         }
 
@@ -628,11 +628,11 @@ namespace cryptonote
 
         if (rsp.node_data.peer_id == m_config.m_peer_id)
         {
-            logger(Logging::TRACE) << context << "Connection to self detected, dropping connection";
+            logger(logging::TRACE) << context << "Connection to self detected, dropping connection";
             return false;
         }
 
-        logger(Logging::DEBUGGING) << context << "COMMAND_HANDSHAKE INVOKED OK";
+        logger(logging::DEBUGGING) << context << "COMMAND_HANDSHAKE INVOKED OK";
         return true;
     }
 
@@ -663,7 +663,7 @@ namespace cryptonote
 
         if (!handle_remote_peerlist(rsp.local_peerlist, rsp.local_time, context))
         {
-            logger(Logging::ERROR) << context << "COMMAND_TIMED_SYNC: failed to handle_remote_peerlist(...), closing connection.";
+            logger(logging::ERROR) << context << "COMMAND_TIMED_SYNC: failed to handle_remote_peerlist(...), closing connection.";
             return false;
         }
 
@@ -798,7 +798,7 @@ namespace cryptonote
 
             if (just_take_peerlist)
             {
-                logger(Logging::DEBUGGING, Logging::BRIGHT_GREEN) << ctx << "CONNECTION HANDSHAKED OK AND CLOSED.";
+                logger(logging::DEBUGGING, logging::BRIGHT_GREEN) << ctx << "CONNECTION HANDSHAKED OK AND CLOSED.";
                 return true;
             }
 
@@ -1021,8 +1021,8 @@ namespace cryptonote
         std::list<PeerlistEntry> peerlist_ = peerlist;
         if (!fix_time_delta(peerlist_, local_time, delta))
             return false;
-        logger(Logging::TRACE) << context << "REMOTE PEERLIST: TIME_DELTA: " << delta << ", remote peerlist size=" << peerlist_.size();
-        logger(Logging::TRACE) << context << "REMOTE PEERLIST: " << print_peerlist_to_string(peerlist_);
+        logger(logging::TRACE) << context << "REMOTE PEERLIST: TIME_DELTA: " << delta << ", remote peerlist size=" << peerlist_.size();
+        logger(logging::TRACE) << context << "REMOTE PEERLIST: " << print_peerlist_to_string(peerlist_);
         return m_peerlist.merge_peerlist(peerlist_);
     }
     //-----------------------------------------------------------------------------------
@@ -1216,7 +1216,7 @@ namespace cryptonote
     {
         if (!m_payload_handler.process_payload_sync_data(arg.payload_data, context, false))
         {
-            logger(Logging::ERROR) << context << "Failed to process_payload_sync_data(), dropping connection";
+            logger(logging::ERROR) << context << "Failed to process_payload_sync_data(), dropping connection";
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
         }
@@ -1225,7 +1225,7 @@ namespace cryptonote
         rsp.local_time = time(NULL);
         m_peerlist.get_peerlist_head(rsp.local_peerlist);
         m_payload_handler.get_payload_sync_data(rsp.payload_data);
-        logger(Logging::TRACE) << context << "COMMAND_TIMED_SYNC";
+        logger(logging::TRACE) << context << "COMMAND_TIMED_SYNC";
         return 1;
     }
     //-----------------------------------------------------------------------------------
@@ -1236,40 +1236,40 @@ namespace cryptonote
 
         if (arg.node_data.network_id != m_network_id)
         {
-            logger(Logging::DEBUGGING) << context << "WRONG NETWORK AGENT CONNECTED! id=" << arg.node_data.network_id;
+            logger(logging::DEBUGGING) << context << "WRONG NETWORK AGENT CONNECTED! id=" << arg.node_data.network_id;
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
         }
 
         if (arg.node_data.version < cryptonote::P2P_MINIMUM_VERSION)
         {
-            logger(Logging::DEBUGGING) << context << "UNSUPPORTED NETWORK AGENT VERSION CONNECTED! version=" << std::to_string(arg.node_data.version);
+            logger(logging::DEBUGGING) << context << "UNSUPPORTED NETWORK AGENT VERSION CONNECTED! version=" << std::to_string(arg.node_data.version);
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
         }
         else if (arg.node_data.version > cryptonote::P2P_CURRENT_VERSION)
         {
-            logger(Logging::WARNING) << context << "Our software may be out of date. Please visit: "
+            logger(logging::WARNING) << context << "Our software may be out of date. Please visit: "
                                      << cryptonote::LATEST_VERSION_URL << " for the latest version.";
         }
 
         if (!context.m_is_income)
         {
-            logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE came not from incoming connection";
+            logger(logging::ERROR) << context << "COMMAND_HANDSHAKE came not from incoming connection";
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
         }
 
         if (context.peerId)
         {
-            logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE came, but seems that connection already have associated peer_id (double COMMAND_HANDSHAKE?)";
+            logger(logging::ERROR) << context << "COMMAND_HANDSHAKE came, but seems that connection already have associated peer_id (double COMMAND_HANDSHAKE?)";
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
         }
 
         if (!m_payload_handler.process_payload_sync_data(arg.payload_data, context, true))
         {
-            logger(Logging::ERROR) << context << "COMMAND_HANDSHAKE came, but process_payload_sync_data returned false, dropping connection.";
+            logger(logging::ERROR) << context << "COMMAND_HANDSHAKE came, but process_payload_sync_data returned false, dropping connection.";
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
         }
@@ -1291,7 +1291,7 @@ namespace cryptonote
                 pe.id = peer_id_l;
                 m_peerlist.append_with_peer_white(pe);
 
-                logger(Logging::TRACE) << context << "BACK PING SUCCESS, " << common::ipAddressToString(context.m_remote_ip) << ":" << port_l << " added to whitelist";
+                logger(logging::TRACE) << context << "BACK PING SUCCESS, " << common::ipAddressToString(context.m_remote_ip) << ":" << port_l << " added to whitelist";
             }
         }
 
@@ -1300,14 +1300,14 @@ namespace cryptonote
         get_local_node_data(rsp.node_data);
         m_payload_handler.get_payload_sync_data(rsp.payload_data);
 
-        logger(Logging::DEBUGGING, Logging::BRIGHT_GREEN) << "COMMAND_HANDSHAKE";
+        logger(logging::DEBUGGING, logging::BRIGHT_GREEN) << "COMMAND_HANDSHAKE";
         return 1;
     }
     //-----------------------------------------------------------------------------------
 
     int NodeServer::handle_ping(int command, COMMAND_PING::request &arg, COMMAND_PING::response &rsp, P2pConnectionContext &context)
     {
-        logger(Logging::TRACE) << context << "COMMAND_PING";
+        logger(logging::TRACE) << context << "COMMAND_PING";
         rsp.status = PING_OK_RESPONSE_STATUS_TEXT;
         rsp.peer_id = m_config.m_peer_id;
         return 1;

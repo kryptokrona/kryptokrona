@@ -26,7 +26,7 @@ namespace cryptonote
     class RpcServer : public HttpServer
     {
     public:
-        RpcServer(syst::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log, Core &c, NodeServer &p2p, ICryptoNoteProtocolHandler &protocol);
+        RpcServer(syst::Dispatcher &dispatcher, std::shared_ptr<logging::ILogger> log, Core &c, NodeServer &p2p, ICryptoNoteProtocolHandler &protocol);
 
         typedef std::function<bool(RpcServer *, const HttpRequest &request, HttpResponse &response)> HandlerFunction;
         bool enableCors(const std::vector<std::string> domains);
@@ -102,7 +102,7 @@ namespace cryptonote
         bool f_on_transactions_pool_json(const F_COMMAND_RPC_GET_POOL::request &req, F_COMMAND_RPC_GET_POOL::response &res);
         bool f_getMixin(const Transaction &transaction, uint64_t &mixin);
 
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         Core &m_core;
         NodeServer &m_p2p;
         ICryptoNoteProtocolHandler &m_protocol;

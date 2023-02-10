@@ -833,7 +833,7 @@ namespace cryptonote
     {
     }
 
-    CurrencyBuilder::CurrencyBuilder(std::shared_ptr<Logging::ILogger> log) : m_currency(log)
+    CurrencyBuilder::CurrencyBuilder(std::shared_ptr<logging::ILogger> log) : m_currency(log)
     {
         maxBlockNumber(parameters::CRYPTONOTE_MAX_BLOCK_NUMBER);
         maxBlockBlobSize(parameters::CRYPTONOTE_MAX_BLOCK_BLOB_SIZE);

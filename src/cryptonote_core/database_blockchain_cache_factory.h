@@ -28,7 +28,7 @@ namespace cryptonote
     class DatabaseBlockchainCacheFactory : public IBlockchainCacheFactory
     {
     public:
-        explicit DatabaseBlockchainCacheFactory(IDataBase &database, std::shared_ptr<Logging::ILogger> logger);
+        explicit DatabaseBlockchainCacheFactory(IDataBase &database, std::shared_ptr<logging::ILogger> logger);
         virtual ~DatabaseBlockchainCacheFactory();
 
         virtual std::unique_ptr<IBlockchainCache> createRootBlockchainCache(const Currency &currency) override;
@@ -36,7 +36,7 @@ namespace cryptonote
 
     private:
         IDataBase &database;
-        std::shared_ptr<Logging::ILogger> logger;
+        std::shared_ptr<logging::ILogger> logger;
     };
 
 } // namespace cryptonote

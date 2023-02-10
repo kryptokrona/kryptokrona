@@ -38,7 +38,7 @@ namespace cryptonote
     class TransactionPool : public ITransactionPool
     {
     public:
-        TransactionPool(std::shared_ptr<Logging::ILogger> logger);
+        TransactionPool(std::shared_ptr<logging::ILogger> logger);
 
         virtual bool pushTransaction(CachedTransaction &&transaction, TransactionValidatorState &&transactionState) override;
         virtual const CachedTransaction &getTransaction(const Crypto::Hash &hash) const override;
@@ -120,7 +120,7 @@ namespace cryptonote
         TransactionsContainer::index<TransactionCostTag>::type &transactionCostIndex;
         TransactionsContainer::index<PaymentIdTag>::type &paymentIdIndex;
 
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
     };
 
 }

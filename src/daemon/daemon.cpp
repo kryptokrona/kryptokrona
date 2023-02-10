@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        Level cfgLogLevel = static_cast<Level>(static_cast<int>(Logging::ERROR) + config.logLevel);
+        Level cfgLogLevel = static_cast<Level>(static_cast<int>(logging::ERROR) + config.logLevel);
 
         // configure logging
         logManager->configure(buildLoggerConfiguration(cfgLogLevel, cfgLogFile.string()));

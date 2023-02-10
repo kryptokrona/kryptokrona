@@ -30,7 +30,7 @@ namespace cryptonote
         TransactionPoolCleanWrapper(
             std::unique_ptr<ITransactionPool> &&transactionPool,
             std::unique_ptr<ITimeProvider> &&timeProvider,
-            std::shared_ptr<Logging::ILogger> logger,
+            std::shared_ptr<logging::ILogger> logger,
             uint64_t timeout);
 
         TransactionPoolCleanWrapper(const TransactionPoolCleanWrapper &) = delete;
@@ -62,7 +62,7 @@ namespace cryptonote
     private:
         std::unique_ptr<ITransactionPool> transactionPool;
         std::unique_ptr<ITimeProvider> timeProvider;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         std::unordered_map<Crypto::Hash, uint64_t> recentlyDeletedTransactions;
         uint64_t timeout;
 

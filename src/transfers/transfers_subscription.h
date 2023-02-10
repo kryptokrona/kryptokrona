@@ -29,7 +29,7 @@ namespace cryptonote
     class TransfersSubscription : public IObservableImpl<ITransfersObserver, ITransfersSubscription>
     {
     public:
-        TransfersSubscription(const cryptonote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription &sub);
+        TransfersSubscription(const cryptonote::Currency &currency, std::shared_ptr<logging::ILogger> logger, const AccountSubscription &sub);
 
         SynchronizationStart getSyncStart();
         void onBlockchainDetach(uint32_t height);
@@ -47,7 +47,7 @@ namespace cryptonote
         virtual ITransfersContainer &getContainer() override;
 
     private:
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         TransfersContainer transfers;
         AccountSubscription subscription;
         std::string m_address;

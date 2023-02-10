@@ -101,7 +101,7 @@ namespace Logging
                     }
 
                     std::string type = loggerConfiguration("type").getString();
-                    std::unique_ptr<Logging::CommonLogger> logger;
+                    std::unique_ptr<logging::CommonLogger> logger;
 
                     if (type == "console")
                     {

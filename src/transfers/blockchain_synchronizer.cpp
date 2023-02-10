@@ -76,7 +76,7 @@ namespace
 namespace cryptonote
 {
 
-    BlockchainSynchronizer::BlockchainSynchronizer(INode &node, std::shared_ptr<Logging::ILogger> logger, const Hash &genesisBlockHash) : m_logger(logger, "BlockchainSynchronizer"),
+    BlockchainSynchronizer::BlockchainSynchronizer(INode &node, std::shared_ptr<logging::ILogger> logger, const Hash &genesisBlockHash) : m_logger(logger, "BlockchainSynchronizer"),
                                                                                                                                           m_node(node),
                                                                                                                                           m_genesisBlockHash(genesisBlockHash),
                                                                                                                                           m_currentState(State::stopped),

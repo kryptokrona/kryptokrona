@@ -98,7 +98,7 @@ namespace cryptonote
     class BlockchainCache : public IBlockchainCache
     {
     public:
-        BlockchainCache(const std::string &filename, const Currency &currency, std::shared_ptr<Logging::ILogger> logger, IBlockchainCache *parent, uint32_t startIndex = 0);
+        BlockchainCache(const std::string &filename, const Currency &currency, std::shared_ptr<logging::ILogger> logger, IBlockchainCache *parent, uint32_t startIndex = 0);
 
         // Returns upper part of segment. [this] remains lower part.
         // All of indexes on blockIndex == splitBlockIndex belong to upper part
@@ -288,7 +288,7 @@ namespace cryptonote
         const uint32_t CURRENT_SERIALIZATION_VERSION = 1;
         std::string filename;
         const Currency &currency;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         IBlockchainCache *parent;
         // index of first block stored in this cache
         uint32_t startIndex;

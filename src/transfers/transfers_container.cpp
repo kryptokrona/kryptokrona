@@ -167,7 +167,7 @@ namespace cryptonote
         }
     }
 
-    TransfersContainer::TransfersContainer(const Currency &currency, std::shared_ptr<Logging::ILogger> logger, size_t transactionSpendableAge) : m_currentHeight(0),
+    TransfersContainer::TransfersContainer(const Currency &currency, std::shared_ptr<logging::ILogger> logger, size_t transactionSpendableAge) : m_currentHeight(0),
                                                                                                                                                  m_currency(currency),
                                                                                                                                                  m_logger(logger, "TransfersContainer"),
                                                                                                                                                  m_transactionSpendableAge(transactionSpendableAge)

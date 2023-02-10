@@ -52,7 +52,7 @@ namespace cryptonote
         P2pNode(
             const P2pNodeConfig &cfg,
             syst::Dispatcher &dispatcher,
-            std::shared_ptr<Logging::ILogger> log,
+            std::shared_ptr<logging::ILogger> log,
             const Crypto::Hash &genesisHash,
             uint64_t peerId);
 
@@ -73,7 +73,7 @@ namespace cryptonote
         typedef std::unique_ptr<P2pContext> ContextPtr;
         typedef std::list<ContextPtr> ContextList;
 
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         bool m_stopRequested;
         const P2pNodeConfig m_cfg;
         const uint64_t m_myPeerId;

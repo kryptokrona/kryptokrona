@@ -171,7 +171,7 @@ namespace cryptonote
         static const std::vector<uint64_t> PRETTY_AMOUNTS;
 
     private:
-        Currency(std::shared_ptr<Logging::ILogger> log) : logger(log, "currency")
+        Currency(std::shared_ptr<logging::ILogger> log) : logger(log, "currency")
         {
         }
 
@@ -244,7 +244,7 @@ namespace cryptonote
         BlockTemplate genesisBlockTemplate;
         std::unique_ptr<CachedBlock> cachedGenesisBlock;
 
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
 
         friend class CurrencyBuilder;
     };
@@ -252,7 +252,7 @@ namespace cryptonote
     class CurrencyBuilder : boost::noncopyable
     {
     public:
-        CurrencyBuilder(std::shared_ptr<Logging::ILogger> log);
+        CurrencyBuilder(std::shared_ptr<logging::ILogger> log);
 
         Currency currency()
         {

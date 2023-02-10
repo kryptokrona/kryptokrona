@@ -41,7 +41,7 @@ namespace PaymentService
         uint64_t scanHeight;
     };
 
-    void generateNewWallet(const cryptonote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger, syst::Dispatcher &dispatcher);
+    void generateNewWallet(const cryptonote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<logging::ILogger> logger, syst::Dispatcher &dispatcher);
 
     struct TransactionsInBlockInfoFilter;
 
@@ -49,7 +49,7 @@ namespace PaymentService
     {
     public:
         WalletService(const cryptonote::Currency &currency, syst::Dispatcher &sys, cryptonote::INode &node, cryptonote::IWallet &wallet,
-                      cryptonote::IFusionManager &fusionManager, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger);
+                      cryptonote::IFusionManager &fusionManager, const WalletConfiguration &conf, std::shared_ptr<logging::ILogger> logger);
         virtual ~WalletService();
 
         void init();
@@ -116,7 +116,7 @@ namespace PaymentService
         cryptonote::INode &node;
         const WalletConfiguration &config;
         bool inited;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         syst::Dispatcher &dispatcher;
         syst::Event readyEvent;
         syst::ContextGroup refreshContext;

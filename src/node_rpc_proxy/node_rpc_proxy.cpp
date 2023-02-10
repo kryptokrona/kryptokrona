@@ -60,7 +60,7 @@ namespace cryptonote
 
     }
 
-    NodeRpcProxy::NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<Logging::ILogger> logger) : m_logger(logger, "NodeRpcProxy"),
+    NodeRpcProxy::NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<logging::ILogger> logger) : m_logger(logger, "NodeRpcProxy"),
                                                                                                                                                            m_rpcTimeout(10000),
                                                                                                                                                            m_pullInterval(5000),
                                                                                                                                                            m_nodeHost(nodeHost),
@@ -74,7 +74,7 @@ namespace cryptonote
         resetInternalState();
     }
 
-    NodeRpcProxy::NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout) : m_logger(std::make_shared<Logging::DummyLogger>(), "NodeRpcProxy"),
+    NodeRpcProxy::NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout) : m_logger(std::make_shared<logging::DummyLogger>(), "NodeRpcProxy"),
                                                                                                                  m_rpcTimeout(10000),
                                                                                                                  m_pullInterval(5000),
                                                                                                                  m_nodeHost(nodeHost),

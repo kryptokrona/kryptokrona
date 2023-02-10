@@ -78,7 +78,7 @@ namespace cryptonote
         uint64_t peerId;
         syst::TcpConnection connection;
 
-        P2pConnectionContext(syst::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log, syst::TcpConnection &&conn) : context(nullptr),
+        P2pConnectionContext(syst::Dispatcher &dispatcher, std::shared_ptr<logging::ILogger> log, syst::TcpConnection &&conn) : context(nullptr),
                                                                                                                                     peerId(0),
                                                                                                                                     connection(std::move(conn)),
                                                                                                                                     logger(log, "node_server"),
@@ -104,7 +104,7 @@ namespace cryptonote
         uint64_t writeDuration(TimePoint now) const;
 
     private:
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         TimePoint writeOperationStartTime;
         syst::Event queueEvent;
         std::vector<P2pMessage> writeQueue;
@@ -115,7 +115,7 @@ namespace cryptonote
     class NodeServer : public IP2pEndpoint
     {
     public:
-        NodeServer(syst::Dispatcher &dispatcher, cryptonote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log);
+        NodeServer(syst::Dispatcher &dispatcher, cryptonote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<logging::ILogger> log);
 
         bool run();
         bool init(const NetNodeConfig &config);
@@ -235,7 +235,7 @@ namespace cryptonote
         syst::Timer m_idleTimer;
         syst::Timer m_timeoutTimer;
         syst::TcpListener m_listener;
-        Logging::LoggerRef logger;
+        logging::LoggerRef logger;
         std::atomic<bool> m_stop;
 
         CryptoNoteProtocolHandler &m_payload_handler;
