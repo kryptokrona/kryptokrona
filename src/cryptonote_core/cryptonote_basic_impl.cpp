@@ -98,7 +98,7 @@ namespace cryptonote
 }
 
 //--------------------------------------------------------------------------------
-bool parse_hash256(const std::string &str_hash, Crypto::Hash &hash)
+bool parse_hash256(const std::string &str_hash, crypto::Hash &hash)
 {
     return common::podFromHex(str_hash, hash);
 }

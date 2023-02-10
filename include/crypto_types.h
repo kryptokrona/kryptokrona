@@ -371,91 +371,91 @@ namespace std
 {
     /* For using in std::unordered_* containers */
     template <>
-    struct hash<Crypto::Hash>
+    struct hash<crypto::Hash>
     {
-        size_t operator()(const Crypto::Hash &hash) const
+        size_t operator()(const crypto::Hash &hash) const
         {
             return reinterpret_cast<const size_t &>(hash);
         }
     };
 
     template <>
-    struct hash<Crypto::PublicKey>
+    struct hash<crypto::PublicKey>
     {
-        size_t operator()(const Crypto::PublicKey &publicKey) const
+        size_t operator()(const crypto::PublicKey &publicKey) const
         {
             return reinterpret_cast<const size_t &>(publicKey);
         }
     };
 
     template <>
-    struct hash<Crypto::SecretKey>
+    struct hash<crypto::SecretKey>
     {
-        size_t operator()(const Crypto::SecretKey &secretKey) const
+        size_t operator()(const crypto::SecretKey &secretKey) const
         {
             return reinterpret_cast<const size_t &>(secretKey);
         }
     };
 
     template <>
-    struct hash<Crypto::KeyDerivation>
+    struct hash<crypto::KeyDerivation>
     {
-        size_t operator()(const Crypto::KeyDerivation &keyDerivation) const
+        size_t operator()(const crypto::KeyDerivation &keyDerivation) const
         {
             return reinterpret_cast<const size_t &>(keyDerivation);
         }
     };
 
     template <>
-    struct hash<Crypto::KeyImage>
+    struct hash<crypto::KeyImage>
     {
-        size_t operator()(const Crypto::KeyImage &keyImage) const
+        size_t operator()(const crypto::KeyImage &keyImage) const
         {
             return reinterpret_cast<const size_t &>(keyImage);
         }
     };
 
     template <>
-    struct hash<Crypto::Signature>
+    struct hash<crypto::Signature>
     {
-        size_t operator()(const Crypto::Signature &signature) const
+        size_t operator()(const crypto::Signature &signature) const
         {
             return reinterpret_cast<const size_t &>(signature);
         }
     };
 
     /* Overloading the << operator */
-    inline ostream &operator<<(ostream &os, const Crypto::Hash &hash)
+    inline ostream &operator<<(ostream &os, const crypto::Hash &hash)
     {
         os << common::podToHex(hash);
         return os;
     }
 
-    inline ostream &operator<<(ostream &os, const Crypto::PublicKey &publicKey)
+    inline ostream &operator<<(ostream &os, const crypto::PublicKey &publicKey)
     {
         os << common::podToHex(publicKey);
         return os;
     }
 
-    inline ostream &operator<<(ostream &os, const Crypto::SecretKey &secretKey)
+    inline ostream &operator<<(ostream &os, const crypto::SecretKey &secretKey)
     {
         os << common::podToHex(secretKey);
         return os;
     }
 
-    inline ostream &operator<<(ostream &os, const Crypto::KeyDerivation &keyDerivation)
+    inline ostream &operator<<(ostream &os, const crypto::KeyDerivation &keyDerivation)
     {
         os << common::podToHex(keyDerivation);
         return os;
     }
 
-    inline ostream &operator<<(ostream &os, const Crypto::KeyImage &keyImage)
+    inline ostream &operator<<(ostream &os, const crypto::KeyImage &keyImage)
     {
         os << common::podToHex(keyImage);
         return os;
     }
 
-    inline ostream &operator<<(ostream &os, const Crypto::Signature &signature)
+    inline ostream &operator<<(ostream &os, const crypto::Signature &signature)
     {
         os << common::podToHex(signature);
         return os;

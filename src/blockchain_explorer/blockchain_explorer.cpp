@@ -229,10 +229,10 @@ namespace cryptonote
             throw std::system_error(make_error_code(cryptonote::error::BlockchainExplorerErrorCodes::INTERNAL_ERROR));
         }
 
-        std::vector<Crypto::Hash> knownPoolTransactionHashes;
+        std::vector<crypto::Hash> knownPoolTransactionHashes;
         bool isBlockchainActual;
         std::vector<TransactionDetails> newTransactions;
-        std::vector<Crypto::Hash> removedTransactions;
+        std::vector<crypto::Hash> removedTransactions;
         StateRollback stateRollback(state);
         if (!getPoolState(knownPoolTransactionHashes, knownBlockchainTop.hash, isBlockchainActual, newTransactions, removedTransactions))
         {
@@ -440,7 +440,7 @@ namespace cryptonote
 
         logger(DEBUGGING) << "Get transactions by payment id " << paymentId << " request came.";
 
-        std::vector<Crypto::Hash> transactionHashes;
+        std::vector<crypto::Hash> transactionHashes;
         NodeRequest request([&](const INode::Callback &cb)
                             { return node.getTransactionHashesByPaymentId(paymentId, transactionHashes, cb); });
 
@@ -631,7 +631,7 @@ namespace cryptonote
                                                                   }
                                                               }
 
-                                                              for (const std::pair<Crypto::Hash, TransactionRemoveReason> &kv : *removedTransactionsHashesPtr)
+                                                              for (const std::pair<crypto::Hash, TransactionRemoveReason> &kv : *removedTransactionsHashesPtr)
                                                               {
                                                                   auto iter = knownPoolState.find(kv.first);
                                                                   if (iter != knownPoolState.end())

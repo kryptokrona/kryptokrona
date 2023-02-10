@@ -18,7 +18,7 @@ uint64_t SynchronizationStatus::getHeight() const
 }
 
 void SynchronizationStatus::storeBlockHash(
-    const Crypto::Hash hash,
+    const crypto::Hash hash,
     const uint64_t height)
 {
     /* If it's not a fork and not the very first block */
@@ -70,9 +70,9 @@ void SynchronizationStatus::storeBlockHash(
    database, then returns the height it found. So, if you put your earliest
    block at the start of the vector, you're just going to start syncing from
    that block every time. */
-std::vector<Crypto::Hash> SynchronizationStatus::getBlockHashCheckpoints() const
+std::vector<crypto::Hash> SynchronizationStatus::getBlockHashCheckpoints() const
 {
-    std::vector<Crypto::Hash> results;
+    std::vector<crypto::Hash> results;
 
     /* Copy the contents of m_lastKnownBlockHashes to result, these are the
        last 100 known block hashes we have synced. For example, if the top
@@ -92,14 +92,14 @@ void SynchronizationStatus::fromJSON(const JSONObject &j)
 {
     for (const auto &x : getArrayFromJSON(j, "blockHashCheckpoints"))
     {
-        Crypto::Hash h;
+        crypto::Hash h;
         h.fromString(getStringFromJSONString(x));
         m_blockHashCheckpoints.push_back(h);
     }
 
     for (const auto &x : getArrayFromJSON(j, "lastKnownBlockHashes"))
     {
-        Crypto::Hash h;
+        crypto::Hash h;
         h.fromString(getStringFromJSONString(x));
         m_lastKnownBlockHashes.push_back(h);
     }

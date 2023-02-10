@@ -389,8 +389,8 @@ std::tuple<Error, uint16_t> ApiDispatcher::keyImportWallet(
 
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
-    const auto privateViewKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateViewKey");
-    const auto privateSpendKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateSpendKey");
+    const auto privateViewKey = tryGetJsonValue<crypto::SecretKey>(body, "privateViewKey");
+    const auto privateSpendKey = tryGetJsonValue<crypto::SecretKey>(body, "privateSpendKey");
 
     uint64_t scanHeight = 0;
 
@@ -444,7 +444,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importViewWallet(
     const auto [daemonHost, daemonPort, filename, password] = getDefaultWalletParams(body);
 
     const std::string address = tryGetJsonValue<std::string>(body, "address");
-    const auto privateViewKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateViewKey");
+    const auto privateViewKey = tryGetJsonValue<crypto::SecretKey>(body, "privateViewKey");
 
     uint64_t scanHeight = 0;
 
@@ -509,7 +509,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importAddress(
         scanHeight = tryGetJsonValue<uint64_t>(body, "scanHeight");
     }
 
-    const auto privateSpendKey = tryGetJsonValue<Crypto::SecretKey>(body, "privateSpendKey");
+    const auto privateSpendKey = tryGetJsonValue<crypto::SecretKey>(body, "privateSpendKey");
 
     const auto [error, address] = m_walletBackend->importSubWallet(
         privateSpendKey, scanHeight);
@@ -541,7 +541,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::importViewAddress(
         scanHeight = tryGetJsonValue<uint64_t>(body, "scanHeight");
     }
 
-    const auto publicSpendKey = tryGetJsonValue<Crypto::PublicKey>(body, "publicSpendKey");
+    const auto publicSpendKey = tryGetJsonValue<crypto::PublicKey>(body, "publicSpendKey");
 
     const auto [error, address] = m_walletBackend->importViewSubWallet(
         publicSpendKey, scanHeight);
@@ -1305,7 +1305,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionDetails(
 {
     std::string hashStr = req.path.substr(std::string("/transactions/hash/").size());
 
-    Crypto::Hash hash;
+    crypto::Hash hash;
 
     common::podFromHex(hashStr, hash.data);
 
@@ -1393,7 +1393,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTxPrivateKey(
 {
     std::string txHashStr = req.path.substr(std::string("/transactions/privatekey/").size());
 
-    Crypto::Hash txHash;
+    crypto::Hash txHash;
 
     common::podFromHex(txHashStr, txHash.data);
 
@@ -1531,7 +1531,7 @@ void ApiDispatcher::publicKeysToAddresses(nlohmann::json &j) const
         for (auto &tx : item.at("transfers"))
         {
             /* Get the spend key */
-            Crypto::PublicKey spendKey = tx.at("publicKey").get<Crypto::PublicKey>();
+            crypto::PublicKey spendKey = tx.at("publicKey").get<crypto::PublicKey>();
 
             /* Get the address it belongs to */
             const auto [error, address] = m_walletBackend->getAddress(spendKey);

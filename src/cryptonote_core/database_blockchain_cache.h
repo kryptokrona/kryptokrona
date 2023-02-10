@@ -62,31 +62,31 @@ namespace cryptonote
                        const TransactionValidatorState &validatorState, size_t blockSize, uint64_t generatedCoins,
                        uint64_t blockDifficulty, RawBlock &&rawBlock) override;
         virtual PushedBlockInfo getPushedBlockInfo(uint32_t index) const override;
-        bool checkIfSpent(const Crypto::KeyImage &keyImage, uint32_t blockIndex) const override;
-        bool checkIfSpent(const Crypto::KeyImage &keyImage) const override;
+        bool checkIfSpent(const crypto::KeyImage &keyImage, uint32_t blockIndex) const override;
+        bool checkIfSpent(const crypto::KeyImage &keyImage) const override;
 
         bool isTransactionSpendTimeUnlocked(uint64_t unlockTime) const override;
         bool isTransactionSpendTimeUnlocked(uint64_t unlockTime, uint32_t blockIndex) const override;
 
         ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
-                                                     std::vector<Crypto::PublicKey> &publicKeys) const override;
+                                                     std::vector<crypto::PublicKey> &publicKeys) const override;
         ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex,
                                                      common::ArrayView<uint32_t> globalIndexes,
-                                                     std::vector<Crypto::PublicKey> &publicKeys) const override;
+                                                     std::vector<crypto::PublicKey> &publicKeys) const override;
 
         ExtractOutputKeysResult extractKeyOtputIndexes(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
                                                        std::vector<PackedOutIndex> &outIndexes) const override;
         ExtractOutputKeysResult
         extractKeyOtputReferences(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
-                                  std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const override;
+                                  std::vector<std::pair<crypto::Hash, size_t>> &outputReferences) const override;
 
         uint32_t getTopBlockIndex() const override;
-        const Crypto::Hash &getTopBlockHash() const override;
+        const crypto::Hash &getTopBlockHash() const override;
         uint32_t getBlockCount() const override;
-        bool hasBlock(const Crypto::Hash &blockHash) const override;
-        uint32_t getBlockIndex(const Crypto::Hash &blockHash) const override;
+        bool hasBlock(const crypto::Hash &blockHash) const override;
+        uint32_t getBlockIndex(const crypto::Hash &blockHash) const override;
 
-        bool hasTransaction(const Crypto::Hash &transactionHash) const override;
+        bool hasTransaction(const crypto::Hash &transactionHash) const override;
 
         std::vector<uint64_t> getLastTimestamps(size_t count) const override;
         std::vector<uint64_t> getLastTimestamps(size_t count, uint32_t blockIndex, UseGenesis) const override;
@@ -109,8 +109,8 @@ namespace cryptonote
         std::vector<uint64_t> getLastUnits(size_t count, uint32_t blockIndex, UseGenesis use,
                                            std::function<uint64_t(const CachedBlockInfo &)> pred) const override;
 
-        Crypto::Hash getBlockHash(uint32_t blockIndex) const override;
-        virtual std::vector<Crypto::Hash> getBlockHashes(uint32_t startIndex, size_t maxCount) const override;
+        crypto::Hash getBlockHash(uint32_t blockIndex) const override;
+        virtual std::vector<crypto::Hash> getBlockHashes(uint32_t startIndex, size_t maxCount) const override;
 
         /*
          * This method always returns zero
@@ -123,13 +123,13 @@ namespace cryptonote
 
         virtual uint32_t getTimestampLowerBoundBlockIndex(uint64_t timestamp) const override;
 
-        virtual std::unordered_map<Crypto::Hash, std::vector<uint64_t>> getGlobalIndexes(
-            const std::vector<Crypto::Hash> transactionHashes) const override;
+        virtual std::unordered_map<crypto::Hash, std::vector<uint64_t>> getGlobalIndexes(
+            const std::vector<crypto::Hash> transactionHashes) const override;
 
-        virtual bool getTransactionGlobalIndexes(const Crypto::Hash &transactionHash,
+        virtual bool getTransactionGlobalIndexes(const crypto::Hash &transactionHash,
                                                  std::vector<uint32_t> &globalIndexes) const override;
         virtual size_t getTransactionCount() const override;
-        virtual uint32_t getBlockIndexContainingTx(const Crypto::Hash &transactionHash) const override;
+        virtual uint32_t getBlockIndexContainingTx(const crypto::Hash &transactionHash) const override;
 
         virtual size_t getChildCount() const override;
 
@@ -147,14 +147,14 @@ namespace cryptonote
         virtual void save() override;
         virtual void load() override;
 
-        virtual std::vector<BinaryArray> getRawTransactions(const std::vector<Crypto::Hash> &transactions,
-                                                            std::vector<Crypto::Hash> &missedTransactions) const override;
-        virtual std::vector<BinaryArray> getRawTransactions(const std::vector<Crypto::Hash> &transactions) const override;
-        void getRawTransactions(const std::vector<Crypto::Hash> &transactions, std::vector<BinaryArray> &foundTransactions,
-                                std::vector<Crypto::Hash> &missedTransactions) const override;
+        virtual std::vector<BinaryArray> getRawTransactions(const std::vector<crypto::Hash> &transactions,
+                                                            std::vector<crypto::Hash> &missedTransactions) const override;
+        virtual std::vector<BinaryArray> getRawTransactions(const std::vector<crypto::Hash> &transactions) const override;
+        void getRawTransactions(const std::vector<crypto::Hash> &transactions, std::vector<BinaryArray> &foundTransactions,
+                                std::vector<crypto::Hash> &missedTransactions) const override;
         virtual RawBlock getBlockByIndex(uint32_t index) const override;
         virtual BinaryArray getRawTransaction(uint32_t blockIndex, uint32_t transactionIndex) const override;
-        virtual std::vector<Crypto::Hash> getTransactionHashes() const override;
+        virtual std::vector<crypto::Hash> getTransactionHashes() const override;
         virtual std::vector<uint32_t> getRandomOutsByAmount(uint64_t amount, size_t count,
                                                             uint32_t blockIndex) const override;
         virtual ExtractOutputKeysResult
@@ -163,8 +163,8 @@ namespace cryptonote
                                                                 uint32_t globalIndex)>
                               pred) const override;
 
-        virtual std::vector<Crypto::Hash> getTransactionHashesByPaymentId(const Crypto::Hash &paymentId) const override;
-        virtual std::vector<Crypto::Hash> getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const override;
+        virtual std::vector<crypto::Hash> getTransactionHashesByPaymentId(const crypto::Hash &paymentId) const override;
+        virtual std::vector<crypto::Hash> getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const override;
 
         virtual std::vector<RawBlock> getBlocksByHeight(
             const uint64_t startHeight,
@@ -175,7 +175,7 @@ namespace cryptonote
         IDataBase &database;
         IBlockchainCacheFactory &blockchainCacheFactory;
         mutable boost::optional<uint32_t> topBlockIndex;
-        mutable boost::optional<Crypto::Hash> topBlockHash;
+        mutable boost::optional<crypto::Hash> topBlockHash;
         mutable boost::optional<uint64_t> transactionsCount;
         mutable boost::optional<uint32_t> keyOutputAmountsCount;
         mutable std::unordered_map<Amount, int32_t> keyOutputCountsForAmounts;
@@ -191,7 +191,7 @@ namespace cryptonote
         CachedBlockInfo getCachedBlockInfo(uint32_t index) const;
         BlockchainReadResult readDatabase(BlockchainReadBatch &batch) const;
 
-        void addSpentKeyImage(const Crypto::KeyImage &keyImage, uint32_t blockIndex);
+        void addSpentKeyImage(const crypto::KeyImage &keyImage, uint32_t blockIndex);
         void pushTransaction(const CachedTransaction &cachedTransaction,
                              uint32_t blockIndex,
                              uint16_t transactionBlockIndex,
@@ -199,8 +199,8 @@ namespace cryptonote
 
         uint32_t insertKeyOutputToGlobalIndex(uint64_t amount, PackedOutIndex output); // TODO not implemented. Should it be removed?
         uint32_t updateKeyOutputCount(Amount amount, int32_t diff) const;
-        void insertPaymentId(BlockchainWriteBatch &batch, const Crypto::Hash &transactionHash, const Crypto::Hash &paymentId);
-        void insertBlockTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const Crypto::Hash &blockHash);
+        void insertPaymentId(BlockchainWriteBatch &batch, const crypto::Hash &transactionHash, const crypto::Hash &paymentId);
+        void insertBlockTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const crypto::Hash &blockHash);
 
         void addGenesisBlock(CachedBlock &&genesisBlock);
 
@@ -213,15 +213,15 @@ namespace cryptonote
 
         TransactionValidatorState fillOutputsSpentByBlock(uint32_t blockIndex) const;
 
-        Crypto::Hash pushBlockToAnotherCache(IBlockchainCache &segment, PushedBlockInfo &&pushedBlockInfo);
+        crypto::Hash pushBlockToAnotherCache(IBlockchainCache &segment, PushedBlockInfo &&pushedBlockInfo);
         void requestDeleteSpentOutputs(BlockchainWriteBatch &writeBatch, uint32_t splitBlockIndex, const TransactionValidatorState &spentOutputs);
-        std::vector<Crypto::Hash> requestTransactionHashesFromBlockIndex(uint32_t splitBlockIndex);
-        void requestDeleteTransactions(BlockchainWriteBatch &writeBatch, const std::vector<Crypto::Hash> &transactionHashes);
-        void requestDeletePaymentIds(BlockchainWriteBatch &writeBatch, const std::vector<Crypto::Hash> &transactionHashes);
-        void requestDeletePaymentId(BlockchainWriteBatch &writeBatch, const Crypto::Hash &paymentId, size_t toDelete);
+        std::vector<crypto::Hash> requestTransactionHashesFromBlockIndex(uint32_t splitBlockIndex);
+        void requestDeleteTransactions(BlockchainWriteBatch &writeBatch, const std::vector<crypto::Hash> &transactionHashes);
+        void requestDeletePaymentIds(BlockchainWriteBatch &writeBatch, const std::vector<crypto::Hash> &transactionHashes);
+        void requestDeletePaymentId(BlockchainWriteBatch &writeBatch, const crypto::Hash &paymentId, size_t toDelete);
         void requestDeleteKeyOutputs(BlockchainWriteBatch &writeBatch, const std::map<IBlockchainCache::Amount, IBlockchainCache::GlobalOutputIndex> &boundaries);
         void requestDeleteKeyOutputsAmount(BlockchainWriteBatch &writeBatch, IBlockchainCache::Amount amount, IBlockchainCache::GlobalOutputIndex boundary, uint32_t outputsCount);
-        void requestRemoveTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const Crypto::Hash &blockHash);
+        void requestRemoveTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const crypto::Hash &blockHash);
 
         uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
         uint64_t getCachedTransactionsCount() const;

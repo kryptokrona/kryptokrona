@@ -180,7 +180,7 @@ std::string getPaymentIDFromExtra(const std::string &extra)
             vecExtra.push_back(static_cast<uint8_t>(it));
         }
 
-        Crypto::Hash paymentIdHash;
+        crypto::Hash paymentIdHash;
 
         if (cryptonote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash))
         {

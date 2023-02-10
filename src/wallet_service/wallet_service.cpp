@@ -71,14 +71,14 @@ namespace payment_service
     return false; });
         }
 
-        Crypto::Hash parsePaymentId(const std::string &paymentIdStr)
+        crypto::Hash parsePaymentId(const std::string &paymentIdStr)
         {
             if (!checkPaymentId(paymentIdStr))
             {
                 throw std::system_error(make_error_code(cryptonote::error::WalletServiceErrorCode::WRONG_PAYMENT_ID_FORMAT));
             }
 
-            Crypto::Hash paymentId;
+            crypto::Hash paymentId;
             bool r = common::podFromHex(paymentIdStr, paymentId);
             if (r)
             {
@@ -88,14 +88,14 @@ namespace payment_service
             return paymentId;
         }
 
-        bool getPaymentIdFromExtra(const std::string &binaryString, Crypto::Hash &paymentId)
+        bool getPaymentIdFromExtra(const std::string &binaryString, crypto::Hash &paymentId)
         {
             return cryptonote::getPaymentIdFromTxExtra(common::asBinaryArray(binaryString), paymentId);
         }
 
         std::string getPaymentIdStringFromExtra(const std::string &binaryString)
         {
-            Crypto::Hash paymentId;
+            crypto::Hash paymentId;
 
             try
             {
@@ -135,7 +135,7 @@ namespace payment_service
         {
             if (havePaymentId)
             {
-                Crypto::Hash transactionPaymentId;
+                crypto::Hash transactionPaymentId;
                 if (!getPaymentIdFromExtra(transaction.transaction.extra, transactionPaymentId))
                 {
                     return false;
@@ -167,7 +167,7 @@ namespace payment_service
 
         std::unordered_set<std::string> addresses;
         bool havePaymentId = false;
-        Crypto::Hash paymentId;
+        crypto::Hash paymentId;
     };
 
     namespace
@@ -193,9 +193,9 @@ namespace payment_service
             }
         }
 
-        Crypto::Hash parseHash(const std::string &hashString, logging::LoggerRef logger)
+        crypto::Hash parseHash(const std::string &hashString, logging::LoggerRef logger)
         {
-            Crypto::Hash hash;
+            crypto::Hash hash;
 
             if (!common::podFromHex(hashString, hash))
             {
@@ -431,10 +431,10 @@ namespace payment_service
         {
             log(logging::INFO, logging::BRIGHT_WHITE) << "Generating new wallet";
 
-            Crypto::SecretKey private_view_key;
+            crypto::SecretKey private_view_key;
             cryptonote::KeyPair spendKey;
 
-            Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+            crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
             cryptonote::AccountBase::generateViewFromSpend(spendKey.secretKey, private_view_key);
 
             wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key, 0, true);
@@ -454,7 +454,7 @@ namespace payment_service
                 return;
             }
 
-            Crypto::SecretKey private_view_key;
+            crypto::SecretKey private_view_key;
 
             cryptonote::AccountBase::generateViewFromSpend(private_spend_key, private_view_key);
 
@@ -474,8 +474,8 @@ namespace payment_service
             else
             {
                 log(logging::INFO, logging::BRIGHT_WHITE) << "Attemping to import wallet from keys";
-                Crypto::Hash private_spend_key_hash;
-                Crypto::Hash private_view_key_hash;
+                crypto::Hash private_spend_key_hash;
+                crypto::Hash private_view_key_hash;
                 uint64_t size;
                 if (!common::fromHex(conf.secretSpendKey, &private_spend_key_hash, sizeof(private_spend_key_hash), size) || size != sizeof(private_spend_key_hash))
                 {
@@ -487,8 +487,8 @@ namespace payment_service
                     log(logging::ERROR, logging::BRIGHT_RED) << "Invalid view key";
                     return;
                 }
-                Crypto::SecretKey private_spend_key = *(struct Crypto::SecretKey *)&private_spend_key_hash;
-                Crypto::SecretKey private_view_key = *(struct Crypto::SecretKey *)&private_view_key_hash;
+                crypto::SecretKey private_spend_key = *(struct crypto::SecretKey *)&private_spend_key_hash;
+                crypto::SecretKey private_view_key = *(struct crypto::SecretKey *)&private_view_key_hash;
 
                 wallet->initializeWithViewKey(conf.walletFile, conf.walletPassword, private_view_key, conf.scanHeight, false);
                 address = wallet->createAddress(private_spend_key, conf.scanHeight, false);
@@ -689,7 +689,7 @@ namespace payment_service
 
             logger(logging::DEBUGGING) << "Creating address";
 
-            Crypto::SecretKey secretKey;
+            crypto::SecretKey secretKey;
             if (!common::podFromHex(spendSecretKeyText, secretKey))
             {
                 logger(logging::WARNING, logging::BRIGHT_YELLOW) << "Wrong key format: " << spendSecretKeyText;
@@ -717,7 +717,7 @@ namespace payment_service
 
             logger(logging::DEBUGGING) << "Creating " << spendSecretKeysText.size() << " addresses...";
 
-            std::vector<Crypto::SecretKey> secretKeys;
+            std::vector<crypto::SecretKey> secretKeys;
             std::unordered_set<std::string> unique;
             secretKeys.reserve(spendSecretKeysText.size());
             unique.reserve(spendSecretKeysText.size());
@@ -730,7 +730,7 @@ namespace payment_service
                     return make_error_code(cryptonote::error::WalletServiceErrorCode::DUPLICATE_KEY);
                 }
 
-                Crypto::SecretKey key;
+                crypto::SecretKey key;
                 if (!common::podFromHex(keyText, key))
                 {
                     logger(logging::WARNING, logging::BRIGHT_YELLOW) << "Wrong key format: " << keyText;
@@ -782,7 +782,7 @@ namespace payment_service
 
             logger(logging::DEBUGGING) << "Creating tracking address";
 
-            Crypto::PublicKey publicKey;
+            crypto::PublicKey publicKey;
             if (!common::podFromHex(spendPublicKeyText, publicKey))
             {
                 logger(logging::WARNING, logging::BRIGHT_YELLOW) << "Wrong key format: " << spendPublicKeyText;
@@ -885,7 +885,7 @@ namespace payment_service
         try
         {
             syst::EventLock lk(readyEvent);
-            std::vector<Crypto::Hash> hashes = wallet.getBlockHashes(firstBlockIndex, blockCount);
+            std::vector<crypto::Hash> hashes = wallet.getBlockHashes(firstBlockIndex, blockCount);
 
             blockHashes.reserve(hashes.size());
             for (const auto &hash : hashes)
@@ -927,7 +927,7 @@ namespace payment_service
             cryptonote::KeyPair key = wallet.getAddressSpendKey(address);
             cryptonote::KeyPair viewKey = wallet.getViewKey();
 
-            Crypto::SecretKey deterministic_private_view_key;
+            crypto::SecretKey deterministic_private_view_key;
 
             cryptonote::AccountBase::generateViewFromSpend(key.secretKey, deterministic_private_view_key);
 
@@ -969,7 +969,7 @@ namespace payment_service
             }
 
             TransactionsInBlockInfoFilter transactionFilter(addresses, paymentId);
-            Crypto::Hash blockHash = parseHash(blockHashString, logger);
+            crypto::Hash blockHash = parseHash(blockHashString, logger);
 
             transactionHashes = getRpcTransactionHashes(blockHash, blockCount, transactionFilter);
         }
@@ -1032,7 +1032,7 @@ namespace payment_service
 
             TransactionsInBlockInfoFilter transactionFilter(addresses, paymentId);
 
-            Crypto::Hash blockHash = parseHash(blockHashString, logger);
+            crypto::Hash blockHash = parseHash(blockHashString, logger);
 
             transactions = getRpcTransactions(blockHash, blockCount, transactionFilter);
         }
@@ -1086,7 +1086,7 @@ namespace payment_service
         try
         {
             syst::EventLock lk(readyEvent);
-            Crypto::Hash hash = parseHash(transactionHash, logger);
+            crypto::Hash hash = parseHash(transactionHash, logger);
 
             cryptonote::WalletTransactionWithTransfers transactionWithTransfers = wallet.getTransaction(hash);
 
@@ -1641,7 +1641,7 @@ namespace payment_service
         wallet.reset(scanHeight);
     }
 
-    std::vector<cryptonote::TransactionsInBlockInfo> WalletService::getTransactions(const Crypto::Hash &blockHash, size_t blockCount) const
+    std::vector<cryptonote::TransactionsInBlockInfo> WalletService::getTransactions(const crypto::Hash &blockHash, size_t blockCount) const
     {
         std::vector<cryptonote::TransactionsInBlockInfo> result = wallet.getTransactions(blockHash, blockCount);
         if (result.empty())
@@ -1663,7 +1663,7 @@ namespace payment_service
         return result;
     }
 
-    std::vector<TransactionHashesInBlockRpcInfo> WalletService::getRpcTransactionHashes(const Crypto::Hash &blockHash, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const
+    std::vector<TransactionHashesInBlockRpcInfo> WalletService::getRpcTransactionHashes(const crypto::Hash &blockHash, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const
     {
         std::vector<cryptonote::TransactionsInBlockInfo> allTransactions = getTransactions(blockHash, blockCount);
         std::vector<cryptonote::TransactionsInBlockInfo> filteredTransactions = filterTransactions(allTransactions, filter);
@@ -1677,7 +1677,7 @@ namespace payment_service
         return convertTransactionsInBlockInfoToTransactionHashesInBlockRpcInfo(filteredTransactions);
     }
 
-    std::vector<TransactionsInBlockRpcInfo> WalletService::getRpcTransactions(const Crypto::Hash &blockHash, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const
+    std::vector<TransactionsInBlockRpcInfo> WalletService::getRpcTransactions(const crypto::Hash &blockHash, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const
     {
         std::vector<cryptonote::TransactionsInBlockInfo> allTransactions = getTransactions(blockHash, blockCount);
         std::vector<cryptonote::TransactionsInBlockInfo> filteredTransactions = filterTransactions(allTransactions, filter);

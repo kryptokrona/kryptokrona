@@ -81,7 +81,7 @@ namespace crypto
             const Hash prefixHash,
             const KeyImage keyImage,
             const std::vector<PublicKey> publicKeys,
-            const Crypto::SecretKey transactionSecretKey,
+            const crypto::SecretKey transactionSecretKey,
             uint64_t realOutput);
 
         static bool checkRingSignature(

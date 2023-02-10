@@ -929,7 +929,7 @@ namespace cryptonote
         return result;
     }
 
-    void TransfersContainer::getUnconfirmedTransactions(std::vector<Crypto::Hash> &transactions) const
+    void TransfersContainer::getUnconfirmedTransactions(std::vector<crypto::Hash> &transactions) const
     {
         std::lock_guard<std::mutex> lk(m_mutex);
         transactions.clear();
@@ -937,7 +937,7 @@ namespace cryptonote
         {
             if (element.blockHeight == WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
             {
-                transactions.push_back(*reinterpret_cast<const Crypto::Hash *>(&element.transactionHash));
+                transactions.push_back(*reinterpret_cast<const crypto::Hash *>(&element.transactionHash));
             }
         }
     }

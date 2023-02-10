@@ -13,7 +13,7 @@
 
 namespace Mnemonics
 {
-    std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::string words)
+    std::tuple<Error, crypto::SecretKey> MnemonicToPrivateKey(const std::string words)
     {
         std::vector<std::string> wordsList;
 
@@ -30,7 +30,7 @@ namespace Mnemonics
 
     /* Note - if the returned string is not empty, it is an error message, and
        the returned secret key is not initialized. */
-    std::tuple<Error, Crypto::SecretKey> MnemonicToPrivateKey(const std::vector<std::string> words)
+    std::tuple<Error, crypto::SecretKey> MnemonicToPrivateKey(const std::vector<std::string> words)
     {
         const size_t len = words.size();
 
@@ -48,7 +48,7 @@ namespace Mnemonics
                     std::to_string(len) + " " +
                     wordPlural + " long.");
 
-            return {error, Crypto::SecretKey()};
+            return {error, crypto::SecretKey()};
         }
 
         /* All words must be present in the word list */
@@ -66,14 +66,14 @@ namespace Mnemonics
                     "in the english word list (" +
                         word + ").");
 
-                return {error, Crypto::SecretKey()};
+                return {error, crypto::SecretKey()};
             }
         }
 
         /* The checksum must be correct */
         if (!HasValidChecksum(words))
         {
-            return {MNEMONIC_INVALID_CHECKSUM, Crypto::SecretKey()};
+            return {MNEMONIC_INVALID_CHECKSUM, crypto::SecretKey()};
         }
 
         auto wordIndexes = GetWordIndexes(words);
@@ -97,7 +97,7 @@ namespace Mnemonics
             /* Don't know what this is testing either */
             if (!(val % wlLen == w1))
             {
-                return {INVALID_MNEMONIC, Crypto::SecretKey()};
+                return {INVALID_MNEMONIC, crypto::SecretKey()};
             }
 
             /* Interpret val as 4 uint8_t's */
@@ -110,7 +110,7 @@ namespace Mnemonics
             }
         }
 
-        Crypto::SecretKey key;
+        crypto::SecretKey key;
 
         /* Copy the data to the secret key */
         std::copy(data.begin(), data.end(), key.data);
@@ -118,7 +118,7 @@ namespace Mnemonics
         return {SUCCESS, key};
     }
 
-    std::string PrivateKeyToMnemonic(const Crypto::SecretKey privateKey)
+    std::string PrivateKeyToMnemonic(const crypto::SecretKey privateKey)
     {
         std::vector<std::string> words;
 

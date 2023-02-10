@@ -32,7 +32,7 @@ private:
     bool m_stopped;
     syst::ContextGroup m_sleepingContext;
 
-    std::optional<Crypto::Hash> requestLastBlockHash();
+    std::optional<crypto::Hash> requestLastBlockHash();
 
     std::shared_ptr<httplib::Client> m_httpClient = nullptr;
 };

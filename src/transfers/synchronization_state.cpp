@@ -106,7 +106,7 @@ namespace cryptonote
         m_blockchain.resize(height);
     }
 
-    void SynchronizationState::addBlocks(const Crypto::Hash *blockHashes, uint32_t height, uint32_t count)
+    void SynchronizationState::addBlocks(const crypto::Hash *blockHashes, uint32_t height, uint32_t count)
     {
         assert(blockHashes);
         auto size = m_blockchain.size();
@@ -125,7 +125,7 @@ namespace cryptonote
         return static_cast<uint32_t>(m_blockchain.size());
     }
 
-    const std::vector<Crypto::Hash> &SynchronizationState::getKnownBlockHashes() const
+    const std::vector<crypto::Hash> &SynchronizationState::getKnownBlockHashes() const
     {
         return m_blockchain;
     }

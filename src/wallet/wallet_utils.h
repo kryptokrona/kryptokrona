@@ -27,7 +27,7 @@ namespace cryptonote
 {
 
     uint64_t getDefaultMixinByHeight(const uint64_t height);
-    void throwIfKeysMismatch(const Crypto::SecretKey &secretKey, const Crypto::PublicKey &expectedPublicKey, const std::string &message = "");
+    void throwIfKeysMismatch(const crypto::SecretKey &secretKey, const crypto::PublicKey &expectedPublicKey, const std::string &message = "");
     bool validateAddress(const std::string &address, const cryptonote::Currency &currency);
 
     std::ostream &operator<<(std::ostream &os, cryptonote::WalletTransactionState state);

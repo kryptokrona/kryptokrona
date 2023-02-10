@@ -32,7 +32,7 @@ namespace
     {
         uint32_t blockHeight;
         Hash transactionHash;
-        Crypto::PublicKey walletSpendPublicKey;
+        crypto::PublicKey walletSpendPublicKey;
     };
 
     // DO NOT CHANGE IT
@@ -127,8 +127,8 @@ namespace cryptonote
 
     WalletSerializerV2::WalletSerializerV2(
         ITransfersObserver &transfersObserver,
-        Crypto::PublicKey &viewPublicKey,
-        Crypto::SecretKey &viewSecretKey,
+        crypto::PublicKey &viewPublicKey,
+        crypto::SecretKey &viewSecretKey,
         uint64_t &actualBalance,
         uint64_t &pendingBalance,
         WalletsContainer &walletsContainer,
@@ -201,12 +201,12 @@ namespace cryptonote
         s(m_extra, "extra");
     }
 
-    std::unordered_set<Crypto::PublicKey> &WalletSerializerV2::addedKeys()
+    std::unordered_set<crypto::PublicKey> &WalletSerializerV2::addedKeys()
     {
         return m_addedKeys;
     }
 
-    std::unordered_set<Crypto::PublicKey> &WalletSerializerV2::deletedKeys()
+    std::unordered_set<crypto::PublicKey> &WalletSerializerV2::deletedKeys()
     {
         return m_deletedKeys;
     }
@@ -220,11 +220,11 @@ namespace cryptonote
         m_pendingBalance = 0;
         m_deletedKeys.clear();
 
-        std::unordered_set<Crypto::PublicKey> cachedKeySet;
+        std::unordered_set<crypto::PublicKey> cachedKeySet;
         auto &index = m_walletsContainer.get<KeysIndex>();
         for (size_t i = 0; i < walletCount; ++i)
         {
-            Crypto::PublicKey spendPublicKey;
+            crypto::PublicKey spendPublicKey;
             uint64_t actualBalance;
             uint64_t pendingBalance;
             serializer(spendPublicKey, "spendPublicKey");

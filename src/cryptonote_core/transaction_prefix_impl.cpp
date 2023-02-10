@@ -98,7 +98,7 @@ namespace cryptonote
 
     PublicKey TransactionPrefixImpl::getTransactionPublicKey() const
     {
-        Crypto::PublicKey pk(NULL_PUBLIC_KEY);
+        crypto::PublicKey pk(NULL_PUBLIC_KEY);
         m_extra.getPublicKey(pk);
         return pk;
     }
@@ -114,7 +114,7 @@ namespace cryptonote
 
         if (getExtraNonce(nonce))
         {
-            Crypto::Hash paymentId;
+            crypto::Hash paymentId;
             if (getPaymentIdFromTransactionExtraNonce(nonce, paymentId))
             {
                 hash = reinterpret_cast<const Hash &>(paymentId);

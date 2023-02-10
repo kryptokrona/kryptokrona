@@ -21,22 +21,22 @@ const BlockTemplate &CachedBlock::getBlock() const
     return block;
 }
 
-const Crypto::Hash &CachedBlock::getTransactionTreeHash() const
+const crypto::Hash &CachedBlock::getTransactionTreeHash() const
 {
     if (!transactionTreeHash.is_initialized())
     {
-        std::vector<Crypto::Hash> transactionHashes;
+        std::vector<crypto::Hash> transactionHashes;
         transactionHashes.reserve(block.transactionHashes.size() + 1);
         transactionHashes.push_back(getObjectHash(block.baseTransaction));
         transactionHashes.insert(transactionHashes.end(), block.transactionHashes.begin(), block.transactionHashes.end());
-        transactionTreeHash = Crypto::Hash();
-        Crypto::tree_hash(transactionHashes.data(), transactionHashes.size(), transactionTreeHash.get());
+        transactionTreeHash = crypto::Hash();
+        crypto::tree_hash(transactionHashes.data(), transactionHashes.size(), transactionTreeHash.get());
     }
 
     return transactionTreeHash.get();
 }
 
-const Crypto::Hash &CachedBlock::getBlockHash() const
+const crypto::Hash &CachedBlock::getBlockHash() const
 {
     if (!blockHash.is_initialized())
     {
@@ -53,7 +53,7 @@ const Crypto::Hash &CachedBlock::getBlockHash() const
     return blockHash.get();
 }
 
-const Crypto::Hash &CachedBlock::getBlockLongHash() const
+const crypto::Hash &CachedBlock::getBlockLongHash() const
 {
     if (!blockLongHash.is_initialized())
     {
@@ -90,7 +90,7 @@ const Crypto::Hash &CachedBlock::getBlockLongHash() const
     return blockLongHash.get();
 }
 
-const Crypto::Hash &CachedBlock::getAuxiliaryBlockHeaderHash() const
+const crypto::Hash &CachedBlock::getAuxiliaryBlockHeaderHash() const
 {
     if (!auxiliaryBlockHeaderHash.is_initialized())
     {

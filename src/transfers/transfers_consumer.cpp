@@ -24,8 +24,8 @@ using namespace crypto;
 using namespace logging;
 using namespace common;
 
-std::unordered_set<Crypto::Hash> transactions_hash_seen;
-std::unordered_set<Crypto::PublicKey> public_keys_seen;
+std::unordered_set<crypto::Hash> transactions_hash_seen;
+std::unordered_set<crypto::PublicKey> public_keys_seen;
 std::mutex seen_mutex;
 
 namespace
@@ -36,7 +36,7 @@ namespace
     class MarkTransactionConfirmedException : public std::exception
     {
     public:
-        MarkTransactionConfirmedException(const Crypto::Hash &txHash)
+        MarkTransactionConfirmedException(const crypto::Hash &txHash)
         {
         }
 
@@ -46,7 +46,7 @@ namespace
         }
 
     private:
-        Crypto::Hash m_txHash;
+        crypto::Hash m_txHash;
     };
 
     void checkOutputKey(
@@ -102,9 +102,9 @@ namespace
         }
     }
 
-    std::vector<Crypto::Hash> getBlockHashes(const cryptonote::CompleteBlock *blocks, size_t count)
+    std::vector<crypto::Hash> getBlockHashes(const cryptonote::CompleteBlock *blocks, size_t count)
     {
-        std::vector<Crypto::Hash> result;
+        std::vector<crypto::Hash> result;
         result.reserve(count);
 
         for (size_t i = 0; i < count; ++i)
@@ -176,11 +176,11 @@ namespace cryptonote
         }
     }
 
-    void TransfersConsumer::initTransactionPool(const std::unordered_set<Crypto::Hash> &uncommitedTransactions)
+    void TransfersConsumer::initTransactionPool(const std::unordered_set<crypto::Hash> &uncommitedTransactions)
     {
         for (auto itSubscriptions = m_subscriptions.begin(); itSubscriptions != m_subscriptions.end(); ++itSubscriptions)
         {
-            std::vector<Crypto::Hash> unconfirmedTransactions;
+            std::vector<crypto::Hash> unconfirmedTransactions;
             itSubscriptions->second->getContainer().getUnconfirmedTransactions(unconfirmedTransactions);
 
             for (auto itTransactions = unconfirmedTransactions.begin(); itTransactions != unconfirmedTransactions.end(); ++itTransactions)
@@ -349,7 +349,7 @@ namespace cryptonote
             return 0;
         }
 
-        std::vector<Crypto::Hash> blockHashes = getBlockHashes(blocks, count);
+        std::vector<crypto::Hash> blockHashes = getBlockHashes(blocks, count);
         m_observerManager.notify(&IBlockchainConsumerObserver::onBlocksAdded, this, blockHashes);
 
         // sort by block height and transaction index in block
@@ -440,7 +440,7 @@ namespace cryptonote
         return std::error_code();
     }
 
-    const std::unordered_set<Crypto::Hash> &TransfersConsumer::getKnownPoolTxIds() const
+    const std::unordered_set<crypto::Hash> &TransfersConsumer::getKnownPoolTxIds() const
     {
         return m_poolTxs;
     }
@@ -455,7 +455,7 @@ namespace cryptonote
         return processTransaction(unconfirmedBlockInfo, transaction);
     }
 
-    void TransfersConsumer::removeUnconfirmedTransaction(const Crypto::Hash &transactionHash)
+    void TransfersConsumer::removeUnconfirmedTransaction(const crypto::Hash &transactionHash)
     {
         m_observerManager.notify(&IBlockchainConsumerObserver::onTransactionDeleteBegin, this, transactionHash);
         for (auto &subscription : m_subscriptions)
@@ -465,7 +465,7 @@ namespace cryptonote
         m_observerManager.notify(&IBlockchainConsumerObserver::onTransactionDeleteEnd, this, transactionHash);
     }
 
-    void TransfersConsumer::addPublicKeysSeen(const Crypto::Hash &transactionHash, const Crypto::PublicKey &outputKey)
+    void TransfersConsumer::addPublicKeysSeen(const crypto::Hash &transactionHash, const crypto::PublicKey &outputKey)
     {
         std::lock_guard<std::mutex> lk(seen_mutex);
         transactions_hash_seen.insert(transactionHash);

@@ -36,7 +36,7 @@ WalletSynchronizer::WalletSynchronizer(
     const std::shared_ptr<Nigel> daemon,
     const uint64_t startHeight,
     const uint64_t startTimestamp,
-    const Crypto::SecretKey privateViewKey,
+    const crypto::SecretKey privateViewKey,
     const std::shared_ptr<EventHandler> eventHandler) :
 
                                                         m_daemon(daemon),
@@ -204,10 +204,10 @@ std::vector<wallet_types::WalletBlockInfo> WalletSynchronizer::downloadBlocks()
     return blocks;
 }
 
-std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> WalletSynchronizer::processBlockOutputs(
+std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> WalletSynchronizer::processBlockOutputs(
     const wallet_types::WalletBlockInfo &block) const
 {
-    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> inputs;
+    std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> inputs;
 
     if (wallet_config::processCoinbaseTransactions)
     {
@@ -237,7 +237,7 @@ void WalletSynchronizer::processBlock(const wallet_types::WalletBlockInfo &block
 
     auto ourInputs = processBlockOutputs(block);
 
-    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> globalIndexes;
+    std::unordered_map<crypto::Hash, std::vector<uint64_t>> globalIndexes;
 
     for (auto &[publicKey, input] : ourInputs)
     {
@@ -302,7 +302,7 @@ void WalletSynchronizer::processBlock(const wallet_types::WalletBlockInfo &block
 
 BlockScanTmpInfo WalletSynchronizer::processBlockTransactions(
     const wallet_types::WalletBlockInfo &block,
-    const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const
+    const std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const
 {
     BlockScanTmpInfo txData;
 
@@ -339,13 +339,13 @@ BlockScanTmpInfo WalletSynchronizer::processBlockTransactions(
 
 std::optional<wallet_types::Transaction> WalletSynchronizer::processCoinbaseTransaction(
     const wallet_types::WalletBlockInfo &block,
-    const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const
+    const std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const
 {
     const auto tx = block.coinbaseTransaction;
 
-    std::unordered_map<Crypto::PublicKey, int64_t> transfers;
+    std::unordered_map<crypto::PublicKey, int64_t> transfers;
 
-    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> relevantInputs;
+    std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> relevantInputs;
 
     std::copy_if(inputs.begin(), inputs.end(), std::back_inserter(relevantInputs), [&](const auto input)
                  { return std::get<1>(input).parentTransactionHash == tx.hash; });
@@ -369,14 +369,14 @@ std::optional<wallet_types::Transaction> WalletSynchronizer::processCoinbaseTran
     return std::nullopt;
 }
 
-std::tuple<std::optional<wallet_types::Transaction>, std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>>> WalletSynchronizer::processTransaction(
+std::tuple<std::optional<wallet_types::Transaction>, std::vector<std::tuple<crypto::PublicKey, crypto::KeyImage>>> WalletSynchronizer::processTransaction(
     const wallet_types::WalletBlockInfo &block,
-    const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs,
+    const std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> &inputs,
     const wallet_types::RawTransaction &tx) const
 {
-    std::unordered_map<Crypto::PublicKey, int64_t> transfers;
+    std::unordered_map<crypto::PublicKey, int64_t> transfers;
 
-    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> relevantInputs;
+    std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> relevantInputs;
 
     std::copy_if(inputs.begin(), inputs.end(), std::back_inserter(relevantInputs), [&](const auto input)
                  { return std::get<1>(input).parentTransactionHash == tx.hash; });
@@ -386,7 +386,7 @@ std::tuple<std::optional<wallet_types::Transaction>, std::vector<std::tuple<Cryp
         transfers[publicSpendKey] += input.amount;
     }
 
-    std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>> spentKeyImages;
+    std::vector<std::tuple<crypto::PublicKey, crypto::KeyImage>> spentKeyImages;
 
     for (const auto input : tx.keyInputs)
     {
@@ -426,25 +426,25 @@ std::tuple<std::optional<wallet_types::Transaction>, std::vector<std::tuple<Cryp
     return {std::nullopt, {}};
 }
 
-std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> WalletSynchronizer::processTransactionOutputs(
+std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> WalletSynchronizer::processTransactionOutputs(
     const wallet_types::RawCoinbaseTransaction &rawTX,
     const uint64_t blockHeight) const
 {
-    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> inputs;
+    std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> inputs;
 
-    Crypto::KeyDerivation derivation;
+    crypto::KeyDerivation derivation;
 
-    Crypto::generate_key_derivation(rawTX.transactionPublicKey, m_privateViewKey, derivation);
+    crypto::generate_key_derivation(rawTX.transactionPublicKey, m_privateViewKey, derivation);
 
-    const std::vector<Crypto::PublicKey> spendKeys = m_subWallets->m_publicSpendKeys;
+    const std::vector<crypto::PublicKey> spendKeys = m_subWallets->m_publicSpendKeys;
 
     uint64_t outputIndex = 0;
 
     for (const auto output : rawTX.keyOutputs)
     {
-        Crypto::PublicKey derivedSpendKey;
+        crypto::PublicKey derivedSpendKey;
 
-        Crypto::underive_public_key(derivation, outputIndex, output.key, derivedSpendKey);
+        crypto::underive_public_key(derivation, outputIndex, output.key, derivedSpendKey);
 
         /* See if the derived spend key matches any of our spend keys */
         const auto ourSpendKey = std::find(spendKeys.begin(), spendKeys.end(),
@@ -457,7 +457,7 @@ std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> Walle
                we'll let the subwallet do this since we need the private spend
                key. We use the key images to detect outgoing transactions,
                and we use the transaction inputs to make transactions ourself */
-            const Crypto::KeyImage keyImage = m_subWallets->getTxInputKeyImage(
+            const crypto::KeyImage keyImage = m_subWallets->getTxInputKeyImage(
                 derivedSpendKey, derivation, outputIndex);
 
             const uint64_t spendHeight = 0;
@@ -481,7 +481,7 @@ std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> Walle
 
    For example, if we want the global indexes for a transaction in block
    17, we get all the indexes from block 10 to block 20. */
-std::unordered_map<Crypto::Hash, std::vector<uint64_t>> WalletSynchronizer::getGlobalIndexes(
+std::unordered_map<crypto::Hash, std::vector<uint64_t>> WalletSynchronizer::getGlobalIndexes(
     const uint64_t blockHeight) const
 {
     uint64_t startHeight = utilities::getLowerBound(
@@ -510,15 +510,15 @@ void WalletSynchronizer::checkLockedTransactions()
     {
         /* Transactions that are in the pool - we'll query these again
            next time to see if they have moved */
-        std::unordered_set<Crypto::Hash> transactionsInPool;
+        std::unordered_set<crypto::Hash> transactionsInPool;
 
         /* Transactions that are in a block - don't need to do anything,
            when we get to the block they will be processed and unlocked. */
-        std::unordered_set<Crypto::Hash> transactionsInBlock;
+        std::unordered_set<crypto::Hash> transactionsInBlock;
 
         /* Transactions that the daemon doesn't know about - returned to
            our wallet for timeout or other reason */
-        std::unordered_set<Crypto::Hash> cancelledTransactions;
+        std::unordered_set<crypto::Hash> cancelledTransactions;
 
         /* Get the status of the locked transactions */
         bool success = m_daemon->getTransactionsStatus(

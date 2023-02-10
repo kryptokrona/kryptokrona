@@ -28,7 +28,7 @@ namespace cryptonote
     //---------------------------------------------------------------------------
     bool Checkpoints::addCheckpoint(uint32_t index, const std::string &hash_str)
     {
-        Crypto::Hash h = NULL_HASH;
+        crypto::Hash h = NULL_HASH;
 
         if (!common::podFromHex(hash_str, h))
         {
@@ -115,7 +115,7 @@ namespace cryptonote
         return !points.empty() && (index <= (--points.end())->first);
     }
     //---------------------------------------------------------------------------
-    bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h,
+    bool Checkpoints::checkBlock(uint32_t index, const crypto::Hash &h,
                                  bool &isCheckpoint) const
     {
         auto it = points.find(index);
@@ -141,7 +141,7 @@ namespace cryptonote
         }
     }
     //---------------------------------------------------------------------------
-    bool Checkpoints::checkBlock(uint32_t index, const Crypto::Hash &h) const
+    bool Checkpoints::checkBlock(uint32_t index, const crypto::Hash &h) const
     {
         bool ignored;
         return checkBlock(index, h, ignored);

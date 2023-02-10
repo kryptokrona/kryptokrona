@@ -31,7 +31,7 @@ namespace cryptonote
 
     bool checkInputsKeyimagesDiff(const cryptonote::TransactionPrefix &tx)
     {
-        std::unordered_set<Crypto::KeyImage> ki;
+        std::unordered_set<crypto::KeyImage> ki;
         for (const auto &in : tx.inputs)
         {
             if (in.type() == typeid(KeyInput))
@@ -143,13 +143,13 @@ namespace cryptonote
         // only view secret key is used, spend key is not needed
         keys.viewSecretKey = viewSecretKey;
 
-        Crypto::PublicKey txPubKey = getTransactionPublicKeyFromExtra(transaction.extra);
+        crypto::PublicKey txPubKey = getTransactionPublicKeyFromExtra(transaction.extra);
 
         amount = 0;
         size_t keyIndex = 0;
         uint32_t outputIndex = 0;
 
-        Crypto::KeyDerivation derivation;
+        crypto::KeyDerivation derivation;
         generate_key_derivation(txPubKey, keys.viewSecretKey, derivation);
 
         for (const TransactionOutput &o : transaction.outputs)

@@ -21,9 +21,9 @@ namespace utilities
 
        Please note this function does not accept integrated addresses. Please
        extract the payment ID from them before calling this function. */
-    std::vector<Crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses)
+    std::vector<crypto::PublicKey> addressesToSpendKeys(const std::vector<std::string> addresses)
     {
-        std::vector<Crypto::PublicKey> spendKeys;
+        std::vector<crypto::PublicKey> spendKeys;
 
         for (const auto &address : addresses)
         {
@@ -34,7 +34,7 @@ namespace utilities
         return spendKeys;
     }
 
-    std::tuple<Crypto::PublicKey, Crypto::PublicKey> addressToKeys(const std::string address)
+    std::tuple<crypto::PublicKey, crypto::PublicKey> addressToKeys(const std::string address)
     {
         cryptonote::AccountPublicAddress parsedAddress;
 
@@ -91,8 +91,8 @@ namespace utilities
     }
 
     std::string publicKeysToAddress(
-        const Crypto::PublicKey publicSpendKey,
-        const Crypto::PublicKey publicViewKey)
+        const crypto::PublicKey publicSpendKey,
+        const crypto::PublicKey publicViewKey)
     {
         return cryptonote::getAccountAddressAsStr(
             cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
@@ -101,14 +101,14 @@ namespace utilities
 
     /* Generates a public address from the given private keys */
     std::string privateKeysToAddress(
-        const Crypto::SecretKey privateSpendKey,
-        const Crypto::SecretKey privateViewKey)
+        const crypto::SecretKey privateSpendKey,
+        const crypto::SecretKey privateViewKey)
     {
-        Crypto::PublicKey publicSpendKey;
-        Crypto::PublicKey publicViewKey;
+        crypto::PublicKey publicSpendKey;
+        crypto::PublicKey publicViewKey;
 
-        Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
-        Crypto::secret_key_to_public_key(privateViewKey, publicViewKey);
+        crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
+        crypto::secret_key_to_public_key(privateViewKey, publicViewKey);
 
         return cryptonote::getAccountAddressAsStr(
             cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,

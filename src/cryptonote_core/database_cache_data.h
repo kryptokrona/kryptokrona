@@ -25,8 +25,8 @@ namespace cryptonote
 
     struct KeyOutputInfo
     {
-        Crypto::PublicKey publicKey;
-        Crypto::Hash transactionHash;
+        crypto::PublicKey publicKey;
+        crypto::Hash transactionHash;
         uint64_t unlockTime;
         uint16_t outputIndex;
 

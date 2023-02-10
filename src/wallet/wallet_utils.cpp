@@ -44,10 +44,10 @@ namespace cryptonote
         }
     }
 
-    void throwIfKeysMismatch(const Crypto::SecretKey &secretKey, const Crypto::PublicKey &expectedPublicKey, const std::string &message)
+    void throwIfKeysMismatch(const crypto::SecretKey &secretKey, const crypto::PublicKey &expectedPublicKey, const std::string &message)
     {
-        Crypto::PublicKey pub;
-        bool r = Crypto::secret_key_to_public_key(secretKey, pub);
+        crypto::PublicKey pub;
+        bool r = crypto::secret_key_to_public_key(secretKey, pub);
         if (!r || expectedPublicKey != pub)
         {
             throw std::system_error(make_error_code(cryptonote::error::WRONG_PASSWORD), message);

@@ -265,15 +265,15 @@ namespace cryptonote
                     throw std::runtime_error("Serialization error: unexpected signatures size");
                 }
 
-                for (Crypto::Signature &sig : tx.signatures[i])
+                for (crypto::Signature &sig : tx.signatures[i])
                 {
                     serializePod(sig, "", serializer);
                 }
             }
             else
             {
-                std::vector<Crypto::Signature> signatures(signatureSize);
-                for (Crypto::Signature &sig : signatures)
+                std::vector<crypto::Signature> signatures(signatureSize);
+                for (crypto::Signature &sig : signatures)
                 {
                     serializePod(sig, "", serializer);
                 }
@@ -358,14 +358,14 @@ namespace cryptonote
 
         if (pbs.m_hashingSerialization)
         {
-            Crypto::Hash minerTxHash;
+            crypto::Hash minerTxHash;
             if (!getBaseTransactionHash(pbs.m_parentBlock.baseTransaction, minerTxHash))
             {
                 throw std::runtime_error("Get transaction hash error");
             }
 
-            Crypto::Hash merkleRoot;
-            Crypto::tree_hash_from_branch(pbs.m_parentBlock.baseTransactionBranch.data(), pbs.m_parentBlock.baseTransactionBranch.size(), minerTxHash, 0, merkleRoot);
+            crypto::Hash merkleRoot;
+            crypto::tree_hash_from_branch(pbs.m_parentBlock.baseTransactionBranch.data(), pbs.m_parentBlock.baseTransactionBranch.size(), minerTxHash, 0, merkleRoot);
 
             serializer(merkleRoot, "merkleRoot");
         }
@@ -383,7 +383,7 @@ namespace cryptonote
             return;
         }
 
-        uint64_t branchSize = Crypto::tree_depth(pbs.m_parentBlock.transactionCount);
+        uint64_t branchSize = crypto::tree_depth(pbs.m_parentBlock.transactionCount);
         if (serializer.type() == ISerializer::OUTPUT)
         {
             if (pbs.m_parentBlock.baseTransactionBranch.size() != branchSize)
@@ -398,7 +398,7 @@ namespace cryptonote
 
         //  serializer(m_parentBlock.baseTransactionBranch, "baseTransactionBranch");
         // TODO: Make arrays with computable size! This code won't work with json serialization!
-        for (Crypto::Hash &hash : pbs.m_parentBlock.baseTransactionBranch)
+        for (crypto::Hash &hash : pbs.m_parentBlock.baseTransactionBranch)
         {
             serializer(hash, "");
         }
@@ -411,7 +411,7 @@ namespace cryptonote
             throw std::runtime_error("Can't get extra merge mining tag");
         }
 
-        if (mmTag.depth > 8 * sizeof(Crypto::Hash))
+        if (mmTag.depth > 8 * sizeof(crypto::Hash))
         {
             throw std::runtime_error("Wrong merge mining tag depth");
         }
@@ -430,7 +430,7 @@ namespace cryptonote
 
         //  serializer(m_parentBlock.blockchainBranch, "blockchainBranch");
         // TODO: Make arrays with computable size! This code won't work with json serialization!
-        for (Crypto::Hash &hash : pbs.m_parentBlock.blockchainBranch)
+        for (crypto::Hash &hash : pbs.m_parentBlock.blockchainBranch)
         {
             serializer(hash, "");
         }

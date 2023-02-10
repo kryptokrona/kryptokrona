@@ -134,7 +134,7 @@ namespace cryptonote
         bool isTestnet() const { return m_testnet; }
 
         const BlockTemplate &genesisBlock() const { return cachedGenesisBlock->getBlock(); }
-        const Crypto::Hash &genesisBlockHash() const { return cachedGenesisBlock->getBlockHash(); }
+        const crypto::Hash &genesisBlockHash() const { return cachedGenesisBlock->getBlockHash(); }
 
         bool getBlockReward(uint8_t blockMajorVersion, size_t medianSize, size_t currentBlockSize, uint64_t alreadyGeneratedCoins, uint64_t fee,
                             uint64_t &reward, int64_t &emissionChange) const;

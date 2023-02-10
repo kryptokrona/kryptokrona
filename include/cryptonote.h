@@ -30,11 +30,11 @@ struct BaseInput {
 struct KeyInput {
   uint64_t amount;
   std::vector<uint32_t> outputIndexes;
-  Crypto::KeyImage keyImage;
+  crypto::KeyImage keyImage;
 };
 
 struct KeyOutput {
-  Crypto::PublicKey key;
+  crypto::PublicKey key;
 };
 
 typedef boost::variant<BaseInput, KeyInput> TransactionInput;
@@ -55,7 +55,7 @@ struct TransactionPrefix {
 };
 
 struct Transaction : public TransactionPrefix {
-  std::vector<std::vector<Crypto::Signature>> signatures;
+  std::vector<std::vector<crypto::Signature>> signatures;
 };
 
 struct BaseTransaction : public TransactionPrefix {
@@ -64,11 +64,11 @@ struct BaseTransaction : public TransactionPrefix {
 struct ParentBlock {
   uint8_t majorVersion;
   uint8_t minorVersion;
-  Crypto::Hash previousBlockHash;
+  crypto::Hash previousBlockHash;
   uint16_t transactionCount;
-  std::vector<Crypto::Hash> baseTransactionBranch;
+  std::vector<crypto::Hash> baseTransactionBranch;
   BaseTransaction baseTransaction;
-  std::vector<Crypto::Hash> blockchainBranch;
+  std::vector<crypto::Hash> blockchainBranch;
 };
 
 struct BlockHeader {
@@ -76,29 +76,29 @@ struct BlockHeader {
   uint8_t minorVersion;
   uint32_t nonce;
   uint64_t timestamp;
-  Crypto::Hash previousBlockHash;
+  crypto::Hash previousBlockHash;
 };
 
 struct BlockTemplate : public BlockHeader {
   ParentBlock parentBlock;
   Transaction baseTransaction;
-  std::vector<Crypto::Hash> transactionHashes;
+  std::vector<crypto::Hash> transactionHashes;
 };
 
 struct AccountPublicAddress {
-  Crypto::PublicKey spendPublicKey;
-  Crypto::PublicKey viewPublicKey;
+  crypto::PublicKey spendPublicKey;
+  crypto::PublicKey viewPublicKey;
 };
 
 struct AccountKeys {
   AccountPublicAddress address;
-  Crypto::SecretKey spendSecretKey;
-  Crypto::SecretKey viewSecretKey;
+  crypto::SecretKey spendSecretKey;
+  crypto::SecretKey viewSecretKey;
 };
 
 struct KeyPair {
-  Crypto::PublicKey publicKey;
-  Crypto::SecretKey secretKey;
+  crypto::PublicKey publicKey;
+  crypto::SecretKey secretKey;
 };
 
 using BinaryArray = std::vector<uint8_t>;
@@ -121,7 +121,7 @@ inline void from_json(const nlohmann::json &j, cryptonote::KeyInput &k)
 {
     k.amount = j.at("amount").get<uint64_t>();
     k.outputIndexes = j.at("key_offsets").get<std::vector<uint32_t>>();
-    k.keyImage = j.at("k_image").get<Crypto::KeyImage>();
+    k.keyImage = j.at("k_image").get<crypto::KeyImage>();
 }
 
 }

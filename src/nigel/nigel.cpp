@@ -62,7 +62,7 @@ void Nigel::swapNode(const std::string daemonHost, const uint16_t daemonPort)
 }
 
 std::tuple<bool, std::vector<wallet_types::WalletBlockInfo>> Nigel::getWalletSyncData(
-    const std::vector<Crypto::Hash> blockHashCheckpoints,
+    const std::vector<crypto::Hash> blockHashCheckpoints,
     uint64_t startHeight,
     uint64_t startTimestamp) const
 {
@@ -247,10 +247,10 @@ std::tuple<std::string, uint16_t> Nigel::nodeAddress() const
 }
 
 bool Nigel::getTransactionsStatus(
-    const std::unordered_set<Crypto::Hash> transactionHashes,
-    std::unordered_set<Crypto::Hash> &transactionsInPool,
-    std::unordered_set<Crypto::Hash> &transactionsInBlock,
-    std::unordered_set<Crypto::Hash> &transactionsUnknown) const
+    const std::unordered_set<crypto::Hash> transactionHashes,
+    std::unordered_set<crypto::Hash> &transactionsInPool,
+    std::unordered_set<crypto::Hash> &transactionsInBlock,
+    std::unordered_set<crypto::Hash> &transactionsUnknown) const
 {
     json j = {
         {"transactionHashes", transactionHashes}};
@@ -269,9 +269,9 @@ bool Nigel::getTransactionsStatus(
                 return false;
             }
 
-            transactionsInPool = j.at("transactionsInPool").get<std::unordered_set<Crypto::Hash>>();
-            transactionsInBlock = j.at("transactionsInBlock").get<std::unordered_set<Crypto::Hash>>();
-            transactionsUnknown = j.at("transactionsUnknown").get<std::unordered_set<Crypto::Hash>>();
+            transactionsInPool = j.at("transactionsInPool").get<std::unordered_set<crypto::Hash>>();
+            transactionsInBlock = j.at("transactionsInBlock").get<std::unordered_set<crypto::Hash>>();
+            transactionsUnknown = j.at("transactionsUnknown").get<std::unordered_set<crypto::Hash>>();
             return true;
         }
         catch (const json::exception &)
@@ -346,7 +346,7 @@ std::tuple<bool, bool> Nigel::sendTransaction(
     return {success, connectionError};
 }
 
-std::tuple<bool, std::unordered_map<Crypto::Hash, std::vector<uint64_t>>>
+std::tuple<bool, std::unordered_map<crypto::Hash, std::vector<uint64_t>>>
 Nigel::getGlobalIndexesForRange(
     const uint64_t startHeight,
     const uint64_t endHeight) const
@@ -362,7 +362,7 @@ Nigel::getGlobalIndexesForRange(
     {
         try
         {
-            std::unordered_map<Crypto::Hash, std::vector<uint64_t>> result;
+            std::unordered_map<crypto::Hash, std::vector<uint64_t>> result;
 
             json j = json::parse(res->body);
 
@@ -377,7 +377,7 @@ Nigel::getGlobalIndexesForRange(
 
             for (const auto index : indexes)
             {
-                result[index.at("key").get<Crypto::Hash>()] = index.at("value").get<std::vector<uint64_t>>();
+                result[index.at("key").get<crypto::Hash>()] = index.at("value").get<std::vector<uint64_t>>();
             }
 
             return {true, result};

@@ -309,12 +309,12 @@ namespace cryptonote
 
         uint32_t totalBlockCount;
         uint32_t startBlockIndex;
-        std::vector<Crypto::Hash> supplement = m_core.findBlockchainSupplement(req.block_ids, COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT, totalBlockCount, startBlockIndex);
+        std::vector<crypto::Hash> supplement = m_core.findBlockchainSupplement(req.block_ids, COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT, totalBlockCount, startBlockIndex);
 
         res.current_height = totalBlockCount;
         res.start_height = startBlockIndex;
 
-        std::vector<Crypto::Hash> missedHashes;
+        std::vector<crypto::Hash> missedHashes;
         m_core.getBlocks(supplement, res.blocks, missedHashes);
         assert(missedHashes.empty());
 
@@ -445,7 +445,7 @@ namespace cryptonote
         for (uint64_t amount : req.amounts)
         {
             std::vector<uint32_t> globalIndexes;
-            std::vector<Crypto::PublicKey> publicKeys;
+            std::vector<crypto::PublicKey> publicKeys;
             if (!m_core.getRandomOutputs(amount, static_cast<uint16_t>(req.outs_count), globalIndexes, publicKeys))
             {
                 return true;
@@ -540,7 +540,7 @@ namespace cryptonote
         try
         {
             std::vector<BlockDetails> blockDetails;
-            for (const Crypto::Hash &hash : req.blockHashes)
+            for (const crypto::Hash &hash : req.blockHashes)
             {
                 blockDetails.push_back(m_core.getBlockDetails(hash));
             }
@@ -743,7 +743,7 @@ namespace cryptonote
             return true;
         }
 
-        Crypto::Hash transactionHash = Crypto::cn_fast_hash(transactions.back().data(), transactions.back().size());
+        crypto::Hash transactionHash = crypto::cn_fast_hash(transactions.back().data(), transactions.back().size());
         logger(DEBUGGING) << "transaction " << transactionHash << " came in on_send_raw_tx";
 
         if (!m_core.addTransactionToPool(transactions.back()))
@@ -942,7 +942,7 @@ namespace cryptonote
         transaction_short.size = getObjectBinarySize(blk.baseTransaction);
         res.block.transactions.push_back(transaction_short);
 
-        std::vector<Crypto::Hash> missed_txs;
+        std::vector<crypto::Hash> missed_txs;
         std::vector<BinaryArray> txs;
         m_core.getTransactions(blk.transactionHashes, txs, missed_txs);
 
@@ -989,10 +989,10 @@ namespace cryptonote
                 "Failed to parse hex representation of transaction hash. Hex = " + req.hash + '.'};
         }
 
-        std::vector<Crypto::Hash> tx_ids;
+        std::vector<crypto::Hash> tx_ids;
         tx_ids.push_back(hash);
 
-        std::vector<Crypto::Hash> missed_txs;
+        std::vector<crypto::Hash> missed_txs;
         std::vector<BinaryArray> txs;
         m_core.getTransactions(tx_ids, txs, missed_txs);
 
@@ -1013,7 +1013,7 @@ namespace cryptonote
         }
         TransactionDetails transactionDetails = m_core.getTransactionDetails(hash);
 
-        Crypto::Hash blockHash;
+        crypto::Hash blockHash;
         if (transactionDetails.inBlockchain)
         {
             uint32_t blockHeight = transactionDetails.blockIndex;
@@ -1055,7 +1055,7 @@ namespace cryptonote
         }
         res.txDetails.mixin = mixin;
 
-        Crypto::Hash paymentId;
+        crypto::Hash paymentId;
         if (cryptonote::getPaymentIdFromTxExtra(res.tx.extra, paymentId))
         {
             res.txDetails.paymentId = common::podToHex(paymentId);
@@ -1127,7 +1127,7 @@ namespace cryptonote
         }
 
         uint32_t h = static_cast<uint32_t>(req[0]);
-        Crypto::Hash blockId = m_core.getBlockHashByIndex(h - 1);
+        crypto::Hash blockId = m_core.getBlockHashByIndex(h - 1);
         if (blockId == NULL_HASH)
         {
             throw json_rpc::JsonRpcError{
@@ -1274,7 +1274,7 @@ namespace cryptonote
         }
 
         rawBlock.transactions.reserve(blockTemplate.transactionHashes.size());
-        std::vector<Crypto::Hash> missedTransactions;
+        std::vector<crypto::Hash> missedTransactions;
         m_core.getTransactions(blockTemplate.transactionHashes, rawBlock.transactions, missedTransactions);
         assert(missedTransactions.empty());
 
@@ -1379,7 +1379,7 @@ namespace cryptonote
 
         for (uint32_t h = static_cast<uint32_t>(req.start_height); h <= static_cast<uint32_t>(req.end_height); ++h)
         {
-            Crypto::Hash block_hash = m_core.getBlockHashByIndex(h);
+            crypto::Hash block_hash = m_core.getBlockHashByIndex(h);
             cryptonote::BlockTemplate blk = m_core.getBlockByHash(block_hash);
 
             res.headers.push_back(block_header_response());

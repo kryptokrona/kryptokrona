@@ -80,7 +80,7 @@ void BlockchainMonitor::stop()
     m_sleepingContext.wait();
 }
 
-std::optional<Crypto::Hash> BlockchainMonitor::requestLastBlockHash()
+std::optional<crypto::Hash> BlockchainMonitor::requestLastBlockHash()
 {
     json j = {
         {"jsonrpc", "2.0"},
@@ -127,7 +127,7 @@ std::optional<Crypto::Hash> BlockchainMonitor::requestLastBlockHash()
             return std::nullopt;
         }
 
-        return j.at("result").at("block_header").at("hash").get<Crypto::Hash>();
+        return j.at("result").at("block_header").at("hash").get<crypto::Hash>();
     }
     catch (const json::exception &e)
     {

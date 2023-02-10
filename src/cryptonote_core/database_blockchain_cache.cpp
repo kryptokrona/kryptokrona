@@ -64,7 +64,7 @@ namespace cryptonote
             return true;
         }
 
-        bool requestTransactionHashesForGlobalOutputIndexes(const std::vector<PackedOutIndex> &packedOuts, IDataBase &database, std::vector<Crypto::Hash> &transactionHashes)
+        bool requestTransactionHashesForGlobalOutputIndexes(const std::vector<PackedOutIndex> &packedOuts, IDataBase &database, std::vector<crypto::Hash> &transactionHashes)
         {
             BlockchainReadBatch readHashesBatch;
 
@@ -102,12 +102,12 @@ namespace cryptonote
             return true;
         }
 
-        bool requestCachedTransactionInfos(const std::vector<Crypto::Hash> &transactionHashes, IDataBase &database, std::vector<CachedTransactionInfo> &result)
+        bool requestCachedTransactionInfos(const std::vector<crypto::Hash> &transactionHashes, IDataBase &database, std::vector<CachedTransactionInfo> &result)
         {
             result.reserve(result.size() + transactionHashes.size());
 
             BlockchainReadBatch transactionsBatch;
-            std::for_each(transactionHashes.begin(), transactionHashes.end(), [&transactionsBatch](const Crypto::Hash &hash)
+            std::for_each(transactionHashes.begin(), transactionHashes.end(), [&transactionsBatch](const crypto::Hash &hash)
                           { transactionsBatch.requestCachedTransaction(hash); });
             auto dbResult = database.read(transactionsBatch);
             if (dbResult)
@@ -133,7 +133,7 @@ namespace cryptonote
         // returns CachedTransactionInfos in the same or as packedOuts are
         /*
         bool requestCachedTransactionInfos(const std::vector<PackedOutIndex>& packedOuts, IDataBase& database, std::vector<CachedTransactionInfo>& result) {
-          std::vector<Crypto::Hash> transactionHashes;
+          std::vector<crypto::Hash> transactionHashes;
           if (!requestTransactionHashesForGlobalOutputIndexes(packedOuts, database, transactionHashes)) {
             return false;
           }
@@ -142,12 +142,12 @@ namespace cryptonote
         }
         */
 
-        bool requestExtendedTransactionInfos(const std::vector<Crypto::Hash> &transactionHashes, IDataBase &database, std::vector<ExtendedTransactionInfo> &result)
+        bool requestExtendedTransactionInfos(const std::vector<crypto::Hash> &transactionHashes, IDataBase &database, std::vector<ExtendedTransactionInfo> &result)
         {
             result.reserve(result.size() + transactionHashes.size());
 
             BlockchainReadBatch transactionsBatch;
-            std::for_each(transactionHashes.begin(), transactionHashes.end(), [&transactionsBatch](const Crypto::Hash &hash)
+            std::for_each(transactionHashes.begin(), transactionHashes.end(), [&transactionsBatch](const crypto::Hash &hash)
                           { transactionsBatch.requestCachedTransaction(hash); });
             auto dbResult = database.read(transactionsBatch);
             if (dbResult)
@@ -158,7 +158,7 @@ namespace cryptonote
             auto readResult = transactionsBatch.extractResult();
             const auto &transactions = readResult.getCachedTransactions();
 
-            std::unordered_set<Crypto::Hash> uniqueTransactionHashes(transactionHashes.begin(), transactionHashes.end());
+            std::unordered_set<crypto::Hash> uniqueTransactionHashes(transactionHashes.begin(), transactionHashes.end());
             if (transactions.size() != uniqueTransactionHashes.size())
             {
                 return false;
@@ -175,7 +175,7 @@ namespace cryptonote
         // returns ExtendedTransactionInfos in the same order as packedOuts are
         bool requestExtendedTransactionInfos(const std::vector<PackedOutIndex> &packedOuts, IDataBase &database, std::vector<ExtendedTransactionInfo> &result)
         {
-            std::vector<Crypto::Hash> transactionHashes;
+            std::vector<crypto::Hash> transactionHashes;
             if (!requestTransactionHashesForGlobalOutputIndexes(packedOuts, database, transactionHashes))
             {
                 return false;
@@ -263,7 +263,7 @@ namespace cryptonote
             return blockTemplate.baseTransaction;
         }
 
-        size_t requestPaymentIdTransactionsCount(IDataBase &database, const Crypto::Hash &paymentId)
+        size_t requestPaymentIdTransactionsCount(IDataBase &database, const crypto::Hash &paymentId)
         {
             auto batch = BlockchainReadBatch().requestTransactionCountByPaymentId(paymentId);
             auto error = database.read(batch);
@@ -281,7 +281,7 @@ namespace cryptonote
             return result.getTransactionCountByPaymentIds().at(paymentId);
         }
 
-        bool requestPaymentId(IDataBase &database, const Crypto::Hash &transactionHash, Crypto::Hash &paymentId)
+        bool requestPaymentId(IDataBase &database, const crypto::Hash &transactionHash, crypto::Hash &paymentId)
         {
             std::vector<CachedTransactionInfo> cachedTransactions;
 
@@ -621,7 +621,7 @@ namespace cryptonote
 
         auto cache = blockchainCacheFactory.createBlockchainCache(currency, this, splitBlockIndex);
 
-        using DeleteBlockInfo = std::tuple<uint32_t, Crypto::Hash, TransactionValidatorState, uint64_t>;
+        using DeleteBlockInfo = std::tuple<uint32_t, crypto::Hash, TransactionValidatorState, uint64_t>;
         std::vector<DeleteBlockInfo> deletingBlocks;
 
         BlockchainWriteBatch writeBatch;
@@ -699,7 +699,7 @@ namespace cryptonote
     }
 
     // returns hash of pushed block
-    Crypto::Hash DatabaseBlockchainCache::pushBlockToAnotherCache(IBlockchainCache &segment, PushedBlockInfo &&pushedBlockInfo)
+    crypto::Hash DatabaseBlockchainCache::pushBlockToAnotherCache(IBlockchainCache &segment, PushedBlockInfo &&pushedBlockInfo)
     {
         BlockTemplate block;
         bool br = fromBinaryArray(block, pushedBlockInfo.rawBlock.block);
@@ -727,7 +727,7 @@ namespace cryptonote
         return cachedBlock.getBlockHash();
     }
 
-    std::vector<Crypto::Hash> DatabaseBlockchainCache::requestTransactionHashesFromBlockIndex(uint32_t splitBlockIndex)
+    std::vector<crypto::Hash> DatabaseBlockchainCache::requestTransactionHashesFromBlockIndex(uint32_t splitBlockIndex)
     {
         logger(logging::DEBUGGING) << "Requesting transaction hashes starting from block index " << splitBlockIndex;
 
@@ -737,7 +737,7 @@ namespace cryptonote
             readBatch.requestTransactionHashesByBlock(blockIndex);
         }
 
-        std::vector<Crypto::Hash> transactionHashes;
+        std::vector<crypto::Hash> transactionHashes;
 
         auto dbResult = readDatabase(readBatch);
         for (const auto &kv : dbResult.getTransactionHashesByBlocks())
@@ -751,7 +751,7 @@ namespace cryptonote
         return transactionHashes;
     }
 
-    void DatabaseBlockchainCache::requestDeleteTransactions(BlockchainWriteBatch &writeBatch, const std::vector<Crypto::Hash> &transactionHashes)
+    void DatabaseBlockchainCache::requestDeleteTransactions(BlockchainWriteBatch &writeBatch, const std::vector<crypto::Hash> &transactionHashes)
     {
         for (const auto &hash : transactionHashes)
         {
@@ -761,13 +761,13 @@ namespace cryptonote
         }
     }
 
-    void DatabaseBlockchainCache::requestDeletePaymentIds(BlockchainWriteBatch &writeBatch, const std::vector<Crypto::Hash> &transactionHashes)
+    void DatabaseBlockchainCache::requestDeletePaymentIds(BlockchainWriteBatch &writeBatch, const std::vector<crypto::Hash> &transactionHashes)
     {
-        std::unordered_map<Crypto::Hash, size_t> paymentCounts;
+        std::unordered_map<crypto::Hash, size_t> paymentCounts;
 
         for (const auto &hash : transactionHashes)
         {
-            Crypto::Hash paymentId;
+            crypto::Hash paymentId;
             if (!requestPaymentId(database, hash, paymentId))
             {
                 continue;
@@ -782,7 +782,7 @@ namespace cryptonote
         }
     }
 
-    void DatabaseBlockchainCache::requestDeletePaymentId(BlockchainWriteBatch &writeBatch, const Crypto::Hash &paymentId, size_t toDelete)
+    void DatabaseBlockchainCache::requestDeletePaymentId(BlockchainWriteBatch &writeBatch, const crypto::Hash &paymentId, size_t toDelete)
     {
         size_t count = requestPaymentIdTransactionsCount(database, paymentId);
         assert(count > 0);
@@ -796,7 +796,7 @@ namespace cryptonote
     {
         logger(logging::DEBUGGING) << "Deleting spent outputs for block index " << blockIndex;
 
-        std::vector<Crypto::KeyImage> spentKeys(spentOutputs.spentKeyImages.begin(), spentOutputs.spentKeyImages.end());
+        std::vector<crypto::KeyImage> spentKeys(spentOutputs.spentKeyImages.begin(), spentOutputs.spentKeyImages.end());
 
         writeBatch.removeSpentKeyImages(blockIndex, spentKeys);
     }
@@ -841,7 +841,7 @@ namespace cryptonote
         updateKeyOutputCount(amount, boundary - outputsCount);
     }
 
-    void DatabaseBlockchainCache::requestRemoveTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const Crypto::Hash &blockHash)
+    void DatabaseBlockchainCache::requestRemoveTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const crypto::Hash &blockHash)
     {
         auto readBatch = BlockchainReadBatch().requestBlockHashesByTimestamp(timestamp);
         auto result = readDatabase(readBatch);
@@ -937,7 +937,7 @@ namespace cryptonote
             batch.insertKeyOutputAmounts(newKeyAmounts, *keyOutputAmountsCount);
         }
 
-        Crypto::Hash paymentId;
+        crypto::Hash paymentId;
         if (getPaymentIdFromTxExtra(cachedTransaction.getTransaction().extra, paymentId))
         {
             insertPaymentId(batch, cachedTransaction.getTransactionHash(), paymentId);
@@ -984,7 +984,7 @@ namespace cryptonote
         return it->second;
     }
 
-    void DatabaseBlockchainCache::insertPaymentId(BlockchainWriteBatch &batch, const Crypto::Hash &transactionHash, const Crypto::Hash &paymentId)
+    void DatabaseBlockchainCache::insertPaymentId(BlockchainWriteBatch &batch, const crypto::Hash &transactionHash, const crypto::Hash &paymentId)
     {
         BlockchainReadBatch readBatch;
         uint32_t count = 0;
@@ -1000,12 +1000,12 @@ namespace cryptonote
         batch.insertPaymentId(transactionHash, paymentId, count);
     }
 
-    void DatabaseBlockchainCache::insertBlockTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const Crypto::Hash &blockHash)
+    void DatabaseBlockchainCache::insertBlockTimestamp(BlockchainWriteBatch &batch, uint64_t timestamp, const crypto::Hash &blockHash)
     {
         BlockchainReadBatch readBatch;
         readBatch.requestBlockHashesByTimestamp(timestamp);
 
-        std::vector<Crypto::Hash> blockHashes;
+        std::vector<crypto::Hash> blockHashes;
         auto readResult = readDatabase(readBatch);
 
         if (readResult.getBlockHashesByTimestamp().count(timestamp) != 0)
@@ -1098,7 +1098,7 @@ namespace cryptonote
         return getExtendedPushedBlockInfo(blockIndex).pushedBlockInfo;
     }
 
-    bool DatabaseBlockchainCache::checkIfSpent(const Crypto::KeyImage &keyImage, uint32_t blockIndex) const
+    bool DatabaseBlockchainCache::checkIfSpent(const crypto::KeyImage &keyImage, uint32_t blockIndex) const
     {
         auto batch = BlockchainReadBatch().requestBlockIndexBySpentKeyImage(keyImage);
         auto res = database.read(batch);
@@ -1114,7 +1114,7 @@ namespace cryptonote
         return it != readResult.getBlockIndexesBySpentKeyImages().end() && it->second <= blockIndex;
     }
 
-    bool DatabaseBlockchainCache::checkIfSpent(const Crypto::KeyImage &keyImage) const
+    bool DatabaseBlockchainCache::checkIfSpent(const crypto::KeyImage &keyImage) const
     {
         return checkIfSpent(keyImage, getTopBlockIndex());
     }
@@ -1139,7 +1139,7 @@ namespace cryptonote
 
     ExtractOutputKeysResult
     DatabaseBlockchainCache::extractKeyOutputKeys(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
-                                                  std::vector<Crypto::PublicKey> &publicKeys) const
+                                                  std::vector<crypto::PublicKey> &publicKeys) const
     {
         return extractKeyOutputKeys(amount, getTopBlockIndex(), globalIndexes, publicKeys);
     }
@@ -1147,7 +1147,7 @@ namespace cryptonote
     ExtractOutputKeysResult
     DatabaseBlockchainCache::extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex,
                                                   common::ArrayView<uint32_t> globalIndexes,
-                                                  std::vector<Crypto::PublicKey> &publicKeys) const
+                                                  std::vector<crypto::PublicKey> &publicKeys) const
     {
         return extractKeyOutputs(amount, blockIndex, globalIndexes, [this, &publicKeys, blockIndex](const CachedTransactionInfo &info, PackedOutIndex index, uint32_t globalIndex)
                                  {
@@ -1178,7 +1178,7 @@ namespace cryptonote
 
     ExtractOutputKeysResult DatabaseBlockchainCache::extractKeyOtputReferences(
         uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
-        std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const
+        std::vector<std::pair<crypto::Hash, size_t>> &outputReferences) const
     {
 
         return extractKeyOutputs(amount, getTopBlockIndex(), globalIndexes, [&outputReferences](const CachedTransactionInfo &info, PackedOutIndex index, uint32_t globalIndex)
@@ -1251,7 +1251,7 @@ namespace cryptonote
         return *transactionsCount;
     }
 
-    const Crypto::Hash &DatabaseBlockchainCache::getTopBlockHash() const
+    const crypto::Hash &DatabaseBlockchainCache::getTopBlockHash() const
     {
         if (!topBlockHash)
         {
@@ -1266,14 +1266,14 @@ namespace cryptonote
         return getTopBlockIndex() + 1;
     }
 
-    bool DatabaseBlockchainCache::hasBlock(const Crypto::Hash &blockHash) const
+    bool DatabaseBlockchainCache::hasBlock(const crypto::Hash &blockHash) const
     {
         auto batch = BlockchainReadBatch().requestBlockIndexByBlockHash(blockHash);
         auto result = database.read(batch);
         return !result && batch.extractResult().getBlockIndexesByBlockHashes().count(blockHash);
     }
 
-    uint32_t DatabaseBlockchainCache::getBlockIndex(const Crypto::Hash &blockHash) const
+    uint32_t DatabaseBlockchainCache::getBlockIndex(const crypto::Hash &blockHash) const
     {
         if (blockHash == getTopBlockHash())
         {
@@ -1285,7 +1285,7 @@ namespace cryptonote
         return result.getBlockIndexesByBlockHashes().at(blockHash);
     }
 
-    bool DatabaseBlockchainCache::hasTransaction(const Crypto::Hash &transactionHash) const
+    bool DatabaseBlockchainCache::hasTransaction(const crypto::Hash &transactionHash) const
     {
         auto batch = BlockchainReadBatch().requestCachedTransaction(transactionHash);
         auto result = database.read(batch);
@@ -1504,7 +1504,7 @@ namespace cryptonote
         return result;
     }
 
-    Crypto::Hash DatabaseBlockchainCache::getBlockHash(uint32_t blockIndex) const
+    crypto::Hash DatabaseBlockchainCache::getBlockHash(uint32_t blockIndex) const
     {
         if (blockIndex == getTopBlockIndex())
         {
@@ -1516,7 +1516,7 @@ namespace cryptonote
         return result.getCachedBlocks().at(blockIndex).blockHash;
     }
 
-    std::vector<Crypto::Hash> DatabaseBlockchainCache::getBlockHashes(uint32_t startIndex, size_t maxCount) const
+    std::vector<crypto::Hash> DatabaseBlockchainCache::getBlockHashes(uint32_t startIndex, size_t maxCount) const
     {
         assert(startIndex <= getTopBlockIndex());
         assert(maxCount <= std::numeric_limits<uint32_t>::max());
@@ -1537,7 +1537,7 @@ namespace cryptonote
         auto result = readDatabase(request);
         assert(result.getCachedBlocks().size() == count);
 
-        std::vector<Crypto::Hash> hashes;
+        std::vector<crypto::Hash> hashes;
         hashes.reserve(count);
 
         std::map<uint32_t, CachedBlockInfo> sortedResult(
@@ -1623,7 +1623,7 @@ namespace cryptonote
         return 0;
     }
 
-    bool DatabaseBlockchainCache::getTransactionGlobalIndexes(const Crypto::Hash &transactionHash,
+    bool DatabaseBlockchainCache::getTransactionGlobalIndexes(const crypto::Hash &transactionHash,
                                                               std::vector<uint32_t> &globalIndexes) const
     {
         auto batch = BlockchainReadBatch().requestCachedTransaction(transactionHash);
@@ -1651,7 +1651,7 @@ namespace cryptonote
         return static_cast<size_t>(getCachedTransactionsCount());
     }
 
-    uint32_t DatabaseBlockchainCache::getBlockIndexContainingTx(const Crypto::Hash &transactionHash) const
+    uint32_t DatabaseBlockchainCache::getBlockIndexContainingTx(const crypto::Hash &transactionHash) const
     {
         auto batch = BlockchainReadBatch().requestCachedTransaction(transactionHash);
         auto result = readDatabase(batch);
@@ -1672,8 +1672,8 @@ namespace cryptonote
     }
 
     std::vector<BinaryArray>
-    DatabaseBlockchainCache::getRawTransactions(const std::vector<Crypto::Hash> &transactions,
-                                                std::vector<Crypto::Hash> &missedTransactions) const
+    DatabaseBlockchainCache::getRawTransactions(const std::vector<crypto::Hash> &transactions,
+                                                std::vector<crypto::Hash> &missedTransactions) const
     {
         std::vector<BinaryArray> found;
         getRawTransactions(transactions, found, missedTransactions);
@@ -1681,17 +1681,17 @@ namespace cryptonote
     }
 
     std::vector<BinaryArray>
-    DatabaseBlockchainCache::getRawTransactions(const std::vector<Crypto::Hash> &transactions) const
+    DatabaseBlockchainCache::getRawTransactions(const std::vector<crypto::Hash> &transactions) const
     {
-        std::vector<Crypto::Hash> missed;
+        std::vector<crypto::Hash> missed;
         std::vector<BinaryArray> found;
         getRawTransactions(transactions, found, missed);
         return found;
     }
 
-    void DatabaseBlockchainCache::getRawTransactions(const std::vector<Crypto::Hash> &transactions,
+    void DatabaseBlockchainCache::getRawTransactions(const std::vector<crypto::Hash> &transactions,
                                                      std::vector<BinaryArray> &foundTransactions,
-                                                     std::vector<Crypto::Hash> &missedTransactions) const
+                                                     std::vector<crypto::Hash> &missedTransactions) const
     {
         BlockchainReadBatch batch;
         for (auto &hash : transactions)
@@ -1753,7 +1753,7 @@ namespace cryptonote
         return getBlockByIndex(blockIndex).transactions.at(transactionIndex);
     }
 
-    std::vector<Crypto::Hash> DatabaseBlockchainCache::getTransactionHashes() const
+    std::vector<crypto::Hash> DatabaseBlockchainCache::getTransactionHashes() const
     {
         assert(false);
         return {};
@@ -1863,7 +1863,7 @@ namespace cryptonote
         return ExtractOutputKeysResult::SUCCESS;
     }
 
-    std::vector<Crypto::Hash> DatabaseBlockchainCache::getTransactionHashesByPaymentId(const Crypto::Hash &paymentId) const
+    std::vector<crypto::Hash> DatabaseBlockchainCache::getTransactionHashesByPaymentId(const crypto::Hash &paymentId) const
     {
         auto countBatch = BlockchainReadBatch().requestTransactionCountByPaymentId(paymentId);
         uint32_t transactionsCountByPaymentId = readDatabase(countBatch).getTransactionCountByPaymentIds().at(paymentId);
@@ -1875,7 +1875,7 @@ namespace cryptonote
         }
 
         auto result = readDatabase(transactionBatch);
-        std::vector<Crypto::Hash> transactionHashes;
+        std::vector<crypto::Hash> transactionHashes;
         transactionHashes.reserve(result.getTransactionHashesByPaymentIds().size());
         for (const auto &kv : result.getTransactionHashesByPaymentIds())
         {
@@ -1885,9 +1885,9 @@ namespace cryptonote
         return transactionHashes;
     }
 
-    std::vector<Crypto::Hash> DatabaseBlockchainCache::getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const
+    std::vector<crypto::Hash> DatabaseBlockchainCache::getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const
     {
-        std::vector<Crypto::Hash> blockHashes;
+        std::vector<crypto::Hash> blockHashes;
         if (secondsCount == 0)
         {
             return blockHashes;
@@ -1933,8 +1933,8 @@ namespace cryptonote
         return orderedBlocks;
     }
 
-    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> DatabaseBlockchainCache::getGlobalIndexes(
-        const std::vector<Crypto::Hash> transactionHashes) const
+    std::unordered_map<crypto::Hash, std::vector<uint64_t>> DatabaseBlockchainCache::getGlobalIndexes(
+        const std::vector<crypto::Hash> transactionHashes) const
     {
         auto txBatch = BlockchainReadBatch().requestCachedTransactions(transactionHashes);
 
@@ -1942,7 +1942,7 @@ namespace cryptonote
 
         auto txs = txBatch.extractResult().getCachedTransactions();
 
-        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
+        std::unordered_map<crypto::Hash, std::vector<uint64_t>> indexes;
 
         for (const auto [txHash, transaction] : txs)
         {

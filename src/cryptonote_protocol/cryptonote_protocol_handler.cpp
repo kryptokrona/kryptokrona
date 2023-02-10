@@ -678,7 +678,7 @@ namespace cryptonote
             return 1;
         }
 
-        std::unordered_map<Crypto::Hash, BinaryArray> provided_txs;
+        std::unordered_map<crypto::Hash, BinaryArray> provided_txs;
         provided_txs.reserve(missingTxs.size());
         for (const auto &iMissingTx : missingTxs)
         {
@@ -687,7 +687,7 @@ namespace cryptonote
         }
 
         std::vector<BinaryArray> have_txs;
-        std::vector<Crypto::Hash> need_txs;
+        std::vector<crypto::Hash> need_txs;
 
         if (context.m_pending_lite_block.has_value())
         {
@@ -976,7 +976,7 @@ namespace cryptonote
     {
         logger(logging::TRACE) << context << "NOTIFY_REQUEST_TX_POOL: txs.size() = " << arg.txs.size();
         NOTIFY_NEW_TRANSACTIONS::request notification;
-        std::vector<Crypto::Hash> deletedTransactions;
+        std::vector<crypto::Hash> deletedTransactions;
         m_core.getPoolChanges(m_core.getTopBlockHash(), arg.txs, notification.txs, deletedTransactions);
         if (!notification.txs.empty())
         {
@@ -1012,7 +1012,7 @@ namespace cryptonote
         NOTIFY_NEW_TRANSACTIONS::request req;
 
         std::vector<BinaryArray> txs;
-        std::vector<Crypto::Hash> missedHashes;
+        std::vector<crypto::Hash> missedHashes;
         m_core.getTransactions(arg.missing_txs, txs, missedHashes);
         if (!missedHashes.empty())
         {

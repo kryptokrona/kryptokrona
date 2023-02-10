@@ -91,7 +91,7 @@ void fullOptimize(cryptonote::WalletGreen &wallet, uint64_t height)
 bool optimize(cryptonote::WalletGreen &wallet, uint64_t threshold,
               uint64_t height)
 {
-    std::vector<Crypto::Hash> fusionTransactionHashes;
+    std::vector<crypto::Hash> fusionTransactionHashes;
 
     while (true)
     {
@@ -155,7 +155,7 @@ bool optimize(cryptonote::WalletGreen &wallet, uint64_t threshold,
         const std::vector<cryptonote::WalletTransactionWithTransfers>
             unconfirmedTransactions = wallet.getUnconfirmedTransactions();
 
-        std::vector<Crypto::Hash> unconfirmedTxHashes;
+        std::vector<crypto::Hash> unconfirmedTxHashes;
 
         for (const auto &t : unconfirmedTransactions)
         {

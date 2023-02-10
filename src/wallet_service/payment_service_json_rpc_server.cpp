@@ -75,7 +75,7 @@ namespace payment_service
                 clientPassword = req("password").getString();
 
                 std::vector<uint8_t> rawData(clientPassword.begin(), clientPassword.end());
-                Crypto::Hash hashedPassword = Crypto::Hash();
+                crypto::Hash hashedPassword = crypto::Hash();
                 cn_slow_hash_v0(rawData.data(), rawData.size(), hashedPassword);
                 if (hashedPassword != config.rpcSecret)
                 {

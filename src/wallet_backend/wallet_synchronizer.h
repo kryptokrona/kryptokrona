@@ -26,10 +26,10 @@ struct BlockScanTmpInfo
 
     /* The corresponding inputs to the transactions, indexed by public key
        (i.e., the corresponding subwallet to add the input to) */
-    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> inputsToAdd;
+    std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> inputsToAdd;
 
     /* Need to mark these as spent so we don't include them later */
-    std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>> keyImagesToMarkSpent;
+    std::vector<std::tuple<crypto::PublicKey, crypto::KeyImage>> keyImagesToMarkSpent;
 };
 
 class WalletSynchronizer
@@ -47,7 +47,7 @@ public:
         const std::shared_ptr<Nigel> daemon,
         const uint64_t startTimestamp,
         const uint64_t startHeight,
-        const Crypto::SecretKey privateViewKey,
+        const crypto::SecretKey privateViewKey,
         const std::shared_ptr<EventHandler> eventHandler);
 
     /* Delete the copy constructor */
@@ -107,29 +107,29 @@ private:
 
     std::vector<wallet_types::WalletBlockInfo> downloadBlocks();
 
-    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> processBlockOutputs(
+    std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> processBlockOutputs(
         const wallet_types::WalletBlockInfo &block) const;
 
     void processBlock(const wallet_types::WalletBlockInfo &block);
 
     BlockScanTmpInfo processBlockTransactions(
         const wallet_types::WalletBlockInfo &block,
-        const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const;
+        const std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const;
 
     std::optional<wallet_types::Transaction> processCoinbaseTransaction(
         const wallet_types::WalletBlockInfo &block,
-        const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const;
+        const std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const;
 
-    std::tuple<std::optional<wallet_types::Transaction>, std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>>> processTransaction(
+    std::tuple<std::optional<wallet_types::Transaction>, std::vector<std::tuple<crypto::PublicKey, crypto::KeyImage>>> processTransaction(
         const wallet_types::WalletBlockInfo &block,
-        const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs,
+        const std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> &inputs,
         const wallet_types::RawTransaction &tx) const;
 
-    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> processTransactionOutputs(
+    std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> processTransactionOutputs(
         const wallet_types::RawCoinbaseTransaction &rawTX,
         const uint64_t blockHeight) const;
 
-    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> getGlobalIndexes(
+    std::unordered_map<crypto::Hash, std::vector<uint64_t>> getGlobalIndexes(
         const uint64_t blockHeight) const;
 
     void removeForkedTransactions(const uint64_t forkHeight);
@@ -155,7 +155,7 @@ private:
     uint64_t m_startHeight;
 
     /* The private view key we use for decrypting transactions */
-    Crypto::SecretKey m_privateViewKey;
+    crypto::SecretKey m_privateViewKey;
 
     /* Used for firing events, such as onSynced() */
     std::shared_ptr<EventHandler> m_eventHandler;

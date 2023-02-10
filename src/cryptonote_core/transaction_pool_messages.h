@@ -32,12 +32,12 @@ namespace cryptonote
     // immutable messages
     struct AddTransaction
     {
-        Crypto::Hash hash;
+        crypto::Hash hash;
     };
 
     struct DeleteTransaction
     {
-        Crypto::Hash hash;
+        crypto::Hash hash;
     };
 
     class TransactionPoolMessage

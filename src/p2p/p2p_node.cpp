@@ -117,7 +117,7 @@ namespace cryptonote
 
     }
 
-    P2pNode::P2pNode(const P2pNodeConfig &cfg, Dispatcher &dispatcher, std::shared_ptr<logging::ILogger> log, const Crypto::Hash &genesisHash, uint64_t peerId) : logger(log, "P2pNode:" + std::to_string(cfg.getBindPort())),
+    P2pNode::P2pNode(const P2pNodeConfig &cfg, Dispatcher &dispatcher, std::shared_ptr<logging::ILogger> log, const crypto::Hash &genesisHash, uint64_t peerId) : logger(log, "P2pNode:" + std::to_string(cfg.getBindPort())),
                                                                                                                                                                   m_stopRequested(false),
                                                                                                                                                                   m_cfg(cfg),
                                                                                                                                                                   m_myPeerId(peerId),

@@ -17,7 +17,7 @@ namespace cryptonote
     bool hasIntersections(const TransactionValidatorState &destination, const TransactionValidatorState &source)
     {
         return std::any_of(source.spentKeyImages.begin(), source.spentKeyImages.end(),
-                           [&](const Crypto::KeyImage &ki)
+                           [&](const crypto::KeyImage &ki)
                            { return destination.spentKeyImages.count(ki) != 0; });
     }
 

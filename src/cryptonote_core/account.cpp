@@ -24,7 +24,7 @@ namespace cryptonote
     void AccountBase::generate()
     {
 
-        Crypto::generate_keys(m_keys.address.spendPublicKey, m_keys.spendSecretKey);
+        crypto::generate_keys(m_keys.address.spendPublicKey, m_keys.spendSecretKey);
 
         /* We derive the view secret key by taking our spend secret key, hashing
            with keccak-256, and then using this as the seed to generate a new set
@@ -33,19 +33,19 @@ namespace cryptonote
         generateViewFromSpend(m_keys.spendSecretKey, m_keys.viewSecretKey, m_keys.address.viewPublicKey);
         m_creation_timestamp = time(NULL);
     }
-    void AccountBase::generateViewFromSpend(const Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret, Crypto::PublicKey &viewPublic)
+    void AccountBase::generateViewFromSpend(const crypto::SecretKey &spend, crypto::SecretKey &viewSecret, crypto::PublicKey &viewPublic)
     {
-        Crypto::SecretKey viewKeySeed;
+        crypto::SecretKey viewKeySeed;
 
         keccak((uint8_t *)&spend, sizeof(spend), (uint8_t *)&viewKeySeed, sizeof(viewKeySeed));
 
-        Crypto::generate_deterministic_keys(viewPublic, viewSecret, viewKeySeed);
+        crypto::generate_deterministic_keys(viewPublic, viewSecret, viewKeySeed);
     }
 
-    void AccountBase::generateViewFromSpend(const Crypto::SecretKey &spend, Crypto::SecretKey &viewSecret)
+    void AccountBase::generateViewFromSpend(const crypto::SecretKey &spend, crypto::SecretKey &viewSecret)
     {
         /* If we don't need the pub key */
-        Crypto::PublicKey unused_dummy_variable;
+        crypto::PublicKey unused_dummy_variable;
         generateViewFromSpend(spend, viewSecret, unused_dummy_variable);
     }
     //-----------------------------------------------------------------

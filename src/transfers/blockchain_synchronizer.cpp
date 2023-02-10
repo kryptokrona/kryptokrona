@@ -135,7 +135,7 @@ namespace cryptonote
         return getConsumerSynchronizationState(consumer);
     }
 
-    std::vector<Crypto::Hash> BlockchainSynchronizer::getConsumerKnownBlocks(IBlockchainConsumer &consumer) const
+    std::vector<crypto::Hash> BlockchainSynchronizer::getConsumerKnownBlocks(IBlockchainConsumer &consumer) const
     {
         std::unique_lock<std::mutex> lk(m_consumersMutex);
 
@@ -171,7 +171,7 @@ namespace cryptonote
         return future;
     }
 
-    std::future<void> BlockchainSynchronizer::removeUnconfirmedTransaction(const Crypto::Hash &transactionHash)
+    std::future<void> BlockchainSynchronizer::removeUnconfirmedTransaction(const crypto::Hash &transactionHash)
     {
         m_logger(INFO, BRIGHT_WHITE) << "Removing unconfirmed transaction, hash " << transactionHash;
 
@@ -224,7 +224,7 @@ namespace cryptonote
         return ec;
     }
 
-    void BlockchainSynchronizer::doRemoveUnconfirmedTransaction(const Crypto::Hash &transactionHash)
+    void BlockchainSynchronizer::doRemoveUnconfirmedTransaction(const crypto::Hash &transactionHash)
     {
         std::unique_lock<std::mutex> lk(m_consumersMutex);
 
@@ -295,7 +295,7 @@ namespace cryptonote
         while (!m_removeTransactionTasks.empty())
         {
             auto &task = m_removeTransactionTasks.front();
-            const Crypto::Hash &transactionHash = *task.first;
+            const crypto::Hash &transactionHash = *task.first;
             auto detachedPromise = std::move(task.second);
             m_removeTransactionTasks.pop_front();
 
@@ -456,7 +456,7 @@ namespace cryptonote
     }
     //--------------------------- FSM END ------------------------------------
 
-    void BlockchainSynchronizer::getPoolUnionAndIntersection(std::unordered_set<Crypto::Hash> &poolUnion, std::unordered_set<Crypto::Hash> &poolIntersection) const
+    void BlockchainSynchronizer::getPoolUnionAndIntersection(std::unordered_set<crypto::Hash> &poolUnion, std::unordered_set<crypto::Hash> &poolIntersection) const
     {
         std::unique_lock<std::mutex> lk(m_consumersMutex);
 
@@ -467,7 +467,7 @@ namespace cryptonote
 
         for (; itConsumers != m_consumers.end(); ++itConsumers)
         {
-            const std::unordered_set<Crypto::Hash> &consumerKnownIds = itConsumers->first->getKnownPoolTxIds();
+            const std::unordered_set<crypto::Hash> &consumerKnownIds = itConsumers->first->getKnownPoolTxIds();
 
             poolUnion.insert(consumerKnownIds.begin(), consumerKnownIds.end());
 
@@ -746,8 +746,8 @@ namespace cryptonote
     {
         m_logger(INFO, BRIGHT_WHITE) << "Removing outdated pool transactions...";
 
-        std::unordered_set<Crypto::Hash> unionPoolHistory;
-        std::unordered_set<Crypto::Hash> ignored;
+        std::unordered_set<crypto::Hash> unionPoolHistory;
+        std::unordered_set<crypto::Hash> ignored;
         getPoolUnionAndIntersection(unionPoolHistory, ignored);
 
         GetPoolRequest request;
@@ -803,8 +803,8 @@ namespace cryptonote
     {
         m_logger(DEBUGGING) << "Starting pool synchronization...";
 
-        std::unordered_set<Crypto::Hash> unionPoolHistory;
-        std::unordered_set<Crypto::Hash> intersectedPoolHistory;
+        std::unordered_set<crypto::Hash> unionPoolHistory;
+        std::unordered_set<crypto::Hash> intersectedPoolHistory;
         getPoolUnionAndIntersection(unionPoolHistory, intersectedPoolHistory);
 
         GetPoolRequest unionRequest;

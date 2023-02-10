@@ -93,7 +93,7 @@ namespace cryptonote
         bool on_get_block_header_by_hash(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HASH::request &req, COMMAND_RPC_GET_BLOCK_HEADER_BY_HASH::response &res);
         bool on_get_block_header_by_height(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::request &req, COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::response &res);
 
-        void fill_block_header_response(const BlockTemplate &blk, bool orphan_status, uint32_t index, const Crypto::Hash &hash, block_header_response &responce);
+        void fill_block_header_response(const BlockTemplate &blk, bool orphan_status, uint32_t index, const crypto::Hash &hash, block_header_response &responce);
         RawBlockLegacy prepareRawBlockLegacy(BinaryArray &&blockBlob);
 
         bool f_on_blocks_list_json(const F_COMMAND_RPC_GET_BLOCKS_LIST::request &req, F_COMMAND_RPC_GET_BLOCKS_LIST::response &res);

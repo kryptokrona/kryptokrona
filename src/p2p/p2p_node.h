@@ -53,7 +53,7 @@ namespace cryptonote
             const P2pNodeConfig &cfg,
             syst::Dispatcher &dispatcher,
             std::shared_ptr<logging::ILogger> log,
-            const Crypto::Hash &genesisHash,
+            const crypto::Hash &genesisHash,
             uint64_t peerId);
 
         ~P2pNode();

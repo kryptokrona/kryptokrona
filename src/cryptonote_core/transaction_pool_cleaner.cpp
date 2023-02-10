@@ -40,12 +40,12 @@ namespace cryptonote
         return !isTransactionRecentlyDeleted(tx.getTransactionHash()) && transactionPool->pushTransaction(std::move(tx), std::move(transactionState));
     }
 
-    const CachedTransaction &TransactionPoolCleanWrapper::getTransaction(const Crypto::Hash &hash) const
+    const CachedTransaction &TransactionPoolCleanWrapper::getTransaction(const crypto::Hash &hash) const
     {
         return transactionPool->getTransaction(hash);
     }
 
-    bool TransactionPoolCleanWrapper::removeTransaction(const Crypto::Hash &hash)
+    bool TransactionPoolCleanWrapper::removeTransaction(const crypto::Hash &hash)
     {
         return transactionPool->removeTransaction(hash);
     }
@@ -55,12 +55,12 @@ namespace cryptonote
         return transactionPool->getTransactionCount();
     }
 
-    std::vector<Crypto::Hash> TransactionPoolCleanWrapper::getTransactionHashes() const
+    std::vector<crypto::Hash> TransactionPoolCleanWrapper::getTransactionHashes() const
     {
         return transactionPool->getTransactionHashes();
     }
 
-    bool TransactionPoolCleanWrapper::checkIfTransactionPresent(const Crypto::Hash &hash) const
+    bool TransactionPoolCleanWrapper::checkIfTransactionPresent(const crypto::Hash &hash) const
     {
         return transactionPool->checkIfTransactionPresent(hash);
     }
@@ -75,12 +75,12 @@ namespace cryptonote
         return transactionPool->getPoolTransactions();
     }
 
-    uint64_t TransactionPoolCleanWrapper::getTransactionReceiveTime(const Crypto::Hash &hash) const
+    uint64_t TransactionPoolCleanWrapper::getTransactionReceiveTime(const crypto::Hash &hash) const
     {
         return transactionPool->getTransactionReceiveTime(hash);
     }
 
-    std::vector<Crypto::Hash> TransactionPoolCleanWrapper::getTransactionHashesByPaymentId(const Crypto::Hash &paymentId) const
+    std::vector<crypto::Hash> TransactionPoolCleanWrapper::getTransactionHashesByPaymentId(const crypto::Hash &paymentId) const
     {
         return transactionPool->getTransactionHashesByPaymentId(paymentId);
     }
@@ -132,13 +132,13 @@ namespace cryptonote
         return payload_json;
     }
 
-    std::vector<Crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t height)
+    std::vector<crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t height)
     {
         try
         {
             uint64_t currentTime = timeProvider->now();
             auto transactionHashes = transactionPool->getTransactionHashes();
-            std::vector<Crypto::Hash> deletedTransactions;
+            std::vector<crypto::Hash> deletedTransactions;
             uint64_t boxed_transaction_age;
             uint64_t transaction_extra_data_size;
 
@@ -221,7 +221,7 @@ namespace cryptonote
         }
     }
 
-    bool TransactionPoolCleanWrapper::isTransactionRecentlyDeleted(const Crypto::Hash &hash) const
+    bool TransactionPoolCleanWrapper::isTransactionRecentlyDeleted(const crypto::Hash &hash) const
     {
         auto it = recentlyDeletedTransactions.find(hash);
         return it != recentlyDeletedTransactions.end() && it->second >= timeout;

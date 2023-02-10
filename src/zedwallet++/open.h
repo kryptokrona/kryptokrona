@@ -18,7 +18,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config);
 
 std::shared_ptr<WalletBackend> createWallet(const Config &config);
 
-Crypto::SecretKey getPrivateKey(const std::string outputMsg);
+crypto::SecretKey getPrivateKey(const std::string outputMsg);
 
 std::string getNewWalletFileName();
 

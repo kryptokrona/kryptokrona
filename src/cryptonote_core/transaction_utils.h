@@ -36,6 +36,6 @@ namespace cryptonote
     const TransactionOutput &getOutputChecked(const cryptonote::TransactionPrefix &transaction, size_t index, TransactionTypes::OutputType type);
 
     bool findOutputsToAccount(const cryptonote::TransactionPrefix &transaction, const AccountPublicAddress &addr,
-                              const Crypto::SecretKey &viewSecretKey, std::vector<uint32_t> &out, uint64_t &amount);
+                              const crypto::SecretKey &viewSecretKey, std::vector<uint32_t> &out, uint64_t &amount);
 
 } // namespace cryptonote

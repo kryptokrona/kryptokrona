@@ -298,10 +298,10 @@ namespace cryptonote
         uint64_t summaryAmounts = 0;
         for (size_t no = 0; no < outAmounts.size(); no++)
         {
-            Crypto::KeyDerivation derivation = boost::value_initialized<Crypto::KeyDerivation>();
-            Crypto::PublicKey outEphemeralPubKey = boost::value_initialized<Crypto::PublicKey>();
+            crypto::KeyDerivation derivation = boost::value_initialized<crypto::KeyDerivation>();
+            crypto::PublicKey outEphemeralPubKey = boost::value_initialized<crypto::PublicKey>();
 
-            bool r = Crypto::generate_key_derivation(minerAddress.viewPublicKey, txkey.secretKey, derivation);
+            bool r = crypto::generate_key_derivation(minerAddress.viewPublicKey, txkey.secretKey, derivation);
 
             if (!(r))
             {
@@ -311,7 +311,7 @@ namespace cryptonote
                 return false;
             }
 
-            r = Crypto::derive_public_key(derivation, no, minerAddress.spendPublicKey, outEphemeralPubKey);
+            r = crypto::derive_public_key(derivation, no, minerAddress.spendPublicKey, outEphemeralPubKey);
 
             if (!(r))
             {
@@ -726,8 +726,8 @@ namespace cryptonote
             return false;
         }
 
-        Crypto::Hash auxBlocksMerkleRoot;
-        Crypto::tree_hash_from_branch(block.parentBlock.blockchainBranch.data(), block.parentBlock.blockchainBranch.size(),
+        crypto::Hash auxBlocksMerkleRoot;
+        crypto::tree_hash_from_branch(block.parentBlock.blockchainBranch.data(), block.parentBlock.blockchainBranch.size(),
                                       cachedBlock.getAuxiliaryBlockHeaderHash(), &cachedGenesisBlock->getBlockHash(), auxBlocksMerkleRoot);
 
         if (auxBlocksMerkleRoot != mmTag.merkleRoot)
@@ -759,17 +759,17 @@ namespace cryptonote
 
     size_t Currency::getApproximateMaximumInputCount(size_t transactionSize, size_t outputCount, size_t mixinCount)
     {
-        const size_t KEY_IMAGE_SIZE = sizeof(Crypto::KeyImage);
+        const size_t KEY_IMAGE_SIZE = sizeof(crypto::KeyImage);
         const size_t OUTPUT_KEY_SIZE = sizeof(decltype(KeyOutput::key));
         const size_t AMOUNT_SIZE = sizeof(uint64_t) + 2;                   // varint
         const size_t GLOBAL_INDEXES_VECTOR_SIZE_SIZE = sizeof(uint8_t);    // varint
         const size_t GLOBAL_INDEXES_INITIAL_VALUE_SIZE = sizeof(uint32_t); // varint
         const size_t GLOBAL_INDEXES_DIFFERENCE_SIZE = sizeof(uint32_t);    // varint
-        const size_t SIGNATURE_SIZE = sizeof(Crypto::Signature);
+        const size_t SIGNATURE_SIZE = sizeof(crypto::Signature);
         const size_t EXTRA_TAG_SIZE = sizeof(uint8_t);
         const size_t INPUT_TAG_SIZE = sizeof(uint8_t);
         const size_t OUTPUT_TAG_SIZE = sizeof(uint8_t);
-        const size_t PUBLIC_KEY_SIZE = sizeof(Crypto::PublicKey);
+        const size_t PUBLIC_KEY_SIZE = sizeof(crypto::PublicKey);
         const size_t TRANSACTION_VERSION_SIZE = sizeof(uint8_t);
         const size_t TRANSACTION_UNLOCK_TIME_SIZE = sizeof(uint64_t);
 
@@ -923,15 +923,15 @@ namespace cryptonote
         uint64_t first_target_amount = target_amount + block_reward % targets.size();
         for (size_t i = 0; i < targets.size(); ++i)
         {
-            Crypto::KeyDerivation derivation = boost::value_initialized<Crypto::KeyDerivation>();
-            Crypto::PublicKey outEphemeralPubKey = boost::value_initialized<Crypto::PublicKey>();
-            bool r = Crypto::generate_key_derivation(targets[i].viewPublicKey, txkey.secretKey, derivation);
+            crypto::KeyDerivation derivation = boost::value_initialized<crypto::KeyDerivation>();
+            crypto::PublicKey outEphemeralPubKey = boost::value_initialized<crypto::PublicKey>();
+            bool r = crypto::generate_key_derivation(targets[i].viewPublicKey, txkey.secretKey, derivation);
             if (r)
             {
             }
             assert(r == true);
             //      CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to generate_key_derivation(" << targets[i].viewPublicKey << ", " << txkey.sec << ")");
-            r = Crypto::derive_public_key(derivation, i, targets[i].spendPublicKey, outEphemeralPubKey);
+            r = crypto::derive_public_key(derivation, i, targets[i].spendPublicKey, outEphemeralPubKey);
             assert(r == true);
             //     CHECK_AND_ASSERT_MES(r, false, "while creating outs: failed to derive_public_key(" << derivation << ", " << i << ", " << targets[i].spendPublicKey << ")");
             KeyOutput tk;

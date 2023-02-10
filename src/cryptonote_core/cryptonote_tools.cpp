@@ -38,14 +38,14 @@ bool cryptonote::toBinaryArray(const BinaryArray &object, BinaryArray &binaryArr
     return true;
 }
 
-void cryptonote::getBinaryArrayHash(const BinaryArray &binaryArray, Crypto::Hash &hash)
+void cryptonote::getBinaryArrayHash(const BinaryArray &binaryArray, crypto::Hash &hash)
 {
     cn_fast_hash(binaryArray.data(), binaryArray.size(), hash);
 }
 
-Crypto::Hash cryptonote::getBinaryArrayHash(const BinaryArray &binaryArray)
+crypto::Hash cryptonote::getBinaryArrayHash(const BinaryArray &binaryArray)
 {
-    Crypto::Hash hash;
+    crypto::Hash hash;
     getBinaryArrayHash(binaryArray, hash);
     return hash;
 }

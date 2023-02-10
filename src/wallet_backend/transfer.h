@@ -18,25 +18,25 @@
 
 namespace send_transaction
 {
-    std::tuple<Error, Crypto::Hash> sendFusionTransactionBasic(
+    std::tuple<Error, crypto::Hash> sendFusionTransactionBasic(
         const std::shared_ptr<Nigel> daemon,
         const std::shared_ptr<SubWallets> subWallets);
 
-    std::tuple<Error, Crypto::Hash> sendFusionTransactionAdvanced(
+    std::tuple<Error, crypto::Hash> sendFusionTransactionAdvanced(
         const uint64_t mixin,
         const std::vector<std::string> addressesToTakeFrom,
         std::string destination,
         const std::shared_ptr<Nigel> daemon,
         const std::shared_ptr<SubWallets> subWallets);
 
-    std::tuple<Error, Crypto::Hash> sendTransactionBasic(
+    std::tuple<Error, crypto::Hash> sendTransactionBasic(
         std::string destination,
         const uint64_t amount,
         std::string paymentID,
         const std::shared_ptr<Nigel> daemon,
         const std::shared_ptr<SubWallets> subWallets);
 
-    std::tuple<Error, Crypto::Hash> sendTransactionAdvanced(
+    std::tuple<Error, crypto::Hash> sendTransactionAdvanced(
         std::vector<std::pair<std::string, uint64_t>> addressesAndAmounts,
         const uint64_t mixin,
         const uint64_t fee,
@@ -57,9 +57,9 @@ namespace send_transaction
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon);
 
-    std::tuple<Error, std::vector<cryptonote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
+    std::tuple<Error, std::vector<cryptonote::KeyInput>, std::vector<crypto::SecretKey>> setupInputs(
         const std::vector<wallet_types::ObscuredInput> inputsAndFakes,
-        const Crypto::SecretKey privateViewKey);
+        const crypto::SecretKey privateViewKey);
 
     std::tuple<std::vector<wallet_types::KeyOutput>, cryptonote::KeyPair> setupOutputs(
         std::vector<wallet_types::TransactionDestination> destinations);
@@ -67,7 +67,7 @@ namespace send_transaction
     std::tuple<Error, cryptonote::Transaction> generateRingSignatures(
         cryptonote::Transaction tx,
         const std::vector<wallet_types::ObscuredInput> inputsAndFakes,
-        const std::vector<Crypto::SecretKey> tmpSecretKeys);
+        const std::vector<crypto::SecretKey> tmpSecretKeys);
 
     std::vector<uint64_t> splitAmountIntoDenominations(uint64_t amount);
 
@@ -77,7 +77,7 @@ namespace send_transaction
     std::vector<cryptonote::TransactionOutput> keyOutputToTransactionOutput(
         const std::vector<wallet_types::KeyOutput> keyOutputs);
 
-    Crypto::Hash getTransactionHash(cryptonote::Transaction tx);
+    crypto::Hash getTransactionHash(cryptonote::Transaction tx);
 
     std::tuple<Error, std::vector<cryptonote::RandomOuts>> getRingParticipants(
         const uint64_t mixin,
@@ -109,16 +109,16 @@ namespace send_transaction
         const std::shared_ptr<SubWallets> subWallets,
         const uint64_t unlockTime);
 
-    std::tuple<Error, Crypto::Hash> relayTransaction(
+    std::tuple<Error, crypto::Hash> relayTransaction(
         const cryptonote::Transaction tx,
         const std::shared_ptr<Nigel> daemon);
 
-    std::tuple<cryptonote::KeyPair, Crypto::KeyImage> genKeyImage(
+    std::tuple<cryptonote::KeyPair, crypto::KeyImage> genKeyImage(
         const wallet_types::ObscuredInput input,
-        const Crypto::SecretKey privateViewKey);
+        const crypto::SecretKey privateViewKey);
 
     void storeSentTransaction(
-        const Crypto::Hash hash,
+        const crypto::Hash hash,
         const uint64_t fee,
         const std::string paymentID,
         const std::vector<wallet_types::TxInputAndOwner> ourInputs,
@@ -133,8 +133,8 @@ namespace send_transaction
     void storeUnconfirmedIncomingInputs(
         const std::shared_ptr<SubWallets> subWallets,
         const std::vector<wallet_types::KeyOutput> keyOutputs,
-        const Crypto::PublicKey txPublicKey,
-        const Crypto::Hash txHash);
+        const crypto::PublicKey txPublicKey,
+        const crypto::Hash txHash);
 
     /* Verify all amounts in the transaction given are PRETTY_AMOUNTS */
     bool verifyAmounts(const cryptonote::Transaction tx);

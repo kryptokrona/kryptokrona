@@ -164,7 +164,7 @@ namespace cryptonote
     void WalletGreen::createViewWallet(const std::string &path,
                                        const std::string &password,
                                        const std::string address,
-                                       const Crypto::SecretKey &viewSecretKey,
+                                       const crypto::SecretKey &viewSecretKey,
                                        const uint64_t scanHeight,
                                        bool newAddress)
     {
@@ -181,10 +181,10 @@ namespace cryptonote
         createAddress(publicKeys.spendPublicKey, scanHeight, newAddress);
     }
 
-    void WalletGreen::initializeWithViewKey(const std::string &path, const std::string &password, const Crypto::SecretKey &viewSecretKey, const uint64_t scanHeight, const bool newAddress)
+    void WalletGreen::initializeWithViewKey(const std::string &path, const std::string &password, const crypto::SecretKey &viewSecretKey, const uint64_t scanHeight, const bool newAddress)
     {
-        Crypto::PublicKey viewPublicKey;
-        if (!Crypto::secret_key_to_public_key(viewSecretKey, viewPublicKey))
+        crypto::PublicKey viewPublicKey;
+        if (!crypto::secret_key_to_public_key(viewSecretKey, viewPublicKey))
         {
             m_logger(ERROR, BRIGHT_RED) << "initializeWithViewKey(" << viewSecretKey << ") Failed to convert secret key to public key";
             throw std::system_error(make_error_code(cryptonote::error::KEY_GENERATION_ERROR));
@@ -272,7 +272,7 @@ namespace cryptonote
     }
 
     void WalletGreen::decryptKeyPair(const EncryptedWalletRecord &cipher, PublicKey &publicKey, SecretKey &secretKey,
-                                     uint64_t &creationTimestamp, const Crypto::chacha8_key &key)
+                                     uint64_t &creationTimestamp, const crypto::chacha8_key &key)
     {
 
         std::array<char, sizeof(cipher.data)> buffer;
@@ -292,7 +292,7 @@ namespace cryptonote
     }
 
     EncryptedWalletRecord WalletGreen::encryptKeyPair(const PublicKey &publicKey, const SecretKey &secretKey, uint64_t creationTimestamp,
-                                                      const Crypto::chacha8_key &key, const Crypto::chacha8_iv &iv)
+                                                      const crypto::chacha8_key &key, const crypto::chacha8_iv &iv)
     {
 
         EncryptedWalletRecord result;
@@ -318,15 +318,15 @@ namespace cryptonote
         return encryptKeyPair(publicKey, secretKey, creationTimestamp, m_key, getNextIv());
     }
 
-    Crypto::chacha8_iv WalletGreen::getNextIv() const
+    crypto::chacha8_iv WalletGreen::getNextIv() const
     {
         const auto *prefix = reinterpret_cast<const ContainerStoragePrefix *>(m_containerStorage.prefix());
         return prefix->nextIv;
     }
 
-    void WalletGreen::incIv(Crypto::chacha8_iv &iv)
+    void WalletGreen::incIv(crypto::chacha8_iv &iv)
     {
-        static_assert(sizeof(uint64_t) == sizeof(Crypto::chacha8_iv), "Bad Crypto::chacha8_iv size");
+        static_assert(sizeof(uint64_t) == sizeof(crypto::chacha8_iv), "Bad crypto::chacha8_iv size");
         uint64_t *i = reinterpret_cast<uint64_t *>(&iv);
         if (*i < std::numeric_limits<uint64_t>::max())
         {
@@ -340,13 +340,13 @@ namespace cryptonote
 
     void WalletGreen::incNextIv()
     {
-        static_assert(sizeof(uint64_t) == sizeof(Crypto::chacha8_iv), "Bad Crypto::chacha8_iv size");
+        static_assert(sizeof(uint64_t) == sizeof(crypto::chacha8_iv), "Bad crypto::chacha8_iv size");
         auto *prefix = reinterpret_cast<ContainerStoragePrefix *>(m_containerStorage.prefix());
         incIv(prefix->nextIv);
     }
 
     void WalletGreen::initWithKeys(const std::string &path, const std::string &password,
-                                   const Crypto::PublicKey &viewPublicKey, const Crypto::SecretKey &viewSecretKey, const uint64_t scanHeight, const bool newAddress)
+                                   const crypto::PublicKey &viewPublicKey, const crypto::SecretKey &viewSecretKey, const uint64_t scanHeight, const bool newAddress)
     {
 
         if (m_state != WalletState::NOT_INITIALIZED)
@@ -360,9 +360,9 @@ namespace cryptonote
         ContainerStorage newStorage(path, common::FileMappedVectorOpenMode::CREATE, sizeof(ContainerStoragePrefix));
         ContainerStoragePrefix *prefix = reinterpret_cast<ContainerStoragePrefix *>(newStorage.prefix());
         prefix->version = static_cast<uint8_t>(WalletSerializerV2::SERIALIZATION_VERSION);
-        prefix->nextIv = Crypto::randomChachaIV();
+        prefix->nextIv = crypto::randomChachaIV();
 
-        Crypto::generate_chacha8_key(password, m_key);
+        crypto::generate_chacha8_key(password, m_key);
 
         uint64_t creationTimestamp;
 
@@ -511,8 +511,8 @@ namespace cryptonote
             {
                 try
                 {
-                    std::unordered_set<Crypto::PublicKey> addedSpendKeys;
-                    std::unordered_set<Crypto::PublicKey> deletedSpendKeys;
+                    std::unordered_set<crypto::PublicKey> addedSpendKeys;
+                    std::unordered_set<crypto::PublicKey> deletedSpendKeys;
                     loadWalletCache(addedSpendKeys, deletedSpendKeys, extra);
 
                     if (!addedSpendKeys.empty())
@@ -632,7 +632,7 @@ namespace cryptonote
         }
     }
 
-    void WalletGreen::loadWalletCache(std::unordered_set<Crypto::PublicKey> &addedKeys, std::unordered_set<Crypto::PublicKey> &deletedKeys, std::string &extra)
+    void WalletGreen::loadWalletCache(std::unordered_set<crypto::PublicKey> &addedKeys, std::unordered_set<crypto::PublicKey> &deletedKeys, std::string &extra)
     {
         assert(m_containerStorage.isOpened());
 
@@ -662,7 +662,7 @@ namespace cryptonote
         m_logger(DEBUGGING) << "Container cache loaded";
     }
 
-    void WalletGreen::saveWalletCache(ContainerStorage &storage, const Crypto::chacha8_key &key, WalletSaveLevel saveLevel, const std::string &extra)
+    void WalletGreen::saveWalletCache(ContainerStorage &storage, const crypto::chacha8_key &key, WalletSaveLevel saveLevel, const std::string &extra)
     {
         m_logger(DEBUGGING) << "Saving cache...";
 
@@ -730,14 +730,14 @@ namespace cryptonote
         size_t counter = 0;
         for (auto &encryptedSpendKeys : src)
         {
-            Crypto::PublicKey publicKey;
-            Crypto::SecretKey secretKey;
+            crypto::PublicKey publicKey;
+            crypto::SecretKey secretKey;
             uint64_t creationTimestamp;
             decryptKeyPair(encryptedSpendKeys, publicKey, secretKey, creationTimestamp, srcKey);
 
             // push_back() can resize container, and dstPrefix address can be changed, so it is requested for each key pair
             ContainerStoragePrefix *dstPrefix = reinterpret_cast<ContainerStoragePrefix *>(dst.prefix());
-            Crypto::chacha8_iv keyPairIv = dstPrefix->nextIv;
+            crypto::chacha8_iv keyPairIv = dstPrefix->nextIv;
             incIv(dstPrefix->nextIv);
 
             dst.push_back(encryptKeyPair(publicKey, secretKey, creationTimestamp, dstKey, keyPairIv));
@@ -757,21 +757,21 @@ namespace cryptonote
         ContainerStoragePrefix *srcPrefix = reinterpret_cast<ContainerStoragePrefix *>(src.prefix());
         ContainerStoragePrefix *dstPrefix = reinterpret_cast<ContainerStoragePrefix *>(dst.prefix());
         dstPrefix->version = srcPrefix->version;
-        dstPrefix->nextIv = Crypto::randomChachaIV();
+        dstPrefix->nextIv = crypto::randomChachaIV();
 
-        Crypto::PublicKey publicKey;
-        Crypto::SecretKey secretKey;
+        crypto::PublicKey publicKey;
+        crypto::SecretKey secretKey;
         uint64_t creationTimestamp;
         decryptKeyPair(srcPrefix->encryptedViewKeys, publicKey, secretKey, creationTimestamp, srcKey);
         dstPrefix->encryptedViewKeys = encryptKeyPair(publicKey, secretKey, creationTimestamp, dstKey, dstPrefix->nextIv);
         incIv(dstPrefix->nextIv);
     }
 
-    void WalletGreen::encryptAndSaveContainerData(ContainerStorage &storage, const Crypto::chacha8_key &key, const void *containerData, size_t containerDataSize)
+    void WalletGreen::encryptAndSaveContainerData(ContainerStorage &storage, const crypto::chacha8_key &key, const void *containerData, size_t containerDataSize)
     {
         ContainerStoragePrefix *prefix = reinterpret_cast<ContainerStoragePrefix *>(storage.prefix());
 
-        Crypto::chacha8_iv suffixIv = prefix->nextIv;
+        crypto::chacha8_iv suffixIv = prefix->nextIv;
         incIv(prefix->nextIv);
 
         BinaryArray encryptedContainer;
@@ -788,11 +788,11 @@ namespace cryptonote
         std::copy(suffix.begin(), suffix.end(), storage.suffix());
     }
 
-    void WalletGreen::loadAndDecryptContainerData(ContainerStorage &storage, const Crypto::chacha8_key &key, BinaryArray &containerData)
+    void WalletGreen::loadAndDecryptContainerData(ContainerStorage &storage, const crypto::chacha8_key &key, BinaryArray &containerData)
     {
         common::MemoryInputStream suffixStream(storage.suffix(), storage.suffixSize());
         BinaryInputStreamSerializer suffixSerializer(suffixStream);
-        Crypto::chacha8_iv suffixIv;
+        crypto::chacha8_iv suffixIv;
         BinaryArray encryptedContainer;
         suffixSerializer(suffixIv, "suffixIv");
         suffixSerializer(encryptedContainer, "encryptedContainer");
@@ -803,7 +803,7 @@ namespace cryptonote
 
     void WalletGreen::initTransactionPool()
     {
-        std::unordered_set<Crypto::Hash> uncommitedTransactionsSet;
+        std::unordered_set<crypto::Hash> uncommitedTransactionsSet;
         std::transform(m_uncommitedTransactions.begin(), m_uncommitedTransactions.end(), std::inserter(uncommitedTransactionsSet, uncommitedTransactionsSet.end()),
                        [](const UncommitedTransactions::value_type &pair)
                        {
@@ -812,7 +812,7 @@ namespace cryptonote
         m_synchronizer.initTransactionPool(uncommitedTransactionsSet);
     }
 
-    void WalletGreen::deleteOrphanTransactions(const std::unordered_set<Crypto::PublicKey> &deletedKeys)
+    void WalletGreen::deleteOrphanTransactions(const std::unordered_set<crypto::PublicKey> &deletedKeys)
     {
         for (auto spendPublicKey : deletedKeys)
         {
@@ -852,7 +852,7 @@ namespace cryptonote
             }
             else
             {
-                if (!Crypto::check_key(wallet.spendPublicKey))
+                if (!crypto::check_key(wallet.spendPublicKey))
                 {
                     throw std::system_error(make_error_code(error::WRONG_PASSWORD), "Public spend key is incorrect");
                 }
@@ -936,8 +936,8 @@ namespace cryptonote
             return;
         }
 
-        Crypto::chacha8_key newKey;
-        Crypto::generate_chacha8_key(newPassword, newKey);
+        crypto::chacha8_key newKey;
+        crypto::generate_chacha8_key(newPassword, newKey);
 
         m_containerStorage.atomicUpdate([this, newKey](ContainerStorage &newStorage)
                                         {
@@ -1023,16 +1023,16 @@ namespace cryptonote
     {
         KeyPair spendKey;
 
-        Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+        crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
 
         return doCreateAddress(spendKey.publicKey, spendKey.secretKey, 0, true);
     }
 
-    std::string WalletGreen::createAddress(const Crypto::SecretKey &spendSecretKey, const uint64_t scanHeight, const bool newAddress)
+    std::string WalletGreen::createAddress(const crypto::SecretKey &spendSecretKey, const uint64_t scanHeight, const bool newAddress)
     {
-        Crypto::PublicKey spendPublicKey;
+        crypto::PublicKey spendPublicKey;
 
-        if (!Crypto::secret_key_to_public_key(spendSecretKey, spendPublicKey))
+        if (!crypto::secret_key_to_public_key(spendSecretKey, spendPublicKey))
         {
             m_logger(ERROR, BRIGHT_RED) << "createAddress(" << spendSecretKey << ") Failed to convert secret key to public key";
             throw std::system_error(make_error_code(cryptonote::error::KEY_GENERATION_ERROR));
@@ -1041,9 +1041,9 @@ namespace cryptonote
         return doCreateAddress(spendPublicKey, spendSecretKey, scanHeight, newAddress);
     }
 
-    std::string WalletGreen::createAddress(const Crypto::PublicKey &spendPublicKey, const uint64_t scanHeight, const bool newAddress)
+    std::string WalletGreen::createAddress(const crypto::PublicKey &spendPublicKey, const uint64_t scanHeight, const bool newAddress)
     {
-        if (!Crypto::check_key(spendPublicKey))
+        if (!crypto::check_key(spendPublicKey))
         {
             m_logger(ERROR, BRIGHT_RED) << "createAddress(" << spendPublicKey << ") Wrong public key format";
             throw std::system_error(make_error_code(error::WRONG_PARAMETERS), "Wrong public key format");
@@ -1052,15 +1052,15 @@ namespace cryptonote
         return doCreateAddress(spendPublicKey, NULL_SECRET_KEY, scanHeight, newAddress);
     }
 
-    std::vector<std::string> WalletGreen::createAddressList(const std::vector<Crypto::SecretKey> &spendSecretKeys, const uint64_t scanHeight, const bool newAddress)
+    std::vector<std::string> WalletGreen::createAddressList(const std::vector<crypto::SecretKey> &spendSecretKeys, const uint64_t scanHeight, const bool newAddress)
     {
         std::vector<NewAddressData> addressDataList(spendSecretKeys.size());
 
         for (size_t i = 0; i < spendSecretKeys.size(); ++i)
         {
-            Crypto::PublicKey spendPublicKey;
+            crypto::PublicKey spendPublicKey;
 
-            if (!Crypto::secret_key_to_public_key(spendSecretKeys[i], spendPublicKey))
+            if (!crypto::secret_key_to_public_key(spendSecretKeys[i], spendPublicKey))
             {
                 m_logger(ERROR, BRIGHT_RED) << "createAddressList(): failed to convert secret key to public key, secret key " << spendSecretKeys[i];
                 throw std::system_error(make_error_code(cryptonote::error::KEY_GENERATION_ERROR));
@@ -1073,7 +1073,7 @@ namespace cryptonote
         return doCreateAddressList(addressDataList, scanHeight, newAddress);
     }
 
-    std::string WalletGreen::doCreateAddress(const Crypto::PublicKey &spendPublicKey, const Crypto::SecretKey &spendSecretKey, const uint64_t scanHeight, const bool newAddress)
+    std::string WalletGreen::doCreateAddress(const crypto::PublicKey &spendPublicKey, const crypto::SecretKey &spendSecretKey, const uint64_t scanHeight, const bool newAddress)
     {
         std::vector<NewAddressData> addressDataList;
 
@@ -1355,8 +1355,8 @@ namespace cryptonote
         /* As a reference so we can update it */
         for (auto &encryptedSpendKeys : m_containerStorage)
         {
-            Crypto::PublicKey publicKey;
-            Crypto::SecretKey secretKey;
+            crypto::PublicKey publicKey;
+            crypto::SecretKey secretKey;
             uint64_t oldTimestamp;
 
             /* Decrypt the key pair we're pointing to */
@@ -1411,8 +1411,8 @@ namespace cryptonote
         auto addressIndex = std::distance(m_walletsContainer.get<RandomAccessIndex>().begin(), m_walletsContainer.project<RandomAccessIndex>(it));
 
 #if !defined(NDEBUG)
-        Crypto::PublicKey publicKey;
-        Crypto::SecretKey secretKey;
+        crypto::PublicKey publicKey;
+        crypto::SecretKey secretKey;
         uint64_t creationTimestamp;
         decryptKeyPair(m_containerStorage[addressIndex], publicKey, secretKey, creationTimestamp);
         assert(publicKey == it->spendPublicKey);
@@ -2829,7 +2829,7 @@ namespace cryptonote
         }
     }
 
-    WalletTransactionWithTransfers WalletGreen::getTransaction(const Crypto::Hash &transactionHash) const
+    WalletTransactionWithTransfers WalletGreen::getTransaction(const crypto::Hash &transactionHash) const
     {
         throwIfNotInitialized();
         throwIfStopped();
@@ -2849,7 +2849,7 @@ namespace cryptonote
         return walletTransaction;
     }
 
-    std::vector<TransactionsInBlockInfo> WalletGreen::getTransactions(const Crypto::Hash &blockHash, size_t count) const
+    std::vector<TransactionsInBlockInfo> WalletGreen::getTransactions(const crypto::Hash &blockHash, size_t count) const
     {
         throwIfNotInitialized();
         throwIfStopped();
@@ -2875,7 +2875,7 @@ namespace cryptonote
         return getTransactionsInBlocks(blockIndex, count);
     }
 
-    std::vector<Crypto::Hash> WalletGreen::getBlockHashes(uint32_t blockIndex, size_t count) const
+    std::vector<crypto::Hash> WalletGreen::getBlockHashes(uint32_t blockIndex, size_t count) const
     {
         throwIfNotInitialized();
         throwIfStopped();
@@ -2884,12 +2884,12 @@ namespace cryptonote
 
         if (blockIndex >= index.size())
         {
-            return std::vector<Crypto::Hash>();
+            return std::vector<crypto::Hash>();
         }
 
         auto start = std::next(index.begin(), blockIndex);
         auto end = std::next(index.begin(), std::min(index.size(), blockIndex + count));
-        return std::vector<Crypto::Hash>(start, end);
+        return std::vector<crypto::Hash>(start, end);
     }
 
     uint32_t WalletGreen::getBlockCount() const
@@ -3034,13 +3034,13 @@ namespace cryptonote
         pushEvent(makeSyncCompletedEvent());
     }
 
-    void WalletGreen::onBlocksAdded(const Crypto::PublicKey &viewPublicKey, const std::vector<Crypto::Hash> &blockHashes)
+    void WalletGreen::onBlocksAdded(const crypto::PublicKey &viewPublicKey, const std::vector<crypto::Hash> &blockHashes)
     {
         m_dispatcher.remoteSpawn([this, blockHashes]()
                                  { blocksAdded(blockHashes); });
     }
 
-    void WalletGreen::blocksAdded(const std::vector<Crypto::Hash> &blockHashes)
+    void WalletGreen::blocksAdded(const std::vector<crypto::Hash> &blockHashes)
     {
         syst::EventLock lk(m_readyEvent);
 
@@ -3052,7 +3052,7 @@ namespace cryptonote
         m_blockchain.insert(m_blockchain.end(), blockHashes.begin(), blockHashes.end());
     }
 
-    void WalletGreen::onBlockchainDetach(const Crypto::PublicKey &viewPublicKey, uint32_t blockIndex)
+    void WalletGreen::onBlockchainDetach(const crypto::PublicKey &viewPublicKey, uint32_t blockIndex)
     {
         m_dispatcher.remoteSpawn([this, blockIndex]()
                                  { blocksRollback(blockIndex); });
@@ -3073,26 +3073,26 @@ namespace cryptonote
         blockHeightIndex.erase(std::next(blockHeightIndex.begin(), blockIndex), blockHeightIndex.end());
     }
 
-    void WalletGreen::onTransactionDeleteBegin(const Crypto::PublicKey &viewPublicKey, Crypto::Hash transactionHash)
+    void WalletGreen::onTransactionDeleteBegin(const crypto::PublicKey &viewPublicKey, crypto::Hash transactionHash)
     {
         m_dispatcher.remoteSpawn([=]()
                                  { transactionDeleteBegin(transactionHash); });
     }
 
     // TODO remove
-    void WalletGreen::transactionDeleteBegin(Crypto::Hash transactionHash)
+    void WalletGreen::transactionDeleteBegin(crypto::Hash transactionHash)
     {
         m_logger(TRACE) << "transactionDeleteBegin " << transactionHash;
     }
 
-    void WalletGreen::onTransactionDeleteEnd(const Crypto::PublicKey &viewPublicKey, Crypto::Hash transactionHash)
+    void WalletGreen::onTransactionDeleteEnd(const crypto::PublicKey &viewPublicKey, crypto::Hash transactionHash)
     {
         m_dispatcher.remoteSpawn([=]()
                                  { transactionDeleteEnd(transactionHash); });
     }
 
     // TODO remove
-    void WalletGreen::transactionDeleteEnd(Crypto::Hash transactionHash)
+    void WalletGreen::transactionDeleteEnd(crypto::Hash transactionHash)
     {
         m_logger(TRACE) << "transactionDeleteEnd " << transactionHash;
     }
@@ -3114,12 +3114,12 @@ namespace cryptonote
         }
     }
 
-    void WalletGreen::onTransactionUpdated(ITransfersSubscription * /*object*/, const Crypto::Hash & /*transactionHash*/)
+    void WalletGreen::onTransactionUpdated(ITransfersSubscription * /*object*/, const crypto::Hash & /*transactionHash*/)
     {
-        // Deprecated, ignore it. New event handler is onTransactionUpdated(const Crypto::PublicKey&, const Crypto::Hash&, const std::vector<ITransfersContainer*>&)
+        // Deprecated, ignore it. New event handler is onTransactionUpdated(const crypto::PublicKey&, const crypto::Hash&, const std::vector<ITransfersContainer*>&)
     }
 
-    void WalletGreen::onTransactionUpdated(const Crypto::PublicKey &, const Crypto::Hash &transactionHash, const std::vector<ITransfersContainer *> &containers)
+    void WalletGreen::onTransactionUpdated(const crypto::PublicKey &, const crypto::Hash &transactionHash, const std::vector<ITransfersContainer *> &containers)
     {
         assert(!containers.empty());
 
@@ -3352,7 +3352,7 @@ namespace cryptonote
         m_logger(DEBUGGING) << "Unconfirmed transaction added to BlockchainSynchronizer, hash " << transaction.getTransactionHash();
     }
 
-    void WalletGreen::removeUnconfirmedTransaction(const Crypto::Hash &transactionHash)
+    void WalletGreen::removeUnconfirmedTransaction(const crypto::Hash &transactionHash)
     {
         syst::RemoteContext<void> context(m_dispatcher, [this, &transactionHash]
                                             { m_blockchainSynchronizer.removeUnconfirmedTransaction(transactionHash).get(); });
@@ -3854,7 +3854,7 @@ namespace cryptonote
         return result;
     }
 
-    Crypto::Hash WalletGreen::getBlockHashByIndex(uint32_t blockIndex) const
+    crypto::Hash WalletGreen::getBlockHashByIndex(uint32_t blockIndex) const
     {
         assert(blockIndex < m_blockchain.size());
         return m_blockchain.get<BlockHeightIndex>()[blockIndex];
@@ -3916,9 +3916,9 @@ namespace cryptonote
         }
     }
 
-    void WalletGreen::initBlockchain(const Crypto::PublicKey &viewPublicKey)
+    void WalletGreen::initBlockchain(const crypto::PublicKey &viewPublicKey)
     {
-        std::vector<Crypto::Hash> blockchain = m_synchronizer.getViewKeyKnownBlocks(m_viewPublicKey);
+        std::vector<crypto::Hash> blockchain = m_synchronizer.getViewKeyKnownBlocks(m_viewPublicKey);
         m_blockchain.insert(m_blockchain.end(), blockchain.begin(), blockchain.end());
     }
 

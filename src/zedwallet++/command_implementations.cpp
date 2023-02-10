@@ -615,7 +615,7 @@ void getTxPrivateKey(const std::shared_ptr<WalletBackend> walletBackend)
         return;
     }
 
-    Crypto::Hash hash;
+    crypto::Hash hash;
 
     common::podFromHex(txHash, hash);
 

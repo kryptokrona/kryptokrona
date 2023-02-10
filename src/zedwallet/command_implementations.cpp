@@ -62,7 +62,7 @@ void exportKeys(std::shared_ptr<WalletInfo> walletInfo)
 
 void printPrivateKeys(cryptonote::WalletGreen &wallet, bool viewWallet)
 {
-    const Crypto::SecretKey privateViewKey = wallet.getViewKey().secretKey;
+    const crypto::SecretKey privateViewKey = wallet.getViewKey().secretKey;
 
     if (viewWallet)
     {
@@ -73,9 +73,9 @@ void printPrivateKeys(cryptonote::WalletGreen &wallet, bool viewWallet)
         return;
     }
 
-    Crypto::SecretKey privateSpendKey = wallet.getAddressSpendKey(0).secretKey;
+    crypto::SecretKey privateSpendKey = wallet.getAddressSpendKey(0).secretKey;
 
-    Crypto::SecretKey derivedPrivateViewKey;
+    crypto::SecretKey derivedPrivateViewKey;
 
     cryptonote::AccountBase::generateViewFromSpend(privateSpendKey,
                                                    derivedPrivateViewKey);

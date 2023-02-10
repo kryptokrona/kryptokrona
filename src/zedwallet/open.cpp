@@ -36,7 +36,7 @@ std::shared_ptr<WalletInfo> createViewWallet(cryptonote::WalletGreen &wallet)
         return nullptr;
     }
 
-    Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
+    crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
 
     std::string address;
 
@@ -81,9 +81,9 @@ std::shared_ptr<WalletInfo> createViewWallet(cryptonote::WalletGreen &wallet)
 
 std::shared_ptr<WalletInfo> importWallet(cryptonote::WalletGreen &wallet)
 {
-    const Crypto::SecretKey privateSpendKey = getPrivateKey("Enter your private spend key: ");
+    const crypto::SecretKey privateSpendKey = getPrivateKey("Enter your private spend key: ");
 
-    const Crypto::SecretKey privateViewKey = getPrivateKey("Enter your private view key: ");
+    const crypto::SecretKey privateViewKey = getPrivateKey("Enter your private view key: ");
 
     return importFromKeys(wallet, privateSpendKey, privateViewKey);
 }
@@ -112,7 +112,7 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(cryptonote::WalletGreen
         }
         else
         {
-            Crypto::SecretKey privateViewKey;
+            crypto::SecretKey privateViewKey;
 
             cryptonote::AccountBase::generateViewFromSpend(
                 privateSpendKey, privateViewKey);
@@ -123,8 +123,8 @@ std::shared_ptr<WalletInfo> mnemonicImportWallet(cryptonote::WalletGreen
 }
 
 std::shared_ptr<WalletInfo> importFromKeys(cryptonote::WalletGreen &wallet,
-                                           Crypto::SecretKey privateSpendKey,
-                                           Crypto::SecretKey privateViewKey)
+                                           crypto::SecretKey privateSpendKey,
+                                           crypto::SecretKey privateViewKey)
 {
     const std::string walletFileName = getNewWalletFileName();
 
@@ -162,9 +162,9 @@ std::shared_ptr<WalletInfo> generateWallet(cryptonote::WalletGreen &wallet)
     const std::string walletPass = getWalletPassword(true, msg);
 
     cryptonote::KeyPair spendKey;
-    Crypto::SecretKey privateViewKey;
+    crypto::SecretKey privateViewKey;
 
-    Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
+    crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
 
     cryptonote::AccountBase::generateViewFromSpend(spendKey.secretKey,
                                                    privateViewKey);
@@ -218,7 +218,7 @@ std::shared_ptr<WalletInfo> openWallet(cryptonote::WalletGreen &wallet,
 
             const std::string walletAddress = wallet.getAddress(0);
 
-            const Crypto::SecretKey privateSpendKey = wallet.getAddressSpendKey(0).secretKey;
+            const crypto::SecretKey privateSpendKey = wallet.getAddressSpendKey(0).secretKey;
 
             bool viewWallet = false;
 
@@ -331,15 +331,15 @@ std::shared_ptr<WalletInfo> openWallet(cryptonote::WalletGreen &wallet,
     }
 }
 
-Crypto::SecretKey getPrivateKey(std::string msg)
+crypto::SecretKey getPrivateKey(std::string msg)
 {
     const uint64_t privateKeyLen = 64;
     uint64_t size;
 
     std::string privateKeyString;
-    Crypto::Hash privateKeyHash;
-    Crypto::SecretKey privateKey;
-    Crypto::PublicKey publicKey;
+    crypto::Hash privateKeyHash;
+    crypto::SecretKey privateKey;
+    crypto::PublicKey publicKey;
 
     while (true)
     {
@@ -369,11 +369,11 @@ Crypto::SecretKey getPrivateKey(std::string msg)
             continue;
         }
 
-        privateKey = *(struct Crypto::SecretKey *)&privateKeyHash;
+        privateKey = *(struct crypto::SecretKey *)&privateKeyHash;
 
         /* Just used for verification purposes before we pass it to
            walletgreen */
-        if (!Crypto::secret_key_to_public_key(privateKey, publicKey))
+        if (!crypto::secret_key_to_public_key(privateKey, publicKey))
         {
             std::cout << std::endl
                       << WarningMsg("Invalid private key, is not on the ")

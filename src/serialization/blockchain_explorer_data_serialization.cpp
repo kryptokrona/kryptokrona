@@ -157,7 +157,7 @@ namespace cryptonote
         // serializer(transaction.signatures, "signatures");
         if (serializer.type() == ISerializer::OUTPUT)
         {
-            std::vector<std::pair<uint64_t, Crypto::Signature>> signaturesForSerialization;
+            std::vector<std::pair<uint64_t, crypto::Signature>> signaturesForSerialization;
             signaturesForSerialization.reserve(transaction.signatures.size());
             uint64_t ctr = 0;
             for (const auto &signaturesV : transaction.signatures)
@@ -178,7 +178,7 @@ namespace cryptonote
             serializer(size, "signaturesSize");
             transaction.signatures.resize(size);
 
-            std::vector<std::pair<uint64_t, Crypto::Signature>> signaturesForSerialization;
+            std::vector<std::pair<uint64_t, crypto::Signature>> signaturesForSerialization;
             serializer(signaturesForSerialization, "signatures");
 
             for (const auto &signatureWithIndex : signaturesForSerialization)

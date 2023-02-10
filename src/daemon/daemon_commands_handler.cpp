@@ -277,7 +277,7 @@ bool DaemonCommandsHandler::print_block_by_height(uint32_t height)
 //--------------------------------------------------------------------------------
 bool DaemonCommandsHandler::print_block_by_hash(const std::string &arg)
 {
-    Crypto::Hash block_hash;
+    crypto::Hash block_hash;
     if (!parse_hash256(arg, block_hash))
     {
         return false;
@@ -329,16 +329,16 @@ bool DaemonCommandsHandler::print_tx(const std::vector<std::string> &args)
     }
 
     const std::string &str_hash = args.front();
-    Crypto::Hash tx_hash;
+    crypto::Hash tx_hash;
     if (!parse_hash256(str_hash, tx_hash))
     {
         return true;
     }
 
-    std::vector<Crypto::Hash> tx_ids;
+    std::vector<crypto::Hash> tx_ids;
     tx_ids.push_back(tx_hash);
     std::vector<cryptonote::BinaryArray> txs;
-    std::vector<Crypto::Hash> missed_ids;
+    std::vector<crypto::Hash> missed_ids;
     m_core.getTransactions(tx_ids, txs, missed_ids);
 
     if (1 == txs.size())

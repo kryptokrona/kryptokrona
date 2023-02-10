@@ -199,29 +199,29 @@ void benchmark(T hashFunction, std::string hashFunctionName, uint64_t iterations
 
 void benchmarkUnderivePublicKey()
 {
-    Crypto::KeyDerivation derivation;
+    crypto::KeyDerivation derivation;
 
-    Crypto::PublicKey txPublicKey;
+    crypto::PublicKey txPublicKey;
     common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
 
-    Crypto::SecretKey privateViewKey;
+    crypto::SecretKey privateViewKey;
     common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
 
-    Crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
+    crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
 
     const uint64_t loopIterations = 600000;
 
     auto startTimer = std::chrono::high_resolution_clock::now();
 
-    Crypto::PublicKey spendKey;
+    crypto::PublicKey spendKey;
 
-    Crypto::PublicKey outputKey;
+    crypto::PublicKey outputKey;
     common::podFromHex("4a078e76cd41a3d3b534b83dc6f2ea2de500b653ca82273b7bfad8045d85a400", outputKey);
 
     for (uint64_t i = 0; i < loopIterations; i++)
     {
         /* Use i as output index to prevent optimization */
-        Crypto::underive_public_key(derivation, i, outputKey, spendKey);
+        crypto::underive_public_key(derivation, i, outputKey, spendKey);
     }
 
     auto elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;
@@ -234,12 +234,12 @@ void benchmarkUnderivePublicKey()
 
 void benchmarkGenerateKeyDerivation()
 {
-    Crypto::KeyDerivation derivation;
+    crypto::KeyDerivation derivation;
 
-    Crypto::PublicKey txPublicKey;
+    crypto::PublicKey txPublicKey;
     common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
 
-    Crypto::SecretKey privateViewKey;
+    crypto::SecretKey privateViewKey;
     common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
 
     const uint64_t loopIterations = 60000;
@@ -248,7 +248,7 @@ void benchmarkGenerateKeyDerivation()
 
     for (uint64_t i = 0; i < loopIterations; i++)
     {
-        Crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
+        crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
     }
 
     auto elapsedTime = std::chrono::high_resolution_clock::now() - startTimer;

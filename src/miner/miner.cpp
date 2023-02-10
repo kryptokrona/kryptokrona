@@ -107,7 +107,7 @@ namespace cryptonote
             while (m_state == MiningState::MINING_IN_PROGRESS)
             {
                 CachedBlock cachedBlock(block);
-                Crypto::Hash hash = cachedBlock.getBlockLongHash();
+                crypto::Hash hash = cachedBlock.getBlockLongHash();
 
                 if (check_hash(hash, difficulty))
                 {

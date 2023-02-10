@@ -327,7 +327,7 @@ namespace cryptonote
         logger(logging::DEBUGGING) << "Transactions split completed";
     }
 
-    void BlockchainCache::removePaymentId(const Crypto::Hash &transactionHash, BlockchainCache &newCache)
+    void BlockchainCache::removePaymentId(const crypto::Hash &transactionHash, BlockchainCache &newCache)
     {
         auto &index = paymentIds.get<TransactionHashTag>();
         auto it = index.find(transactionHash);
@@ -366,7 +366,7 @@ namespace cryptonote
         logger(logging::DEBUGGING) << "Key output global indexes split successfully completed";
     }
 
-    void BlockchainCache::addSpentKeyImage(const Crypto::KeyImage &keyImage, uint32_t blockIndex)
+    void BlockchainCache::addSpentKeyImage(const crypto::KeyImage &keyImage, uint32_t blockIndex)
     {
         assert(!checkIfSpent(keyImage, blockIndex - 1)); // Changed from "assert(!checkIfSpent(keyImage, blockIndex));"
                                                          // to prevent fail when pushing block from DatabaseBlockchainCache.
@@ -375,10 +375,10 @@ namespace cryptonote
         spentKeyImages.get<BlockIndexTag>().insert(SpentKeyImage{blockIndex, keyImage});
     }
 
-    std::vector<Crypto::Hash> BlockchainCache::getTransactionHashes() const
+    std::vector<crypto::Hash> BlockchainCache::getTransactionHashes() const
     {
         auto &txInfos = transactions.get<TransactionHashTag>();
-        std::vector<Crypto::Hash> hashes;
+        std::vector<crypto::Hash> hashes;
         for (auto &tx : txInfos)
         {
             // skip base transaction
@@ -456,7 +456,7 @@ namespace cryptonote
         return indexEntry.startIndex + static_cast<uint32_t>(indexEntry.outputs.size()) - 1;
     }
 
-    bool BlockchainCache::checkIfSpent(const Crypto::KeyImage &keyImage, uint32_t blockIndex) const
+    bool BlockchainCache::checkIfSpent(const crypto::KeyImage &keyImage, uint32_t blockIndex) const
     {
         if (blockIndex < startIndex)
         {
@@ -473,7 +473,7 @@ namespace cryptonote
         return it->blockIndex <= blockIndex;
     }
 
-    bool BlockchainCache::checkIfSpent(const Crypto::KeyImage &keyImage) const
+    bool BlockchainCache::checkIfSpent(const crypto::KeyImage &keyImage) const
     {
         if (spentKeyImages.get<KeyImageTag>().count(keyImage) != 0)
         {
@@ -488,12 +488,12 @@ namespace cryptonote
         return static_cast<uint32_t>(blockInfos.size());
     }
 
-    bool BlockchainCache::hasBlock(const Crypto::Hash &blockHash) const
+    bool BlockchainCache::hasBlock(const crypto::Hash &blockHash) const
     {
         return blockInfos.get<BlockHashTag>().count(blockHash) != 0;
     }
 
-    uint32_t BlockchainCache::getBlockIndex(const Crypto::Hash &blockHash) const
+    uint32_t BlockchainCache::getBlockIndex(const crypto::Hash &blockHash) const
     {
         //  assert(blockInfos.get<BlockHashTag>().count(blockHash) > 0);
         const auto hashIt = blockInfos.get<BlockHashTag>().find(blockHash);
@@ -506,7 +506,7 @@ namespace cryptonote
         return static_cast<uint32_t>(std::distance(blockInfos.get<BlockIndexTag>().begin(), rndIt)) + startIndex;
     }
 
-    Crypto::Hash BlockchainCache::getBlockHash(uint32_t blockIndex) const
+    crypto::Hash BlockchainCache::getBlockHash(uint32_t blockIndex) const
     {
         if (blockIndex < startIndex)
         {
@@ -518,11 +518,11 @@ namespace cryptonote
         return blockInfos.get<BlockIndexTag>()[blockIndex - startIndex].blockHash;
     }
 
-    std::vector<Crypto::Hash> BlockchainCache::getBlockHashes(uint32_t startBlockIndex, size_t maxCount) const
+    std::vector<crypto::Hash> BlockchainCache::getBlockHashes(uint32_t startBlockIndex, size_t maxCount) const
     {
         size_t blocksLeft;
         size_t start = 0;
-        std::vector<Crypto::Hash> hashes;
+        std::vector<crypto::Hash> hashes;
 
         if (startBlockIndex < startIndex)
         {
@@ -654,7 +654,7 @@ namespace cryptonote
         }
     }
 
-    bool BlockchainCache::getTransactionGlobalIndexes(const Crypto::Hash &transactionHash,
+    bool BlockchainCache::getTransactionGlobalIndexes(const crypto::Hash &transactionHash,
                                                       std::vector<uint32_t> &globalIndexes) const
     {
         auto it = transactions.get<TransactionHashTag>().find(transactionHash);
@@ -726,14 +726,14 @@ namespace cryptonote
         return blocks;
     }
 
-    std::unordered_map<Crypto::Hash, std::vector<uint64_t>> BlockchainCache::getGlobalIndexes(
-        const std::vector<Crypto::Hash> transactionHashes) const
+    std::unordered_map<crypto::Hash, std::vector<uint64_t>> BlockchainCache::getGlobalIndexes(
+        const std::vector<crypto::Hash> transactionHashes) const
     {
-        std::unordered_map<Crypto::Hash, std::vector<uint64_t>> indexes;
+        std::unordered_map<crypto::Hash, std::vector<uint64_t>> indexes;
 
         auto &availableTransactions = transactions.get<TransactionHashTag>();
 
-        std::vector<Crypto::Hash> remainingTransactions;
+        std::vector<crypto::Hash> remainingTransactions;
 
         for (const auto hash : transactionHashes)
         {
@@ -790,25 +790,25 @@ namespace cryptonote
     }
 
     std::vector<BinaryArray>
-    BlockchainCache::getRawTransactions(const std::vector<Crypto::Hash> &requestedTransactions) const
+    BlockchainCache::getRawTransactions(const std::vector<crypto::Hash> &requestedTransactions) const
     {
-        std::vector<Crypto::Hash> misses;
+        std::vector<crypto::Hash> misses;
         auto ret = getRawTransactions(requestedTransactions, misses);
         assert(misses.empty());
         return ret;
     }
 
-    std::vector<BinaryArray> BlockchainCache::getRawTransactions(const std::vector<Crypto::Hash> &requestedTransactions,
-                                                                 std::vector<Crypto::Hash> &missedTransactions) const
+    std::vector<BinaryArray> BlockchainCache::getRawTransactions(const std::vector<crypto::Hash> &requestedTransactions,
+                                                                 std::vector<crypto::Hash> &missedTransactions) const
     {
         std::vector<BinaryArray> res;
         getRawTransactions(requestedTransactions, res, missedTransactions);
         return res;
     }
 
-    void BlockchainCache::getRawTransactions(const std::vector<Crypto::Hash> &requestedTransactions,
+    void BlockchainCache::getRawTransactions(const std::vector<crypto::Hash> &requestedTransactions,
                                              std::vector<BinaryArray> &foundTransactions,
-                                             std::vector<Crypto::Hash> &missedTransactions) const
+                                             std::vector<crypto::Hash> &missedTransactions) const
     {
         auto &index = transactions.get<TransactionHashTag>();
         for (const auto &transactionHash : requestedTransactions)
@@ -925,7 +925,7 @@ namespace cryptonote
 
     ExtractOutputKeysResult BlockchainCache::extractKeyOutputKeys(uint64_t amount,
                                                                   common::ArrayView<uint32_t> globalIndexes,
-                                                                  std::vector<Crypto::PublicKey> &publicKeys) const
+                                                                  std::vector<crypto::PublicKey> &publicKeys) const
     {
         return extractKeyOutputKeys(amount, getTopBlockIndex(), globalIndexes, publicKeys);
     }
@@ -997,7 +997,7 @@ namespace cryptonote
 
     ExtractOutputKeysResult BlockchainCache::extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex,
                                                                   common::ArrayView<uint32_t> globalIndexes,
-                                                                  std::vector<Crypto::PublicKey> &publicKeys) const
+                                                                  std::vector<crypto::PublicKey> &publicKeys) const
     {
         assert(!globalIndexes.isEmpty());
         assert(std::is_sorted(globalIndexes.begin(), globalIndexes.end()));                            // sorted
@@ -1016,7 +1016,7 @@ namespace cryptonote
 
     ExtractOutputKeysResult
     BlockchainCache::extractKeyOtputReferences(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
-                                               std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const
+                                               std::vector<std::pair<crypto::Hash, size_t>> &outputReferences) const
     {
         assert(!globalIndexes.isEmpty());
         assert(std::is_sorted(globalIndexes.begin(), globalIndexes.end()));                            // sorted
@@ -1098,9 +1098,9 @@ namespace cryptonote
         return ExtractOutputKeysResult::SUCCESS;
     }
 
-    std::vector<Crypto::Hash> BlockchainCache::getTransactionHashesByPaymentId(const Crypto::Hash &paymentId) const
+    std::vector<crypto::Hash> BlockchainCache::getTransactionHashesByPaymentId(const crypto::Hash &paymentId) const
     {
-        std::vector<Crypto::Hash> transactionHashes;
+        std::vector<crypto::Hash> transactionHashes;
 
         if (parent != nullptr)
         {
@@ -1120,9 +1120,9 @@ namespace cryptonote
         return transactionHashes;
     }
 
-    std::vector<Crypto::Hash> BlockchainCache::getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const
+    std::vector<crypto::Hash> BlockchainCache::getBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount) const
     {
-        std::vector<Crypto::Hash> blockHashes;
+        std::vector<crypto::Hash> blockHashes;
         if (secondsCount == 0)
         {
             return blockHashes;
@@ -1167,7 +1167,7 @@ namespace cryptonote
         return startIndex + static_cast<uint32_t>(blockInfos.size()) - 1;
     }
 
-    const Crypto::Hash &BlockchainCache::getTopBlockHash() const
+    const crypto::Hash &BlockchainCache::getTopBlockHash() const
     {
         assert(!blockInfos.empty());
         return blockInfos.get<BlockIndexTag>().back().blockHash;
@@ -1307,14 +1307,14 @@ namespace cryptonote
         return spentOutputs;
     }
 
-    bool BlockchainCache::hasTransaction(const Crypto::Hash &transactionHash) const
+    bool BlockchainCache::hasTransaction(const crypto::Hash &transactionHash) const
     {
         auto &index = transactions.get<TransactionHashTag>();
         auto it = index.find(transactionHash);
         return it != index.end();
     }
 
-    uint32_t BlockchainCache::getBlockIndexContainingTx(const Crypto::Hash &transactionHash) const
+    uint32_t BlockchainCache::getBlockIndexContainingTx(const crypto::Hash &transactionHash) const
     {
         auto &index = transactions.get<TransactionHashTag>();
         auto it = index.find(transactionHash);

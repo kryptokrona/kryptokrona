@@ -36,7 +36,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
         return nullptr;
     }
 
-    Crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
+    crypto::SecretKey privateViewKey = getPrivateKey("Private View Key: ");
 
     std::string address;
 
@@ -98,9 +98,9 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
 std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
 {
-    const Crypto::SecretKey privateSpendKey = getPrivateKey("Enter your private spend key: ");
+    const crypto::SecretKey privateSpendKey = getPrivateKey("Enter your private spend key: ");
 
-    const Crypto::SecretKey privateViewKey = getPrivateKey("Enter your private view key: ");
+    const crypto::SecretKey privateViewKey = getPrivateKey("Enter your private view key: ");
 
     const std::string walletFileName = getNewWalletFileName();
 
@@ -280,15 +280,15 @@ std::shared_ptr<WalletBackend> openWallet(const Config &config)
     }
 }
 
-Crypto::SecretKey getPrivateKey(const std::string outputMsg)
+crypto::SecretKey getPrivateKey(const std::string outputMsg)
 {
     const uint64_t privateKeyLen = 64;
     uint64_t size;
 
     std::string privateKeyString;
-    Crypto::Hash privateKeyHash;
-    Crypto::SecretKey privateKey;
-    Crypto::PublicKey publicKey;
+    crypto::Hash privateKeyHash;
+    crypto::SecretKey privateKey;
+    crypto::PublicKey publicKey;
 
     while (true)
     {
@@ -319,10 +319,10 @@ Crypto::SecretKey getPrivateKey(const std::string outputMsg)
             continue;
         }
 
-        privateKey = *(struct Crypto::SecretKey *)&privateKeyHash;
+        privateKey = *(struct crypto::SecretKey *)&privateKeyHash;
 
         /* Just used for verification */
-        if (!Crypto::secret_key_to_public_key(privateKey, publicKey))
+        if (!crypto::secret_key_to_public_key(privateKey, publicKey))
         {
             std::cout << std::endl
                       << WarningMsg("Invalid private key, is not on the ")
