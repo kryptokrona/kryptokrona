@@ -29,12 +29,12 @@ namespace PaymentService
     {
         struct Request
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -44,12 +44,12 @@ namespace PaymentService
         {
             std::string fileName;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -63,12 +63,12 @@ namespace PaymentService
 
             bool newAddress = false;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -76,14 +76,14 @@ namespace PaymentService
     {
         struct Request
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::string viewSecretKey;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -93,14 +93,14 @@ namespace PaymentService
         {
             std::string address;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::string mnemonicSeed;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -108,7 +108,7 @@ namespace PaymentService
     {
         struct Request
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
@@ -119,7 +119,7 @@ namespace PaymentService
             std::string lastBlockHash;
             uint32_t peerCount;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -127,14 +127,14 @@ namespace PaymentService
     {
         struct Request
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::vector<std::string> addresses;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -149,14 +149,14 @@ namespace PaymentService
 
             bool newAddress = false;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::string address;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -170,14 +170,14 @@ namespace PaymentService
 
             bool newAddress = false;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::vector<std::string> addresses;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -187,12 +187,12 @@ namespace PaymentService
         {
             std::string address;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -202,7 +202,7 @@ namespace PaymentService
         {
             std::string address;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
@@ -210,7 +210,7 @@ namespace PaymentService
             std::string spendSecretKey;
             std::string spendPublicKey;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -220,7 +220,7 @@ namespace PaymentService
         {
             std::string address;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
@@ -228,7 +228,7 @@ namespace PaymentService
             uint64_t availableBalance;
             uint64_t lockedAmount;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -239,14 +239,14 @@ namespace PaymentService
             uint32_t firstBlockIndex;
             uint32_t blockCount;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::vector<std::string> blockHashes;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -255,7 +255,7 @@ namespace PaymentService
         std::string blockHash;
         std::vector<std::string> transactionHashes;
 
-        void serialize(CryptoNote::ISerializer &serializer);
+        void serialize(cryptonote::ISerializer &serializer);
     };
 
     struct GetTransactionHashes
@@ -268,14 +268,14 @@ namespace PaymentService
             uint32_t blockCount;
             std::string paymentId;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::vector<TransactionHashesInBlockRpcInfo> items;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -285,7 +285,7 @@ namespace PaymentService
         std::string address;
         int64_t amount;
 
-        void serialize(CryptoNote::ISerializer &serializer);
+        void serialize(cryptonote::ISerializer &serializer);
     };
 
     struct TransactionRpcInfo
@@ -302,7 +302,7 @@ namespace PaymentService
         std::string extra;
         std::string paymentId;
 
-        void serialize(CryptoNote::ISerializer &serializer);
+        void serialize(cryptonote::ISerializer &serializer);
     };
 
     struct GetTransaction
@@ -311,14 +311,14 @@ namespace PaymentService
         {
             std::string transactionHash;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             TransactionRpcInfo transaction;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -327,7 +327,7 @@ namespace PaymentService
         std::string blockHash;
         std::vector<TransactionRpcInfo> transactions;
 
-        void serialize(CryptoNote::ISerializer &serializer);
+        void serialize(cryptonote::ISerializer &serializer);
     };
 
     struct GetTransactions
@@ -340,14 +340,14 @@ namespace PaymentService
             uint32_t blockCount;
             std::string paymentId;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::vector<TransactionsInBlockRpcInfo> items;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -357,14 +357,14 @@ namespace PaymentService
         {
             std::vector<std::string> addresses;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::vector<std::string> transactionHashes;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -373,7 +373,7 @@ namespace PaymentService
         std::string address;
         uint64_t amount;
 
-        void serialize(CryptoNote::ISerializer &serializer);
+        void serialize(cryptonote::ISerializer &serializer);
     };
 
     struct SendTransaction
@@ -389,14 +389,14 @@ namespace PaymentService
             std::string paymentId;
             uint64_t unlockTime = 0;
 
-            void serialize(CryptoNote::ISerializer &serializer, const WalletService &service);
+            void serialize(cryptonote::ISerializer &serializer, const WalletService &service);
         };
 
         struct Response
         {
             std::string transactionHash;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -413,14 +413,14 @@ namespace PaymentService
             std::string paymentId;
             uint64_t unlockTime = 0;
 
-            void serialize(CryptoNote::ISerializer &serializer, const WalletService &service);
+            void serialize(cryptonote::ISerializer &serializer, const WalletService &service);
         };
 
         struct Response
         {
             std::string transactionHash;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -428,14 +428,14 @@ namespace PaymentService
     {
         struct Request
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::vector<std::string> transactionHashes;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -445,12 +445,12 @@ namespace PaymentService
         {
             std::string transactionHash;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -460,12 +460,12 @@ namespace PaymentService
         {
             std::string transactionHash;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -478,14 +478,14 @@ namespace PaymentService
             std::vector<std::string> addresses;
             std::string destinationAddress;
 
-            void serialize(CryptoNote::ISerializer &serializer, const WalletService &service);
+            void serialize(cryptonote::ISerializer &serializer, const WalletService &service);
         };
 
         struct Response
         {
             std::string transactionHash;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -496,7 +496,7 @@ namespace PaymentService
             uint64_t threshold;
             std::vector<std::string> addresses;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
@@ -504,7 +504,7 @@ namespace PaymentService
             uint32_t fusionReadyCount;
             uint32_t totalOutputCount;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -515,14 +515,14 @@ namespace PaymentService
             std::string address;
             std::string paymentId;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
         {
             std::string integratedAddress;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 
@@ -530,7 +530,7 @@ namespace PaymentService
     {
         struct Request
         {
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
 
         struct Response
@@ -538,7 +538,7 @@ namespace PaymentService
             std::string address;
             uint32_t amount;
 
-            void serialize(CryptoNote::ISerializer &serializer);
+            void serialize(cryptonote::ISerializer &serializer);
         };
     };
 

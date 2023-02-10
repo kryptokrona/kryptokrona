@@ -888,7 +888,7 @@ namespace cryptonote
 
             context.m_state = CryptoNoteConnectionContext::state_normal;
             logger(Logging::INFO, Logging::BRIGHT_YELLOW) << context << "Successfully synchronized with the "
-                                                          << CryptoNote::CRYPTONOTE_NAME << " Network.";
+                                                          << cryptonote::CRYPTONOTE_NAME << " Network.";
             on_connection_synchronized();
         }
         return true;
@@ -901,7 +901,7 @@ namespace cryptonote
         {
             logger(Logging::INFO)
                 << ENDL;
-            logger(INFO, BRIGHT_CYAN) << "===[ " + std::string(CryptoNote::CRYPTONOTE_NAME) + " Tip! ]=============================" << ENDL;
+            logger(INFO, BRIGHT_CYAN) << "===[ " + std::string(cryptonote::CRYPTONOTE_NAME) + " Tip! ]=============================" << ENDL;
             logger(INFO, WHITE) << " Always exit " + WalletConfig::daemonName + " and " + WalletConfig::walletName + " with the \"exit\" command to preserve your chain and wallet data." << ENDL;
             logger(INFO, WHITE) << " Use the \"help\" command to see a list of available commands." << ENDL;
             logger(INFO, WHITE) << " Use the \"backup\" command in " + WalletConfig::walletName + " to display your keys/seed for restoring a corrupted wallet." << ENDL;

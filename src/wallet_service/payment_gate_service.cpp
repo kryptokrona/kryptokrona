@@ -49,7 +49,7 @@ PaymentGateService::PaymentGateService() : dispatcher(nullptr),
                                            fileLogger(Logging::TRACE),
                                            consoleLogger(Logging::INFO)
 {
-    currencyBuilder = std::make_shared<CryptoNote::CurrencyBuilder>(logger);
+    currencyBuilder = std::make_shared<cryptonote::CurrencyBuilder>(logger);
     consoleLogger.setPattern("%D %T %L ");
     fileLogger.setPattern("%D %T %L ");
 }
@@ -98,7 +98,7 @@ WalletConfiguration PaymentGateService::getWalletConfig() const
     };
 }
 
-const CryptoNote::Currency PaymentGateService::getCurrency()
+const cryptonote::Currency PaymentGateService::getCurrency()
 {
     return currencyBuilder->currency();
 }
@@ -141,9 +141,9 @@ void PaymentGateService::stop()
 void PaymentGateService::runRpcProxy(Logging::LoggerRef &log)
 {
     log(Logging::INFO) << "Starting Payment Gate with remote node, timeout: " << config.serviceConfig.initTimeout;
-    CryptoNote::Currency currency = currencyBuilder->currency();
+    cryptonote::Currency currency = currencyBuilder->currency();
 
-    std::unique_ptr<CryptoNote::INode> node(
+    std::unique_ptr<cryptonote::INode> node(
         PaymentService::NodeFactory::createNode(
             config.serviceConfig.daemonAddress,
             config.serviceConfig.daemonPort,
@@ -153,14 +153,14 @@ void PaymentGateService::runRpcProxy(Logging::LoggerRef &log)
     runWalletService(currency, *node);
 }
 
-void PaymentGateService::runWalletService(const CryptoNote::Currency &currency, CryptoNote::INode &node)
+void PaymentGateService::runWalletService(const cryptonote::Currency &currency, cryptonote::INode &node)
 {
     PaymentService::WalletConfiguration walletConfiguration{
         config.serviceConfig.containerFile,
         config.serviceConfig.containerPassword,
         config.serviceConfig.syncFromZero};
 
-    std::unique_ptr<CryptoNote::WalletGreen> wallet(new CryptoNote::WalletGreen(*dispatcher, currency, node, logger));
+    std::unique_ptr<cryptonote::WalletGreen> wallet(new cryptonote::WalletGreen(*dispatcher, currency, node, logger));
 
     service = new PaymentService::WalletService(currency, *dispatcher, node, *wallet, *wallet, walletConfiguration, logger);
     std::unique_ptr<PaymentService::WalletService> serviceGuard(service);

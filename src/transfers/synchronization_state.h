@@ -59,7 +59,7 @@ namespace cryptonote
         virtual void load(std::istream &in) override;
 
         // serialization
-        CryptoNote::ISerializer &serialize(CryptoNote::ISerializer &s, const std::string &name);
+        cryptonote::ISerializer &serialize(cryptonote::ISerializer &s, const std::string &name);
 
     private:
         std::vector<Crypto::Hash> m_blockchain;

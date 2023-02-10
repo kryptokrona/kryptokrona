@@ -20,8 +20,8 @@ namespace PaymentService
             daemonAddress = "127.0.0.1";
             bindAddress = "127.0.0.1";
             logFile = "service.log";
-            daemonPort = CryptoNote::RPC_DEFAULT_PORT;
-            bindPort = CryptoNote::SERVICE_DEFAULT_PORT;
+            daemonPort = cryptonote::RPC_DEFAULT_PORT;
+            bindPort = cryptonote::SERVICE_DEFAULT_PORT;
             logLevel = Logging::INFO;
             legacySecurity = false;
             help = false;

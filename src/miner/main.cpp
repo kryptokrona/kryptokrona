@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 {
     while (true)
     {
-        CryptoNote::MiningConfig config;
+        cryptonote::MiningConfig config;
         config.parse(argc, argv);
 
         try

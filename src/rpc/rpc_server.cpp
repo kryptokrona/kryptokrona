@@ -674,9 +674,9 @@ namespace cryptonote
         res.grey_peerlist_size = m_p2p.getPeerlistManager().get_gray_peers_count();
         res.last_known_block_index = std::max(static_cast<uint32_t>(1), m_protocol.getObservedHeight()) - 1;
         res.network_height = std::max(static_cast<uint32_t>(1), m_protocol.getBlockchainHeight());
-        res.upgrade_heights = CryptoNote::parameters::FORK_HEIGHTS_SIZE == 0 ? std::vector<uint64_t>() : std::vector<uint64_t>(CryptoNote::parameters::FORK_HEIGHTS, CryptoNote::parameters::FORK_HEIGHTS + CryptoNote::parameters::FORK_HEIGHTS_SIZE);
-        res.supported_height = CryptoNote::parameters::FORK_HEIGHTS_SIZE == 0 ? 0 : CryptoNote::parameters::FORK_HEIGHTS[CryptoNote::parameters::CURRENT_FORK_INDEX];
-        res.hashrate = (uint32_t)round(res.difficulty / CryptoNote::parameters::DIFFICULTY_TARGET);
+        res.upgrade_heights = cryptonote::parameters::FORK_HEIGHTS_SIZE == 0 ? std::vector<uint64_t>() : std::vector<uint64_t>(cryptonote::parameters::FORK_HEIGHTS, cryptonote::parameters::FORK_HEIGHTS + cryptonote::parameters::FORK_HEIGHTS_SIZE);
+        res.supported_height = cryptonote::parameters::FORK_HEIGHTS_SIZE == 0 ? 0 : cryptonote::parameters::FORK_HEIGHTS[cryptonote::parameters::CURRENT_FORK_INDEX];
+        res.hashrate = (uint32_t)round(res.difficulty / cryptonote::parameters::DIFFICULTY_TARGET);
         res.synced = ((uint64_t)res.height == (uint64_t)res.network_height);
         res.testnet = m_core.getCurrency().isTestnet();
         res.major_version = m_core.getBlockDetails(m_core.getTopBlockIndex()).majorVersion;
@@ -1056,7 +1056,7 @@ namespace cryptonote
         res.txDetails.mixin = mixin;
 
         Crypto::Hash paymentId;
-        if (CryptoNote::getPaymentIdFromTxExtra(res.tx.extra, paymentId))
+        if (cryptonote::getPaymentIdFromTxExtra(res.tx.extra, paymentId))
         {
             res.txDetails.paymentId = Common::podToHex(paymentId);
         }
@@ -1172,7 +1172,7 @@ namespace cryptonote
         }
 
         BlockTemplate blockTemplate = boost::value_initialized<BlockTemplate>();
-        CryptoNote::BinaryArray blob_reserve;
+        cryptonote::BinaryArray blob_reserve;
         blob_reserve.resize(req.reserve_size, 0);
 
         if (!m_core.getBlockTemplate(blockTemplate, acc, blob_reserve, res.difficulty, res.height))
@@ -1182,7 +1182,7 @@ namespace cryptonote
         }
 
         BinaryArray block_blob = toBinaryArray(blockTemplate);
-        PublicKey tx_pub_key = CryptoNote::getTransactionPublicKeyFromExtra(blockTemplate.baseTransaction.extra);
+        PublicKey tx_pub_key = cryptonote::getTransactionPublicKeyFromExtra(blockTemplate.baseTransaction.extra);
         if (tx_pub_key == NULL_PUBLIC_KEY)
         {
             logger(ERROR) << "Failed to find tx pub key in coinbase extra";
@@ -1380,7 +1380,7 @@ namespace cryptonote
         for (uint32_t h = static_cast<uint32_t>(req.start_height); h <= static_cast<uint32_t>(req.end_height); ++h)
         {
             Crypto::Hash block_hash = m_core.getBlockHashByIndex(h);
-            CryptoNote::BlockTemplate blk = m_core.getBlockByHash(block_hash);
+            cryptonote::BlockTemplate blk = m_core.getBlockByHash(block_hash);
 
             res.headers.push_back(block_header_response());
             fill_block_header_response(blk, false, h, block_hash, res.headers.back());

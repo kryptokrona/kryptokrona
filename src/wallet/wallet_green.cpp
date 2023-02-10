@@ -57,46 +57,46 @@ namespace
         requestFinished.set();
     }
 
-    CryptoNote::WalletEvent makeTransactionUpdatedEvent(size_t id)
+    cryptonote::WalletEvent makeTransactionUpdatedEvent(size_t id)
     {
-        CryptoNote::WalletEvent event;
-        event.type = CryptoNote::WalletEventType::TRANSACTION_UPDATED;
+        cryptonote::WalletEvent event;
+        event.type = cryptonote::WalletEventType::TRANSACTION_UPDATED;
         event.transactionUpdated.transactionIndex = id;
 
         return event;
     }
 
-    CryptoNote::WalletEvent makeTransactionCreatedEvent(size_t id)
+    cryptonote::WalletEvent makeTransactionCreatedEvent(size_t id)
     {
-        CryptoNote::WalletEvent event;
-        event.type = CryptoNote::WalletEventType::TRANSACTION_CREATED;
+        cryptonote::WalletEvent event;
+        event.type = cryptonote::WalletEventType::TRANSACTION_CREATED;
         event.transactionCreated.transactionIndex = id;
 
         return event;
     }
 
-    CryptoNote::WalletEvent makeMoneyUnlockedEvent()
+    cryptonote::WalletEvent makeMoneyUnlockedEvent()
     {
-        CryptoNote::WalletEvent event;
-        event.type = CryptoNote::WalletEventType::BALANCE_UNLOCKED;
+        cryptonote::WalletEvent event;
+        event.type = cryptonote::WalletEventType::BALANCE_UNLOCKED;
 
         return event;
     }
 
-    CryptoNote::WalletEvent makeSyncProgressUpdatedEvent(uint32_t current, uint32_t total)
+    cryptonote::WalletEvent makeSyncProgressUpdatedEvent(uint32_t current, uint32_t total)
     {
-        CryptoNote::WalletEvent event;
-        event.type = CryptoNote::WalletEventType::SYNC_PROGRESS_UPDATED;
+        cryptonote::WalletEvent event;
+        event.type = cryptonote::WalletEventType::SYNC_PROGRESS_UPDATED;
         event.synchronizationProgressUpdated.processedBlockCount = current;
         event.synchronizationProgressUpdated.totalBlockCount = total;
 
         return event;
     }
 
-    CryptoNote::WalletEvent makeSyncCompletedEvent()
+    cryptonote::WalletEvent makeSyncCompletedEvent()
     {
-        CryptoNote::WalletEvent event;
-        event.type = CryptoNote::WalletEventType::SYNC_COMPLETED;
+        cryptonote::WalletEvent event;
+        event.type = cryptonote::WalletEventType::SYNC_COMPLETED;
 
         return event;
     }
@@ -168,10 +168,10 @@ namespace cryptonote
                                        const uint64_t scanHeight,
                                        bool newAddress)
     {
-        CryptoNote::AccountPublicAddress publicKeys;
+        cryptonote::AccountPublicAddress publicKeys;
         uint64_t prefix;
 
-        if (!CryptoNote::parseAccountAddressString(prefix, publicKeys, address))
+        if (!cryptonote::parseAccountAddressString(prefix, publicKeys, address))
         {
             throw std::runtime_error("Failed to parse address!");
         }
@@ -187,7 +187,7 @@ namespace cryptonote
         if (!Crypto::secret_key_to_public_key(viewSecretKey, viewPublicKey))
         {
             m_logger(ERROR, BRIGHT_RED) << "initializeWithViewKey(" << viewSecretKey << ") Failed to convert secret key to public key";
-            throw std::system_error(make_error_code(CryptoNote::error::KEY_GENERATION_ERROR));
+            throw std::system_error(make_error_code(cryptonote::error::KEY_GENERATION_ERROR));
         }
 
         initWithKeys(path, password, viewPublicKey, viewSecretKey, scanHeight, newAddress);
@@ -242,7 +242,7 @@ namespace cryptonote
                                           {
                                               wallet.actualBalance = 0;
                                               wallet.pendingBalance = 0;
-                                              wallet.container = reinterpret_cast<CryptoNote::ITransfersContainer *>(walletIndex++); // dirty hack. container field must be unique
+                                              wallet.container = reinterpret_cast<cryptonote::ITransfersContainer *>(walletIndex++); // dirty hack. container field must be unique
                                           });
             }
 
@@ -352,7 +352,7 @@ namespace cryptonote
         if (m_state != WalletState::NOT_INITIALIZED)
         {
             m_logger(ERROR, BRIGHT_RED) << "Failed to initialize with keys: already initialized. Current state: " << m_state;
-            throw std::system_error(make_error_code(CryptoNote::error::ALREADY_INITIALIZED));
+            throw std::system_error(make_error_code(cryptonote::error::ALREADY_INITIALIZED));
         }
 
         throwIfStopped();
@@ -860,7 +860,7 @@ namespace cryptonote
 
             wallet.actualBalance = 0;
             wallet.pendingBalance = 0;
-            wallet.container = reinterpret_cast<CryptoNote::ITransfersContainer *>(i); // dirty hack. container field must be unique
+            wallet.container = reinterpret_cast<cryptonote::ITransfersContainer *>(i); // dirty hack. container field must be unique
 
             m_walletsContainer.push_back(std::move(wallet));
         }
@@ -999,7 +999,7 @@ namespace cryptonote
         throwIfNotInitialized();
         throwIfStopped();
 
-        CryptoNote::AccountPublicAddress pubAddr = parseAddress(address);
+        cryptonote::AccountPublicAddress pubAddr = parseAddress(address);
 
         auto it = m_walletsContainer.get<KeysIndex>().find(pubAddr.spendPublicKey);
         if (it == m_walletsContainer.get<KeysIndex>().end())
@@ -1035,7 +1035,7 @@ namespace cryptonote
         if (!Crypto::secret_key_to_public_key(spendSecretKey, spendPublicKey))
         {
             m_logger(ERROR, BRIGHT_RED) << "createAddress(" << spendSecretKey << ") Failed to convert secret key to public key";
-            throw std::system_error(make_error_code(CryptoNote::error::KEY_GENERATION_ERROR));
+            throw std::system_error(make_error_code(cryptonote::error::KEY_GENERATION_ERROR));
         }
 
         return doCreateAddress(spendPublicKey, spendSecretKey, scanHeight, newAddress);
@@ -1063,7 +1063,7 @@ namespace cryptonote
             if (!Crypto::secret_key_to_public_key(spendSecretKeys[i], spendPublicKey))
             {
                 m_logger(ERROR, BRIGHT_RED) << "createAddressList(): failed to convert secret key to public key, secret key " << spendSecretKeys[i];
-                throw std::system_error(make_error_code(CryptoNote::error::KEY_GENERATION_ERROR));
+                throw std::system_error(make_error_code(cryptonote::error::KEY_GENERATION_ERROR));
             }
 
             addressDataList[i].spendSecretKey = spendSecretKeys[i];
@@ -1257,9 +1257,9 @@ namespace cryptonote
         }
     }
 
-    CryptoNote::BlockDetails WalletGreen::getBlock(const uint64_t blockHeight)
+    cryptonote::BlockDetails WalletGreen::getBlock(const uint64_t blockHeight)
     {
-        CryptoNote::BlockDetails block;
+        cryptonote::BlockDetails block;
 
         if (m_node.getLastKnownBlockHeight() == 0)
         {
@@ -1299,14 +1299,14 @@ namespace cryptonote
 
         /* Get the amount of seconds since the blockchain launched */
         uint64_t secondsSinceLaunch = scanHeight *
-                                      CryptoNote::parameters::DIFFICULTY_TARGET;
+                                      cryptonote::parameters::DIFFICULTY_TARGET;
 
         /* Add a bit of a buffer in case of difficulty weirdness, blocks coming
            out too fast */
         secondsSinceLaunch *= 0.95;
 
         /* Get the genesis block timestamp and add the time since launch */
-        timestamp = CryptoNote::parameters::GENESIS_BLOCK_TIMESTAMP + secondsSinceLaunch;
+        timestamp = cryptonote::parameters::GENESIS_BLOCK_TIMESTAMP + secondsSinceLaunch;
 
         /* Timestamp in the future */
         if (timestamp >= static_cast<uint64_t>(std::time(nullptr)))
@@ -1325,9 +1325,9 @@ namespace cryptonote
         /* Take the amount of time a block can potentially be in the past/future */
         std::initializer_list<uint64_t> limits =
             {
-                CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT,
-                CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3,
-                CryptoNote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4};
+                cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT,
+                cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3,
+                cryptonote::parameters::CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4};
 
         /* Get the largest adjustment possible */
         uint64_t adjust = std::max(limits);
@@ -1370,7 +1370,7 @@ namespace cryptonote
         start();
 
         /* Save just the keys + timestamp to file */
-        save(CryptoNote::WalletSaveLevel::SAVE_KEYS_ONLY);
+        save(cryptonote::WalletSaveLevel::SAVE_KEYS_ONLY);
 
         /* Stop and shutdown */
         stop();
@@ -1389,7 +1389,7 @@ namespace cryptonote
         throwIfNotInitialized();
         throwIfStopped();
 
-        CryptoNote::AccountPublicAddress pubAddr = parseAddress(address);
+        cryptonote::AccountPublicAddress pubAddr = parseAddress(address);
 
         auto it = m_walletsContainer.get<KeysIndex>().find(pubAddr.spendPublicKey);
         if (it == m_walletsContainer.get<KeysIndex>().end())
@@ -1500,7 +1500,7 @@ namespace cryptonote
         if (m_transactions.size() <= transactionIndex)
         {
             m_logger(ERROR, BRIGHT_RED) << "Failed to get transaction: invalid index " << transactionIndex << ". Number of transactions: " << m_transactions.size();
-            throw std::system_error(make_error_code(CryptoNote::error::INDEX_OUT_OF_RANGE));
+            throw std::system_error(make_error_code(cryptonote::error::INDEX_OUT_OF_RANGE));
         }
 
         return m_transactions.get<RandomAccessIndex>()[transactionIndex];
@@ -1598,7 +1598,7 @@ namespace cryptonote
                                          const std::string &extra,
                                          uint64_t unlockTimestamp,
                                          const DonationSettings &donation,
-                                         const CryptoNote::AccountPublicAddress &changeDestination,
+                                         const cryptonote::AccountPublicAddress &changeDestination,
                                          PreparedTransaction &preparedTransaction)
     {
 
@@ -1670,7 +1670,7 @@ namespace cryptonote
         if (notEnoughIt != mixinResult.end())
         {
             m_logger(ERROR, BRIGHT_RED) << "Mixin is too big: " << mixIn;
-            throw std::system_error(make_error_code(CryptoNote::error::MIXIN_COUNT_TOO_BIG));
+            throw std::system_error(make_error_code(cryptonote::error::MIXIN_COUNT_TOO_BIG));
         }
     }
 
@@ -1687,7 +1687,7 @@ namespace cryptonote
             {
                 std::string message = "Order amount must not exceed " + m_currency.formatAmount(std::numeric_limits<decltype(transfer.amount)>::max());
                 m_logger(ERROR, BRIGHT_RED) << message;
-                throw std::system_error(make_error_code(CryptoNote::error::WRONG_AMOUNT), message);
+                throw std::system_error(make_error_code(cryptonote::error::WRONG_AMOUNT), message);
             }
 
             transfer.type = WalletTransferType::USUAL;
@@ -1700,7 +1700,7 @@ namespace cryptonote
         return transfers;
     }
 
-    uint64_t WalletGreen::countNeededMoney(const std::vector<CryptoNote::WalletTransfer> &destinations, uint64_t fee) const
+    uint64_t WalletGreen::countNeededMoney(const std::vector<cryptonote::WalletTransfer> &destinations, uint64_t fee) const
     {
         uint64_t neededMoney = 0;
         for (const auto &transfer : destinations)
@@ -1708,7 +1708,7 @@ namespace cryptonote
             if (transfer.amount == 0)
             {
                 m_logger(ERROR, BRIGHT_RED) << "Bad destination: zero amount, address " << transfer.address;
-                throw std::system_error(make_error_code(CryptoNote::error::ZERO_DESTINATION));
+                throw std::system_error(make_error_code(cryptonote::error::ZERO_DESTINATION));
             }
             else if (transfer.amount < 0)
             {
@@ -1725,7 +1725,7 @@ namespace cryptonote
             else
             {
                 m_logger(ERROR, BRIGHT_RED) << "Bad destinations: integer overflow";
-                throw std::system_error(make_error_code(CryptoNote::error::SUM_OVERFLOW));
+                throw std::system_error(make_error_code(cryptonote::error::SUM_OVERFLOW));
             }
         }
 
@@ -1736,20 +1736,20 @@ namespace cryptonote
         else
         {
             m_logger(ERROR, BRIGHT_RED) << "Bad fee: integer overflow, fee=" << fee;
-            throw std::system_error(make_error_code(CryptoNote::error::SUM_OVERFLOW));
+            throw std::system_error(make_error_code(cryptonote::error::SUM_OVERFLOW));
         }
 
         return neededMoney;
     }
 
-    CryptoNote::AccountPublicAddress WalletGreen::parseAccountAddressString(const std::string &addressString) const
+    cryptonote::AccountPublicAddress WalletGreen::parseAccountAddressString(const std::string &addressString) const
     {
-        CryptoNote::AccountPublicAddress address;
+        cryptonote::AccountPublicAddress address;
 
         if (!m_currency.parseAccountAddressString(addressString, address))
         {
             m_logger(ERROR, BRIGHT_RED) << "Bad address: " << addressString;
-            throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+            throw std::system_error(make_error_code(cryptonote::error::BAD_ADDRESS));
         }
 
         return address;
@@ -1784,10 +1784,10 @@ namespace cryptonote
     {
         for (const auto &address : addresses)
         {
-            if (!CryptoNote::validateAddress(address, m_currency))
+            if (!cryptonote::validateAddress(address, m_currency))
             {
                 m_logger(ERROR, BRIGHT_RED) << "Bad address: " << address;
-                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+                throw std::system_error(make_error_code(cryptonote::error::BAD_ADDRESS));
             }
         }
     }
@@ -1796,17 +1796,17 @@ namespace cryptonote
     {
         for (const auto &order : orders)
         {
-            if (!CryptoNote::validateAddress(order.address, m_currency))
+            if (!cryptonote::validateAddress(order.address, m_currency))
             {
                 m_logger(ERROR, BRIGHT_RED) << "Bad order address: " << order.address;
-                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS));
+                throw std::system_error(make_error_code(cryptonote::error::BAD_ADDRESS));
             }
 
             if (order.amount >= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
             {
                 std::string message = "Order amount must not exceed " + m_currency.formatAmount(std::numeric_limits<int64_t>::max());
                 m_logger(ERROR, BRIGHT_RED) << message;
-                throw std::system_error(make_error_code(CryptoNote::error::WRONG_AMOUNT), message);
+                throw std::system_error(make_error_code(cryptonote::error::WRONG_AMOUNT), message);
             }
         }
     }
@@ -1825,11 +1825,11 @@ namespace cryptonote
         }
         else
         {
-            if (!CryptoNote::validateAddress(changeDestination, m_currency))
+            if (!cryptonote::validateAddress(changeDestination, m_currency))
             {
                 message = std::string("Bad ") + (isFusion ? "destination" : "change destination") + " address: " + changeDestination;
                 m_logger(ERROR, BRIGHT_RED) << message;
-                throw std::system_error(make_error_code(CryptoNote::error::BAD_ADDRESS), message);
+                throw std::system_error(make_error_code(cryptonote::error::BAD_ADDRESS), message);
             }
 
             if (!isMyAddress(changeDestination))
@@ -1873,7 +1873,7 @@ namespace cryptonote
     size_t WalletGreen::doTransfer(const TransactionParameters &transactionParameters)
     {
         validateTransactionParameters(transactionParameters);
-        CryptoNote::AccountPublicAddress changeDestination = getChangeDestination(transactionParameters.changeDestination, transactionParameters.sourceAddresses);
+        cryptonote::AccountPublicAddress changeDestination = getChangeDestination(transactionParameters.changeDestination, transactionParameters.sourceAddresses);
         m_logger(DEBUGGING) << "Change address " << m_currency.accountAddressAsString(changeDestination);
 
         std::vector<WalletOuts> wallets;
@@ -1918,7 +1918,7 @@ namespace cryptonote
         throwIfTrackingMode();
         throwIfStopped();
 
-        CryptoNote::AccountPublicAddress changeDestination = getChangeDestination(sendingTransaction.changeDestination, sendingTransaction.sourceAddresses);
+        cryptonote::AccountPublicAddress changeDestination = getChangeDestination(sendingTransaction.changeDestination, sendingTransaction.sourceAddresses);
 
         std::vector<WalletOuts> wallets;
         if (!sendingTransaction.sourceAddresses.empty())
@@ -1972,7 +1972,7 @@ namespace cryptonote
                                      << ", from " << Common::makeContainerFormatter(sendingTransaction.sourceAddresses) << ", to " << WalletOrderListFormatter(m_currency, sendingTransaction.destinations) << ", change address '" << sendingTransaction.changeDestination << '\'' << ", fee " << m_currency.formatAmount(sendingTransaction.fee) << ", mixin " << sendingTransaction.mixIn << ", unlockTimestamp " << sendingTransaction.unlockTimestamp;
 
         validateTransactionParameters(sendingTransaction);
-        CryptoNote::AccountPublicAddress changeDestination = getChangeDestination(sendingTransaction.changeDestination, sendingTransaction.sourceAddresses);
+        cryptonote::AccountPublicAddress changeDestination = getChangeDestination(sendingTransaction.changeDestination, sendingTransaction.sourceAddresses);
         m_logger(DEBUGGING) << "Change address " << m_currency.accountAddressAsString(changeDestination);
 
         std::vector<WalletOuts> wallets;
@@ -2012,7 +2012,7 @@ namespace cryptonote
         if (transactionId >= m_transactions.size())
         {
             m_logger(ERROR, BRIGHT_RED) << "Failed to commit transaction: invalid index " << transactionId << ". Number of transactions: " << m_transactions.size();
-            throw std::system_error(make_error_code(CryptoNote::error::INDEX_OUT_OF_RANGE));
+            throw std::system_error(make_error_code(cryptonote::error::INDEX_OUT_OF_RANGE));
         }
 
         auto txIt = std::next(m_transactions.get<RandomAccessIndex>().begin(), transactionId);
@@ -2061,7 +2061,7 @@ namespace cryptonote
         if (transactionId >= m_transactions.size())
         {
             m_logger(ERROR, BRIGHT_RED) << "Failed to rollback transaction: invalid index " << transactionId << ". Number of transactions: " << m_transactions.size();
-            throw std::system_error(make_error_code(CryptoNote::error::INDEX_OUT_OF_RANGE));
+            throw std::system_error(make_error_code(cryptonote::error::INDEX_OUT_OF_RANGE));
         }
 
         auto txIt = m_transactions.get<RandomAccessIndex>().begin();
@@ -2098,7 +2098,7 @@ namespace cryptonote
         insertTx.state = WalletTransactionState::CREATED;
         insertTx.creationTime = static_cast<uint64_t>(time(nullptr));
         insertTx.unlockTime = unlockTimestamp;
-        insertTx.blockHeight = CryptoNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT;
+        insertTx.blockHeight = cryptonote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT;
         insertTx.extra.assign(reinterpret_cast<const char *>(extra.data()), extra.size());
         insertTx.fee = fee;
         insertTx.hash = transactionHash;
@@ -2128,7 +2128,7 @@ namespace cryptonote
         }
     }
 
-    bool WalletGreen::updateWalletTransactionInfo(size_t transactionId, const CryptoNote::TransactionInformation &info, int64_t totalAmount)
+    bool WalletGreen::updateWalletTransactionInfo(size_t transactionId, const cryptonote::TransactionInformation &info, int64_t totalAmount)
     {
         auto &txIdIndex = m_transactions.get<RandomAccessIndex>();
         assert(transactionId < txIdIndex.size());
@@ -2457,7 +2457,7 @@ namespace cryptonote
                               { return eraseOutputTransfers == isOutput && knownAddresses.count(transferAddress) == 0; });
     }
 
-    std::unique_ptr<CryptoNote::ITransaction> WalletGreen::makeTransaction(const std::vector<ReceiverAmounts> &decomposedOutputs,
+    std::unique_ptr<cryptonote::ITransaction> WalletGreen::makeTransaction(const std::vector<ReceiverAmounts> &decomposedOutputs,
                                                                            std::vector<InputInfo> &keysInfo, const std::string &extra, uint64_t unlockTimestamp)
     {
 
@@ -2500,7 +2500,7 @@ namespace cryptonote
         return tx;
     }
 
-    void WalletGreen::sendTransaction(const CryptoNote::Transaction &cryptoNoteTransaction)
+    void WalletGreen::sendTransaction(const cryptonote::Transaction &cryptoNoteTransaction)
     {
         syst::Event completion(m_dispatcher);
         std::error_code ec;
@@ -2534,17 +2534,17 @@ namespace cryptonote
             throw std::system_error(make_error_code(error::TRANSACTION_SIZE_TOO_BIG));
         }
 
-        CryptoNote::Transaction cryptoNoteTransaction;
+        cryptonote::Transaction cryptoNoteTransaction;
         if (!fromBinaryArray(cryptoNoteTransaction, transactionData))
         {
             m_logger(ERROR, BRIGHT_RED) << "Failed to deserialize created transaction. Transaction hash " << transaction.getTransactionHash();
             throw std::system_error(make_error_code(error::INTERNAL_WALLET_ERROR), "Failed to deserialize created transaction");
         }
 
-        if (cryptoNoteTransaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_V2)
+        if (cryptoNoteTransaction.extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_V2)
         {
             m_logger(ERROR, BRIGHT_RED) << "Transaction extra is too large. Allowed: "
-                                        << CryptoNote::parameters::MAX_EXTRA_SIZE_V2
+                                        << cryptonote::parameters::MAX_EXTRA_SIZE_V2
                                         << ", actual: " << cryptoNoteTransaction.extra.size()
                                         << ".";
 
@@ -2604,7 +2604,7 @@ namespace cryptonote
     void WalletGreen::requestMixinOuts(
         const std::vector<OutputToTransfer> &selectedTransfers,
         uint16_t mixIn,
-        std::vector<CryptoNote::RandomOuts> &mixinResult)
+        std::vector<cryptonote::RandomOuts> &mixinResult)
     {
 
         std::vector<uint64_t> amounts;
@@ -2743,9 +2743,9 @@ namespace cryptonote
         return wallets;
     }
 
-    std::vector<CryptoNote::WalletGreen::ReceiverAmounts> WalletGreen::splitDestinations(const std::vector<CryptoNote::WalletTransfer> &destinations,
+    std::vector<cryptonote::WalletGreen::ReceiverAmounts> WalletGreen::splitDestinations(const std::vector<cryptonote::WalletTransfer> &destinations,
                                                                                          uint64_t dustThreshold,
-                                                                                         const CryptoNote::Currency &currency)
+                                                                                         const cryptonote::Currency &currency)
     {
 
         std::vector<ReceiverAmounts> decomposedOutputs;
@@ -2758,7 +2758,7 @@ namespace cryptonote
         return decomposedOutputs;
     }
 
-    CryptoNote::WalletGreen::ReceiverAmounts WalletGreen::splitAmount(
+    cryptonote::WalletGreen::ReceiverAmounts WalletGreen::splitAmount(
         uint64_t amount,
         const AccountPublicAddress &destination,
         uint64_t dustThreshold)
@@ -2773,7 +2773,7 @@ namespace cryptonote
 
     void WalletGreen::prepareInputs(
         const std::vector<OutputToTransfer> &selectedTransfers,
-        std::vector<CryptoNote::RandomOuts> &mixinResult,
+        std::vector<cryptonote::RandomOuts> &mixinResult,
         uint16_t mixIn,
         std::vector<InputInfo> &keysInfo)
     {
@@ -2980,7 +2980,7 @@ namespace cryptonote
         if (m_state != WalletState::INITIALIZED)
         {
             m_logger(ERROR, BRIGHT_RED) << "WalletGreen is not initialized. Current state: " << m_state;
-            throw std::system_error(make_error_code(CryptoNote::error::NOT_INITIALIZED));
+            throw std::system_error(make_error_code(cryptonote::error::NOT_INITIALIZED));
         }
     }
 
@@ -3181,7 +3181,7 @@ namespace cryptonote
             m_fusionTxsCache.emplace(transactionId, isFusionTransaction(*it));
         }
 
-        if (transactionInfo.blockHeight != CryptoNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
+        if (transactionInfo.blockHeight != cryptonote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
         {
             // In some cases a transaction can be included to a block but not removed from m_uncommitedTransactions. Fix it
             m_uncommitedTransactions.erase(transactionId);
@@ -3192,7 +3192,7 @@ namespace cryptonote
         {
             updateBalance(containerAmounts.container);
 
-            if (transactionInfo.blockHeight != CryptoNote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
+            if (transactionInfo.blockHeight != cryptonote::WALLET_UNCONFIRMED_TRANSACTION_HEIGHT)
             {
                 uint32_t unlockHeight = std::max(transactionInfo.blockHeight + m_transactionSoftLockTime, static_cast<uint32_t>(transactionInfo.unlockTime));
                 insertUnlockTransactionJob(transactionInfo.transactionHash, unlockHeight, containerAmounts.container);
@@ -3266,12 +3266,12 @@ namespace cryptonote
             return;
         }
 
-        CryptoNote::ITransfersContainer *container = &object->getContainer();
+        cryptonote::ITransfersContainer *container = &object->getContainer();
         updateBalance(container);
         deleteUnlockTransactionJob(transactionHash);
 
         bool updated = false;
-        m_transactions.get<TransactionIndex>().modify(it, [&updated](CryptoNote::WalletTransaction &tx)
+        m_transactions.get<TransactionIndex>().modify(it, [&updated](cryptonote::WalletTransaction &tx)
                                                       {
     if (tx.state == WalletTransactionState::CREATED || tx.state == WalletTransactionState::SUCCEEDED) {
       tx.state = WalletTransactionState::CANCELLED;
@@ -3292,7 +3292,7 @@ namespace cryptonote
         }
     }
 
-    void WalletGreen::insertUnlockTransactionJob(const Hash &transactionHash, uint32_t blockHeight, CryptoNote::ITransfersContainer *container)
+    void WalletGreen::insertUnlockTransactionJob(const Hash &transactionHash, uint32_t blockHeight, cryptonote::ITransfersContainer *container)
     {
         auto &index = m_unlockTransactionsJob.get<BlockHeightIndex>();
         index.insert({blockHeight, container, transactionHash});
@@ -3361,7 +3361,7 @@ namespace cryptonote
         m_logger(DEBUGGING) << "Unconfirmed transaction removed from BlockchainSynchronizer, hash " << transactionHash;
     }
 
-    void WalletGreen::updateBalance(CryptoNote::ITransfersContainer *container)
+    void WalletGreen::updateBalance(cryptonote::ITransfersContainer *container)
     {
         auto it = m_walletsContainer.get<TransfersContainerIndex>().find(container);
 
@@ -3423,11 +3423,11 @@ namespace cryptonote
 
     const WalletRecord &WalletGreen::getWalletRecord(const std::string &address) const
     {
-        CryptoNote::AccountPublicAddress pubAddr = parseAddress(address);
+        cryptonote::AccountPublicAddress pubAddr = parseAddress(address);
         return getWalletRecord(pubAddr.spendPublicKey);
     }
 
-    const WalletRecord &WalletGreen::getWalletRecord(CryptoNote::ITransfersContainer *container) const
+    const WalletRecord &WalletGreen::getWalletRecord(cryptonote::ITransfersContainer *container) const
     {
         auto it = m_walletsContainer.get<TransfersContainerIndex>().find(container);
         if (it == m_walletsContainer.get<TransfersContainerIndex>().end())
@@ -3439,9 +3439,9 @@ namespace cryptonote
         return *it;
     }
 
-    CryptoNote::AccountPublicAddress WalletGreen::parseAddress(const std::string &address) const
+    cryptonote::AccountPublicAddress WalletGreen::parseAddress(const std::string &address) const
     {
-        CryptoNote::AccountPublicAddress pubAddr;
+        cryptonote::AccountPublicAddress pubAddr;
 
         if (!m_currency.parseAccountAddressString(address, pubAddr))
         {
@@ -3611,7 +3611,7 @@ namespace cryptonote
         if (m_transactions.size() <= transactionId)
         {
             m_logger(ERROR, BRIGHT_RED) << "Failed to check transaction: invalid index " << transactionId << ". Number of transactions: " << m_transactions.size();
-            throw std::system_error(make_error_code(CryptoNote::error::INDEX_OUT_OF_RANGE));
+            throw std::system_error(make_error_code(cryptonote::error::INDEX_OUT_OF_RANGE));
         }
 
         auto isFusionIter = m_fusionTxsCache.find(transactionId);
@@ -3924,7 +3924,7 @@ namespace cryptonote
 
     /// pre: changeDestinationAddress belongs to current container
     /// pre: source address belongs to current container
-    CryptoNote::AccountPublicAddress WalletGreen::getChangeDestination(const std::string &changeDestinationAddress, const std::vector<std::string> &sourceAddresses) const
+    cryptonote::AccountPublicAddress WalletGreen::getChangeDestination(const std::string &changeDestinationAddress, const std::vector<std::string> &sourceAddresses) const
     {
         if (!changeDestinationAddress.empty())
         {
@@ -3942,7 +3942,7 @@ namespace cryptonote
 
     bool WalletGreen::isMyAddress(const std::string &addressString) const
     {
-        CryptoNote::AccountPublicAddress address = parseAccountAddressString(addressString);
+        cryptonote::AccountPublicAddress address = parseAccountAddressString(addressString);
         return m_viewPublicKey == address.viewPublicKey && m_walletsContainer.get<KeysIndex>().count(address.spendPublicKey) != 0;
     }
 
@@ -4091,15 +4091,15 @@ namespace cryptonote
     {
         uint32_t currentHeight = m_node.getLastKnownBlockHeight();
 
-        size_t growth = (currentHeight * CryptoNote ::parameters ::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR) /
+        size_t growth = (currentHeight * cryptonote::parameters ::MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR) /
 
-                        CryptoNote ::parameters ::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
+                        cryptonote::parameters ::MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR;
 
-        size_t x = CryptoNote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
+        size_t x = cryptonote::parameters::MAX_BLOCK_SIZE_INITIAL + growth;
 
         size_t y = 125000;
 
-        return std::min(x, y) - CryptoNote::parameters ::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+        return std::min(x, y) - cryptonote::parameters ::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
     }
 
 } // namespace cryptonote

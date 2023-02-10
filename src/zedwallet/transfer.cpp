@@ -91,7 +91,7 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
     return amount >= WalletConfig::minimumSend;
 }
 
-bool confirmTransaction(CryptoNote::TransactionParameters t,
+bool confirmTransaction(cryptonote::TransactionParameters t,
                         std::shared_ptr<WalletInfo> walletInfo,
                         bool integratedAddress, uint32_t nodeFee,
                         std::string originalAddress)
@@ -137,8 +137,8 @@ bool confirmTransaction(CryptoNote::TransactionParameters t,
 
 /* Note that the originalTXParams, and thus the splitTXParams already has the
    node transfer added */
-void splitTX(CryptoNote::WalletGreen &wallet,
-             const CryptoNote::TransactionParameters originalTXParams,
+void splitTX(cryptonote::WalletGreen &wallet,
+             const cryptonote::TransactionParameters originalTXParams,
              uint32_t nodeFee)
 {
     std::cout << "Transaction is still too large to send, splitting into "
@@ -342,7 +342,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
        the fee from full balance */
     uint64_t amount = 0;
 
-    uint64_t mixin = CryptoNote::getDefaultMixinByHeight(height);
+    uint64_t mixin = cryptonote::getDefaultMixinByHeight(height);
 
     /* If we're sending everything, obviously we don't need to ask them how
        much to send */
@@ -410,7 +410,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
        check for balance minus dust */
     if (sendAll)
     {
-        if (CryptoNote::getDefaultMixinByHeight(height) != 0 && balance != balanceNoDust)
+        if (cryptonote::getDefaultMixinByHeight(height) != 0 && balance != balanceNoDust)
         {
             uint64_t unsendable = balance - balanceNoDust;
 
@@ -481,7 +481,7 @@ BalanceInfo doWeHaveEnoughBalance(uint64_t amount, uint64_t fee,
 
         return NotEnoughBalance;
     }
-    else if (CryptoNote::getDefaultMixinByHeight(height) != 0 &&
+    else if (cryptonote::getDefaultMixinByHeight(height) != 0 &&
              balanceNoDust < amount + WalletConfig::minimumFee + nodeFee)
     {
         std::cout << std::endl
@@ -537,9 +537,9 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
         return;
     }
 
-    CryptoNote::TransactionParameters p;
+    cryptonote::TransactionParameters p;
 
-    p.destinations = std::vector<CryptoNote::WalletOrder>{
+    p.destinations = std::vector<cryptonote::WalletOrder>{
         {address, amount}};
 
     if (!nodeAddress.empty() && nodeFee != 0)
@@ -563,7 +563,7 @@ void doTransfer(std::string address, uint64_t amount, uint64_t fee,
 }
 
 void sendTX(std::shared_ptr<WalletInfo> walletInfo,
-            CryptoNote::TransactionParameters p, uint32_t height,
+            cryptonote::TransactionParameters p, uint32_t height,
             bool retried, uint32_t nodeFee)
 {
     try
@@ -632,13 +632,13 @@ bool handleTransferError(const std::system_error &e,
 
     switch (e.code().value())
     {
-    case CryptoNote::error::WRONG_AMOUNT:
+    case cryptonote::error::WRONG_AMOUNT:
     {
         wrongAmount = true;
         [[fallthrough]];
     }
-    case CryptoNote::error::MIXIN_COUNT_TOO_BIG:
-    case CryptoNote::NodeError::INTERNAL_NODE_ERROR:
+    case cryptonote::error::MIXIN_COUNT_TOO_BIG:
+    case cryptonote::NodeError::INTERNAL_NODE_ERROR:
     {
 
         if (wrongAmount)
@@ -682,8 +682,8 @@ bool handleTransferError(const std::system_error &e,
 
         break;
     }
-    case CryptoNote::NodeError::NETWORK_ERROR:
-    case CryptoNote::NodeError::CONNECT_ERROR:
+    case cryptonote::NodeError::NETWORK_ERROR:
+    case cryptonote::NodeError::CONNECT_ERROR:
     {
         std::cout << WarningMsg("Couldn't connect to the network "
                                 "to send the transaction!")
@@ -754,7 +754,7 @@ Maybe<std::string> getPaymentID(std::string msg)
         std::vector<uint8_t> extra;
 
         /* Convert the payment ID into an "extra" */
-        if (!CryptoNote::createTxExtraWithPaymentId(paymentID, extra))
+        if (!cryptonote::createTxExtraWithPaymentId(paymentID, extra))
         {
             std::cout << WarningMsg("Failed to parse! Payment ID's are 64 "
                                     "character hexadecimal strings.")
@@ -776,7 +776,7 @@ std::string getExtraFromPaymentID(std::string paymentID)
     std::vector<uint8_t> extra;
 
     /* Convert the payment ID into an "extra" */
-    CryptoNote::createTxExtraWithPaymentId(paymentID, extra);
+    cryptonote::createTxExtraWithPaymentId(paymentID, extra);
 
     /* Then convert the "extra" back into a string so we can pass
        the argument that walletgreen expects. Note this string is not
@@ -924,7 +924,7 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
 
     /* The prefix needs to be the same as the base58 prefix */
     if (prefix !=
-        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
+        cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
@@ -937,17 +937,17 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     /* The binary array encoded keys are the rest of the address */
     std::string keys = decoded.substr(paymentIDLen, std::string::npos);
 
-    CryptoNote::AccountPublicAddress addr;
-    CryptoNote::BinaryArray ba = Common::asBinaryArray(keys);
+    cryptonote::AccountPublicAddress addr;
+    cryptonote::BinaryArray ba = Common::asBinaryArray(keys);
 
-    if (!CryptoNote::fromBinaryArray(addr, ba))
+    if (!cryptonote::fromBinaryArray(addr, ba))
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
 
     /* Parse the AccountPublicAddress into a standard wallet address */
     /* Use the calculated prefix from earlier for less typing :p */
-    std::string address = CryptoNote::getAccountAddressAsStr(prefix, addr);
+    std::string address = cryptonote::getAccountAddressAsStr(prefix, addr);
 
     /* The address out should of course be a valid address */
     if (!parseStandardAddress(address))
@@ -958,7 +958,7 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     std::vector<uint8_t> extra;
 
     /* And the payment ID out should be valid as well! */
-    if (!CryptoNote::createTxExtraWithPaymentId(paymentID, extra))
+    if (!cryptonote::createTxExtraWithPaymentId(paymentID, extra))
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
@@ -1048,9 +1048,9 @@ bool parseStandardAddress(std::string address, bool printErrors)
 {
     uint64_t prefix;
 
-    CryptoNote::AccountPublicAddress addr;
+    cryptonote::AccountPublicAddress addr;
 
-    const bool valid = CryptoNote::parseAccountAddressString(prefix, addr,
+    const bool valid = cryptonote::parseAccountAddressString(prefix, addr,
                                                              address);
 
     if (address.length() != WalletConfig::standardAddressLength)

@@ -58,7 +58,7 @@ namespace cryptonote
     public:
         TransactionImpl();
         TransactionImpl(const BinaryArray &txblob);
-        TransactionImpl(const CryptoNote::Transaction &tx);
+        TransactionImpl(const cryptonote::Transaction &tx);
 
         // ITransactionReader
         virtual Hash getTransactionHash() const override;
@@ -124,7 +124,7 @@ namespace cryptonote
             }
         }
 
-        CryptoNote::Transaction transaction;
+        cryptonote::Transaction transaction;
         boost::optional<SecretKey> secretKey;
         mutable boost::optional<Hash> transactionHash;
         TransactionExtra extra;
@@ -144,14 +144,14 @@ namespace cryptonote
         return std::unique_ptr<ITransaction>(new TransactionImpl(transactionBlob));
     }
 
-    std::unique_ptr<ITransaction> createTransaction(const CryptoNote::Transaction &tx)
+    std::unique_ptr<ITransaction> createTransaction(const cryptonote::Transaction &tx)
     {
         return std::unique_ptr<ITransaction>(new TransactionImpl(tx));
     }
 
     TransactionImpl::TransactionImpl()
     {
-        CryptoNote::KeyPair txKeys(CryptoNote::generateKeyPair());
+        cryptonote::KeyPair txKeys(cryptonote::generateKeyPair());
 
         TransactionExtraPublicKey pk = {txKeys.publicKey};
         extra.set(pk);
@@ -174,7 +174,7 @@ namespace cryptonote
         transactionHash = getBinaryArrayHash(ba); // avoid serialization if we already have blob
     }
 
-    TransactionImpl::TransactionImpl(const CryptoNote::Transaction &tx) : transaction(tx)
+    TransactionImpl::TransactionImpl(const cryptonote::Transaction &tx) : transaction(tx)
     {
         extra.parse(transaction.extra);
     }
@@ -413,7 +413,7 @@ namespace cryptonote
 
     bool TransactionImpl::findOutputsToAccount(const AccountPublicAddress &addr, const SecretKey &viewSecretKey, std::vector<uint32_t> &out, uint64_t &amount) const
     {
-        return ::CryptoNote::findOutputsToAccount(transaction, addr, viewSecretKey, out, amount);
+        return ::cryptonote::findOutputsToAccount(transaction, addr, viewSecretKey, out, amount);
     }
 
     size_t TransactionImpl::getRequiredSignaturesCount(size_t index) const

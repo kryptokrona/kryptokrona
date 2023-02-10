@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
     Config config = parseArguments(argc, argv);
 
-    std::cout << InformationMsg(CryptoNote::getProjectCLIHeader()) << std::endl;
+    std::cout << InformationMsg(cryptonote::getProjectCLIHeader()) << std::endl;
 
     const auto logManager = std::make_shared<Logging::LoggerManager>();
 
@@ -49,14 +49,14 @@ int main(int argc, char **argv)
     }
 
     /* Currency contains our coin parameters, such as decimal places, supply */
-    const CryptoNote::Currency currency = CryptoNote::CurrencyBuilder(logManager).currency();
+    const cryptonote::Currency currency = cryptonote::CurrencyBuilder(logManager).currency();
 
     syst::Dispatcher localDispatcher;
     syst::Dispatcher *dispatcher = &localDispatcher;
 
     /* Our connection to kryptokronad */
-    std::unique_ptr<CryptoNote::INode> node(
-        new CryptoNote::NodeRpcProxy(config.host, config.port, 10, logManager));
+    std::unique_ptr<cryptonote::INode> node(
+        new cryptonote::NodeRpcProxy(config.host, config.port, 10, logManager));
 
     std::promise<std::error_code> errorPromise;
 
@@ -117,13 +117,13 @@ int main(int argc, char **argv)
     }
 
     /* Create the wallet instance */
-    CryptoNote::WalletGreen wallet(*dispatcher, currency, *node, logManager);
+    cryptonote::WalletGreen wallet(*dispatcher, currency, *node, logManager);
 
     /* Run the interactive wallet interface */
     run(wallet, *node, config);
 }
 
-void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+void run(cryptonote::WalletGreen &wallet, cryptonote::INode &node,
          Config &config)
 {
     auto [quit, walletInfo] = selectionScreen(config, wallet, node);

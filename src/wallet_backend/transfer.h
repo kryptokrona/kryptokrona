@@ -57,29 +57,29 @@ namespace SendTransaction
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon);
 
-    std::tuple<Error, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
+    std::tuple<Error, std::vector<cryptonote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
         const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
         const Crypto::SecretKey privateViewKey);
 
-    std::tuple<std::vector<WalletTypes::KeyOutput>, CryptoNote::KeyPair> setupOutputs(
+    std::tuple<std::vector<WalletTypes::KeyOutput>, cryptonote::KeyPair> setupOutputs(
         std::vector<WalletTypes::TransactionDestination> destinations);
 
-    std::tuple<Error, CryptoNote::Transaction> generateRingSignatures(
-        CryptoNote::Transaction tx,
+    std::tuple<Error, cryptonote::Transaction> generateRingSignatures(
+        cryptonote::Transaction tx,
         const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
         const std::vector<Crypto::SecretKey> tmpSecretKeys);
 
     std::vector<uint64_t> splitAmountIntoDenominations(uint64_t amount);
 
-    std::vector<CryptoNote::TransactionInput> keyInputToTransactionInput(
-        const std::vector<CryptoNote::KeyInput> keyInputs);
+    std::vector<cryptonote::TransactionInput> keyInputToTransactionInput(
+        const std::vector<cryptonote::KeyInput> keyInputs);
 
-    std::vector<CryptoNote::TransactionOutput> keyOutputToTransactionOutput(
+    std::vector<cryptonote::TransactionOutput> keyOutputToTransactionOutput(
         const std::vector<WalletTypes::KeyOutput> keyOutputs);
 
-    Crypto::Hash getTransactionHash(CryptoNote::Transaction tx);
+    Crypto::Hash getTransactionHash(cryptonote::Transaction tx);
 
-    std::tuple<Error, std::vector<CryptoNote::RandomOuts>> getRingParticipants(
+    std::tuple<Error, std::vector<cryptonote::RandomOuts>> getRingParticipants(
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon,
         const std::vector<WalletTypes::TxInputAndOwner> sources);
@@ -90,14 +90,14 @@ namespace SendTransaction
         Error error;
 
         /* The raw transaction */
-        CryptoNote::Transaction transaction;
+        cryptonote::Transaction transaction;
 
         /* The transaction outputs, before converted into boost uglyness, used
            for determining key inputs from the tx that belong to us */
         std::vector<WalletTypes::KeyOutput> outputs;
 
         /* The random key pair we generated */
-        CryptoNote::KeyPair txKeyPair;
+        cryptonote::KeyPair txKeyPair;
     };
 
     TransactionResult makeTransaction(
@@ -110,10 +110,10 @@ namespace SendTransaction
         const uint64_t unlockTime);
 
     std::tuple<Error, Crypto::Hash> relayTransaction(
-        const CryptoNote::Transaction tx,
+        const cryptonote::Transaction tx,
         const std::shared_ptr<Nigel> daemon);
 
-    std::tuple<CryptoNote::KeyPair, Crypto::KeyImage> genKeyImage(
+    std::tuple<cryptonote::KeyPair, Crypto::KeyImage> genKeyImage(
         const WalletTypes::ObscuredInput input,
         const Crypto::SecretKey privateViewKey);
 
@@ -127,7 +127,7 @@ namespace SendTransaction
         const std::shared_ptr<SubWallets> subWallets);
 
     Error isTransactionPayloadTooBig(
-        const CryptoNote::Transaction tx,
+        const cryptonote::Transaction tx,
         const uint64_t currentHeight);
 
     void storeUnconfirmedIncomingInputs(
@@ -137,11 +137,11 @@ namespace SendTransaction
         const Crypto::Hash txHash);
 
     /* Verify all amounts in the transaction given are PRETTY_AMOUNTS */
-    bool verifyAmounts(const CryptoNote::Transaction tx);
+    bool verifyAmounts(const cryptonote::Transaction tx);
 
     /* Verify all amounts given are PRETTY_AMOUNTS */
     bool verifyAmounts(const std::vector<uint64_t> amounts);
 
     /* Verify fee is as expected */
-    bool verifyTransactionFee(const uint64_t expectedFee, CryptoNote::Transaction tx);
+    bool verifyTransactionFee(const uint64_t expectedFee, cryptonote::Transaction tx);
 }

@@ -102,7 +102,7 @@ namespace
         }
     }
 
-    std::vector<Crypto::Hash> getBlockHashes(const CryptoNote::CompleteBlock *blocks, size_t count)
+    std::vector<Crypto::Hash> getBlockHashes(const cryptonote::CompleteBlock *blocks, size_t count)
     {
         std::vector<Crypto::Hash> result;
         result.reserve(count);
@@ -120,7 +120,7 @@ namespace
 namespace cryptonote
 {
 
-    TransfersConsumer::TransfersConsumer(const CryptoNote::Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, const SecretKey &viewSecret) : m_node(node), m_viewSecret(viewSecret), m_currency(currency), m_logger(logger, "TransfersConsumer")
+    TransfersConsumer::TransfersConsumer(const cryptonote::Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, const SecretKey &viewSecret) : m_node(node), m_viewSecret(viewSecret), m_currency(currency), m_logger(logger, "TransfersConsumer")
     {
         updateSyncStart();
     }
@@ -515,8 +515,8 @@ namespace cryptonote
                 KeyOutput out;
                 tx.getOutput(idx, out, amount);
 
-                CryptoNote::KeyPair in_ephemeral;
-                CryptoNote::generate_key_image_helper(
+                cryptonote::KeyPair in_ephemeral;
+                cryptonote::generate_key_image_helper(
                     account,
                     txPubKey,
                     idx,

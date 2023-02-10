@@ -75,7 +75,7 @@ namespace PaymentService
 
         if (serviceConfig.dumpConfig)
         {
-            std::cout << CryptoNote::getProjectCLIHeader() << asString(serviceConfig) << std::endl;
+            std::cout << cryptonote::getProjectCLIHeader() << asString(serviceConfig) << std::endl;
             exit(0);
         }
         else if (!serviceConfig.outputFile.empty())
@@ -83,12 +83,12 @@ namespace PaymentService
             try
             {
                 asFile(serviceConfig, serviceConfig.outputFile);
-                std::cout << CryptoNote::getProjectCLIHeader() << "Configuration saved to: " << serviceConfig.outputFile << std::endl;
+                std::cout << cryptonote::getProjectCLIHeader() << "Configuration saved to: " << serviceConfig.outputFile << std::endl;
                 exit(0);
             }
             catch (std::exception &e)
             {
-                std::cout << CryptoNote::getProjectCLIHeader() << "Could not save configuration to: " << serviceConfig.outputFile
+                std::cout << cryptonote::getProjectCLIHeader() << "Could not save configuration to: " << serviceConfig.outputFile
                           << std::endl
                           << e.what() << std::endl;
                 exit(1);

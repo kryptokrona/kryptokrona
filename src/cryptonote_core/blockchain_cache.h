@@ -91,7 +91,7 @@ namespace cryptonote
         void serialize(ISerializer &s);
     };
 
-    bool serialize(PackedOutIndex &value, Common::StringView name, CryptoNote::ISerializer &serializer);
+    bool serialize(PackedOutIndex &value, Common::StringView name, cryptonote::ISerializer &serializer);
 
     class DatabaseBlockchainCache;
 

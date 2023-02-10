@@ -6,23 +6,23 @@
 
 #include <zedwallet/types.h>
 
-std::shared_ptr<WalletInfo> importFromKeys(CryptoNote::WalletGreen &wallet,
+std::shared_ptr<WalletInfo> importFromKeys(cryptonote::WalletGreen &wallet,
                                            Crypto::SecretKey privateSpendKey,
                                            Crypto::SecretKey privateViewKey);
 
-std::shared_ptr<WalletInfo> openWallet(CryptoNote::WalletGreen &wallet,
+std::shared_ptr<WalletInfo> openWallet(cryptonote::WalletGreen &wallet,
                                        Config &config);
 
-std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet);
+std::shared_ptr<WalletInfo> createViewWallet(cryptonote::WalletGreen &wallet);
 
-std::shared_ptr<WalletInfo> importWallet(CryptoNote::WalletGreen &wallet);
+std::shared_ptr<WalletInfo> importWallet(cryptonote::WalletGreen &wallet);
 
-std::shared_ptr<WalletInfo> createViewWallet(CryptoNote::WalletGreen &wallet);
+std::shared_ptr<WalletInfo> createViewWallet(cryptonote::WalletGreen &wallet);
 
-std::shared_ptr<WalletInfo> mnemonicImportWallet(CryptoNote::WalletGreen
+std::shared_ptr<WalletInfo> mnemonicImportWallet(cryptonote::WalletGreen
                                                      &wallet);
 
-std::shared_ptr<WalletInfo> generateWallet(CryptoNote::WalletGreen &wallet);
+std::shared_ptr<WalletInfo> generateWallet(cryptonote::WalletGreen &wallet);
 
 Crypto::SecretKey getPrivateKey(std::string outputMsg);
 
@@ -41,4 +41,4 @@ void viewWalletMsg();
 
 void connectingMsg();
 
-void promptSaveKeys(CryptoNote::WalletGreen &wallet);
+void promptSaveKeys(cryptonote::WalletGreen &wallet);

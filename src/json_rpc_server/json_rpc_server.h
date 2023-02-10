@@ -55,7 +55,7 @@ namespace cryptonote
 
     private:
         // HttpServer
-        virtual void processRequest(const CryptoNote::HttpRequest &request, CryptoNote::HttpResponse &response) override;
+        virtual void processRequest(const cryptonote::HttpRequest &request, cryptonote::HttpResponse &response) override;
 
         syst::Event &stopEvent;
         Logging::LoggerRef logger;

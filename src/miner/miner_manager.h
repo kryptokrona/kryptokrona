@@ -30,22 +30,22 @@ namespace Miner
     public:
         MinerManager(
             syst::Dispatcher &dispatcher,
-            const CryptoNote::MiningConfig &config,
+            const cryptonote::MiningConfig &config,
             const std::shared_ptr<httplib::Client> httpClient);
 
         void start();
 
     private:
         syst::ContextGroup m_contextGroup;
-        CryptoNote::MiningConfig m_config;
-        CryptoNote::Miner m_miner;
+        cryptonote::MiningConfig m_config;
+        cryptonote::Miner m_miner;
         BlockchainMonitor m_blockchainMonitor;
 
         syst::Event m_eventOccurred;
         std::queue<MinerEvent> m_events;
         bool isRunning;
 
-        CryptoNote::BlockTemplate m_minedBlock;
+        cryptonote::BlockTemplate m_minedBlock;
 
         uint64_t m_lastBlockTimestamp;
 
@@ -56,16 +56,16 @@ namespace Miner
         void pushEvent(MinerEvent &&event);
         void printHashRate();
 
-        void startMining(const CryptoNote::BlockMiningParameters &params);
+        void startMining(const cryptonote::BlockMiningParameters &params);
         void stopMining();
 
         void startBlockchainMonitoring();
         void stopBlockchainMonitoring();
 
-        bool submitBlock(const CryptoNote::BlockTemplate &minedBlock);
-        CryptoNote::BlockMiningParameters requestMiningParameters();
+        bool submitBlock(const cryptonote::BlockTemplate &minedBlock);
+        cryptonote::BlockMiningParameters requestMiningParameters();
 
-        void adjustBlockTemplate(CryptoNote::BlockTemplate &blockTemplate) const;
+        void adjustBlockTemplate(cryptonote::BlockTemplate &blockTemplate) const;
     };
 
 } // namespace Miner

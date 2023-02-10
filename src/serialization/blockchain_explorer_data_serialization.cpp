@@ -29,42 +29,42 @@
 namespace cryptonote
 {
 
-    using CryptoNote::SerializationTag;
+    using cryptonote::SerializationTag;
 
     namespace
     {
 
         struct BinaryVariantTagGetter : boost::static_visitor<uint8_t>
         {
-            uint8_t operator()(const CryptoNote::BaseInputDetails) { return static_cast<uint8_t>(SerializationTag::Base); }
-            uint8_t operator()(const CryptoNote::KeyInputDetails) { return static_cast<uint8_t>(SerializationTag::Key); }
+            uint8_t operator()(const cryptonote::BaseInputDetails) { return static_cast<uint8_t>(SerializationTag::Base); }
+            uint8_t operator()(const cryptonote::KeyInputDetails) { return static_cast<uint8_t>(SerializationTag::Key); }
         };
 
         struct VariantSerializer : boost::static_visitor<>
         {
-            VariantSerializer(CryptoNote::ISerializer &serializer, const std::string &name) : s(serializer), name(name) {}
+            VariantSerializer(cryptonote::ISerializer &serializer, const std::string &name) : s(serializer), name(name) {}
 
             template <typename T>
             void operator()(T &param) { s(param, name); }
 
-            CryptoNote::ISerializer &s;
+            cryptonote::ISerializer &s;
             const std::string name;
         };
 
-        void getVariantValue(CryptoNote::ISerializer &serializer, uint8_t tag, boost::variant<CryptoNote::BaseInputDetails, CryptoNote::KeyInputDetails> &in)
+        void getVariantValue(cryptonote::ISerializer &serializer, uint8_t tag, boost::variant<cryptonote::BaseInputDetails, cryptonote::KeyInputDetails> &in)
         {
             switch (static_cast<SerializationTag>(tag))
             {
             case SerializationTag::Base:
             {
-                CryptoNote::BaseInputDetails v;
+                cryptonote::BaseInputDetails v;
                 serializer(v, "data");
                 in = v;
                 break;
             }
             case SerializationTag::Key:
             {
-                CryptoNote::KeyInputDetails v;
+                cryptonote::KeyInputDetails v;
                 serializer(v, "data");
                 in = v;
                 break;
@@ -75,7 +75,7 @@ namespace cryptonote
         }
 
         template <typename T>
-        bool serializePod(T &v, Common::StringView name, CryptoNote::ISerializer &serializer)
+        bool serializePod(T &v, Common::StringView name, cryptonote::ISerializer &serializer)
         {
             return serializer.binary(&v, sizeof(v), name);
         }

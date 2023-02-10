@@ -91,7 +91,7 @@ namespace cryptonote
         SpentOutputDescriptor getSpentOutputDescriptor() const { return SpentOutputDescriptor(*this); }
         const Crypto::Hash &getTransactionHash() const { return transactionHash; }
 
-        void serialize(CryptoNote::ISerializer &s)
+        void serialize(cryptonote::ISerializer &s)
         {
             s(reinterpret_cast<uint8_t &>(type), "type");
             s(amount, "");
@@ -162,7 +162,7 @@ namespace cryptonote
     class TransfersContainer : public ITransfersContainer
     {
     public:
-        TransfersContainer(const CryptoNote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, size_t transactionSpendableAge);
+        TransfersContainer(const cryptonote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, size_t transactionSpendableAge);
 
         bool addTransaction(const TransactionBlockInfo &block, const ITransactionReader &tx, const std::vector<TransactionOutputInformationIn> &transfers);
         bool deleteUnconfirmedTransaction(const Crypto::Hash &transactionHash);
@@ -285,7 +285,7 @@ namespace cryptonote
 
         uint32_t m_currentHeight; // current height is needed to check if a transfer is unlocked
         size_t m_transactionSpendableAge;
-        const CryptoNote::Currency &m_currency;
+        const cryptonote::Currency &m_currency;
         mutable std::mutex m_mutex;
         Logging::LoggerRef m_logger;
     };

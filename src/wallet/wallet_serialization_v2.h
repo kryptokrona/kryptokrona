@@ -54,20 +54,20 @@ namespace cryptonote
         static const uint8_t SERIALIZATION_VERSION = 6;
 
     private:
-        void loadKeyListAndBalances(CryptoNote::ISerializer &serializer, bool saveCache);
-        void saveKeyListAndBalances(CryptoNote::ISerializer &serializer, bool saveCache);
+        void loadKeyListAndBalances(cryptonote::ISerializer &serializer, bool saveCache);
+        void saveKeyListAndBalances(cryptonote::ISerializer &serializer, bool saveCache);
 
-        void loadTransactions(CryptoNote::ISerializer &serializer);
-        void saveTransactions(CryptoNote::ISerializer &serializer);
+        void loadTransactions(cryptonote::ISerializer &serializer);
+        void saveTransactions(cryptonote::ISerializer &serializer);
 
-        void loadTransfers(CryptoNote::ISerializer &serializer);
-        void saveTransfers(CryptoNote::ISerializer &serializer);
+        void loadTransfers(cryptonote::ISerializer &serializer);
+        void saveTransfers(cryptonote::ISerializer &serializer);
 
-        void loadTransfersSynchronizer(CryptoNote::ISerializer &serializer);
-        void saveTransfersSynchronizer(CryptoNote::ISerializer &serializer);
+        void loadTransfersSynchronizer(cryptonote::ISerializer &serializer);
+        void saveTransfersSynchronizer(cryptonote::ISerializer &serializer);
 
-        void loadUnlockTransactionsJobs(CryptoNote::ISerializer &serializer);
-        void saveUnlockTransactionsJobs(CryptoNote::ISerializer &serializer);
+        void loadUnlockTransactionsJobs(cryptonote::ISerializer &serializer);
+        void saveUnlockTransactionsJobs(cryptonote::ISerializer &serializer);
 
         uint64_t &m_actualBalance;
         uint64_t &m_pendingBalance;

@@ -68,7 +68,7 @@ Crypto::KeyImage SubWallet::getTxInputKeyImage(
         Crypto::KeyImage keyImage;
 
         /* Make a temporary key pair */
-        CryptoNote::KeyPair tmp;
+        cryptonote::KeyPair tmp;
 
         /* Get the tmp public key from the derivation, the index,
            and our public spend key */

@@ -28,7 +28,7 @@ namespace SendTransaction
         const std::shared_ptr<Nigel> daemon,
         const std::shared_ptr<SubWallets> subWallets)
     {
-        const auto [minMixin, maxMixin, defaultMixin] = CryptoNote::Mixins::getMixinAllowableRange(
+        const auto [minMixin, maxMixin, defaultMixin] = cryptonote::Mixins::getMixinAllowableRange(
             daemon->networkBlockCount());
 
         /* Assumes the container has at least one subwallet - this is true as long
@@ -74,7 +74,7 @@ namespace SendTransaction
 
         /* Mixin is too large to get enough outputs whilst remaining in the size
            and ratio constraints */
-        if (maxFusionInputs < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+        if (maxFusionInputs < cryptonote::parameters::FUSION_TX_MIN_INPUT_COUNT)
         {
             return {FUSION_MIXIN_TOO_LARGE, Crypto::Hash()};
         }
@@ -82,16 +82,16 @@ namespace SendTransaction
         /* Payment ID's are not needed with fusion transactions */
         const std::string paymentID = "";
 
-        CryptoNote::Transaction tx;
+        cryptonote::Transaction tx;
 
         std::vector<WalletTypes::KeyOutput> transactionOutputs;
 
-        CryptoNote::KeyPair txKeyPair;
+        cryptonote::KeyPair txKeyPair;
 
         while (true)
         {
             /* Not got enough unspent inputs for a fusion tx - we're fully optimized. */
-            if (ourInputs.size() < CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+            if (ourInputs.size() < cryptonote::parameters::FUSION_TX_MIN_INPUT_COUNT)
             {
                 return {FULLY_OPTIMIZED, Crypto::Hash()};
             }
@@ -113,7 +113,7 @@ namespace SendTransaction
                 destinations.push_back(destination);
             }
 
-            uint64_t requiredInputOutputRatio = CryptoNote::parameters::FUSION_TX_MIN_IN_OUT_COUNT_RATIO;
+            uint64_t requiredInputOutputRatio = cryptonote::parameters::FUSION_TX_MIN_IN_OUT_COUNT_RATIO;
 
             /* We need to have at least 4x more inputs than outputs */
             if (destinations.size() == 0 || (ourInputs.size() / destinations.size()) < requiredInputOutputRatio)
@@ -143,10 +143,10 @@ namespace SendTransaction
                 return {txResult.error, Crypto::Hash()};
             }
 
-            const uint64_t txSize = CryptoNote::toBinaryArray(tx).size();
+            const uint64_t txSize = cryptonote::toBinaryArray(tx).size();
 
             /* Transaction is too large, remove an input and try again */
-            if (txSize > CryptoNote::parameters::FUSION_TX_MAX_SIZE)
+            if (txSize > cryptonote::parameters::FUSION_TX_MAX_SIZE)
             {
                 /* Reduce the amount we're sending */
                 foundMoney -= ourInputs.back().input.amount;
@@ -223,7 +223,7 @@ namespace SendTransaction
         std::vector<std::pair<std::string, uint64_t>> destinations = {
             {destination, amount}};
 
-        const auto [minMixin, maxMixin, defaultMixin] = CryptoNote::Mixins::getMixinAllowableRange(
+        const auto [minMixin, maxMixin, defaultMixin] = cryptonote::Mixins::getMixinAllowableRange(
             daemon->networkBlockCount());
 
         const uint64_t fee = WalletConfig::defaultFee;
@@ -371,10 +371,10 @@ namespace SendTransaction
     }
 
     Error isTransactionPayloadTooBig(
-        const CryptoNote::Transaction tx,
+        const cryptonote::Transaction tx,
         const uint64_t currentHeight)
     {
-        const uint64_t txSize = CryptoNote::toBinaryArray(tx).size();
+        const uint64_t txSize = cryptonote::toBinaryArray(tx).size();
 
         const uint64_t maxTxSize = Utilities::getMaxTxSize(currentHeight);
 
@@ -482,7 +482,7 @@ namespace SendTransaction
     }
 
     std::tuple<Error, Crypto::Hash> relayTransaction(
-        const CryptoNote::Transaction tx,
+        const cryptonote::Transaction tx,
         const std::shared_ptr<Nigel> daemon)
     {
         const auto [success, connectionError] = daemon->sendTransaction(tx);
@@ -534,7 +534,7 @@ namespace SendTransaction
         return destinations;
     }
 
-    std::tuple<Error, std::vector<CryptoNote::RandomOuts>> getRingParticipants(
+    std::tuple<Error, std::vector<cryptonote::RandomOuts>> getRingParticipants(
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon,
         const std::vector<WalletTypes::TxInputAndOwner> sources)
@@ -744,7 +744,7 @@ namespace SendTransaction
         return {SUCCESS, result};
     }
 
-    std::tuple<CryptoNote::KeyPair, Crypto::KeyImage> genKeyImage(
+    std::tuple<cryptonote::KeyPair, Crypto::KeyImage> genKeyImage(
         const WalletTypes::ObscuredInput input,
         const Crypto::SecretKey privateViewKey)
     {
@@ -755,7 +755,7 @@ namespace SendTransaction
         Crypto::generate_key_derivation(
             input.realTransactionPublicKey, privateViewKey, derivation);
 
-        CryptoNote::KeyPair tmpKeyPair;
+        cryptonote::KeyPair tmpKeyPair;
 
         /* Derive the public key of the tmp key pair */
         Crypto::derive_public_key(
@@ -776,11 +776,11 @@ namespace SendTransaction
         return {tmpKeyPair, keyImage};
     }
 
-    std::tuple<Error, std::vector<CryptoNote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
+    std::tuple<Error, std::vector<cryptonote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
         const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
         const Crypto::SecretKey privateViewKey)
     {
-        std::vector<CryptoNote::KeyInput> inputs;
+        std::vector<cryptonote::KeyInput> inputs;
 
         std::vector<Crypto::SecretKey> tmpSecretKeys;
 
@@ -795,7 +795,7 @@ namespace SendTransaction
 
             tmpSecretKeys.push_back(tmpKeyPair.secretKey);
 
-            CryptoNote::KeyInput keyInput;
+            cryptonote::KeyInput keyInput;
 
             keyInput.amount = input.amount;
             keyInput.keyImage = keyImage;
@@ -811,7 +811,7 @@ namespace SendTransaction
                originally had [5, 10, 20, 21, 22], this would become
                [5, 5, 10, 1, 1]. Due to this, the indexes MUST be sorted - they
                are serialized as a uint32_t, so negative values will overflow! */
-            keyInput.outputIndexes = CryptoNote::absolute_output_offsets_to_relative(keyInput.outputIndexes);
+            keyInput.outputIndexes = cryptonote::absolute_output_offsets_to_relative(keyInput.outputIndexes);
 
             /* Store the key input */
             inputs.push_back(keyInput);
@@ -820,7 +820,7 @@ namespace SendTransaction
         return {SUCCESS, inputs, tmpSecretKeys};
     }
 
-    std::tuple<std::vector<WalletTypes::KeyOutput>, CryptoNote::KeyPair> setupOutputs(
+    std::tuple<std::vector<WalletTypes::KeyOutput>, cryptonote::KeyPair> setupOutputs(
         std::vector<WalletTypes::TransactionDestination> destinations)
     {
         /* Sort the destinations by amount. Helps obscure which output belongs to
@@ -830,7 +830,7 @@ namespace SendTransaction
 
         /* Generate a random key pair for the transaction - public key gets added
            to tx extra */
-        CryptoNote::KeyPair randomTxKey = CryptoNote::generateKeyPair();
+        cryptonote::KeyPair randomTxKey = cryptonote::generateKeyPair();
 
         /* Index of the output */
         uint32_t outputIndex = 0;
@@ -864,8 +864,8 @@ namespace SendTransaction
         return {outputs, randomTxKey};
     }
 
-    std::tuple<Error, CryptoNote::Transaction> generateRingSignatures(
-        CryptoNote::Transaction tx,
+    std::tuple<Error, cryptonote::Transaction> generateRingSignatures(
+        cryptonote::Transaction tx,
         const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
         const std::vector<Crypto::SecretKey> tmpSecretKeys)
     {
@@ -873,8 +873,8 @@ namespace SendTransaction
 
         /* Hash the transaction prefix (Prefix is just a subset of transaction, so
            we can just do a cast here) */
-        CryptoNote::getObjectHash(
-            static_cast<CryptoNote::TransactionPrefix>(tx), txPrefixHash);
+        cryptonote::getObjectHash(
+            static_cast<cryptonote::TransactionPrefix>(tx), txPrefixHash);
 
         size_t i = 0;
 
@@ -892,7 +892,7 @@ namespace SendTransaction
             /* Generate the ring signatures - note - modifying the transaction
                post signature generation will invalidate the signatures. */
             const auto [success, signatures] = Crypto::crypto_ops::generateRingSignatures(
-                txPrefixHash, boost::get<CryptoNote::KeyInput>(tx.inputs[i]).keyImage,
+                txPrefixHash, boost::get<cryptonote::KeyInput>(tx.inputs[i]).keyImage,
                 publicKeys, tmpSecretKeys[i], input.realOutput);
 
             if (!success)
@@ -919,7 +919,7 @@ namespace SendTransaction
 
             if (!Crypto::crypto_ops::checkRingSignature(
                     txPrefixHash,
-                    boost::get<CryptoNote::KeyInput>(tx.inputs[i]).keyImage,
+                    boost::get<cryptonote::KeyInput>(tx.inputs[i]).keyImage,
                     publicKeys,
                     tx.signatures[i]))
             {
@@ -959,10 +959,10 @@ namespace SendTransaction
         return splitAmounts;
     }
 
-    std::vector<CryptoNote::TransactionInput> keyInputToTransactionInput(
-        const std::vector<CryptoNote::KeyInput> keyInputs)
+    std::vector<cryptonote::TransactionInput> keyInputToTransactionInput(
+        const std::vector<cryptonote::KeyInput> keyInputs)
     {
-        std::vector<CryptoNote::TransactionInput> result;
+        std::vector<cryptonote::TransactionInput> result;
 
         for (const auto input : keyInputs)
         {
@@ -972,18 +972,18 @@ namespace SendTransaction
         return result;
     }
 
-    std::vector<CryptoNote::TransactionOutput> keyOutputToTransactionOutput(
+    std::vector<cryptonote::TransactionOutput> keyOutputToTransactionOutput(
         const std::vector<WalletTypes::KeyOutput> keyOutputs)
     {
-        std::vector<CryptoNote::TransactionOutput> result;
+        std::vector<cryptonote::TransactionOutput> result;
 
         for (const auto output : keyOutputs)
         {
-            CryptoNote::TransactionOutput tmpOutput;
+            cryptonote::TransactionOutput tmpOutput;
 
             tmpOutput.amount = output.amount;
 
-            CryptoNote::KeyOutput tmpKey;
+            cryptonote::KeyOutput tmpKey;
 
             tmpKey.key = output.key;
 
@@ -995,9 +995,9 @@ namespace SendTransaction
         return result;
     }
 
-    Crypto::Hash getTransactionHash(CryptoNote::Transaction tx)
+    Crypto::Hash getTransactionHash(cryptonote::Transaction tx)
     {
-        std::vector<uint8_t> data = CryptoNote::toBinaryArray(tx);
+        std::vector<uint8_t> data = cryptonote::toBinaryArray(tx);
         return Crypto::cn_fast_hash(data.data(), data.size());
     }
 
@@ -1039,16 +1039,16 @@ namespace SendTransaction
 
         if (paymentID != "")
         {
-            CryptoNote::createTxExtraWithPaymentId(paymentID, extra);
+            cryptonote::createTxExtraWithPaymentId(paymentID, extra);
         }
 
         /* Append the transaction public key we generated earlier to the extra
            data */
-        CryptoNote::addTransactionPublicKeyToExtra(extra, result.txKeyPair.publicKey);
+        cryptonote::addTransactionPublicKeyToExtra(extra, result.txKeyPair.publicKey);
 
-        CryptoNote::Transaction setupTX;
+        cryptonote::Transaction setupTX;
 
-        setupTX.version = CryptoNote::CURRENT_TRANSACTION_VERSION;
+        setupTX.version = cryptonote::CURRENT_TRANSACTION_VERSION;
 
         setupTX.unlockTime = unlockTime;
 
@@ -1072,7 +1072,7 @@ namespace SendTransaction
         return result;
     }
 
-    bool verifyAmounts(const CryptoNote::Transaction tx)
+    bool verifyAmounts(const cryptonote::Transaction tx)
     {
         std::vector<uint64_t> amounts;
 
@@ -1090,7 +1090,7 @@ namespace SendTransaction
     bool verifyAmounts(const std::vector<uint64_t> amounts)
     {
         /* yeah... i don't want to type that every time */
-        const auto prettyAmounts = CryptoNote::Currency::PRETTY_AMOUNTS;
+        const auto prettyAmounts = cryptonote::Currency::PRETTY_AMOUNTS;
 
         for (const auto amount : amounts)
         {
@@ -1103,14 +1103,14 @@ namespace SendTransaction
         return true;
     }
 
-    bool verifyTransactionFee(const uint64_t expectedFee, const CryptoNote::Transaction tx)
+    bool verifyTransactionFee(const uint64_t expectedFee, const cryptonote::Transaction tx)
     {
         uint64_t inputTotal = 0;
         uint64_t outputTotal = 0;
 
         for (const auto input : tx.inputs)
         {
-            inputTotal += boost::get<CryptoNote::KeyInput>(input).amount;
+            inputTotal += boost::get<cryptonote::KeyInput>(input).amount;
         }
 
         for (const auto output : tx.outputs)

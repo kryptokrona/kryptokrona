@@ -616,7 +616,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedTransaction(
     else
     {
         /* Get the default mixin */
-        std::tie(std::ignore, std::ignore, mixin) = CryptoNote::Mixins::getMixinAllowableRange(
+        std::tie(std::ignore, std::ignore, mixin) = cryptonote::Mixins::getMixinAllowableRange(
             m_walletBackend->getStatus().networkBlockCount);
     }
 
@@ -708,7 +708,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedFusionTransaction(
     else
     {
         /* Get the default mixin */
-        std::tie(std::ignore, std::ignore, mixin) = CryptoNote::Mixins::getMixinAllowableRange(
+        std::tie(std::ignore, std::ignore, mixin) = cryptonote::Mixins::getMixinAllowableRange(
             m_walletBackend->getStatus().networkBlockCount);
     }
 
@@ -1453,7 +1453,7 @@ std::tuple<std::string, uint16_t, std::string, std::string>
 ApiDispatcher::getDefaultWalletParams(const nlohmann::json body) const
 {
     std::string daemonHost = "127.0.0.1";
-    uint16_t daemonPort = CryptoNote::RPC_DEFAULT_PORT;
+    uint16_t daemonPort = cryptonote::RPC_DEFAULT_PORT;
 
     const std::string filename = tryGetJsonValue<std::string>(body, "filename");
     const std::string password = tryGetJsonValue<std::string>(body, "password");

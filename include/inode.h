@@ -57,7 +57,7 @@ namespace cryptonote
     {
         Crypto::Hash blockHash;
         bool hasBlock;
-        CryptoNote::BlockTemplate block;
+        cryptonote::BlockTemplate block;
         std::vector<TransactionShortInfo> txsShortInfo;
     };
 

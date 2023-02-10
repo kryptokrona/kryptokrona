@@ -20,9 +20,9 @@ Config parseArguments(int argc, char **argv)
 {
     Config config;
 
-    std::string defaultRemoteDaemon = "127.0.0.1:" + std::to_string(CryptoNote::RPC_DEFAULT_PORT);
+    std::string defaultRemoteDaemon = "127.0.0.1:" + std::to_string(cryptonote::RPC_DEFAULT_PORT);
 
-    cxxopts::Options options(argv[0], CryptoNote::getProjectCLIHeader());
+    cxxopts::Options options(argv[0], cryptonote::getProjectCLIHeader());
 
     bool help, version;
 
@@ -59,7 +59,7 @@ Config parseArguments(int argc, char **argv)
     }
     else if (version) // Do we want to display the software version?
     {
-        std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+        std::cout << cryptonote::getProjectCLIHeader() << std::endl;
         exit(0);
     }
 

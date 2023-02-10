@@ -66,7 +66,7 @@ namespace cryptonote
         template <class Value>
         std::string serialize(const Value &value, const std::string &name)
         {
-            CryptoNote::KVBinaryOutputStreamSerializer serializer;
+            cryptonote::KVBinaryOutputStreamSerializer serializer;
             std::stringstream ss;
             Common::StdOutputStream stream(ss);
 
@@ -95,7 +95,7 @@ namespace cryptonote
         {
             std::stringstream ss(serialized);
             Common::StdInputStream stream(ss);
-            CryptoNote::KVBinaryInputStreamSerializer serializer(stream);
+            cryptonote::KVBinaryInputStreamSerializer serializer(stream);
             serializer(value, name);
         }
 

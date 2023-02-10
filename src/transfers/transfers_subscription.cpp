@@ -25,7 +25,7 @@ using namespace Logging;
 namespace cryptonote
 {
 
-    TransfersSubscription::TransfersSubscription(const CryptoNote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription &sub)
+    TransfersSubscription::TransfersSubscription(const cryptonote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription &sub)
         : subscription(sub), logger(logger, "TransfersSubscription"), transfers(currency, logger, sub.transactionSpendableAge),
           m_address(currency.accountAddressAsString(sub.keys.address))
     {

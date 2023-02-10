@@ -19,21 +19,21 @@ namespace DaemonConfig
         DaemonConfiguration()
         {
             std::stringstream logfile;
-            logfile << CryptoNote::CRYPTONOTE_NAME << "d.log";
+            logfile << cryptonote::CRYPTONOTE_NAME << "d.log";
 
             dataDirectory = Tools::getDefaultDataDirectory();
             checkPoints = "default";
             logFile = logfile.str();
             logLevel = Logging::WARNING;
-            dbMaxOpenFiles = CryptoNote::DATABASE_DEFAULT_MAX_OPEN_FILES;
-            dbReadCacheSizeMB = CryptoNote::DATABASE_READ_BUFFER_MB_DEFAULT_SIZE;
-            dbThreads = CryptoNote::DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT;
-            dbWriteBufferSizeMB = CryptoNote::DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE;
+            dbMaxOpenFiles = cryptonote::DATABASE_DEFAULT_MAX_OPEN_FILES;
+            dbReadCacheSizeMB = cryptonote::DATABASE_READ_BUFFER_MB_DEFAULT_SIZE;
+            dbThreads = cryptonote::DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT;
+            dbWriteBufferSizeMB = cryptonote::DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE;
             p2pInterface = "0.0.0.0";
-            p2pPort = CryptoNote::P2P_DEFAULT_PORT;
+            p2pPort = cryptonote::P2P_DEFAULT_PORT;
             p2pExternalPort = 0;
             rpcInterface = "127.0.0.1";
-            rpcPort = CryptoNote::RPC_DEFAULT_PORT;
+            rpcPort = cryptonote::RPC_DEFAULT_PORT;
             noConsole = false;
             enableBlockExplorer = false;
             localIp = false;

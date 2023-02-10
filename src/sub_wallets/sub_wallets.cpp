@@ -96,7 +96,7 @@ std::tuple<Error, std::string, Crypto::SecretKey> SubWallets::addSubWallet()
 
     std::scoped_lock lock(m_mutex);
 
-    CryptoNote::KeyPair spendKey;
+    cryptonote::KeyPair spendKey;
 
     /* Generate a spend key */
     Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
@@ -538,9 +538,9 @@ SubWallets::getFusionTransactionInputs(
 
     /* Get an approximation of the max amount of inputs we can include in this
        transaction */
-    uint64_t maxInputsToTake = CryptoNote::Currency::getApproximateMaximumInputCount(
-        CryptoNote::parameters::FUSION_TX_MAX_SIZE,
-        CryptoNote::parameters::FUSION_TX_MIN_IN_OUT_COUNT_RATIO,
+    uint64_t maxInputsToTake = cryptonote::Currency::getApproximateMaximumInputCount(
+        cryptonote::parameters::FUSION_TX_MAX_SIZE,
+        cryptonote::parameters::FUSION_TX_MIN_IN_OUT_COUNT_RATIO,
         mixin);
 
     /* Shuffle the inputs */
@@ -567,7 +567,7 @@ SubWallets::getFusionTransactionInputs(
     for (const auto [amount, bucket] : buckets)
     {
         /* Skip the buckets with not enough items */
-        if (bucket.size() >= CryptoNote::parameters::FUSION_TX_MIN_INPUT_COUNT)
+        if (bucket.size() >= cryptonote::parameters::FUSION_TX_MIN_INPUT_COUNT)
         {
             fullBuckets.push_back(bucket);
         }

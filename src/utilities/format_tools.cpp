@@ -117,7 +117,7 @@ namespace Utilities
             }
         }
 
-        const float days = (next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
+        const float days = (next_fork - height) / cryptonote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
 
         /* Next fork in < 30 days away */
         if (days < 30)
@@ -157,7 +157,7 @@ namespace Utilities
             }
         }
 
-        const float days = (static_cast<float>(next_fork - height) / CryptoNote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);
+        const float days = (static_cast<float>(next_fork - height) / cryptonote::parameters::EXPECTED_NUMBER_OF_BLOCKS_PER_DAY);
 
         std::stringstream stream;
 
@@ -218,7 +218,7 @@ namespace Utilities
         {
             if (upgrade > supported_height)
             {
-                return "The network forked at height " + std::to_string(upgrade) + ", please update your software: " + CryptoNote::LATEST_VERSION_URL;
+                return "The network forked at height " + std::to_string(upgrade) + ", please update your software: " + cryptonote::LATEST_VERSION_URL;
             }
         }
 
@@ -226,7 +226,7 @@ namespace Utilities
         return std::string();
     }
 
-    std::string get_status_string(CryptoNote::COMMAND_RPC_GET_INFO::response iresp)
+    std::string get_status_string(cryptonote::COMMAND_RPC_GET_INFO::response iresp)
     {
         std::stringstream ss;
         std::time_t uptime = std::time(nullptr) - iresp.start_time;

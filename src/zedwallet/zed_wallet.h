@@ -10,5 +10,5 @@
 
 int main(int argc, char **argv);
 
-void run(CryptoNote::WalletGreen &wallet, CryptoNote::INode &node,
+void run(cryptonote::WalletGreen &wallet, cryptonote::INode &node,
          Config &config);

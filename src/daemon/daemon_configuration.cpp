@@ -28,7 +28,7 @@ namespace DaemonConfig
 
     void handleSettings(int argc, char *argv[], DaemonConfiguration &config)
     {
-        cxxopts::Options options(argv[0], CryptoNote::getProjectCLIHeader());
+        cxxopts::Options options(argv[0], cryptonote::getProjectCLIHeader());
 
         options.add_options("Core")("help", "Display this help message", cxxopts::value<bool>()->implicit_value("true"))("os-version", "Output Operating System version information", cxxopts::value<bool>()->default_value("false")->implicit_value("true"))("version", "Output daemon version information", cxxopts::value<bool>()->default_value("false")->implicit_value("true"));
 
@@ -217,12 +217,12 @@ namespace DaemonConfig
             }
             else if (config.version) // Do we want to display the software version?
             {
-                std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+                std::cout << cryptonote::getProjectCLIHeader() << std::endl;
                 exit(0);
             }
             else if (config.osVersion) // Do we want to display the OS version information?
             {
-                std::cout << CryptoNote::getProjectCLIHeader() << "OS: " << Tools::get_os_version_string() << std::endl;
+                std::cout << cryptonote::getProjectCLIHeader() << "OS: " << Tools::get_os_version_string() << std::endl;
                 exit(0);
             }
         }

@@ -333,7 +333,7 @@ int main(int argc, char **argv)
             return 0; // help message requested or so
         }
 
-        std::cout << CryptoNote::getProjectCLIHeader();
+        std::cout << cryptonote::getProjectCLIHeader();
 
         const auto &config = pg.getConfig();
 

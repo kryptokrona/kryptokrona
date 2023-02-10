@@ -16,7 +16,7 @@ namespace cryptonote
         std::stringstream programHeader;
         programHeader << std::endl
                       << asciiArt << std::endl
-                      << " " << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << std::endl
+                      << " " << cryptonote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << std::endl
                       << " This software is distributed under the General Public License v3.0"
                       << std::endl
                       << std::endl
@@ -25,7 +25,7 @@ namespace cryptonote
                       << std::endl
                       << " Additional Copyright(s) may apply, please see the included LICENSE file for more information." << std::endl
                       << " If you did not receive a copy of the LICENSE, please visit:" << std::endl
-                      << " " << CryptoNote::LICENSE_URL
+                      << " " << cryptonote::LICENSE_URL
                       << std::endl
                       << std::endl;
 

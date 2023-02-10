@@ -38,7 +38,7 @@ namespace cryptonote
     struct CompleteBlock
     {
         Crypto::Hash blockHash;
-        boost::optional<CryptoNote::BlockTemplate> block;
+        boost::optional<cryptonote::BlockTemplate> block;
         // first transaction is always coinbase
         std::list<std::shared_ptr<ITransactionReader>> transactions;
     };

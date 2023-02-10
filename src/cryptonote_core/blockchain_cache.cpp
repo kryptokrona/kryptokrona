@@ -107,7 +107,7 @@ namespace cryptonote
         s(transactionHash, "transaction_hash");
     }
 
-    bool serialize(PackedOutIndex &value, Common::StringView name, CryptoNote::ISerializer &serializer)
+    bool serialize(PackedOutIndex &value, Common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializer(value.packedValue, name);
     }
@@ -892,7 +892,7 @@ namespace cryptonote
     {
         std::ofstream file(filename.c_str());
         Common::StdOutputStream stream(file);
-        CryptoNote::BinaryOutputStreamSerializer s(stream);
+        cryptonote::BinaryOutputStreamSerializer s(stream);
 
         serialize(s);
     }
@@ -901,7 +901,7 @@ namespace cryptonote
     {
         std::ifstream file(filename.c_str());
         Common::StdInputStream stream(file);
-        CryptoNote::BinaryInputStreamSerializer s(stream);
+        cryptonote::BinaryInputStreamSerializer s(stream);
 
         serialize(s);
     }

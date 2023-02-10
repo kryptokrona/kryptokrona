@@ -73,7 +73,7 @@ namespace cryptonote
         allowLocalIp = localIp;
         hideMyPort = hidePort;
         configFolder = dataDir;
-        p2pStateFilename = CryptoNote::parameters::P2P_NET_DATA_FILENAME;
+        p2pStateFilename = cryptonote::parameters::P2P_NET_DATA_FILENAME;
 
         if (!addPeers.empty())
         {

@@ -56,12 +56,12 @@ namespace Miner
 
             if (blockTemplate.majorVersion >= BLOCK_MAJOR_VERSION_2)
             {
-                CryptoNote::TransactionExtraMergeMiningTag mmTag;
+                cryptonote::TransactionExtraMergeMiningTag mmTag;
                 mmTag.depth = 0;
                 mmTag.merkleRoot = cachedBlock.getAuxiliaryBlockHeaderHash();
 
                 blockTemplate.parentBlock.baseTransaction.extra.clear();
-                if (!CryptoNote::appendMergeMiningTagToExtra(blockTemplate.parentBlock.baseTransaction.extra, mmTag))
+                if (!cryptonote::appendMergeMiningTagToExtra(blockTemplate.parentBlock.baseTransaction.extra, mmTag))
                 {
                     throw std::runtime_error("Couldn't append merge mining tag");
                 }
@@ -72,7 +72,7 @@ namespace Miner
 
     MinerManager::MinerManager(
         syst::Dispatcher &dispatcher,
-        const CryptoNote::MiningConfig &config,
+        const cryptonote::MiningConfig &config,
         const std::shared_ptr<httplib::Client> httpClient) :
 
                                                              m_contextGroup(dispatcher),
@@ -188,7 +188,7 @@ namespace Miner
         m_eventOccurred.set();
     }
 
-    void MinerManager::startMining(const CryptoNote::BlockMiningParameters &params)
+    void MinerManager::startMining(const cryptonote::BlockMiningParameters &params)
     {
         m_contextGroup.spawn([this, params]()
                              {
@@ -334,7 +334,7 @@ namespace Miner
         }
     }
 
-    void MinerManager::adjustBlockTemplate(CryptoNote::BlockTemplate &blockTemplate) const
+    void MinerManager::adjustBlockTemplate(cryptonote::BlockTemplate &blockTemplate) const
     {
         adjustMergeMiningTag(blockTemplate);
 

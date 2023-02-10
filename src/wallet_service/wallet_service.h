@@ -41,15 +41,15 @@ namespace PaymentService
         uint64_t scanHeight;
     };
 
-    void generateNewWallet(const CryptoNote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger, syst::Dispatcher &dispatcher);
+    void generateNewWallet(const cryptonote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger, syst::Dispatcher &dispatcher);
 
     struct TransactionsInBlockInfoFilter;
 
     class WalletService
     {
     public:
-        WalletService(const CryptoNote::Currency &currency, syst::Dispatcher &sys, CryptoNote::INode &node, CryptoNote::IWallet &wallet,
-                      CryptoNote::IFusionManager &fusionManager, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger);
+        WalletService(const cryptonote::Currency &currency, syst::Dispatcher &sys, cryptonote::INode &node, cryptonote::IWallet &wallet,
+                      cryptonote::IFusionManager &fusionManager, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger);
         virtual ~WalletService();
 
         void init();
@@ -101,8 +101,8 @@ namespace PaymentService
         void loadTransactionIdIndex();
         void getNodeFee();
 
-        std::vector<CryptoNote::TransactionsInBlockInfo> getTransactions(const Crypto::Hash &blockHash, size_t blockCount) const;
-        std::vector<CryptoNote::TransactionsInBlockInfo> getTransactions(uint32_t firstBlockIndex, size_t blockCount) const;
+        std::vector<cryptonote::TransactionsInBlockInfo> getTransactions(const Crypto::Hash &blockHash, size_t blockCount) const;
+        std::vector<cryptonote::TransactionsInBlockInfo> getTransactions(uint32_t firstBlockIndex, size_t blockCount) const;
 
         std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(const Crypto::Hash &blockHash, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const;
         std::vector<TransactionHashesInBlockRpcInfo> getRpcTransactionHashes(uint32_t firstBlockIndex, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const;
@@ -110,10 +110,10 @@ namespace PaymentService
         std::vector<TransactionsInBlockRpcInfo> getRpcTransactions(const Crypto::Hash &blockHash, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const;
         std::vector<TransactionsInBlockRpcInfo> getRpcTransactions(uint32_t firstBlockIndex, size_t blockCount, const TransactionsInBlockInfoFilter &filter) const;
 
-        const CryptoNote::Currency &currency;
-        CryptoNote::IWallet &wallet;
-        CryptoNote::IFusionManager &fusionManager;
-        CryptoNote::INode &node;
+        const cryptonote::Currency &currency;
+        cryptonote::IWallet &wallet;
+        cryptonote::IFusionManager &fusionManager;
+        cryptonote::INode &node;
         const WalletConfiguration &config;
         bool inited;
         Logging::LoggerRef logger;

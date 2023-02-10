@@ -21,7 +21,7 @@ namespace Utilities
         const uint64_t height,
         const uint64_t upgrade_height);
 
-    std::string get_status_string(CryptoNote::COMMAND_RPC_GET_INFO::response iresp);
+    std::string get_status_string(cryptonote::COMMAND_RPC_GET_INFO::response iresp);
 
     std::string formatAmount(const uint64_t amount);
 

@@ -178,8 +178,8 @@ namespace cryptonote
                         boxed_transaction_age = currentTime - (box_time / 1000);
 
                         if (
-                            (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || boxed_transaction_age >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME) &&
-                            transaction_extra_data_size > CryptoNote::parameters::MAX_EXTRA_SIZE_BLOCK)
+                            (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || boxed_transaction_age >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME) &&
+                            transaction_extra_data_size > cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
                         {
                             logger(Logging::INFO) << "Deleting hugin transaction...";
                             recentlyDeletedTransactions.emplace(hash, currentTime);

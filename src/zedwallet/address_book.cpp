@@ -203,7 +203,7 @@ void sendFromAddressBook(std::shared_ptr<WalletInfo> walletInfo,
     auto amount = maybeAmount.x;
     auto fee = WalletConfig::defaultFee;
     auto extra = getExtraFromPaymentID(addressBookEntry.paymentID);
-    auto mixin = CryptoNote::getDefaultMixinByHeight(height);
+    auto mixin = cryptonote::getDefaultMixinByHeight(height);
     auto integrated = addressBookEntry.integratedAddress;
 
     if (integrated)
@@ -358,7 +358,7 @@ AddressBook getAddressBook()
         buffer << input.rdbuf();
         input.close();
 
-        CryptoNote::loadFromJson(addressBook, buffer.str());
+        cryptonote::loadFromJson(addressBook, buffer.str());
     }
 
     return addressBook;
@@ -366,7 +366,7 @@ AddressBook getAddressBook()
 
 bool saveAddressBook(AddressBook addressBook)
 {
-    std::string jsonString = CryptoNote::storeToJson(addressBook);
+    std::string jsonString = cryptonote::storeToJson(addressBook);
 
     std::ofstream output(WalletConfig::addressBookFilename);
 

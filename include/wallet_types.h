@@ -58,7 +58,7 @@ namespace WalletTypes
 
         /* The inputs used for a transaction, can be used to track outgoing
            transactions */
-        std::vector<CryptoNote::KeyInput> keyInputs;
+        std::vector<cryptonote::KeyInput> keyInputs;
     };
 
     /* A 'block' with the very basics needed to sync the transactions */
@@ -513,7 +513,7 @@ namespace WalletTypes
         r.transactionPublicKey = j.at("txPublicKey").get<Crypto::PublicKey>();
         r.unlockTime = j.at("unlockTime").get<uint64_t>();
         r.paymentID = j.at("paymentID").get<std::string>();
-        r.keyInputs = j.at("inputs").get<std::vector<CryptoNote::KeyInput>>();
+        r.keyInputs = j.at("inputs").get<std::vector<cryptonote::KeyInput>>();
     }
 
     inline void to_json(nlohmann::json &j, const KeyOutput &k)

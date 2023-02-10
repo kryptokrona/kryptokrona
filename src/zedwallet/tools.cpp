@@ -182,7 +182,7 @@ std::string getPaymentIDFromExtra(const std::string &extra)
 
         Crypto::Hash paymentIdHash;
 
-        if (CryptoNote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash))
+        if (cryptonote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash))
         {
             return Common::podToHex(paymentIdHash);
         }
@@ -204,19 +204,19 @@ std::string createIntegratedAddress(const std::string &address,
 {
     uint64_t prefix;
 
-    CryptoNote::AccountPublicAddress addr;
+    cryptonote::AccountPublicAddress addr;
 
     /* Get the private + public key from the address */
-    CryptoNote::parseAccountAddressString(prefix, addr, address);
+    cryptonote::parseAccountAddressString(prefix, addr, address);
 
     /* Pack as a binary array */
-    CryptoNote::BinaryArray ba;
-    CryptoNote::toBinaryArray(addr, ba);
+    cryptonote::BinaryArray ba;
+    cryptonote::toBinaryArray(addr, ba);
     std::string keys = Common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
     return Tools::Base58::encode_addr(
-        CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+        cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
         paymentID + keys);
 }
 
@@ -309,7 +309,7 @@ bool fileExists(const std::string &filename)
     return static_cast<bool>(std::ifstream(filename));
 }
 
-bool shutdown(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node,
+bool shutdown(std::shared_ptr<WalletInfo> walletInfo, cryptonote::INode &node,
               bool &alreadyShuttingDown)
 {
     if (alreadyShuttingDown)
@@ -413,6 +413,6 @@ bool parseDaemonAddressFromString(std::string &host, int &port, const std::strin
     }
 
     host = parts.at(0);
-    port = CryptoNote::RPC_DEFAULT_PORT;
+    port = cryptonote::RPC_DEFAULT_PORT;
     return true;
 }

@@ -6,7 +6,7 @@
 
 #include <zedwallet/types.h>
 
-void syncWallet(CryptoNote::INode &node,
+void syncWallet(cryptonote::INode &node,
                 std::shared_ptr<WalletInfo> walletInfo);
 
 void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo);

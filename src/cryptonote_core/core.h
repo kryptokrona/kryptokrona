@@ -233,7 +233,7 @@ namespace cryptonote
         void switchMainChainStorage(uint32_t splitBlockIndex, IBlockchainCache &newChain);
 
         static WalletTypes::RawCoinbaseTransaction getRawCoinbaseTransaction(
-            const CryptoNote::Transaction &t);
+            const cryptonote::Transaction &t);
 
         static WalletTypes::RawTransaction getRawTransaction(
             const std::vector<uint8_t> &rawTX);

@@ -264,7 +264,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
         {
             std::stringstream stream;
 
-            stream << CryptoNote::CRYPTONOTE_NAME << " transfers can have "
+            stream << cryptonote::CRYPTONOTE_NAME << " transfers can have "
                    << "a max of " << WalletConfig::numDecimalPlaces
                    << " decimal places.\n";
 
@@ -313,14 +313,14 @@ std::tuple<std::string, uint16_t> getDaemonAddress()
     {
         std::cout << InformationMsg("\nEnter the daemon address you want to use.\n"
                                     "You can omit the port, and it will default to ")
-                  << InformationMsg(CryptoNote::RPC_DEFAULT_PORT)
+                  << InformationMsg(cryptonote::RPC_DEFAULT_PORT)
                   << ".\n\nHit enter for the default of localhost: ";
 
         std::string address;
 
         std::string host = "127.0.0.1";
 
-        uint16_t port = CryptoNote::RPC_DEFAULT_PORT;
+        uint16_t port = cryptonote::RPC_DEFAULT_PORT;
 
         /* Fixes infinite looping when someone does a ctrl + c */
         if (!std::getline(std::cin, address) || address == "")

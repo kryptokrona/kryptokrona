@@ -113,8 +113,8 @@ std::string parseCommand(const std::vector<T> &printableCommands,
 }
 
 std::tuple<bool, std::shared_ptr<WalletInfo>>
-selectionScreen(Config &config, CryptoNote::WalletGreen &wallet,
-                CryptoNote::INode &node)
+selectionScreen(Config &config, cryptonote::WalletGreen &wallet,
+                cryptonote::INode &node)
 {
     while (true)
     {
@@ -184,7 +184,7 @@ selectionScreen(Config &config, CryptoNote::WalletGreen &wallet,
     }
 }
 
-bool checkNodeStatus(CryptoNote::INode &node)
+bool checkNodeStatus(cryptonote::INode &node)
 {
     while (node.getLastKnownBlockHeight() == 0)
     {
@@ -251,7 +251,7 @@ std::string getAction(Config &config)
                         "What would you like to do?: ", false, nullptr);
 }
 
-void mainLoop(std::shared_ptr<WalletInfo> walletInfo, CryptoNote::INode &node)
+void mainLoop(std::shared_ptr<WalletInfo> walletInfo, cryptonote::INode &node)
 {
     if (walletInfo->viewWallet)
     {

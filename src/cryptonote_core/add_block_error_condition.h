@@ -108,7 +108,7 @@ namespace std
 {
 
     template <>
-    struct is_error_condition_enum<CryptoNote::error::AddBlockErrorCondition> : public true_type
+    struct is_error_condition_enum<cryptonote::error::AddBlockErrorCondition> : public true_type
     {
     };
 

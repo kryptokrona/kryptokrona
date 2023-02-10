@@ -8,8 +8,8 @@
 
 bool handleCommand(const std::string command,
                    std::shared_ptr<WalletInfo> walletInfo,
-                   CryptoNote::INode &node);
+                   cryptonote::INode &node);
 
-std::shared_ptr<WalletInfo> handleLaunchCommand(CryptoNote::WalletGreen &wallet,
+std::shared_ptr<WalletInfo> handleLaunchCommand(cryptonote::WalletGreen &wallet,
                                                 std::string launchCommand,
                                                 Config &config);

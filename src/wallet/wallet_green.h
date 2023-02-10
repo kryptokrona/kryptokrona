@@ -146,7 +146,7 @@ namespace cryptonote
         std::string doCreateAddress(const Crypto::PublicKey &spendPublicKey, const Crypto::SecretKey &spendSecretKey, const uint64_t scanHeight, const bool newAddress);
         std::vector<std::string> doCreateAddressList(const std::vector<NewAddressData> &addressDataList, const uint64_t scanHeight, const bool newAddress);
 
-        CryptoNote::BlockDetails getBlock(const uint64_t blockHeight);
+        cryptonote::BlockDetails getBlock(const uint64_t blockHeight);
 
         uint64_t scanHeightToTimestamp(const uint64_t scanHeight);
 
@@ -167,7 +167,7 @@ namespace cryptonote
 
         struct ReceiverAmounts
         {
-            CryptoNote::AccountPublicAddress receiver;
+            cryptonote::AccountPublicAddress receiver;
             std::vector<uint64_t> amounts;
         };
 
@@ -234,14 +234,14 @@ namespace cryptonote
         WalletOuts pickWallet(const std::string &address) const;
         std::vector<WalletOuts> pickWallets(const std::vector<std::string> &addresses) const;
 
-        void updateBalance(CryptoNote::ITransfersContainer *container);
+        void updateBalance(cryptonote::ITransfersContainer *container);
         void unlockBalances(uint32_t height);
 
         const WalletRecord &getWalletRecord(const Crypto::PublicKey &key) const;
         const WalletRecord &getWalletRecord(const std::string &address) const;
-        const WalletRecord &getWalletRecord(CryptoNote::ITransfersContainer *container) const;
+        const WalletRecord &getWalletRecord(cryptonote::ITransfersContainer *container) const;
 
-        CryptoNote::AccountPublicAddress parseAddress(const std::string &address) const;
+        cryptonote::AccountPublicAddress parseAddress(const std::string &address) const;
         std::string addWallet(const NewAddressData &addressData, uint64_t scanHeight, bool newAddress);
         AccountKeys makeAccountKeys(const WalletRecord &wallet) const;
         size_t getTransactionId(const Crypto::Hash &transactionHash) const;
@@ -255,15 +255,15 @@ namespace cryptonote
                                 const std::string &extra,
                                 uint64_t unlockTimestamp,
                                 const DonationSettings &donation,
-                                const CryptoNote::AccountPublicAddress &changeDestinationAddress,
+                                const cryptonote::AccountPublicAddress &changeDestinationAddress,
                                 PreparedTransaction &preparedTransaction);
 
         size_t doTransfer(const TransactionParameters &transactionParameters);
 
-        void checkIfEnoughMixins(std::vector<CryptoNote::RandomOuts> &mixinResult, uint16_t mixIn) const;
+        void checkIfEnoughMixins(std::vector<cryptonote::RandomOuts> &mixinResult, uint16_t mixIn) const;
         std::vector<WalletTransfer> convertOrdersToTransfers(const std::vector<WalletOrder> &orders) const;
-        uint64_t countNeededMoney(const std::vector<CryptoNote::WalletTransfer> &destinations, uint64_t fee) const;
-        CryptoNote::AccountPublicAddress parseAccountAddressString(const std::string &addressString) const;
+        uint64_t countNeededMoney(const std::vector<cryptonote::WalletTransfer> &destinations, uint64_t fee) const;
+        cryptonote::AccountPublicAddress parseAccountAddressString(const std::string &addressString) const;
         uint64_t pushDonationTransferIfPossible(const DonationSettings &donation, uint64_t freeAmount, uint64_t dustThreshold, std::vector<WalletTransfer> &destinations) const;
         void validateAddresses(const std::vector<std::string> &addresses) const;
         void validateOrders(const std::vector<WalletOrder> &orders) const;
@@ -273,10 +273,10 @@ namespace cryptonote
 
         void requestMixinOuts(const std::vector<OutputToTransfer> &selectedTransfers,
                               uint16_t mixIn,
-                              std::vector<CryptoNote::RandomOuts> &mixinResult);
+                              std::vector<cryptonote::RandomOuts> &mixinResult);
 
         void prepareInputs(const std::vector<OutputToTransfer> &selectedTransfers,
-                           std::vector<CryptoNote::RandomOuts> &mixinResult,
+                           std::vector<cryptonote::RandomOuts> &mixinResult,
                            uint16_t mixIn,
                            std::vector<InputInfo> &keysInfo);
 
@@ -290,16 +290,16 @@ namespace cryptonote
                                                        uint64_t dustThreshold, const Currency &currency);
         ReceiverAmounts splitAmount(uint64_t amount, const AccountPublicAddress &destination, uint64_t dustThreshold);
 
-        std::unique_ptr<CryptoNote::ITransaction> makeTransaction(const std::vector<ReceiverAmounts> &decomposedOutputs,
+        std::unique_ptr<cryptonote::ITransaction> makeTransaction(const std::vector<ReceiverAmounts> &decomposedOutputs,
                                                                   std::vector<InputInfo> &keysInfo, const std::string &extra, uint64_t unlockTimestamp);
 
-        void sendTransaction(const CryptoNote::Transaction &cryptoNoteTransaction);
+        void sendTransaction(const cryptonote::Transaction &cryptoNoteTransaction);
         size_t validateSaveAndSendTransaction(const ITransactionReader &transaction, const std::vector<WalletTransfer> &destinations, bool isFusion, bool send);
 
         size_t insertBlockchainTransaction(const TransactionInformation &info, int64_t txBalance);
         size_t insertOutgoingTransactionAndPushEvent(const Crypto::Hash &transactionHash, uint64_t fee, const BinaryArray &extra, uint64_t unlockTimestamp);
         void updateTransactionStateAndPushEvent(size_t transactionId, WalletTransactionState state);
-        bool updateWalletTransactionInfo(size_t transactionId, const CryptoNote::TransactionInformation &info, int64_t totalAmount);
+        bool updateWalletTransactionInfo(size_t transactionId, const cryptonote::TransactionInformation &info, int64_t totalAmount);
         bool updateTransactionTransfers(size_t transactionId, const std::vector<ContainerAmounts> &containerAmountsList,
                                         int64_t allInputsAmount, int64_t allOutputsAmount);
         TransfersMap getKnownTransfersMap(size_t transactionId, size_t firstTransferIdx) const;
@@ -312,7 +312,7 @@ namespace cryptonote
         bool eraseTransfersByAddress(size_t transactionId, size_t firstTransferIdx, const std::string &address, bool eraseOutputTransfers);
         bool eraseForeignTransfers(size_t transactionId, size_t firstTransferIdx, const std::unordered_set<std::string> &knownAddresses, bool eraseOutputTransfers);
         void pushBackOutgoingTransfers(size_t txId, const std::vector<WalletTransfer> &destinations);
-        void insertUnlockTransactionJob(const Crypto::Hash &transactionHash, uint32_t blockHeight, CryptoNote::ITransfersContainer *container);
+        void insertUnlockTransactionJob(const Crypto::Hash &transactionHash, uint32_t blockHeight, cryptonote::ITransfersContainer *container);
         void deleteUnlockTransactionJob(const Crypto::Hash &transactionHash);
         void startBlockchainSynchronizer();
         void stopBlockchainSynchronizer();
@@ -357,7 +357,7 @@ namespace cryptonote
         std::vector<WalletTransfer> getTransactionTransfers(const WalletTransaction &transaction) const;
         void filterOutTransactions(WalletTransactions &transactions, WalletTransfers &transfers, std::function<bool(const WalletTransaction &)> &&pred) const;
         void initBlockchain(const Crypto::PublicKey &viewPublicKey);
-        CryptoNote::AccountPublicAddress getChangeDestination(const std::string &changeDestinationAddress, const std::vector<std::string> &sourceAddresses) const;
+        cryptonote::AccountPublicAddress getChangeDestination(const std::string &changeDestinationAddress, const std::vector<std::string> &sourceAddresses) const;
         bool isMyAddress(const std::string &address) const;
 
         void deleteContainerFromUnlockTransactionJobs(const ITransfersContainer *container);
@@ -403,8 +403,8 @@ namespace cryptonote
 
         BlockHashesContainer m_blockchain;
 
-        friend std::ostream &operator<<(std::ostream &os, CryptoNote::WalletGreen::WalletState state);
-        friend std::ostream &operator<<(std::ostream &os, CryptoNote::WalletGreen::WalletTrackingMode mode);
+        friend std::ostream &operator<<(std::ostream &os, cryptonote::WalletGreen::WalletState state);
+        friend std::ostream &operator<<(std::ostream &os, cryptonote::WalletGreen::WalletTrackingMode mode);
         friend class TransferListFormatter;
     };
 

@@ -27,9 +27,9 @@
 namespace std
 {
     template <>
-    struct hash<std::pair<CryptoNote::IBlockchainCache::Amount, uint32_t>>
+    struct hash<std::pair<cryptonote::IBlockchainCache::Amount, uint32_t>>
     {
-        using argment_type = std::pair<CryptoNote::IBlockchainCache::Amount, uint32_t>;
+        using argment_type = std::pair<cryptonote::IBlockchainCache::Amount, uint32_t>;
         using result_type = size_t;
 
         result_type operator()(const argment_type &arg) const

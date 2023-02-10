@@ -41,7 +41,7 @@ namespace
     class TransactionReaderListFormatter
     {
     public:
-        explicit TransactionReaderListFormatter(const std::vector<std::unique_ptr<CryptoNote::ITransactionReader>> &transactionList) : m_transactionList(transactionList)
+        explicit TransactionReaderListFormatter(const std::vector<std::unique_ptr<cryptonote::ITransactionReader>> &transactionList) : m_transactionList(transactionList)
         {
         }
 
@@ -68,7 +68,7 @@ namespace
         }
 
     private:
-        const std::vector<std::unique_ptr<CryptoNote::ITransactionReader>> &m_transactionList;
+        const std::vector<std::unique_ptr<cryptonote::ITransactionReader>> &m_transactionList;
     };
 
 }

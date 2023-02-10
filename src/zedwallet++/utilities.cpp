@@ -202,7 +202,7 @@ namespace ZedUtilities
         }
 
         host = parts.at(0);
-        port = CryptoNote::RPC_DEFAULT_PORT;
+        port = cryptonote::RPC_DEFAULT_PORT;
 
         return true;
     }

@@ -32,7 +32,7 @@ using namespace Logging;
 namespace cryptonote
 {
 
-    void serialize(TransactionInformation &ti, CryptoNote::ISerializer &s)
+    void serialize(TransactionInformation &ti, cryptonote::ISerializer &s)
     {
         s(ti.transactionHash, "");
         s(ti.publicKey, "");
@@ -946,7 +946,7 @@ namespace cryptonote
     {
         std::lock_guard<std::mutex> lk(m_mutex);
         StdOutputStream stream(os);
-        CryptoNote::BinaryOutputStreamSerializer s(stream);
+        cryptonote::BinaryOutputStreamSerializer s(stream);
 
         s(const_cast<uint32_t &>(TRANSFERS_CONTAINER_STORAGE_VERSION), "version");
 
@@ -961,7 +961,7 @@ namespace cryptonote
     {
         std::lock_guard<std::mutex> lk(m_mutex);
         StdInputStream stream(in);
-        CryptoNote::BinaryInputStreamSerializer s(stream);
+        cryptonote::BinaryInputStreamSerializer s(stream);
 
         uint32_t version = 0;
         s(version, "version");

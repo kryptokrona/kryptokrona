@@ -30,7 +30,7 @@ namespace cryptonote
         uint64_t unlockTime;
         uint16_t outputIndex;
 
-        void serialize(CryptoNote::ISerializer &s);
+        void serialize(cryptonote::ISerializer &s);
     };
 
     // inherit here to avoid breaking IBlockchainCache interface

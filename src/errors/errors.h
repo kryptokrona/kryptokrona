@@ -73,7 +73,7 @@ enum ErrorCode
     /* The payment ID encoded in the integrated address is not valid */
     INTEGRATED_ADDRESS_PAYMENT_ID_INVALID = 16,
 
-    /* The fee given is lower than the CryptoNote::parameters::MINIMUM_FEE */
+    /* The fee given is lower than the cryptonote::parameters::MINIMUM_FEE */
     FEE_TOO_SMALL = 17,
 
     /* The destinations array is empty */

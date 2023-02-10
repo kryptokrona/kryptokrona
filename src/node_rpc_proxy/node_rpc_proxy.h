@@ -36,18 +36,18 @@ namespace cryptonote
         virtual void connectionStatusUpdated(bool connected) {}
     };
 
-    class NodeRpcProxy : public CryptoNote::INode
+    class NodeRpcProxy : public cryptonote::INode
     {
     public:
         NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout, std::shared_ptr<Logging::ILogger> logger);
         NodeRpcProxy(const std::string &nodeHost, unsigned short nodePort, unsigned int initTimeout);
         virtual ~NodeRpcProxy();
 
-        virtual bool addObserver(CryptoNote::INodeObserver *observer) override;
-        virtual bool removeObserver(CryptoNote::INodeObserver *observer) override;
+        virtual bool addObserver(cryptonote::INodeObserver *observer) override;
+        virtual bool removeObserver(cryptonote::INodeObserver *observer) override;
 
-        virtual bool addObserver(CryptoNote::INodeRpcProxyObserver *observer);
-        virtual bool removeObserver(CryptoNote::INodeRpcProxyObserver *observer);
+        virtual bool addObserver(cryptonote::INodeRpcProxyObserver *observer);
+        virtual bool removeObserver(cryptonote::INodeRpcProxyObserver *observer);
 
         virtual void init(const Callback &callback) override;
         virtual bool shutdown() override;
@@ -66,7 +66,7 @@ namespace cryptonote
 
         virtual BlockHeaderInfo getLastLocalBlockHeaderInfo() const override;
 
-        virtual void relayTransaction(const CryptoNote::Transaction &transaction, const Callback &callback) override;
+        virtual void relayTransaction(const cryptonote::Transaction &transaction, const Callback &callback) override;
         virtual void getRandomOutsByAmounts(std::vector<uint64_t> &&amounts, uint16_t outsCount, std::vector<RandomOuts> &result, const Callback &callback) override;
         virtual void getTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash, std::vector<uint32_t> &outsGlobalIndices, const Callback &callback) override;
 
@@ -111,7 +111,7 @@ namespace cryptonote
         void updatePoolState(const std::vector<std::unique_ptr<ITransactionReader>> &addedTxs, const std::vector<Crypto::Hash> &deletedTxsIds);
 
         std::error_code doGetBlockHashesByTimestamps(uint64_t timestampBegin, size_t secondsCount, std::vector<Crypto::Hash> &blockHashes);
-        std::error_code doRelayTransaction(const CryptoNote::Transaction &transaction);
+        std::error_code doRelayTransaction(const cryptonote::Transaction &transaction);
         std::error_code doGetRandomOutsByAmounts(std::vector<uint64_t> &amounts, uint16_t outsCount,
                                                  std::vector<RandomOuts> &result);
         std::error_code doGetTransactionOutsGlobalIndices(const Crypto::Hash &transactionHash,
@@ -129,7 +129,7 @@ namespace cryptonote
             std::unordered_set<Crypto::Hash> &transactionsUnknown);
 
         std::error_code doQueryBlocksLite(const std::vector<Crypto::Hash> &knownBlockIds, uint64_t timestamp,
-                                          std::vector<CryptoNote::BlockShortEntry> &newBlocks, uint32_t &startHeight);
+                                          std::vector<cryptonote::BlockShortEntry> &newBlocks, uint32_t &startHeight);
 
         std::error_code doGetWalletSyncData(const std::vector<Crypto::Hash> &knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo> &newBlocks);
 
@@ -164,8 +164,8 @@ namespace cryptonote
         std::thread m_workerThread;
         syst::Dispatcher *m_dispatcher = nullptr;
         syst::ContextGroup *m_context_group = nullptr;
-        Tools::ObserverManager<CryptoNote::INodeObserver> m_observerManager;
-        Tools::ObserverManager<CryptoNote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
+        Tools::ObserverManager<cryptonote::INodeObserver> m_observerManager;
+        Tools::ObserverManager<cryptonote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
 
         const std::string m_nodeHost;
         const unsigned short m_nodePort;

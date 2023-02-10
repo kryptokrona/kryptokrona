@@ -177,7 +177,7 @@ Error validatePaymentID(const std::string paymentID)
 
 Error validateMixin(const uint64_t mixin, const uint64_t height)
 {
-    const auto [minMixin, maxMixin, defaultMixin] = CryptoNote::Mixins::getMixinAllowableRange(height);
+    const auto [minMixin, maxMixin, defaultMixin] = cryptonote::Mixins::getMixinAllowableRange(height);
 
     if (mixin < minMixin)
     {
@@ -208,7 +208,7 @@ Error validateAmount(
     const uint64_t currentHeight)
 {
     /* Verify the fee is valid */
-    if (fee < CryptoNote::parameters::MINIMUM_FEE)
+    if (fee < cryptonote::parameters::MINIMUM_FEE)
     {
         return FEE_TOO_SMALL;
     }
@@ -332,7 +332,7 @@ Error validateAddresses(
             std::vector<uint8_t> extra;
 
             /* Verify the extracted payment ID is valid */
-            if (!CryptoNote::createTxExtraWithPaymentId(paymentID, extra))
+            if (!cryptonote::createTxExtraWithPaymentId(paymentID, extra))
             {
                 return INTEGRATED_ADDRESS_PAYMENT_ID_INVALID;
             }
@@ -341,20 +341,20 @@ Error validateAddresses(
             std::string keys = decoded.substr(paymentIDLen, std::string::npos);
 
             /* Convert keys as string to binary array */
-            CryptoNote::BinaryArray ba = Common::asBinaryArray(keys);
+            cryptonote::BinaryArray ba = Common::asBinaryArray(keys);
 
-            CryptoNote::AccountPublicAddress addr;
+            cryptonote::AccountPublicAddress addr;
 
             /* Convert from binary array to public keys */
-            if (!CryptoNote::fromBinaryArray(addr, ba))
+            if (!cryptonote::fromBinaryArray(addr, ba))
             {
                 return ADDRESS_NOT_VALID;
             }
 
             /* Convert the set of extracted keys back into an address, then
                verify that as a normal address */
-            address = CryptoNote::getAccountAddressAsStr(
-                CryptoNote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+            address = cryptonote::getAccountAddressAsStr(
+                cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
                 addr);
         }
 
@@ -362,7 +362,7 @@ Error validateAddresses(
         uint64_t ignore;
 
         /* Not used */
-        CryptoNote::AccountPublicAddress ignore2;
+        cryptonote::AccountPublicAddress ignore2;
 
         if (!parseAccountAddressString(ignore, ignore2, address))
         {

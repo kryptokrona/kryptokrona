@@ -16,7 +16,7 @@ struct WalletInfo
                std::string walletPass,
                std::string walletAddress,
                bool viewWallet,
-               CryptoNote::WalletGreen &wallet) : walletFileName(walletFileName),
+               cryptonote::WalletGreen &wallet) : walletFileName(walletFileName),
                                                   walletPass(walletPass),
                                                   walletAddress(walletAddress),
                                                   viewWallet(viewWallet),
@@ -38,7 +38,7 @@ struct WalletInfo
     bool viewWallet;
 
     /* The walletgreen wallet container */
-    CryptoNote::WalletGreen &wallet;
+    cryptonote::WalletGreen &wallet;
 };
 
 struct Config
@@ -56,7 +56,7 @@ struct Config
     std::string host = "127.0.0.1";
 
     /* The daemon port */
-    int port = CryptoNote::RPC_DEFAULT_PORT;
+    int port = cryptonote::RPC_DEFAULT_PORT;
 
     /* The wallet file path */
     std::string walletFile = "";
@@ -92,7 +92,7 @@ struct AddressBookEntry
        address + payment ID pair */
     bool integratedAddress;
 
-    void serialize(CryptoNote::ISerializer &s)
+    void serialize(cryptonote::ISerializer &s)
     {
         KV_MEMBER(friendlyName)
         KV_MEMBER(address)

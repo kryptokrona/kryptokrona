@@ -152,7 +152,7 @@ bool Nigel::getDaemonInfo()
 
             m_peerCount = j.at("incoming_connections_count").get<uint64_t>() + j.at("outgoing_connections_count").get<uint64_t>();
 
-            m_lastKnownHashrate = j.at("difficulty").get<uint64_t>() / CryptoNote::parameters::DIFFICULTY_TARGET;
+            m_lastKnownHashrate = j.at("difficulty").get<uint64_t>() / cryptonote::parameters::DIFFICULTY_TARGET;
 
             return true;
         }
@@ -282,7 +282,7 @@ bool Nigel::getTransactionsStatus(
     return false;
 }
 
-std::tuple<bool, std::vector<CryptoNote::RandomOuts>> Nigel::getRandomOutsByAmounts(
+std::tuple<bool, std::vector<cryptonote::RandomOuts>> Nigel::getRandomOutsByAmounts(
     const std::vector<uint64_t> amounts,
     const uint64_t requestedOuts) const
 {
@@ -304,7 +304,7 @@ std::tuple<bool, std::vector<CryptoNote::RandomOuts>> Nigel::getRandomOutsByAmou
                 return {};
             }
 
-            const auto outs = j.at("outs").get<std::vector<CryptoNote::RandomOuts>>();
+            const auto outs = j.at("outs").get<std::vector<cryptonote::RandomOuts>>();
 
             return {true, outs};
         }
@@ -317,10 +317,10 @@ std::tuple<bool, std::vector<CryptoNote::RandomOuts>> Nigel::getRandomOutsByAmou
 }
 
 std::tuple<bool, bool> Nigel::sendTransaction(
-    const CryptoNote::Transaction tx) const
+    const cryptonote::Transaction tx) const
 {
     json j = {
-        {"tx_as_hex", Common::toHex(CryptoNote::toBinaryArray(tx))}};
+        {"tx_as_hex", Common::toHex(cryptonote::toBinaryArray(tx))}};
 
     const auto res = m_httpClient->Post(
         "/sendrawtransaction", j.dump(), "application/json");

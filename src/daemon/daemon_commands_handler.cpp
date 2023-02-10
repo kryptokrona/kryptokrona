@@ -31,11 +31,11 @@ namespace
     template <typename T>
     static bool print_as_json(const T &obj)
     {
-        std::cout << CryptoNote::storeToJson(obj) << ENDL;
+        std::cout << cryptonote::storeToJson(obj) << ENDL;
         return true;
     }
 
-    std::string printTransactionShortInfo(const CryptoNote::CachedTransaction &transaction)
+    std::string printTransactionShortInfo(const cryptonote::CachedTransaction &transaction)
     {
         std::stringstream ss;
 
@@ -46,12 +46,12 @@ namespace
         return ss.str();
     }
 
-    std::string printTransactionFullInfo(const CryptoNote::CachedTransaction &transaction)
+    std::string printTransactionFullInfo(const cryptonote::CachedTransaction &transaction)
     {
         std::stringstream ss;
         ss << printTransactionShortInfo(transaction);
         ss << "JSON: \n"
-           << CryptoNote::storeToJson(transaction.getTransaction()) << std::endl;
+           << cryptonote::storeToJson(transaction.getTransaction()) << std::endl;
 
         return ss.str();
     }
@@ -59,10 +59,10 @@ namespace
 } // namespace
 
 DaemonCommandsHandler::DaemonCommandsHandler(
-    CryptoNote::Core &core,
-    CryptoNote::NodeServer &srv,
+    cryptonote::Core &core,
+    cryptonote::NodeServer &srv,
     std::shared_ptr<Logging::LoggerManager> log,
-    CryptoNote::RpcServer *prpc_server) : m_core(core),
+    cryptonote::RpcServer *prpc_server) : m_core(core),
                                           m_srv(srv),
                                           logger(log, "daemon"),
                                           m_logManager(log),
@@ -104,7 +104,7 @@ DaemonCommandsHandler::DaemonCommandsHandler(
 std::string DaemonCommandsHandler::get_commands_str()
 {
     std::stringstream ss;
-    ss << CryptoNote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << ENDL;
+    ss << cryptonote::CRYPTONOTE_NAME << " v" << PROJECT_VERSION << ENDL;
     ss << "Commands: " << ENDL;
     std::string usage = m_consoleHandler.getUsage();
     boost::replace_all(usage, "\n", "\n  ");
@@ -191,9 +191,9 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args)
         return false;
     }
 
-    CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request req;
-    CryptoNote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response res;
-    CryptoNote::JsonRpc::JsonRpcError error_resp;
+    cryptonote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request req;
+    cryptonote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response res;
+    cryptonote::JsonRpc::JsonRpcError error_resp;
 
     req.start_height = start_index;
     req.end_height = end_index;
@@ -206,10 +206,10 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args)
         return false;
     }
 
-    const CryptoNote::Currency &currency = m_core.getCurrency();
+    const cryptonote::Currency &currency = m_core.getCurrency();
 
     bool first = true;
-    for (CryptoNote::block_header_response &header : res.headers)
+    for (cryptonote::block_header_response &header : res.headers)
     {
         if (!first)
         {
@@ -337,13 +337,13 @@ bool DaemonCommandsHandler::print_tx(const std::vector<std::string> &args)
 
     std::vector<Crypto::Hash> tx_ids;
     tx_ids.push_back(tx_hash);
-    std::vector<CryptoNote::BinaryArray> txs;
+    std::vector<cryptonote::BinaryArray> txs;
     std::vector<Crypto::Hash> missed_ids;
     m_core.getTransactions(tx_ids, txs, missed_ids);
 
     if (1 == txs.size())
     {
-        CryptoNote::CachedTransaction tx(txs.front());
+        cryptonote::CachedTransaction tx(txs.front());
         print_as_json(tx.getTransaction());
     }
     else
@@ -362,7 +362,7 @@ bool DaemonCommandsHandler::print_pool(const std::vector<std::string> &args)
 
     for (const auto &tx : pool)
     {
-        CryptoNote::CachedTransaction ctx(tx);
+        cryptonote::CachedTransaction ctx(tx);
         std::cout << printTransactionFullInfo(ctx) << "\n";
     }
 
@@ -379,7 +379,7 @@ bool DaemonCommandsHandler::print_pool_sh(const std::vector<std::string> &args)
 
     for (const auto &tx : pool)
     {
-        CryptoNote::CachedTransaction ctx(tx);
+        cryptonote::CachedTransaction ctx(tx);
         std::cout << printTransactionShortInfo(ctx) << "\n";
     }
 
@@ -391,8 +391,8 @@ bool DaemonCommandsHandler::print_pool_sh(const std::vector<std::string> &args)
 //--------------------------------------------------------------------------------
 bool DaemonCommandsHandler::status(const std::vector<std::string> &args)
 {
-    CryptoNote::COMMAND_RPC_GET_INFO::request ireq;
-    CryptoNote::COMMAND_RPC_GET_INFO::response iresp;
+    cryptonote::COMMAND_RPC_GET_INFO::request ireq;
+    cryptonote::COMMAND_RPC_GET_INFO::response iresp;
 
     if (!m_prpc_server->on_get_info(ireq, iresp) || iresp.status != CORE_RPC_STATUS_OK)
     {

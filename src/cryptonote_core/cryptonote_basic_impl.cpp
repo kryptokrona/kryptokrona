@@ -87,13 +87,13 @@ namespace cryptonote
                check_key(adr.viewPublicKey);
     }
     ////-----------------------------------------------------------------------
-    // bool operator ==(const CryptoNote::Transaction& a, const CryptoNote::Transaction& b) {
+    // bool operator ==(const cryptonote::Transaction& a, const cryptonote::Transaction& b) {
     //   return getObjectHash(a) == getObjectHash(b);
     // }
     ////-----------------------------------------------------------------------
-    // bool operator ==(const CryptoNote::BlockTemplate& a, const CryptoNote::BlockTemplate& b) {
+    // bool operator ==(const cryptonote::BlockTemplate& a, const cryptonote::BlockTemplate& b) {
 
-    //  return CryptoNote::get_block_hash(a) == CryptoNote::get_block_hash(b);
+    //  return cryptonote::get_block_hash(a) == cryptonote::get_block_hash(b);
     //}
 }
 

@@ -19,7 +19,7 @@ namespace PaymentService
 
     class WalletService;
 
-    class PaymentServiceJsonRpcServer : public CryptoNote::JsonRpcServer
+    class PaymentServiceJsonRpcServer : public cryptonote::JsonRpcServer
     {
     public:
         PaymentServiceJsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, WalletService &service, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config);
@@ -44,7 +44,7 @@ namespace PaymentService
 
                 try
                 {
-                    CryptoNote::JsonInputValueSerializer inputSerializer(const_cast<Common::JsonValue &>(jsonRpcParams));
+                    cryptonote::JsonInputValueSerializer inputSerializer(const_cast<Common::JsonValue &>(jsonRpcParams));
                     SerializeRequest(request, inputSerializer);
                 }
                 catch (std::exception &)
@@ -60,29 +60,29 @@ namespace PaymentService
                     return;
                 }
 
-                CryptoNote::JsonOutputStreamSerializer outputSerializer;
+                cryptonote::JsonOutputStreamSerializer outputSerializer;
                 serialize(response, outputSerializer);
                 fillJsonResponse(outputSerializer.getValue(), jsonResponse);
             };
         }
 
         template <typename RequestType>
-        void SerializeRequest(RequestType &request, CryptoNote::JsonInputValueSerializer &inputSerializer)
+        void SerializeRequest(RequestType &request, cryptonote::JsonInputValueSerializer &inputSerializer)
         {
             serialize(request, inputSerializer);
         }
 
-        void SerializeRequest(SendTransaction::Request &request, CryptoNote::JsonInputValueSerializer &inputSerializer)
+        void SerializeRequest(SendTransaction::Request &request, cryptonote::JsonInputValueSerializer &inputSerializer)
         {
             request.serialize(inputSerializer, service);
         }
 
-        void SerializeRequest(CreateDelayedTransaction::Request &request, CryptoNote::JsonInputValueSerializer &inputSerializer)
+        void SerializeRequest(CreateDelayedTransaction::Request &request, cryptonote::JsonInputValueSerializer &inputSerializer)
         {
             request.serialize(inputSerializer, service);
         }
 
-        void SerializeRequest(SendFusionTransaction::Request &request, CryptoNote::JsonInputValueSerializer &inputSerializer)
+        void SerializeRequest(SendFusionTransaction::Request &request, cryptonote::JsonInputValueSerializer &inputSerializer)
         {
             request.serialize(inputSerializer, service);
         }

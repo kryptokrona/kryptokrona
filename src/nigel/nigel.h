@@ -71,13 +71,13 @@ public:
         std::unordered_set<Crypto::Hash> &transactionsInBlock,
         std::unordered_set<Crypto::Hash> &transactionsUnknown) const;
 
-    std::tuple<bool, std::vector<CryptoNote::RandomOuts>> getRandomOutsByAmounts(
+    std::tuple<bool, std::vector<cryptonote::RandomOuts>> getRandomOutsByAmounts(
         const std::vector<uint64_t> amounts,
         const uint64_t requestedOuts) const;
 
     /* {success, connectionError} */
     std::tuple<bool, bool> sendTransaction(
-        const CryptoNote::Transaction tx) const;
+        const cryptonote::Transaction tx) const;
 
     std::tuple<bool, std::unordered_map<Crypto::Hash, std::vector<uint64_t>>>
     getGlobalIndexesForRange(

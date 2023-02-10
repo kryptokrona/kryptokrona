@@ -115,14 +115,14 @@ namespace cryptonote
     class NodeServer : public IP2pEndpoint
     {
     public:
-        NodeServer(syst::Dispatcher &dispatcher, CryptoNote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log);
+        NodeServer(syst::Dispatcher &dispatcher, cryptonote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log);
 
         bool run();
         bool init(const NetNodeConfig &config);
         bool deinit();
         bool sendStopSignal();
         uint32_t get_this_peer_port() { return m_listeningPort; }
-        CryptoNote::CryptoNoteProtocolHandler &get_payload_object();
+        cryptonote::CryptoNoteProtocolHandler &get_payload_object();
 
         void serialize(ISerializer &s);
 
@@ -153,7 +153,7 @@ namespace cryptonote
         bool store_config();
         void initUpnp();
 
-        bool handshake(CryptoNote::LevinProtocol &proto, P2pConnectionContext &context, bool just_take_peerlist = false);
+        bool handshake(cryptonote::LevinProtocol &proto, P2pConnectionContext &context, bool just_take_peerlist = false);
         bool timedSync();
         bool handleTimedSyncResponse(const BinaryArray &in, P2pConnectionContext &context);
         void forEachConnection(std::function<void(P2pConnectionContext &)> action);
@@ -164,7 +164,7 @@ namespace cryptonote
         //----------------- i_p2p_endpoint -------------------------------------------------------------
         virtual void relay_notify_to_all(int command, const BinaryArray &data_buff, const boost::uuids::uuid *excludeConnection) override;
         virtual bool invoke_notify_to_peer(int command, const BinaryArray &req_buff, const CryptoNoteConnectionContext &context) override;
-        virtual void for_each_connection(std::function<void(CryptoNote::CryptoNoteConnectionContext &, uint64_t)> f) override;
+        virtual void for_each_connection(std::function<void(cryptonote::CryptoNoteConnectionContext &, uint64_t)> f) override;
         virtual void externalRelayNotifyToAll(int command, const BinaryArray &data_buff, const boost::uuids::uuid *excludeConnection) override;
         virtual void externalRelayNotifyToList(int command, const BinaryArray &data_buff, const std::list<boost::uuids::uuid> relayList) override;
 

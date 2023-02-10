@@ -76,7 +76,7 @@ namespace
                 std::ostringstream portString;
                 portString << port;
                 if (UPNP_AddPortMapping(urls.controlURL, igdData.first.servicetype, portString.str().c_str(),
-                                        portString.str().c_str(), lanAddress, CryptoNote::CRYPTONOTE_NAME, "TCP", 0, "0") != 0)
+                                        portString.str().c_str(), lanAddress, cryptonote::CRYPTONOTE_NAME, "TCP", 0, "0") != 0)
                 {
                     logger(ERROR) << "UPNP_AddPortMapping failed.";
                 }
@@ -199,12 +199,12 @@ namespace cryptonote
         return ret;
     }
 
-    NodeServer::NodeServer(syst::Dispatcher &dispatcher, CryptoNote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log) : m_dispatcher(dispatcher),
+    NodeServer::NodeServer(syst::Dispatcher &dispatcher, cryptonote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log) : m_dispatcher(dispatcher),
                                                                                                                                                             m_workingContextGroup(dispatcher),
                                                                                                                                                             m_payload_handler(payload_handler),
                                                                                                                                                             m_allow_local_ip(false),
                                                                                                                                                             m_hide_my_port(false),
-                                                                                                                                                            m_network_id(CryptoNote::CRYPTONOTE_NETWORK),
+                                                                                                                                                            m_network_id(cryptonote::CRYPTONOTE_NETWORK),
                                                                                                                                                             logger(log, "node_server"),
                                                                                                                                                             m_stopEvent(m_dispatcher),
                                                                                                                                                             m_idleTimer(m_dispatcher),
@@ -212,7 +212,7 @@ namespace cryptonote
                                                                                                                                                             m_timeoutTimer(m_dispatcher),
                                                                                                                                                             m_stop(false),
                                                                                                                                                             // intervals
-                                                                                                                                                            // m_peer_handshake_idle_maker_interval(CryptoNote::P2P_DEFAULT_HANDSHAKE_INTERVAL),
+                                                                                                                                                            // m_peer_handshake_idle_maker_interval(cryptonote::P2P_DEFAULT_HANDSHAKE_INTERVAL),
                                                                                                                                                             m_connections_maker_interval(1),
                                                                                                                                                             m_peerlist_store_interval(60 * 30, false)
     {
@@ -294,7 +294,7 @@ namespace cryptonote
                 {
                     StdInputStream inputStream(p2p_data);
                     BinaryInputStreamSerializer a(inputStream);
-                    CryptoNote::serialize(*this, a);
+                    cryptonote::serialize(*this, a);
                     loaded = true;
                 }
             }
@@ -309,13 +309,13 @@ namespace cryptonote
             }
 
             // at this moment we have hardcoded config
-            m_config.m_net_config.handshake_interval = CryptoNote::P2P_DEFAULT_HANDSHAKE_INTERVAL;
-            m_config.m_net_config.connections_count = CryptoNote::P2P_DEFAULT_CONNECTIONS_COUNT;
-            m_config.m_net_config.packet_max_size = CryptoNote::P2P_DEFAULT_PACKET_MAX_SIZE; // 20 MB limit
+            m_config.m_net_config.handshake_interval = cryptonote::P2P_DEFAULT_HANDSHAKE_INTERVAL;
+            m_config.m_net_config.connections_count = cryptonote::P2P_DEFAULT_CONNECTIONS_COUNT;
+            m_config.m_net_config.packet_max_size = cryptonote::P2P_DEFAULT_PACKET_MAX_SIZE; // 20 MB limit
             m_config.m_net_config.config_id = 0;                                             // initial config
-            m_config.m_net_config.connection_timeout = CryptoNote::P2P_DEFAULT_CONNECTION_TIMEOUT;
-            m_config.m_net_config.ping_connection_timeout = CryptoNote::P2P_DEFAULT_PING_CONNECTION_TIMEOUT;
-            m_config.m_net_config.send_peerlist_sz = CryptoNote::P2P_DEFAULT_PEERS_IN_HANDSHAKE;
+            m_config.m_net_config.connection_timeout = cryptonote::P2P_DEFAULT_CONNECTION_TIMEOUT;
+            m_config.m_net_config.ping_connection_timeout = cryptonote::P2P_DEFAULT_PING_CONNECTION_TIMEOUT;
+            m_config.m_net_config.send_peerlist_sz = cryptonote::P2P_DEFAULT_PEERS_IN_HANDSHAKE;
 
             m_first_connection_maker_call = true;
         }
@@ -425,7 +425,7 @@ namespace cryptonote
     {
         if (!config.getTestnet())
         {
-            for (auto seed : CryptoNote::SEED_NODES)
+            for (auto seed : cryptonote::SEED_NODES)
             {
                 append_net_address(m_seed_nodes, seed);
             }
@@ -468,7 +468,7 @@ namespace cryptonote
 
         // configure self
         //  m_net_server.get_config_object().m_pcommands_handler = this;
-        //  m_net_server.get_config_object().m_invoke_timeout = CryptoNote::P2P_DEFAULT_INVOKE_TIMEOUT;
+        //  m_net_server.get_config_object().m_invoke_timeout = cryptonote::P2P_DEFAULT_INVOKE_TIMEOUT;
 
         // try to bind
         logger(INFO) << "Binding on " << m_bind_ip << ":" << m_port;
@@ -487,7 +487,7 @@ namespace cryptonote
     }
     //-----------------------------------------------------------------------------------
 
-    CryptoNote::CryptoNoteProtocolHandler &NodeServer::get_payload_object()
+    cryptonote::CryptoNoteProtocolHandler &NodeServer::get_payload_object()
     {
         return m_payload_handler;
     }
@@ -548,7 +548,7 @@ namespace cryptonote
 
             StdOutputStream stream(p2p_data);
             BinaryOutputStreamSerializer a(stream);
-            CryptoNote::serialize(*this, a);
+            cryptonote::serialize(*this, a);
             return true;
         }
         catch (const std::exception &e)
@@ -574,7 +574,7 @@ namespace cryptonote
     }
 
     //-----------------------------------------------------------------------------------
-    bool NodeServer::handshake(CryptoNote::LevinProtocol &proto, P2pConnectionContext &context, bool just_take_peerlist)
+    bool NodeServer::handshake(cryptonote::LevinProtocol &proto, P2pConnectionContext &context, bool just_take_peerlist)
     {
         COMMAND_HANDSHAKE::request arg;
         COMMAND_HANDSHAKE::response rsp;
@@ -595,15 +595,15 @@ namespace cryptonote
             return false;
         }
 
-        if (rsp.node_data.version < CryptoNote::P2P_MINIMUM_VERSION)
+        if (rsp.node_data.version < cryptonote::P2P_MINIMUM_VERSION)
         {
             logger(Logging::DEBUGGING) << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(rsp.node_data.version) << "), closing connection.";
             return false;
         }
-        else if ((rsp.node_data.version - CryptoNote::P2P_CURRENT_VERSION) >= CryptoNote::P2P_UPGRADE_WINDOW)
+        else if ((rsp.node_data.version - cryptonote::P2P_CURRENT_VERSION) >= cryptonote::P2P_UPGRADE_WINDOW)
         {
             logger(Logging::WARNING) << context << "COMMAND_HANDSHAKE Warning, your software may be out of date. Please visit: "
-                                     << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
+                                     << cryptonote::LATEST_VERSION_URL << " for the latest version.";
         }
 
         if (!handle_remote_peerlist(rsp.local_peerlist, rsp.node_data.local_time, context))
@@ -774,7 +774,7 @@ namespace cryptonote
             {
                 syst::Context<bool> handshakeContext(m_dispatcher, [&]
                                                        {
-          CryptoNote::LevinProtocol proto(ctx.connection);
+          cryptonote::LevinProtocol proto(ctx.connection);
           return handshake(proto, ctx, just_take_peerlist); });
 
                 syst::Context<> timeoutContext(m_dispatcher, [&]
@@ -921,7 +921,7 @@ namespace cryptonote
         if (!connect_to_peerlist(m_priority_peers))
             return false;
 
-        size_t expected_white_connections = (m_config.m_net_config.connections_count * CryptoNote::P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT) / 100;
+        size_t expected_white_connections = (m_config.m_net_config.connections_count * cryptonote::P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT) / 100;
 
         size_t conn_count = get_outgoing_connections_count();
         if (conn_count < m_config.m_net_config.connections_count)
@@ -1029,7 +1029,7 @@ namespace cryptonote
 
     bool NodeServer::get_local_node_data(basic_node_data &node_data)
     {
-        node_data.version = CryptoNote::P2P_CURRENT_VERSION;
+        node_data.version = cryptonote::P2P_CURRENT_VERSION;
         time_t local_time;
         time(&local_time);
         node_data.local_time = local_time;
@@ -1068,7 +1068,7 @@ namespace cryptonote
         }
 
         Crypto::PublicKey pk;
-        Common::podFromHex(CryptoNote::P2P_STAT_TRUSTED_PUB_KEY, pk);
+        Common::podFromHex(cryptonote::P2P_STAT_TRUSTED_PUB_KEY, pk);
         Crypto::Hash h = get_proof_of_trust_hash(tr);
         if (!Crypto::check_signature(h, pk, tr.sign))
         {
@@ -1241,16 +1241,16 @@ namespace cryptonote
             return 1;
         }
 
-        if (arg.node_data.version < CryptoNote::P2P_MINIMUM_VERSION)
+        if (arg.node_data.version < cryptonote::P2P_MINIMUM_VERSION)
         {
             logger(Logging::DEBUGGING) << context << "UNSUPPORTED NETWORK AGENT VERSION CONNECTED! version=" << std::to_string(arg.node_data.version);
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;
         }
-        else if (arg.node_data.version > CryptoNote::P2P_CURRENT_VERSION)
+        else if (arg.node_data.version > cryptonote::P2P_CURRENT_VERSION)
         {
             logger(Logging::WARNING) << context << "Our software may be out of date. Please visit: "
-                                     << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
+                                     << cryptonote::LATEST_VERSION_URL << " for the latest version.";
         }
 
         if (!context.m_is_income)

@@ -22,7 +22,7 @@ namespace cryptonote
 
     const uint32_t TRANSFERS_STORAGE_ARCHIVE_VERSION = 0;
 
-    TransfersSyncronizer::TransfersSyncronizer(const CryptoNote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, IBlockchainSynchronizer &sync, INode &node) : m_currency(currency), m_logger(logger, "TransfersSyncronizer"), m_sync(sync), m_node(node)
+    TransfersSyncronizer::TransfersSyncronizer(const cryptonote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, IBlockchainSynchronizer &sync, INode &node) : m_currency(currency), m_logger(logger, "TransfersSyncronizer"), m_sync(sync), m_node(node)
     {
     }
 
@@ -181,7 +181,7 @@ namespace cryptonote
         m_sync.save(os);
 
         StdOutputStream stream(os);
-        CryptoNote::BinaryOutputStreamSerializer s(stream);
+        cryptonote::BinaryOutputStreamSerializer s(stream);
         s(const_cast<uint32_t &>(TRANSFERS_STORAGE_ARCHIVE_VERSION), "version");
 
         uint64_t subscriptionCount = m_consumers.size();
@@ -252,7 +252,7 @@ namespace cryptonote
         m_sync.load(is);
 
         StdInputStream inputStream(is);
-        CryptoNote::BinaryInputStreamSerializer s(inputStream);
+        cryptonote::BinaryInputStreamSerializer s(inputStream);
         uint32_t version = 0;
 
         s(version, "version");

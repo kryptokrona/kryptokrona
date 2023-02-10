@@ -85,7 +85,7 @@ namespace cryptonote
     {
         genesisBlockTemplate = boost::value_initialized<BlockTemplate>();
 
-        std::string genesisCoinbaseTxHex = CryptoNote::parameters::GENESIS_COINBASE_TX_HEX;
+        std::string genesisCoinbaseTxHex = cryptonote::parameters::GENESIS_COINBASE_TX_HEX;
         BinaryArray minerTxBlob;
 
         bool r =
@@ -119,11 +119,11 @@ namespace cryptonote
         }
         else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2)
         {
-            return CryptoNote::parameters::DIFFICULTY_WINDOW_V2;
+            return cryptonote::parameters::DIFFICULTY_WINDOW_V2;
         }
         else
         {
-            return CryptoNote::parameters::DIFFICULTY_WINDOW_V1;
+            return cryptonote::parameters::DIFFICULTY_WINDOW_V1;
         }
     }
 
@@ -135,11 +135,11 @@ namespace cryptonote
         }
         else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2)
         {
-            return CryptoNote::parameters::DIFFICULTY_LAG_V2;
+            return cryptonote::parameters::DIFFICULTY_LAG_V2;
         }
         else
         {
-            return CryptoNote::parameters::DIFFICULTY_LAG_V1;
+            return cryptonote::parameters::DIFFICULTY_LAG_V1;
         }
     }
 
@@ -151,19 +151,19 @@ namespace cryptonote
         }
         else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2)
         {
-            return CryptoNote::parameters::DIFFICULTY_CUT_V2;
+            return cryptonote::parameters::DIFFICULTY_CUT_V2;
         }
         else
         {
-            return CryptoNote::parameters::DIFFICULTY_CUT_V1;
+            return cryptonote::parameters::DIFFICULTY_CUT_V1;
         }
     }
 
     size_t Currency::difficultyBlocksCountByBlockVersion(uint8_t blockMajorVersion, uint32_t height) const
     {
-        if (height >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+        if (height >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
         {
-            return CryptoNote::parameters::DIFFICULTY_BLOCKS_COUNT_V3;
+            return cryptonote::parameters::DIFFICULTY_BLOCKS_COUNT_V3;
         }
 
         return difficultyWindowByBlockVersion(blockMajorVersion) + difficultyLagByBlockVersion(blockMajorVersion);
@@ -177,11 +177,11 @@ namespace cryptonote
         }
         else if (blockMajorVersion == BLOCK_MAJOR_VERSION_2)
         {
-            return CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
+            return cryptonote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V2;
         }
         else
         {
-            return CryptoNote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
+            return cryptonote::parameters::CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_V1;
         }
     }
 
@@ -440,7 +440,7 @@ namespace cryptonote
     bool Currency::parseAccountAddressString(const std::string &str, AccountPublicAddress &addr) const
     {
         uint64_t prefix;
-        if (!CryptoNote::parseAccountAddressString(prefix, addr, str))
+        if (!cryptonote::parseAccountAddressString(prefix, addr, str))
         {
             return false;
         }
@@ -524,19 +524,19 @@ namespace cryptonote
     uint64_t Currency::getNextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<uint64_t> cumulativeDifficulties) const
     {
         /* nextDifficultyV3 and above are defined in src/CryptoNoteCore/Difficulty.cpp */
-        if (blockIndex >= CryptoNote::parameters::LWMA_3_DIFFICULTY_BLOCK_INDEX)
+        if (blockIndex >= cryptonote::parameters::LWMA_3_DIFFICULTY_BLOCK_INDEX)
         {
             return nextDifficultyV6(timestamps, cumulativeDifficulties);
         }
-        else if (blockIndex >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V3)
+        else if (blockIndex >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V3)
         {
             return nextDifficultyV5(timestamps, cumulativeDifficulties);
         }
-        else if (blockIndex >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
+        else if (blockIndex >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX_V2)
         {
             return nextDifficultyV4(timestamps, cumulativeDifficulties);
         }
-        else if (blockIndex >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+        else if (blockIndex >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
         {
             return nextDifficultyV3(timestamps, cumulativeDifficulties);
         }
@@ -898,8 +898,8 @@ namespace cryptonote
 
     Transaction CurrencyBuilder::generateGenesisTransaction()
     {
-        CryptoNote::Transaction tx;
-        CryptoNote::AccountPublicAddress ac = boost::value_initialized<CryptoNote::AccountPublicAddress>();
+        cryptonote::Transaction tx;
+        cryptonote::AccountPublicAddress ac = boost::value_initialized<cryptonote::AccountPublicAddress>();
         m_currency.constructMinerTx(1, 0, 0, 0, 0, 0, ac, tx); // zero fee in genesis
         return tx;
     }
@@ -907,7 +907,7 @@ namespace cryptonote
     {
         assert(!targets.empty());
 
-        CryptoNote::Transaction tx;
+        cryptonote::Transaction tx;
         tx.inputs.clear();
         tx.outputs.clear();
         tx.extra.clear();

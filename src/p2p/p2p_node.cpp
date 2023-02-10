@@ -180,14 +180,14 @@ namespace cryptonote
     {
         StdOutputStream stream(os);
         BinaryOutputStreamSerializer a(stream);
-        CryptoNote::serialize(*this, a);
+        cryptonote::serialize(*this, a);
     }
 
     void P2pNode::load(std::istream &in)
     {
         StdInputStream stream(in);
         BinaryInputStreamSerializer a(stream);
-        CryptoNote::serialize(*this, a);
+        cryptonote::serialize(*this, a);
     }
 
     void P2pNode::acceptLoop()
@@ -456,15 +456,15 @@ namespace cryptonote
                 return false;
             }
 
-            if (response.node_data.version < CryptoNote::P2P_MINIMUM_VERSION)
+            if (response.node_data.version < cryptonote::P2P_MINIMUM_VERSION)
             {
                 logger(DEBUGGING) << *connection << "COMMAND_HANDSHAKE Failed, peer is wrong version: " << std::to_string(response.node_data.version);
                 return false;
             }
-            else if ((response.node_data.version - CryptoNote::P2P_CURRENT_VERSION) >= CryptoNote::P2P_UPGRADE_WINDOW)
+            else if ((response.node_data.version - cryptonote::P2P_CURRENT_VERSION) >= cryptonote::P2P_UPGRADE_WINDOW)
             {
                 logger(WARNING) << *connection << "COMMAND_HANDSHAKE Warning, your software may be out of date. Please visit: "
-                                << CryptoNote::LATEST_VERSION_URL << " for the latest version.";
+                                << cryptonote::LATEST_VERSION_URL << " for the latest version.";
             }
 
             return handleRemotePeerList(response.local_peerlist, response.node_data.local_time);
@@ -521,7 +521,7 @@ namespace cryptonote
     {
         basic_node_data nodeData;
         nodeData.network_id = m_cfg.getNetworkId();
-        nodeData.version = CryptoNote::P2P_CURRENT_VERSION;
+        nodeData.version = cryptonote::P2P_CURRENT_VERSION;
         nodeData.local_time = time(nullptr);
         nodeData.peer_id = m_myPeerId;
 
@@ -626,7 +626,7 @@ namespace cryptonote
             throw std::runtime_error(msg.str());
         }
 
-        if (node.version < CryptoNote::P2P_MINIMUM_VERSION)
+        if (node.version < cryptonote::P2P_MINIMUM_VERSION)
         {
             std::ostringstream msg;
             msg << context << "COMMAND_HANDSHAKE Failed, peer is wrong version! (" << std::to_string(node.version) << ")";

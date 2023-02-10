@@ -60,7 +60,7 @@ namespace cryptonote
 
             Common::StdOutputStream stream(dataFile);
             BinaryOutputStreamSerializer out(stream);
-            CryptoNote::serialize(const_cast<T &>(obj), out);
+            cryptonote::serialize(const_cast<T &>(obj), out);
 
             if (dataFile.fail())
             {

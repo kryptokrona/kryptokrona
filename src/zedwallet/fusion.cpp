@@ -17,7 +17,7 @@
 #include <zedwallet/tools.h>
 #include <config/wallet_config.h>
 
-size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
+size_t makeFusionTransaction(cryptonote::WalletGreen &wallet,
                              uint64_t threshold, uint64_t height)
 {
     uint64_t bestThreshold = threshold;
@@ -42,13 +42,13 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
     /* Can't optimize */
     if (optimizable == 0)
     {
-        return CryptoNote::WALLET_INVALID_TRANSACTION_ID;
+        return cryptonote::WALLET_INVALID_TRANSACTION_ID;
     }
 
     try
     {
         return wallet.createFusionTransaction(
-            bestThreshold, CryptoNote::getDefaultMixinByHeight(height), {},
+            bestThreshold, cryptonote::getDefaultMixinByHeight(height), {},
             wallet.getAddress(0));
     }
     catch (const std::runtime_error &e)
@@ -56,11 +56,11 @@ size_t makeFusionTransaction(CryptoNote::WalletGreen &wallet,
         std::cout << WarningMsg("Failed to send fusion transaction: ")
                   << WarningMsg(e.what()) << std::endl;
 
-        return CryptoNote::WALLET_INVALID_TRANSACTION_ID;
+        return cryptonote::WALLET_INVALID_TRANSACTION_ID;
     }
 }
 
-void fullOptimize(CryptoNote::WalletGreen &wallet, uint64_t height)
+void fullOptimize(cryptonote::WalletGreen &wallet, uint64_t height)
 {
     std::cout << "Attempting to optimize your wallet to allow you to "
               << "send large amounts at once. " << std::endl
@@ -88,7 +88,7 @@ void fullOptimize(CryptoNote::WalletGreen &wallet, uint64_t height)
     std::cout << SuccessMsg("Full optimization completed!") << std::endl;
 }
 
-bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold,
+bool optimize(cryptonote::WalletGreen &wallet, uint64_t threshold,
               uint64_t height)
 {
     std::vector<Crypto::Hash> fusionTransactionHashes;
@@ -101,13 +101,13 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold,
         const size_t tmpFusionTxID = makeFusionTransaction(
             wallet, threshold, height);
 
-        if (tmpFusionTxID == CryptoNote::WALLET_INVALID_TRANSACTION_ID)
+        if (tmpFusionTxID == cryptonote::WALLET_INVALID_TRANSACTION_ID)
         {
             break;
         }
         else
         {
-            const CryptoNote::WalletTransaction w = wallet.getTransaction(tmpFusionTxID);
+            const cryptonote::WalletTransaction w = wallet.getTransaction(tmpFusionTxID);
 
             fusionTransactionHashes.push_back(w.hash);
 
@@ -152,7 +152,7 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold,
 
     while (true)
     {
-        const std::vector<CryptoNote::WalletTransactionWithTransfers>
+        const std::vector<cryptonote::WalletTransactionWithTransfers>
             unconfirmedTransactions = wallet.getUnconfirmedTransactions();
 
         std::vector<Crypto::Hash> unconfirmedTxHashes;
@@ -224,8 +224,8 @@ bool optimize(CryptoNote::WalletGreen &wallet, uint64_t threshold,
     return true;
 }
 
-bool fusionTX(CryptoNote::WalletGreen &wallet,
-              CryptoNote::TransactionParameters p,
+bool fusionTX(cryptonote::WalletGreen &wallet,
+              cryptonote::TransactionParameters p,
               uint64_t height)
 {
     std::cout << WarningMsg("Your transaction is too large to be accepted by "

@@ -28,7 +28,7 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
         for (size_t i = walletInfo->knownTransactionCount;
              i < newTransactionCount; i++)
         {
-            const CryptoNote::WalletTransaction t = walletInfo->wallet.getTransaction(i);
+            const cryptonote::WalletTransaction t = walletInfo->wallet.getTransaction(i);
 
             /* Don't print outgoing or fusion transfers */
             if (t.totalAmount > 0 && t.fee != 0)
@@ -51,7 +51,7 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
     }
 }
 
-void syncWallet(CryptoNote::INode &node,
+void syncWallet(cryptonote::INode &node,
                 std::shared_ptr<WalletInfo> walletInfo)
 {
     uint32_t localHeight = node.getLastLocalBlockHeight();
@@ -180,7 +180,7 @@ void syncWallet(CryptoNote::INode &node,
             {
                 for (size_t i = transactionCount; i < tmpTransactionCount; i++)
                 {
-                    CryptoNote::WalletTransaction t = walletInfo->wallet.getTransaction(i);
+                    cryptonote::WalletTransaction t = walletInfo->wallet.getTransaction(i);
 
                     /* Don't print out fusion transactions */
                     if (t.totalAmount != 0)

@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 {
     Config config = parseArguments(argc, argv);
 
-    std::cout << CryptoNote::getProjectCLIHeader() << std::endl;
+    std::cout << cryptonote::getProjectCLIHeader() << std::endl;
 
     std::thread apiThread;
 

@@ -74,7 +74,7 @@ namespace cryptonote
     } // namespace error
 } // namespace cryptonote
 
-inline std::error_code make_error_code(CryptoNote::error::BlockchainExplorerErrorCodes e)
+inline std::error_code make_error_code(cryptonote::error::BlockchainExplorerErrorCodes e)
 {
-    return std::error_code(static_cast<int>(e), CryptoNote::error::BlockchainExplorerErrorCategory::INSTANCE);
+    return std::error_code(static_cast<int>(e), cryptonote::error::BlockchainExplorerErrorCategory::INSTANCE);
 }

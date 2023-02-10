@@ -788,7 +788,7 @@ namespace cryptonote
     }
 
     WalletTypes::RawCoinbaseTransaction Core::getRawCoinbaseTransaction(
-        const CryptoNote::Transaction &t)
+        const cryptonote::Transaction &t)
     {
         WalletTypes::RawCoinbaseTransaction transaction;
 
@@ -804,7 +804,7 @@ namespace cryptonote
             WalletTypes::KeyOutput keyOutput;
 
             keyOutput.amount = output.amount;
-            keyOutput.key = boost::get<CryptoNote::KeyOutput>(output.target).key;
+            keyOutput.key = boost::get<cryptonote::KeyOutput>(output.target).key;
 
             transaction.keyOutputs.push_back(keyOutput);
         }
@@ -840,7 +840,7 @@ namespace cryptonote
             WalletTypes::KeyOutput keyOutput;
 
             keyOutput.amount = output.amount;
-            keyOutput.key = boost::get<CryptoNote::KeyOutput>(output.target).key;
+            keyOutput.key = boost::get<cryptonote::KeyOutput>(output.target).key;
 
             transaction.keyOutputs.push_back(keyOutput);
         }
@@ -848,7 +848,7 @@ namespace cryptonote
         /* Simplify the inputs */
         for (const auto &input : t.inputs)
         {
-            transaction.keyInputs.push_back(boost::get<CryptoNote::KeyInput>(input));
+            transaction.keyInputs.push_back(boost::get<cryptonote::KeyInput>(input));
         }
 
         return transaction;
@@ -1135,9 +1135,9 @@ namespace cryptonote
         // that may be using older mixin rules on the network. This helps to clear out the transaction
         // pool during a network soft fork that requires a mixin lower or upper bound change
         uint32_t mixinChangeWindow = blockIndex;
-        if (mixinChangeWindow > CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
+        if (mixinChangeWindow > cryptonote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW)
         {
-            mixinChangeWindow = mixinChangeWindow - CryptoNote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
+            mixinChangeWindow = mixinChangeWindow - cryptonote::parameters::CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW;
         }
 
         auto [success, error] = Mixins::validate(transactions, blockIndex);
@@ -1614,7 +1614,7 @@ namespace cryptonote
             return false;
         }
 
-        if (cachedTransaction.getTransaction().extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_POOL)
+        if (cachedTransaction.getTransaction().extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_POOL)
         {
             logger(Logging::TRACE) << "Not adding transaction "
                                    << cachedTransaction.getTransactionHash()
@@ -1660,7 +1660,7 @@ namespace cryptonote
         return transactionPool->getTransactionHashes();
     }
 
-    std::tuple<bool, CryptoNote::BinaryArray> Core::getPoolTransaction(const Crypto::Hash &transactionHash) const
+    std::tuple<bool, cryptonote::BinaryArray> Core::getPoolTransaction(const Crypto::Hash &transactionHash) const
     {
         if (transactionPool->checkIfTransactionPresent(transactionHash))
         {
@@ -1780,13 +1780,13 @@ namespace cryptonote
         /* How many blocks we look in the past to calculate the median timestamp */
         uint64_t blockchain_timestamp_check_window;
 
-        if (height >= CryptoNote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+        if (height >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
         {
-            blockchain_timestamp_check_window = CryptoNote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3;
+            blockchain_timestamp_check_window = cryptonote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3;
         }
         else
         {
-            blockchain_timestamp_check_window = CryptoNote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW;
+            blockchain_timestamp_check_window = cryptonote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW;
         }
 
         /* Skip the first N blocks, we don't have enough blocks to calculate a
@@ -2158,7 +2158,7 @@ namespace cryptonote
         throw std::runtime_error("Genesis block hash was not found.");
     }
 
-    std::vector<Crypto::Hash> CryptoNote::Core::getBlockHashes(uint32_t startBlockIndex, uint32_t maxCount) const
+    std::vector<Crypto::Hash> cryptonote::Core::getBlockHashes(uint32_t startBlockIndex, uint32_t maxCount) const
     {
         return chainsLeaves[0]->getBlockHashes(startBlockIndex, maxCount);
     }
@@ -2257,7 +2257,7 @@ namespace cryptonote
         return error::BlockValidationError::VALIDATION_SUCCESS;
     }
 
-    uint64_t CryptoNote::Core::getAdjustedTime() const
+    uint64_t cryptonote::Core::getAdjustedTime() const
     {
         return time(NULL);
     }
@@ -2708,7 +2708,7 @@ namespace cryptonote
     {
         const auto &transaction = cachedTransaction.getTransaction();
 
-        if (transaction.extra.size() >= CryptoNote::parameters::MAX_EXTRA_SIZE_BLOCK)
+        if (transaction.extra.size() >= cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
         {
             logger(Logging::TRACE) << "Not adding transaction "
                                    << cachedTransaction.getTransactionHash()
@@ -2766,7 +2766,7 @@ namespace cryptonote
                 logger(Logging::DEBUGGING) << "Transaction age is "
                                            << transactionAge;
 
-                if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+                if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                 {
                     logger(Logging::INFO) << "Removing.. ";
                     transactionPool->removeTransaction(transaction.getTransactionHash());
@@ -2800,7 +2800,7 @@ namespace cryptonote
                 logger(Logging::INFO) << "Transaction age is "
                                       << transactionAge;
 
-                if (transactionAge >= CryptoNote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+                if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                 {
                     logger(Logging::INFO) << "Removing.. ";
 

@@ -12,12 +12,12 @@
 namespace PaymentService
 {
 
-    class NodeRpcStub : public CryptoNote::INode
+    class NodeRpcStub : public cryptonote::INode
     {
     public:
         virtual ~NodeRpcStub() {}
-        virtual bool addObserver(CryptoNote::INodeObserver *observer) override { return true; }
-        virtual bool removeObserver(CryptoNote::INodeObserver *observer) override { return true; }
+        virtual bool addObserver(cryptonote::INodeObserver *observer) override { return true; }
+        virtual bool removeObserver(cryptonote::INodeObserver *observer) override { return true; }
 
         virtual void init(const Callback &callback) override {}
         virtual bool shutdown() override { return true; }
@@ -41,11 +41,11 @@ namespace PaymentService
             callback(std::error_code());
         }
 
-        virtual CryptoNote::BlockHeaderInfo getLastLocalBlockHeaderInfo() const override { return CryptoNote::BlockHeaderInfo(); }
+        virtual cryptonote::BlockHeaderInfo getLastLocalBlockHeaderInfo() const override { return cryptonote::BlockHeaderInfo(); }
 
-        virtual void relayTransaction(const CryptoNote::Transaction &transaction, const Callback &callback) override { callback(std::error_code()); }
+        virtual void relayTransaction(const cryptonote::Transaction &transaction, const Callback &callback) override { callback(std::error_code()); }
         virtual void getRandomOutsByAmounts(std::vector<uint64_t> &&amounts, uint16_t outsCount,
-                                            std::vector<CryptoNote::RandomOuts> &result, const Callback &callback) override
+                                            std::vector<cryptonote::RandomOuts> &result, const Callback &callback) override
         {
         }
 
@@ -70,7 +70,7 @@ namespace PaymentService
             callback(std::error_code());
         };
 
-        virtual void queryBlocks(std::vector<Crypto::Hash> &&knownBlockIds, uint64_t timestamp, std::vector<CryptoNote::BlockShortEntry> &newBlocks,
+        virtual void queryBlocks(std::vector<Crypto::Hash> &&knownBlockIds, uint64_t timestamp, std::vector<cryptonote::BlockShortEntry> &newBlocks,
                                  uint32_t &startHeight, const Callback &callback) override
         {
             startHeight = 0;
@@ -84,22 +84,22 @@ namespace PaymentService
         };
 
         virtual void getPoolSymmetricDifference(std::vector<Crypto::Hash> &&knownPoolTxIds, Crypto::Hash knownBlockId, bool &isBcActual,
-                                                std::vector<std::unique_ptr<CryptoNote::ITransactionReader>> &newTxs, std::vector<Crypto::Hash> &deletedTxIds, const Callback &callback) override
+                                                std::vector<std::unique_ptr<cryptonote::ITransactionReader>> &newTxs, std::vector<Crypto::Hash> &deletedTxIds, const Callback &callback) override
         {
             isBcActual = true;
             callback(std::error_code());
         }
 
-        virtual void getBlocks(const std::vector<uint32_t> &blockHeights, std::vector<std::vector<CryptoNote::BlockDetails>> &blocks,
+        virtual void getBlocks(const std::vector<uint32_t> &blockHeights, std::vector<std::vector<cryptonote::BlockDetails>> &blocks,
                                const Callback &callback) override {}
 
-        virtual void getBlocks(const std::vector<Crypto::Hash> &blockHashes, std::vector<CryptoNote::BlockDetails> &blocks,
+        virtual void getBlocks(const std::vector<Crypto::Hash> &blockHashes, std::vector<cryptonote::BlockDetails> &blocks,
                                const Callback &callback) override {}
 
-        virtual void getBlock(const uint32_t blockHeight, CryptoNote::BlockDetails &block,
+        virtual void getBlock(const uint32_t blockHeight, cryptonote::BlockDetails &block,
                               const Callback &callback) override {}
 
-        virtual void getTransactions(const std::vector<Crypto::Hash> &transactionHashes, std::vector<CryptoNote::TransactionDetails> &transactions,
+        virtual void getTransactions(const std::vector<Crypto::Hash> &transactionHashes, std::vector<cryptonote::TransactionDetails> &transactions,
                                      const Callback &callback) override {}
 
         virtual void isSynchronized(bool &syncStatus, const Callback &callback) override {}
@@ -143,9 +143,9 @@ namespace PaymentService
     {
     }
 
-    CryptoNote::INode *NodeFactory::createNode(const std::string &daemonAddress, uint16_t daemonPort, uint16_t initTimeout, std::shared_ptr<Logging::ILogger> logger)
+    cryptonote::INode *NodeFactory::createNode(const std::string &daemonAddress, uint16_t daemonPort, uint16_t initTimeout, std::shared_ptr<Logging::ILogger> logger)
     {
-        std::unique_ptr<CryptoNote::INode> node(new CryptoNote::NodeRpcProxy(daemonAddress, daemonPort, initTimeout, logger));
+        std::unique_ptr<cryptonote::INode> node(new cryptonote::NodeRpcProxy(daemonAddress, daemonPort, initTimeout, logger));
 
         NodeInitObserver initObserver;
         node->init(std::bind(&NodeInitObserver::initCompleted, &initObserver, std::placeholders::_1));
@@ -154,7 +154,7 @@ namespace PaymentService
         return node.release();
     }
 
-    CryptoNote::INode *NodeFactory::createNodeStub()
+    cryptonote::INode *NodeFactory::createNodeStub()
     {
         return new NodeRpcStub();
     }
