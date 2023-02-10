@@ -20,7 +20,7 @@
 #include <ostream>
 #include "ioutput_stream.h"
 
-namespace Common
+namespace common
 {
 
     class StdOutputStream : public IOutputStream

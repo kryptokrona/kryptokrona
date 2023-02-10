@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <vector>
 
-namespace Common
+namespace common
 {
 
     template <class T>

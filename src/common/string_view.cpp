@@ -18,7 +18,7 @@
 #include "string_view.h"
 #include <limits>
 
-namespace Common
+namespace common
 {
 
     const StringView::Size StringView::INVALID = std::numeric_limits<StringView::Size>::max();

@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace Common
+namespace common
 {
 
     std::string asString(const void *data, uint64_t size);  // Does not throw

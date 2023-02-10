@@ -19,7 +19,7 @@
 #include <fstream>
 #include <iomanip>
 
-namespace Common
+namespace common
 {
 
     namespace

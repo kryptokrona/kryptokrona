@@ -27,7 +27,7 @@
 
 #include "common/scope_exit.h"
 
-namespace Common
+namespace common
 {
 
     template <class T>

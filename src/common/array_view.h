@@ -22,7 +22,7 @@
 #include <cstdint>
 #include <limits>
 
-namespace Common
+namespace common
 {
 
     // 'ArrayView' is a pair of pointer to constant object of parametrized type and size.

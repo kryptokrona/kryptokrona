@@ -17,7 +17,7 @@
 
 #include "vector_output_stream.h"
 
-namespace Common
+namespace common
 {
 
     VectorOutputStream::VectorOutputStream(std::vector<uint8_t> &out) : out(out)

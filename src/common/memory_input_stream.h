@@ -19,7 +19,7 @@
 
 #include "iinput_stream.h"
 
-namespace Common
+namespace common
 {
 
     class MemoryInputStream : public IInputStream

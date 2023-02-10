@@ -20,7 +20,7 @@
 #include <string>
 #include "iinput_stream.h"
 
-namespace Common
+namespace common
 {
 
     class StringInputStream : public IInputStream

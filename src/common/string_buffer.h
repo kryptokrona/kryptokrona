@@ -21,7 +21,7 @@
 #include <limits>
 #include <string.h>
 
-namespace Common
+namespace common
 {
 
     // 'StringBuffer' is a string of fixed maximum size.

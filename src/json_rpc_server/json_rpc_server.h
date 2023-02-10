@@ -20,7 +20,7 @@ namespace cryptonote
     class HttpRequest;
 }
 
-namespace Common
+namespace common
 {
     class JsonValue;
 }

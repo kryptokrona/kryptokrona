@@ -19,7 +19,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace Common
+namespace common
 {
 
     JsonValue::JsonValue() : type(NIL)

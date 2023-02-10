@@ -27,7 +27,7 @@
 #include "kv_binary_output_stream_serializer.h"
 #include <zedwallet/types.h>
 
-namespace Common
+namespace common
 {
 
     template <typename T>

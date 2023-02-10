@@ -20,7 +20,7 @@
 #include <string>
 #include "ioutput_stream.h"
 
-namespace Common
+namespace common
 {
 
     class StringOutputStream : public IOutputStream

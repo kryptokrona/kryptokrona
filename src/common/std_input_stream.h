@@ -20,7 +20,7 @@
 #include <istream>
 #include "iinput_stream.h"
 
-namespace Common
+namespace common
 {
 
     class StdInputStream : public IInputStream

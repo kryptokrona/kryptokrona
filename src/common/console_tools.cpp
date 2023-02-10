@@ -30,7 +30,7 @@
 #include <unistd.h>
 #endif
 
-namespace Common
+namespace common
 {
     namespace Console
     {

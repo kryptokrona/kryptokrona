@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <cstddef>
 
-namespace Common
+namespace common
 {
 
     class IInputStream

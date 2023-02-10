@@ -20,7 +20,7 @@
 #include "array_view.h"
 #include <limits>
 
-namespace Common
+namespace common
 {
 
     // 'ArrayRef' is a pair of pointer to object of parametrized type and size.

@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-namespace Common
+namespace common
 {
 
     class JsonValue

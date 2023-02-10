@@ -20,7 +20,7 @@
 #include <cassert>
 #include <string>
 
-namespace Common
+namespace common
 {
 
     // 'StringView' is a pair of pointer to constant char and size.

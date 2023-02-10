@@ -20,7 +20,7 @@
 #include "iinput_stream.h"
 #include "ioutput_stream.h"
 
-namespace Common
+namespace common
 {
 
     void read(IInputStream &in, void *data, uint64_t size)

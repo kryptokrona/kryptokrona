@@ -31,7 +31,7 @@
 #include <sys/select.h>
 #endif
 
-namespace Common
+namespace common
 {
 
     class AsyncConsoleReader

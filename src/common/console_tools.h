@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-namespace Common
+namespace common
 {
     namespace Console
     {

@@ -20,7 +20,7 @@
 #include <cassert>
 #include <cstring> // memcpy
 
-namespace Common
+namespace common
 {
 
     MemoryInputStream::MemoryInputStream(const void *buffer, uint64_t bufferSize) : buffer(static_cast<const char *>(buffer)), bufferSize(bufferSize), position(0) {}

@@ -19,7 +19,7 @@
 
 #include <string>
 
-namespace Common
+namespace common
 {
 
     std::string NativePathToGeneric(const std::string &nativePath);
