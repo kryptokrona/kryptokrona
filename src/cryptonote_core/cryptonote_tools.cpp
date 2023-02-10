@@ -25,9 +25,9 @@ bool cryptonote::toBinaryArray(const BinaryArray &object, BinaryArray &binaryArr
 {
     try
     {
-        Common::VectorOutputStream stream(binaryArray);
+        common::VectorOutputStream stream(binaryArray);
         BinaryOutputStreamSerializer serializer(stream);
-        std::string oldBlob = Common::asString(object);
+        std::string oldBlob = common::asString(object);
         serializer(oldBlob, "");
     }
     catch (std::exception &)

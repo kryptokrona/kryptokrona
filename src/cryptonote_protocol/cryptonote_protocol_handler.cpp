@@ -262,7 +262,7 @@ namespace cryptonote
            << std::setw(20) << "Lifetime(seconds)" << ENDL;
 
         m_p2p->for_each_connection([&](const CryptoNoteConnectionContext &cntxt, uint64_t peer_id)
-                                   { ss << std::setw(25) << std::left << std::string(cntxt.m_is_income ? "[INCOMING]" : "[OUTGOING]") + Common::ipAddressToString(cntxt.m_remote_ip) + ":" + std::to_string(cntxt.m_remote_port)
+                                   { ss << std::setw(25) << std::left << std::string(cntxt.m_is_income ? "[INCOMING]" : "[OUTGOING]") + common::ipAddressToString(cntxt.m_remote_ip) + ":" + std::to_string(cntxt.m_remote_port)
                                         << std::setw(20) << std::hex << peer_id
                                         // << std::setw(25) << std::to_string(cntxt.m_recv_cnt) + "(" + std::to_string(time(NULL) - cntxt.m_last_recv) + ")" + "/" + std::to_string(cntxt.m_send_cnt) + "(" + std::to_string(time(NULL) - cntxt.m_last_send) + ")"
                                         << std::setw(25) << get_protocol_state_string(cntxt.m_state)
@@ -583,7 +583,7 @@ namespace cryptonote
             auto req_it = context.m_requested_objects.find(cachedBlocks.back().getBlockHash());
             if (req_it == context.m_requested_objects.end())
             {
-                logger(Logging::ERROR) << context << "sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id=" << Common::podToHex(cachedBlocks.back().getBlockHash())
+                logger(Logging::ERROR) << context << "sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id=" << common::podToHex(cachedBlocks.back().getBlockHash())
                                        << " wasn't requested, dropping connection";
                 context.m_state = CryptoNoteConnectionContext::state_shutdown;
                 return 1;
@@ -592,7 +592,7 @@ namespace cryptonote
             if (cachedBlocks.back().getBlock().transactionHashes.size() != rawBlocks[index].transactions.size())
             {
                 logger(Logging::ERROR) << context
-                                       << "sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id=" << Common::podToHex(cachedBlocks.back().getBlockHash())
+                                       << "sent wrong NOTIFY_RESPONSE_GET_OBJECTS: block with id=" << common::podToHex(cachedBlocks.back().getBlockHash())
                                        << ", transactionHashes.size()=" << cachedBlocks.back().getBlock().transactionHashes.size()
                                        << " mismatch with block_complete_entry.m_txs.size()=" << rawBlocks[index].transactions.size()
                                        << ", dropping connection";
@@ -931,7 +931,7 @@ namespace cryptonote
         {
             logger(Logging::ERROR)
                 << context << "sent m_block_ids starting from unknown id: "
-                << Common::podToHex(arg.m_block_ids.front())
+                << common::podToHex(arg.m_block_ids.front())
                 << " , dropping connection";
             context.m_state = CryptoNoteConnectionContext::state_shutdown;
             return 1;

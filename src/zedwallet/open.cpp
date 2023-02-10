@@ -357,7 +357,7 @@ Crypto::SecretKey getPrivateKey(std::string msg)
 
             continue;
         }
-        else if (!Common::fromHex(privateKeyString, &privateKeyHash,
+        else if (!common::fromHex(privateKeyString, &privateKeyHash,
                                   sizeof(privateKeyHash), size) ||
                  size != sizeof(privateKeyHash))
         {

@@ -107,7 +107,7 @@ namespace cryptonote
         s(transactionHash, "transaction_hash");
     }
 
-    bool serialize(PackedOutIndex &value, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(PackedOutIndex &value, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializer(value.packedValue, name);
     }
@@ -891,7 +891,7 @@ namespace cryptonote
     void BlockchainCache::save()
     {
         std::ofstream file(filename.c_str());
-        Common::StdOutputStream stream(file);
+        common::StdOutputStream stream(file);
         cryptonote::BinaryOutputStreamSerializer s(stream);
 
         serialize(s);
@@ -900,7 +900,7 @@ namespace cryptonote
     void BlockchainCache::load()
     {
         std::ifstream file(filename.c_str());
-        Common::StdInputStream stream(file);
+        common::StdInputStream stream(file);
         cryptonote::BinaryInputStreamSerializer s(stream);
 
         serialize(s);
@@ -924,7 +924,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult BlockchainCache::extractKeyOutputKeys(uint64_t amount,
-                                                                  Common::ArrayView<uint32_t> globalIndexes,
+                                                                  common::ArrayView<uint32_t> globalIndexes,
                                                                   std::vector<Crypto::PublicKey> &publicKeys) const
     {
         return extractKeyOutputKeys(amount, getTopBlockIndex(), globalIndexes, publicKeys);
@@ -996,7 +996,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult BlockchainCache::extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex,
-                                                                  Common::ArrayView<uint32_t> globalIndexes,
+                                                                  common::ArrayView<uint32_t> globalIndexes,
                                                                   std::vector<Crypto::PublicKey> &publicKeys) const
     {
         assert(!globalIndexes.isEmpty());
@@ -1015,7 +1015,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult
-    BlockchainCache::extractKeyOtputReferences(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes,
+    BlockchainCache::extractKeyOtputReferences(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
                                                std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const
     {
         assert(!globalIndexes.isEmpty());
@@ -1030,7 +1030,7 @@ namespace cryptonote
 
     // TODO: start from index
     ExtractOutputKeysResult BlockchainCache::extractKeyOutputs(
-        uint64_t amount, uint32_t blockIndex, Common::ArrayView<uint32_t> globalIndexes,
+        uint64_t amount, uint32_t blockIndex, common::ArrayView<uint32_t> globalIndexes,
         std::function<ExtractOutputKeysResult(const CachedTransactionInfo &info, PackedOutIndex index, uint32_t globalIndex)> pred) const
     {
         assert(!globalIndexes.isEmpty());
@@ -1149,7 +1149,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult BlockchainCache::extractKeyOtputIndexes(uint64_t amount,
-                                                                    Common::ArrayView<uint32_t> globalIndexes,
+                                                                    common::ArrayView<uint32_t> globalIndexes,
                                                                     std::vector<PackedOutIndex> &outIndexes) const
     {
         assert(!globalIndexes.isEmpty());

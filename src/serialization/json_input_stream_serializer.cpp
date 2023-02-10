@@ -26,9 +26,9 @@ namespace cryptonote
     namespace
     {
 
-        Common::JsonValue getJsonValueFromStreamHelper(std::istream &stream)
+        common::JsonValue getJsonValueFromStreamHelper(std::istream &stream)
         {
-            Common::JsonValue value;
+            common::JsonValue value;
             stream >> value;
             return value;
         }

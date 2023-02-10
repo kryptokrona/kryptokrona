@@ -20,7 +20,7 @@
 
 namespace cryptonote
 {
-    inline bool serialize(boost::uuids::uuid &v, Common::StringView name, ISerializer &s)
+    inline bool serialize(boost::uuids::uuid &v, common::StringView name, ISerializer &s)
     {
         return s.binary(&v, sizeof(v), name);
     }

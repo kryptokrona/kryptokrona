@@ -109,14 +109,14 @@ namespace cryptonote
         virtual bool isTransactionSpendTimeUnlocked(uint64_t unlockTime) const = 0;
         virtual bool isTransactionSpendTimeUnlocked(uint64_t unlockTime, uint32_t blockIndex) const = 0;
 
-        virtual ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const = 0;
-        virtual ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex, Common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const = 0;
+        virtual ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const = 0;
+        virtual ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex, common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const = 0;
 
-        virtual ExtractOutputKeysResult extractKeyOtputIndexes(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes, std::vector<PackedOutIndex> &outIndexes) const = 0;
-        virtual ExtractOutputKeysResult extractKeyOtputReferences(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes, std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const = 0;
+        virtual ExtractOutputKeysResult extractKeyOtputIndexes(uint64_t amount, common::ArrayView<uint32_t> globalIndexes, std::vector<PackedOutIndex> &outIndexes) const = 0;
+        virtual ExtractOutputKeysResult extractKeyOtputReferences(uint64_t amount, common::ArrayView<uint32_t> globalIndexes, std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const = 0;
         // TODO: get rid of pred in this method. return vector of KeyOutputInfo structures
         virtual ExtractOutputKeysResult extractKeyOutputs(
-            uint64_t amount, uint32_t blockIndex, Common::ArrayView<uint32_t> globalIndexes,
+            uint64_t amount, uint32_t blockIndex, common::ArrayView<uint32_t> globalIndexes,
             std::function<ExtractOutputKeysResult(const CachedTransactionInfo &info, PackedOutIndex index, uint32_t globalIndex)> pred) const = 0;
 
         virtual uint32_t getTopBlockIndex() const = 0;

@@ -185,7 +185,7 @@ namespace cryptonote
             int64_t emissionChange = 0;
             auto alreadyGeneratedCoins = segment.getAlreadyGeneratedCoins(previousBlockIndex);
             auto lastBlocksSizes = segment.getLastBlocksSizes(currency.rewardBlocksWindow(), previousBlockIndex, addGenesisBlock);
-            auto blocksSizeMedian = Common::medianValue(lastBlocksSizes);
+            auto blocksSizeMedian = common::medianValue(lastBlocksSizes);
             if (!currency.getBlockReward(cachedBlock.getBlock().majorVersion, blocksSizeMedian,
                                          cumulativeSize, alreadyGeneratedCoins, cumulativeFee, reward, emissionChange))
             {
@@ -941,7 +941,7 @@ namespace cryptonote
                     std::copy(dataBegin, dataEnd, std::begin(paymentIDHash.data));
 
                     /* Convert to a string */
-                    std::string paymentID = Common::podToHex(paymentIDHash);
+                    std::string paymentID = common::podToHex(paymentIDHash);
 
                     /* Convert it to lower case */
                     std::transform(paymentID.begin(), paymentID.end(),
@@ -1173,7 +1173,7 @@ namespace cryptonote
         int64_t emissionChange = 0;
         auto alreadyGeneratedCoins = cache->getAlreadyGeneratedCoins(previousBlockIndex);
         auto lastBlocksSizes = cache->getLastBlocksSizes(currency.rewardBlocksWindow(), previousBlockIndex, addGenesisBlock);
-        auto blocksSizeMedian = Common::medianValue(lastBlocksSizes);
+        auto blocksSizeMedian = common::medianValue(lastBlocksSizes);
 
         if (!currency.getBlockReward(cachedBlock.getBlock().majorVersion, blocksSizeMedian,
                                      cumulativeBlockSize, alreadyGeneratedCoins, cumulativeFee, reward, emissionChange))
@@ -1432,7 +1432,7 @@ namespace cryptonote
         {
             if (!transactionPool->checkIfTransactionPresent(transactionHash))
             {
-                logger(Logging::WARNING) << "The transaction " << Common::podToHex(transactionHash)
+                logger(Logging::WARNING) << "The transaction " << common::podToHex(transactionHash)
                                          << " is absent in transaction pool";
                 return error::BlockValidationError::TRANSACTION_ABSENT_IN_POOL;
             }
@@ -1801,7 +1801,7 @@ namespace cryptonote
                 timestamps.push_back(getBlockTimestampByIndex(offset));
             }
 
-            uint64_t medianTimestamp = Common::medianValue(timestamps);
+            uint64_t medianTimestamp = common::medianValue(timestamps);
 
             if (b.timestamp < medianTimestamp)
             {
@@ -2200,7 +2200,7 @@ namespace cryptonote
         auto timestamps = cache->getLastTimestamps(currency.timestampCheckWindow(previousBlockIndex + 1), previousBlockIndex, addGenesisBlock);
         if (timestamps.size() >= currency.timestampCheckWindow(previousBlockIndex + 1))
         {
-            auto median_ts = Common::medianValue(timestamps);
+            auto median_ts = common::medianValue(timestamps);
             if (block.timestamp < median_ts)
             {
                 return error::BlockValidationError::TIMESTAMP_TOO_FAR_IN_PAST;
@@ -2691,7 +2691,7 @@ namespace cryptonote
         assert(!chainsLeaves.empty());
         // FIXME: skip gensis here?
         auto sizes = chainsLeaves[0]->getLastBlocksSizes(currency.rewardBlocksWindow());
-        uint64_t median = Common::medianValue(sizes);
+        uint64_t median = common::medianValue(sizes);
         if (median <= nextBlockGrantedFullRewardZone)
         {
             median = nextBlockGrantedFullRewardZone;
@@ -3005,7 +3005,7 @@ namespace cryptonote
         if (blockDetails.index > 0)
         {
             auto lastBlocksSizes = segment->getLastBlocksSizes(currency.rewardBlocksWindow(), blockDetails.index - 1, addGenesisBlock);
-            blockDetails.sizeMedian = Common::medianValue(lastBlocksSizes);
+            blockDetails.sizeMedian = common::medianValue(lastBlocksSizes);
             prevBlockGeneratedCoins = segment->getAlreadyGeneratedCoins(blockDetails.index - 1);
         }
 
@@ -3327,7 +3327,7 @@ namespace cryptonote
 
         auto lastBlockSizes = mainChain->getLastBlocksSizes(currency.rewardBlocksWindow());
 
-        blockMedianSize = std::max(Common::medianValue(lastBlockSizes), static_cast<uint64_t>(nextBlockGrantedFullRewardZone));
+        blockMedianSize = std::max(common::medianValue(lastBlockSizes), static_cast<uint64_t>(nextBlockGrantedFullRewardZone));
     }
 
     uint64_t Core::get_current_blockchain_height() const

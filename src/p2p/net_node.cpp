@@ -121,7 +121,7 @@ namespace cryptonote
             ss << std::setfill('0') << std::setw(8) << std::hex << std::noshowbase;
             for (const auto &pe : pl)
             {
-                ss << pe.id << "\t" << pe.adr << " \tlast_seen: " << Common::timeIntervalToString(now_time - pe.last_seen) << std::endl;
+                ss << pe.id << "\t" << pe.adr << " \tlast_seen: " << common::timeIntervalToString(now_time - pe.last_seen) << std::endl;
             }
             return ss.str();
         }
@@ -402,7 +402,7 @@ namespace cryptonote
 
         try
         {
-            uint32_t port = Common::fromString<uint32_t>(addr.substr(pos + 1));
+            uint32_t port = common::fromString<uint32_t>(addr.substr(pos + 1));
 
             syst::Ipv4Resolver resolver(m_dispatcher);
             auto addr = resolver.resolve(host);
@@ -472,7 +472,7 @@ namespace cryptonote
 
         // try to bind
         logger(INFO) << "Binding on " << m_bind_ip << ":" << m_port;
-        m_listeningPort = Common::fromString<uint16_t>(m_port);
+        m_listeningPort = common::fromString<uint16_t>(m_port);
 
         m_listener = syst::TcpListener(m_dispatcher, syst::Ipv4Address(m_bind_ip), static_cast<uint16_t>(m_listeningPort));
 
@@ -735,7 +735,7 @@ namespace cryptonote
     {
 
         logger(DEBUGGING) << "Connecting to " << na << " (white=" << white << ", last_seen: "
-                          << (last_seen_stamp ? Common::timeIntervalToString(time(NULL) - last_seen_stamp) : "never") << ")...";
+                          << (last_seen_stamp ? common::timeIntervalToString(time(NULL) - last_seen_stamp) : "never") << ")...";
 
         try
         {
@@ -746,7 +746,7 @@ namespace cryptonote
                 syst::Context<syst::TcpConnection> connectionContext(m_dispatcher, [&]
                                                                          {
           syst::TcpConnector connector(m_dispatcher);
-          return connector.connect(syst::Ipv4Address(Common::ipAddressToString(na.ip)), static_cast<uint16_t>(na.port)); });
+          return connector.connect(syst::Ipv4Address(common::ipAddressToString(na.ip)), static_cast<uint16_t>(na.port)); });
 
                 syst::Context<> timeoutContext(m_dispatcher, [&]
                                                  {
@@ -875,7 +875,7 @@ namespace cryptonote
                 continue;
 
             logger(DEBUGGING) << "Selected peer: " << pe.id << " " << pe.adr << " [white=" << use_white_list
-                              << "] last_seen: " << (pe.last_seen ? Common::timeIntervalToString(time(NULL) - pe.last_seen) : "never");
+                              << "] last_seen: " << (pe.last_seen ? common::timeIntervalToString(time(NULL) - pe.last_seen) : "never");
 
             if (!try_to_connect_and_handshake_with_new_peer(pe.adr, false, pe.last_seen, use_white_list))
                 continue;
@@ -1068,7 +1068,7 @@ namespace cryptonote
         }
 
         Crypto::PublicKey pk;
-        Common::podFromHex(cryptonote::P2P_STAT_TRUSTED_PUB_KEY, pk);
+        common::podFromHex(cryptonote::P2P_STAT_TRUSTED_PUB_KEY, pk);
         Crypto::Hash h = get_proof_of_trust_hash(tr);
         if (!Crypto::check_signature(h, pk, tr.sign))
         {
@@ -1173,7 +1173,7 @@ namespace cryptonote
             return false;
         }
 
-        auto ip = Common::ipAddressToString(actual_ip);
+        auto ip = common::ipAddressToString(actual_ip);
         auto port = node_data.my_port;
         auto peerId = node_data.peer_id;
 
@@ -1291,7 +1291,7 @@ namespace cryptonote
                 pe.id = peer_id_l;
                 m_peerlist.append_with_peer_white(pe);
 
-                logger(Logging::TRACE) << context << "BACK PING SUCCESS, " << Common::ipAddressToString(context.m_remote_ip) << ":" << port_l << " added to whitelist";
+                logger(Logging::TRACE) << context << "BACK PING SUCCESS, " << common::ipAddressToString(context.m_remote_ip) << ":" << port_l << " added to whitelist";
             }
         }
 
@@ -1339,7 +1339,7 @@ namespace cryptonote
 
         for (const auto &cntxt : m_connections)
         {
-            ss << Common::ipAddressToString(cntxt.second.m_remote_ip) << ":" << cntxt.second.m_remote_port
+            ss << common::ipAddressToString(cntxt.second.m_remote_ip) << ":" << cntxt.second.m_remote_port
                << " \t\tpeer_id " << cntxt.second.peerId
                << " \t\tconn_id " << cntxt.second.m_connection_id << (cntxt.second.m_is_income ? " INCOMING" : " OUTGOING")
                << std::endl;

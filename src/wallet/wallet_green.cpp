@@ -357,7 +357,7 @@ namespace cryptonote
 
         throwIfStopped();
 
-        ContainerStorage newStorage(path, Common::FileMappedVectorOpenMode::CREATE, sizeof(ContainerStoragePrefix));
+        ContainerStorage newStorage(path, common::FileMappedVectorOpenMode::CREATE, sizeof(ContainerStoragePrefix));
         ContainerStoragePrefix *prefix = reinterpret_cast<ContainerStoragePrefix *>(newStorage.prefix());
         prefix->version = static_cast<uint8_t>(WalletSerializerV2::SERIALIZATION_VERSION);
         prefix->nextIv = Crypto::randomChachaIV();
@@ -654,7 +654,7 @@ namespace cryptonote
             extra,
             m_transactionSoftLockTime);
 
-        Common::MemoryInputStream containerStream(contanerData.data(), contanerData.size());
+        common::MemoryInputStream containerStream(contanerData.data(), contanerData.size());
         s.load(containerStream, reinterpret_cast<const ContainerStoragePrefix *>(m_containerStorage.prefix())->version);
         addedKeys = std::move(s.addedKeys());
         deletedKeys = std::move(s.deletedKeys());
@@ -689,7 +689,7 @@ namespace cryptonote
         }
 
         std::string containerData;
-        Common::StringOutputStream containerStream(containerData);
+        common::StringOutputStream containerStream(containerData);
 
         WalletSerializerV2 s(
             *this,
@@ -779,7 +779,7 @@ namespace cryptonote
         chacha8(containerData, containerDataSize, key, suffixIv, reinterpret_cast<char *>(encryptedContainer.data()));
 
         std::string suffix;
-        Common::StringOutputStream suffixStream(suffix);
+        common::StringOutputStream suffixStream(suffix);
         BinaryOutputStreamSerializer suffixSerializer(suffixStream);
         suffixSerializer(suffixIv, "suffixIv");
         suffixSerializer(encryptedContainer, "encryptedContainer");
@@ -790,7 +790,7 @@ namespace cryptonote
 
     void WalletGreen::loadAndDecryptContainerData(ContainerStorage &storage, const Crypto::chacha8_key &key, BinaryArray &containerData)
     {
-        Common::MemoryInputStream suffixStream(storage.suffix(), storage.suffixSize());
+        common::MemoryInputStream suffixStream(storage.suffix(), storage.suffixSize());
         BinaryInputStreamSerializer suffixSerializer(suffixStream);
         Crypto::chacha8_iv suffixIv;
         BinaryArray encryptedContainer;
@@ -1567,7 +1567,7 @@ namespace cryptonote
         throwIfStopped();
 
         m_logger(INFO, BRIGHT_WHITE) << "transfer"
-                                     << ", from " << Common::makeContainerFormatter(transactionParameters.sourceAddresses) << ", to " << WalletOrderListFormatter(m_currency, transactionParameters.destinations) << ", change address '" << transactionParameters.changeDestination << '\'' << ", fee " << m_currency.formatAmount(transactionParameters.fee) << ", mixin " << transactionParameters.mixIn << ", unlockTimestamp " << transactionParameters.unlockTimestamp;
+                                     << ", from " << common::makeContainerFormatter(transactionParameters.sourceAddresses) << ", to " << WalletOrderListFormatter(m_currency, transactionParameters.destinations) << ", change address '" << transactionParameters.changeDestination << '\'' << ", fee " << m_currency.formatAmount(transactionParameters.fee) << ", mixin " << transactionParameters.mixIn << ", unlockTimestamp " << transactionParameters.unlockTimestamp;
 
         id = doTransfer(transactionParameters);
         return id;
@@ -1969,7 +1969,7 @@ namespace cryptonote
         throwIfStopped();
 
         m_logger(INFO, BRIGHT_WHITE) << "makeTransaction"
-                                     << ", from " << Common::makeContainerFormatter(sendingTransaction.sourceAddresses) << ", to " << WalletOrderListFormatter(m_currency, sendingTransaction.destinations) << ", change address '" << sendingTransaction.changeDestination << '\'' << ", fee " << m_currency.formatAmount(sendingTransaction.fee) << ", mixin " << sendingTransaction.mixIn << ", unlockTimestamp " << sendingTransaction.unlockTimestamp;
+                                     << ", from " << common::makeContainerFormatter(sendingTransaction.sourceAddresses) << ", to " << WalletOrderListFormatter(m_currency, sendingTransaction.destinations) << ", change address '" << sendingTransaction.changeDestination << '\'' << ", fee " << m_currency.formatAmount(sendingTransaction.fee) << ", mixin " << sendingTransaction.mixIn << ", unlockTimestamp " << sendingTransaction.unlockTimestamp;
 
         validateTransactionParameters(sendingTransaction);
         cryptonote::AccountPublicAddress changeDestination = getChangeDestination(sendingTransaction.changeDestination, sendingTransaction.sourceAddresses);
@@ -2164,7 +2164,7 @@ namespace cryptonote
 
     // Fix LegacyWallet error. Some old versions didn't fill extra field
     if (transaction.extra.empty() && !info.extra.empty()) {
-      transaction.extra = Common::asString(info.extra);
+      transaction.extra = common::asString(info.extra);
       updated = true;
     }
 
@@ -2483,7 +2483,7 @@ namespace cryptonote
         }
 
         tx->setUnlockTime(unlockTimestamp);
-        tx->appendExtra(Common::asBinaryArray(extra));
+        tx->appendExtra(common::asBinaryArray(extra));
 
         for (auto &input : keysInfo)
         {
@@ -3500,7 +3500,7 @@ namespace cryptonote
         syst::EventLock lk(m_readyEvent);
 
         m_logger(INFO, BRIGHT_WHITE) << "createFusionTransaction"
-                                     << ", from " << Common::makeContainerFormatter(sourceAddresses) << ", to '" << destinationAddress << '\'' << ", threshold " << m_currency.formatAmount(threshold) << ", mixin " << mixin;
+                                     << ", from " << common::makeContainerFormatter(sourceAddresses) << ", to '" << destinationAddress << '\'' << ", threshold " << m_currency.formatAmount(threshold) << ", mixin " << mixin;
 
         throwIfNotInitialized();
         throwIfTrackingMode();

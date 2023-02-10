@@ -79,7 +79,7 @@ namespace PaymentService
             }
 
             Crypto::Hash paymentId;
-            bool r = Common::podFromHex(paymentIdStr, paymentId);
+            bool r = common::podFromHex(paymentIdStr, paymentId);
             if (r)
             {
             }
@@ -90,7 +90,7 @@ namespace PaymentService
 
         bool getPaymentIdFromExtra(const std::string &binaryString, Crypto::Hash &paymentId)
         {
-            return cryptonote::getPaymentIdFromTxExtra(Common::asBinaryArray(binaryString), paymentId);
+            return cryptonote::getPaymentIdFromTxExtra(common::asBinaryArray(binaryString), paymentId);
         }
 
         std::string getPaymentIdStringFromExtra(const std::string &binaryString)
@@ -109,7 +109,7 @@ namespace PaymentService
                 return std::string();
             }
 
-            return Common::podToHex(paymentId);
+            return common::podToHex(paymentId);
         }
 
     }
@@ -197,7 +197,7 @@ namespace PaymentService
         {
             Crypto::Hash hash;
 
-            if (!Common::podFromHex(hashString, hash))
+            if (!common::podFromHex(hashString, hash))
             {
                 logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Can't parse hash string " << hashString;
                 throw std::system_error(make_error_code(cryptonote::error::WalletServiceErrorCode::WRONG_HASH_FORMAT));
@@ -242,14 +242,14 @@ namespace PaymentService
             PaymentService::TransactionRpcInfo transactionInfo;
 
             transactionInfo.state = static_cast<uint8_t>(transactionWithTransfers.transaction.state);
-            transactionInfo.transactionHash = Common::podToHex(transactionWithTransfers.transaction.hash);
+            transactionInfo.transactionHash = common::podToHex(transactionWithTransfers.transaction.hash);
             transactionInfo.blockIndex = transactionWithTransfers.transaction.blockHeight;
             transactionInfo.timestamp = transactionWithTransfers.transaction.timestamp;
             transactionInfo.isBase = transactionWithTransfers.transaction.isBase;
             transactionInfo.unlockTime = transactionWithTransfers.transaction.unlockTime;
             transactionInfo.amount = transactionWithTransfers.transaction.totalAmount;
             transactionInfo.fee = transactionWithTransfers.transaction.fee;
-            transactionInfo.extra = Common::toHex(transactionWithTransfers.transaction.extra.data(), transactionWithTransfers.transaction.extra.size());
+            transactionInfo.extra = common::toHex(transactionWithTransfers.transaction.extra.data(), transactionWithTransfers.transaction.extra.size());
             transactionInfo.paymentId = getPaymentIdStringFromExtra(transactionWithTransfers.transaction.extra);
 
             for (const cryptonote::WalletTransfer &transfer : transactionWithTransfers.transfers)
@@ -274,7 +274,7 @@ namespace PaymentService
             for (const auto &block : blocks)
             {
                 PaymentService::TransactionsInBlockRpcInfo rpcBlock;
-                rpcBlock.blockHash = Common::podToHex(block.blockHash);
+                rpcBlock.blockHash = common::podToHex(block.blockHash);
 
                 for (const cryptonote::WalletTransactionWithTransfers &transactionWithTransfers : block.transactions)
                 {
@@ -297,11 +297,11 @@ namespace PaymentService
             for (const cryptonote::TransactionsInBlockInfo &block : blocks)
             {
                 PaymentService::TransactionHashesInBlockRpcInfo item;
-                item.blockHash = Common::podToHex(block.blockHash);
+                item.blockHash = common::podToHex(block.blockHash);
 
                 for (const cryptonote::WalletTransactionWithTransfers &transaction : block.transactions)
                 {
-                    item.transactionHashes.emplace_back(Common::podToHex(transaction.transaction.hash));
+                    item.transactionHashes.emplace_back(common::podToHex(transaction.transaction.hash));
                 }
 
                 transactionHashes.push_back(std::move(item));
@@ -351,7 +351,7 @@ namespace PaymentService
             std::string keys = decoded.substr(paymentIDLen, std::string::npos);
 
             cryptonote::AccountPublicAddress addr;
-            cryptonote::BinaryArray ba = Common::asBinaryArray(keys);
+            cryptonote::BinaryArray ba = common::asBinaryArray(keys);
 
             if (!cryptonote::fromBinaryArray(addr, ba))
             {
@@ -371,12 +371,12 @@ namespace PaymentService
         std::string getValidatedTransactionExtraString(const std::string &extraString)
         {
             std::vector<uint8_t> binary;
-            if (!Common::fromHex(extraString, binary))
+            if (!common::fromHex(extraString, binary))
             {
                 throw std::system_error(make_error_code(cryptonote::error::BAD_TRANSACTION_EXTRA));
             }
 
-            return Common::asString(binary);
+            return common::asString(binary);
         }
 
         std::vector<std::string> collectDestinationAddresses(const std::vector<PaymentService::WalletRpcOrder> &orders)
@@ -477,12 +477,12 @@ namespace PaymentService
                 Crypto::Hash private_spend_key_hash;
                 Crypto::Hash private_view_key_hash;
                 uint64_t size;
-                if (!Common::fromHex(conf.secretSpendKey, &private_spend_key_hash, sizeof(private_spend_key_hash), size) || size != sizeof(private_spend_key_hash))
+                if (!common::fromHex(conf.secretSpendKey, &private_spend_key_hash, sizeof(private_spend_key_hash), size) || size != sizeof(private_spend_key_hash))
                 {
                     log(Logging::ERROR, Logging::BRIGHT_RED) << "Invalid spend key";
                     return;
                 }
-                if (!Common::fromHex(conf.secretViewKey, &private_view_key_hash, sizeof(private_view_key_hash), size) || size != sizeof(private_spend_key_hash))
+                if (!common::fromHex(conf.secretViewKey, &private_view_key_hash, sizeof(private_view_key_hash), size) || size != sizeof(private_spend_key_hash))
                 {
                     log(Logging::ERROR, Logging::BRIGHT_RED) << "Invalid view key";
                     return;
@@ -584,7 +584,7 @@ namespace PaymentService
 
         for (size_t i = 0; i < wallet.getTransactionCount(); ++i)
         {
-            transactionIdIndex.emplace(Common::podToHex(wallet.getTransaction(i).hash), i);
+            transactionIdIndex.emplace(common::podToHex(wallet.getTransaction(i).hash), i);
         }
     }
 
@@ -690,7 +690,7 @@ namespace PaymentService
             logger(Logging::DEBUGGING) << "Creating address";
 
             Crypto::SecretKey secretKey;
-            if (!Common::podFromHex(spendSecretKeyText, secretKey))
+            if (!common::podFromHex(spendSecretKeyText, secretKey))
             {
                 logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Wrong key format: " << spendSecretKeyText;
                 return make_error_code(cryptonote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
@@ -731,7 +731,7 @@ namespace PaymentService
                 }
 
                 Crypto::SecretKey key;
-                if (!Common::podFromHex(keyText, key))
+                if (!common::podFromHex(keyText, key))
                 {
                     logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Wrong key format: " << keyText;
                     return make_error_code(cryptonote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
@@ -783,7 +783,7 @@ namespace PaymentService
             logger(Logging::DEBUGGING) << "Creating tracking address";
 
             Crypto::PublicKey publicKey;
-            if (!Common::podFromHex(spendPublicKeyText, publicKey))
+            if (!common::podFromHex(spendPublicKeyText, publicKey))
             {
                 logger(Logging::WARNING, Logging::BRIGHT_YELLOW) << "Wrong key format: " << spendPublicKeyText;
                 return make_error_code(cryptonote::error::WalletServiceErrorCode::WRONG_KEY_FORMAT);
@@ -828,8 +828,8 @@ namespace PaymentService
 
             cryptonote::KeyPair key = wallet.getAddressSpendKey(address);
 
-            publicSpendKeyText = Common::podToHex(key.publicKey);
-            secretSpendKeyText = Common::podToHex(key.secretKey);
+            publicSpendKeyText = common::podToHex(key.publicKey);
+            secretSpendKeyText = common::podToHex(key.secretKey);
         }
         catch (std::system_error &x)
         {
@@ -890,7 +890,7 @@ namespace PaymentService
             blockHashes.reserve(hashes.size());
             for (const auto &hash : hashes)
             {
-                blockHashes.push_back(Common::podToHex(hash));
+                blockHashes.push_back(common::podToHex(hash));
             }
         }
         catch (std::system_error &x)
@@ -908,7 +908,7 @@ namespace PaymentService
         {
             syst::EventLock lk(readyEvent);
             cryptonote::KeyPair viewKey = wallet.getViewKey();
-            viewSecretKey = Common::podToHex(viewKey.secretKey);
+            viewSecretKey = common::podToHex(viewKey.secretKey);
         }
         catch (std::system_error &x)
         {
@@ -1224,7 +1224,7 @@ namespace PaymentService
             sendParams.changeDestination = request.changeAddress;
 
             size_t transactionId = wallet.transfer(sendParams);
-            transactionHash = Common::podToHex(wallet.getTransaction(transactionId).hash);
+            transactionHash = common::podToHex(wallet.getTransaction(transactionId).hash);
 
             logger(Logging::DEBUGGING) << "Transaction " << transactionHash << " has been sent";
         }
@@ -1312,7 +1312,7 @@ namespace PaymentService
             }
             else
             {
-                sendParams.extra = Common::asString(Common::fromHex(request.extra));
+                sendParams.extra = common::asString(common::fromHex(request.extra));
             }
 
             sendParams.sourceAddresses = request.addresses;
@@ -1323,7 +1323,7 @@ namespace PaymentService
             sendParams.changeDestination = request.changeAddress;
 
             size_t transactionId = wallet.makeTransaction(sendParams);
-            transactionHash = Common::podToHex(wallet.getTransaction(transactionId).hash);
+            transactionHash = common::podToHex(wallet.getTransaction(transactionId).hash);
 
             logger(Logging::DEBUGGING) << "Delayed transaction " << transactionHash << " has been created";
         }
@@ -1352,7 +1352,7 @@ namespace PaymentService
 
             for (auto id : transactionIds)
             {
-                transactionHashes.emplace_back(Common::podToHex(wallet.getTransaction(id).hash));
+                transactionHashes.emplace_back(common::podToHex(wallet.getTransaction(id).hash));
             }
         }
         catch (std::system_error &x)
@@ -1451,7 +1451,7 @@ namespace PaymentService
             {
                 if (transactionFilter.checkTransaction(transaction))
                 {
-                    transactionHashes.emplace_back(Common::podToHex(transaction.transaction.hash));
+                    transactionHashes.emplace_back(common::podToHex(transaction.transaction.hash));
                 }
             }
         }
@@ -1486,7 +1486,7 @@ namespace PaymentService
             blockCount = wallet.getBlockCount();
 
             auto lastHashes = wallet.getBlockHashes(blockCount - 1, 1);
-            lastBlockHash = Common::podToHex(lastHashes.back());
+            lastBlockHash = common::podToHex(lastHashes.back());
         }
         catch (std::system_error &x)
         {
@@ -1517,7 +1517,7 @@ namespace PaymentService
             }
 
             size_t transactionId = fusionManager.createFusionTransaction(threshold, anonymity, addresses, destinationAddress);
-            transactionHash = Common::podToHex(wallet.getTransaction(transactionId).hash);
+            transactionHash = common::podToHex(wallet.getTransaction(transactionId).hash);
 
             logger(Logging::DEBUGGING) << "Fusion transaction " << transactionHash << " has been sent";
         }
@@ -1588,7 +1588,7 @@ namespace PaymentService
         /* Pack as a binary array */
         cryptonote::BinaryArray ba;
         cryptonote::toBinaryArray(addr, ba);
-        std::string keys = Common::asString(ba);
+        std::string keys = common::asString(ba);
 
         /* Encode prefix + paymentID + keys as an address */
         integratedAddress = Tools::Base58::encode_addr(
@@ -1622,7 +1622,7 @@ namespace PaymentService
                 if (event.type == cryptonote::TRANSACTION_CREATED)
                 {
                     size_t transactionId = event.transactionCreated.transactionIndex;
-                    transactionIdIndex.emplace(Common::podToHex(wallet.getTransaction(transactionId).hash), transactionId);
+                    transactionIdIndex.emplace(common::podToHex(wallet.getTransaction(transactionId).hash), transactionId);
                 }
             }
         }

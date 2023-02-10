@@ -900,7 +900,7 @@ namespace cryptonote
 
     std::error_code BlockchainSynchronizer::processPoolTxs(GetPoolResponse &response)
     {
-        m_logger(DEBUGGING) << "Starting to process pool transactions, added " << response.newTxs.size() << ':' << TransactionReaderListFormatter(response.newTxs) << ", deleted " << response.deletedTxIds.size() << ':' << Common::makeContainerFormatter(response.deletedTxIds);
+        m_logger(DEBUGGING) << "Starting to process pool transactions, added " << response.newTxs.size() << ':' << TransactionReaderListFormatter(response.newTxs) << ", deleted " << response.deletedTxIds.size() << ':' << common::makeContainerFormatter(response.deletedTxIds);
 
         std::error_code error;
         {

@@ -91,7 +91,7 @@ namespace cryptonote
         void serialize(ISerializer &s);
     };
 
-    bool serialize(PackedOutIndex &value, Common::StringView name, cryptonote::ISerializer &serializer);
+    bool serialize(PackedOutIndex &value, common::StringView name, cryptonote::ISerializer &serializer);
 
     class DatabaseBlockchainCache;
 
@@ -118,11 +118,11 @@ namespace cryptonote
         bool isTransactionSpendTimeUnlocked(uint64_t unlockTime) const override;
         bool isTransactionSpendTimeUnlocked(uint64_t unlockTime, uint32_t blockIndex) const override;
 
-        ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const override;
-        ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex, Common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const override;
+        ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const override;
+        ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex, common::ArrayView<uint32_t> globalIndexes, std::vector<Crypto::PublicKey> &publicKeys) const override;
 
-        ExtractOutputKeysResult extractKeyOtputIndexes(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes, std::vector<PackedOutIndex> &outIndexes) const override;
-        ExtractOutputKeysResult extractKeyOtputReferences(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes, std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const override;
+        ExtractOutputKeysResult extractKeyOtputIndexes(uint64_t amount, common::ArrayView<uint32_t> globalIndexes, std::vector<PackedOutIndex> &outIndexes) const override;
+        ExtractOutputKeysResult extractKeyOtputReferences(uint64_t amount, common::ArrayView<uint32_t> globalIndexes, std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const override;
 
         uint32_t getTopBlockIndex() const override;
         const Crypto::Hash &getTopBlockHash() const override;
@@ -190,7 +190,7 @@ namespace cryptonote
         virtual BinaryArray getRawTransaction(uint32_t blockIndex, uint32_t transactionIndex) const override;
         virtual std::vector<Crypto::Hash> getTransactionHashes() const override;
         virtual std::vector<uint32_t> getRandomOutsByAmount(uint64_t amount, size_t count, uint32_t blockIndex) const override;
-        virtual ExtractOutputKeysResult extractKeyOutputs(uint64_t amount, uint32_t blockIndex, Common::ArrayView<uint32_t> globalIndexes,
+        virtual ExtractOutputKeysResult extractKeyOutputs(uint64_t amount, uint32_t blockIndex, common::ArrayView<uint32_t> globalIndexes,
                                                           std::function<ExtractOutputKeysResult(const CachedTransactionInfo &info, PackedOutIndex index,
                                                                                                 uint32_t globalIndex)>
                                                               pred) const override;

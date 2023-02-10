@@ -726,7 +726,7 @@ namespace cryptonote
 
         for (const auto &miss_tx : missed_txs)
         {
-            res.missed_tx.push_back(Common::podToHex(miss_tx));
+            res.missed_tx.push_back(common::podToHex(miss_tx));
         }
 
         res.status = CORE_RPC_STATUS_OK;
@@ -839,7 +839,7 @@ namespace cryptonote
             block_short.timestamp = blk.timestamp;
             block_short.difficulty = blkDetails.difficulty;
             block_short.height = i;
-            block_short.hash = Common::podToHex(block_hash);
+            block_short.hash = common::podToHex(block_hash);
             block_short.tx_count = blk.transactionHashes.size() + 1;
 
             res.blocks.push_back(block_short);
@@ -903,7 +903,7 @@ namespace cryptonote
         res.block.timestamp = block_header.timestamp;
         res.block.prev_hash = block_header.prev_hash;
         res.block.nonce = block_header.nonce;
-        res.block.hash = Common::podToHex(hash);
+        res.block.hash = common::podToHex(hash);
         res.block.depth = m_core.getTopBlockIndex() - res.block.height;
         res.block.difficulty = m_core.getBlockDifficulty(res.block.height);
         res.block.transactionsCumulativeSize = blkDetails.transactionsCumulativeSize;
@@ -936,7 +936,7 @@ namespace cryptonote
 
         // Base transaction adding
         f_transaction_short_response transaction_short;
-        transaction_short.hash = Common::podToHex(getObjectHash(blk.baseTransaction));
+        transaction_short.hash = common::podToHex(getObjectHash(blk.baseTransaction));
         transaction_short.fee = 0;
         transaction_short.amount_out = getOutputAmount(blk.baseTransaction);
         transaction_short.size = getObjectBinarySize(blk.baseTransaction);
@@ -959,7 +959,7 @@ namespace cryptonote
             uint64_t amount_in = getInputAmount(tx);
             uint64_t amount_out = getOutputAmount(tx);
 
-            transaction_short.hash = Common::podToHex(getObjectHash(tx));
+            transaction_short.hash = common::podToHex(getObjectHash(tx));
             transaction_short.fee = amount_in - amount_out;
             transaction_short.amount_out = amount_out;
             transaction_short.size = getObjectBinarySize(tx);
@@ -1021,7 +1021,7 @@ namespace cryptonote
             {
                 throw JsonRpc::JsonRpcError{
                     CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
-                    "Internal error: can't get transaction by hash. Hash = " + Common::podToHex(hash) + '.'};
+                    "Internal error: can't get transaction by hash. Hash = " + common::podToHex(hash) + '.'};
             }
             blockHash = m_core.getBlockHashByIndex(blockHeight);
             BlockTemplate blk = m_core.getBlockByHash(blockHash);
@@ -1033,7 +1033,7 @@ namespace cryptonote
             block_short.cumul_size = blkDetails.blockSize;
             block_short.timestamp = blk.timestamp;
             block_short.height = blockHeight;
-            block_short.hash = Common::podToHex(blockHash);
+            block_short.hash = common::podToHex(blockHash);
             block_short.tx_count = blk.transactionHashes.size() + 1;
             res.block = block_short;
         }
@@ -1041,7 +1041,7 @@ namespace cryptonote
         uint64_t amount_in = getInputAmount(res.tx);
         uint64_t amount_out = getOutputAmount(res.tx);
 
-        res.txDetails.hash = Common::podToHex(getObjectHash(res.tx));
+        res.txDetails.hash = common::podToHex(getObjectHash(res.tx));
         res.txDetails.fee = amount_in - amount_out;
         if (amount_in == 0)
             res.txDetails.fee = 0;
@@ -1058,7 +1058,7 @@ namespace cryptonote
         Crypto::Hash paymentId;
         if (cryptonote::getPaymentIdFromTxExtra(res.tx.extra, paymentId))
         {
-            res.txDetails.paymentId = Common::podToHex(paymentId);
+            res.txDetails.paymentId = common::podToHex(paymentId);
         }
         else
         {
@@ -1084,7 +1084,7 @@ namespace cryptonote
             uint64_t amount_in = getInputAmount(tx);
             uint64_t amount_out = getOutputAmount(tx);
 
-            transaction_short.hash = Common::podToHex(getObjectHash(tx));
+            transaction_short.hash = common::podToHex(getObjectHash(tx));
             transaction_short.fee = amount_in - amount_out;
             transaction_short.amount_out = amount_out;
             transaction_short.size = getObjectBinarySize(tx);
@@ -1135,7 +1135,7 @@ namespace cryptonote
                 std::string("Too big height: ") + std::to_string(h) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex() + 1)};
         }
 
-        res = Common::podToHex(blockId);
+        res = common::podToHex(blockId);
         return true;
     }
 
@@ -1218,7 +1218,7 @@ namespace cryptonote
     bool RpcServer::on_get_currency_id(const COMMAND_RPC_GET_CURRENCY_ID::request & /*req*/, COMMAND_RPC_GET_CURRENCY_ID::response &res)
     {
         Hash genesisBlockHash = m_core.getCurrency().genesisBlockHash();
-        res.currency_id_blob = Common::podToHex(genesisBlockHash);
+        res.currency_id_blob = common::podToHex(genesisBlockHash);
         return true;
     }
 
@@ -1302,12 +1302,12 @@ namespace cryptonote
         response.major_version = blk.majorVersion;
         response.minor_version = blk.minorVersion;
         response.timestamp = blk.timestamp;
-        response.prev_hash = Common::podToHex(blk.previousBlockHash);
+        response.prev_hash = common::podToHex(blk.previousBlockHash);
         response.nonce = blk.nonce;
         response.orphan_status = orphan_status;
         response.height = index;
         response.depth = m_core.getTopBlockIndex() - index;
-        response.hash = Common::podToHex(hash);
+        response.hash = common::podToHex(hash);
         response.difficulty = m_core.getBlockDifficulty(index);
         response.reward = get_block_reward(blk);
         BlockDetails blkDetails = m_core.getBlockDetails(hash);

@@ -123,7 +123,7 @@ namespace cryptonote
                                                    boost::multi_index::member<cryptonote::WalletTransaction, uint32_t, &cryptonote::WalletTransaction::blockHeight>>>>
         WalletTransactions;
 
-    typedef Common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
+    typedef common::FileMappedVector<EncryptedWalletRecord> ContainerStorage;
     typedef std::pair<uint64_t, cryptonote::WalletTransfer> TransactionTransferPair;
     typedef std::vector<TransactionTransferPair> WalletTransfers;
     typedef std::map<uint64_t, cryptonote::Transaction> UncommitedTransactions;

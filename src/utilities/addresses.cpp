@@ -75,7 +75,7 @@ namespace Utilities
         std::string keys = decoded.substr(paymentIDLen, std::string::npos);
 
         /* Convert keys as string to binary array */
-        cryptonote::BinaryArray ba = Common::asBinaryArray(keys);
+        cryptonote::BinaryArray ba = common::asBinaryArray(keys);
 
         cryptonote::AccountPublicAddress addr;
 

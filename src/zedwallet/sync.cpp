@@ -38,7 +38,7 @@ void checkForNewTransactions(std::shared_ptr<WalletInfo> walletInfo)
                           << std::endl
                           << SuccessMsg("Incoming transfer:")
                           << std::endl
-                          << SuccessMsg("Hash: " + Common::podToHex(t.hash))
+                          << SuccessMsg("Hash: " + common::podToHex(t.hash))
                           << std::endl
                           << SuccessMsg("Amount: " + formatAmount(t.totalAmount))
                           << std::endl

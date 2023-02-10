@@ -68,7 +68,7 @@ void printPrivateKeys(cryptonote::WalletGreen &wallet, bool viewWallet)
     {
         std::cout << SuccessMsg("Private view key:")
                   << std::endl
-                  << SuccessMsg(Common::podToHex(privateViewKey))
+                  << SuccessMsg(common::podToHex(privateViewKey))
                   << std::endl;
         return;
     }
@@ -84,12 +84,12 @@ void printPrivateKeys(cryptonote::WalletGreen &wallet, bool viewWallet)
 
     std::cout << SuccessMsg("Private spend key:")
               << std::endl
-              << SuccessMsg(Common::podToHex(privateSpendKey))
+              << SuccessMsg(common::podToHex(privateSpendKey))
               << std::endl
               << std::endl
               << SuccessMsg("Private view key:")
               << std::endl
-              << SuccessMsg(Common::podToHex(privateViewKey))
+              << SuccessMsg(common::podToHex(privateViewKey))
               << std::endl;
 
     if (deterministicPrivateKeys)
@@ -397,7 +397,7 @@ void saveCSV(cryptonote::WalletGreen &wallet, cryptonote::INode &node)
 
         csv << unixTimeToDate(t.timestamp) << "," /* Timestamp */
             << t.blockHeight << ","               /* Block Height */
-            << Common::podToHex(t.hash) << ","    /* Hash */
+            << common::podToHex(t.hash) << ","    /* Hash */
             << amount << ","                      /* Amount */
             << direction                          /* In/Out */
             << std::endl;
@@ -416,7 +416,7 @@ void printOutgoingTransfer(cryptonote::WalletTransaction t,
 {
     std::cout << WarningMsg("Outgoing transfer:")
               << std::endl
-              << WarningMsg("Hash: " + Common::podToHex(t.hash))
+              << WarningMsg("Hash: " + common::podToHex(t.hash))
               << std::endl;
 
     if (t.timestamp != 0)
@@ -451,7 +451,7 @@ void printIncomingTransfer(cryptonote::WalletTransaction t,
 {
     std::cout << SuccessMsg("Incoming transfer:")
               << std::endl
-              << SuccessMsg("Hash: " + Common::podToHex(t.hash))
+              << SuccessMsg("Hash: " + common::podToHex(t.hash))
               << std::endl;
 
     if (t.timestamp != 0)

@@ -144,7 +144,7 @@ namespace cryptonote
 
             for (const auto &hash : transactionHashes)
             {
-                logger(Logging::INFO) << "Checking transaction " << Common::podToHex(hash);
+                logger(Logging::INFO) << "Checking transaction " << common::podToHex(hash);
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
                 boxed_transaction_age = 0;
                 transaction_extra_data_size = transactionPool->getTransaction(hash).getTransaction().extra.size();
@@ -158,7 +158,7 @@ namespace cryptonote
 
                 if (!success)
                 {
-                    logger(Logging::INFO) << "Deleting invalid mixin transaction " << Common::podToHex(hash) << " from pool..." << error;
+                    logger(Logging::INFO) << "Deleting invalid mixin transaction " << common::podToHex(hash) << " from pool..." << error;
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
@@ -168,7 +168,7 @@ namespace cryptonote
                     try
                     {
                         // check transaction age
-                        std::string extraData = Common::toHex(
+                        std::string extraData = common::toHex(
                             transactionPool->getTransaction(hash).getTransaction().extra.data(),
                             transaction_extra_data_size);
 
@@ -194,14 +194,14 @@ namespace cryptonote
                 }
                 else if (transactionAge >= timeout)
                 {
-                    logger(Logging::INFO) << "Deleting transaction " << Common::podToHex(hash) << " from pool.";
+                    logger(Logging::INFO) << "Deleting transaction " << common::podToHex(hash) << " from pool.";
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
                 }
                 else
                 {
-                    logger(Logging::DEBUGGING) << "Transaction " << Common::podToHex(hash) << " is cool...";
+                    logger(Logging::DEBUGGING) << "Transaction " << common::podToHex(hash) << " is cool...";
                 }
             }
 

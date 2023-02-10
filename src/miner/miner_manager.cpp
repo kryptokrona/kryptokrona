@@ -233,7 +233,7 @@ namespace Miner
         json j = {
             {"jsonrpc", "2.0"},
             {"method", "submitblock"},
-            {"params", {Common::toHex(toBinaryArray(minedBlock))}}};
+            {"params", {common::toHex(toBinaryArray(minedBlock))}}};
 
         auto res = m_httpClient->Post("/json_rpc", j.dump(), "application/json");
 
@@ -306,7 +306,7 @@ namespace Miner
                 BlockMiningParameters params;
                 params.difficulty = j.at("result").at("difficulty").get<uint64_t>();
 
-                std::vector<uint8_t> blob = Common::fromHex(
+                std::vector<uint8_t> blob = common::fromHex(
                     j.at("result").at("blocktemplate_blob").get<std::string>());
 
                 if (!fromBinaryArray(params.blockTemplate, blob))

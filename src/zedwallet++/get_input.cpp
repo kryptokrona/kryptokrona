@@ -89,7 +89,7 @@ std::string getInput(
     }
 
     /* Remove any whitespace */
-    Common::trim(command);
+    common::trim(command);
 
     if (command != "")
     {
@@ -116,7 +116,7 @@ std::string getAddress(
             return "cancel";
         }
 
-        Common::trim(address);
+        common::trim(address);
 
         /* \n == no-op */
         if (address == "")
@@ -160,7 +160,7 @@ std::string getPaymentID(
             return "cancel";
         }
 
-        Common::trim(paymentID);
+        common::trim(paymentID);
 
         if (paymentID == "cancel" && cancelAllowed)
         {
@@ -201,7 +201,7 @@ std::string getHash(
             return "cancel";
         }
 
-        Common::trim(hash);
+        common::trim(hash);
 
         if (hash == "cancel" && cancelAllowed)
         {
@@ -243,7 +243,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
             continue;
         }
 
-        Common::trim(amountString);
+        common::trim(amountString);
 
         /* If the user entered thousand separators, remove them */
         ZedUtilities::removeCharFromString(amountString, ',');
@@ -328,7 +328,7 @@ std::tuple<std::string, uint16_t> getDaemonAddress()
             return {host, port};
         }
 
-        Common::trim(address);
+        common::trim(address);
 
         if (!ZedUtilities::parseDaemonAddressFromString(host, port, address))
         {

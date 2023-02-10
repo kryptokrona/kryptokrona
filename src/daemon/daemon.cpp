@@ -40,7 +40,7 @@
 #include <unistd.h>
 #endif
 
-using Common::JsonValue;
+using common::JsonValue;
 using namespace cryptonote;
 using namespace Logging;
 using namespace DaemonConfig;
@@ -81,7 +81,7 @@ void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const 
         transaction = cryptonote::CurrencyBuilder(logManager).generateGenesisTransaction(rewardTargets);
     }
 
-    std::string transactionHex = Common::toHex(cryptonote::toBinaryArray(transaction));
+    std::string transactionHex = common::toHex(cryptonote::toBinaryArray(transaction));
     std::cout << getProjectCLIHeader() << std::endl
               << std::endl
               << "Replace the current GENESIS_COINBASE_TX_HEX line in src/config/CryptoNoteConfig.h with this one:" << std::endl

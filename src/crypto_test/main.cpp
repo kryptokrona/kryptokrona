@@ -110,7 +110,7 @@ const std::string CN_SOFT_SHELL_V2[] = {
 static inline bool CompareHashes(const Hash leftHash, const std::string right)
 {
     Hash rightHash = Hash();
-    if (!Common::podFromHex(right, rightHash))
+    if (!common::podFromHex(right, rightHash))
     {
         return false;
     }
@@ -141,7 +141,7 @@ void testHashFunction(
     int64_t height,
     Args &&...args)
 {
-    const BinaryArray &rawData = Common::fromHex(INPUT_DATA);
+    const BinaryArray &rawData = common::fromHex(INPUT_DATA);
 
     if (need43BytesOfData(hashFunctionName) && rawData.size() < 43)
     {
@@ -174,7 +174,7 @@ void testHashFunction(
 template <typename T>
 void benchmark(T hashFunction, std::string hashFunctionName, uint64_t iterations)
 {
-    const BinaryArray &rawData = Common::fromHex(INPUT_DATA);
+    const BinaryArray &rawData = common::fromHex(INPUT_DATA);
 
     if (need43BytesOfData(hashFunctionName) && rawData.size() < 43)
     {
@@ -202,10 +202,10 @@ void benchmarkUnderivePublicKey()
     Crypto::KeyDerivation derivation;
 
     Crypto::PublicKey txPublicKey;
-    Common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
+    common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
 
     Crypto::SecretKey privateViewKey;
-    Common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
+    common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
 
     Crypto::generate_key_derivation(txPublicKey, privateViewKey, derivation);
 
@@ -216,7 +216,7 @@ void benchmarkUnderivePublicKey()
     Crypto::PublicKey spendKey;
 
     Crypto::PublicKey outputKey;
-    Common::podFromHex("4a078e76cd41a3d3b534b83dc6f2ea2de500b653ca82273b7bfad8045d85a400", outputKey);
+    common::podFromHex("4a078e76cd41a3d3b534b83dc6f2ea2de500b653ca82273b7bfad8045d85a400", outputKey);
 
     for (uint64_t i = 0; i < loopIterations; i++)
     {
@@ -237,10 +237,10 @@ void benchmarkGenerateKeyDerivation()
     Crypto::KeyDerivation derivation;
 
     Crypto::PublicKey txPublicKey;
-    Common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
+    common::podFromHex("f235acd76ee38ec4f7d95123436200f9ed74f9eb291b1454fbc30742481be1ab", txPublicKey);
 
     Crypto::SecretKey privateViewKey;
-    Common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
+    common::podFromHex("89df8c4d34af41a51cfae0267e8254cadd2298f9256439fa1cfa7e25ee606606", privateViewKey);
 
     const uint64_t loopIterations = 60000;
 

@@ -38,7 +38,7 @@ public:
     bool exit(const std::vector<std::string> &args);
 
 private:
-    Common::ConsoleHandler m_consoleHandler;
+    common::ConsoleHandler m_consoleHandler;
     cryptonote::Core &m_core;
     cryptonote::NodeServer &m_srv;
     Logging::LoggerRef logger;

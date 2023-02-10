@@ -23,7 +23,7 @@
 namespace Logging
 {
 
-    using Common::JsonValue;
+    using common::JsonValue;
 
     LoggerManager::LoggerManager()
     {

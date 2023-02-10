@@ -68,7 +68,7 @@ namespace cryptonote
         {
             cryptonote::KVBinaryOutputStreamSerializer serializer;
             std::stringstream ss;
-            Common::StdOutputStream stream(ss);
+            common::StdOutputStream stream(ss);
 
             serializer(const_cast<Value &>(value), name);
             serializer.dump(stream);
@@ -94,7 +94,7 @@ namespace cryptonote
         void deserialize(const std::string &serialized, Value &value, const std::string &name)
         {
             std::stringstream ss(serialized);
-            Common::StdInputStream stream(ss);
+            common::StdInputStream stream(ss);
             cryptonote::KVBinaryInputStreamSerializer serializer(stream);
             serializer(value, name);
         }

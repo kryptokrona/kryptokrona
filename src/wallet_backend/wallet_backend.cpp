@@ -206,7 +206,7 @@ std::tuple<Error, std::string> WalletBackend::createIntegratedAddress(
     /* Pack as a binary array */
     cryptonote::BinaryArray ba;
     cryptonote::toBinaryArray(addr, ba);
-    std::string keys = Common::asString(ba);
+    std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
     const std::string integratedAddress = Tools::Base58::encode_addr(

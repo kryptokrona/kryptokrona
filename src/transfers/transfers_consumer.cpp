@@ -529,7 +529,7 @@ namespace cryptonote
                 {
                     if (public_keys_seen.find(out.key) != public_keys_seen.end())
                     {
-                        m_logger(WARNING, BRIGHT_RED) << "A duplicate public key was found in " << Common::podToHex(tx.getTransactionHash());
+                        m_logger(WARNING, BRIGHT_RED) << "A duplicate public key was found in " << common::podToHex(tx.getTransactionHash());
                         isDuplicate = true;
                     }
                     else
@@ -562,7 +562,7 @@ namespace cryptonote
         }
         catch (const std::exception &e)
         {
-            m_logger(WARNING, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << Common::podToHex(tx.getTransactionHash());
+            m_logger(WARNING, BRIGHT_RED) << "Failed to process transaction: " << e.what() << ", transaction hash " << common::podToHex(tx.getTransactionHash());
             return std::error_code();
         }
 

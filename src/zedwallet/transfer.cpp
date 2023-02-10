@@ -81,7 +81,7 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
         strAmount.append(numDecimalPlaces - fractionSize, '0');
     }
 
-    bool success = Common::fromString(strAmount, amount);
+    bool success = common::fromString(strAmount, amount);
 
     if (!success)
     {
@@ -249,7 +249,7 @@ void splitTX(cryptonote::WalletGreen &wallet,
         stream << "Transaction has been sent!"
                << std::endl
                << "Hash: "
-               << Common::podToHex(hash)
+               << common::podToHex(hash)
                << std::endl
                << "Amount: "
                << formatAmount(splitTXParams.destinations[0].amount)
@@ -598,7 +598,7 @@ void sendTX(std::shared_ptr<WalletInfo> walletInfo,
         std::cout << SuccessMsg("Transaction has been sent!")
                   << std::endl
                   << SuccessMsg("Hash: ")
-                  << SuccessMsg(Common::podToHex(hash))
+                  << SuccessMsg(common::podToHex(hash))
                   << std::endl;
     }
     /* Lets handle the error and possibly resend the transaction */
@@ -938,7 +938,7 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     std::string keys = decoded.substr(paymentIDLen, std::string::npos);
 
     cryptonote::AccountPublicAddress addr;
-    cryptonote::BinaryArray ba = Common::asBinaryArray(keys);
+    cryptonote::BinaryArray ba = common::asBinaryArray(keys);
 
     if (!cryptonote::fromBinaryArray(addr, ba))
     {

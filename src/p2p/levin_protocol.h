@@ -92,7 +92,7 @@ namespace cryptonote
         {
             try
             {
-                Common::MemoryInputStream stream(buf.data(), buf.size());
+                common::MemoryInputStream stream(buf.data(), buf.size());
                 KVBinaryInputStreamSerializer serializer(stream);
                 serialize(value, serializer);
             }
@@ -110,7 +110,7 @@ namespace cryptonote
             BinaryArray result;
             KVBinaryOutputStreamSerializer serializer;
             serialize(const_cast<T &>(value), serializer);
-            Common::VectorOutputStream stream(result);
+            common::VectorOutputStream stream(result);
             serializer.dump(stream);
             return result;
         }

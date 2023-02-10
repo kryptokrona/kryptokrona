@@ -32,7 +32,7 @@ namespace cryptonote
     BinaryArray storeToBinary(const T &obj)
     {
         BinaryArray result;
-        Common::VectorOutputStream stream(result);
+        common::VectorOutputStream stream(result);
         BinaryOutputStreamSerializer ba(stream);
         serialize(const_cast<T &>(obj), ba);
         return result;
@@ -41,7 +41,7 @@ namespace cryptonote
     template <typename T>
     void loadFromBinary(T &obj, const BinaryArray &blob)
     {
-        Common::MemoryInputStream stream(blob.data(), blob.size());
+        common::MemoryInputStream stream(blob.data(), blob.size());
         BinaryInputStreamSerializer ba(stream);
         serialize(obj, ba);
     }
@@ -58,7 +58,7 @@ namespace cryptonote
                 return false;
             }
 
-            Common::StdOutputStream stream(dataFile);
+            common::StdOutputStream stream(dataFile);
             BinaryOutputStreamSerializer out(stream);
             cryptonote::serialize(const_cast<T &>(obj), out);
 
@@ -89,7 +89,7 @@ namespace cryptonote
                 return false;
             }
 
-            Common::StdInputStream stream(dataFile);
+            common::StdInputStream stream(dataFile);
             BinaryInputStreamSerializer in(stream);
             serialize(obj, in);
             return !dataFile.fail();

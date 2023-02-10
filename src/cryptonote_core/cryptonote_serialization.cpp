@@ -117,12 +117,12 @@ namespace
     }
 
     template <typename T>
-    bool serializePod(T &v, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serializePod(T &v, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializer.binary(&v, sizeof(v), name);
     }
 
-    bool serializeVarintVector(std::vector<uint32_t> &vector, cryptonote::ISerializer &serializer, Common::StringView name)
+    bool serializeVarintVector(std::vector<uint32_t> &vector, cryptonote::ISerializer &serializer, common::StringView name)
     {
         uint64_t size = vector.size();
 
@@ -148,42 +148,42 @@ namespace
 namespace Crypto
 {
 
-    bool serialize(PublicKey &pubKey, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(PublicKey &pubKey, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(pubKey, name, serializer);
     }
 
-    bool serialize(SecretKey &secKey, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(SecretKey &secKey, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(secKey, name, serializer);
     }
 
-    bool serialize(Hash &h, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(Hash &h, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(h, name, serializer);
     }
 
-    bool serialize(KeyImage &keyImage, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(KeyImage &keyImage, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(keyImage, name, serializer);
     }
 
-    bool serialize(chacha8_iv &chacha, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(chacha8_iv &chacha, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(chacha, name, serializer);
     }
 
-    bool serialize(Signature &sig, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(Signature &sig, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(sig, name, serializer);
     }
 
-    bool serialize(EllipticCurveScalar &ecScalar, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(EllipticCurveScalar &ecScalar, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(ecScalar, name, serializer);
     }
 
-    bool serialize(EllipticCurvePoint &ecPoint, Common::StringView name, cryptonote::ISerializer &serializer)
+    bool serialize(EllipticCurvePoint &ecPoint, common::StringView name, cryptonote::ISerializer &serializer)
     {
         return serializePod(ecPoint, name, serializer);
     }

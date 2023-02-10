@@ -516,7 +516,7 @@ void createIntegratedAddress()
 
         std::getline(std::cin, address);
 
-        Common::trim(address);
+        common::trim(address);
 
         const bool integratedAddressesAllowed = false;
 
@@ -537,7 +537,7 @@ void createIntegratedAddress()
 
         std::getline(std::cin, paymentID);
 
-        Common::trim(paymentID);
+        common::trim(paymentID);
 
         /* Validate the payment ID */
         if (Error error = validatePaymentID(paymentID); error != SUCCESS)
@@ -617,7 +617,7 @@ void getTxPrivateKey(const std::shared_ptr<WalletBackend> walletBackend)
 
     Crypto::Hash hash;
 
-    Common::podFromHex(txHash, hash);
+    common::podFromHex(txHash, hash);
 
     const auto [error, key] = walletBackend->getTxPrivateKey(hash);
 

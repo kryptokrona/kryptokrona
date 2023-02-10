@@ -349,7 +349,7 @@ const T &SwappedVector<T>::operator[](uint64_t index)
     m_itemsFile.seekg(m_offsets[index]);
     T tempItem;
 
-    Common::StdInputStream stream(m_itemsFile);
+    common::StdInputStream stream(m_itemsFile);
     cryptonote::BinaryInputStreamSerializer archive(stream);
     serialize(tempItem, archive);
 
@@ -432,7 +432,7 @@ void SwappedVector<T>::push_back(const T &item)
 
         m_itemsFile.seekp(m_itemsFileSize);
 
-        Common::StdOutputStream stream(m_itemsFile);
+        common::StdOutputStream stream(m_itemsFile);
         cryptonote::BinaryOutputStreamSerializer archive(stream);
         serialize(const_cast<T &>(item), archive);
 

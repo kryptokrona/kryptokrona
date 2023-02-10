@@ -320,7 +320,7 @@ std::tuple<bool, bool> Nigel::sendTransaction(
     const cryptonote::Transaction tx) const
 {
     json j = {
-        {"tx_as_hex", Common::toHex(cryptonote::toBinaryArray(tx))}};
+        {"tx_as_hex", common::toHex(cryptonote::toBinaryArray(tx))}};
 
     const auto res = m_httpClient->Post(
         "/sendrawtransaction", j.dump(), "application/json");

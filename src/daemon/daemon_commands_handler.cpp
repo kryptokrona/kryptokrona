@@ -162,13 +162,13 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args)
     uint32_t end_index = 0;
     uint32_t end_block_parametr = m_core.getTopBlockIndex();
 
-    if (!Common::fromString(args[0], start_index))
+    if (!common::fromString(args[0], start_index))
     {
         std::cout << "wrong starter block index parameter" << ENDL;
         return false;
     }
 
-    if (args.size() > 1 && !Common::fromString(args[1], end_index))
+    if (args.size() > 1 && !common::fromString(args[1], end_index))
     {
         std::cout << "wrong end block index parameter" << ENDL;
         return false;
@@ -239,7 +239,7 @@ bool DaemonCommandsHandler::set_log(const std::vector<std::string> &args)
     }
 
     uint16_t l = 0;
-    if (!Common::fromString(args[0], l))
+    if (!common::fromString(args[0], l))
     {
         std::cout << "wrong number format, use: set_log <log_level_number_0-4>" << ENDL;
         return true;

@@ -1307,7 +1307,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionDetails(
 
     Crypto::Hash hash;
 
-    Common::podFromHex(hashStr, hash.data);
+    common::podFromHex(hashStr, hash.data);
 
     for (const auto tx : m_walletBackend->getTransactions())
     {
@@ -1395,7 +1395,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTxPrivateKey(
 
     Crypto::Hash txHash;
 
-    Common::podFromHex(txHashStr, txHash.data);
+    common::podFromHex(txHashStr, txHash.data);
 
     const auto [error, key] = m_walletBackend->getTxPrivateKey(txHash);
 
@@ -1559,5 +1559,5 @@ std::string ApiDispatcher::hashPassword(const std::string password) const
         key, sizeof(key), 0, (byte *)password.c_str(),
         password.size(), m_salt, sizeof(m_salt), ApiConstants::PBKDF2_ITERATIONS);
 
-    return Common::podToHex(key);
+    return common::podToHex(key);
 }

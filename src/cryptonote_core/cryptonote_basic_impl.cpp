@@ -73,7 +73,7 @@ namespace cryptonote
         {
         }
         assert(r);
-        return Tools::Base58::encode_addr(prefix, Common::asString(ba));
+        return Tools::Base58::encode_addr(prefix, common::asString(ba));
     }
     //-----------------------------------------------------------------------
     bool parseAccountAddressString(uint64_t &prefix, AccountPublicAddress &adr, const std::string &str)
@@ -100,5 +100,5 @@ namespace cryptonote
 //--------------------------------------------------------------------------------
 bool parse_hash256(const std::string &str_hash, Crypto::Hash &hash)
 {
-    return Common::podFromHex(str_hash, hash);
+    return common::podFromHex(str_hash, hash);
 }

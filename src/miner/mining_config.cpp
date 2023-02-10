@@ -138,7 +138,7 @@ namespace cryptonote
 
             std::cout << InformationMsg("What address do you want to mine to?: ");
             std::getline(std::cin, miningAddress);
-            Common::trim(miningAddress);
+            common::trim(miningAddress);
 
             error = validateAddresses({miningAddress}, integratedAddressesAllowed);
         }

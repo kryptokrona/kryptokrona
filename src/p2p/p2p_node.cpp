@@ -319,7 +319,7 @@ namespace cryptonote
                 continue;
             }
 
-            logger(DEBUGGING) << "Selected peer: [" << peer.id << " " << peer.adr << "] last_seen: " << (peer.last_seen ? Common::timeIntervalToString(time(NULL) - peer.last_seen) : "never");
+            logger(DEBUGGING) << "Selected peer: [" << peer.id << " " << peer.adr << "] last_seen: " << (peer.last_seen ? common::timeIntervalToString(time(NULL) - peer.last_seen) : "never");
 
             auto conn = tryToConnectPeer(peer.adr);
             if (conn.get())
@@ -408,7 +408,7 @@ namespace cryptonote
 
             doWithTimeoutAndThrow(m_dispatcher, m_cfg.getConnectTimeout(), [&]
                                   { tcpConnection = connector.connect(
-                                        Ipv4Address(Common::ipAddressToString(address.ip)),
+                                        Ipv4Address(common::ipAddressToString(address.ip)),
                                         static_cast<uint16_t>(address.port)); });
 
             logger(DEBUGGING) << "connection established to " << address;
@@ -591,7 +591,7 @@ namespace cryptonote
             TcpConnection connection;
 
             doWithTimeoutAndThrow(m_dispatcher, m_cfg.getConnectTimeout(), [&]
-                                  { connection = connector.connect(Ipv4Address(Common::ipAddressToString(peerAddress.ip)), static_cast<uint16_t>(peerAddress.port)); });
+                                  { connection = connector.connect(Ipv4Address(common::ipAddressToString(peerAddress.ip)), static_cast<uint16_t>(peerAddress.port)); });
 
             doWithTimeoutAndThrow(m_dispatcher, m_cfg.getHandshakeTimeout(), [&]
                                   {

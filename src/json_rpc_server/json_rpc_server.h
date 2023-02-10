@@ -42,15 +42,15 @@ namespace cryptonote
         void start(const std::string &bindAddress, uint16_t bindPort);
 
     protected:
-        static void makeErrorResponse(const std::error_code &ec, Common::JsonValue &resp);
-        static void makeMethodNotFoundResponse(Common::JsonValue &resp);
-        static void makeInvalidPasswordResponse(Common::JsonValue &resp);
-        static void makeGenericErrorReponse(Common::JsonValue &resp, const char *what, int errorCode = -32001);
-        static void fillJsonResponse(const Common::JsonValue &v, Common::JsonValue &resp);
-        static void prepareJsonResponse(const Common::JsonValue &req, Common::JsonValue &resp);
-        static void makeJsonParsingErrorResponse(Common::JsonValue &resp);
+        static void makeErrorResponse(const std::error_code &ec, common::JsonValue &resp);
+        static void makeMethodNotFoundResponse(common::JsonValue &resp);
+        static void makeInvalidPasswordResponse(common::JsonValue &resp);
+        static void makeGenericErrorReponse(common::JsonValue &resp, const char *what, int errorCode = -32001);
+        static void fillJsonResponse(const common::JsonValue &v, common::JsonValue &resp);
+        static void prepareJsonResponse(const common::JsonValue &req, common::JsonValue &resp);
+        static void makeJsonParsingErrorResponse(common::JsonValue &resp);
 
-        virtual void processJsonRpcRequest(const Common::JsonValue &req, Common::JsonValue &resp) = 0;
+        virtual void processJsonRpcRequest(const common::JsonValue &req, common::JsonValue &resp) = 0;
         PaymentService::ConfigurationManager &config;
 
     private:

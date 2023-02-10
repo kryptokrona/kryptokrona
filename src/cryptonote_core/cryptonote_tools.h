@@ -56,7 +56,7 @@ namespace cryptonote
     BinaryArray toBinaryArray(const T &object)
     {
         BinaryArray ba;
-        ::Common::VectorOutputStream stream(ba);
+        ::common::VectorOutputStream stream(ba);
         BinaryOutputStreamSerializer serializer(stream);
         serialize(const_cast<T &>(object), serializer);
         return ba;
@@ -66,7 +66,7 @@ namespace cryptonote
     T fromBinaryArray(const BinaryArray &binaryArray)
     {
         T object;
-        Common::MemoryInputStream stream(binaryArray.data(), binaryArray.size());
+        common::MemoryInputStream stream(binaryArray.data(), binaryArray.size());
         BinaryInputStreamSerializer serializer(stream);
         serialize(object, serializer);
         if (!stream.endOfStream())

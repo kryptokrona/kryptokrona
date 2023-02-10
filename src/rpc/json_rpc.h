@@ -68,19 +68,19 @@ namespace cryptonote
             std::string message;
         };
 
-        typedef boost::optional<Common::JsonValue> OptionalId;
-        typedef boost::optional<Common::JsonValue> OptionalPassword;
+        typedef boost::optional<common::JsonValue> OptionalId;
+        typedef boost::optional<common::JsonValue> OptionalPassword;
 
         class JsonRpcRequest
         {
         public:
-            JsonRpcRequest() : psReq(Common::JsonValue::OBJECT) {}
+            JsonRpcRequest() : psReq(common::JsonValue::OBJECT) {}
 
             bool parseRequest(const std::string &requestBody)
             {
                 try
                 {
-                    psReq = Common::JsonValue::fromString(requestBody);
+                    psReq = common::JsonValue::fromString(requestBody);
                 }
                 catch (std::exception &)
                 {
@@ -110,7 +110,7 @@ namespace cryptonote
             template <typename T>
             bool loadParams(T &v) const
             {
-                loadFromJsonValue(v, psReq.contains("params") ? psReq("params") : Common::JsonValue(Common::JsonValue::NIL));
+                loadFromJsonValue(v, psReq.contains("params") ? psReq("params") : common::JsonValue(common::JsonValue::NIL));
                 return true;
             }
 
@@ -149,7 +149,7 @@ namespace cryptonote
             }
 
         private:
-            Common::JsonValue psReq;
+            common::JsonValue psReq;
             OptionalId id;
             OptionalPassword password;
             std::string method;
@@ -158,13 +158,13 @@ namespace cryptonote
         class JsonRpcResponse
         {
         public:
-            JsonRpcResponse() : psResp(Common::JsonValue::OBJECT) {}
+            JsonRpcResponse() : psResp(common::JsonValue::OBJECT) {}
 
             void parse(const std::string &responseBody)
             {
                 try
                 {
-                    psResp = Common::JsonValue::fromString(responseBody);
+                    psResp = common::JsonValue::fromString(responseBody);
                 }
                 catch (std::exception &)
                 {
@@ -222,7 +222,7 @@ namespace cryptonote
             }
 
         private:
-            Common::JsonValue psResp;
+            common::JsonValue psResp;
         };
 
         void invokeJsonRpcCommand(HttpClient &httpClient, JsonRpcRequest &req, JsonRpcResponse &res);

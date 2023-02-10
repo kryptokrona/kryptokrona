@@ -51,8 +51,8 @@ namespace cryptonote
             if (req.getUrl() == "/json_rpc")
             {
                 std::istringstream jsonInputStream(req.getBody());
-                Common::JsonValue jsonRpcRequest;
-                Common::JsonValue jsonRpcResponse(Common::JsonValue::OBJECT);
+                common::JsonValue jsonRpcRequest;
+                common::JsonValue jsonRpcResponse(common::JsonValue::OBJECT);
 
                 try
                 {
@@ -94,9 +94,9 @@ namespace cryptonote
         }
     }
 
-    void JsonRpcServer::prepareJsonResponse(const Common::JsonValue &req, Common::JsonValue &resp)
+    void JsonRpcServer::prepareJsonResponse(const common::JsonValue &req, common::JsonValue &resp)
     {
-        using Common::JsonValue;
+        using common::JsonValue;
 
         if (req.contains("id"))
         {
@@ -106,9 +106,9 @@ namespace cryptonote
         resp.insert("jsonrpc", "2.0");
     }
 
-    void JsonRpcServer::makeErrorResponse(const std::error_code &ec, Common::JsonValue &resp)
+    void JsonRpcServer::makeErrorResponse(const std::error_code &ec, common::JsonValue &resp)
     {
-        using Common::JsonValue;
+        using common::JsonValue;
 
         JsonValue error(JsonValue::OBJECT);
 
@@ -130,9 +130,9 @@ namespace cryptonote
         resp.insert("error", error);
     }
 
-    void JsonRpcServer::makeGenericErrorReponse(Common::JsonValue &resp, const char *what, int errorCode)
+    void JsonRpcServer::makeGenericErrorReponse(common::JsonValue &resp, const char *what, int errorCode)
     {
-        using Common::JsonValue;
+        using common::JsonValue;
 
         JsonValue error(JsonValue::OBJECT);
 
@@ -158,9 +158,9 @@ namespace cryptonote
         resp.insert("error", error);
     }
 
-    void JsonRpcServer::makeMethodNotFoundResponse(Common::JsonValue &resp)
+    void JsonRpcServer::makeMethodNotFoundResponse(common::JsonValue &resp)
     {
-        using Common::JsonValue;
+        using common::JsonValue;
 
         JsonValue error(JsonValue::OBJECT);
 
@@ -176,9 +176,9 @@ namespace cryptonote
         resp.insert("error", error);
     }
 
-    void JsonRpcServer::makeInvalidPasswordResponse(Common::JsonValue &resp)
+    void JsonRpcServer::makeInvalidPasswordResponse(common::JsonValue &resp)
     {
-        using Common::JsonValue;
+        using common::JsonValue;
 
         JsonValue error(JsonValue::OBJECT);
 
@@ -194,14 +194,14 @@ namespace cryptonote
         resp.insert("error", error);
     }
 
-    void JsonRpcServer::fillJsonResponse(const Common::JsonValue &v, Common::JsonValue &resp)
+    void JsonRpcServer::fillJsonResponse(const common::JsonValue &v, common::JsonValue &resp)
     {
         resp.insert("result", v);
     }
 
-    void JsonRpcServer::makeJsonParsingErrorResponse(Common::JsonValue &resp)
+    void JsonRpcServer::makeJsonParsingErrorResponse(common::JsonValue &resp)
     {
-        using Common::JsonValue;
+        using common::JsonValue;
 
         resp = JsonValue(JsonValue::OBJECT);
         resp.insert("jsonrpc", "2.0");

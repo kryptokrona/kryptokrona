@@ -31,7 +31,7 @@ namespace cryptonote
         const uint32_t ONE_DAY_SECONDS = 60 * 60 * 24;
         const CachedBlockInfo NULL_CACHED_BLOCK_INFO{NULL_HASH, 0, 0, 0, 0, 0};
 
-        bool requestPackedOutputs(IBlockchainCache::Amount amount, Common::ArrayView<uint32_t> globalIndexes, IDataBase &database, std::vector<PackedOutIndex> &result)
+        bool requestPackedOutputs(IBlockchainCache::Amount amount, common::ArrayView<uint32_t> globalIndexes, IDataBase &database, std::vector<PackedOutIndex> &result)
         {
             BlockchainReadBatch readBatch;
             result.reserve(result.size() + globalIndexes.getSize());
@@ -1138,7 +1138,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult
-    DatabaseBlockchainCache::extractKeyOutputKeys(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes,
+    DatabaseBlockchainCache::extractKeyOutputKeys(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
                                                   std::vector<Crypto::PublicKey> &publicKeys) const
     {
         return extractKeyOutputKeys(amount, getTopBlockIndex(), globalIndexes, publicKeys);
@@ -1146,7 +1146,7 @@ namespace cryptonote
 
     ExtractOutputKeysResult
     DatabaseBlockchainCache::extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex,
-                                                  Common::ArrayView<uint32_t> globalIndexes,
+                                                  common::ArrayView<uint32_t> globalIndexes,
                                                   std::vector<Crypto::PublicKey> &publicKeys) const
     {
         return extractKeyOutputs(amount, blockIndex, globalIndexes, [this, &publicKeys, blockIndex](const CachedTransactionInfo &info, PackedOutIndex index, uint32_t globalIndex)
@@ -1164,7 +1164,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult DatabaseBlockchainCache::extractKeyOtputIndexes(uint64_t amount,
-                                                                            Common::ArrayView<uint32_t> globalIndexes,
+                                                                            common::ArrayView<uint32_t> globalIndexes,
                                                                             std::vector<PackedOutIndex> &outIndexes) const
     {
         if (!requestPackedOutputs(amount, globalIndexes, database, outIndexes))
@@ -1177,7 +1177,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult DatabaseBlockchainCache::extractKeyOtputReferences(
-        uint64_t amount, Common::ArrayView<uint32_t> globalIndexes,
+        uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
         std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const
     {
 
@@ -1791,7 +1791,7 @@ namespace cryptonote
             }
 
             std::vector<PackedOutIndex> outputs;
-            if (extractKeyOtputIndexes(amount, Common::ArrayView<uint32_t>(globalIndexes.data(), globalIndexes.size()), outputs) != ExtractOutputKeysResult::SUCCESS)
+            if (extractKeyOtputIndexes(amount, common::ArrayView<uint32_t>(globalIndexes.data(), globalIndexes.size()), outputs) != ExtractOutputKeysResult::SUCCESS)
             {
                 logger(Logging::DEBUGGING) << "getRandomOutsByAmount: failed to extract key output indexes";
                 throw std::runtime_error("Invalid output index"); // TODO: make error code
@@ -1828,7 +1828,7 @@ namespace cryptonote
     }
 
     ExtractOutputKeysResult DatabaseBlockchainCache::extractKeyOutputs(
-        uint64_t amount, uint32_t blockIndex, Common::ArrayView<uint32_t> globalIndexes,
+        uint64_t amount, uint32_t blockIndex, common::ArrayView<uint32_t> globalIndexes,
         std::function<ExtractOutputKeysResult(const CachedTransactionInfo &info, PackedOutIndex index,
                                               uint32_t globalIndex)>
             callback) const

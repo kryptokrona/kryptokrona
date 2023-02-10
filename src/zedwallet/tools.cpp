@@ -184,7 +184,7 @@ std::string getPaymentIDFromExtra(const std::string &extra)
 
         if (cryptonote::getPaymentIdFromTxExtra(vecExtra, paymentIdHash))
         {
-            return Common::podToHex(paymentIdHash);
+            return common::podToHex(paymentIdHash);
         }
     }
 
@@ -212,7 +212,7 @@ std::string createIntegratedAddress(const std::string &address,
     /* Pack as a binary array */
     cryptonote::BinaryArray ba;
     cryptonote::toBinaryArray(addr, ba);
-    std::string keys = Common::asString(ba);
+    std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
     return Tools::Base58::encode_addr(

@@ -150,7 +150,7 @@ namespace cryptonote
     {
     }
 
-    void WalletSerializerV2::load(Common::IInputStream &source, uint8_t version)
+    void WalletSerializerV2::load(common::IInputStream &source, uint8_t version)
     {
         cryptonote::BinaryInputStreamSerializer s(source);
 
@@ -176,7 +176,7 @@ namespace cryptonote
         s(m_extra, "extra");
     }
 
-    void WalletSerializerV2::save(Common::IOutputStream &destination, WalletSaveLevel saveLevel)
+    void WalletSerializerV2::save(common::IOutputStream &destination, WalletSaveLevel saveLevel)
     {
         cryptonote::BinaryOutputStreamSerializer s(destination);
 

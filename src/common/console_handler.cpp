@@ -33,7 +33,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-using Common::Console::Color;
+using common::Console::Color;
 
 namespace Common
 {

@@ -17,7 +17,7 @@ namespace cryptonote
 
         bool parsePeerFromString(NetworkAddress &pe, const std::string &node_addr)
         {
-            return Common::parseIpAddressAndPort(pe.ip, pe.port, node_addr);
+            return common::parseIpAddressAndPort(pe.ip, pe.port, node_addr);
         }
 
         bool parsePeersAndAddToNetworkContainer(const std::vector<std::string> peerList, std::vector<NetworkAddress> &container)

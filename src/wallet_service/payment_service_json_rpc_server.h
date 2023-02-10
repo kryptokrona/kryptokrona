@@ -26,25 +26,25 @@ namespace PaymentService
         PaymentServiceJsonRpcServer(const PaymentServiceJsonRpcServer &) = delete;
 
     protected:
-        virtual void processJsonRpcRequest(const Common::JsonValue &req, Common::JsonValue &resp) override;
+        virtual void processJsonRpcRequest(const common::JsonValue &req, common::JsonValue &resp) override;
 
     private:
         WalletService &service;
         Logging::LoggerRef logger;
 
-        typedef std::function<void(const Common::JsonValue &jsonRpcParams, Common::JsonValue &jsonResponse)> HandlerFunction;
+        typedef std::function<void(const common::JsonValue &jsonRpcParams, common::JsonValue &jsonResponse)> HandlerFunction;
 
         template <typename RequestType, typename ResponseType, typename RequestHandler>
         HandlerFunction jsonHandler(RequestHandler handler)
         {
-            return [handler, this](const Common::JsonValue &jsonRpcParams, Common::JsonValue &jsonResponse) mutable
+            return [handler, this](const common::JsonValue &jsonRpcParams, common::JsonValue &jsonResponse) mutable
             {
                 RequestType request;
                 ResponseType response;
 
                 try
                 {
-                    cryptonote::JsonInputValueSerializer inputSerializer(const_cast<Common::JsonValue &>(jsonRpcParams));
+                    cryptonote::JsonInputValueSerializer inputSerializer(const_cast<common::JsonValue &>(jsonRpcParams));
                     SerializeRequest(request, inputSerializer);
                 }
                 catch (std::exception &)

@@ -68,16 +68,16 @@ namespace cryptonote
         bool isTransactionSpendTimeUnlocked(uint64_t unlockTime) const override;
         bool isTransactionSpendTimeUnlocked(uint64_t unlockTime, uint32_t blockIndex) const override;
 
-        ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes,
+        ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
                                                      std::vector<Crypto::PublicKey> &publicKeys) const override;
         ExtractOutputKeysResult extractKeyOutputKeys(uint64_t amount, uint32_t blockIndex,
-                                                     Common::ArrayView<uint32_t> globalIndexes,
+                                                     common::ArrayView<uint32_t> globalIndexes,
                                                      std::vector<Crypto::PublicKey> &publicKeys) const override;
 
-        ExtractOutputKeysResult extractKeyOtputIndexes(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes,
+        ExtractOutputKeysResult extractKeyOtputIndexes(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
                                                        std::vector<PackedOutIndex> &outIndexes) const override;
         ExtractOutputKeysResult
-        extractKeyOtputReferences(uint64_t amount, Common::ArrayView<uint32_t> globalIndexes,
+        extractKeyOtputReferences(uint64_t amount, common::ArrayView<uint32_t> globalIndexes,
                                   std::vector<std::pair<Crypto::Hash, size_t>> &outputReferences) const override;
 
         uint32_t getTopBlockIndex() const override;
@@ -158,7 +158,7 @@ namespace cryptonote
         virtual std::vector<uint32_t> getRandomOutsByAmount(uint64_t amount, size_t count,
                                                             uint32_t blockIndex) const override;
         virtual ExtractOutputKeysResult
-        extractKeyOutputs(uint64_t amount, uint32_t blockIndex, Common::ArrayView<uint32_t> globalIndexes,
+        extractKeyOutputs(uint64_t amount, uint32_t blockIndex, common::ArrayView<uint32_t> globalIndexes,
                           std::function<ExtractOutputKeysResult(const CachedTransactionInfo &info, PackedOutIndex index,
                                                                 uint32_t globalIndex)>
                               pred) const override;

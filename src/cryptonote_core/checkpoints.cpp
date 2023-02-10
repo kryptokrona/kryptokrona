@@ -30,7 +30,7 @@ namespace cryptonote
     {
         Crypto::Hash h = NULL_HASH;
 
-        if (!Common::podFromHex(hash_str, h))
+        if (!common::podFromHex(hash_str, h))
         {
             logger(ERROR, BRIGHT_RED) << "INVALID HASH IN CHECKPOINTS!";
             return false;

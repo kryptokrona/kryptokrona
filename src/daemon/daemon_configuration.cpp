@@ -22,7 +22,7 @@ namespace DaemonConfig
     DaemonConfiguration initConfiguration(const char *path)
     {
         DaemonConfiguration config;
-        config.logFile = Common::ReplaceExtenstion(Common::NativePathToGeneric(path), ".log");
+        config.logFile = common::ReplaceExtenstion(common::NativePathToGeneric(path), ".log");
         return config;
     }
 
