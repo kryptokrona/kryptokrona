@@ -37,7 +37,7 @@ namespace cryptonote
         }
 
     protected:
-        Tools::ObserverManager<Observer> m_observerManager;
+        tools::ObserverManager<Observer> m_observerManager;
     };
 
 }

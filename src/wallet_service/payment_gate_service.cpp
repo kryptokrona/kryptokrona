@@ -112,7 +112,7 @@ void PaymentGateService::run()
     this->dispatcher = &localDispatcher;
     this->stopEvent = &localStopEvent;
 
-    Tools::SignalHandler::install(std::bind(&stopSignalHandler, this));
+    tools::SignalHandler::install(std::bind(&stopSignalHandler, this));
 
     logging::LoggerRef log(logger, "run");
 

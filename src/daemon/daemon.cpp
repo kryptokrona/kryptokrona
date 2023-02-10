@@ -272,14 +272,14 @@ int main(int argc, char *argv[])
 
         if (dbConfig.isConfigFolderDefaulted())
         {
-            if (!Tools::create_directories_if_necessary(dbConfig.getDataDir()))
+            if (!tools::create_directories_if_necessary(dbConfig.getDataDir()))
             {
                 throw std::runtime_error("Can't create directory: " + dbConfig.getDataDir());
             }
         }
         else
         {
-            if (!Tools::directoryExists(dbConfig.getDataDir()))
+            if (!tools::directoryExists(dbConfig.getDataDir()))
             {
                 throw std::runtime_error("Directory does not exist: " + dbConfig.getDataDir());
             }
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
 
         RocksDBWrapper database(logManager);
         database.init(dbConfig);
-        Tools::ScopeExit dbShutdownOnExit([&database]()
+        tools::ScopeExit dbShutdownOnExit([&database]()
                                           { database.shutdown(); });
 
         if (!DatabaseBlockchainCache::checkDBSchemeVersion(database, logManager))
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
         rpcServer.start(config.rpcInterface, config.rpcPort);
         logger(INFO) << "Core rpc server started ok";
 
-        Tools::SignalHandler::install([&dch]
+        tools::SignalHandler::install([&dch]
                                       {
        dch.exit({});
        dch.stop_handling(); });

@@ -164,8 +164,8 @@ namespace cryptonote
         std::thread m_workerThread;
         syst::Dispatcher *m_dispatcher = nullptr;
         syst::ContextGroup *m_context_group = nullptr;
-        Tools::ObserverManager<cryptonote::INodeObserver> m_observerManager;
-        Tools::ObserverManager<cryptonote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
+        tools::ObserverManager<cryptonote::INodeObserver> m_observerManager;
+        tools::ObserverManager<cryptonote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
 
         const std::string m_nodeHost;
         const unsigned short m_nodePort;

@@ -17,7 +17,7 @@ namespace
     const uint64_t MEGABYTE = 1024 * 1024;
 }
 
-DataBaseConfig::DataBaseConfig() : dataDir(Tools::getDefaultDataDirectory()),
+DataBaseConfig::DataBaseConfig() : dataDir(tools::getDefaultDataDirectory()),
                                    backgroundThreadsCount(DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT),
                                    maxOpenFiles(DATABASE_DEFAULT_MAX_OPEN_FILES),
                                    writeBufferSize(DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE * MEGABYTE),
@@ -35,7 +35,7 @@ bool DataBaseConfig::init(const std::string dataDirectory, const int backgroundT
     writeBufferSize = writeBufferMB * MEGABYTE;
     readCacheSize = readCacheMB * MEGABYTE;
 
-    if (dataDir == Tools::getDefaultDataDirectory())
+    if (dataDir == tools::getDefaultDataDirectory())
     {
         configFolderDefaulted = true;
     }

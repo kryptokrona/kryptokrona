@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     try
     {
         /* Trigger the shutdown signal if ctrl+c is used */
-        Tools::SignalHandler::install([&ctrl_c]
+        tools::SignalHandler::install([&ctrl_c]
                                       { ctrl_c = true; });
 
         /* Init the API */

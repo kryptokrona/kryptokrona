@@ -268,7 +268,7 @@ namespace tools
             if (expected_checksum != checksum)
                 return false;
 
-            int read = Tools::read_varint(addr_data.begin(), addr_data.end(), tag);
+            int read = tools::read_varint(addr_data.begin(), addr_data.end(), tag);
             if (read <= 0)
                 return false;
 

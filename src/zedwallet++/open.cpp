@@ -442,7 +442,7 @@ std::string getNewWalletFileName()
 
 std::string getWalletPassword(const bool verifyPwd, const std::string msg)
 {
-    Tools::PasswordContainer pwdContainer;
+    tools::PasswordContainer pwdContainer;
     pwdContainer.read_password(verifyPwd, msg);
     return pwdContainer.password();
 }

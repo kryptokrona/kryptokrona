@@ -136,7 +136,7 @@ void run(cryptonote::WalletGreen &wallet, cryptonote::INode &node,
         /* walletInfo = walletInfo - workaround for
            https://stackoverflow.com/a/46115028/8737306 - standard &
            capture works in newer compilers. */
-        Tools::SignalHandler::install([&walletInfo = walletInfo, &node,
+        tools::SignalHandler::install([&walletInfo = walletInfo, &node,
                                        &alreadyShuttingDown]
                                       {
             /* If we're already shutting down let control flow continue

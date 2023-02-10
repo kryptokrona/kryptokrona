@@ -30,7 +30,7 @@ namespace ZedUtilities
            pass so copy it into a tmp string and std::move that instead */
         std::string tmpString = currentPassword;
 
-        Tools::PasswordContainer pwdContainer(std::move(tmpString));
+        tools::PasswordContainer pwdContainer(std::move(tmpString));
 
         while (!pwdContainer.read_and_validate(msg))
         {

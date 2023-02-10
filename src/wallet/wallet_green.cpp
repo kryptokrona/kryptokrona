@@ -431,7 +431,7 @@ namespace cryptonote
         try
         {
             bool storageCreated = false;
-            Tools::ScopeExit failExitHandler([path, &storageCreated]
+            tools::ScopeExit failExitHandler([path, &storageCreated]
                                              {
       // Don't delete file if it has existed
       if (storageCreated) {
@@ -722,7 +722,7 @@ namespace cryptonote
         dst.reserve(src.size());
 
         dst.setAutoFlush(false);
-        Tools::ScopeExit exitHandler([&dst]
+        tools::ScopeExit exitHandler([&dst]
                                      {
     dst.setAutoFlush(true);
     dst.flush(); });
@@ -1131,7 +1131,7 @@ namespace cryptonote
                     m_containerStorage.setAutoFlush(false);
                 }
 
-                Tools::ScopeExit exitHandler([this]
+                tools::ScopeExit exitHandler([this]
                                              {
         if (!m_containerStorage.getAutoFlush()) {
           m_containerStorage.setAutoFlush(true);
@@ -1519,7 +1519,7 @@ namespace cryptonote
     size_t WalletGreen::transfer(const PreparedTransaction &preparedTransaction)
     {
         size_t id = WALLET_INVALID_TRANSACTION_ID;
-        Tools::ScopeExit releaseContext([this, &id]
+        tools::ScopeExit releaseContext([this, &id]
                                         {
     m_dispatcher.yield();
 
@@ -1546,7 +1546,7 @@ namespace cryptonote
     size_t WalletGreen::transfer(const TransactionParameters &transactionParameters)
     {
         size_t id = WALLET_INVALID_TRANSACTION_ID;
-        Tools::ScopeExit releaseContext([this, &id]
+        tools::ScopeExit releaseContext([this, &id]
                                         {
     m_dispatcher.yield();
 
@@ -1948,7 +1948,7 @@ namespace cryptonote
     size_t WalletGreen::makeTransaction(const TransactionParameters &sendingTransaction)
     {
         size_t id = WALLET_INVALID_TRANSACTION_ID;
-        Tools::ScopeExit releaseContext([this, &id]
+        tools::ScopeExit releaseContext([this, &id]
                                         {
     m_dispatcher.yield();
 
@@ -2049,7 +2049,7 @@ namespace cryptonote
 
     void WalletGreen::rollbackUncommitedTransaction(size_t transactionId)
     {
-        Tools::ScopeExit releaseContext([this]
+        tools::ScopeExit releaseContext([this]
                                         { m_dispatcher.yield(); });
 
         syst::EventLock lk(m_readyEvent);
@@ -2554,14 +2554,14 @@ namespace cryptonote
         uint64_t fee = transaction.getInputTotalAmount() - transaction.getOutputTotalAmount();
         size_t transactionId = insertOutgoingTransactionAndPushEvent(transaction.getTransactionHash(), fee, transaction.getExtra(), transaction.getUnlockTime());
         m_logger(DEBUGGING) << "Transaction added to container, ID " << transactionId << ", hash " << transaction.getTransactionHash() << ", block " << m_transactions[transactionId].blockHeight << ", state " << m_transactions[transactionId].state;
-        Tools::ScopeExit rollbackTransactionInsertion([this, transactionId]
+        tools::ScopeExit rollbackTransactionInsertion([this, transactionId]
                                                       { updateTransactionStateAndPushEvent(transactionId, WalletTransactionState::FAILED); });
 
         m_fusionTxsCache.emplace(transactionId, isFusion);
         pushBackOutgoingTransfers(transactionId, destinations);
 
         addUnconfirmedTransaction(transaction);
-        Tools::ScopeExit rollbackAddingUnconfirmedTransaction([this, &transaction]
+        tools::ScopeExit rollbackAddingUnconfirmedTransaction([this, &transaction]
                                                               {
     try {
       removeUnconfirmedTransaction(transaction.getTransactionHash());
@@ -3485,7 +3485,7 @@ namespace cryptonote
     {
 
         size_t id = WALLET_INVALID_TRANSACTION_ID;
-        Tools::ScopeExit releaseContext([this, &id]
+        tools::ScopeExit releaseContext([this, &id]
                                         {
     m_dispatcher.yield();
 

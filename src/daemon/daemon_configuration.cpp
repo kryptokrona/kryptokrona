@@ -222,7 +222,7 @@ namespace DaemonConfig
             }
             else if (config.osVersion) // Do we want to display the OS version information?
             {
-                std::cout << cryptonote::getProjectCLIHeader() << "OS: " << Tools::get_os_version_string() << std::endl;
+                std::cout << cryptonote::getProjectCLIHeader() << "OS: " << tools::get_os_version_string() << std::endl;
                 exit(0);
             }
         }

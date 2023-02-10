@@ -169,7 +169,7 @@ selectionScreen(Config &config, cryptonote::WalletGreen &wallet,
                it yet. */
             bool alreadyShuttingDown = false;
 
-            Tools::SignalHandler::install([&]
+            tools::SignalHandler::install([&]
                                           {
                 if (shutdown(walletInfo, node, alreadyShuttingDown))
                 {

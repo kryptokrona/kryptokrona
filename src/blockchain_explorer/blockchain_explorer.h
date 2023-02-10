@@ -112,7 +112,7 @@ namespace cryptonote
         std::atomic<State> state;
         std::atomic<bool> synchronized;
         std::atomic<uint32_t> observersCounter;
-        Tools::ObserverManager<IBlockchainObserver> observerManager;
+        tools::ObserverManager<IBlockchainObserver> observerManager;
 
         std::mutex mutex;
 

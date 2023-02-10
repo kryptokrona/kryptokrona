@@ -21,7 +21,7 @@ namespace DaemonConfig
             std::stringstream logfile;
             logfile << cryptonote::CRYPTONOTE_NAME << "d.log";
 
-            dataDirectory = Tools::getDefaultDataDirectory();
+            dataDirectory = tools::getDefaultDataDirectory();
             checkPoints = "default";
             logFile = logfile.str();
             logLevel = logging::WARNING;

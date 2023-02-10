@@ -58,7 +58,7 @@ namespace cryptonote
         externalPort = 0;
         allowLocalIp = false;
         hideMyPort = false;
-        configFolder = Tools::getDefaultDataDirectory();
+        configFolder = tools::getDefaultDataDirectory();
         testnet = false;
     }
 

@@ -912,7 +912,7 @@ namespace common
             boost::filesystem::remove(bakPath);
         }
 
-        Tools::ScopeExit tmpFileDeleter([&tmpPath]
+        tools::ScopeExit tmpFileDeleter([&tmpPath]
                                         {
     boost::system::error_code ignore;
     boost::filesystem::remove(tmpPath, ignore); });

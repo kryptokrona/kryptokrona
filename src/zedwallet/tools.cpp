@@ -29,7 +29,7 @@ void confirmPassword(const std::string &walletPass, const std::string &msg)
     /* Password container requires an rvalue, we don't want to wipe our current
        pass so copy it into a tmp string and std::move that instead */
     std::string tmpString = walletPass;
-    Tools::PasswordContainer pwdContainer(std::move(tmpString));
+    tools::PasswordContainer pwdContainer(std::move(tmpString));
 
     while (!pwdContainer.read_and_validate(msg))
     {
@@ -215,7 +215,7 @@ std::string createIntegratedAddress(const std::string &address,
     std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
-    return Tools::Base58::encode_addr(
+    return tools::Base58::encode_addr(
         cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
         paymentID + keys);
 }
