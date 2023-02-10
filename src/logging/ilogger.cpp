@@ -17,7 +17,7 @@
 
 #include "ilogger.h"
 
-namespace Logging
+namespace logging
 {
 
     const std::string BLUE = "\x1F"

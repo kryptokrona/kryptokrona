@@ -20,7 +20,7 @@
 #include <vector>
 #include "common_logger.h"
 
-namespace Logging
+namespace logging
 {
 
     class LoggerGroup : public CommonLogger

@@ -17,7 +17,7 @@
 
 #include "file_logger.h"
 
-namespace Logging
+namespace logging
 {
 
     FileLogger::FileLogger(Level level) : StreamLogger(level)

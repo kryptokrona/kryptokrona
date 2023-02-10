@@ -17,7 +17,7 @@
 
 #include "logger_message.h"
 
-namespace Logging
+namespace logging
 {
 
     LoggerMessage::LoggerMessage(std::shared_ptr<ILogger> logger, const std::string &category, Level level, const std::string &color)

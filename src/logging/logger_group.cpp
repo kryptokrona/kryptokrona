@@ -18,7 +18,7 @@
 #include "logger_group.h"
 #include <algorithm>
 
-namespace Logging
+namespace logging
 {
 
     LoggerGroup::LoggerGroup(Level level) : CommonLogger(level)

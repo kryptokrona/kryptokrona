@@ -23,7 +23,7 @@
 #include "common/json_value.h"
 #include "logger_group.h"
 
-namespace Logging
+namespace logging
 {
 
     class LoggerManager : public LoggerGroup

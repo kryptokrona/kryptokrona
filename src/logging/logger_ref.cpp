@@ -17,7 +17,7 @@
 
 #include "logger_ref.h"
 
-namespace Logging
+namespace logging
 {
 
     LoggerRef::LoggerRef(std::shared_ptr<ILogger> logger, const std::string &category) : logger(logger), category(category)

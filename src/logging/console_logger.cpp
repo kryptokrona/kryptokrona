@@ -20,7 +20,7 @@
 #include <unordered_map>
 #include <common/console_tools.h>
 
-namespace Logging
+namespace logging
 {
 
     using common::console::Color;

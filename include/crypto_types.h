@@ -52,13 +52,13 @@ namespace Crypto
         /* Converts the class to a json object */
         void toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
         {
-            writer.String(Common::podToHex(data));
+            writer.String(common::podToHex(data));
         }
 
         /* Initializes the class from a json string */
         void fromString(const std::string &s)
         {
-            if (!Common::podFromHex(s, data))
+            if (!common::podFromHex(s, data))
             {
                 throw std::invalid_argument("Error parsing JSON Hash, wrong length or not hex");
             }
@@ -92,13 +92,13 @@ namespace Crypto
         /* Converts the class to a json object */
         void toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
         {
-            writer.String(Common::podToHex(data));
+            writer.String(common::podToHex(data));
         }
 
         /* Initializes the class from a json string */
         void fromString(const std::string &s)
         {
-            if (!Common::podFromHex(s, data))
+            if (!common::podFromHex(s, data))
             {
                 throw std::invalid_argument("Error parsing JSON PublicKey, wrong length or not hex");
             }
@@ -134,13 +134,13 @@ namespace Crypto
         /* Converts the class to a json object */
         void toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
         {
-            writer.String(Common::podToHex(data));
+            writer.String(common::podToHex(data));
         }
 
         /* Initializes the class from a json string */
         void fromString(const std::string &s)
         {
-            if (!Common::podFromHex(s, data))
+            if (!common::podFromHex(s, data))
             {
                 throw std::invalid_argument("Error parsing JSON SecretKey, wrong length or not hex");
             }
@@ -176,13 +176,13 @@ namespace Crypto
         /* Converts the class to a json object */
         void toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
         {
-            writer.String(Common::podToHex(data));
+            writer.String(common::podToHex(data));
         }
 
         /* Initializes the class from a json string */
         void fromString(const std::string &s)
         {
-            if (!Common::podFromHex(s, data))
+            if (!common::podFromHex(s, data))
             {
                 throw std::invalid_argument("Error parsing JSON KeyDerivation, wrong length or not hex");
             }
@@ -218,13 +218,13 @@ namespace Crypto
         /* Converts the class to a json object */
         void toJSON(rapidjson::Writer<rapidjson::StringBuffer> &writer) const
         {
-            writer.String(Common::podToHex(data));
+            writer.String(common::podToHex(data));
         }
 
         /* Initializes the class from a json string */
         void fromString(const std::string &s)
         {
-            if (!Common::podFromHex(s, data))
+            if (!common::podFromHex(s, data))
             {
                 throw std::invalid_argument("Error parsing JSON keyimage, wrong length or not hex");
             }
@@ -288,12 +288,12 @@ namespace Crypto
 
     inline void to_json(nlohmann::json &j, const Hash &h)
     {
-        j = Common::podToHex(h);
+        j = common::podToHex(h);
     }
 
     inline void from_json(const nlohmann::json &j, Hash &h)
     {
-        if (!Common::podFromHex(j.get<std::string>(), h.data))
+        if (!common::podFromHex(j.get<std::string>(), h.data))
         {
             const auto err = nlohmann::detail::parse_error::create(
                 100, 0, "Wrong length or not hex!");
@@ -304,12 +304,12 @@ namespace Crypto
 
     inline void to_json(nlohmann::json &j, const PublicKey &p)
     {
-        j = Common::podToHex(p);
+        j = common::podToHex(p);
     }
 
     inline void from_json(const nlohmann::json &j, PublicKey &p)
     {
-        if (!Common::podFromHex(j.get<std::string>(), p.data))
+        if (!common::podFromHex(j.get<std::string>(), p.data))
         {
             const auto err = nlohmann::detail::parse_error::create(
                 100, 0, "Wrong length or not hex!");
@@ -320,12 +320,12 @@ namespace Crypto
 
     inline void to_json(nlohmann::json &j, const SecretKey &s)
     {
-        j = Common::podToHex(s);
+        j = common::podToHex(s);
     }
 
     inline void from_json(const nlohmann::json &j, SecretKey &s)
     {
-        if (!Common::podFromHex(j.get<std::string>(), s.data))
+        if (!common::podFromHex(j.get<std::string>(), s.data))
         {
             const auto err = nlohmann::detail::parse_error::create(
                 100, 0, "Wrong length or not hex!");
@@ -336,12 +336,12 @@ namespace Crypto
 
     inline void to_json(nlohmann::json &j, const KeyDerivation &k)
     {
-        j = Common::podToHex(k);
+        j = common::podToHex(k);
     }
 
     inline void from_json(const nlohmann::json &j, KeyDerivation &k)
     {
-        if (!Common::podFromHex(j.get<std::string>(), k.data))
+        if (!common::podFromHex(j.get<std::string>(), k.data))
         {
             const auto err = nlohmann::detail::parse_error::create(
                 100, 0, "Wrong length or not hex!");
@@ -352,12 +352,12 @@ namespace Crypto
 
     inline void to_json(nlohmann::json &j, const KeyImage &k)
     {
-        j = Common::podToHex(k);
+        j = common::podToHex(k);
     }
 
     inline void from_json(const nlohmann::json &j, KeyImage &k)
     {
-        if (!Common::podFromHex(j.get<std::string>(), k.data))
+        if (!common::podFromHex(j.get<std::string>(), k.data))
         {
             const auto err = nlohmann::detail::parse_error::create(
                 100, 0, "Wrong length or not hex!");
@@ -427,37 +427,37 @@ namespace std
     /* Overloading the << operator */
     inline ostream &operator<<(ostream &os, const Crypto::Hash &hash)
     {
-        os << Common::podToHex(hash);
+        os << common::podToHex(hash);
         return os;
     }
 
     inline ostream &operator<<(ostream &os, const Crypto::PublicKey &publicKey)
     {
-        os << Common::podToHex(publicKey);
+        os << common::podToHex(publicKey);
         return os;
     }
 
     inline ostream &operator<<(ostream &os, const Crypto::SecretKey &secretKey)
     {
-        os << Common::podToHex(secretKey);
+        os << common::podToHex(secretKey);
         return os;
     }
 
     inline ostream &operator<<(ostream &os, const Crypto::KeyDerivation &keyDerivation)
     {
-        os << Common::podToHex(keyDerivation);
+        os << common::podToHex(keyDerivation);
         return os;
     }
 
     inline ostream &operator<<(ostream &os, const Crypto::KeyImage &keyImage)
     {
-        os << Common::podToHex(keyImage);
+        os << common::podToHex(keyImage);
         return os;
     }
 
     inline ostream &operator<<(ostream &os, const Crypto::Signature &signature)
     {
-        os << Common::podToHex(signature);
+        os << common::podToHex(signature);
         return os;
     }
 }

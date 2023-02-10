@@ -20,7 +20,7 @@
 #include "console_logger.h"
 #include "file_logger.h"
 
-namespace Logging
+namespace logging
 {
 
     using common::JsonValue;

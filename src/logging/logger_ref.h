@@ -20,7 +20,7 @@
 #include "ilogger.h"
 #include "logger_message.h"
 
-namespace Logging
+namespace logging
 {
 
     class LoggerRef

@@ -20,7 +20,7 @@
 #include <fstream>
 #include "stream_logger.h"
 
-namespace Logging
+namespace logging
 {
 
     class FileLogger : public StreamLogger

@@ -20,7 +20,7 @@
 #include <set>
 #include "ilogger.h"
 
-namespace Logging
+namespace logging
 {
 
     class CommonLogger : public ILogger

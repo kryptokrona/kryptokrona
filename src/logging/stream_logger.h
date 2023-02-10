@@ -20,7 +20,7 @@
 #include <mutex>
 #include "common_logger.h"
 
-namespace Logging
+namespace logging
 {
 
     class StreamLogger : public CommonLogger
