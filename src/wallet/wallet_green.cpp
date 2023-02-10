@@ -2473,7 +2473,7 @@ namespace cryptonote
             }
         }
 
-        std::shuffle(amountsToAddresses.begin(), amountsToAddresses.end(), Random::generator());
+        std::shuffle(amountsToAddresses.begin(), amountsToAddresses.end(), rnd::generator());
         std::sort(amountsToAddresses.begin(), amountsToAddresses.end(), [](const AmountToAddress &left, const AmountToAddress &right)
                   { return left.second < right.second; });
 
@@ -3745,7 +3745,7 @@ namespace cryptonote
         // now, pick the bucket
         std::vector<uint8_t> bucketNumbers(bucketSizes.size());
         std::iota(bucketNumbers.begin(), bucketNumbers.end(), 0);
-        std::shuffle(bucketNumbers.begin(), bucketNumbers.end(), Random::generator());
+        std::shuffle(bucketNumbers.begin(), bucketNumbers.end(), rnd::generator());
         size_t bucketNumberIndex = 0;
         for (; bucketNumberIndex < bucketNumbers.size(); ++bucketNumberIndex)
         {

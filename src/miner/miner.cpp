@@ -75,7 +75,7 @@ namespace cryptonote
 
         try
         {
-            blockMiningParameters.blockTemplate.nonce = Random::randomValue<uint32_t>();
+            blockMiningParameters.blockTemplate.nonce = rnd::randomValue<uint32_t>();
 
             for (size_t i = 0; i < threadCount; ++i)
             {

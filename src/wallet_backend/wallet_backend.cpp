@@ -559,7 +559,7 @@ Error WalletBackend::unsafeSave() const
     byte salt[16];
 
     /* Generate 16 random bytes for the salt */
-    Random::randomBytes(16, salt);
+    rnd::randomBytes(16, salt);
 
     /* Using SHA256 as the algorithm */
     CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;

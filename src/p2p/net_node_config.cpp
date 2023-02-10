@@ -39,7 +39,7 @@ namespace cryptonote
             for (const std::string &peer : peerList)
             {
                 PeerlistEntry peerListEntry = PeerlistEntry();
-                peerListEntry.id = Random::randomValue<uint64_t>();
+                peerListEntry.id = rnd::randomValue<uint64_t>();
                 if (!parsePeerFromString(peerListEntry.adr, peer))
                 {
                     return false;

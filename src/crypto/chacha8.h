@@ -52,7 +52,7 @@ namespace Crypto
     inline chacha8_iv randomChachaIV()
     {
         chacha8_iv result;
-        Random::randomBytes(CHACHA8_IV_SIZE, result.data);
+        rnd::randomBytes(CHACHA8_IV_SIZE, result.data);
         return result;
     }
 }

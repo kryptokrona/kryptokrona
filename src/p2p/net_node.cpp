@@ -54,7 +54,7 @@ namespace
         // divide by zero workaround
         if (!max_index)
             return 0;
-        size_t x = Random::randomValue<size_t>() % (max_index + 1);
+        size_t x = rnd::randomValue<size_t>() % (max_index + 1);
         return (x * x * x) / (max_index * max_index); // parabola \/
     }
 
@@ -359,7 +359,7 @@ namespace cryptonote
     //-----------------------------------------------------------------------------------
     bool NodeServer::make_default_config()
     {
-        m_config.m_peer_id = Random::randomValue<uint64_t>();
+        m_config.m_peer_id = rnd::randomValue<uint64_t>();
         logger(INFO, BRIGHT_WHITE) << "Generated new peer ID: " << m_config.m_peer_id;
         return true;
     }
@@ -901,7 +901,7 @@ namespace cryptonote
         if (!m_peerlist.get_white_peers_count() && m_seed_nodes.size())
         {
             size_t try_count = 0;
-            size_t current_index = Random::randomValue<size_t>() % m_seed_nodes.size();
+            size_t current_index = rnd::randomValue<size_t>() % m_seed_nodes.size();
 
             while (true)
             {
