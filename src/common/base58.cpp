@@ -27,7 +27,7 @@
 
 namespace tools
 {
-    namespace Base58
+    namespace base58
     {
         namespace
         {
