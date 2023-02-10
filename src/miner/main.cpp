@@ -22,7 +22,7 @@ int main(int argc, char **argv)
                 config.daemonHost.c_str(), config.daemonPort, 10 /* 10 second timeout */
             );
 
-            Miner::MinerManager app(dispatcher, config, httpClient);
+            miner::MinerManager app(dispatcher, config, httpClient);
 
             app.start();
         }

@@ -25,13 +25,13 @@
 namespace cryptonote
 {
 
-    Miner::Miner(syst::Dispatcher &dispatcher) : m_dispatcher(dispatcher),
-                                                   m_miningStopped(dispatcher),
-                                                   m_state(MiningState::MINING_STOPPED)
+    miner::Miner(syst::Dispatcher &dispatcher) : m_dispatcher(dispatcher),
+                                                 m_miningStopped(dispatcher),
+                                                 m_state(MiningState::MINING_STOPPED)
     {
     }
 
-    BlockTemplate Miner::mine(const BlockMiningParameters &blockMiningParameters, size_t threadCount)
+    BlockTemplate miner::mine(const BlockMiningParameters &blockMiningParameters, size_t threadCount)
     {
         if (threadCount == 0)
         {
@@ -56,7 +56,7 @@ namespace cryptonote
         return m_block;
     }
 
-    void Miner::stop()
+    void miner::stop()
     {
         MiningState state = MiningState::MINING_IN_PROGRESS;
 
@@ -67,7 +67,7 @@ namespace cryptonote
         }
     }
 
-    void Miner::runWorkers(BlockMiningParameters blockMiningParameters, size_t threadCount)
+    void miner::runWorkers(BlockMiningParameters blockMiningParameters, size_t threadCount)
     {
         std::cout << InformationMsg("Started mining for difficulty of ")
                   << InformationMsg(blockMiningParameters.difficulty)
@@ -80,7 +80,7 @@ namespace cryptonote
             for (size_t i = 0; i < threadCount; ++i)
             {
                 m_workers.emplace_back(std::unique_ptr<syst::RemoteContext<void>>(
-                    new syst::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount)))));
+                    new syst::RemoteContext<void>(m_dispatcher, std::bind(&miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount)))));
 
                 blockMiningParameters.blockTemplate.nonce++;
             }
@@ -98,7 +98,7 @@ namespace cryptonote
         m_miningStopped.set();
     }
 
-    void Miner::workerFunc(const BlockTemplate &blockTemplate, uint64_t difficulty, uint32_t nonceStep)
+    void miner::workerFunc(const BlockTemplate &blockTemplate, uint64_t difficulty, uint32_t nonceStep)
     {
         try
         {
@@ -133,7 +133,7 @@ namespace cryptonote
         }
     }
 
-    bool Miner::setStateBlockFound()
+    bool miner::setStateBlockFound()
     {
         auto state = m_state.load();
 
@@ -166,12 +166,12 @@ namespace cryptonote
         }
     }
 
-    void Miner::incrementHashCount()
+    void miner::incrementHashCount()
     {
         m_hash_count++;
     }
 
-    uint64_t Miner::getHashCount()
+    uint64_t miner::getHashCount()
     {
         return m_hash_count.load();
     }
