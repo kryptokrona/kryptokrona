@@ -31,7 +31,7 @@ namespace cryptonote
 
     class HttpClient;
 
-    namespace JsonRpc
+    namespace json_rpc
     {
 
         const int errParseError = -32700;

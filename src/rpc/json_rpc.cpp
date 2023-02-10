@@ -21,7 +21,7 @@
 namespace cryptonote
 {
 
-    namespace JsonRpc
+    namespace json_rpc
     {
 
         JsonRpcError::JsonRpcError() : code(0) {}
