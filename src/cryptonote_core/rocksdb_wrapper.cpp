@@ -55,7 +55,7 @@ void RocksDBWrapper::init(const DataBaseConfig &config)
     rocksdb::DB *dbPtr;
 
     rocksdb::Options dbOptions = getDBOptions(config);
-    rocksdb::Status status = rocksdb::db::Open(dbOptions, dataDir, &dbPtr);
+    rocksdb::Status status = rocksdb::DB::Open(dbOptions, dataDir, &dbPtr);
     if (status.ok())
     {
         logger(INFO) << "DB opened in " << dataDir;
@@ -64,7 +64,7 @@ void RocksDBWrapper::init(const DataBaseConfig &config)
     {
         logger(INFO) << "DB not found in " << dataDir << ". Creating new DB...";
         dbOptions.create_if_missing = true;
-        rocksdb::Status status = rocksdb::db::Open(dbOptions, dataDir, &dbPtr);
+        rocksdb::Status status = rocksdb::DB::Open(dbOptions, dataDir, &dbPtr);
         if (!status.ok())
         {
             logger(ERROR) << "DB Error. DB can't be created in " << dataDir << ". Error: " << status.ToString();
