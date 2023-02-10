@@ -32,7 +32,7 @@
 
 namespace common
 {
-    namespace Console
+    namespace console
     {
 
         bool isConsoleTty()

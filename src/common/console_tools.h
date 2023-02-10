@@ -21,7 +21,7 @@
 
 namespace common
 {
-    namespace Console
+    namespace console
     {
 
         enum class Color : uint8_t
