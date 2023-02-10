@@ -6,7 +6,7 @@
 
 #include <config/wallet_config.h>
 
-namespace ApiConstants
+namespace api_constants
 {
     /* The number of iterations of PBKDF2 to perform on the wallet
        password. */
