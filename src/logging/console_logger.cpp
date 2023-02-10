@@ -23,7 +23,7 @@
 namespace Logging
 {
 
-    using common::Console::Color;
+    using common::console::Color;
 
     ConsoleLogger::ConsoleLogger(Level level) : CommonLogger(level)
     {
@@ -64,7 +64,7 @@ namespace Logging
                 if (readingText)
                 {
                     auto it = colorMapping.find(color);
-                    common::Console::setTextColor(it == colorMapping.end() ? Color::Default : it->second);
+                    common::console::setTextColor(it == colorMapping.end() ? Color::Default : it->second);
                     changedColor = true;
                     color.clear();
                 }
@@ -81,7 +81,7 @@ namespace Logging
 
         if (changedColor)
         {
-            common::Console::setTextColor(Color::Default);
+            common::console::setTextColor(Color::Default);
         }
     }
 
