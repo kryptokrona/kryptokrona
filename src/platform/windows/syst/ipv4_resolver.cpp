@@ -27,7 +27,7 @@
 #include <syst/interrupted_exception.h>
 #include <syst/ipv4_address.h>
 
-namespace System
+namespace syst
 {
 
     Ipv4Resolver::Ipv4Resolver() : dispatcher(nullptr)

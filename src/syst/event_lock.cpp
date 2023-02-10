@@ -18,7 +18,7 @@
 #include "event_lock.h"
 #include <syst/event.h>
 
-namespace System
+namespace syst
 {
 
     EventLock::EventLock(Event &event) : event(event)

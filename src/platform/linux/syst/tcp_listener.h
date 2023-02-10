@@ -20,7 +20,7 @@
 #include <cstdint>
 #include <string>
 
-namespace System
+namespace syst
 {
 
     class Dispatcher;

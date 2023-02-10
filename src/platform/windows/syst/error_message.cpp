@@ -24,7 +24,7 @@
 #include <cstddef>
 #include <windows.h>
 
-namespace System
+namespace syst
 {
 
     std::string lastErrorMessage()

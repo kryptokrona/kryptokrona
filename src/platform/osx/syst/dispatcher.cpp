@@ -29,7 +29,7 @@
 #include "context.h"
 #include "error_message.h"
 
-namespace System
+namespace syst
 {
 
     namespace

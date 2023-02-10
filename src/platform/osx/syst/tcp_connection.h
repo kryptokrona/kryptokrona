@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <utility>
 
-namespace System
+namespace syst
 {
 
     class Dispatcher;

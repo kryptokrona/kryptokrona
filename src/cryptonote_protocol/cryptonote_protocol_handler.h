@@ -23,7 +23,7 @@
 
 #include <logging/logger_ref.h>
 
-namespace System
+namespace syst
 {
     class Dispatcher;
 }

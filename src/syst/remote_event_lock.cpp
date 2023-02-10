@@ -22,7 +22,7 @@
 #include <syst/dispatcher.h>
 #include <syst/event.h>
 
-namespace System
+namespace syst
 {
 
     RemoteEventLock::RemoteEventLock(Dispatcher &dispatcher, Event &event) : dispatcher(dispatcher), event(event)

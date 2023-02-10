@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace System
+namespace syst
 {
 
     class Dispatcher;

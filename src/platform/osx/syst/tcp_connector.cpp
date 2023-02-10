@@ -32,7 +32,7 @@
 #include "error_message.h"
 #include "tcp_connection.h"
 
-namespace System
+namespace syst
 {
 
     namespace

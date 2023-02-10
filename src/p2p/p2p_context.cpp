@@ -24,7 +24,7 @@
 
 #include "levin_protocol.h"
 
-using namespace System;
+using namespace syst;
 
 namespace CryptoNote
 {

@@ -19,7 +19,7 @@
 
 #include <chrono>
 
-namespace System
+namespace syst
 {
 
     class Dispatcher;

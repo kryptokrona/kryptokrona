@@ -27,7 +27,7 @@
 #include <syst/error_message.h>
 #include <syst/interrupted_exception.h>
 
-namespace System
+namespace syst
 {
 
     Timer::Timer() : dispatcher(nullptr)

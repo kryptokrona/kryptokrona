@@ -18,7 +18,7 @@
 #include "ipv4_address.h"
 #include <stdexcept>
 
-namespace System
+namespace syst
 {
 
     namespace

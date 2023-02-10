@@ -18,7 +18,7 @@
 #include "context_group.h"
 #include <cassert>
 
-namespace System
+namespace syst
 {
 
     ContextGroup::ContextGroup(Dispatcher &dispatcher) : dispatcher(&dispatcher)

@@ -19,7 +19,7 @@
 
 #include <syst/dispatcher.h>
 
-namespace System
+namespace syst
 {
 
     class ContextGroup

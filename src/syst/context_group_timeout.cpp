@@ -18,7 +18,7 @@
 #include "context_group_timeout.h"
 #include <syst/interrupted_exception.h>
 
-using namespace System;
+using namespace syst;
 
 ContextGroupTimeout::ContextGroupTimeout(Dispatcher &dispatcher, ContextGroup &contextGroup, std::chrono::nanoseconds timeout) : workingContextGroup(dispatcher),
                                                                                                                                  timeoutTimer(dispatcher)

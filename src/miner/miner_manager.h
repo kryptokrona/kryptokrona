@@ -17,7 +17,7 @@
 #include "miner_event.h"
 #include "mining_config.h"
 
-namespace System
+namespace syst
 {
     class Dispatcher;
 }

@@ -23,7 +23,7 @@
 
 #include <syst/interrupted_exception.h>
 
-using namespace System;
+using namespace syst;
 
 namespace CryptoNote
 {

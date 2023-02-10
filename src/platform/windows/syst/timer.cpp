@@ -28,7 +28,7 @@
 #include <syst/interrupted_exception.h>
 #include "dispatcher.h"
 
-namespace System
+namespace syst
 {
 
     namespace

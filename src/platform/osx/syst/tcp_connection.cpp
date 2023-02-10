@@ -29,7 +29,7 @@
 #include <syst/interrupted_exception.h>
 #include <syst/ipv4_address.h>
 
-namespace System
+namespace syst
 {
 
     TcpConnection::TcpConnection() : dispatcher(nullptr)

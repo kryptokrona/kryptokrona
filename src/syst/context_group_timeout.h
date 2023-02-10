@@ -20,7 +20,7 @@
 #include <syst/context_group.h>
 #include <syst/timer.h>
 
-namespace System
+namespace syst
 {
 
     class ContextGroupTimeout

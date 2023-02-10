@@ -33,7 +33,7 @@
 #include <syst/interrupted_exception.h>
 #include <syst/ipv4_address.h>
 
-namespace System
+namespace syst
 {
 
     TcpListener::TcpListener() : dispatcher(nullptr)

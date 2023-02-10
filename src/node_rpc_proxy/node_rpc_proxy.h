@@ -17,7 +17,7 @@
 #include "inode.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
 
-namespace System
+namespace syst
 {
     class ContextGroup;
     class Dispatcher;

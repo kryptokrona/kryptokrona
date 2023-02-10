@@ -19,7 +19,7 @@
 
 #include <string>
 
-namespace System
+namespace syst
 {
 
     std::string lastErrorMessage();

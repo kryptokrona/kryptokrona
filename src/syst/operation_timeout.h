@@ -21,7 +21,7 @@
 #include <syst/dispatcher.h>
 #include <syst/timer.h>
 
-namespace System
+namespace syst
 {
 
     template <typename T>

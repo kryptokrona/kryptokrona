@@ -21,7 +21,7 @@
 #include <syst/event.h>
 #include <syst/interrupted_exception.h>
 
-namespace System
+namespace syst
 {
 
     template <typename ResultType = void>

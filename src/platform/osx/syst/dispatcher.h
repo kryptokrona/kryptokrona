@@ -23,7 +23,7 @@
 #include <queue>
 #include <stack>
 
-namespace System
+namespace syst
 {
 
     struct NativeContextGroup;

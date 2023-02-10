@@ -30,7 +30,7 @@
 #include "p2p_protocol_definitions.h"
 #include "peer_list_manager.h"
 
-namespace System
+namespace syst
 {
     class TcpConnection;
 }

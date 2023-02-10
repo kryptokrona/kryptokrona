@@ -20,7 +20,7 @@
 #include <syst/dispatcher.h>
 #include <syst/interrupted_exception.h>
 
-namespace System
+namespace syst
 {
 
     namespace

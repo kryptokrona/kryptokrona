@@ -21,7 +21,7 @@
 #include <string>
 #include <system_error>
 
-namespace System
+namespace syst
 {
 
     class MemoryMappedFile

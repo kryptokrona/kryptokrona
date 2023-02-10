@@ -18,7 +18,7 @@
 #include "tcp_stream.h"
 #include <syst/tcp_connection.h>
 
-namespace System
+namespace syst
 {
 
     TcpStreambuf::TcpStreambuf(TcpConnection &connection) : connection(connection)
