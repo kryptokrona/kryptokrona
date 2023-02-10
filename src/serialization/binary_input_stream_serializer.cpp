@@ -26,7 +26,7 @@
 
 using namespace Common;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace

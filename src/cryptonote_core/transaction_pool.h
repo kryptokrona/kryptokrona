@@ -32,7 +32,7 @@
 #include <logging/logger_ref.h>
 #include "transaction_validatior_state.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class TransactionPool : public ITransactionPool

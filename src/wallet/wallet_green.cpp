@@ -46,7 +46,7 @@
 
 using namespace Common;
 using namespace Crypto;
-using namespace CryptoNote;
+using namespace cryptonote;
 using namespace Logging;
 
 namespace
@@ -130,7 +130,7 @@ namespace
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     WalletGreen::WalletGreen(System::Dispatcher &dispatcher, const Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, uint32_t transactionSoftLockTime) : m_dispatcher(dispatcher),
@@ -4102,4 +4102,4 @@ namespace CryptoNote
         return std::min(x, y) - CryptoNote::parameters ::CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

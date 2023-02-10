@@ -24,7 +24,7 @@ namespace syst
     class Event;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class HttpClient;

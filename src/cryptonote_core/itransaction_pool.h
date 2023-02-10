@@ -18,7 +18,7 @@
 #pragma once
 #include "cached_transaction.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct TransactionValidatorState;

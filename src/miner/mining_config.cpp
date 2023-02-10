@@ -27,7 +27,7 @@
 
 #include <utilities/coloured_msg.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace

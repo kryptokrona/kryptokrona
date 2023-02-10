@@ -21,9 +21,9 @@
 #include "common/string_tools.h"
 
 using Common::JsonValue;
-using namespace CryptoNote;
+using namespace cryptonote;
 
-namespace CryptoNote
+namespace cryptonote
 {
     std::ostream &operator<<(std::ostream &out, const JsonOutputStreamSerializer &enumerator)
     {

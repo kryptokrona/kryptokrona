@@ -19,7 +19,7 @@
 
 #include <syst/context_group.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     using json = nlohmann::json;
@@ -70,4 +70,4 @@ namespace CryptoNote
         void cleanRecentlyDeletedTransactions(uint64_t currentTime);
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

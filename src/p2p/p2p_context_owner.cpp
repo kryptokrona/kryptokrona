@@ -19,7 +19,7 @@
 #include <cassert>
 #include "p2p_context.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     P2pContextOwner::P2pContextOwner(P2pContext *ctx, ContextList &contextList) : contextList(contextList)

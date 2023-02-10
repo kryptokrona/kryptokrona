@@ -21,7 +21,7 @@
 
 #include <wallet_types.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class INodeObserver

@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <cstddef>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class ICryptoNoteProtocolObserver
@@ -32,4 +32,4 @@ namespace CryptoNote
         virtual void blockchainSynchronized(uint32_t topHeight) {}
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

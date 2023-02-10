@@ -14,7 +14,7 @@ namespace Crypto
     struct Hash;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class ITransactionPoolCleanWrapper : public ITransactionPool
@@ -25,4 +25,4 @@ namespace CryptoNote
         virtual std::vector<Crypto::Hash> clean(const uint32_t height) = 0;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

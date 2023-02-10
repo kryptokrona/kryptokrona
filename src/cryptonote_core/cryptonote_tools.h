@@ -26,7 +26,7 @@
 #include <config/cryptonote_config.h>
 #include "cryptonote_serialization.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void getBinaryArrayHash(const BinaryArray &binaryArray, Crypto::Hash &hash);

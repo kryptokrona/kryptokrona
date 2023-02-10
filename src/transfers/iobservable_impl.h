@@ -19,7 +19,7 @@
 
 #include "common/observer_manager.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     template <typename Observer, typename Base>

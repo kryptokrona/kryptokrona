@@ -19,7 +19,7 @@
 
 #include <cryptonote.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class IMainChainStorage

@@ -20,7 +20,7 @@
 #include <list>
 #include <memory>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class P2pContext;

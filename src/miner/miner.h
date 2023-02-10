@@ -16,7 +16,7 @@
 
 #include "cryptonote.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct BlockMiningParameters
@@ -60,4 +60,4 @@ namespace CryptoNote
         void incrementHashCount();
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

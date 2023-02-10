@@ -22,7 +22,7 @@
 using namespace Crypto;
 using namespace Logging;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     TransfersSubscription::TransfersSubscription(const CryptoNote::Currency &currency, std::shared_ptr<Logging::ILogger> logger, const AccountSubscription &sub)

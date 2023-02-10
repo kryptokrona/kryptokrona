@@ -41,7 +41,7 @@
 #endif
 
 using Common::JsonValue;
-using namespace CryptoNote;
+using namespace cryptonote;
 using namespace Logging;
 using namespace DaemonConfig;
 

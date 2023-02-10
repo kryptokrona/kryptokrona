@@ -20,7 +20,7 @@
 #include <cryptonote.h>
 #include <functional>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     enum class TransactionMessageType

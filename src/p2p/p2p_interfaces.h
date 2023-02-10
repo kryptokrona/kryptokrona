@@ -22,7 +22,7 @@
 
 #include <cryptonote.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct P2pMessage

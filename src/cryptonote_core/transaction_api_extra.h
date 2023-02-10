@@ -20,7 +20,7 @@
 #include "cryptonote_format_utils.h"
 #include "transaction_extra.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class TransactionExtra

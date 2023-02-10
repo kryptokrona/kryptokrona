@@ -19,7 +19,7 @@
 
 #include "cryptonote_core/cryptonote_basic.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     struct IMinerHandler
     {

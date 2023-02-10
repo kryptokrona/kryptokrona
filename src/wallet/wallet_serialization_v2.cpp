@@ -122,7 +122,7 @@ namespace
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     WalletSerializerV2::WalletSerializerV2(
@@ -429,4 +429,4 @@ namespace CryptoNote
         }
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

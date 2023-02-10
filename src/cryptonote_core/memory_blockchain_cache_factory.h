@@ -21,7 +21,7 @@
 
 #include "blockchain_cache.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class MemoryBlockchainCacheFactory : public IBlockchainCacheFactory
@@ -38,4 +38,4 @@ namespace CryptoNote
         std::shared_ptr<Logging::ILogger> logger;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

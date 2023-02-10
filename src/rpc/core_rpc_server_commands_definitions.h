@@ -19,7 +19,7 @@
 
 #include <wallet_types.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 //-----------------------------------------------
 #define CORE_RPC_STATUS_OK "OK"

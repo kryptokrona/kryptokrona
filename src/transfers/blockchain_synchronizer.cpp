@@ -73,7 +73,7 @@ namespace
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     BlockchainSynchronizer::BlockchainSynchronizer(INode &node, std::shared_ptr<Logging::ILogger> logger, const Hash &genesisBlockHash) : m_logger(logger, "BlockchainSynchronizer"),

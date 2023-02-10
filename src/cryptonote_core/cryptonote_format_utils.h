@@ -30,7 +30,7 @@ namespace Logging
     class ILogger;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     bool is_out_to_acc(const AccountKeys &acc, const KeyOutput &out_key, const Crypto::KeyDerivation &derivation, size_t keyIndex);

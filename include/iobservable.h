@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace CryptoNote {
+namespace cryptonote {
 
 template <typename T>
 class IObservable {

@@ -17,7 +17,7 @@
 
 #include "add_block_error_condition.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace error
     {

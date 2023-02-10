@@ -19,7 +19,7 @@
 
 #include "dbutils.h"
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 BlockchainWriteBatch::BlockchainWriteBatch()
 {

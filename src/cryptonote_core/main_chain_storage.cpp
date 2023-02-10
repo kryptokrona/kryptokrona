@@ -21,7 +21,7 @@
 
 #include "cryptonote_tools.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     const size_t STORAGE_CACHE_SIZE = 100;

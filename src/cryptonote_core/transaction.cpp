@@ -33,7 +33,7 @@ using namespace Crypto;
 namespace
 {
 
-    using namespace CryptoNote;
+    using namespace cryptonote;
 
     void derivePublicKey(const AccountPublicAddress &to, const SecretKey &txKey, size_t outputIndex, PublicKey &ephemeralKey)
     {
@@ -44,7 +44,7 @@ namespace
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     using namespace Crypto;

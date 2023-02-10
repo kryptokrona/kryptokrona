@@ -12,7 +12,7 @@
 #include <syst/interrupted_exception.h>
 #include <syst/timer.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     using json = nlohmann::json;

@@ -26,7 +26,7 @@
 using namespace Logging;
 using namespace Common;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace

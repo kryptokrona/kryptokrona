@@ -43,7 +43,7 @@ using namespace Common;
 namespace
 {
 
-    using namespace CryptoNote;
+    using namespace cryptonote;
     using namespace Common;
 
     uint64_t getSignaturesCount(const TransactionInput &input)
@@ -190,7 +190,7 @@ namespace Crypto
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void serialize(TransactionPrefix &txP, ISerializer &serializer)
@@ -572,4 +572,4 @@ namespace CryptoNote
         }
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

@@ -18,7 +18,7 @@
 #include "upgrade_detector.h"
 #include "iupgrade_detector.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class SimpleUpgradeDetector : public IUpgradeDetector

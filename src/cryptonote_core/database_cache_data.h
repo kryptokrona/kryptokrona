@@ -20,7 +20,7 @@
 #include <cryptonote_core/blockchain_cache.h>
 #include <map>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct KeyOutputInfo

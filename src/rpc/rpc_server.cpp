@@ -39,7 +39,7 @@ using namespace Logging;
 using namespace Crypto;
 using namespace Common;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     static inline void serialize(COMMAND_RPC_GET_BLOCKS_FAST::response &response, ISerializer &s)

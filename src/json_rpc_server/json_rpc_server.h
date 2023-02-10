@@ -14,7 +14,7 @@
 #include "rpc/http_server.h"
 #include "wallet_service/configuration_manager.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     class HttpResponse;
     class HttpRequest;
@@ -30,7 +30,7 @@ namespace syst
     class TcpConnection;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class JsonRpcServer : HttpServer
@@ -61,4 +61,4 @@ namespace CryptoNote
         Logging::LoggerRef logger;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

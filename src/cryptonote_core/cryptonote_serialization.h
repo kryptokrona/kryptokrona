@@ -36,7 +36,7 @@ namespace Crypto
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct AccountKeys;

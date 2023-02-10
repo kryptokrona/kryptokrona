@@ -21,7 +21,7 @@
 #include <string>
 #include <utility>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class IReadBatch {
 public:
@@ -29,4 +29,4 @@ public:
   virtual void submitRawResult(const std::vector<std::string>& values, const std::vector<bool>& resultStates) = 0;
 };
 
-} //namespace CryptoNote
+} //namespace cryptonote

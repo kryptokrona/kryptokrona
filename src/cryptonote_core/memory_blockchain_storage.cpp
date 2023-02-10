@@ -19,7 +19,7 @@
 #include <cassert>
 #include "serialization/serialization_overloads.h"
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 MemoryBlockchainStorage::MemoryBlockchainStorage(uint32_t reserveSize)
 {

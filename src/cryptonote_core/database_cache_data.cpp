@@ -20,7 +20,7 @@
 #include <cryptonote_core/database_cache_data.h>
 #include <serialization/serialization_overloads.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void ExtendedTransactionInfo::serialize(CryptoNote::ISerializer &s)

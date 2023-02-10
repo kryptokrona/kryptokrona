@@ -37,7 +37,7 @@
 #include <p2p/peer_list_manager.h>
 #include <p2p/peerlist.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class P2pContext;

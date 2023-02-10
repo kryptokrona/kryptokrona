@@ -17,7 +17,7 @@
 
 #include "block_validation_errors.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace error
     {

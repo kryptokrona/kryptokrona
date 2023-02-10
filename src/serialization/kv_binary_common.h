@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     const uint32_t PORTABLE_STORAGE_SIGNATUREA = 0x01011101;

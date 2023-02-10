@@ -19,7 +19,7 @@
 
 #include <cryptonote_core/blockchain_storage.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class MemoryBlockchainStorage : public BlockchainStorage::IBlockchainStorageInternal

@@ -24,7 +24,7 @@
 #include "p2p_context_owner.h"
 #include "p2p_interfaces.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class P2pContext;

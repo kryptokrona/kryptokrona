@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace CryptoNote
+namespace cryptonote
 {
     class ICryptoNoteProtocolObserver;
 
@@ -36,4 +36,4 @@ namespace CryptoNote
         virtual bool isSynchronized() const = 0;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

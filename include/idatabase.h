@@ -23,7 +23,7 @@
 #include "iwrite_batch.h"
 #include "iread_batch.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class IDataBase

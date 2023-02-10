@@ -22,7 +22,7 @@
 #include "iserializer.h"
 #include "memory_stream.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class KVBinaryOutputStreamSerializer : public ISerializer

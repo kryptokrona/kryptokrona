@@ -24,7 +24,7 @@
 
 #include "cryptonote.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 namespace TransactionTypes {
   

@@ -19,7 +19,7 @@
 
 #include <config/cryptonote_config.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     UpgradeManager::UpgradeManager()

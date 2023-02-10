@@ -28,7 +28,7 @@
 #include "cryptonote_core/transaction_validatior_state.h"
 #include "common/array_view.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class ISerializer;

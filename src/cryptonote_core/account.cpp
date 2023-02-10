@@ -8,7 +8,7 @@
 #include "cryptonote_serialization.h"
 #include "crypto/keccak.c"
 
-namespace CryptoNote
+namespace cryptonote
 {
     //-----------------------------------------------------------------
     AccountBase::AccountBase()

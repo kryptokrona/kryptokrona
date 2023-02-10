@@ -25,7 +25,7 @@
 
 #include <fstream>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     template <typename T>

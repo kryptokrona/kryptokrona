@@ -23,7 +23,7 @@
 #include "cryptonote_core/currency.h"
 #include "wallet/wallet_green.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     uint64_t getDefaultMixinByHeight(const uint64_t height);

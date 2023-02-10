@@ -17,7 +17,7 @@
 
 #include "cryptonote_core/blockchain_messages.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     BlockchainMessage::BlockchainMessage(const NewBlock &message) : type(Type::NewBlock), newBlock(std::move(message))

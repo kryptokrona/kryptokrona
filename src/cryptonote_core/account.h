@@ -20,7 +20,7 @@
 #include "cryptonote_core/cryptonote_basic.h"
 #include "crypto/crypto.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class ISerializer;

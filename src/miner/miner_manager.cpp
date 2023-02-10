@@ -26,7 +26,7 @@
 
 #include <utilities/coloured_msg.h>
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 using json = nlohmann::json;
 

@@ -44,7 +44,7 @@
 
 using namespace Crypto;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace

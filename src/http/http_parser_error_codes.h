@@ -20,7 +20,7 @@
 #include <string>
 #include <system_error>
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace error
     {
@@ -73,7 +73,7 @@ namespace CryptoNote
         };
 
     } // namespace error
-} // namespace CryptoNote
+} // namespace cryptonote
 
 inline std::error_code make_error_code(CryptoNote::error::HttpParserErrorCodes e)
 {

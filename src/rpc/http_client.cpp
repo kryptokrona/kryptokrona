@@ -22,7 +22,7 @@
 #include <syst/ipv4_address.h>
 #include <syst/tcp_connector.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     HttpClient::HttpClient(System::Dispatcher &dispatcher, const std::string &address, uint16_t port) : m_dispatcher(dispatcher), m_address(address), m_port(port)

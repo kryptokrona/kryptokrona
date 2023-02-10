@@ -19,7 +19,7 @@
 
 #include <vector>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class WriteBatch;

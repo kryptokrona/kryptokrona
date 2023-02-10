@@ -20,7 +20,7 @@
 #include "cryptonote_basic_impl.h"
 #include <logging/logger_ref.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
     class Checkpoints
     {

@@ -30,7 +30,7 @@
 
 #include "logging/logger_ref.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class BlockchainSynchronizer : public IObservableImpl<IBlockchainSynchronizerObserver, IBlockchainSynchronizer>,

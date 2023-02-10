@@ -26,7 +26,7 @@
 #include <config/cryptonote_config.h>
 #include "check_difficulty.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     using std::uint64_t;

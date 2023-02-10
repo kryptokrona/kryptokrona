@@ -28,7 +28,7 @@
 #include "common/std_input_stream.h"
 #include "serialization/kv_binary_input_stream_serializer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace DB
     {

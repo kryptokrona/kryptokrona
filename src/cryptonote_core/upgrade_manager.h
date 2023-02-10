@@ -23,7 +23,7 @@
 
 #include "iupgrade_detector.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     // Simple upgrade manager version. It doesn't support voting for now.
@@ -41,4 +41,4 @@ namespace CryptoNote
         std::vector<std::unique_ptr<IUpgradeDetector>> m_upgradeDetectors;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

@@ -21,7 +21,7 @@
 
 #include <memory>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     // TODO: rename this class since it's not persistent blockchain storage!

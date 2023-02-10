@@ -31,7 +31,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     template <typename T>

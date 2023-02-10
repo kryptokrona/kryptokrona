@@ -10,7 +10,7 @@
 #include "cryptonote.h"
 #include "p2p_protocol_types.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct CryptoNoteConnectionContext;

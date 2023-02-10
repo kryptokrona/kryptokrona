@@ -11,7 +11,7 @@
 #include <cryptonote.h>
 #include <crypto/crypto.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct TransactionValidatorState

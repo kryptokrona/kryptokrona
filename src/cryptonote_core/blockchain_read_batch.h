@@ -55,7 +55,7 @@ namespace std
     };
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     using KeyOutputKeyResult = std::unordered_map<std::pair<IBlockchainCache::Amount, IBlockchainCache::GlobalOutputIndex>, KeyOutputInfo>;

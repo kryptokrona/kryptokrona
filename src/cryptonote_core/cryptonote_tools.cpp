@@ -18,7 +18,7 @@
 #include "cryptonote_tools.h"
 #include "cryptonote_format_utils.h"
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 template <>
 bool CryptoNote::toBinaryArray(const BinaryArray &object, BinaryArray &binaryArray)

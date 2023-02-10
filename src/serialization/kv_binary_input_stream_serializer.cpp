@@ -25,7 +25,7 @@
 #include "kv_binary_common.h"
 
 using namespace Common;
-using namespace CryptoNote;
+using namespace cryptonote;
 
 namespace
 {

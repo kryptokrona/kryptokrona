@@ -6,7 +6,7 @@
 
 #include "transaction_validatior_state.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void mergeStates(TransactionValidatorState &destination, const TransactionValidatorState &source)

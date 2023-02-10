@@ -23,7 +23,7 @@
 
 #include "logging/logger_ref.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class TransfersSubscription : public IObservableImpl<ITransfersObserver, ITransfersSubscription>

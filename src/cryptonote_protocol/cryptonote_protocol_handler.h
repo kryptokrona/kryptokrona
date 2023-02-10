@@ -28,7 +28,7 @@ namespace syst
     class Dispatcher;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
     class Currency;
 

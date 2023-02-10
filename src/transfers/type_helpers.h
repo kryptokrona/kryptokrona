@@ -21,7 +21,7 @@
 #include <functional>
 #include <cstring>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     inline bool operator==(const AccountPublicAddress &_v1, const AccountPublicAddress &_v2)

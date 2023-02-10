@@ -21,7 +21,7 @@
 #include "common/json_value.h"
 #include "iserializer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class JsonOutputStreamSerializer : public ISerializer

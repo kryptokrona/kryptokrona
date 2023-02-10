@@ -10,7 +10,7 @@
 #include "crypto/crypto.h"
 #include <config/cryptonote_config.h>
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 namespace
 {

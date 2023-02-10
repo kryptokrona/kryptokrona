@@ -20,7 +20,7 @@
 #include "iblockchain_cache_factory.h"
 #include <logging/logger_message.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class IDataBase;
@@ -39,4 +39,4 @@ namespace CryptoNote
         std::shared_ptr<Logging::ILogger> logger;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

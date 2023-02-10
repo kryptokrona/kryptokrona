@@ -13,7 +13,7 @@
 #include <initializer_list>
 #include <boost/uuid/uuid.hpp>
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace parameters
     {

@@ -17,7 +17,7 @@
 
 #include "node_errors.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace NodeError
     {

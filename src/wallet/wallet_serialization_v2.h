@@ -23,7 +23,7 @@
 #include "transfers/transfers_synchronizer.h"
 #include "wallet/wallet_indices.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class WalletSerializerV2
@@ -83,4 +83,4 @@ namespace CryptoNote
         std::unordered_set<Crypto::PublicKey> m_deletedKeys;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

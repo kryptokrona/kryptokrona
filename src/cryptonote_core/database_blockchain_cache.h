@@ -27,7 +27,7 @@
 #include <cryptonote_core/database_cache_data.h>
 #include <cryptonote_core/iblockchain_cache_factory.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     /*

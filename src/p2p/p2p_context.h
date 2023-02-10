@@ -32,7 +32,7 @@
 #include "p2p_protocol_definitions.h"
 #include "p2p_protocol_types.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class P2pContext

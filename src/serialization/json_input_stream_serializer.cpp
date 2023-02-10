@@ -20,7 +20,7 @@
 #include <ctype.h>
 #include <exception>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace
@@ -43,4 +43,4 @@ namespace CryptoNote
     {
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

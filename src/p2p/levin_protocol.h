@@ -28,7 +28,7 @@ namespace syst
     class TcpConnection;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     enum class LevinError : int32_t

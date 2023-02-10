@@ -45,7 +45,7 @@ namespace Common
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     template <typename T>

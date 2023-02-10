@@ -17,7 +17,7 @@
 
 #include "p2p_interfaces.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     IP2pConnection::~IP2pConnection()

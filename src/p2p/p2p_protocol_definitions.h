@@ -18,7 +18,7 @@
 #include "serialization/serialization_overloads.h"
 #include "cryptonote_core/cryptonote_serialization.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     inline bool serialize(boost::uuids::uuid &v, Common::StringView name, ISerializer &s)
     {

@@ -36,7 +36,7 @@ using namespace Logging;
 using namespace Crypto;
 using namespace Common;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     bool generate_key_image_helper(const AccountKeys &ack, const PublicKey &tx_public_key, size_t real_output_index, KeyPair &in_ephemeral, KeyImage &ki)

@@ -21,7 +21,7 @@
 #include "iserializer.h"
 #include "serialization_overloads.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class BinaryInputStreamSerializer : public ISerializer

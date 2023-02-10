@@ -28,7 +28,7 @@
 
 #include "p2p/pending_lite_block.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct CryptoNoteConnectionContext

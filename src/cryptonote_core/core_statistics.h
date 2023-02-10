@@ -19,7 +19,7 @@
 
 #include "serialization/iserializer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct CoreStatistics

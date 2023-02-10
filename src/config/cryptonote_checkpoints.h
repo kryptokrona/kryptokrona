@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <initializer_list>
 
-namespace CryptoNote
+namespace cryptonote
 {
     struct CheckpointData
     {

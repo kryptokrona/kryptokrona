@@ -24,7 +24,7 @@
 #include "serialization/serialization_overloads.h"
 #include "transaction_validatior_state.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace

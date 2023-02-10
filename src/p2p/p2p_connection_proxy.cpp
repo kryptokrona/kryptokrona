@@ -25,7 +25,7 @@
 
 using namespace syst;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     P2pConnectionProxy::P2pConnectionProxy(P2pContextOwner &&ctx, IP2pNodeInternal &node)

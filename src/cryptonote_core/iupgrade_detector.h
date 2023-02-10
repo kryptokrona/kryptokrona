@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <cryptonote_core/currency.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class IUpgradeDetector

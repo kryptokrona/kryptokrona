@@ -22,7 +22,7 @@
 
 #include <utilities/coloured_msg.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     Miner::Miner(System::Dispatcher &dispatcher) : m_dispatcher(dispatcher),
@@ -176,4 +176,4 @@ namespace CryptoNote
         return m_hash_count.load();
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

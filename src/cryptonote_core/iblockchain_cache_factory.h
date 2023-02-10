@@ -19,7 +19,7 @@
 
 #include <memory>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class IBlockchainCache;
@@ -34,4 +34,4 @@ namespace CryptoNote
         virtual std::unique_ptr<IBlockchainCache> createBlockchainCache(const Currency &currency, IBlockchainCache *parent, uint32_t startIndex = 0) = 0;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

@@ -10,7 +10,7 @@
 #include "cryptonote_tools.h"
 
 using namespace Crypto;
-using namespace CryptoNote;
+using namespace cryptonote;
 
 CachedBlock::CachedBlock(const BlockTemplate &block) : block(block)
 {

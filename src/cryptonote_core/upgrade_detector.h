@@ -28,7 +28,7 @@
 #include <config/cryptonote_config.h>
 #include <logging/logger_ref.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
     class UpgradeDetectorBase
     {

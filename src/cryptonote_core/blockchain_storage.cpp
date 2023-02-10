@@ -20,7 +20,7 @@
 #include "memory_blockchain_storage.h"
 #include "swapped_blockchain_storage.h"
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 BlockchainStorage::BlockchainStorage(uint32_t reserveSize) : internalStorage(new MemoryBlockchainStorage(reserveSize))
 {

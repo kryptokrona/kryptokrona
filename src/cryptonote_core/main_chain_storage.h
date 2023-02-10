@@ -21,7 +21,7 @@
 #include "currency.h"
 #include "swapped_vector.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class MainChainStorage : public IMainChainStorage

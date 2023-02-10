@@ -39,7 +39,7 @@ using namespace Common;
 using namespace Logging;
 using namespace syst;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace

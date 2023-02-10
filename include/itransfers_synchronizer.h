@@ -24,7 +24,7 @@
 #include "itransfers_container.h"
 #include "istream_serializable.h"
 
-namespace CryptoNote {
+namespace cryptonote {
 
 struct SynchronizationStart {
   uint64_t timestamp;

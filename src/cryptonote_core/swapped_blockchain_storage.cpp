@@ -24,7 +24,7 @@
 #include "memory_blockchain_storage.h"
 #include "serialization/serialization_overloads.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     SwappedBlockchainStorage::SwappedBlockchainStorage(const std::string &indexFileName, const std::string &dataFileName)

@@ -21,7 +21,7 @@
 #include "crypto/crypto.h"
 #include "wallet/wallet_errors.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     uint64_t getDefaultMixinByHeight(const uint64_t height)

@@ -20,7 +20,7 @@
 #include <memory>
 #include "itransaction.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     std::unique_ptr<ITransaction> createTransaction();
     std::unique_ptr<ITransaction> createTransaction(const BinaryArray &transactionBlob);

@@ -24,7 +24,7 @@
 
 #include "blockchain_explorer_data.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class IBlockchainObserver

@@ -35,7 +35,7 @@ namespace syst
     class TcpConnection;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
     class LevinProtocol;
     class ISerializer;

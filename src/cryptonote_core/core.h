@@ -29,7 +29,7 @@
 
 #include <wallet_types.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class Core : public ICore, public ICoreInformation

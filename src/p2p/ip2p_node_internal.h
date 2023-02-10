@@ -20,7 +20,7 @@
 #include <list>
 #include "p2p_protocol_definitions.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class P2pContext;

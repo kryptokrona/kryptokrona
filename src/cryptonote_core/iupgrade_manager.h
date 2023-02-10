@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class IUpgradeManager

@@ -20,7 +20,7 @@
 #include <stdexcept>
 #include <limits>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void serializeBlockHeight(ISerializer &s, uint32_t &blockHeight, Common::StringView name)
@@ -54,4 +54,4 @@ namespace CryptoNote
         serializeBlockHeight(s, globalOutputIndex, name);
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

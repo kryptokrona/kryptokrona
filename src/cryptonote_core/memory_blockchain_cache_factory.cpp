@@ -17,7 +17,7 @@
 
 #include "memory_blockchain_cache_factory.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     MemoryBlockchainCacheFactory::MemoryBlockchainCacheFactory(const std::string &filename, std::shared_ptr<Logging::ILogger> logger) : filename(filename), logger(logger)
@@ -42,4 +42,4 @@ namespace CryptoNote
         return std::unique_ptr<IBlockchainCache>(new BlockchainCache(filename, currency, logger, parent, startIndex));
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

@@ -22,7 +22,7 @@
 
 #include <common/string_view.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class ISerializer

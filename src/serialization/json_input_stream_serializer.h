@@ -23,7 +23,7 @@
 #include "common/json_value.h"
 #include "json_input_value_serializer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     // deserialization

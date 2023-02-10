@@ -20,7 +20,7 @@
 #include <cryptonote_core/blockchain_storage.h>
 #include "cryptonote_core/swapped_vector.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class SwappedBlockchainStorage : public BlockchainStorage::IBlockchainStorageInternal

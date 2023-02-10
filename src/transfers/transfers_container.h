@@ -38,7 +38,7 @@
 #include "itransaction.h"
 #include "itransfers_container.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct TransactionOutputInformationIn;

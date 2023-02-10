@@ -18,7 +18,7 @@
 #pragma once
 #include <cstdint>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class ICoreInformation

@@ -25,7 +25,7 @@
 #include "syst/event.h"
 #include "syst/interrupted_exception.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     template <class MessageType>

@@ -17,7 +17,7 @@
 
 #include "wallet_async_context_counter.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void WalletAsyncContextCounter::addAsyncContext()
@@ -42,4 +42,4 @@ namespace CryptoNote
             m_cv.wait(lock);
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

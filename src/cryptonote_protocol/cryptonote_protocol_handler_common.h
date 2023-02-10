@@ -22,7 +22,7 @@
 
 #include <vector>
 
-namespace CryptoNote
+namespace cryptonote
 {
     struct NOTIFY_NEW_BLOCK_request;
 

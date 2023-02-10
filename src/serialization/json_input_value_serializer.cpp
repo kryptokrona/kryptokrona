@@ -23,7 +23,7 @@
 #include "common/string_tools.h"
 
 using Common::JsonValue;
-using namespace CryptoNote;
+using namespace cryptonote;
 
 JsonInputValueSerializer::JsonInputValueSerializer(const Common::JsonValue &value)
 {

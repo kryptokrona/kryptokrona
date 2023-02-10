@@ -22,7 +22,7 @@
 #include "icore_definitions.h"
 #include "message_queue.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     enum class CoreEvent

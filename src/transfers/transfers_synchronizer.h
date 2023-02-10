@@ -18,12 +18,12 @@
 
 #include "logging/logger_ref.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     class Currency;
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class TransfersConsumer;

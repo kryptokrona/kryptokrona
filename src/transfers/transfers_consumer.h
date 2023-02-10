@@ -19,7 +19,7 @@
 
 #include <unordered_set>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class INode;

@@ -26,7 +26,7 @@
 #include "serialization/iserializer.h"
 #include "serialization/serialization_tools.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class HttpClient;

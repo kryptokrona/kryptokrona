@@ -12,7 +12,7 @@
 
 #include <wallet/wallet_errors.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
     class Mixins
     {

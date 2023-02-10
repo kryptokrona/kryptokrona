@@ -41,7 +41,7 @@ namespace
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     HttpResponse::HTTP_STATUS HttpParser::parseResponseStatusFromString(const std::string &status)

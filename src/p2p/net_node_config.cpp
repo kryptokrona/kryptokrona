@@ -10,7 +10,7 @@
 #include <config/cryptonote_config.h>
 #include <crypto/random.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace
     {

@@ -22,7 +22,7 @@
 #include "blockchain_cache.h"
 #include "database_blockchain_cache.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     DatabaseBlockchainCacheFactory::DatabaseBlockchainCacheFactory(IDataBase &database, std::shared_ptr<Logging::ILogger> logger) : database(database), logger(logger)
@@ -43,4 +43,4 @@ namespace CryptoNote
         return std::unique_ptr<IBlockchainCache>(new BlockchainCache("", currency, logger, parent, startIndex));
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

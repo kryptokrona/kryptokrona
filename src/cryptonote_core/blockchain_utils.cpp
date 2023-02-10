@@ -17,7 +17,7 @@
 
 #include "blockchain_utils.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace Utils
     {

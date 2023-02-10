@@ -26,7 +26,7 @@
 using namespace Logging;
 using namespace Common;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     const std::vector<uint64_t> Currency::PRETTY_AMOUNTS = {

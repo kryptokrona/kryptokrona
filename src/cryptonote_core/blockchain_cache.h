@@ -34,7 +34,7 @@
 #include "iblockchain_cache.h"
 #include "cryptonote_core/upgrade_manager.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class ISerializer;

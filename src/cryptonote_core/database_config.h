@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class DataBaseConfig
@@ -35,4 +35,4 @@ namespace CryptoNote
         uint64_t readCacheSize;
         bool testnet;
     };
-} // namespace CryptoNote
+} // namespace cryptonote

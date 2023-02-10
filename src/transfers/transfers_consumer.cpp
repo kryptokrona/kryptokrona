@@ -31,7 +31,7 @@ std::mutex seen_mutex;
 namespace
 {
 
-    using namespace CryptoNote;
+    using namespace cryptonote;
 
     class MarkTransactionConfirmedException : public std::exception
     {
@@ -117,7 +117,7 @@ namespace
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     TransfersConsumer::TransfersConsumer(const CryptoNote::Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, const SecretKey &viewSecret) : m_node(node), m_viewSecret(viewSecret), m_currency(currency), m_logger(logger, "TransfersConsumer")

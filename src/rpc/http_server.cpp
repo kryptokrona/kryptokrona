@@ -25,7 +25,7 @@
 
 using namespace Logging;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     HttpServer::HttpServer(System::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log)

@@ -17,7 +17,7 @@
 
 #include "http_parser_error_codes.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace error
     {
@@ -25,4 +25,4 @@ namespace CryptoNote
         HttpParserErrorCategory HttpParserErrorCategory::INSTANCE;
 
     } // namespace error
-} // namespace CryptoNote
+} // namespace cryptonote

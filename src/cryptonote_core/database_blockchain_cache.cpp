@@ -22,7 +22,7 @@
 #include <cryptonote_core/cryptonote_basic_impl.h>
 #include "cryptonote_core/transaction_extra.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace

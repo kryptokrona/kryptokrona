@@ -29,7 +29,7 @@ using namespace Common;
 using namespace Crypto;
 using namespace Logging;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void serialize(TransactionInformation &ti, CryptoNote::ISerializer &s)

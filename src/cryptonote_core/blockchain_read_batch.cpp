@@ -21,7 +21,7 @@
 
 #include "dbutils.h"
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 BlockchainReadBatch::BlockchainReadBatch()
 {

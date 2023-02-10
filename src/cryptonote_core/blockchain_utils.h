@@ -23,7 +23,7 @@
 #include "cryptonote.h"
 #include "cryptonote_tools.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace Utils
     {
@@ -31,4 +31,4 @@ namespace CryptoNote
         bool restoreCachedTransactions(const std::vector<BinaryArray> &binaryTransactions, std::vector<CachedTransaction> &transactions);
 
     } // namespace Utils
-} // namespace CryptoNote
+} // namespace cryptonote

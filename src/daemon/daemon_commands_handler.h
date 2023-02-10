@@ -13,7 +13,7 @@
 #include "rpc/core_rpc_server_commands_definitions.h"
 #include "rpc/json_rpc.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     class Core;
     class NodeServer;

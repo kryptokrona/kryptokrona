@@ -21,7 +21,7 @@
 #include <string>
 #include <utility>
 
-namespace CryptoNote {
+namespace cryptonote {
 
 class IWriteBatch {
 public:
@@ -29,4 +29,4 @@ public:
   virtual std::vector<std::string> extractRawKeysToRemove() = 0;
 };
 
-} //namespace CryptoNote
+} //namespace cryptonote

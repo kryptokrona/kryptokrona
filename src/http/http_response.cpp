@@ -56,7 +56,7 @@ namespace
 
 } // namespace
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     HttpResponse::HttpResponse()
@@ -112,4 +112,4 @@ namespace CryptoNote
         return os;
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

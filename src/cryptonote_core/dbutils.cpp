@@ -23,7 +23,7 @@ namespace
     const std::string RAW_TXS_NAME = "raw_txs";
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace DB
     {

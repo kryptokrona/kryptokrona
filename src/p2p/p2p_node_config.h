@@ -21,7 +21,7 @@
 #include <chrono>
 #include "net_node_config.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class P2pNodeConfig : public NetNodeConfig

@@ -21,7 +21,7 @@
 #include "cryptonote_tools.h"
 
 using namespace Crypto;
-using namespace CryptoNote;
+using namespace cryptonote;
 
 CachedTransaction::CachedTransaction(Transaction &&transaction) : transaction(std::move(transaction))
 {

@@ -21,7 +21,7 @@
 
 #include "serialization/iserializer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     void serialize(TransactionOutputDetails &output, ISerializer &serializer);
@@ -36,4 +36,4 @@ namespace CryptoNote
 
     void serialize(BlockDetails &block, ISerializer &serializer);
 
-} // namespace CryptoNote
+} // namespace cryptonote

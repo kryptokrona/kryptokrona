@@ -16,7 +16,7 @@
 #include "cached_block.h"
 #include "cryptonote_basic.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class AccountBase;

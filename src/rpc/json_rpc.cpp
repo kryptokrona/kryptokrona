@@ -18,7 +18,7 @@
 #include "json_rpc.h"
 #include "rpc/http_client.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     namespace JsonRpc

@@ -22,7 +22,7 @@
 #include "crypto/hash.h"
 #include "cryptonote_core/cryptonote_basic.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     /************************************************************************/
     /* CryptoNote helper functions                                          */

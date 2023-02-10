@@ -9,7 +9,7 @@
 #include <config/ascii.h>
 #include <version.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
     inline std::string getProjectCLIHeader()
     {

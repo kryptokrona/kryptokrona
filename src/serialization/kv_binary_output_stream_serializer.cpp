@@ -24,7 +24,7 @@
 #include <common/stream_tools.h>
 
 using namespace Common;
-using namespace CryptoNote;
+using namespace cryptonote;
 
 namespace
 {
@@ -82,7 +82,7 @@ namespace
 
 }
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     KVBinaryOutputStreamSerializer::KVBinaryOutputStreamSerializer()

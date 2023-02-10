@@ -24,7 +24,7 @@
 #include "serialization/json_input_value_serializer.h"
 #include "serialization/json_output_stream_serializer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     JsonRpcServer::JsonRpcServer(System::Dispatcher &sys, System::Event &stopEvent, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config) : HttpServer(sys, loggerGroup),

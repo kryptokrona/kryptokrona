@@ -26,7 +26,7 @@
 
 using namespace Crypto;
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     bool checkInputsKeyimagesDiff(const CryptoNote::TransactionPrefix &tx)

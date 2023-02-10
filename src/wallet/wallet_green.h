@@ -31,7 +31,7 @@
 #include "transfers/transfers_synchronizer.h"
 #include "transfers/blockchain_synchronizer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct PreparedTransaction
@@ -408,4 +408,4 @@ namespace CryptoNote
         friend class TransferListFormatter;
     };
 
-} // namespace CryptoNote
+} // namespace cryptonote

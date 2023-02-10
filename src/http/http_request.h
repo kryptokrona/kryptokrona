@@ -21,7 +21,7 @@
 #include <map>
 #include <string>
 
-namespace CryptoNote
+namespace cryptonote
 {
     class HttpRequest
     {

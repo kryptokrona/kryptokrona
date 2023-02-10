@@ -29,7 +29,7 @@
 #include "istream_serializable.h"
 #include "itransfers_synchronizer.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct CompleteBlock;

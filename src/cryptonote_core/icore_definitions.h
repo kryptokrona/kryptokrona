@@ -22,7 +22,7 @@
 #include <crypto_types.h>
 #include <wallet_types.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     struct BlockFullInfo : public RawBlock

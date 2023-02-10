@@ -18,7 +18,7 @@
 #include "levin_protocol.h"
 #include <syst/tcp_connection.h>
 
-using namespace CryptoNote;
+using namespace cryptonote;
 
 namespace
 {

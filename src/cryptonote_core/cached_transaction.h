@@ -20,7 +20,7 @@
 #include <boost/optional.hpp>
 #include <cryptonote.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class CachedTransaction

@@ -17,7 +17,7 @@
 
 #include "wallet_service_error_category.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace error
     {

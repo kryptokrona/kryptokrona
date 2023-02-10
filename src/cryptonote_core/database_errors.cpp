@@ -17,7 +17,7 @@
 
 #include "database_errors.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
     namespace error
     {
@@ -25,4 +25,4 @@ namespace CryptoNote
         DataBaseErrorCategory DataBaseErrorCategory::INSTANCE;
 
     } // namespace error
-} // namespace CryptoNote
+} // namespace cryptonote

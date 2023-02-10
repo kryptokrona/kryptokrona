@@ -23,7 +23,7 @@
 #include "cryptonote.h"
 #include "database_cache_data.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     class BlockchainWriteBatch : public IWriteBatch

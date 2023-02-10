@@ -26,7 +26,7 @@
 
 #include "serialization/serialization_overloads.h"
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     using CryptoNote::SerializationTag;
@@ -82,7 +82,7 @@ namespace CryptoNote
 
     } // namespace
 
-    // namespace CryptoNote {
+    // namespace cryptonote {
 
     void serialize(TransactionOutputDetails &output, ISerializer &serializer)
     {
@@ -213,4 +213,4 @@ namespace CryptoNote
         serializer(block.transactions, "transactions");
     }
 
-} // namespace CryptoNote
+} // namespace cryptonote

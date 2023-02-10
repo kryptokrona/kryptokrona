@@ -17,7 +17,7 @@
 
 #include <cryptonote_core/transaction_pool_messages.h>
 
-namespace CryptoNote
+namespace cryptonote
 {
 
     TransactionPoolMessage::TransactionPoolMessage(const AddTransaction &at)
