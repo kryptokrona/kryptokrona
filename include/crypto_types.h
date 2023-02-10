@@ -31,7 +31,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-namespace Crypto
+namespace crypto
 {
     struct Hash
     {
