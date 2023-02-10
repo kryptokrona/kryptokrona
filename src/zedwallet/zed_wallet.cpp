@@ -51,8 +51,8 @@ int main(int argc, char **argv)
     /* Currency contains our coin parameters, such as decimal places, supply */
     const CryptoNote::Currency currency = CryptoNote::CurrencyBuilder(logManager).currency();
 
-    System::Dispatcher localDispatcher;
-    System::Dispatcher *dispatcher = &localDispatcher;
+    syst::Dispatcher localDispatcher;
+    syst::Dispatcher *dispatcher = &localDispatcher;
 
     /* Our connection to kryptokronad */
     std::unique_ptr<CryptoNote::INode> node(

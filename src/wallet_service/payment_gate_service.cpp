@@ -106,8 +106,8 @@ const CryptoNote::Currency PaymentGateService::getCurrency()
 void PaymentGateService::run()
 {
 
-    System::Dispatcher localDispatcher;
-    System::Event localStopEvent(localDispatcher);
+    syst::Dispatcher localDispatcher;
+    syst::Event localStopEvent(localDispatcher);
 
     this->dispatcher = &localDispatcher;
     this->stopEvent = &localStopEvent;

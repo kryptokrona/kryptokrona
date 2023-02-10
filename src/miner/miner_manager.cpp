@@ -71,7 +71,7 @@ namespace Miner
     } // namespace
 
     MinerManager::MinerManager(
-        System::Dispatcher &dispatcher,
+        syst::Dispatcher &dispatcher,
         const CryptoNote::MiningConfig &config,
         const std::shared_ptr<httplib::Client> httpClient) :
 

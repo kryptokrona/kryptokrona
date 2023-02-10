@@ -32,7 +32,7 @@ namespace cryptonote
     class MessageQueue
     {
     public:
-        MessageQueue(System::Dispatcher &dispatcher);
+        MessageQueue(syst::Dispatcher &dispatcher);
 
         const MessageType &front();
         void pop();
@@ -45,9 +45,9 @@ namespace cryptonote
         typename IntrusiveLinkedList<MessageQueue<MessageType>>::hook &getHook();
         void wait();
 
-        System::Dispatcher &dispatcher;
+        syst::Dispatcher &dispatcher;
         std::queue<MessageType> messageQueue;
-        System::Event event;
+        syst::Event event;
         bool stopped;
 
         typename IntrusiveLinkedList<MessageQueue<MessageType>>::hook hook;
@@ -74,7 +74,7 @@ namespace cryptonote
     };
 
     template <class MessageType>
-    MessageQueue<MessageType>::MessageQueue(System::Dispatcher &dispatch)
+    MessageQueue<MessageType>::MessageQueue(syst::Dispatcher &dispatch)
         : dispatcher(dispatch), event(dispatch), stopped(false)
     {
     }
@@ -86,7 +86,7 @@ namespace cryptonote
         {
             if (stopped)
             {
-                throw System::InterruptedException();
+                throw syst::InterruptedException();
             }
 
             event.clear();
@@ -96,7 +96,7 @@ namespace cryptonote
 
                 if (stopped)
                 {
-                    throw System::InterruptedException();
+                    throw syst::InterruptedException();
                 }
             }
         }

@@ -225,7 +225,7 @@ namespace cryptonote
 
     }
 
-    Core::Core(const Currency &currency, std::shared_ptr<Logging::ILogger> logger, Checkpoints &&checkpoints, System::Dispatcher &dispatcher,
+    Core::Core(const Currency &currency, std::shared_ptr<Logging::ILogger> logger, Checkpoints &&checkpoints, syst::Dispatcher &dispatcher,
                std::unique_ptr<IBlockchainCacheFactory> &&blockchainCacheFactory, std::unique_ptr<IMainChainStorage> &&mainchainStorage)
         : currency(currency), dispatcher(dispatcher), contextGroup(dispatcher), logger(logger, "Core"), checkpoints(std::move(checkpoints)),
           upgradeManager(new UpgradeManager()), blockchainCacheFactory(std::move(blockchainCacheFactory)),
@@ -3292,7 +3292,7 @@ namespace cryptonote
 
     void Core::transactionPoolCleaningProcedure()
     {
-        System::Timer timer(dispatcher);
+        syst::Timer timer(dispatcher);
 
         try
         {
@@ -3309,7 +3309,7 @@ namespace cryptonote
                 notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
             }
         }
-        catch (System::InterruptedException &)
+        catch (syst::InterruptedException &)
         {
             logger(Logging::INFO) << "transactionPoolCleaningProcedure has been interrupted";
         }

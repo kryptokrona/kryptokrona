@@ -51,7 +51,7 @@ namespace cryptonote
     public:
         P2pNode(
             const P2pNodeConfig &cfg,
-            System::Dispatcher &dispatcher,
+            syst::Dispatcher &dispatcher,
             std::shared_ptr<Logging::ILogger> log,
             const Crypto::Hash &genesisHash,
             uint64_t peerId);
@@ -79,13 +79,13 @@ namespace cryptonote
         const uint64_t m_myPeerId;
         const CORE_SYNC_DATA m_genesisPayload;
 
-        System::Dispatcher &m_dispatcher;
-        System::ContextGroup workingContextGroup;
-        System::TcpListener m_listener;
-        System::Timer m_connectorTimer;
+        syst::Dispatcher &m_dispatcher;
+        syst::ContextGroup workingContextGroup;
+        syst::TcpListener m_listener;
+        syst::Timer m_connectorTimer;
         PeerlistManager m_peerlist;
         ContextList m_contexts;
-        System::Event m_queueEvent;
+        syst::Event m_queueEvent;
         std::deque<std::unique_ptr<IP2pConnection>> m_connectionQueue;
 
         // IP2pNodeInternal

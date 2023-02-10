@@ -28,7 +28,7 @@ namespace cryptonote
     class Miner
     {
     public:
-        Miner(System::Dispatcher &dispatcher);
+        Miner(syst::Dispatcher &dispatcher);
 
         BlockTemplate mine(const BlockMiningParameters &blockMiningParameters, size_t threadCount);
         uint64_t getHashCount();
@@ -37,8 +37,8 @@ namespace cryptonote
         void stop();
 
     private:
-        System::Dispatcher &m_dispatcher;
-        System::Event m_miningStopped;
+        syst::Dispatcher &m_dispatcher;
+        syst::Event m_miningStopped;
 
         enum class MiningState : uint8_t
         {
@@ -48,7 +48,7 @@ namespace cryptonote
         };
         std::atomic<MiningState> m_state;
 
-        std::vector<std::unique_ptr<System::RemoteContext<void>>> m_workers;
+        std::vector<std::unique_ptr<syst::RemoteContext<void>>> m_workers;
 
         BlockTemplate m_block;
         std::atomic<uint64_t> m_hash_count = 0;

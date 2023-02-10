@@ -35,7 +35,7 @@ namespace cryptonote
     class CryptoNoteProtocolHandler : public ICryptoNoteProtocolHandler
     {
     public:
-        CryptoNoteProtocolHandler(const Currency &currency, System::Dispatcher &dispatcher, ICore &rcore, IP2pEndpoint *p_net_layout, std::shared_ptr<Logging::ILogger> log);
+        CryptoNoteProtocolHandler(const Currency &currency, syst::Dispatcher &dispatcher, ICore &rcore, IP2pEndpoint *p_net_layout, std::shared_ptr<Logging::ILogger> log);
 
         virtual bool addObserver(ICryptoNoteProtocolObserver *observer) override;
         virtual bool removeObserver(ICryptoNoteProtocolObserver *observer) override;
@@ -88,7 +88,7 @@ namespace cryptonote
         int doPushLiteBlock(NOTIFY_NEW_LITE_BLOCK::request block, CryptoNoteConnectionContext &context, std::vector<BinaryArray> missingTxs);
 
     private:
-        System::Dispatcher &m_dispatcher;
+        syst::Dispatcher &m_dispatcher;
         ICore &m_core;
         const Currency &m_currency;
 

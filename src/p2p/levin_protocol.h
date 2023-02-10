@@ -48,7 +48,7 @@ namespace cryptonote
     class LevinProtocol
     {
     public:
-        LevinProtocol(System::TcpConnection &connection);
+        LevinProtocol(syst::TcpConnection &connection);
 
         template <typename Request, typename Response>
         bool invoke(uint32_t command, const Request &request, Response &response)
@@ -118,7 +118,7 @@ namespace cryptonote
     private:
         bool readStrict(uint8_t *ptr, size_t size);
         void writeStrict(const uint8_t *ptr, size_t size);
-        System::TcpConnection &m_conn;
+        syst::TcpConnection &m_conn;
     };
 
 }

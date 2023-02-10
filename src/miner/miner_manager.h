@@ -29,19 +29,19 @@ namespace Miner
     {
     public:
         MinerManager(
-            System::Dispatcher &dispatcher,
+            syst::Dispatcher &dispatcher,
             const CryptoNote::MiningConfig &config,
             const std::shared_ptr<httplib::Client> httpClient);
 
         void start();
 
     private:
-        System::ContextGroup m_contextGroup;
+        syst::ContextGroup m_contextGroup;
         CryptoNote::MiningConfig m_config;
         CryptoNote::Miner m_miner;
         BlockchainMonitor m_blockchainMonitor;
 
-        System::Event m_eventOccurred;
+        syst::Event m_eventOccurred;
         std::queue<MinerEvent> m_events;
         bool isRunning;
 

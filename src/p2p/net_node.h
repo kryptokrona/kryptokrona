@@ -74,11 +74,11 @@ namespace cryptonote
         using Clock = std::chrono::steady_clock;
         using TimePoint = Clock::time_point;
 
-        System::Context<void> *context;
+        syst::Context<void> *context;
         uint64_t peerId;
-        System::TcpConnection connection;
+        syst::TcpConnection connection;
 
-        P2pConnectionContext(System::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log, System::TcpConnection &&conn) : context(nullptr),
+        P2pConnectionContext(syst::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log, syst::TcpConnection &&conn) : context(nullptr),
                                                                                                                                     peerId(0),
                                                                                                                                     connection(std::move(conn)),
                                                                                                                                     logger(log, "node_server"),
@@ -106,7 +106,7 @@ namespace cryptonote
     private:
         Logging::LoggerRef logger;
         TimePoint writeOperationStartTime;
-        System::Event queueEvent;
+        syst::Event queueEvent;
         std::vector<P2pMessage> writeQueue;
         size_t writeQueueSize = 0;
         bool stopped;
@@ -115,7 +115,7 @@ namespace cryptonote
     class NodeServer : public IP2pEndpoint
     {
     public:
-        NodeServer(System::Dispatcher &dispatcher, CryptoNote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log);
+        NodeServer(syst::Dispatcher &dispatcher, CryptoNote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log);
 
         bool run();
         bool init(const NetNodeConfig &config);
@@ -229,12 +229,12 @@ namespace cryptonote
         bool m_hide_my_port;
         std::string m_p2p_state_filename;
 
-        System::Dispatcher &m_dispatcher;
-        System::ContextGroup m_workingContextGroup;
-        System::Event m_stopEvent;
-        System::Timer m_idleTimer;
-        System::Timer m_timeoutTimer;
-        System::TcpListener m_listener;
+        syst::Dispatcher &m_dispatcher;
+        syst::ContextGroup m_workingContextGroup;
+        syst::Event m_stopEvent;
+        syst::Timer m_idleTimer;
+        syst::Timer m_timeoutTimer;
+        syst::TcpListener m_listener;
         Logging::LoggerRef logger;
         std::atomic<bool> m_stop;
 
@@ -244,7 +244,7 @@ namespace cryptonote
         // OnceInInterval m_peer_handshake_idle_maker_interval;
         OnceInInterval m_connections_maker_interval;
         OnceInInterval m_peerlist_store_interval;
-        System::Timer m_timedSyncTimer;
+        syst::Timer m_timedSyncTimer;
 
         std::string m_bind_ip;
         std::string m_port;

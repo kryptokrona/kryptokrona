@@ -49,7 +49,7 @@ namespace cryptonote
                         public IFusionManager
     {
     public:
-        WalletGreen(System::Dispatcher &dispatcher, const Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, uint32_t transactionSoftLockTime = 1);
+        WalletGreen(syst::Dispatcher &dispatcher, const Currency &currency, INode &node, std::shared_ptr<Logging::ILogger> logger, uint32_t transactionSoftLockTime = 1);
         virtual ~WalletGreen();
 
         virtual void initializeWithViewKey(const std::string &path, const std::string &password, const Crypto::SecretKey &viewSecretKey, const uint64_t scanHeight, const bool newAddress) override;
@@ -364,7 +364,7 @@ namespace cryptonote
         std::vector<size_t> deleteTransfersForAddress(const std::string &address, std::vector<size_t> &deletedTransactions);
         void deleteFromUncommitedTransactions(const std::vector<size_t> &deletedTransactions);
 
-        System::Dispatcher &m_dispatcher;
+        syst::Dispatcher &m_dispatcher;
         const Currency &m_currency;
         INode &m_node;
         mutable Logging::LoggerRef m_logger;
@@ -382,9 +382,9 @@ namespace cryptonote
         BlockchainSynchronizer m_blockchainSynchronizer;
         TransfersSyncronizer m_synchronizer;
 
-        System::Event m_eventOccurred;
+        syst::Event m_eventOccurred;
         std::queue<WalletEvent> m_events;
-        mutable System::Event m_readyEvent;
+        mutable syst::Event m_readyEvent;
 
         WalletState m_state;
 

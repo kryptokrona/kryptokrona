@@ -341,7 +341,7 @@ namespace Common
 
     private:
         std::string m_path;
-        System::MemoryMappedFile m_file;
+        syst::MemoryMappedFile m_file;
         uint64_t m_prefixSize;
         uint64_t m_suffixSize;
         bool m_autoFlush;

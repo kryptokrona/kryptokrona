@@ -162,7 +162,7 @@ namespace cryptonote
         serializeAsBinary(request.missing_txs, "missing_txs", s);
     }
 
-    CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency &currency, System::Dispatcher &dispatcher, ICore &rcore, IP2pEndpoint *p_net_layout, std::shared_ptr<Logging::ILogger> log) : m_dispatcher(dispatcher),
+    CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency &currency, syst::Dispatcher &dispatcher, ICore &rcore, IP2pEndpoint *p_net_layout, std::shared_ptr<Logging::ILogger> log) : m_dispatcher(dispatcher),
                                                                                                                                                                                                       m_currency(currency),
                                                                                                                                                                                                       m_core(rcore),
                                                                                                                                                                                                       m_p2p(p_net_layout),

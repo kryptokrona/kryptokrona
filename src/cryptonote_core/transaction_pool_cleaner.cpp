@@ -210,7 +210,7 @@ namespace cryptonote
             cleanRecentlyDeletedTransactions(currentTime);
             return deletedTransactions;
         }
-        catch (System::InterruptedException &)
+        catch (syst::InterruptedException &)
         {
             throw;
         }

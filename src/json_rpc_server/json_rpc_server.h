@@ -36,7 +36,7 @@ namespace cryptonote
     class JsonRpcServer : HttpServer
     {
     public:
-        JsonRpcServer(System::Dispatcher &sys, System::Event &stopEvent, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config);
+        JsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config);
         JsonRpcServer(const JsonRpcServer &) = delete;
 
         void start(const std::string &bindAddress, uint16_t bindPort);
@@ -57,7 +57,7 @@ namespace cryptonote
         // HttpServer
         virtual void processRequest(const CryptoNote::HttpRequest &request, CryptoNote::HttpResponse &response) override;
 
-        System::Event &stopEvent;
+        syst::Event &stopEvent;
         Logging::LoggerRef logger;
     };
 

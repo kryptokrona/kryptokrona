@@ -37,7 +37,7 @@ namespace cryptonote
     {
 
     public:
-        HttpServer(System::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log);
+        HttpServer(syst::Dispatcher &dispatcher, std::shared_ptr<Logging::ILogger> log);
 
         void start(const std::string &address, uint16_t port);
         void stop();
@@ -45,16 +45,16 @@ namespace cryptonote
         virtual void processRequest(const HttpRequest &request, HttpResponse &response) = 0;
 
     protected:
-        System::Dispatcher &m_dispatcher;
+        syst::Dispatcher &m_dispatcher;
 
     private:
         void acceptLoop();
-        void connectionHandler(System::TcpConnection &&conn);
+        void connectionHandler(syst::TcpConnection &&conn);
 
-        System::ContextGroup workingContextGroup;
+        syst::ContextGroup workingContextGroup;
         Logging::LoggerRef logger;
-        System::TcpListener m_listener;
-        std::unordered_set<System::TcpConnection *> m_connections;
+        syst::TcpListener m_listener;
+        std::unordered_set<syst::TcpConnection *> m_connections;
     };
 
 }

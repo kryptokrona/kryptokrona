@@ -416,7 +416,7 @@ namespace PaymentService
 
     }
 
-    void generateNewWallet(const CryptoNote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger, System::Dispatcher &dispatcher)
+    void generateNewWallet(const CryptoNote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger, syst::Dispatcher &dispatcher)
     {
         Logging::LoggerRef log(logger, "generateNewWallet");
 
@@ -500,7 +500,7 @@ namespace PaymentService
         log(Logging::INFO, Logging::BRIGHT_WHITE) << "Wallet is saved";
     }
 
-    WalletService::WalletService(const CryptoNote::Currency &currency, System::Dispatcher &sys, CryptoNote::INode &node,
+    WalletService::WalletService(const CryptoNote::Currency &currency, syst::Dispatcher &sys, CryptoNote::INode &node,
                                  CryptoNote::IWallet &wallet, CryptoNote::IFusionManager &fusionManager, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger) : currency(currency),
                                                                                                                                                                                       wallet(wallet),
                                                                                                                                                                                       fusionManager(fusionManager),
@@ -592,7 +592,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Saving wallet...";
 
@@ -622,7 +622,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             if (!inited)
             {
@@ -654,7 +654,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             logger(Logging::INFO, Logging::BRIGHT_WHITE) << "Resetting wallet";
 
@@ -685,7 +685,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             logger(Logging::DEBUGGING) << "Creating address";
 
@@ -713,7 +713,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             logger(Logging::DEBUGGING) << "Creating " << spendSecretKeysText.size() << " addresses...";
 
@@ -757,7 +757,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             logger(Logging::DEBUGGING) << "Creating address";
 
@@ -778,7 +778,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             logger(Logging::DEBUGGING) << "Creating tracking address";
 
@@ -805,7 +805,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             logger(Logging::DEBUGGING) << "Delete address request came";
             wallet.deleteAddress(address);
@@ -824,7 +824,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             CryptoNote::KeyPair key = wallet.getAddressSpendKey(address);
 
@@ -844,7 +844,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             logger(Logging::DEBUGGING) << "Getting balance for address " << address;
 
             availableBalance = wallet.getActualBalance(address);
@@ -864,7 +864,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             logger(Logging::DEBUGGING) << "Getting wallet balance";
 
             availableBalance = wallet.getActualBalance();
@@ -884,7 +884,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             std::vector<Crypto::Hash> hashes = wallet.getBlockHashes(firstBlockIndex, blockCount);
 
             blockHashes.reserve(hashes.size());
@@ -906,7 +906,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             CryptoNote::KeyPair viewKey = wallet.getViewKey();
             viewSecretKey = Common::podToHex(viewKey.secretKey);
         }
@@ -923,7 +923,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             CryptoNote::KeyPair key = wallet.getAddressSpendKey(address);
             CryptoNote::KeyPair viewKey = wallet.getViewKey();
 
@@ -960,7 +960,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             validateAddresses(addresses, currency, logger);
 
             if (!paymentId.empty())
@@ -992,7 +992,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             validateAddresses(addresses, currency, logger);
 
             if (!paymentId.empty())
@@ -1022,7 +1022,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             validateAddresses(addresses, currency, logger);
 
             if (!paymentId.empty())
@@ -1055,7 +1055,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             validateAddresses(addresses, currency, logger);
 
             if (!paymentId.empty())
@@ -1085,7 +1085,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
             Crypto::Hash hash = parseHash(transactionHash, logger);
 
             CryptoNote::WalletTransactionWithTransfers transactionWithTransfers = wallet.getTransaction(hash);
@@ -1116,7 +1116,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             addresses.clear();
             addresses.reserve(wallet.getAddressCount());
@@ -1139,7 +1139,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             /* Integrated address payment ID's are uppercase - lets convert the input
                payment ID to upper so we can compare with more ease */
@@ -1246,7 +1246,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             /* Integrated address payment ID's are uppercase - lets convert the input
                payment ID to upper so we can compare with more ease */
@@ -1345,7 +1345,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             std::vector<size_t> transactionIds = wallet.getDelayedTransactionIds();
             transactionHashes.reserve(transactionIds.size());
@@ -1373,7 +1373,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             parseHash(transactionHash, logger); // validate transactionHash parameter
 
@@ -1406,7 +1406,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             parseHash(transactionHash, logger); // validate transactionHash parameter
 
@@ -1439,7 +1439,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             validateAddresses(addresses, currency, logger);
 
@@ -1474,9 +1474,9 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
-            System::RemoteContext<std::tuple<uint32_t, uint64_t, uint32_t>> remoteContext(dispatcher, [this]()
+            syst::RemoteContext<std::tuple<uint32_t, uint64_t, uint32_t>> remoteContext(dispatcher, [this]()
                                                                                           {
       /* Daemon remote height, daemon local height, peer count */
       return std::make_tuple(node.getKnownBlockCount(), node.getNodeHeight(), static_cast<uint32_t>(node.getPeerCount())); });
@@ -1508,7 +1508,7 @@ namespace PaymentService
 
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             validateAddresses(addresses, currency, logger);
             if (!destinationAddress.empty())
@@ -1541,7 +1541,7 @@ namespace PaymentService
 
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             validateAddresses(addresses, currency, logger);
 
@@ -1567,7 +1567,7 @@ namespace PaymentService
     {
         try
         {
-            System::EventLock lk(readyEvent);
+            syst::EventLock lk(readyEvent);
 
             validateAddresses({address}, currency, logger);
             validatePaymentId(paymentId, logger);

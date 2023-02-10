@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
             dbShutdownOnExit.resume();
         }
 
-        System::Dispatcher dispatcher;
+        syst::Dispatcher dispatcher;
         logger(INFO) << "Initializing core...";
         CryptoNote::Core ccore(
             currency,

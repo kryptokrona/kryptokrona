@@ -199,7 +199,7 @@ namespace cryptonote
         return ret;
     }
 
-    NodeServer::NodeServer(System::Dispatcher &dispatcher, CryptoNote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log) : m_dispatcher(dispatcher),
+    NodeServer::NodeServer(syst::Dispatcher &dispatcher, CryptoNote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<Logging::ILogger> log) : m_dispatcher(dispatcher),
                                                                                                                                                             m_workingContextGroup(dispatcher),
                                                                                                                                                             m_payload_handler(payload_handler),
                                                                                                                                                             m_allow_local_ip(false),
@@ -404,7 +404,7 @@ namespace cryptonote
         {
             uint32_t port = Common::fromString<uint32_t>(addr.substr(pos + 1));
 
-            System::Ipv4Resolver resolver(m_dispatcher);
+            syst::Ipv4Resolver resolver(m_dispatcher);
             auto addr = resolver.resolve(host);
             nodes.push_back(NetworkAddress{hostToNetwork(addr.getValue()), port});
 
@@ -474,7 +474,7 @@ namespace cryptonote
         logger(INFO) << "Binding on " << m_bind_ip << ":" << m_port;
         m_listeningPort = Common::fromString<uint16_t>(m_port);
 
-        m_listener = System::TcpListener(m_dispatcher, System::Ipv4Address(m_bind_ip), static_cast<uint16_t>(m_listeningPort));
+        m_listener = syst::TcpListener(m_dispatcher, syst::Ipv4Address(m_bind_ip), static_cast<uint16_t>(m_listeningPort));
 
         logger(INFO) << "Net service binded on " << m_bind_ip << ":" << m_listeningPort;
 
@@ -739,24 +739,24 @@ namespace cryptonote
 
         try
         {
-            System::TcpConnection connection;
+            syst::TcpConnection connection;
 
             try
             {
-                System::Context<System::TcpConnection> connectionContext(m_dispatcher, [&]
+                syst::Context<syst::TcpConnection> connectionContext(m_dispatcher, [&]
                                                                          {
-          System::TcpConnector connector(m_dispatcher);
-          return connector.connect(System::Ipv4Address(Common::ipAddressToString(na.ip)), static_cast<uint16_t>(na.port)); });
+          syst::TcpConnector connector(m_dispatcher);
+          return connector.connect(syst::Ipv4Address(Common::ipAddressToString(na.ip)), static_cast<uint16_t>(na.port)); });
 
-                System::Context<> timeoutContext(m_dispatcher, [&]
+                syst::Context<> timeoutContext(m_dispatcher, [&]
                                                  {
-          System::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout));
+          syst::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout));
           logger(DEBUGGING) << "Connection to " << na <<" timed out, interrupt it";
           safeInterrupt(connectionContext); });
 
                 connection = std::move(connectionContext.get());
             }
-            catch (System::InterruptedException &)
+            catch (syst::InterruptedException &)
             {
                 logger(DEBUGGING) << "Connection timed out";
                 return false;
@@ -772,15 +772,15 @@ namespace cryptonote
 
             try
             {
-                System::Context<bool> handshakeContext(m_dispatcher, [&]
+                syst::Context<bool> handshakeContext(m_dispatcher, [&]
                                                        {
           CryptoNote::LevinProtocol proto(ctx.connection);
           return handshake(proto, ctx, just_take_peerlist); });
 
-                System::Context<> timeoutContext(m_dispatcher, [&]
+                syst::Context<> timeoutContext(m_dispatcher, [&]
                                                  {
           // Here we use connection_timeout * 3, one for this handshake, and two for back ping from peer.
-          System::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout * 3));
+          syst::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout * 3));
           logger(DEBUGGING) << "Handshake with " << na << " timed out, interrupt it";
           safeInterrupt(handshakeContext); });
 
@@ -790,7 +790,7 @@ namespace cryptonote
                     return false;
                 }
             }
-            catch (System::InterruptedException &)
+            catch (syst::InterruptedException &)
             {
                 logger(DEBUGGING) << "Handshake timed out";
                 return false;
@@ -810,7 +810,7 @@ namespace cryptonote
 
             if (m_stop)
             {
-                throw System::InterruptedException();
+                throw syst::InterruptedException();
             }
 
             auto iter = m_connections.emplace(ctx.m_connection_id, std::move(ctx)).first;
@@ -821,7 +821,7 @@ namespace cryptonote
 
             return true;
         }
-        catch (System::InterruptedException &)
+        catch (syst::InterruptedException &)
         {
             logger(DEBUGGING) << "Connection process interrupted";
             throw;
@@ -1181,15 +1181,15 @@ namespace cryptonote
         {
             COMMAND_PING::request req;
             COMMAND_PING::response rsp;
-            System::Context<> pingContext(m_dispatcher, [&]
+            syst::Context<> pingContext(m_dispatcher, [&]
                                           {
-        System::TcpConnector connector(m_dispatcher);
-        auto connection = connector.connect(System::Ipv4Address(ip), static_cast<uint16_t>(port));
+        syst::TcpConnector connector(m_dispatcher);
+        auto connection = connector.connect(syst::Ipv4Address(ip), static_cast<uint16_t>(port));
         LevinProtocol(connection).invoke(COMMAND_PING::ID, req, rsp); });
 
-            System::Context<> timeoutContext(m_dispatcher, [&]
+            syst::Context<> timeoutContext(m_dispatcher, [&]
                                              {
-        System::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout * 2));
+        syst::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout * 2));
         logger(DEBUGGING) << context << "Back ping timed out" << ip << ":" << port;
         safeInterrupt(pingContext); });
 
@@ -1396,7 +1396,7 @@ namespace cryptonote
 
                 m_workingContextGroup.spawn(std::bind(&NodeServer::connectionHandler, this, std::cref(connectionId), std::ref(connection)));
             }
-            catch (System::InterruptedException &)
+            catch (syst::InterruptedException &)
             {
                 logger(DEBUGGING) << "acceptLoop() is interrupted";
                 break;
@@ -1421,7 +1421,7 @@ namespace cryptonote
                 idle_worker();
                 m_idleTimer.sleep(std::chrono::seconds(1));
             }
-            catch (System::InterruptedException &)
+            catch (syst::InterruptedException &)
             {
                 logger(DEBUGGING) << "onIdle() is interrupted";
                 break;
@@ -1455,7 +1455,7 @@ namespace cryptonote
                 }
             }
         }
-        catch (System::InterruptedException &)
+        catch (syst::InterruptedException &)
         {
             logger(DEBUGGING) << "timeoutLoop() is interrupted";
         }
@@ -1479,7 +1479,7 @@ namespace cryptonote
                 timedSync();
             }
         }
-        catch (System::InterruptedException &)
+        catch (syst::InterruptedException &)
         {
             logger(DEBUGGING) << "timedSyncLoop() is interrupted";
         }
@@ -1494,9 +1494,9 @@ namespace cryptonote
     void NodeServer::connectionHandler(const boost::uuids::uuid &connectionId, P2pConnectionContext &ctx)
     {
         // This inner context is necessary in order to stop connection handler at any moment
-        System::Context<> context(m_dispatcher, [this, &connectionId, &ctx]
+        syst::Context<> context(m_dispatcher, [this, &connectionId, &ctx]
                                   {
-      System::Context<> writeContext(m_dispatcher, std::bind(&NodeServer::writeHandler, this, std::ref(ctx)));
+      syst::Context<> writeContext(m_dispatcher, std::bind(&NodeServer::writeHandler, this, std::ref(ctx)));
 
       try {
         on_connection_new(ctx);
@@ -1535,7 +1535,7 @@ namespace cryptonote
             break;
           }
         }
-      } catch (System::InterruptedException&) {
+      } catch (syst::InterruptedException&) {
         logger(DEBUGGING) << ctx << "connectionHandler() inner context is interrupted";
       } catch (std::exception& e) {
         logger(DEBUGGING) << ctx << "Exception in connectionHandler: " << e.what();
@@ -1554,7 +1554,7 @@ namespace cryptonote
         {
             context.get();
         }
-        catch (System::InterruptedException &)
+        catch (syst::InterruptedException &)
         {
             logger(DEBUGGING) << "connectionHandler() is interrupted";
         }
@@ -1604,7 +1604,7 @@ namespace cryptonote
                 }
             }
         }
-        catch (System::InterruptedException &)
+        catch (syst::InterruptedException &)
         {
             // connection stopped
             logger(DEBUGGING) << ctx << "writeHandler() is interrupted";

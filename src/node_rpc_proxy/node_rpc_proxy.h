@@ -162,8 +162,8 @@ namespace cryptonote
         mutable std::mutex m_mutex;
         std::condition_variable m_cv_initialized;
         std::thread m_workerThread;
-        System::Dispatcher *m_dispatcher = nullptr;
-        System::ContextGroup *m_context_group = nullptr;
+        syst::Dispatcher *m_dispatcher = nullptr;
+        syst::ContextGroup *m_context_group = nullptr;
         Tools::ObserverManager<CryptoNote::INodeObserver> m_observerManager;
         Tools::ObserverManager<CryptoNote::INodeRpcProxyObserver> m_rpcProxyObserverManager;
 
@@ -172,7 +172,7 @@ namespace cryptonote
         unsigned int m_rpcTimeout;
         unsigned int m_initTimeout;
         HttpClient *m_httpClient = nullptr;
-        System::Event *m_httpEvent = nullptr;
+        syst::Event *m_httpEvent = nullptr;
 
         uint64_t m_pullInterval;
 

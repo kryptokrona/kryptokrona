@@ -25,7 +25,7 @@
 namespace cryptonote
 {
 
-    Miner::Miner(System::Dispatcher &dispatcher) : m_dispatcher(dispatcher),
+    Miner::Miner(syst::Dispatcher &dispatcher) : m_dispatcher(dispatcher),
                                                    m_miningStopped(dispatcher),
                                                    m_state(MiningState::MINING_STOPPED)
     {
@@ -50,7 +50,7 @@ namespace cryptonote
 
         if (m_state == MiningState::MINING_STOPPED)
         {
-            throw System::InterruptedException();
+            throw syst::InterruptedException();
         }
 
         return m_block;
@@ -79,8 +79,8 @@ namespace cryptonote
 
             for (size_t i = 0; i < threadCount; ++i)
             {
-                m_workers.emplace_back(std::unique_ptr<System::RemoteContext<void>>(
-                    new System::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount)))));
+                m_workers.emplace_back(std::unique_ptr<syst::RemoteContext<void>>(
+                    new syst::RemoteContext<void>(m_dispatcher, std::bind(&Miner::workerFunc, this, blockMiningParameters.blockTemplate, blockMiningParameters.difficulty, static_cast<uint32_t>(threadCount)))));
 
                 blockMiningParameters.blockTemplate.nonce++;
             }

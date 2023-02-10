@@ -19,7 +19,7 @@
 using json = nlohmann::json;
 
 BlockchainMonitor::BlockchainMonitor(
-    System::Dispatcher &dispatcher,
+    syst::Dispatcher &dispatcher,
     const size_t pollingInterval,
     const std::shared_ptr<httplib::Client> httpClient) :
 
@@ -47,7 +47,7 @@ void BlockchainMonitor::waitBlockchainUpdate()
     {
         m_sleepingContext.spawn([this]()
                                 {
-            System::Timer timer(m_dispatcher);
+            syst::Timer timer(m_dispatcher);
             timer.sleep(std::chrono::seconds(m_pollingInterval)); });
 
         m_sleepingContext.wait();
@@ -68,7 +68,7 @@ void BlockchainMonitor::waitBlockchainUpdate()
 
     if (m_stopped)
     {
-        throw System::InterruptedException();
+        throw syst::InterruptedException();
     }
 }
 

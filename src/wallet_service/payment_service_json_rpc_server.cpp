@@ -21,7 +21,7 @@
 namespace PaymentService
 {
 
-    PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(System::Dispatcher &sys, System::Event &stopEvent, WalletService &service, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config)
+    PaymentServiceJsonRpcServer::PaymentServiceJsonRpcServer(syst::Dispatcher &sys, syst::Event &stopEvent, WalletService &service, std::shared_ptr<Logging::ILogger> loggerGroup, PaymentService::ConfigurationManager &config)
         : JsonRpcServer(sys, stopEvent, loggerGroup, config), service(service), logger(loggerGroup, "PaymentServiceJsonRpcServer")
     {
         handlers.emplace("save", jsonHandler<Save::Request, Save::Response>(std::bind(&PaymentServiceJsonRpcServer::handleSave, this, std::placeholders::_1, std::placeholders::_2)));

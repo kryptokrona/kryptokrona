@@ -91,17 +91,17 @@ namespace cryptonote
             return remoteAddress;
         }
 
-        void doWithTimeoutAndThrow(System::Dispatcher &dispatcher, std::chrono::nanoseconds timeout, std::function<void()> f)
+        void doWithTimeoutAndThrow(syst::Dispatcher &dispatcher, std::chrono::nanoseconds timeout, std::function<void()> f)
         {
             std::string result;
-            System::ContextGroup cg(dispatcher);
-            System::ContextGroupTimeout cgTimeout(dispatcher, cg, timeout);
+            syst::ContextGroup cg(dispatcher);
+            syst::ContextGroupTimeout cgTimeout(dispatcher, cg, timeout);
 
             cg.spawn([&]
                      {
     try {
       f();
-    } catch (System::InterruptedException&) {
+    } catch (syst::InterruptedException&) {
       result = "Operation timeout";
     } catch (std::exception& e) {
       result = e.what();

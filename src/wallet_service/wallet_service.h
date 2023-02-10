@@ -41,14 +41,14 @@ namespace PaymentService
         uint64_t scanHeight;
     };
 
-    void generateNewWallet(const CryptoNote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger, System::Dispatcher &dispatcher);
+    void generateNewWallet(const CryptoNote::Currency &currency, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger, syst::Dispatcher &dispatcher);
 
     struct TransactionsInBlockInfoFilter;
 
     class WalletService
     {
     public:
-        WalletService(const CryptoNote::Currency &currency, System::Dispatcher &sys, CryptoNote::INode &node, CryptoNote::IWallet &wallet,
+        WalletService(const CryptoNote::Currency &currency, syst::Dispatcher &sys, CryptoNote::INode &node, CryptoNote::IWallet &wallet,
                       CryptoNote::IFusionManager &fusionManager, const WalletConfiguration &conf, std::shared_ptr<Logging::ILogger> logger);
         virtual ~WalletService();
 
@@ -117,9 +117,9 @@ namespace PaymentService
         const WalletConfiguration &config;
         bool inited;
         Logging::LoggerRef logger;
-        System::Dispatcher &dispatcher;
-        System::Event readyEvent;
-        System::ContextGroup refreshContext;
+        syst::Dispatcher &dispatcher;
+        syst::Event readyEvent;
+        syst::ContextGroup refreshContext;
         std::string m_node_address;
         uint32_t m_node_fee;
 

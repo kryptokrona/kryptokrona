@@ -38,7 +38,7 @@ namespace cryptonote
     class HttpClient
     {
     public:
-        HttpClient(System::Dispatcher &dispatcher, const std::string &address, uint16_t port);
+        HttpClient(syst::Dispatcher &dispatcher, const std::string &address, uint16_t port);
         ~HttpClient();
         void request(const HttpRequest &req, HttpResponse &res);
 
@@ -52,9 +52,9 @@ namespace cryptonote
         const uint16_t m_port;
 
         bool m_connected = false;
-        System::Dispatcher &m_dispatcher;
-        System::TcpConnection m_connection;
-        std::unique_ptr<System::TcpStreambuf> m_streamBuf;
+        syst::Dispatcher &m_dispatcher;
+        syst::TcpConnection m_connection;
+        std::unique_ptr<syst::TcpStreambuf> m_streamBuf;
 
         /* Don't send two requests at once */
         std::mutex m_mutex;
