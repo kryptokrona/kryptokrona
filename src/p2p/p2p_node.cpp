@@ -29,7 +29,7 @@
 #include "p2p_context_owner.h"
 
 using namespace common;
-using namespace Logging;
+using namespace logging;
 using namespace syst;
 
 namespace cryptonote

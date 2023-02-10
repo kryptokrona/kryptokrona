@@ -43,7 +43,7 @@
 #include "serialization/serialization_overloads.h"
 
 using namespace common;
-using namespace Logging;
+using namespace logging;
 using namespace cryptonote;
 
 namespace

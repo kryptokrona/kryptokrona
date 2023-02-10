@@ -36,7 +36,7 @@
 
 using namespace Crypto;
 using namespace common;
-using namespace Logging;
+using namespace logging;
 using namespace syst;
 
 namespace cryptonote

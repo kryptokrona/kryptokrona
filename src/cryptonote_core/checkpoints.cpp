@@ -19,7 +19,7 @@
 #include "common/string_tools.h"
 #include <fstream>
 
-using namespace Logging;
+using namespace logging;
 
 namespace cryptonote
 {

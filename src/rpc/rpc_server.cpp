@@ -35,7 +35,7 @@
 
 #undef ERROR
 
-using namespace Logging;
+using namespace logging;
 using namespace Crypto;
 using namespace common;
 

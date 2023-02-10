@@ -23,7 +23,7 @@
 
 #undef ERROR
 
-using namespace Logging;
+using namespace logging;
 using namespace common;
 
 namespace cryptonote

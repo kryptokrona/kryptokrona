@@ -20,7 +20,7 @@
 #include "cryptonote_core/cryptonote_basic_impl.h"
 
 using namespace Crypto;
-using namespace Logging;
+using namespace logging;
 
 namespace cryptonote
 {

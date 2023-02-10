@@ -25,7 +25,7 @@
 #include "database_errors.h"
 
 using namespace cryptonote;
-using namespace Logging;
+using namespace logging;
 
 namespace
 {

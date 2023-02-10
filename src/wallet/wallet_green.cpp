@@ -47,7 +47,7 @@
 using namespace common;
 using namespace Crypto;
 using namespace cryptonote;
-using namespace Logging;
+using namespace logging;
 
 namespace
 {

@@ -42,7 +42,7 @@
 
 using common::JsonValue;
 using namespace cryptonote;
-using namespace Logging;
+using namespace logging;
 using namespace DaemonConfig;
 
 void print_genesis_tx_hex(const std::vector<std::string> rewardAddresses, const bool blockExplorerMode, std::shared_ptr<LoggerManager> logManager)

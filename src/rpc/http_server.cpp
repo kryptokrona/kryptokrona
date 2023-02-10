@@ -23,7 +23,7 @@
 #include <syst/tcp_stream.h>
 #include <syst/ipv4_address.h>
 
-using namespace Logging;
+using namespace logging;
 
 namespace cryptonote
 {

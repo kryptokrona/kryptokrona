@@ -21,7 +21,7 @@
 #include <future>
 
 using namespace Crypto;
-using namespace Logging;
+using namespace logging;
 using namespace common;
 
 std::unordered_set<Crypto::Hash> transactions_hash_seen;
