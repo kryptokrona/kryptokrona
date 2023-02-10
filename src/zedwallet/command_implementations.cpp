@@ -219,9 +219,9 @@ void printHeights(uint32_t localHeight, uint32_t remoteHeight,
 void printSyncStatus(uint32_t localHeight, uint32_t remoteHeight,
                      uint32_t walletHeight)
 {
-    std::string networkSyncPercentage = Utilities::get_sync_percentage(localHeight, remoteHeight) + "%";
+    std::string networkSyncPercentage = utilities::get_sync_percentage(localHeight, remoteHeight) + "%";
 
-    std::string walletSyncPercentage = Utilities::get_sync_percentage(walletHeight, remoteHeight) + "%";
+    std::string walletSyncPercentage = utilities::get_sync_percentage(walletHeight, remoteHeight) + "%";
 
     std::cout << "Network sync status: ";
 
@@ -297,7 +297,7 @@ void printHashrate(uint64_t difficulty)
         round(difficulty / cryptonote::parameters::DIFFICULTY_TARGET));
 
     std::cout << "Network hashrate: "
-              << SuccessMsg(Utilities::get_mining_speed(hashrate))
+              << SuccessMsg(utilities::get_mining_speed(hashrate))
               << " (Based on the last local block)" << std::endl;
 }
 

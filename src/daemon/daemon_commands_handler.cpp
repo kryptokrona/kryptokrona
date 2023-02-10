@@ -400,7 +400,7 @@ bool DaemonCommandsHandler::status(const std::vector<std::string> &args)
         return false;
     }
 
-    std::cout << Utilities::get_status_string(iresp) << std::endl;
+    std::cout << utilities::get_status_string(iresp) << std::endl;
 
     return true;
 }

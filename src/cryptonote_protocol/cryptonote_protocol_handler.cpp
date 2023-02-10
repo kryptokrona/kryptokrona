@@ -314,7 +314,7 @@ namespace cryptonote
             /* We're behind the remote node */
             if (diff >= 0)
             {
-                ss << "(" << Utilities::get_sync_percentage(currentHeight, remoteHeight)
+                ss << "(" << utilities::get_sync_percentage(currentHeight, remoteHeight)
                    << "% complete) ";
 
                 ss << "You are " << diff << " blocks (" << days << " days) behind ";

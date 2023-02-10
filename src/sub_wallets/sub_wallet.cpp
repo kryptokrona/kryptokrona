@@ -126,7 +126,7 @@ std::tuple<uint64_t, uint64_t> SubWallet::getBalance(
     for (const auto input : m_unspentInputs)
     {
         /* If an unlock height is present, check if the input is unlocked */
-        if (Utilities::isInputUnlocked(input.unlockTime, currentHeight))
+        if (utilities::isInputUnlocked(input.unlockTime, currentHeight))
         {
             unlockedBalance += input.amount;
         }
@@ -370,7 +370,7 @@ std::vector<WalletTypes::TxInputAndOwner> SubWallet::getSpendableInputs(
 
     for (const auto input : m_unspentInputs)
     {
-        if (Utilities::isInputUnlocked(input.unlockTime, height))
+        if (utilities::isInputUnlocked(input.unlockTime, height))
         {
             inputs.emplace_back(input, m_publicSpendKey, m_privateSpendKey);
         }

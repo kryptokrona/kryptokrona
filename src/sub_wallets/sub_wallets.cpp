@@ -38,7 +38,7 @@ SubWallets::SubWallets(
 
     Crypto::secret_key_to_public_key(privateSpendKey, publicSpendKey);
 
-    const uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
+    const uint64_t timestamp = newWallet ? utilities::getCurrentTimestampAdjusted() : 0;
 
     const bool isPrimaryAddress = true;
 
@@ -59,9 +59,9 @@ SubWallets::SubWallets(
                             m_privateViewKey(privateViewKey),
                             m_isViewWallet(true)
 {
-    const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
+    const auto [publicSpendKey, publicViewKey] = utilities::addressToKeys(address);
 
-    const uint64_t timestamp = newWallet ? Utilities::getCurrentTimestampAdjusted() : 0;
+    const uint64_t timestamp = newWallet ? utilities::getCurrentTimestampAdjusted() : 0;
 
     const bool isPrimaryAddress = true;
 
@@ -101,7 +101,7 @@ std::tuple<Error, std::string, Crypto::SecretKey> SubWallets::addSubWallet()
     /* Generate a spend key */
     Crypto::generate_keys(spendKey.publicKey, spendKey.secretKey);
 
-    const std::string address = Utilities::privateKeysToAddress(
+    const std::string address = utilities::privateKeysToAddress(
         spendKey.secretKey, m_privateViewKey);
 
     const bool isPrimaryAddress = false;
@@ -110,7 +110,7 @@ std::tuple<Error, std::string, Crypto::SecretKey> SubWallets::addSubWallet()
 
     m_subWallets[spendKey.publicKey] = SubWallet(
         spendKey.publicKey, spendKey.secretKey, address, scanHeight,
-        Utilities::getCurrentTimestampAdjusted(), isPrimaryAddress);
+        utilities::getCurrentTimestampAdjusted(), isPrimaryAddress);
 
     m_publicSpendKeys.push_back(spendKey.publicKey);
 
@@ -135,7 +135,7 @@ std::tuple<Error, std::string> SubWallets::importSubWallet(
 
     uint64_t timestamp = 0;
 
-    const std::string address = Utilities::privateKeysToAddress(
+    const std::string address = utilities::privateKeysToAddress(
         privateSpendKey, m_privateViewKey);
 
     const bool isPrimaryAddress = false;
@@ -177,7 +177,7 @@ std::tuple<Error, std::string> SubWallets::importViewSubWallet(
 
     Crypto::secret_key_to_public_key(m_privateViewKey, publicViewKey);
 
-    const std::string address = Utilities::publicKeysToAddress(
+    const std::string address = utilities::publicKeysToAddress(
         publicSpendKey, publicViewKey);
 
     const bool isPrimaryAddress = false;
@@ -194,7 +194,7 @@ Error SubWallets::deleteSubWallet(const std::string address)
 {
     std::scoped_lock lock(m_mutex);
 
-    const auto [spendKey, viewKey] = Utilities::addressToKeys(address);
+    const auto [spendKey, viewKey] = utilities::addressToKeys(address);
 
     const auto it = m_subWallets.find(spendKey);
 
@@ -297,7 +297,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart() const
 
     /* Convert timestamp to height so we can compare them, then return the min
        of the two, and set the other to zero */
-    const uint64_t timestampFromHeight = Utilities::scanHeightToTimestamp(minHeight);
+    const uint64_t timestampFromHeight = utilities::scanHeightToTimestamp(minHeight);
 
     if (timestampFromHeight < minTimestamp)
     {

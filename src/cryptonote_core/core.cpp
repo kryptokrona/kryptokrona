@@ -1496,7 +1496,7 @@ namespace cryptonote
         if (globalIndexes.empty())
         {
             logger(logging::ERROR) << "Failed to get any matching outputs for amount "
-                                   << amount << " (" << Utilities::formatAmount(amount)
+                                   << amount << " (" << utilities::formatAmount(amount)
                                    << "). Further explanation here: "
                                    << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c\n"
                                    << "Note: If you are a public node operator, you can safely ignore this message. "

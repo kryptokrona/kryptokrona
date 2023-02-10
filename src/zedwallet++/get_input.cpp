@@ -287,7 +287,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
             if (amount < WalletConfig::minimumSend)
             {
                 std::cout << WarningMsg("The minimum send allowed is ")
-                          << WarningMsg(Utilities::formatAmount(WalletConfig::minimumSend))
+                          << WarningMsg(utilities::formatAmount(WalletConfig::minimumSend))
                           << WarningMsg("!\n");
             }
             else

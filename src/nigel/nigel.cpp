@@ -204,7 +204,7 @@ void Nigel::backgroundRefresh()
     {
         getDaemonInfo();
 
-        Utilities::sleepUnlessStopping(std::chrono::seconds(10), m_shouldStop);
+        utilities::sleepUnlessStopping(std::chrono::seconds(10), m_shouldStop);
     }
 }
 

@@ -454,7 +454,7 @@ namespace cryptonote
             if (globalIndexes.size() != req.outs_count)
             {
                 logger(ERROR) << "Failed to get enough matching outputs for amount "
-                              << amount << " (" << Utilities::formatAmount(amount)
+                              << amount << " (" << utilities::formatAmount(amount)
                               << "). Requested outputs: " << req.outs_count
                               << ", found outputs: " << globalIndexes.size()
                               << ". Further explanation here: https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c"

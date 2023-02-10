@@ -86,13 +86,13 @@ bool optimizeRound(const std::shared_ptr<WalletBackend> walletBackend)
     {
         std::cout << InformationMsg("Waiting for balance to return and unlock:\n"
                                     "\nTotal balance: ")
-                  << InformationMsg(Utilities::formatAmount(initialBalance))
+                  << InformationMsg(utilities::formatAmount(initialBalance))
 
                   << WarningMsg("\nLocked balance: ")
-                  << WarningMsg(Utilities::formatAmount(initialBalance - currentBalance))
+                  << WarningMsg(utilities::formatAmount(initialBalance - currentBalance))
 
                   << SuccessMsg("\nUnlocked balance: ")
-                  << SuccessMsg(Utilities::formatAmount(currentBalance))
+                  << SuccessMsg(utilities::formatAmount(currentBalance))
 
                   << InformationMsg("\nWill check again in 15 seconds...\n\n");
 

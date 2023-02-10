@@ -145,7 +145,7 @@ WalletBackend::WalletBackend(
                                  m_daemon(std::make_shared<Nigel>(daemonHost, daemonPort))
 {
     /* Generate the address from the two private keys */
-    std::string address = Utilities::privateKeysToAddress(
+    std::string address = utilities::privateKeysToAddress(
         privateSpendKey, privateViewKey);
 
     m_eventHandler = std::make_shared<EventHandler>();
@@ -620,7 +620,7 @@ std::tuple<Error, uint64_t, uint64_t> WalletBackend::getBalance(
     const bool takeFromAll = false;
 
     const auto [unlockedBalance, lockedBalance] = m_subWallets->getBalance(
-        Utilities::addressesToSpendKeys({address}), takeFromAll,
+        utilities::addressesToSpendKeys({address}), takeFromAll,
         m_daemon->networkBlockCount());
 
     return {SUCCESS, unlockedBalance, lockedBalance};
@@ -693,7 +693,7 @@ void WalletBackend::reset(uint64_t scanHeight, uint64_t timestamp)
                transaction in block 9, we can't rely on timestamps to reset accurately. */
             if (timestamp != 0)
             {
-                scanHeight = Utilities::timestampToScanHeight(timestamp);
+                scanHeight = utilities::timestampToScanHeight(timestamp);
                 timestamp = 0;
             }
 
@@ -848,7 +848,7 @@ Error WalletBackend::changePassword(const std::string newPassword)
 std::tuple<Error, Crypto::PublicKey, Crypto::SecretKey>
 WalletBackend::getSpendKeys(const std::string &address) const
 {
-    const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
+    const auto [publicSpendKey, publicViewKey] = utilities::addressToKeys(address);
 
     const auto [success, privateSpendKey] = m_subWallets->getPrivateSpendKey(publicSpendKey);
 

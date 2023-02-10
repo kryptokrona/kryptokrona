@@ -115,7 +115,7 @@ namespace miner
             last_hash_count = current_hash_count;
 
             std::cout << SuccessMsg("\nMining at ")
-                      << SuccessMsg(Utilities::get_mining_speed(hashes))
+                      << SuccessMsg(utilities::get_mining_speed(hashes))
                       << "\n\n";
         }
     }

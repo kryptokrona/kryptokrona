@@ -65,7 +65,7 @@ namespace SendTransaction
         const bool takeFromAllSubWallets = addressesToTakeFrom.empty();
 
         /* Convert the addresses to public spend keys */
-        const std::vector<Crypto::PublicKey> subWalletsToTakeFrom = Utilities::addressesToSpendKeys(addressesToTakeFrom);
+        const std::vector<Crypto::PublicKey> subWalletsToTakeFrom = utilities::addressesToSpendKeys(addressesToTakeFrom);
 
         /* Grab inputs for our fusion transaction */
         auto [ourInputs, maxFusionInputs, foundMoney] = subWallets->getFusionTransactionInputs(
@@ -97,7 +97,7 @@ namespace SendTransaction
             }
 
             /* Grab the public keys from the receiver address */
-            const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(destination);
+            const auto [publicSpendKey, publicViewKey] = utilities::addressToKeys(destination);
 
             std::vector<WalletTypes::TransactionDestination> destinations;
 
@@ -283,7 +283,7 @@ namespace SendTransaction
                 continue;
             }
 
-            auto [extractedAddress, extractedPaymentID] = Utilities::extractIntegratedAddressData(address);
+            auto [extractedAddress, extractedPaymentID] = utilities::extractIntegratedAddressData(address);
 
             address = extractedAddress;
             paymentID = extractedPaymentID;
@@ -293,10 +293,10 @@ namespace SendTransaction
         const bool takeFromAllSubWallets = addressesToTakeFrom.empty();
 
         /* The total amount we are sending */
-        const uint64_t totalAmount = Utilities::getTransactionSum(addressesAndAmounts) + fee;
+        const uint64_t totalAmount = utilities::getTransactionSum(addressesAndAmounts) + fee;
 
         /* Convert the addresses to public spend keys */
-        const std::vector<Crypto::PublicKey> subWalletsToTakeFrom = Utilities::addressesToSpendKeys(addressesToTakeFrom);
+        const std::vector<Crypto::PublicKey> subWalletsToTakeFrom = utilities::addressesToSpendKeys(addressesToTakeFrom);
 
         /* The transaction 'inputs' - key images we have previously received, plus
            their sum. The sumOfInputs is sometimes (most of the time) greater than
@@ -376,16 +376,16 @@ namespace SendTransaction
     {
         const uint64_t txSize = cryptonote::toBinaryArray(tx).size();
 
-        const uint64_t maxTxSize = Utilities::getMaxTxSize(currentHeight);
+        const uint64_t maxTxSize = utilities::getMaxTxSize(currentHeight);
 
         if (txSize > maxTxSize)
         {
             std::stringstream errorMsg;
 
             errorMsg << "Transaction is too large: ("
-                     << Utilities::prettyPrintBytes(txSize)
+                     << utilities::prettyPrintBytes(txSize)
                      << "). Max allowed size is "
-                     << Utilities::prettyPrintBytes(maxTxSize)
+                     << utilities::prettyPrintBytes(maxTxSize)
                      << ". Decrease the amount you are sending, or perform some "
                      << "fusion transactions.";
 
@@ -459,7 +459,7 @@ namespace SendTransaction
         }
 
         /* Grab the subwallet the change address points to */
-        const auto [spendKey, viewKey] = Utilities::addressToKeys(changeAddress);
+        const auto [spendKey, viewKey] = utilities::addressToKeys(changeAddress);
 
         /* Increment the change address with the amount we returned to ourselves */
         if (changeRequired != 0)
@@ -516,7 +516,7 @@ namespace SendTransaction
         for (const auto [address, amount] : addressesAndAmounts)
         {
             /* Grab the public keys from the receiver address */
-            const auto [publicSpendKey, publicViewKey] = Utilities::addressToKeys(address);
+            const auto [publicSpendKey, publicViewKey] = utilities::addressToKeys(address);
 
             /* Split transfer into denominations and create an output for each */
             for (const auto denomination : splitAmountIntoDenominations(amount))
@@ -576,7 +576,7 @@ namespace SendTransaction
                 std::stringstream error;
 
                 error << "Failed to get any matching outputs for amount "
-                      << amount << " (" << Utilities::formatAmount(amount)
+                      << amount << " (" << utilities::formatAmount(amount)
                       << "). Further explanation here: "
                       << "https://gist.github.com/zpalmtree/80b3e80463225bcfb8f8432043cb594c";
 
@@ -591,7 +591,7 @@ namespace SendTransaction
                 std::stringstream error;
 
                 error << "Failed to get enough matching outputs for amount "
-                      << amount << " (" << Utilities::formatAmount(amount)
+                      << amount << " (" << utilities::formatAmount(amount)
                       << "). Requested outputs: " << requestedOuts
                       << ", found outputs: " << it->outs.size()
                       << ". Further explanation here: "
@@ -621,7 +621,7 @@ namespace SendTransaction
                 std::stringstream error;
 
                 error << "Failed to get enough matching outputs for amount "
-                      << fakeOut.amount << " (" << Utilities::formatAmount(fakeOut.amount)
+                      << fakeOut.amount << " (" << utilities::formatAmount(fakeOut.amount)
                       << "). Requested outputs: " << requestedOuts
                       << ", found outputs: " << fakeOut.outs.size()
                       << ". Further explanation here: "
@@ -711,7 +711,7 @@ namespace SendTransaction
 
                 error << "Failed to get enough matching outputs for amount "
                       << walletAmount.input.amount << " ("
-                      << Utilities::formatAmount(walletAmount.input.amount)
+                      << utilities::formatAmount(walletAmount.input.amount)
                       << "). Requested outputs: " << mixin
                       << ", found outputs: " << obscuredInput.outputs.size()
                       << ". Further explanation here: "

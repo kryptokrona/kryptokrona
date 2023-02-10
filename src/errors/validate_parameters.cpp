@@ -120,7 +120,7 @@ Error validateIntegratedAddresses(
         }
 
         /* Grab the address + pid from the integrated address */
-        const auto [extractedAddress, extractedPaymentID] = Utilities::extractIntegratedAddressData(address);
+        const auto [extractedAddress, extractedPaymentID] = utilities::extractIntegratedAddressData(address);
 
         /* No payment ID given, set it to the extracted one */
         if (paymentID == "")
@@ -215,13 +215,13 @@ Error validateAmount(
 
     /* Get the available balance, using the source addresses */
     const auto [availableBalance, lockedBalance] = subWallets->getBalance(
-        Utilities::addressesToSpendKeys(subWalletsToTakeFrom),
+        utilities::addressesToSpendKeys(subWalletsToTakeFrom),
         /* Take from all if no subwallets specified */
         subWalletsToTakeFrom.empty(),
         currentHeight);
 
     /* Get the total amount of the transaction */
-    uint64_t totalAmount = Utilities::getTransactionSum(destinations) + fee;
+    uint64_t totalAmount = utilities::getTransactionSum(destinations) + fee;
 
     std::vector<uint64_t> amounts{fee};
 
@@ -232,7 +232,7 @@ Error validateAmount(
                    });
 
     /* Check the total amount we're sending is not >= uint64_t */
-    if (Utilities::sumWillOverflow(amounts))
+    if (utilities::sumWillOverflow(amounts))
     {
         return WILL_OVERFLOW;
     }
@@ -385,7 +385,7 @@ Error validateOurAddresses(
 
     for (const auto address : addresses)
     {
-        const auto [spendKey, viewKey] = Utilities::addressToKeys(address);
+        const auto [spendKey, viewKey] = utilities::addressToKeys(address);
 
         const auto &keys = subWallets->m_publicSpendKeys;
 

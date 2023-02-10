@@ -484,10 +484,10 @@ std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> Wallet
 std::unordered_map<Crypto::Hash, std::vector<uint64_t>> WalletSynchronizer::getGlobalIndexes(
     const uint64_t blockHeight) const
 {
-    uint64_t startHeight = Utilities::getLowerBound(
+    uint64_t startHeight = utilities::getLowerBound(
         blockHeight, Constants::GLOBAL_INDEXES_OBSCURITY);
 
-    uint64_t endHeight = Utilities::getUpperBound(
+    uint64_t endHeight = utilities::getUpperBound(
         blockHeight, Constants::GLOBAL_INDEXES_OBSCURITY);
 
     const auto [success, indexes] = m_daemon->getGlobalIndexesForRange(

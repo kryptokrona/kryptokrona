@@ -41,9 +41,9 @@ void transfer(
         std::stringstream stream;
 
         stream << "The minimum send allowed is "
-               << Utilities::formatAmount(WalletConfig::minimumSend)
+               << utilities::formatAmount(WalletConfig::minimumSend)
                << ", but you have "
-               << Utilities::formatAmount(unlockedBalance) << "!\n";
+               << utilities::formatAmount(unlockedBalance) << "!\n";
 
         std::cout << WarningMsg(stream.str());
 
@@ -128,13 +128,13 @@ void sendTransaction(
         std::cout << WarningMsg("\nYou don't have enough funds to cover "
                                 "this transaction!\n\n")
                   << "Funds needed: "
-                  << InformationMsg(Utilities::formatAmount(amount + fee + nodeFee))
+                  << InformationMsg(utilities::formatAmount(amount + fee + nodeFee))
                   << " (Includes a network fee of "
-                  << InformationMsg(Utilities::formatAmount(fee))
+                  << InformationMsg(utilities::formatAmount(fee))
                   << " and a node fee of "
-                  << InformationMsg(Utilities::formatAmount(nodeFee))
+                  << InformationMsg(utilities::formatAmount(nodeFee))
                   << ")\nFunds available: "
-                  << SuccessMsg(Utilities::formatAmount(unlockedBalance)) << "\n\n";
+                  << SuccessMsg(utilities::formatAmount(unlockedBalance)) << "\n\n";
 
         return cancel();
     }
@@ -288,7 +288,7 @@ void splitTX(
         std::stringstream stream;
 
         stream << "Transaction number " << txNumber << " has been sent!\nHash: "
-               << hash << "\nAmount: " << Utilities::formatAmount(splitAmount)
+               << hash << "\nAmount: " << utilities::formatAmount(splitAmount)
                << "\n\n";
 
         std::cout << SuccessMsg(stream.str()) << std::endl;
@@ -324,11 +324,11 @@ bool confirmTransaction(
     std::cout << InformationMsg("\nConfirm Transaction?\n");
 
     std::cout << "You are sending "
-              << SuccessMsg(Utilities::formatAmount(amount))
+              << SuccessMsg(utilities::formatAmount(amount))
               << ", with a network fee of "
-              << SuccessMsg(Utilities::formatAmount(WalletConfig::defaultFee))
+              << SuccessMsg(utilities::formatAmount(WalletConfig::defaultFee))
               << ",\nand a node fee of "
-              << SuccessMsg(Utilities::formatAmount(nodeFee));
+              << SuccessMsg(utilities::formatAmount(nodeFee));
 
     if (paymentID != "")
     {
