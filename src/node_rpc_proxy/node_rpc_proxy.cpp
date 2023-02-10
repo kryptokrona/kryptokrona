@@ -1082,7 +1082,7 @@ namespace cryptonote
             m_logger(TRACE) << "Send " << method << " JSON RPC request";
             EventLock eventLock(*m_httpEvent);
 
-            JsonRpc::JsonRpcRequest jsReq;
+            json_rpc::JsonRpcRequest jsReq;
 
             jsReq.setMethod(method);
             jsReq.setParams(req);
@@ -1096,7 +1096,7 @@ namespace cryptonote
 
             m_httpClient->request(httpReq, httpRes);
 
-            JsonRpc::JsonRpcResponse jsRes;
+            json_rpc::JsonRpcResponse jsRes;
 
             if (httpRes.getStatus() == HttpResponse::STATUS_200)
             {

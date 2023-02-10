@@ -34,7 +34,7 @@ namespace cryptonote
         bool setFeeAmount(const uint32_t fee_amount);
         std::vector<std::string> getCorsDomains();
 
-        bool on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res, JsonRpc::JsonRpcError &error_resp);
+        bool on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res, json_rpc::JsonRpcError &error_resp);
         bool on_get_info(const COMMAND_RPC_GET_INFO::request &req, COMMAND_RPC_GET_INFO::response &res);
 
     private:

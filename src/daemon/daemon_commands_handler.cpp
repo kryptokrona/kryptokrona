@@ -193,7 +193,7 @@ bool DaemonCommandsHandler::print_bc(const std::vector<std::string> &args)
 
     cryptonote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request req;
     cryptonote::COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response res;
-    cryptonote::JsonRpc::JsonRpcError error_resp;
+    cryptonote::json_rpc::JsonRpcError error_resp;
 
     req.start_height = start_index;
     req.end_height = end_index;

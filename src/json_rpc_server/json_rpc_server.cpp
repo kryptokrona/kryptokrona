@@ -113,7 +113,7 @@ namespace cryptonote
         JsonValue error(JsonValue::OBJECT);
 
         JsonValue code;
-        code = static_cast<int64_t>(cryptonote::JsonRpc::errParseError); // Application specific error code
+        code = static_cast<int64_t>(cryptonote::json_rpc::errParseError); // Application specific error code
 
         JsonValue message;
         message = ec.message();
@@ -165,7 +165,7 @@ namespace cryptonote
         JsonValue error(JsonValue::OBJECT);
 
         JsonValue code;
-        code = static_cast<int64_t>(cryptonote::JsonRpc::errMethodNotFound); // ambigous declaration of JsonValue::operator= (between int and JsonValue)
+        code = static_cast<int64_t>(cryptonote::json_rpc::errMethodNotFound); // ambigous declaration of JsonValue::operator= (between int and JsonValue)
 
         JsonValue message;
         message = "Method not found";
@@ -183,7 +183,7 @@ namespace cryptonote
         JsonValue error(JsonValue::OBJECT);
 
         JsonValue code;
-        code = static_cast<int64_t>(cryptonote::JsonRpc::errInvalidPassword);
+        code = static_cast<int64_t>(cryptonote::json_rpc::errInvalidPassword);
 
         JsonValue message;
         message = "Invalid or no rpc password";
@@ -209,7 +209,7 @@ namespace cryptonote
 
         JsonValue error(JsonValue::OBJECT);
         JsonValue code;
-        code = static_cast<int64_t>(cryptonote::JsonRpc::errParseError); // ambigous declaration of JsonValue::operator= (between int and JsonValue)
+        code = static_cast<int64_t>(cryptonote::json_rpc::errParseError); // ambigous declaration of JsonValue::operator= (between int and JsonValue)
 
         JsonValue message = "Parse error";
 

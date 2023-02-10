@@ -249,7 +249,7 @@ namespace cryptonote
 
             if (!std::is_same<Request, cryptonote::EMPTY_STRUCT>::value && !jsReq.loadParams(req))
             {
-                throw JsonRpcError(JsonRpc::errInvalidParams);
+                throw JsonRpcError(json_rpc::errInvalidParams);
             }
 
             bool result = handler(req, res);
@@ -258,7 +258,7 @@ namespace cryptonote
             {
                 if (!jsRes.setResult(res))
                 {
-                    throw JsonRpcError(JsonRpc::errInternalError);
+                    throw JsonRpcError(json_rpc::errInternalError);
                 }
             }
             return result;
@@ -271,7 +271,7 @@ namespace cryptonote
         {
             return [handler](void *obj, const JsonRpcRequest &req, JsonRpcResponse &res)
             {
-                return JsonRpc::invokeMethod<Params, Result>(
+                return json_rpc::invokeMethod<Params, Result>(
                     req, res, std::bind(handler, static_cast<Class *>(obj), std::placeholders::_1, std::placeholders::_2));
             };
         }

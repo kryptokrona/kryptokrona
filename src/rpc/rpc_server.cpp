@@ -240,7 +240,7 @@ namespace cryptonote
             auto it = jsonRpcHandlers.find(jsonRequest.getMethod());
             if (it == jsonRpcHandlers.end())
             {
-                throw JsonRpcError(JsonRpc::errMethodNotFound);
+                throw JsonRpcError(json_rpc::errMethodNotFound);
             }
 
             if (!it->second.allowBusyCore && !isCoreReady())
@@ -256,7 +256,7 @@ namespace cryptonote
         }
         catch (const std::exception &e)
         {
-            jsonResponse.setError(JsonRpcError(JsonRpc::errInternalError, e.what()));
+            jsonResponse.setError(JsonRpcError(json_rpc::errInternalError, e.what()));
         }
 
         response.setBody(jsonResponse.getBody());
@@ -811,7 +811,7 @@ namespace cryptonote
 
         if (m_core.getTopBlockIndex() + 1 <= req.height)
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                                         std::string("To big height: ") + std::to_string(req.height) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex())};
         }
 
@@ -827,7 +827,7 @@ namespace cryptonote
             Hash block_hash = m_core.getBlockHashByIndex(static_cast<uint32_t>(i));
             if (!m_core.hasBlock(block_hash))
             {
-                throw JsonRpc::JsonRpcError{
+                throw json_rpc::JsonRpcError{
                     CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                     "Internal error: can't get block by height. Height = " + std::to_string(i) + '.'};
             }
@@ -872,7 +872,7 @@ namespace cryptonote
         {
             if (!parse_hash256(req.hash, hash))
             {
-                throw JsonRpc::JsonRpcError{
+                throw json_rpc::JsonRpcError{
                     CORE_RPC_ERROR_CODE_WRONG_PARAM,
                     "Failed to parse hex representation of block hash. Hex = " + req.hash + '.'};
             }
@@ -880,7 +880,7 @@ namespace cryptonote
 
         if (!m_core.hasBlock(hash))
         {
-            throw JsonRpc::JsonRpcError{
+            throw json_rpc::JsonRpcError{
                 CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                 "Internal error: can't get block by hash. Hash = " + req.hash + '.'};
         }
@@ -889,7 +889,7 @@ namespace cryptonote
 
         if (blk.baseTransaction.inputs.front().type() != typeid(BaseInput))
         {
-            throw JsonRpc::JsonRpcError{
+            throw json_rpc::JsonRpcError{
                 CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                 "Internal error: coinbase transaction in the block has the wrong type"};
         }
@@ -984,7 +984,7 @@ namespace cryptonote
 
         if (!parse_hash256(req.hash, hash))
         {
-            throw JsonRpc::JsonRpcError{
+            throw json_rpc::JsonRpcError{
                 CORE_RPC_ERROR_CODE_WRONG_PARAM,
                 "Failed to parse hex representation of transaction hash. Hex = " + req.hash + '.'};
         }
@@ -1007,7 +1007,7 @@ namespace cryptonote
         }
         else
         {
-            throw JsonRpc::JsonRpcError{
+            throw json_rpc::JsonRpcError{
                 CORE_RPC_ERROR_CODE_WRONG_PARAM,
                 "transaction wasn't found. Hash = " + req.hash + '.'};
         }
@@ -1019,7 +1019,7 @@ namespace cryptonote
             uint32_t blockHeight = transactionDetails.blockIndex;
             if (!blockHeight)
             {
-                throw JsonRpc::JsonRpcError{
+                throw json_rpc::JsonRpcError{
                     CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                     "Internal error: can't get transaction by hash. Hash = " + common::podToHex(hash) + '.'};
             }
@@ -1123,14 +1123,14 @@ namespace cryptonote
     {
         if (req.size() != 1)
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_PARAM, "Wrong parameters, expected height"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_PARAM, "Wrong parameters, expected height"};
         }
 
         uint32_t h = static_cast<uint32_t>(req[0]);
         Crypto::Hash blockId = m_core.getBlockHashByIndex(h - 1);
         if (blockId == NULL_HASH)
         {
-            throw JsonRpc::JsonRpcError{
+            throw json_rpc::JsonRpcError{
                 CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                 std::string("Too big height: ") + std::to_string(h) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex() + 1)};
         }
@@ -1161,14 +1161,14 @@ namespace cryptonote
     {
         if (req.reserve_size > TX_EXTRA_NONCE_MAX_COUNT)
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_TOO_BIG_RESERVE_SIZE, "To big reserved size, maximum 255"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_TOO_BIG_RESERVE_SIZE, "To big reserved size, maximum 255"};
         }
 
         AccountPublicAddress acc = boost::value_initialized<AccountPublicAddress>();
 
         if (!req.wallet_address.size() || !m_core.getCurrency().parseAccountAddressString(req.wallet_address, acc))
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_WALLET_ADDRESS, "Failed to parse wallet address"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_WALLET_ADDRESS, "Failed to parse wallet address"};
         }
 
         BlockTemplate blockTemplate = boost::value_initialized<BlockTemplate>();
@@ -1178,7 +1178,7 @@ namespace cryptonote
         if (!m_core.getBlockTemplate(blockTemplate, acc, blob_reserve, res.difficulty, res.height))
         {
             logger(ERROR) << "Failed to create block template";
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to create block template"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to create block template"};
         }
 
         BinaryArray block_blob = toBinaryArray(blockTemplate);
@@ -1186,7 +1186,7 @@ namespace cryptonote
         if (tx_pub_key == NULL_PUBLIC_KEY)
         {
             logger(ERROR) << "Failed to find tx pub key in coinbase extra";
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to find tx pub key in coinbase extra"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to find tx pub key in coinbase extra"};
         }
 
         if (0 < req.reserve_size)
@@ -1195,13 +1195,13 @@ namespace cryptonote
             if (!res.reserved_offset)
             {
                 logger(ERROR) << "Failed to find tx pub key in blockblob";
-                throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to create block template"};
+                throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to create block template"};
             }
             res.reserved_offset += sizeof(tx_pub_key) + 3; // 3 bytes: tag for TX_EXTRA_TAG_PUBKEY(1 byte), tag for TX_EXTRA_NONCE(1 byte), counter in TX_EXTRA_NONCE(1 byte)
             if (res.reserved_offset + req.reserve_size > block_blob.size())
             {
                 logger(ERROR) << "Failed to calculate offset for reserved bytes";
-                throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to create block template"};
+                throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to create block template"};
             }
         }
         else
@@ -1226,20 +1226,20 @@ namespace cryptonote
     {
         if (req.size() != 1)
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_PARAM, "Wrong param"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_PARAM, "Wrong param"};
         }
 
         BinaryArray blockblob;
         if (!fromHex(req[0], blockblob))
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_BLOCKBLOB, "Wrong block blob"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_WRONG_BLOCKBLOB, "Wrong block blob"};
         }
 
         auto blockToSend = blockblob;
         auto submitResult = m_core.submitBlock(std::move(blockblob));
         if (submitResult != error::AddBlockErrorCondition::BLOCK_ADDED)
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_BLOCK_NOT_ACCEPTED, "Block not accepted"};
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_BLOCK_NOT_ACCEPTED, "Block not accepted"};
         }
 
         if (submitResult == error::AddBlockErrorCode::ADDED_TO_MAIN || submitResult == error::AddBlockErrorCode::ADDED_TO_ALTERNATIVE_AND_SWITCHED)
@@ -1328,14 +1328,14 @@ namespace cryptonote
         Hash blockHash;
         if (!parse_hash256(req.hash, blockHash))
         {
-            throw JsonRpc::JsonRpcError{
+            throw json_rpc::JsonRpcError{
                 CORE_RPC_ERROR_CODE_WRONG_PARAM,
                 "Failed to parse hex representation of block hash. Hex = " + req.hash + '.'};
         }
 
         if (!m_core.hasBlock(blockHash))
         {
-            throw JsonRpc::JsonRpcError{
+            throw json_rpc::JsonRpcError{
                 CORE_RPC_ERROR_CODE_INTERNAL_ERROR,
                 "Internal error: can't get block by hash. Hash = " + req.hash + '.'};
         }
@@ -1353,7 +1353,7 @@ namespace cryptonote
     {
         if (m_core.getTopBlockIndex() < req.height)
         {
-            throw JsonRpc::JsonRpcError{CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT,
                                         std::string("To big height: ") + std::to_string(req.height) + ", current blockchain height = " + std::to_string(m_core.getTopBlockIndex())};
         }
 
@@ -1366,7 +1366,7 @@ namespace cryptonote
         return true;
     }
 
-    bool RpcServer::on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res, JsonRpc::JsonRpcError &error_resp)
+    bool RpcServer::on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res, json_rpc::JsonRpcError &error_resp)
     {
         // TODO: change usage to jsonRpcHandlers?
         const uint64_t bc_height = m_core.get_current_blockchain_height();
