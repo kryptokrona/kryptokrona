@@ -1135,7 +1135,7 @@ namespace payment_service
         return std::error_code();
     }
 
-    std::error_code WalletService::sendTransaction(send_transaction::Request &request, std::string &transactionHash)
+    std::error_code WalletService::sendTransaction(SendTransaction::Request &request, std::string &transactionHash)
     {
         try
         {
@@ -1477,7 +1477,7 @@ namespace payment_service
             syst::EventLock lk(readyEvent);
 
             syst::RemoteContext<std::tuple<uint32_t, uint64_t, uint32_t>> remoteContext(dispatcher, [this]()
-                                                                                          {
+                                                                                        {
       /* Daemon remote height, daemon local height, peer count */
       return std::make_tuple(node.getKnownBlockCount(), node.getNodeHeight(), static_cast<uint32_t>(node.getPeerCount())); });
 

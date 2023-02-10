@@ -72,7 +72,7 @@ namespace payment_service
             serialize(request, inputSerializer);
         }
 
-        void SerializeRequest(send_transaction::Request &request, cryptonote::JsonInputValueSerializer &inputSerializer)
+        void SerializeRequest(SendTransaction::Request &request, cryptonote::JsonInputValueSerializer &inputSerializer)
         {
             request.serialize(inputSerializer, service);
         }
@@ -102,7 +102,7 @@ namespace payment_service
         std::error_code handleGetTransactions(const GetTransactions::Request &request, GetTransactions::Response &response);
         std::error_code handleGetUnconfirmedTransactionHashes(const GetUnconfirmedTransactionHashes::Request &request, GetUnconfirmedTransactionHashes::Response &response);
         std::error_code handleGetTransaction(const GetTransaction::Request &request, GetTransaction::Response &response);
-        std::error_code handleSendTransaction(send_transaction::Request &request, send_transaction::Response &response);
+        std::error_code handleSendTransaction(SendTransaction::Request &request, SendTransaction::Response &response);
         std::error_code handleCreateDelayedTransaction(CreateDelayedTransaction::Request &request, CreateDelayedTransaction::Response &response);
         std::error_code handleGetDelayedTransactionHashes(const GetDelayedTransactionHashes::Request &request, GetDelayedTransactionHashes::Response &response);
         std::error_code handleDeleteDelayedTransaction(const DeleteDelayedTransaction::Request &request, DeleteDelayedTransaction::Response &response);
