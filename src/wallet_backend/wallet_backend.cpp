@@ -209,7 +209,7 @@ std::tuple<Error, std::string> WalletBackend::createIntegratedAddress(
     std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
-    const std::string integratedAddress = tools::Base58::encode_addr(
+    const std::string integratedAddress = tools::base58::encode_addr(
         cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
         paymentID + keys);
 

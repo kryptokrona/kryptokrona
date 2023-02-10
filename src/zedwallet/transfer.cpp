@@ -917,7 +917,7 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     uint64_t prefix;
 
     /* Need to be able to decode the string as an address */
-    if (!tools::Base58::decode_addr(integratedAddress, prefix, decoded))
+    if (!tools::base58::decode_addr(integratedAddress, prefix, decoded))
     {
         return Nothing<std::pair<std::string, std::string>>();
     }

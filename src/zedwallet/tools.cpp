@@ -215,7 +215,7 @@ std::string createIntegratedAddress(const std::string &address,
     std::string keys = common::asString(ba);
 
     /* Encode prefix + paymentID + keys as an address */
-    return tools::Base58::encode_addr(
+    return tools::base58::encode_addr(
         cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
         paymentID + keys);
 }
