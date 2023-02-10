@@ -39,7 +39,7 @@ void from_json(const json &j, Transfer &t);
 void to_json(json &j, const TxPrivateKey &t);
 void from_json(const json &j, TxPrivateKey &t);
 
-namespace WalletTypes
+namespace wallet_types
 {
     /* WalletTypes::Transaction */
     void to_json(json &j, const WalletTypes::Transaction &t);
