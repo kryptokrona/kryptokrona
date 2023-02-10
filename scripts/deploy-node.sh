@@ -72,12 +72,6 @@ else
 fi
 
 echo ""
-echo "###### BULDING DOCKER IMAGE ######"
-echo ""
-(cd ./kryptokrona && git checkout docker-prod) # remove this line after when finished
-(cd ./kryptokrona && docker build -f ./deploy/Dockerfile -t kryptokrona/kryptokrona-node .)
-
-echo ""
 echo "###### CREATING DOCKER NETWORK ######"
 echo ""
 docker network create kryptokrona
@@ -85,7 +79,7 @@ docker network create kryptokrona
 echo ""
 echo "###### RUNNING DOCKER CONTAINER ######"
 echo ""
-docker run -d -p 11898:11898 --volume=$CURRENT_DIR/bootstrap/.kryptokrona:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona kryptokrona/kryptokrona-node 
+docker run -d -p 11898:11898 --volume=$CURRENT_DIR/bootstrap/.kryptokrona:/usr/src/kryptokrona/build/src/blockloc --network=kryptokrona docker pull ghcr.io/kryptokrona/kryptokrona:latest 
 
 echo ""
 echo "###### SETTING UP NGINX AND LET'S ENCRYPT ######"
