@@ -30,7 +30,7 @@ using namespace cryptonote;
 
 using json = nlohmann::json;
 
-namespace Miner
+namespace miner
 {
 
     namespace
@@ -354,4 +354,4 @@ namespace Miner
         }
     }
 
-} // namespace Miner
+} // namespace miner

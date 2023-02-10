@@ -22,7 +22,7 @@ namespace syst
     class Dispatcher;
 }
 
-namespace Miner
+namespace miner
 {
 
     class MinerManager
@@ -68,4 +68,4 @@ namespace Miner
         void adjustBlockTemplate(cryptonote::BlockTemplate &blockTemplate) const;
     };
 
-} // namespace Miner
+} // namespace miner
