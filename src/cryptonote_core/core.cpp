@@ -42,7 +42,7 @@
 
 #include <wallet_types.h>
 
-using namespace Crypto;
+using namespace crypto;
 
 namespace cryptonote
 {

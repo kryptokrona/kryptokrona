@@ -33,7 +33,7 @@
 #include <config/cryptonote_config.h>
 
 using namespace logging;
-using namespace Crypto;
+using namespace crypto;
 using namespace common;
 
 namespace cryptonote

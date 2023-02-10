@@ -9,7 +9,7 @@
 
 #include "cryptonote_core/itransaction_pool.h"
 
-namespace Crypto
+namespace crypto
 {
     struct Hash;
 }

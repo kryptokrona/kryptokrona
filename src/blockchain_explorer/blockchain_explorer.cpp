@@ -32,7 +32,7 @@
 #include "itransaction.h"
 
 using namespace logging;
-using namespace Crypto;
+using namespace crypto;
 
 namespace cryptonote
 {

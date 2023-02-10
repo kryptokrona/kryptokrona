@@ -24,7 +24,7 @@
 #include "cryptonote_format_utils.h"
 #include "transaction_extra.h"
 
-using namespace Crypto;
+using namespace crypto;
 
 namespace cryptonote
 {

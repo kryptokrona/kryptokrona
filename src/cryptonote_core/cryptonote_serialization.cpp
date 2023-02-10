@@ -145,7 +145,7 @@ namespace
 
 }
 
-namespace Crypto
+namespace crypto
 {
 
     bool serialize(PublicKey &pubKey, common::StringView name, cryptonote::ISerializer &serializer)

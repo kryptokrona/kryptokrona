@@ -20,7 +20,7 @@
 #include "inode.h"
 #include <future>
 
-using namespace Crypto;
+using namespace crypto;
 using namespace logging;
 using namespace common;
 

@@ -19,7 +19,7 @@
 #include "transfers_subscription.h"
 #include "cryptonote_core/cryptonote_basic_impl.h"
 
-using namespace Crypto;
+using namespace crypto;
 using namespace logging;
 
 namespace cryptonote

@@ -24,7 +24,7 @@
 #include "crypto/hash.h"
 #include "common/int_util.h"
 
-using namespace Crypto;
+using namespace crypto;
 using namespace common;
 
 namespace cryptonote

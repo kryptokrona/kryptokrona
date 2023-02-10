@@ -28,7 +28,7 @@
 #include <unordered_set>
 #include <memory>
 
-using namespace Crypto;
+using namespace crypto;
 
 namespace
 {
@@ -47,7 +47,7 @@ namespace
 namespace cryptonote
 {
 
-    using namespace Crypto;
+    using namespace crypto;
 
     ////////////////////////////////////////////////////////////////////////
     // class Transaction declaration

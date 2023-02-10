@@ -22,7 +22,7 @@
 #include "serialization/iserializer.h"
 #include "crypto/crypto.h"
 
-namespace Crypto
+namespace crypto
 {
 
     bool serialize(PublicKey &pubKey, common::StringView name, cryptonote::ISerializer &serializer);

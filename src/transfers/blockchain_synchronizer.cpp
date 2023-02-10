@@ -30,7 +30,7 @@
 #include "cryptonote_core/transaction_api.h"
 
 using namespace common;
-using namespace Crypto;
+using namespace crypto;
 using namespace logging;
 
 namespace

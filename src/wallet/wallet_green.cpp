@@ -45,7 +45,7 @@
 #include "wallet_utils.h"
 
 using namespace common;
-using namespace Crypto;
+using namespace crypto;
 using namespace cryptonote;
 using namespace logging;
 

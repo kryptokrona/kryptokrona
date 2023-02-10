@@ -26,7 +26,7 @@
 #include "serialization/serialization_overloads.h"
 
 using namespace common;
-using namespace Crypto;
+using namespace crypto;
 using namespace logging;
 
 namespace cryptonote

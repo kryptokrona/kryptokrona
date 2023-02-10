@@ -34,7 +34,7 @@
 #define AUTO_VAL_INIT(n) boost::value_initialized<decltype(n)>()
 #endif
 
-using namespace Crypto;
+using namespace crypto;
 using namespace common;
 using namespace logging;
 using namespace syst;
