@@ -213,7 +213,7 @@ void printSyncSummary(
     if (localDaemonBlockCount == 0 && networkBlockCount == 0)
     {
         std::cout << WarningMsg("Uh oh, it looks like you don't have ")
-                  << WarningMsg(WalletConfig::daemonName)
+                  << WarningMsg(wallet_config::daemonName)
                   << WarningMsg(" open!")
                   << std::endl;
     }
@@ -324,7 +324,7 @@ void saveCSV(const std::shared_ptr<WalletBackend> walletBackend)
         return;
     }
 
-    std::ofstream csv(WalletConfig::csvFilename);
+    std::ofstream csv(wallet_config::csvFilename);
 
     if (!csv)
     {
@@ -364,7 +364,7 @@ void saveCSV(const std::shared_ptr<WalletBackend> walletBackend)
     }
 
     std::cout << SuccessMsg("CSV successfully written to ")
-              << SuccessMsg(WalletConfig::csvFilename)
+              << SuccessMsg(wallet_config::csvFilename)
               << SuccessMsg("!")
               << std::endl;
 }

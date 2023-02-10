@@ -26,7 +26,7 @@ size_t makeFusionTransaction(cryptonote::WalletGreen &wallet,
     /* Find the best threshold by starting at threshold and decreasing by
        half till we get to the minimum amount, storing the threshold that
        gave us the most amount of optimizable amounts */
-    while (threshold > WalletConfig::minimumSend)
+    while (threshold > wallet_config::minimumSend)
     {
         const auto fusionReadyCount = wallet.estimate(threshold).fusionReadyCount;
 

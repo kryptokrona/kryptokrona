@@ -620,7 +620,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::sendAdvancedTransaction(
             m_walletBackend->getStatus().networkBlockCount);
     }
 
-    uint64_t fee = WalletConfig::defaultFee;
+    uint64_t fee = wallet_config::defaultFee;
 
     if (body.find("fee") != body.end())
     {

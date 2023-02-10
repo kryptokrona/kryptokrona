@@ -43,7 +43,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
     while (true)
     {
         std::cout << InformationMsg("Enter your public ")
-                  << InformationMsg(WalletConfig::ticker)
+                  << InformationMsg(wallet_config::ticker)
                   << InformationMsg(" address: ");
 
         std::getline(std::cin, address);

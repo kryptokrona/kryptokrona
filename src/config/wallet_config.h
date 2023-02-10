@@ -7,7 +7,7 @@
 #include <config/cryptonote_config.h>
 
 /* Make sure everything in here is const - or it won't compile! */
-namespace WalletConfig
+namespace wallet_config
 {
     /* The prefix your coins address starts with */
     const std::string_view addressPrefix = "SEKR";

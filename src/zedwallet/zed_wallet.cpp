@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 
         logging::FileLogger fileLogger;
 
-        fileLogger.init(WalletConfig::walletName + ".log");
+        fileLogger.init(wallet_config::walletName + ".log");
         logManager->addLogger(fileLogger);
     }
 
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
                << "The fee for sending transactions is: " << formatAmount(node->feeAmount()) << " per transaction." << std::endl
                << std::endl
                << "If you don't want to pay the node fee, please "
-               << "relaunch " << WalletConfig::walletName << " and specify a different node or run your own." << std::endl;
+               << "relaunch " << wallet_config::walletName << " and specify a different node or run your own." << std::endl;
 
         std::cout << WarningMsg(feemsg.str()) << std::endl;
     }

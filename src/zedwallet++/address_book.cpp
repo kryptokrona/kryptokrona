@@ -83,7 +83,7 @@ void addToAddressBook()
     std::string paymentID;
 
     /* Don't prompt for a payment ID if we have an integrated address */
-    if (address.length() == WalletConfig::standardAddressLength)
+    if (address.length() == wallet_config::standardAddressLength)
     {
         const bool cancelAllowed = true;
 
@@ -222,7 +222,7 @@ void sendFromAddressBook(const std::shared_ptr<WalletBackend> walletBackend)
     const bool cancelAllowed = true;
 
     const auto [success, amount] = getAmountToAtomic(
-        "How much " + WalletConfig::ticker + " do you want to send?: ",
+        "How much " + wallet_config::ticker + " do you want to send?: ",
         cancelAllowed);
 
     if (!success)
@@ -349,7 +349,7 @@ std::vector<AddressBookEntry> getAddressBook()
 {
     std::vector<AddressBookEntry> addressBook;
 
-    std::ifstream input(WalletConfig::addressBookFilename);
+    std::ifstream input(wallet_config::addressBookFilename);
 
     /* If file exists, read current values */
     if (input)
@@ -383,7 +383,7 @@ bool saveAddressBook(const std::vector<AddressBookEntry> addressBook)
 {
     json addressBookJson = addressBook;
 
-    std::ofstream output(WalletConfig::addressBookFilename);
+    std::ofstream output(wallet_config::addressBookFilename);
 
     if (output)
     {

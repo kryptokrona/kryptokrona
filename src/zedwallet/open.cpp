@@ -43,7 +43,7 @@ std::shared_ptr<WalletInfo> createViewWallet(cryptonote::WalletGreen &wallet)
     while (true)
     {
         std::cout << InformationMsg("Enter your public ")
-                  << InformationMsg(WalletConfig::ticker)
+                  << InformationMsg(wallet_config::ticker)
                   << InformationMsg(" address: ");
 
         std::getline(std::cin, address);
@@ -274,7 +274,7 @@ std::shared_ptr<WalletInfo> openWallet(cryptonote::WalletGreen &wallet,
                     << "Ensure you are opening a wallet file, and the "
                     << "file has not gotten corrupted." << std::endl
                     << "Try reimporting via keys, and always close "
-                    << WalletConfig::walletName << " with the exit "
+                    << wallet_config::walletName << " with the exit "
                     << "command to prevent corruption." << std::endl;
 
                 std::cout << WarningMsg(msg.str()) << std::endl;
@@ -304,13 +304,13 @@ std::shared_ptr<WalletInfo> openWallet(cryptonote::WalletGreen &wallet,
                           << std::endl
                           << WarningMsg("Check with a task manager that you "
                                         "don't have ")
-                          << WalletConfig::walletName
+                          << wallet_config::walletName
                           << WarningMsg(" open twice.")
                           << std::endl
                           << WarningMsg("Also check you don't have another "
                                         "wallet program open, such as a GUI "
                                         "wallet or ")
-                          << WarningMsg(WalletConfig::walletdName)
+                          << WarningMsg(wallet_config::walletdName)
                           << WarningMsg(".")
                           << std::endl
                           << std::endl;
@@ -505,7 +505,7 @@ void connectingMsg()
 {
     std::cout << std::endl
               << "Making initial contact with "
-              << WalletConfig::daemonName
+              << wallet_config::daemonName
               << "."
               << std::endl
               << "Please wait, this sometimes can take a long time..."

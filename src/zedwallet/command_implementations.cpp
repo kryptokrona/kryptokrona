@@ -253,7 +253,7 @@ void printSyncSummary(uint32_t localHeight, uint32_t remoteHeight,
     if (localHeight == 0 && remoteHeight == 0)
     {
         std::cout << WarningMsg("Uh oh, it looks like you don't have ")
-                  << WarningMsg(WalletConfig::daemonName)
+                  << WarningMsg(wallet_config::daemonName)
                   << WarningMsg(" open!")
                   << std::endl;
     }
@@ -361,7 +361,7 @@ void saveCSV(cryptonote::WalletGreen &wallet, cryptonote::INode &node)
     const size_t numTransactions = wallet.getTransactionCount();
 
     std::ofstream csv;
-    csv.open(WalletConfig::csvFilename);
+    csv.open(wallet_config::csvFilename);
 
     if (!csv)
     {
@@ -406,7 +406,7 @@ void saveCSV(cryptonote::WalletGreen &wallet, cryptonote::INode &node)
     csv.close();
 
     std::cout << SuccessMsg("CSV successfully written to ")
-              << SuccessMsg(WalletConfig::csvFilename)
+              << SuccessMsg(wallet_config::csvFilename)
               << SuccessMsg("!")
               << std::endl;
 }

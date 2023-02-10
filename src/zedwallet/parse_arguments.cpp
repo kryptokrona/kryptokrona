@@ -25,7 +25,7 @@ Config parseArguments(int argc, char **argv)
     bool help, version;
     std::string remoteDaemon;
 
-    options.add_options("Core")("h,help", "Display this help message", cxxopts::value<bool>(help)->implicit_value("true"))("v,version", "Output software version information", cxxopts::value<bool>(version)->default_value("false")->implicit_value("true"))("debug", "Enable " + WalletConfig::walletdName + " debugging to " + WalletConfig::walletName + ".log",
+    options.add_options("Core")("h,help", "Display this help message", cxxopts::value<bool>(help)->implicit_value("true"))("v,version", "Output software version information", cxxopts::value<bool>(version)->default_value("false")->implicit_value("true"))("debug", "Enable " + wallet_config::walletdName + " debugging to " + wallet_config::walletName + ".log",
                                                                                                                                                                                                                                                               cxxopts::value<bool>(config.debug)->default_value("false")->implicit_value("true"));
 
     options.add_options("Daemon")("r,remote-daemon", "The daemon <host:port> combination to use for node operations.",

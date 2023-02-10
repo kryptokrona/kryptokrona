@@ -36,12 +36,12 @@ void transfer(
 
     const auto unlockedBalance = walletBackend->getTotalUnlockedBalance();
 
-    if (sendAll && unlockedBalance <= WalletConfig::minimumSend)
+    if (sendAll && unlockedBalance <= wallet_config::minimumSend)
     {
         std::stringstream stream;
 
         stream << "The minimum send allowed is "
-               << utilities::formatAmount(WalletConfig::minimumSend)
+               << utilities::formatAmount(wallet_config::minimumSend)
                << ", but you have "
                << utilities::formatAmount(unlockedBalance) << "!\n";
 
@@ -63,7 +63,7 @@ void transfer(
 
     std::string paymentID;
 
-    if (address.length() == WalletConfig::standardAddressLength)
+    if (address.length() == wallet_config::standardAddressLength)
     {
         paymentID = getPaymentID(
             "What payment ID do you want to use?\n"
@@ -82,7 +82,7 @@ void transfer(
        safely */
     const auto [nodeFee, nodeAddress] = walletBackend->getNodeFee();
 
-    const uint64_t fee = WalletConfig::defaultFee;
+    const uint64_t fee = wallet_config::defaultFee;
 
     /* Default amount if we're sending everything */
     uint64_t amount = unlockedBalance - nodeFee - fee;
@@ -92,7 +92,7 @@ void transfer(
         bool success;
 
         std::tie(success, amount) = getAmountToAtomic(
-            "How much " + WalletConfig::ticker + " do you want to send?: ",
+            "How much " + wallet_config::ticker + " do you want to send?: ",
             cancelAllowed);
 
         std::cout << "\n";
@@ -118,7 +118,7 @@ void sendTransaction(
        safely */
     const auto [nodeFee, nodeAddress] = walletBackend->getNodeFee();
 
-    const uint64_t fee = WalletConfig::defaultFee;
+    const uint64_t fee = wallet_config::defaultFee;
 
     /* The total balance required with fees added */
     const uint64_t total = amount + nodeFee + fee;
@@ -237,17 +237,17 @@ void splitTX(
             splitAmount = remainder;
         }
 
-        uint64_t totalNeeded = splitAmount + WalletConfig::minimumFee + nodeFee;
+        uint64_t totalNeeded = splitAmount + wallet_config::minimumFee + nodeFee;
 
         /* Don't have enough to cover the full transfer, just send as much
            as we can (deduct fees which will be added later) */
         if (totalNeeded > unlockedBalance)
         {
-            totalNeeded = unlockedBalance - WalletConfig::minimumFee - nodeFee;
-            splitAmount = totalNeeded - WalletConfig::minimumFee + nodeFee;
+            totalNeeded = unlockedBalance - wallet_config::minimumFee - nodeFee;
+            splitAmount = totalNeeded - wallet_config::minimumFee + nodeFee;
         }
 
-        if (splitAmount < WalletConfig::minimumSend)
+        if (splitAmount < wallet_config::minimumSend)
         {
             std::cout << WarningMsg("Failed to split up transaction, sorry.\n");
             return;
@@ -298,7 +298,7 @@ void splitTX(
         sentAmount += splitAmount;
 
         /* Remember to remove the fee and node fee as well from balance */
-        unlockedBalance -= splitAmount - WalletConfig::minimumFee - nodeFee;
+        unlockedBalance -= splitAmount - wallet_config::minimumFee - nodeFee;
 
         remainder = totalAmount - sentAmount;
 
@@ -326,7 +326,7 @@ bool confirmTransaction(
     std::cout << "You are sending "
               << SuccessMsg(utilities::formatAmount(amount))
               << ", with a network fee of "
-              << SuccessMsg(utilities::formatAmount(WalletConfig::defaultFee))
+              << SuccessMsg(utilities::formatAmount(wallet_config::defaultFee))
               << ",\nand a node fee of "
               << SuccessMsg(utilities::formatAmount(nodeFee));
 

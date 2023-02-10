@@ -41,7 +41,7 @@ void confirmPassword(const std::string &walletPass, const std::string &msg)
    e.g. 100 for 2 decimal places */
 uint64_t getDivisor()
 {
-    return static_cast<uint64_t>(pow(10, WalletConfig::numDecimalPlaces));
+    return static_cast<uint64_t>(pow(10, wallet_config::numDecimalPlaces));
 }
 
 std::string formatAmount(const uint64_t amount)
@@ -50,7 +50,7 @@ std::string formatAmount(const uint64_t amount)
     const uint64_t dollars = amount / divisor;
     const uint64_t cents = amount % divisor;
 
-    return formatDollars(dollars) + "." + formatCents(cents) + " " + WalletConfig::ticker;
+    return formatDollars(dollars) + "." + formatCents(cents) + " " + wallet_config::ticker;
 }
 
 std::string formatAmountBasic(const uint64_t amount)
@@ -115,7 +115,7 @@ std::string formatDollars(const uint64_t amount)
 std::string formatCents(const uint64_t amount)
 {
     std::stringstream stream;
-    stream << std::setfill('0') << std::setw(WalletConfig::numDecimalPlaces)
+    stream << std::setfill('0') << std::setw(wallet_config::numDecimalPlaces)
            << amount;
     return stream.str();
 }

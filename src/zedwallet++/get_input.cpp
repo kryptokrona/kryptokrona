@@ -48,7 +48,7 @@ std::string getPrompt(std::shared_ptr<WalletBackend> walletBackend)
 
     const std::string shortName = walletName.substr(0, promptLength);
 
-    return "[" + WalletConfig::ticker + " " + shortName + "]: ";
+    return "[" + wallet_config::ticker + " " + shortName + "]: ";
 }
 
 template <typename T>
@@ -260,12 +260,12 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
         const uint64_t decimalLength = decimalPos == std::string::npos ? 0 : amountString.substr(decimalPos + 1, amountString.length()).length();
 
         /* Can't send amounts with more decimal places than supported */
-        if (decimalLength > WalletConfig::numDecimalPlaces)
+        if (decimalLength > wallet_config::numDecimalPlaces)
         {
             std::stringstream stream;
 
             stream << cryptonote::CRYPTONOTE_NAME << " transfers can have "
-                   << "a max of " << WalletConfig::numDecimalPlaces
+                   << "a max of " << wallet_config::numDecimalPlaces
                    << " decimal places.\n";
 
             std::cout << WarningMsg(stream.str());
@@ -278,16 +278,16 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
 
         /* Pad the string with 0's at the end, so 123 becomes 12300, so we
            can parse it as an atomic amount. 123.45 parses as 12345. */
-        amountString.append(WalletConfig::numDecimalPlaces - decimalLength, '0');
+        amountString.append(wallet_config::numDecimalPlaces - decimalLength, '0');
 
         try
         {
             unsigned long long amount = std::stoull(amountString);
 
-            if (amount < WalletConfig::minimumSend)
+            if (amount < wallet_config::minimumSend)
             {
                 std::cout << WarningMsg("The minimum send allowed is ")
-                          << WarningMsg(utilities::formatAmount(WalletConfig::minimumSend))
+                          << WarningMsg(utilities::formatAmount(wallet_config::minimumSend))
                           << WarningMsg("!\n");
             }
             else

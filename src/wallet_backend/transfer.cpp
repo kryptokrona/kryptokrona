@@ -226,7 +226,7 @@ namespace send_transaction
         const auto [minMixin, maxMixin, defaultMixin] = cryptonote::Mixins::getMixinAllowableRange(
             daemon->networkBlockCount());
 
-        const uint64_t fee = WalletConfig::defaultFee;
+        const uint64_t fee = wallet_config::defaultFee;
 
         /* Assumes the container has at least one subwallet - this is true as long
            as the static constructors were used */
@@ -278,7 +278,7 @@ namespace send_transaction
            in validateTransaction(), and the paymentID's do not conflict. */
         for (auto &[address, amount] : addressesAndAmounts)
         {
-            if (address.length() != WalletConfig::integratedAddressLength)
+            if (address.length() != wallet_config::integratedAddressLength)
             {
                 continue;
             }

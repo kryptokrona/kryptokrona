@@ -29,7 +29,7 @@ void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
 
     if (localDaemonBlockCount + 1 <= networkBlockCount)
     {
-        std::cout << "Your " << WalletConfig::daemonName << " isn't fully "
+        std::cout << "Your " << wallet_config::daemonName << " isn't fully "
                   << "synced yet!\n"
                   << "Until you are fully synced, you won't be able to send "
                   << "transactions,\nand your balance may be missing or "
@@ -118,7 +118,7 @@ void syncWallet(const std::shared_ptr<WalletBackend> walletBackend)
                       "node is online, and not syncing.\n(Syncing often stalls "
                       "wallet operation)\nGive the daemon a restart if possible.\n"
                    << "If this persists, visit "
-                   << WalletConfig::contactLink
+                   << wallet_config::contactLink
                    << " for support.";
 
             std::cout << WarningMsg(stream.str()) << std::endl;

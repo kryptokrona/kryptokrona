@@ -209,7 +209,7 @@ std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> Walle
 {
     std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> inputs;
 
-    if (WalletConfig::processCoinbaseTransactions)
+    if (wallet_config::processCoinbaseTransactions)
     {
         const auto newInputs = processTransactionOutputs(
             block.coinbaseTransaction, block.blockHeight);
@@ -306,7 +306,7 @@ BlockScanTmpInfo WalletSynchronizer::processBlockTransactions(
 {
     BlockScanTmpInfo txData;
 
-    if (WalletConfig::processCoinbaseTransactions)
+    if (wallet_config::processCoinbaseTransactions)
     {
         const auto tx = processCoinbaseTransaction(block, inputs);
 

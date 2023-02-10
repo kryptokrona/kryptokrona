@@ -40,7 +40,7 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
     removeCharFromString(strAmount, ',');
 
     const size_t pointIndex = strAmount.find_first_of('.');
-    const size_t numDecimalPlaces = WalletConfig::numDecimalPlaces;
+    const size_t numDecimalPlaces = wallet_config::numDecimalPlaces;
 
     size_t fractionSize;
 
@@ -88,7 +88,7 @@ bool parseAmount(std::string strAmount, uint64_t &amount)
         return false;
     }
 
-    return amount >= WalletConfig::minimumSend;
+    return amount >= wallet_config::minimumSend;
 }
 
 bool confirmTransaction(cryptonote::TransactionParameters t,
@@ -193,7 +193,7 @@ void splitTX(cryptonote::WalletGreen &wallet,
             splitTXParams.destinations[0].amount = balance - splitTXParams.fee - nodeFee;
         }
 
-        if (splitTXParams.destinations[0].amount < WalletConfig::minimumSend)
+        if (splitTXParams.destinations[0].amount < wallet_config::minimumSend)
         {
             std::cout << WarningMsg("Failed to split up transaction, sorry.")
                       << std::endl;
@@ -358,7 +358,7 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
 
         amount = maybeAmount.x;
 
-        switch (doWeHaveEnoughBalance(amount, WalletConfig::defaultFee,
+        switch (doWeHaveEnoughBalance(amount, wallet_config::defaultFee,
                                       walletInfo, height, nodeFee))
         {
         case NotEnoughBalance:
@@ -421,8 +421,8 @@ void transfer(std::shared_ptr<WalletInfo> walletInfo, uint32_t height,
                       << InformationMsg(formatAmount(unsendable))
                       << WarningMsg("of your balance.") << std::endl;
 
-            if (!WalletConfig::mixinZeroDisabled ||
-                height < WalletConfig::mixinZeroDisabledHeight)
+            if (!wallet_config::mixinZeroDisabled ||
+                height < wallet_config::mixinZeroDisabledHeight)
             {
                 std::cout << "Alternatively, you can set the mixin count to "
                           << "zero to send it all." << std::endl;
@@ -482,7 +482,7 @@ BalanceInfo doWeHaveEnoughBalance(uint64_t amount, uint64_t fee,
         return NotEnoughBalance;
     }
     else if (cryptonote::getDefaultMixinByHeight(height) != 0 &&
-             balanceNoDust < amount + WalletConfig::minimumFee + nodeFee)
+             balanceNoDust < amount + wallet_config::minimumFee + nodeFee)
     {
         std::cout << std::endl
                   << WarningMsg("This transaction is unable to be sent ")
@@ -496,8 +496,8 @@ BalanceInfo doWeHaveEnoughBalance(uint64_t amount, uint64_t fee,
                   << ")"
                   << std::endl;
 
-        if (!WalletConfig::mixinZeroDisabled ||
-            height < WalletConfig::mixinZeroDisabledHeight)
+        if (!wallet_config::mixinZeroDisabled ||
+            height < wallet_config::mixinZeroDisabledHeight)
         {
             std::cout << "Alternatively, you can sent the mixin "
                       << "count to 0." << std::endl;
@@ -664,8 +664,8 @@ bool handleTransferError(const std::system_error &e,
         /* If a mixin of zero is allowed, or we are below the
            fork height when it's banned, ask them to resend with
            zero */
-        if (!WalletConfig::mixinZeroDisabled ||
-            height < WalletConfig::mixinZeroDisabledHeight)
+        if (!wallet_config::mixinZeroDisabled ||
+            height < wallet_config::mixinZeroDisabledHeight)
         {
             std::cout << "Alternatively, you can set the mixin "
                       << "count to 0." << std::endl;
@@ -688,7 +688,7 @@ bool handleTransferError(const std::system_error &e,
         std::cout << WarningMsg("Couldn't connect to the network "
                                 "to send the transaction!")
                   << std::endl
-                  << "Ensure " << WalletConfig::daemonName
+                  << "Ensure " << wallet_config::daemonName
                   << " or the remote node you are using is open "
                   << "and functioning."
                   << std::endl;
@@ -825,14 +825,14 @@ Maybe<uint64_t> getFee()
                   << InformationMsg("What fee do you want to use?")
                   << std::endl
                   << "Hit enter for the default fee of "
-                  << formatAmount(WalletConfig::defaultFee)
+                  << formatAmount(wallet_config::defaultFee)
                   << ": ";
 
         std::getline(std::cin, stringAmount);
 
         if (stringAmount == "")
         {
-            return Just<uint64_t>(WalletConfig::defaultFee);
+            return Just<uint64_t>(wallet_config::defaultFee);
         }
 
         if (stringAmount == "cancel")
@@ -858,7 +858,7 @@ Maybe<uint64_t> getTransferAmount()
 
         std::cout << std::endl
                   << InformationMsg("How much ")
-                  << InformationMsg(WalletConfig::ticker)
+                  << InformationMsg(wallet_config::ticker)
                   << InformationMsg(" do you want to send?: ");
 
         std::getline(std::cin, stringAmount);
@@ -888,15 +888,15 @@ bool parseFee(std::string feeString)
                                 "value correctly.")
                   << std::endl
                   << "Please note, you can only use "
-                  << WalletConfig::numDecimalPlaces << " decimal places."
+                  << wallet_config::numDecimalPlaces << " decimal places."
                   << std::endl;
 
         return false;
     }
-    else if (fee < WalletConfig::minimumFee)
+    else if (fee < wallet_config::minimumFee)
     {
         std::cout << WarningMsg("Fee must be at least ")
-                  << formatAmount(WalletConfig::minimumFee) << "!"
+                  << formatAmount(wallet_config::minimumFee) << "!"
                   << std::endl;
 
         return false;
@@ -908,7 +908,7 @@ bool parseFee(std::string feeString)
 Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     std::string integratedAddress)
 {
-    if (integratedAddress.length() != WalletConfig::integratedAddressLength)
+    if (integratedAddress.length() != wallet_config::integratedAddressLength)
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
@@ -1005,12 +1005,12 @@ AddressType parseAddress(std::string address)
 
     /* Failed to parse, lets try and diagnose a more accurate failure message */
 
-    if (address.length() != WalletConfig::standardAddressLength &&
-        address.length() != WalletConfig::integratedAddressLength)
+    if (address.length() != wallet_config::standardAddressLength &&
+        address.length() != wallet_config::integratedAddressLength)
     {
         std::cout << WarningMsg("Address is wrong length!") << std::endl
-                  << "It should be " << WalletConfig::standardAddressLength
-                  << " or " << WalletConfig::integratedAddressLength
+                  << "It should be " << wallet_config::standardAddressLength
+                  << " or " << wallet_config::integratedAddressLength
                   << " characters long, but it is " << address.length()
                   << " characters long!" << std::endl
                   << std::endl;
@@ -1018,11 +1018,11 @@ AddressType parseAddress(std::string address)
         return NotAnAddress;
     }
 
-    if (address.substr(0, WalletConfig::addressPrefix.length()) !=
-        WalletConfig::addressPrefix)
+    if (address.substr(0, wallet_config::addressPrefix.length()) !=
+        wallet_config::addressPrefix)
     {
         std::cout << WarningMsg("Invalid address! It should start with ")
-                  << WarningMsg(std::string(WalletConfig::addressPrefix))
+                  << WarningMsg(std::string(wallet_config::addressPrefix))
                   << WarningMsg("!")
                   << std::endl
                   << std::endl;
@@ -1032,7 +1032,7 @@ AddressType parseAddress(std::string address)
 
     std::cout << WarningMsg("Failed to parse address, address is not a ")
               << WarningMsg("valid ")
-              << WarningMsg(WalletConfig::ticker)
+              << WarningMsg(wallet_config::ticker)
               << WarningMsg(" address!") << std::endl
               << std::endl;
 
@@ -1053,12 +1053,12 @@ bool parseStandardAddress(std::string address, bool printErrors)
     const bool valid = cryptonote::parseAccountAddressString(prefix, addr,
                                                              address);
 
-    if (address.length() != WalletConfig::standardAddressLength)
+    if (address.length() != wallet_config::standardAddressLength)
     {
         if (printErrors)
         {
             std::cout << WarningMsg("Address is wrong length!") << std::endl
-                      << "It should be " << WalletConfig::standardAddressLength
+                      << "It should be " << wallet_config::standardAddressLength
                       << " characters long, but it is " << address.length()
                       << " characters long!" << std::endl
                       << std::endl;
@@ -1070,12 +1070,12 @@ bool parseStandardAddress(std::string address, bool printErrors)
        reasons. To work around this, we can just check that the address starts
        with TRTL, as long as the prefix is the TRTL prefix. This keeps it
        working on testnets with different prefixes. */
-    else if (address.substr(0, WalletConfig::addressPrefix.length()) != WalletConfig::addressPrefix)
+    else if (address.substr(0, wallet_config::addressPrefix.length()) != wallet_config::addressPrefix)
     {
         if (printErrors)
         {
             std::cout << WarningMsg("Invalid address! It should start with ")
-                      << WarningMsg(std::string(WalletConfig::addressPrefix))
+                      << WarningMsg(std::string(wallet_config::addressPrefix))
                       << WarningMsg("!")
                       << std::endl
                       << std::endl;
@@ -1091,7 +1091,7 @@ bool parseStandardAddress(std::string address, bool printErrors)
         {
             std::cout << WarningMsg("Failed to parse address, address is not a ")
                       << WarningMsg("valid ")
-                      << WarningMsg(WalletConfig::ticker)
+                      << WarningMsg(wallet_config::ticker)
                       << WarningMsg(" address!") << std::endl
                       << std::endl;
         }
@@ -1112,9 +1112,9 @@ bool parseAmount(std::string amountString)
                                 "the value correctly.")
                   << std::endl
                   << "Please note, the minimum you can send is "
-                  << formatAmount(WalletConfig::minimumSend) << ","
+                  << formatAmount(wallet_config::minimumSend) << ","
                   << std::endl
-                  << "and you can only use " << WalletConfig::numDecimalPlaces
+                  << "and you can only use " << wallet_config::numDecimalPlaces
                   << " decimal places."
                   << std::endl;
 

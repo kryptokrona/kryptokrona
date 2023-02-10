@@ -190,17 +190,17 @@ bool checkNodeStatus(cryptonote::INode &node)
     {
         std::stringstream msg;
 
-        msg << "It looks like " << WalletConfig::daemonName << " isn't open!"
+        msg << "It looks like " << wallet_config::daemonName << " isn't open!"
             << std::endl
             << std::endl
-            << "Ensure " << WalletConfig::daemonName
+            << "Ensure " << wallet_config::daemonName
             << " is open and has finished initializing." << std::endl
             << "If it's still not working, try restarting "
-            << WalletConfig::daemonName << "."
+            << wallet_config::daemonName << "."
             << "The daemon sometimes gets stuck."
             << std::endl
             << "Alternatively, perhaps "
-            << WalletConfig::daemonName << " can't communicate with any peers."
+            << wallet_config::daemonName << " can't communicate with any peers."
             << std::endl
             << std::endl
             << "The wallet can't function fully until it can communicate with "

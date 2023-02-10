@@ -64,7 +64,7 @@ void syncWallet(cryptonote::INode &node,
 
     if (localHeight != remoteHeight)
     {
-        std::cout << "Your " << WalletConfig::daemonName << " isn't fully "
+        std::cout << "Your " << wallet_config::daemonName << " isn't fully "
                   << "synced yet!" << std::endl
                   << "Until you are fully synced, you won't be able to send "
                   << "transactions,"
@@ -148,11 +148,11 @@ void syncWallet(cryptonote::INode &node,
             if (stuckCounter > 20)
             {
                 std::cout << WarningMsg("Syncing may be stuck. Try restarting ")
-                          << WarningMsg(WalletConfig::daemonName)
+                          << WarningMsg(wallet_config::daemonName)
                           << WarningMsg(".")
                           << std::endl
                           << WarningMsg("If this persists, visit ")
-                          << WarningMsg(WalletConfig::contactLink)
+                          << WarningMsg(wallet_config::contactLink)
                           << WarningMsg(" for support.")
                           << std::endl;
             }

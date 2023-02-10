@@ -63,7 +63,7 @@ std::tuple<bool, bool, std::shared_ptr<WalletBackend>> selectionScreen(const Con
                    << " per transaction.\n\n"
                       "If you don't want to pay the node fee, please "
                       "relaunch "
-                   << WalletConfig::walletName
+                   << wallet_config::walletName
                    << " and specify a different node or run your own.";
 
             std::cout << WarningMsg(feemsg.str()) << std::endl;
@@ -107,14 +107,14 @@ bool checkNodeStatus(const std::shared_ptr<WalletBackend> walletBackend)
 
         std::stringstream msg;
 
-        msg << "It looks like " << WalletConfig::daemonName << " isn't open!\n\n"
-            << "Ensure " << WalletConfig::daemonName
+        msg << "It looks like " << wallet_config::daemonName << " isn't open!\n\n"
+            << "Ensure " << wallet_config::daemonName
             << " is open and has finished syncing. "
             << "(It will often not respond when syncing)\n"
             << "If it's still not working, try restarting "
-            << WalletConfig::daemonName << " (or try a different remote node)."
+            << wallet_config::daemonName << " (or try a different remote node)."
             << "\nThe daemon sometimes gets stuck.\nAlternatively, perhaps "
-            << WalletConfig::daemonName << " can't communicate with any peers."
+            << wallet_config::daemonName << " can't communicate with any peers."
             << "\n\nThe wallet can't function fully until it can communicate with "
             << "the network.";
 
