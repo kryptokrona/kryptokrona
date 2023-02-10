@@ -27,7 +27,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
               << WarningMsg("transactions, and cannot make transfers.")
               << std::endl;
 
-    bool create = ZedUtilities::confirm("Is this OK?");
+    bool create = zed_utilities::confirm("Is this OK?");
 
     std::cout << "\n";
 
@@ -71,7 +71,7 @@ std::shared_ptr<WalletBackend> importViewWallet(const Config &config)
 
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 
-    const uint64_t scanHeight = ZedUtilities::getScanHeight();
+    const uint64_t scanHeight = zed_utilities::getScanHeight();
 
     auto [error, walletBackend] = WalletBackend::importViewWallet(
         privateViewKey, address, walletFileName, walletPass, scanHeight,
@@ -110,7 +110,7 @@ std::shared_ptr<WalletBackend> importWalletFromKeys(const Config &config)
 
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 
-    const uint64_t scanHeight = ZedUtilities::getScanHeight();
+    const uint64_t scanHeight = zed_utilities::getScanHeight();
 
     const auto [error, walletBackend] = WalletBackend::importWalletFromKeys(
         privateSpendKey, privateViewKey, walletFileName, walletPass,
@@ -167,7 +167,7 @@ std::shared_ptr<WalletBackend> importWalletFromSeed(const Config &config)
 
     const std::string walletPass = getWalletPassword(verifyPassword, msg);
 
-    const uint64_t scanHeight = ZedUtilities::getScanHeight();
+    const uint64_t scanHeight = zed_utilities::getScanHeight();
 
     auto [error, walletBackend] = WalletBackend::importWalletFromSeed(
         mnemonicSeed, walletFileName, walletPass, scanHeight,

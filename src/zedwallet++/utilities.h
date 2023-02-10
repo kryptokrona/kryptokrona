@@ -14,7 +14,7 @@
 
 #include <wallet_backend/wallet_backend.h>
 
-namespace ZedUtilities
+namespace zed_utilities
 {
 
     void confirmPassword(

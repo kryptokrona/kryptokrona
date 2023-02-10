@@ -246,7 +246,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
         common::trim(amountString);
 
         /* If the user entered thousand separators, remove them */
-        ZedUtilities::removeCharFromString(amountString, ',');
+        zed_utilities::removeCharFromString(amountString, ',');
 
         if (amountString == "cancel" && cancelAllowed)
         {
@@ -274,7 +274,7 @@ std::tuple<bool, uint64_t> getAmountToAtomic(
         }
 
         /* Remove the decimal place, so we can parse it as an atomic amount */
-        ZedUtilities::removeCharFromString(amountString, '.');
+        zed_utilities::removeCharFromString(amountString, '.');
 
         /* Pad the string with 0's at the end, so 123 becomes 12300, so we
            can parse it as an atomic amount. 123.45 parses as 12345. */
@@ -330,7 +330,7 @@ std::tuple<std::string, uint16_t> getDaemonAddress()
 
         common::trim(address);
 
-        if (!ZedUtilities::parseDaemonAddressFromString(host, port, address))
+        if (!zed_utilities::parseDaemonAddressFromString(host, port, address))
         {
             std::cout << WarningMsg("\nInvalid daemon address! Try again.\n");
             continue;

@@ -187,7 +187,7 @@ const std::tuple<bool, AddressBookEntry> getAddressBookEntry(
                       << std::endl;
         }
 
-        const bool list = ZedUtilities::confirm(
+        const bool list = zed_utilities::confirm(
             "Would you like to list everyone in your address book?");
 
         std::cout << "\n";
@@ -300,7 +300,7 @@ void deleteFromAddressBook()
                   << InformationMsg(friendlyName)
                   << WarningMsg(" in your address book!\n\n");
 
-        const bool list = ZedUtilities::confirm(
+        const bool list = zed_utilities::confirm(
             "Would you like to list everyone in your address book?");
 
         std::cout << "\n";

@@ -201,7 +201,7 @@ void splitTX(
                             "If the node you are using charges a fee,\nyou will "
                             "have to pay this fee for each transction.\n");
 
-    if (!ZedUtilities::confirm("Is this OK?"))
+    if (!zed_utilities::confirm("Is this OK?"))
     {
         return cancel();
     }
@@ -342,10 +342,10 @@ bool confirmTransaction(
     std::cout << "\n\nFROM: " << SuccessMsg(walletBackend->getWalletLocation())
               << "\nTO: " << SuccessMsg(address) << "\n\n";
 
-    if (ZedUtilities::confirm("Is this correct?"))
+    if (zed_utilities::confirm("Is this correct?"))
     {
         /* Use default message */
-        ZedUtilities::confirmPassword(walletBackend, "Confirm your password: ");
+        zed_utilities::confirmPassword(walletBackend, "Confirm your password: ");
         return true;
     }
 

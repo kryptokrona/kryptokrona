@@ -25,7 +25,7 @@
 void changePassword(const std::shared_ptr<WalletBackend> walletBackend)
 {
     /* Check the user knows the current password */
-    ZedUtilities::confirmPassword(walletBackend, "Confirm your current password: ");
+    zed_utilities::confirmPassword(walletBackend, "Confirm your current password: ");
 
     /* Get a new password for the wallet */
     const std::string newPassword = getWalletPassword(true, "Enter your new password: ");
@@ -49,7 +49,7 @@ void changePassword(const std::shared_ptr<WalletBackend> walletBackend)
 
 void backup(const std::shared_ptr<WalletBackend> walletBackend)
 {
-    ZedUtilities::confirmPassword(walletBackend, "Confirm your current password: ");
+    zed_utilities::confirmPassword(walletBackend, "Confirm your current password: ");
     printPrivateKeys(walletBackend);
 }
 
@@ -283,7 +283,7 @@ void status(const std::shared_ptr<WalletBackend> walletBackend)
 
 void reset(const std::shared_ptr<WalletBackend> walletBackend)
 {
-    const uint64_t scanHeight = ZedUtilities::getScanHeight();
+    const uint64_t scanHeight = zed_utilities::getScanHeight();
 
     std::cout << std::endl
               << InformationMsg("This process may take some time to complete.")
@@ -293,7 +293,7 @@ void reset(const std::shared_ptr<WalletBackend> walletBackend)
               << std::endl
               << std::endl;
 
-    if (!ZedUtilities::confirm("Are you sure?"))
+    if (!zed_utilities::confirm("Are you sure?"))
     {
         return;
     }
@@ -355,7 +355,7 @@ void saveCSV(const std::shared_ptr<WalletBackend> walletBackend)
 
         const std::string direction = tx.totalAmount() > 0 ? "IN" : "OUT";
 
-        csv << ZedUtilities::unixTimeToDate(tx.timestamp) << "," /* Timestamp */
+        csv << zed_utilities::unixTimeToDate(tx.timestamp) << "," /* Timestamp */
             << tx.blockHeight << ","                             /* Block Height */
             << tx.hash << ","                                    /* Hash */
             << amount << ","                                     /* Amount */
@@ -381,7 +381,7 @@ void printOutgoingTransfer(const WalletTypes::Transaction tx)
     if (tx.blockHeight != 0 && tx.timestamp != 0)
     {
         stream << "Block height: " << tx.blockHeight << "\n"
-               << "Timestamp: " << ZedUtilities::unixTimeToDate(tx.timestamp) << "\n";
+               << "Timestamp: " << zed_utilities::unixTimeToDate(tx.timestamp) << "\n";
     }
 
     stream << "Spent: " << utilities::formatAmount(amount - tx.fee) << "\n"
@@ -404,7 +404,7 @@ void printIncomingTransfer(const WalletTypes::Transaction tx)
 
     stream << "Incoming transfer:\nHash: " << tx.hash << "\n"
            << "Block height: " << tx.blockHeight << "\n"
-           << "Timestamp: " << ZedUtilities::unixTimeToDate(tx.timestamp) << "\n"
+           << "Timestamp: " << zed_utilities::unixTimeToDate(tx.timestamp) << "\n"
            << "Amount: " << utilities::formatAmount(amount) << "\n";
 
     if (tx.paymentID != "")
