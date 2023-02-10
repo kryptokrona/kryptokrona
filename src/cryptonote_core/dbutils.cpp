@@ -25,7 +25,7 @@ namespace
 
 namespace cryptonote
 {
-    namespace DB
+    namespace db
     {
         std::string serialize(const RawBlock &value, const std::string &name)
         {

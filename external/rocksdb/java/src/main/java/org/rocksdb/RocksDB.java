@@ -516,7 +516,7 @@ public class RocksDB extends RocksObject {
    * If the key definitely does not exist in the database, then this method
    * returns false, else true.
    *
-   * This check is potentially lighter-weight than invoking DB::Get(). One way
+   * This check is potentially lighter-weight than invoking db::Get(). One way
    * to make this lighter weight is to avoid doing any IOs.
    *
    * @param key byte array of a key to search for
@@ -532,7 +532,7 @@ public class RocksDB extends RocksObject {
    * If the key definitely does not exist in the database, then this method
    * returns false, else true.
    *
-   * This check is potentially lighter-weight than invoking DB::Get(). One way
+   * This check is potentially lighter-weight than invoking db::Get(). One way
    * to make this lighter weight is to avoid doing any IOs.
    *
    * @param columnFamilyHandle {@link ColumnFamilyHandle} instance
@@ -551,7 +551,7 @@ public class RocksDB extends RocksObject {
    * If the key definitely does not exist in the database, then this method
    * returns false, else true.
    *
-   * This check is potentially lighter-weight than invoking DB::Get(). One way
+   * This check is potentially lighter-weight than invoking db::Get(). One way
    * to make this lighter weight is to avoid doing any IOs.
    *
    * @param readOptions {@link ReadOptions} instance
@@ -570,7 +570,7 @@ public class RocksDB extends RocksObject {
    * If the key definitely does not exist in the database, then this method
    * returns false, else true.
    *
-   * This check is potentially lighter-weight than invoking DB::Get(). One way
+   * This check is potentially lighter-weight than invoking db::Get(). One way
    * to make this lighter weight is to avoid doing any IOs.
    *
    * @param readOptions {@link ReadOptions} instance

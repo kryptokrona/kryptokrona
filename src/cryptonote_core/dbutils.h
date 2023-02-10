@@ -30,7 +30,7 @@
 
 namespace cryptonote
 {
-    namespace DB
+    namespace db
     {
         const std::string BLOCK_INDEX_TO_KEY_IMAGE_PREFIX = "0";
         const std::string BLOCK_INDEX_TO_TX_HASHES_PREFIX = "1";
@@ -81,13 +81,13 @@ namespace cryptonote
         template <class Key, class Value>
         std::pair<std::string, std::string> serialize(const std::string &keyPrefix, const Key &key, const Value &value)
         {
-            return {DB::serialize(std::make_pair(keyPrefix, key), keyPrefix), DB::serialize(value, keyPrefix)};
+            return {db::serialize(std::make_pair(keyPrefix, key), keyPrefix), db::serialize(value, keyPrefix)};
         }
 
         template <class Key>
         std::string serializeKey(const std::string &keyPrefix, const Key &key)
         {
-            return DB::serialize(std::make_pair(keyPrefix, key), keyPrefix);
+            return db::serialize(std::make_pair(keyPrefix, key), keyPrefix);
         }
 
         template <class Value>
@@ -106,7 +106,7 @@ namespace cryptonote
         {
             for (const std::pair<Key, Value> &kv : map)
             {
-                rawKeys.emplace_back(DB::serializeKey(keyPrefix, kv.first));
+                rawKeys.emplace_back(db::serializeKey(keyPrefix, kv.first));
             }
         }
 
@@ -117,7 +117,7 @@ namespace cryptonote
             {
                 if (boost::get<1>(*serializedValuesIter))
                 {
-                    DB::deserialize(boost::get<0>(*serializedValuesIter), iter->second, name);
+                    db::deserialize(boost::get<0>(*serializedValuesIter), iter->second, name);
                     ++iter;
                 }
                 else
@@ -134,7 +134,7 @@ namespace cryptonote
             {
                 if (boost::get<1>(*serializedValuesIter))
                 {
-                    DB::deserialize(boost::get<0>(*serializedValuesIter), pair.first, name);
+                    db::deserialize(boost::get<0>(*serializedValuesIter), pair.first, name);
                 }
                 else
                 {

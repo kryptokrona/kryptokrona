@@ -169,35 +169,35 @@ std::vector<std::string> BlockchainReadBatch::getRawKeys() const
     std::vector<std::string> rawKeys;
     rawKeys.reserve(state.size());
 
-    DB::serializeKeys(rawKeys, DB::BLOCK_INDEX_TO_KEY_IMAGE_PREFIX, state.spentKeyImagesByBlock);
-    DB::serializeKeys(rawKeys, DB::KEY_IMAGE_TO_BLOCK_INDEX_PREFIX, state.blockIndexesBySpentKeyImages);
-    DB::serializeKeys(rawKeys, DB::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX, state.cachedTransactions);
-    DB::serializeKeys(rawKeys, DB::BLOCK_INDEX_TO_TX_HASHES_PREFIX, state.transactionHashesByBlocks);
-    DB::serializeKeys(rawKeys, DB::BLOCK_INDEX_TO_BLOCK_INFO_PREFIX, state.cachedBlocks);
-    DB::serializeKeys(rawKeys, DB::BLOCK_HASH_TO_BLOCK_INDEX_PREFIX, state.blockIndexesByBlockHashes);
-    DB::serializeKeys(rawKeys, DB::KEY_OUTPUT_AMOUNT_PREFIX, state.keyOutputGlobalIndexesCountForAmounts);
-    DB::serializeKeys(rawKeys, DB::KEY_OUTPUT_AMOUNT_PREFIX, state.keyOutputGlobalIndexesForAmounts);
-    DB::serializeKeys(rawKeys, DB::BLOCK_INDEX_TO_RAW_BLOCK_PREFIX, state.rawBlocks);
-    DB::serializeKeys(rawKeys, DB::CLOSEST_TIMESTAMP_BLOCK_INDEX_PREFIX, state.closestTimestampBlockIndex);
-    DB::serializeKeys(rawKeys, DB::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX, state.keyOutputAmounts);
-    DB::serializeKeys(rawKeys, DB::PAYMENT_ID_TO_TX_HASH_PREFIX, state.transactionCountsByPaymentIds);
-    DB::serializeKeys(rawKeys, DB::PAYMENT_ID_TO_TX_HASH_PREFIX, state.transactionHashesByPaymentIds);
-    DB::serializeKeys(rawKeys, DB::TIMESTAMP_TO_BLOCKHASHES_PREFIX, state.blockHashesByTimestamp);
-    DB::serializeKeys(rawKeys, DB::KEY_OUTPUT_KEY_PREFIX, state.keyOutputKeys);
+    db::serializeKeys(rawKeys, db::BLOCK_INDEX_TO_KEY_IMAGE_PREFIX, state.spentKeyImagesByBlock);
+    db::serializeKeys(rawKeys, db::KEY_IMAGE_TO_BLOCK_INDEX_PREFIX, state.blockIndexesBySpentKeyImages);
+    db::serializeKeys(rawKeys, db::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX, state.cachedTransactions);
+    db::serializeKeys(rawKeys, db::BLOCK_INDEX_TO_TX_HASHES_PREFIX, state.transactionHashesByBlocks);
+    db::serializeKeys(rawKeys, db::BLOCK_INDEX_TO_BLOCK_INFO_PREFIX, state.cachedBlocks);
+    db::serializeKeys(rawKeys, db::BLOCK_HASH_TO_BLOCK_INDEX_PREFIX, state.blockIndexesByBlockHashes);
+    db::serializeKeys(rawKeys, db::KEY_OUTPUT_AMOUNT_PREFIX, state.keyOutputGlobalIndexesCountForAmounts);
+    db::serializeKeys(rawKeys, db::KEY_OUTPUT_AMOUNT_PREFIX, state.keyOutputGlobalIndexesForAmounts);
+    db::serializeKeys(rawKeys, db::BLOCK_INDEX_TO_RAW_BLOCK_PREFIX, state.rawBlocks);
+    db::serializeKeys(rawKeys, db::CLOSEST_TIMESTAMP_BLOCK_INDEX_PREFIX, state.closestTimestampBlockIndex);
+    db::serializeKeys(rawKeys, db::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX, state.keyOutputAmounts);
+    db::serializeKeys(rawKeys, db::PAYMENT_ID_TO_TX_HASH_PREFIX, state.transactionCountsByPaymentIds);
+    db::serializeKeys(rawKeys, db::PAYMENT_ID_TO_TX_HASH_PREFIX, state.transactionHashesByPaymentIds);
+    db::serializeKeys(rawKeys, db::TIMESTAMP_TO_BLOCKHASHES_PREFIX, state.blockHashesByTimestamp);
+    db::serializeKeys(rawKeys, db::KEY_OUTPUT_KEY_PREFIX, state.keyOutputKeys);
 
     if (state.lastBlockIndex.second)
     {
-        rawKeys.emplace_back(DB::serializeKey(DB::BLOCK_INDEX_TO_BLOCK_HASH_PREFIX, DB::LAST_BLOCK_INDEX_KEY));
+        rawKeys.emplace_back(db::serializeKey(db::BLOCK_INDEX_TO_BLOCK_HASH_PREFIX, db::LAST_BLOCK_INDEX_KEY));
     }
 
     if (state.keyOutputAmountsCount.second)
     {
-        rawKeys.emplace_back(DB::serializeKey(DB::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX, DB::KEY_OUTPUT_AMOUNTS_COUNT_KEY));
+        rawKeys.emplace_back(db::serializeKey(db::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX, db::KEY_OUTPUT_AMOUNTS_COUNT_KEY));
     }
 
     if (state.transactionsCount.second)
     {
-        rawKeys.emplace_back(DB::serializeKey(DB::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX, DB::TRANSACTIONS_COUNT_KEY));
+        rawKeys.emplace_back(db::serializeKey(db::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX, db::TRANSACTIONS_COUNT_KEY));
     }
 
     assert(!rawKeys.empty());
@@ -304,25 +304,25 @@ void BlockchainReadBatch::submitRawResult(const std::vector<std::string> &values
     auto range = boost::combine(values, resultStates);
     auto iter = range.begin();
 
-    DB::deserializeValues(state.spentKeyImagesByBlock, iter, DB::BLOCK_INDEX_TO_KEY_IMAGE_PREFIX);
-    DB::deserializeValues(state.blockIndexesBySpentKeyImages, iter, DB::KEY_IMAGE_TO_BLOCK_INDEX_PREFIX);
-    DB::deserializeValues(state.cachedTransactions, iter, DB::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX);
-    DB::deserializeValues(state.transactionHashesByBlocks, iter, DB::BLOCK_INDEX_TO_TX_HASHES_PREFIX);
-    DB::deserializeValues(state.cachedBlocks, iter, DB::BLOCK_INDEX_TO_BLOCK_INFO_PREFIX);
-    DB::deserializeValues(state.blockIndexesByBlockHashes, iter, DB::BLOCK_HASH_TO_BLOCK_INDEX_PREFIX);
-    DB::deserializeValues(state.keyOutputGlobalIndexesCountForAmounts, iter, DB::KEY_OUTPUT_AMOUNT_PREFIX);
-    DB::deserializeValues(state.keyOutputGlobalIndexesForAmounts, iter, DB::KEY_OUTPUT_AMOUNT_PREFIX);
-    DB::deserializeValues(state.rawBlocks, iter, DB::BLOCK_INDEX_TO_RAW_BLOCK_PREFIX);
-    DB::deserializeValues(state.closestTimestampBlockIndex, iter, DB::CLOSEST_TIMESTAMP_BLOCK_INDEX_PREFIX);
-    DB::deserializeValues(state.keyOutputAmounts, iter, DB::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX);
-    DB::deserializeValues(state.transactionCountsByPaymentIds, iter, DB::PAYMENT_ID_TO_TX_HASH_PREFIX);
-    DB::deserializeValues(state.transactionHashesByPaymentIds, iter, DB::PAYMENT_ID_TO_TX_HASH_PREFIX);
-    DB::deserializeValues(state.blockHashesByTimestamp, iter, DB::TIMESTAMP_TO_BLOCKHASHES_PREFIX);
-    DB::deserializeValues(state.keyOutputKeys, iter, DB::KEY_OUTPUT_KEY_PREFIX);
+    db::deserializeValues(state.spentKeyImagesByBlock, iter, db::BLOCK_INDEX_TO_KEY_IMAGE_PREFIX);
+    db::deserializeValues(state.blockIndexesBySpentKeyImages, iter, db::KEY_IMAGE_TO_BLOCK_INDEX_PREFIX);
+    db::deserializeValues(state.cachedTransactions, iter, db::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX);
+    db::deserializeValues(state.transactionHashesByBlocks, iter, db::BLOCK_INDEX_TO_TX_HASHES_PREFIX);
+    db::deserializeValues(state.cachedBlocks, iter, db::BLOCK_INDEX_TO_BLOCK_INFO_PREFIX);
+    db::deserializeValues(state.blockIndexesByBlockHashes, iter, db::BLOCK_HASH_TO_BLOCK_INDEX_PREFIX);
+    db::deserializeValues(state.keyOutputGlobalIndexesCountForAmounts, iter, db::KEY_OUTPUT_AMOUNT_PREFIX);
+    db::deserializeValues(state.keyOutputGlobalIndexesForAmounts, iter, db::KEY_OUTPUT_AMOUNT_PREFIX);
+    db::deserializeValues(state.rawBlocks, iter, db::BLOCK_INDEX_TO_RAW_BLOCK_PREFIX);
+    db::deserializeValues(state.closestTimestampBlockIndex, iter, db::CLOSEST_TIMESTAMP_BLOCK_INDEX_PREFIX);
+    db::deserializeValues(state.keyOutputAmounts, iter, db::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX);
+    db::deserializeValues(state.transactionCountsByPaymentIds, iter, db::PAYMENT_ID_TO_TX_HASH_PREFIX);
+    db::deserializeValues(state.transactionHashesByPaymentIds, iter, db::PAYMENT_ID_TO_TX_HASH_PREFIX);
+    db::deserializeValues(state.blockHashesByTimestamp, iter, db::TIMESTAMP_TO_BLOCKHASHES_PREFIX);
+    db::deserializeValues(state.keyOutputKeys, iter, db::KEY_OUTPUT_KEY_PREFIX);
 
-    DB::deserializeValue(state.lastBlockIndex, iter, DB::BLOCK_INDEX_TO_BLOCK_HASH_PREFIX);
-    DB::deserializeValue(state.keyOutputAmountsCount, iter, DB::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX);
-    DB::deserializeValue(state.transactionsCount, iter, DB::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX);
+    db::deserializeValue(state.lastBlockIndex, iter, db::BLOCK_INDEX_TO_BLOCK_HASH_PREFIX);
+    db::deserializeValue(state.keyOutputAmountsCount, iter, db::KEY_OUTPUT_AMOUNTS_COUNT_PREFIX);
+    db::deserializeValue(state.transactionsCount, iter, db::TRANSACTION_HASH_TO_TRANSACTION_INFO_PREFIX);
 
     assert(iter == range.end());
 

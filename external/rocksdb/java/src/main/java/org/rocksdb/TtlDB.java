@@ -42,7 +42,7 @@ import java.util.List;
  * like TTL = infinity</p>
  *
  * <p><strong>!!!WARNING!!!</strong></p>
- * <p>Calling DB::Open directly to re-open a db created by this API will get
+ * <p>Calling db::Open directly to re-open a db created by this API will get
  * corrupt values(timestamp suffixed) and no ttl effect will be there
  * during the second Open, so use this API consistently to open the db
  * Be careful when passing ttl with a small positive value because the

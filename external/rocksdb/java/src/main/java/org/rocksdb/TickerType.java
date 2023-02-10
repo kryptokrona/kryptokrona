@@ -209,16 +209,16 @@ public enum TickerType {
     NUMBER_KEYS_UPDATED((byte) 0x25),
 
     /**
-     * The number of uncompressed bytes issued by DB::Put(), DB::Delete(),\
-     * DB::Merge(), and DB::Write().
+     * The number of uncompressed bytes issued by db::Put(), db::Delete(),\
+     * db::Merge(), and db::Write().
      */
     BYTES_WRITTEN((byte) 0x26),
 
     /**
-     * The number of uncompressed bytes read from DB::Get().  It could be
+     * The number of uncompressed bytes read from db::Get().  It could be
      * either from memtables, cache, or table files.
      *
-     * For the number of logical bytes read from DB::MultiGet(),
+     * For the number of logical bytes read from db::MultiGet(),
      * please use {@link #NUMBER_MULTIGET_BYTES_READ}.
      */
     BYTES_READ((byte) 0x27),

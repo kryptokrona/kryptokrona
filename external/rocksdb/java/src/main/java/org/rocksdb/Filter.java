@@ -10,7 +10,7 @@ package org.rocksdb;
  * by rocksdb to decide whether or not to read some
  * information from disk. In many cases, a filter can cut down the
  * number of disk seeks form a handful to a single disk seek per
- * DB::Get() call.
+ * db::Get() call.
  */
 public abstract class Filter extends RocksObject {
 

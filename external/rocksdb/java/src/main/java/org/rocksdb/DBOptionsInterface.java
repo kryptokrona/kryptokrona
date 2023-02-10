@@ -231,7 +231,7 @@ public interface DBOptionsInterface<T extends DBOptionsInterface> {
   int maxOpenFiles();
 
   /**
-   * If {@link #maxOpenFiles()} is -1, DB will open all files on DB::Open(). You
+   * If {@link #maxOpenFiles()} is -1, DB will open all files on db::Open(). You
    * can use this option to increase the number of threads used to open the
    * files.
    *
@@ -245,7 +245,7 @@ public interface DBOptionsInterface<T extends DBOptionsInterface> {
   T setMaxFileOpeningThreads(int maxFileOpeningThreads);
 
   /**
-   * If {@link #maxOpenFiles()} is -1, DB will open all files on DB::Open(). You
+   * If {@link #maxOpenFiles()} is -1, DB will open all files on db::Open(). You
    * can use this option to increase the number of threads used to open the
    * files.
    *
@@ -1399,7 +1399,7 @@ public interface DBOptionsInterface<T extends DBOptionsInterface> {
   long writeThreadSlowYieldUsec();
 
   /**
-   * If true, then DB::Open() will not update the statistics used to optimize
+   * If true, then db::Open() will not update the statistics used to optimize
    * compaction decision by loading table properties from many files.
    * Turning off this feature will improve DBOpen time especially in
    * disk environment.
@@ -1413,7 +1413,7 @@ public interface DBOptionsInterface<T extends DBOptionsInterface> {
   T setSkipStatsUpdateOnDbOpen(boolean skipStatsUpdateOnDbOpen);
 
   /**
-   * If true, then DB::Open() will not update the statistics used to optimize
+   * If true, then db::Open() will not update the statistics used to optimize
    * compaction decision by loading table properties from many files.
    * Turning off this feature will improve DBOpen time especially in
    * disk environment.
@@ -1487,7 +1487,7 @@ public interface DBOptionsInterface<T extends DBOptionsInterface> {
   Cache rowCache();
 
   /**
-   * If true, then DB::Open / CreateColumnFamily / DropColumnFamily
+   * If true, then db::Open / CreateColumnFamily / DropColumnFamily
    * / SetOptions will fail if options file is not detected or properly
    * persisted.
    *
@@ -1501,7 +1501,7 @@ public interface DBOptionsInterface<T extends DBOptionsInterface> {
   T setFailIfOptionsFileError(boolean failIfOptionsFileError);
 
   /**
-   * If true, then DB::Open / CreateColumnFamily / DropColumnFamily
+   * If true, then db::Open / CreateColumnFamily / DropColumnFamily
    * / SetOptions will fail if options file is not detected or properly
    * persisted.
    *
