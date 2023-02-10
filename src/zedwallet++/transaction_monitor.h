@@ -25,7 +25,7 @@ private:
 
     std::shared_ptr<WalletBackend> m_walletBackend;
 
-    ThreadSafeQueue<WalletTypes::Transaction> m_queuedTransactions;
+    ThreadSafeQueue<wallet_types::Transaction> m_queuedTransactions;
 
     std::shared_ptr<std::mutex> m_mutex = std::make_shared<std::mutex>();
 };

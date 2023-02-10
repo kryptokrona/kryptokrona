@@ -61,7 +61,7 @@ void Nigel::swapNode(const std::string daemonHost, const uint16_t daemonPort)
     init();
 }
 
-std::tuple<bool, std::vector<WalletTypes::WalletBlockInfo>> Nigel::getWalletSyncData(
+std::tuple<bool, std::vector<wallet_types::WalletBlockInfo>> Nigel::getWalletSyncData(
     const std::vector<Crypto::Hash> blockHashCheckpoints,
     uint64_t startHeight,
     uint64_t startTimestamp) const
@@ -85,7 +85,7 @@ std::tuple<bool, std::vector<WalletTypes::WalletBlockInfo>> Nigel::getWalletSync
                 return {false, {}};
             }
 
-            const auto items = j.at("items").get<std::vector<WalletTypes::WalletBlockInfo>>();
+            const auto items = j.at("items").get<std::vector<wallet_types::WalletBlockInfo>>();
 
             return {true, items};
         }

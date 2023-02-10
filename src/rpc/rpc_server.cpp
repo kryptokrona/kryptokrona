@@ -70,7 +70,7 @@ namespace cryptonote
         KV_MEMBER(blockShortInfo.txPrefixes);
     }
 
-    void serialize(WalletTypes::WalletBlockInfo &walletBlockInfo, ISerializer &s)
+    void serialize(wallet_types::WalletBlockInfo &walletBlockInfo, ISerializer &s)
     {
         s(walletBlockInfo.coinbaseTransaction, "coinbaseTX");
         s(walletBlockInfo.transactions, "transactions");
@@ -79,7 +79,7 @@ namespace cryptonote
         s(walletBlockInfo.blockTimestamp, "blockTimestamp");
     }
 
-    void serialize(WalletTypes::RawTransaction &rawTransaction, ISerializer &s)
+    void serialize(wallet_types::RawTransaction &rawTransaction, ISerializer &s)
     {
         s(rawTransaction.keyInputs, "inputs");
         s(rawTransaction.paymentID, "paymentID");
@@ -89,7 +89,7 @@ namespace cryptonote
         s(rawTransaction.unlockTime, "unlockTime");
     }
 
-    void serialize(WalletTypes::RawCoinbaseTransaction &rawCoinbaseTransaction, ISerializer &s)
+    void serialize(wallet_types::RawCoinbaseTransaction &rawCoinbaseTransaction, ISerializer &s)
     {
         s(rawCoinbaseTransaction.keyOutputs, "outputs");
         s(rawCoinbaseTransaction.hash, "hash");
@@ -97,7 +97,7 @@ namespace cryptonote
         s(rawCoinbaseTransaction.unlockTime, "unlockTime");
     }
 
-    void serialize(WalletTypes::KeyOutput &keyOutput, ISerializer &s)
+    void serialize(wallet_types::KeyOutput &keyOutput, ISerializer &s)
     {
         s(keyOutput.key, "key");
         s(keyOutput.amount, "amount");

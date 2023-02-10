@@ -226,7 +226,7 @@ Error SubWallets::deleteSubWallet(const std::string address)
 }
 
 void SubWallets::deleteAddressTransactions(
-    std::vector<WalletTypes::Transaction> &txs,
+    std::vector<wallet_types::Transaction> &txs,
     const Crypto::PublicKey spendKey)
 {
     const auto it = std::remove_if(txs.begin(), txs.end(), [spendKey](auto &tx)
@@ -309,7 +309,7 @@ std::tuple<uint64_t, uint64_t> SubWallets::getMinInitialSyncStart() const
     }
 }
 
-void SubWallets::addUnconfirmedTransaction(const WalletTypes::Transaction tx)
+void SubWallets::addUnconfirmedTransaction(const wallet_types::Transaction tx)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -331,7 +331,7 @@ void SubWallets::addUnconfirmedTransaction(const WalletTypes::Transaction tx)
     m_lockedTransactions.push_back(tx);
 }
 
-void SubWallets::addTransaction(const WalletTypes::Transaction tx)
+void SubWallets::addTransaction(const wallet_types::Transaction tx)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -391,7 +391,7 @@ Crypto::KeyImage SubWallets::getTxInputKeyImage(
 
 void SubWallets::storeTransactionInput(
     const Crypto::PublicKey publicSpendKey,
-    const WalletTypes::TransactionInput input)
+    const wallet_types::TransactionInput input)
 {
     std::scoped_lock lock(m_mutex);
 
@@ -434,7 +434,7 @@ SubWallets::getKeyImageOwner(const Crypto::KeyImage keyImage) const
 
    This may throw if you don't validate the user has enough balance, and
    that each of the subwallets exist. */
-std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
+std::tuple<std::vector<wallet_types::TxInputAndOwner>, uint64_t>
 SubWallets::getTransactionInputsForAmount(
     const uint64_t amount,
     const bool takeFromAll,
@@ -461,7 +461,7 @@ SubWallets::getTransactionInputsForAmount(
         wallets.push_back(m_subWallets.at(publicKey));
     }
 
-    std::vector<WalletTypes::TxInputAndOwner> availableInputs;
+    std::vector<wallet_types::TxInputAndOwner> availableInputs;
 
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
@@ -476,7 +476,7 @@ SubWallets::getTransactionInputsForAmount(
 
     uint64_t foundMoney = 0;
 
-    std::vector<WalletTypes::TxInputAndOwner> inputsToUse;
+    std::vector<wallet_types::TxInputAndOwner> inputsToUse;
 
     /* Loop through each input */
     for (const auto walletAmount : availableInputs)
@@ -499,7 +499,7 @@ SubWallets::getTransactionInputsForAmount(
 
 /* Remember if the transaction suceeds, we need to remove these key images
    so we don't double spend. */
-std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
+std::tuple<std::vector<wallet_types::TxInputAndOwner>, uint64_t, uint64_t>
 SubWallets::getFusionTransactionInputs(
     const bool takeFromAll,
     std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
@@ -526,7 +526,7 @@ SubWallets::getFusionTransactionInputs(
         wallets.push_back(m_subWallets.at(publicKey));
     }
 
-    std::vector<WalletTypes::TxInputAndOwner> availableInputs;
+    std::vector<wallet_types::TxInputAndOwner> availableInputs;
 
     /* Copy the transaction inputs from this sub wallet to inputs */
     for (const auto &subWallet : wallets)
@@ -548,7 +548,7 @@ SubWallets::getFusionTransactionInputs(
 
     /* Split the inputs into buckets based on what power of ten they are in
        (For example, [1, 2, 5, 7], [20, 50, 80, 80], [100, 600, 700]) */
-    std::unordered_map<uint64_t, std::vector<WalletTypes::TxInputAndOwner>> buckets;
+    std::unordered_map<uint64_t, std::vector<wallet_types::TxInputAndOwner>> buckets;
 
     for (const auto &walletAmount : availableInputs)
     {
@@ -562,7 +562,7 @@ SubWallets::getFusionTransactionInputs(
 
     /* Find the buckets which have enough inputs to meet the fusion tx
        requirements */
-    std::vector<std::vector<WalletTypes::TxInputAndOwner>> fullBuckets;
+    std::vector<std::vector<wallet_types::TxInputAndOwner>> fullBuckets;
 
     for (const auto [amount, bucket] : buckets)
     {
@@ -577,7 +577,7 @@ SubWallets::getFusionTransactionInputs(
     std::shuffle(fullBuckets.begin(), fullBuckets.end(), std::random_device{});
 
     /* The buckets to pick inputs from */
-    std::vector<std::vector<WalletTypes::TxInputAndOwner>> bucketsToTakeFrom;
+    std::vector<std::vector<wallet_types::TxInputAndOwner>> bucketsToTakeFrom;
 
     /* We have full buckets, take the first full bucket */
     if (!fullBuckets.empty())
@@ -593,7 +593,7 @@ SubWallets::getFusionTransactionInputs(
         }
     }
 
-    std::vector<WalletTypes::TxInputAndOwner> inputsToUse;
+    std::vector<wallet_types::TxInputAndOwner> inputsToUse;
 
     uint64_t foundMoney = 0;
 
@@ -858,7 +858,7 @@ Crypto::SecretKey SubWallets::getPrimaryPrivateSpendKey() const
     return it->second.privateSpendKey();
 }
 
-std::vector<WalletTypes::Transaction> SubWallets::getTransactions() const
+std::vector<wallet_types::Transaction> SubWallets::getTransactions() const
 {
     return m_transactions;
 }
@@ -866,7 +866,7 @@ std::vector<WalletTypes::Transaction> SubWallets::getTransactions() const
 /* Note that this DOES NOT return incoming transactions in the pool. It only
    returns outgoing transactions which we sent but have not encountered in a
    block yet. */
-std::vector<WalletTypes::Transaction> SubWallets::getUnconfirmedTransactions() const
+std::vector<wallet_types::Transaction> SubWallets::getUnconfirmedTransactions() const
 {
     return m_lockedTransactions;
 }
@@ -905,7 +905,7 @@ std::tuple<bool, Crypto::SecretKey> SubWallets::getTxPrivateKey(
 }
 
 void SubWallets::storeUnconfirmedIncomingInput(
-    const WalletTypes::UnconfirmedInput input,
+    const wallet_types::UnconfirmedInput input,
     const Crypto::PublicKey publicSpendKey)
 {
     std::scoped_lock lock(m_mutex);
@@ -963,14 +963,14 @@ void SubWallets::fromJSON(const JSONObject &j)
 
     for (const auto &x : getArrayFromJSON(j, "transactions"))
     {
-        WalletTypes::Transaction tx;
+        wallet_types::Transaction tx;
         tx.fromJSON(x);
         m_transactions.push_back(tx);
     }
 
     for (const auto &x : getArrayFromJSON(j, "lockedTransactions"))
     {
-        WalletTypes::Transaction tx;
+        wallet_types::Transaction tx;
         tx.fromJSON(x);
         m_transactions.push_back(tx);
     }

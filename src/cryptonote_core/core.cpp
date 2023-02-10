@@ -669,7 +669,7 @@ namespace cryptonote
         const uint64_t startHeight,
         const uint64_t startTimestamp,
         const uint64_t blockCount,
-        std::vector<WalletTypes::WalletBlockInfo> &walletBlocks) const
+        std::vector<wallet_types::WalletBlockInfo> &walletBlocks) const
     {
         throwIfNotInitialized();
 
@@ -760,7 +760,7 @@ namespace cryptonote
 
                 fromBinaryArray(block, rawBlock.block);
 
-                WalletTypes::WalletBlockInfo walletBlock;
+                wallet_types::WalletBlockInfo walletBlock;
 
                 walletBlock.blockHeight = startIndex++;
                 walletBlock.blockHash = CachedBlock(block).getBlockHash();
@@ -787,10 +787,10 @@ namespace cryptonote
         }
     }
 
-    WalletTypes::RawCoinbaseTransaction Core::getRawCoinbaseTransaction(
+    wallet_types::RawCoinbaseTransaction Core::getRawCoinbaseTransaction(
         const cryptonote::Transaction &t)
     {
-        WalletTypes::RawCoinbaseTransaction transaction;
+        wallet_types::RawCoinbaseTransaction transaction;
 
         transaction.hash = getBinaryArrayHash(toBinaryArray(t));
 
@@ -801,7 +801,7 @@ namespace cryptonote
         /* Fill in the simplified key outputs */
         for (const auto &output : t.outputs)
         {
-            WalletTypes::KeyOutput keyOutput;
+            wallet_types::KeyOutput keyOutput;
 
             keyOutput.amount = output.amount;
             keyOutput.key = boost::get<cryptonote::KeyOutput>(output.target).key;
@@ -812,7 +812,7 @@ namespace cryptonote
         return transaction;
     }
 
-    WalletTypes::RawTransaction Core::getRawTransaction(
+    wallet_types::RawTransaction Core::getRawTransaction(
         const std::vector<uint8_t> &rawTX)
     {
         Transaction t;
@@ -820,7 +820,7 @@ namespace cryptonote
         /* Convert the binary array to a transaction */
         fromBinaryArray(t, rawTX);
 
-        WalletTypes::RawTransaction transaction;
+        wallet_types::RawTransaction transaction;
 
         /* Get the transaction hash from the binary array */
         transaction.hash = getBinaryArrayHash(rawTX);
@@ -837,7 +837,7 @@ namespace cryptonote
         /* Simplify the outputs */
         for (const auto &output : t.outputs)
         {
-            WalletTypes::KeyOutput keyOutput;
+            wallet_types::KeyOutput keyOutput;
 
             keyOutput.amount = output.amount;
             keyOutput.key = boost::get<cryptonote::KeyOutput>(output.target).key;

@@ -222,17 +222,17 @@ public:
         const std::string &address) const;
 
     /* Get all transactions */
-    std::vector<WalletTypes::Transaction> getTransactions() const;
+    std::vector<wallet_types::Transaction> getTransactions() const;
 
     /* Get all unconfirmed (outgoing, sent) transactions */
-    std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
+    std::vector<wallet_types::Transaction> getUnconfirmedTransactions() const;
 
     /* Get sync heights, hashrate, peer count */
-    WalletTypes::WalletStatus getStatus() const;
+    wallet_types::WalletStatus getStatus() const;
 
     /* Returns transactions in the range [startHeight, endHeight - 1] - so if
        we give 1, 100, it will return transactions from block 1 to block 99 */
-    std::vector<WalletTypes::Transaction> getTransactionsRange(
+    std::vector<wallet_types::Transaction> getTransactionsRange(
         const uint64_t startHeight, const uint64_t endHeight) const;
 
     /* Get the node fee and address ({0, ""} if empty) */

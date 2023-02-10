@@ -898,21 +898,21 @@ std::tuple<Error, std::string> WalletBackend::getMnemonicSeedForAddress(
     return {SUCCESS, Mnemonics::PrivateKeyToMnemonic(privateSpendKey)};
 }
 
-std::vector<WalletTypes::Transaction> WalletBackend::getTransactions() const
+std::vector<wallet_types::Transaction> WalletBackend::getTransactions() const
 {
     return m_subWallets->getTransactions();
 }
 
-std::vector<WalletTypes::Transaction> WalletBackend::getUnconfirmedTransactions() const
+std::vector<wallet_types::Transaction> WalletBackend::getUnconfirmedTransactions() const
 {
     return m_subWallets->getUnconfirmedTransactions();
 }
 
-WalletTypes::WalletStatus WalletBackend::getStatus() const
+wallet_types::WalletStatus WalletBackend::getStatus() const
 {
     const auto [walletBlockCount, localDaemonBlockCount, networkBlockCount] = getSyncStatus();
 
-    WalletTypes::WalletStatus status;
+    wallet_types::WalletStatus status;
 
     status.walletBlockCount = walletBlockCount;
     status.localDaemonBlockCount = localDaemonBlockCount;
@@ -926,10 +926,10 @@ WalletTypes::WalletStatus WalletBackend::getStatus() const
 
 /* Returns transactions in the range [startHeight, endHeight - 1] - so if
    we give 1, 100, it will return transactions from block 1 to block 99 */
-std::vector<WalletTypes::Transaction> WalletBackend::getTransactionsRange(
+std::vector<wallet_types::Transaction> WalletBackend::getTransactionsRange(
     const uint64_t startHeight, const uint64_t endHeight) const
 {
-    std::vector<WalletTypes::Transaction> result;
+    std::vector<wallet_types::Transaction> result;
 
     const auto transactions = getTransactions();
 

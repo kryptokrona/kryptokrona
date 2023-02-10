@@ -926,7 +926,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getStatus(
     Response &res,
     const nlohmann::json &body) const
 {
-    const WalletTypes::WalletStatus status = m_walletBackend->getStatus();
+    const wallet_types::WalletStatus status = m_walletBackend->getStatus();
 
     nlohmann::json j{
         {"walletBlockCount", status.walletBlockCount},
@@ -1036,7 +1036,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getUnconfirmedTransactionsForAddress(
 
     const auto txs = m_walletBackend->getUnconfirmedTransactions();
 
-    std::vector<WalletTypes::Transaction> result;
+    std::vector<wallet_types::Transaction> result;
 
     std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
                  [address, this](const auto tx)
@@ -1177,7 +1177,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightWithAddress(
         const auto txs = m_walletBackend->getTransactionsRange(
             startHeight, startHeight + 1000);
 
-        std::vector<WalletTypes::Transaction> result;
+        std::vector<wallet_types::Transaction> result;
 
         std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
                      [address, this](const auto tx)
@@ -1258,7 +1258,7 @@ std::tuple<Error, uint16_t> ApiDispatcher::getTransactionsFromHeightToHeightWith
         const auto txs = m_walletBackend->getTransactionsRange(
             startHeight, endHeight);
 
-        std::vector<WalletTypes::Transaction> result;
+        std::vector<wallet_types::Transaction> result;
 
         std::copy_if(txs.begin(), txs.end(), std::back_inserter(result),
                      [address, this](const auto tx)

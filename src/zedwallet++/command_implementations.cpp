@@ -253,7 +253,7 @@ void printHashrate(const uint64_t hashrate)
 
 void status(const std::shared_ptr<WalletBackend> walletBackend)
 {
-    const WalletTypes::WalletStatus status = walletBackend->getStatus();
+    const wallet_types::WalletStatus status = walletBackend->getStatus();
 
     /* Print the heights of local, remote, and wallet */
     printHeights(
@@ -369,7 +369,7 @@ void saveCSV(const std::shared_ptr<WalletBackend> walletBackend)
               << std::endl;
 }
 
-void printOutgoingTransfer(const WalletTypes::Transaction tx)
+void printOutgoingTransfer(const wallet_types::Transaction tx)
 {
     std::stringstream stream;
 
@@ -396,7 +396,7 @@ void printOutgoingTransfer(const WalletTypes::Transaction tx)
     std::cout << WarningMsg(stream.str()) << std::endl;
 }
 
-void printIncomingTransfer(const WalletTypes::Transaction tx)
+void printIncomingTransfer(const wallet_types::Transaction tx)
 {
     std::stringstream stream;
 
@@ -427,7 +427,7 @@ void listTransfers(
     uint64_t numOutgoingTransactions = 0;
 
     /* Grab confirmed transactions */
-    std::vector<WalletTypes::Transaction> transactions = walletBackend->getTransactions();
+    std::vector<wallet_types::Transaction> transactions = walletBackend->getTransactions();
 
     /* Grab any outgoing transactions still in the pool */
     const auto unconfirmedTransactions = walletBackend->getUnconfirmedTransactions();

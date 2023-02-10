@@ -119,7 +119,7 @@ void WalletSynchronizer::mainLoop()
     }
 }
 
-std::vector<WalletTypes::WalletBlockInfo> WalletSynchronizer::downloadBlocks()
+std::vector<wallet_types::WalletBlockInfo> WalletSynchronizer::downloadBlocks()
 {
     const uint64_t localDaemonBlockCount = m_daemon->localDaemonBlockCount();
 
@@ -204,10 +204,10 @@ std::vector<WalletTypes::WalletBlockInfo> WalletSynchronizer::downloadBlocks()
     return blocks;
 }
 
-std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> WalletSynchronizer::processBlockOutputs(
-    const WalletTypes::WalletBlockInfo &block) const
+std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> WalletSynchronizer::processBlockOutputs(
+    const wallet_types::WalletBlockInfo &block) const
 {
-    std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> inputs;
+    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> inputs;
 
     if (WalletConfig::processCoinbaseTransactions)
     {
@@ -227,7 +227,7 @@ std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> Wallet
     return inputs;
 }
 
-void WalletSynchronizer::processBlock(const WalletTypes::WalletBlockInfo &block)
+void WalletSynchronizer::processBlock(const wallet_types::WalletBlockInfo &block)
 {
     /* Chain forked, invalidate previous transactions */
     if (m_syncStatus.getHeight() >= block.blockHeight)
@@ -301,8 +301,8 @@ void WalletSynchronizer::processBlock(const WalletTypes::WalletBlockInfo &block)
 }
 
 BlockScanTmpInfo WalletSynchronizer::processBlockTransactions(
-    const WalletTypes::WalletBlockInfo &block,
-    const std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> &inputs) const
+    const wallet_types::WalletBlockInfo &block,
+    const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const
 {
     BlockScanTmpInfo txData;
 
@@ -337,15 +337,15 @@ BlockScanTmpInfo WalletSynchronizer::processBlockTransactions(
     return txData;
 }
 
-std::optional<WalletTypes::Transaction> WalletSynchronizer::processCoinbaseTransaction(
-    const WalletTypes::WalletBlockInfo &block,
-    const std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> &inputs) const
+std::optional<wallet_types::Transaction> WalletSynchronizer::processCoinbaseTransaction(
+    const wallet_types::WalletBlockInfo &block,
+    const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs) const
 {
     const auto tx = block.coinbaseTransaction;
 
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
-    std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> relevantInputs;
+    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> relevantInputs;
 
     std::copy_if(inputs.begin(), inputs.end(), std::back_inserter(relevantInputs), [&](const auto input)
                  { return std::get<1>(input).parentTransactionHash == tx.hash; });
@@ -361,7 +361,7 @@ std::optional<WalletTypes::Transaction> WalletSynchronizer::processCoinbaseTrans
         const bool isCoinbaseTransaction = true;
         const std::string paymentID;
 
-        return WalletTypes::Transaction(
+        return wallet_types::Transaction(
             transfers, tx.hash, fee, block.blockTimestamp, block.blockHeight,
             paymentID, tx.unlockTime, isCoinbaseTransaction);
     }
@@ -369,14 +369,14 @@ std::optional<WalletTypes::Transaction> WalletSynchronizer::processCoinbaseTrans
     return std::nullopt;
 }
 
-std::tuple<std::optional<WalletTypes::Transaction>, std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>>> WalletSynchronizer::processTransaction(
-    const WalletTypes::WalletBlockInfo &block,
-    const std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> &inputs,
-    const WalletTypes::RawTransaction &tx) const
+std::tuple<std::optional<wallet_types::Transaction>, std::vector<std::tuple<Crypto::PublicKey, Crypto::KeyImage>>> WalletSynchronizer::processTransaction(
+    const wallet_types::WalletBlockInfo &block,
+    const std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> &inputs,
+    const wallet_types::RawTransaction &tx) const
 {
     std::unordered_map<Crypto::PublicKey, int64_t> transfers;
 
-    std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> relevantInputs;
+    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> relevantInputs;
 
     std::copy_if(inputs.begin(), inputs.end(), std::back_inserter(relevantInputs), [&](const auto input)
                  { return std::get<1>(input).parentTransactionHash == tx.hash; });
@@ -416,7 +416,7 @@ std::tuple<std::optional<WalletTypes::Transaction>, std::vector<std::tuple<Crypt
 
         const bool isCoinbaseTransaction = false;
 
-        const auto newTX = WalletTypes::Transaction(
+        const auto newTX = wallet_types::Transaction(
             transfers, tx.hash, fee, block.blockTimestamp, block.blockHeight,
             tx.paymentID, tx.unlockTime, isCoinbaseTransaction);
 
@@ -426,11 +426,11 @@ std::tuple<std::optional<WalletTypes::Transaction>, std::vector<std::tuple<Crypt
     return {std::nullopt, {}};
 }
 
-std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> WalletSynchronizer::processTransactionOutputs(
-    const WalletTypes::RawCoinbaseTransaction &rawTX,
+std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> WalletSynchronizer::processTransactionOutputs(
+    const wallet_types::RawCoinbaseTransaction &rawTX,
     const uint64_t blockHeight) const
 {
-    std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> inputs;
+    std::vector<std::tuple<Crypto::PublicKey, wallet_types::TransactionInput>> inputs;
 
     Crypto::KeyDerivation derivation;
 
@@ -462,7 +462,7 @@ std::vector<std::tuple<Crypto::PublicKey, WalletTypes::TransactionInput>> Wallet
 
             const uint64_t spendHeight = 0;
 
-            const WalletTypes::TransactionInput input({keyImage, output.amount, blockHeight, rawTX.transactionPublicKey,
+            const wallet_types::TransactionInput input({keyImage, output.amount, blockHeight, rawTX.transactionPublicKey,
                                                        outputIndex, output.globalOutputIndex, output.key, spendHeight,
                                                        rawTX.unlockTime, rawTX.hash});
 

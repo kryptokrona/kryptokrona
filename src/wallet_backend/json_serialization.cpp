@@ -22,7 +22,7 @@ using nlohmann::json;
 namespace wallet_types
 {
     //////////////////////////////
-    /* WalletTypes::Transaction */
+    /* wallet_types::Transaction */
     //////////////////////////////
 
     void to_json(json &j, const Transaction &t)

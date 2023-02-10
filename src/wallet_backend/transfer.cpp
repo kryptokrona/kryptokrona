@@ -84,7 +84,7 @@ namespace SendTransaction
 
         cryptonote::Transaction tx;
 
-        std::vector<WalletTypes::KeyOutput> transactionOutputs;
+        std::vector<wallet_types::KeyOutput> transactionOutputs;
 
         cryptonote::KeyPair txKeyPair;
 
@@ -99,12 +99,12 @@ namespace SendTransaction
             /* Grab the public keys from the receiver address */
             const auto [publicSpendKey, publicViewKey] = utilities::addressToKeys(destination);
 
-            std::vector<WalletTypes::TransactionDestination> destinations;
+            std::vector<wallet_types::TransactionDestination> destinations;
 
             /* Split transfer into denominations and create an output for each */
             for (const auto denomination : splitAmountIntoDenominations(foundMoney))
             {
-                WalletTypes::TransactionDestination destination;
+                wallet_types::TransactionDestination destination;
 
                 destination.amount = denomination;
                 destination.receiverPublicSpendKey = publicSpendKey;
@@ -401,7 +401,7 @@ namespace SendTransaction
        but I think it would make the code harder to follow */
     void storeUnconfirmedIncomingInputs(
         const std::shared_ptr<SubWallets> subWallets,
-        const std::vector<WalletTypes::KeyOutput> keyOutputs,
+        const std::vector<wallet_types::KeyOutput> keyOutputs,
         const Crypto::PublicKey txPublicKey,
         const Crypto::Hash txHash)
     {
@@ -428,7 +428,7 @@ namespace SendTransaction
             {
                 Crypto::PublicKey ourSpendKey = *it;
 
-                WalletTypes::UnconfirmedInput input;
+                wallet_types::UnconfirmedInput input;
 
                 input.amount = keyOutputs[outputIndex].amount;
                 input.key = keyOutputs[outputIndex].key;
@@ -445,7 +445,7 @@ namespace SendTransaction
         const Crypto::Hash hash,
         const uint64_t fee,
         const std::string paymentID,
-        const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+        const std::vector<wallet_types::TxInputAndOwner> ourInputs,
         const std::string changeAddress,
         const uint64_t changeRequired,
         const std::shared_ptr<SubWallets> subWallets)
@@ -474,7 +474,7 @@ namespace SendTransaction
 
         /* Create the unconfirmed transaction (Will be overwritten by the
            confirmed transaction later) */
-        WalletTypes::Transaction tx(
+        wallet_types::Transaction tx(
             transfers, hash, fee, timestamp, blockHeight, paymentID,
             unlockTime, isCoinbaseTransaction);
 
@@ -500,7 +500,7 @@ namespace SendTransaction
         return {SUCCESS, getTransactionHash(tx)};
     }
 
-    std::vector<WalletTypes::TransactionDestination> setupDestinations(
+    std::vector<wallet_types::TransactionDestination> setupDestinations(
         std::vector<std::pair<std::string, uint64_t>> addressesAndAmounts,
         const uint64_t changeRequired,
         const std::string changeAddress)
@@ -511,7 +511,7 @@ namespace SendTransaction
             addressesAndAmounts.push_back({changeAddress, changeRequired});
         }
 
-        std::vector<WalletTypes::TransactionDestination> destinations;
+        std::vector<wallet_types::TransactionDestination> destinations;
 
         for (const auto [address, amount] : addressesAndAmounts)
         {
@@ -521,7 +521,7 @@ namespace SendTransaction
             /* Split transfer into denominations and create an output for each */
             for (const auto denomination : splitAmountIntoDenominations(amount))
             {
-                WalletTypes::TransactionDestination destination;
+                wallet_types::TransactionDestination destination;
 
                 destination.amount = denomination;
                 destination.receiverPublicSpendKey = publicSpendKey;
@@ -537,7 +537,7 @@ namespace SendTransaction
     std::tuple<Error, std::vector<cryptonote::RandomOuts>> getRingParticipants(
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon,
-        const std::vector<WalletTypes::TxInputAndOwner> sources)
+        const std::vector<wallet_types::TxInputAndOwner> sources)
     {
         /* Request one more than our mixin, then if we get our output as one of
            the mixin outs, we can skip it and still form the transaction */
@@ -640,8 +640,8 @@ namespace SendTransaction
     }
 
     /* Take our inputs and pad them with fake inputs, based on our mixin value */
-    std::tuple<Error, std::vector<WalletTypes::ObscuredInput>> prepareRingParticipants(
-        std::vector<WalletTypes::TxInputAndOwner> sources,
+    std::tuple<Error, std::vector<wallet_types::ObscuredInput>> prepareRingParticipants(
+        std::vector<wallet_types::TxInputAndOwner> sources,
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon)
     {
@@ -650,7 +650,7 @@ namespace SendTransaction
         std::sort(sources.begin(), sources.end(), [](const auto &lhs, const auto &rhs)
                   { return lhs.input.amount < rhs.input.amount; });
 
-        std::vector<WalletTypes::ObscuredInput> result;
+        std::vector<wallet_types::ObscuredInput> result;
 
         const auto [error, fakeOuts] = getRingParticipants(mixin, daemon, sources);
 
@@ -663,11 +663,11 @@ namespace SendTransaction
 
         for (const auto walletAmount : sources)
         {
-            WalletTypes::GlobalIndexKey realOutput{
+            wallet_types::GlobalIndexKey realOutput{
                 walletAmount.input.globalOutputIndex.value(),
                 walletAmount.input.key};
 
-            WalletTypes::ObscuredInput obscuredInput;
+            wallet_types::ObscuredInput obscuredInput;
 
             /* The real public key of the transaction */
             obscuredInput.realTransactionPublicKey = walletAmount.input.transactionPublicKey;
@@ -745,7 +745,7 @@ namespace SendTransaction
     }
 
     std::tuple<cryptonote::KeyPair, Crypto::KeyImage> genKeyImage(
-        const WalletTypes::ObscuredInput input,
+        const wallet_types::ObscuredInput input,
         const Crypto::SecretKey privateViewKey)
     {
         Crypto::KeyDerivation derivation;
@@ -777,7 +777,7 @@ namespace SendTransaction
     }
 
     std::tuple<Error, std::vector<cryptonote::KeyInput>, std::vector<Crypto::SecretKey>> setupInputs(
-        const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
+        const std::vector<wallet_types::ObscuredInput> inputsAndFakes,
         const Crypto::SecretKey privateViewKey)
     {
         std::vector<cryptonote::KeyInput> inputs;
@@ -820,8 +820,8 @@ namespace SendTransaction
         return {SUCCESS, inputs, tmpSecretKeys};
     }
 
-    std::tuple<std::vector<WalletTypes::KeyOutput>, cryptonote::KeyPair> setupOutputs(
-        std::vector<WalletTypes::TransactionDestination> destinations)
+    std::tuple<std::vector<wallet_types::KeyOutput>, cryptonote::KeyPair> setupOutputs(
+        std::vector<wallet_types::TransactionDestination> destinations)
     {
         /* Sort the destinations by amount. Helps obscure which output belongs to
            which transaction */
@@ -835,7 +835,7 @@ namespace SendTransaction
         /* Index of the output */
         uint32_t outputIndex = 0;
 
-        std::vector<WalletTypes::KeyOutput> outputs;
+        std::vector<wallet_types::KeyOutput> outputs;
 
         for (const auto destination : destinations)
         {
@@ -851,7 +851,7 @@ namespace SendTransaction
             Crypto::derive_public_key(
                 derivation, outputIndex, destination.receiverPublicSpendKey, tmpPubKey);
 
-            WalletTypes::KeyOutput keyOutput;
+            wallet_types::KeyOutput keyOutput;
 
             keyOutput.key = tmpPubKey;
             keyOutput.amount = destination.amount;
@@ -866,7 +866,7 @@ namespace SendTransaction
 
     std::tuple<Error, cryptonote::Transaction> generateRingSignatures(
         cryptonote::Transaction tx,
-        const std::vector<WalletTypes::ObscuredInput> inputsAndFakes,
+        const std::vector<wallet_types::ObscuredInput> inputsAndFakes,
         const std::vector<Crypto::SecretKey> tmpSecretKeys)
     {
         Crypto::Hash txPrefixHash;
@@ -973,7 +973,7 @@ namespace SendTransaction
     }
 
     std::vector<cryptonote::TransactionOutput> keyOutputToTransactionOutput(
-        const std::vector<WalletTypes::KeyOutput> keyOutputs)
+        const std::vector<wallet_types::KeyOutput> keyOutputs)
     {
         std::vector<cryptonote::TransactionOutput> result;
 
@@ -1004,9 +1004,9 @@ namespace SendTransaction
     TransactionResult makeTransaction(
         const uint64_t mixin,
         const std::shared_ptr<Nigel> daemon,
-        const std::vector<WalletTypes::TxInputAndOwner> ourInputs,
+        const std::vector<wallet_types::TxInputAndOwner> ourInputs,
         const std::string paymentID,
-        const std::vector<WalletTypes::TransactionDestination> destinations,
+        const std::vector<wallet_types::TransactionDestination> destinations,
         const std::shared_ptr<SubWallets> subWallets,
         const uint64_t unlockTime)
     {

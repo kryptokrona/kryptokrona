@@ -567,7 +567,7 @@ namespace cryptonote
                         callback);
     }
 
-    void NodeRpcProxy::getWalletSyncData(std::vector<Crypto::Hash> &&knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo> &newBlocks,
+    void NodeRpcProxy::getWalletSyncData(std::vector<Crypto::Hash> &&knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<wallet_types::WalletBlockInfo> &newBlocks,
                                          const Callback &callback)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -824,7 +824,7 @@ namespace cryptonote
         return std::error_code();
     }
 
-    std::error_code NodeRpcProxy::doGetWalletSyncData(const std::vector<Crypto::Hash> &knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo> &newBlocks)
+    std::error_code NodeRpcProxy::doGetWalletSyncData(const std::vector<Crypto::Hash> &knownBlockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<wallet_types::WalletBlockInfo> &newBlocks)
     {
 
         cryptonote::COMMAND_RPC_GET_WALLET_SYNC_DATA::request req = AUTO_VAL_INIT(req);

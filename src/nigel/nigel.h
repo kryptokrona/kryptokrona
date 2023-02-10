@@ -59,7 +59,7 @@ public:
 
     std::tuple<std::string, uint16_t> nodeAddress() const;
 
-    std::tuple<bool, std::vector<WalletTypes::WalletBlockInfo>> getWalletSyncData(
+    std::tuple<bool, std::vector<wallet_types::WalletBlockInfo>> getWalletSyncData(
         const std::vector<Crypto::Hash> blockHashCheckpoints,
         uint64_t startHeight,
         uint64_t startTimestamp) const;

@@ -41,9 +41,9 @@ void from_json(const json &j, TxPrivateKey &t);
 
 namespace wallet_types
 {
-    /* WalletTypes::Transaction */
-    void to_json(json &j, const WalletTypes::Transaction &t);
-    void from_json(const json &j, WalletTypes::Transaction &t);
+    /* wallet_types::Transaction */
+    void to_json(json &j, const wallet_types::Transaction &t);
+    void from_json(const json &j, wallet_types::Transaction &t);
 }
 
 std::vector<Transfer> transfersToVector(

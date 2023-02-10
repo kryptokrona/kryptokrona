@@ -65,10 +65,10 @@ public:
     void fromJSON(const JSONObject &j);
 
     /* Store a transaction */
-    void addTransaction(const WalletTypes::Transaction tx);
+    void addTransaction(const wallet_types::Transaction tx);
 
     /* Store an outgoing tx, not yet in a block */
-    void addUnconfirmedTransaction(const WalletTypes::Transaction tx);
+    void addUnconfirmedTransaction(const wallet_types::Transaction tx);
 
     /* Generates a key image using the public+private spend key of the
        subwallet. Will return an uninitialized keyimage if a view wallet
@@ -80,19 +80,19 @@ public:
 
     void storeTransactionInput(
         const Crypto::PublicKey publicSpendKey,
-        const WalletTypes::TransactionInput input);
+        const wallet_types::TransactionInput input);
 
     /* Get key images + amounts for the specified transfer amount. We
        can either take from all subwallets, or from some subset
        (usually just one address, e.g. if we're running a web wallet) */
-    std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t>
+    std::tuple<std::vector<wallet_types::TxInputAndOwner>, uint64_t>
     getTransactionInputsForAmount(
         const uint64_t amount,
         const bool takeFromAll,
         std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
         const uint64_t height) const;
 
-    std::tuple<std::vector<WalletTypes::TxInputAndOwner>, uint64_t, uint64_t>
+    std::tuple<std::vector<wallet_types::TxInputAndOwner>, uint64_t, uint64_t>
     getFusionTransactionInputs(
         const bool takeFromAll,
         std::vector<Crypto::PublicKey> subWalletsToTakeFrom,
@@ -156,12 +156,12 @@ public:
 
     void reset(const uint64_t scanHeight);
 
-    std::vector<WalletTypes::Transaction> getTransactions() const;
+    std::vector<wallet_types::Transaction> getTransactions() const;
 
     /* Note that this DOES NOT return incoming transactions in the pool. It only
        returns outgoing transactions which we sent but have not encountered in a
        block yet. */
-    std::vector<WalletTypes::Transaction> getUnconfirmedTransactions() const;
+    std::vector<wallet_types::Transaction> getUnconfirmedTransactions() const;
 
     std::tuple<Error, std::string> getAddress(
         const Crypto::PublicKey spendKey) const;
@@ -176,7 +176,7 @@ public:
         const Crypto::Hash txHash) const;
 
     void storeUnconfirmedIncomingInput(
-        const WalletTypes::UnconfirmedInput input,
+        const wallet_types::UnconfirmedInput input,
         const Crypto::PublicKey publicSpendKey);
 
     void convertSyncTimestampToHeight(
@@ -205,7 +205,7 @@ private:
        removes from the transfers array if there are multiple transfers
        in the tx */
     void deleteAddressTransactions(
-        std::vector<WalletTypes::Transaction> &txs,
+        std::vector<wallet_types::Transaction> &txs,
         const Crypto::PublicKey spendKey);
 
     //////////////////////////////
@@ -216,10 +216,10 @@ private:
     std::unordered_map<Crypto::PublicKey, SubWallet> m_subWallets;
 
     /* A vector of transactions */
-    std::vector<WalletTypes::Transaction> m_transactions;
+    std::vector<wallet_types::Transaction> m_transactions;
 
     /* Transactions which we sent, but haven't been added to a block yet */
-    std::vector<WalletTypes::Transaction> m_lockedTransactions;
+    std::vector<wallet_types::Transaction> m_lockedTransactions;
 
     Crypto::SecretKey m_privateViewKey;
 

@@ -77,7 +77,7 @@ namespace payment_service
             callback(std::error_code());
         };
 
-        virtual void getWalletSyncData(std::vector<Crypto::Hash> &&knownblockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<WalletTypes::WalletBlockInfo> &newBlocks,
+        virtual void getWalletSyncData(std::vector<Crypto::Hash> &&knownblockIds, uint64_t startHeight, uint64_t startTimestamp, std::vector<wallet_types::WalletBlockInfo> &newBlocks,
                                        const Callback &callback) override
         {
             callback(std::error_code());
