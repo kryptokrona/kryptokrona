@@ -1135,7 +1135,7 @@ namespace payment_service
         return std::error_code();
     }
 
-    std::error_code WalletService::sendTransaction(SendTransaction::Request &request, std::string &transactionHash)
+    std::error_code WalletService::sendTransaction(send_transaction::Request &request, std::string &transactionHash)
     {
         try
         {

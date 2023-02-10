@@ -300,7 +300,7 @@ namespace payment_service
         }
     }
 
-    void SendTransaction::Request::serialize(cryptonote::ISerializer &serializer, const WalletService &service)
+    void send_transaction::Request::serialize(cryptonote::ISerializer &serializer, const WalletService &service)
     {
         serializer(sourceAddresses, "addresses");
 
@@ -332,7 +332,7 @@ namespace payment_service
         serializer(unlockTime, "unlockTime");
     }
 
-    void SendTransaction::Response::serialize(cryptonote::ISerializer &serializer)
+    void send_transaction::Response::serialize(cryptonote::ISerializer &serializer)
     {
         serializer(transactionHash, "transactionHash");
     }

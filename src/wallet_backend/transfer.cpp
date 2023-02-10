@@ -21,7 +21,7 @@
 
 #include <wallet_backend/wallet_backend.h>
 
-namespace SendTransaction
+namespace send_transaction
 {
 
     std::tuple<Error, Crypto::Hash> sendFusionTransactionBasic(
@@ -1123,4 +1123,4 @@ namespace SendTransaction
         return expectedFee == actualFee;
     }
 
-} // namespace SendTransaction
+} // namespace send_transaction

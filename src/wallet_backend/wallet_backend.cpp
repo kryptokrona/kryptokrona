@@ -650,7 +650,7 @@ std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionBasic(
     const uint64_t amount,
     const std::string paymentID)
 {
-    return SendTransaction::sendTransactionBasic(
+    return send_transaction::sendTransactionBasic(
         destination, amount, paymentID, m_daemon, m_subWallets);
 }
 
@@ -663,14 +663,14 @@ std::tuple<Error, Crypto::Hash> WalletBackend::sendTransactionAdvanced(
     const std::string changeAddress,
     const uint64_t unlockTime)
 {
-    return SendTransaction::sendTransactionAdvanced(
+    return send_transaction::sendTransactionAdvanced(
         destinations, mixin, fee, paymentID, subWalletsToTakeFrom,
         changeAddress, m_daemon, m_subWallets, unlockTime);
 }
 
 std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionBasic()
 {
-    return SendTransaction::sendFusionTransactionBasic(m_daemon, m_subWallets);
+    return send_transaction::sendFusionTransactionBasic(m_daemon, m_subWallets);
 }
 
 std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
@@ -678,7 +678,7 @@ std::tuple<Error, Crypto::Hash> WalletBackend::sendFusionTransactionAdvanced(
     const std::vector<std::string> subWalletsToTakeFrom,
     const std::string destination)
 {
-    return SendTransaction::sendFusionTransactionAdvanced(
+    return send_transaction::sendFusionTransactionAdvanced(
         mixin, subWalletsToTakeFrom, destination, m_daemon, m_subWallets);
 }
 
