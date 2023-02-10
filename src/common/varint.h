@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace Tools
+namespace tools
 {
 
     template <typename OutputIt, typename T>

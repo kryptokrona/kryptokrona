@@ -35,7 +35,7 @@
 #include <sys/utsname.h>
 #endif
 
-namespace Tools
+namespace tools
 {
 #ifdef WIN32
     std::string get_windows_version_display_string()

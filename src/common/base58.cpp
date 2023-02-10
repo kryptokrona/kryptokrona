@@ -25,7 +25,7 @@
 #include "int_util.h"
 #include "varint.h"
 
-namespace Tools
+namespace tools
 {
     namespace Base58
     {

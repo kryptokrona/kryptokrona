@@ -25,7 +25,7 @@
 
 #include <utilities/coloured_msg.h>
 
-namespace Tools
+namespace tools
 {
     namespace
     {

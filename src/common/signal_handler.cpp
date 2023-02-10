@@ -79,7 +79,7 @@ namespace
 
 }
 
-namespace Tools
+namespace tools
 {
 
     bool SignalHandler::install(std::function<void(void)> t)

@@ -21,7 +21,7 @@
 #include <mutex>
 #include <vector>
 
-namespace Tools
+namespace tools
 {
 
     template <typename T>

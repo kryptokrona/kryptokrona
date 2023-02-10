@@ -17,7 +17,7 @@
 
 #include "scope_exit.h"
 
-namespace Tools
+namespace tools
 {
 
     ScopeExit::ScopeExit(std::function<void()> &&handler) : m_handler(std::move(handler)),
