@@ -35,7 +35,7 @@
 - name: Create Kryptokrona Node Container
   docker_container:
     name: "{{ docker_node_container_name }}"
-    image: "{{ docker_kryptokona_image }}:{{ gitresult.after[:7] }}"
+    image: "{{ docker_kryptokona_image }}:latest"
     command: /bin/echo success
     state: present
     force_kill: yes
@@ -48,7 +48,7 @@
 - name: Start Kryptokrona Node Container
   docker_container:
     name: "{{ docker_node_container_name }}"
-    image: "{{ docker_kryptokona_image }}:{{ gitresult.after[:7] }}"
+    image: "{{ docker_kryptokona_image }}:latest"
     command: "/usr/src/kryptokrona/start.sh"
     volumes:
       - "/root/.kryptokrona:/root/.kryptokrona"
@@ -63,7 +63,7 @@
 - name: Change script ownership
   ansible.builtin.file:
     path: /root/restart_node.sh
-    mode: '0777'
+    mode: "0777"
 
 - name: CRON job to restart node weekly
   cron:
