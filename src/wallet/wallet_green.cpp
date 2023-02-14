@@ -134,19 +134,19 @@ namespace cryptonote
 {
 
     WalletGreen::WalletGreen(syst::Dispatcher &dispatcher, const Currency &currency, INode &node, std::shared_ptr<logging::ILogger> logger, uint32_t transactionSoftLockTime) : m_dispatcher(dispatcher),
-                                                                                                                                                                                  m_currency(currency),
-                                                                                                                                                                                  m_node(node),
-                                                                                                                                                                                  m_logger(logger, "WalletGreen/empty"),
-                                                                                                                                                                                  m_stopped(false),
-                                                                                                                                                                                  m_blockchainSynchronizerStarted(false),
-                                                                                                                                                                                  m_blockchainSynchronizer(node, logger, currency.genesisBlockHash()),
-                                                                                                                                                                                  m_synchronizer(currency, logger, m_blockchainSynchronizer, node),
-                                                                                                                                                                                  m_eventOccurred(m_dispatcher),
-                                                                                                                                                                                  m_readyEvent(m_dispatcher),
-                                                                                                                                                                                  m_state(WalletState::NOT_INITIALIZED),
-                                                                                                                                                                                  m_actualBalance(0),
-                                                                                                                                                                                  m_pendingBalance(0),
-                                                                                                                                                                                  m_transactionSoftLockTime(transactionSoftLockTime)
+                                                                                                                                                                                m_currency(currency),
+                                                                                                                                                                                m_node(node),
+                                                                                                                                                                                m_logger(logger, "WalletGreen/empty"),
+                                                                                                                                                                                m_stopped(false),
+                                                                                                                                                                                m_blockchainSynchronizerStarted(false),
+                                                                                                                                                                                m_blockchainSynchronizer(node, logger, currency.genesisBlockHash()),
+                                                                                                                                                                                m_synchronizer(currency, logger, m_blockchainSynchronizer, node),
+                                                                                                                                                                                m_eventOccurred(m_dispatcher),
+                                                                                                                                                                                m_readyEvent(m_dispatcher),
+                                                                                                                                                                                m_state(WalletState::NOT_INITIALIZED),
+                                                                                                                                                                                m_actualBalance(0),
+                                                                                                                                                                                m_pendingBalance(0),
+                                                                                                                                                                                m_transactionSoftLockTime(transactionSoftLockTime)
     {
         m_readyEvent.set();
     }
@@ -2026,8 +2026,8 @@ namespace cryptonote
         std::error_code ec;
 
         syst::RemoteContext<void> relayTransactionContext(m_dispatcher, [this, transactionId, &ec, &completion]()
-                                                            { m_node.relayTransaction(m_uncommitedTransactions[transactionId], [&ec, &completion, this](std::error_code error)
-                                                                                      {
+                                                          { m_node.relayTransaction(m_uncommitedTransactions[transactionId], [&ec, &completion, this](std::error_code error)
+                                                                                    {
       ec = error;
       this->m_dispatcher.remoteSpawn(std::bind(asyncRequestCompletion, std::ref(completion))); }); });
         relayTransactionContext.get();
@@ -2508,8 +2508,8 @@ namespace cryptonote
         throwIfStopped();
 
         syst::RemoteContext<void> relayTransactionContext(m_dispatcher, [this, &cryptoNoteTransaction, &ec, &completion]()
-                                                            { m_node.relayTransaction(cryptoNoteTransaction, [&ec, &completion, this](std::error_code error)
-                                                                                      {
+                                                          { m_node.relayTransaction(cryptoNoteTransaction, [&ec, &completion, this](std::error_code error)
+                                                                                    {
       ec = error;
       this->m_dispatcher.remoteSpawn(std::bind(asyncRequestCompletion, std::ref(completion))); }); });
         relayTransactionContext.get();
@@ -2622,8 +2622,8 @@ namespace cryptonote
 
         m_logger(DEBUGGING) << "Requesting random outputs";
         syst::RemoteContext<void> getOutputsContext(m_dispatcher, [this, amounts, requestMixinCount, &mixinResult, &requestFinished, &mixinError]() mutable
-                                                      { m_node.getRandomOutsByAmounts(std::move(amounts), requestMixinCount, mixinResult, [&requestFinished, &mixinError, this](std::error_code ec) mutable
-                                                                                      {
+                                                    { m_node.getRandomOutsByAmounts(std::move(amounts), requestMixinCount, mixinResult, [&requestFinished, &mixinError, this](std::error_code ec) mutable
+                                                                                    {
       mixinError = ec;
       m_dispatcher.remoteSpawn(std::bind(asyncRequestCompletion, std::ref(requestFinished))); }); });
         getOutputsContext.get();
@@ -3330,7 +3330,7 @@ namespace cryptonote
         {
             m_logger(DEBUGGING) << "Stopping BlockchainSynchronizer";
             syst::RemoteContext<void> stopContext(m_dispatcher, [this]()
-                                                    { m_blockchainSynchronizer.stop(); });
+                                                  { m_blockchainSynchronizer.stop(); });
             stopContext.get();
 
             m_blockchainSynchronizerStarted = false;
@@ -3340,7 +3340,7 @@ namespace cryptonote
     void WalletGreen::addUnconfirmedTransaction(const ITransactionReader &transaction)
     {
         syst::RemoteContext<std::error_code> context(m_dispatcher, [this, &transaction]
-                                                       { return m_blockchainSynchronizer.addUnconfirmedTransaction(transaction).get(); });
+                                                     { return m_blockchainSynchronizer.addUnconfirmedTransaction(transaction).get(); });
 
         auto ec = context.get();
         if (ec)
@@ -3355,7 +3355,7 @@ namespace cryptonote
     void WalletGreen::removeUnconfirmedTransaction(const crypto::Hash &transactionHash)
     {
         syst::RemoteContext<void> context(m_dispatcher, [this, &transactionHash]
-                                            { m_blockchainSynchronizer.removeUnconfirmedTransaction(transactionHash).get(); });
+                                          { m_blockchainSynchronizer.removeUnconfirmedTransaction(transactionHash).get(); });
 
         context.get();
         m_logger(DEBUGGING) << "Unconfirmed transaction removed from BlockchainSynchronizer, hash " << transactionHash;

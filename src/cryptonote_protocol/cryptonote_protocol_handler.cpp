@@ -163,15 +163,15 @@ namespace cryptonote
     }
 
     CryptoNoteProtocolHandler::CryptoNoteProtocolHandler(const Currency &currency, syst::Dispatcher &dispatcher, ICore &rcore, IP2pEndpoint *p_net_layout, std::shared_ptr<logging::ILogger> log) : m_dispatcher(dispatcher),
-                                                                                                                                                                                                      m_currency(currency),
-                                                                                                                                                                                                      m_core(rcore),
-                                                                                                                                                                                                      m_p2p(p_net_layout),
-                                                                                                                                                                                                      m_synchronized(false),
-                                                                                                                                                                                                      m_stop(false),
-                                                                                                                                                                                                      m_observedHeight(0),
-                                                                                                                                                                                                      m_blockchainHeight(0),
-                                                                                                                                                                                                      m_peersCount(0),
-                                                                                                                                                                                                      logger(log, "protocol")
+                                                                                                                                                                                                    m_currency(currency),
+                                                                                                                                                                                                    m_core(rcore),
+                                                                                                                                                                                                    m_p2p(p_net_layout),
+                                                                                                                                                                                                    m_synchronized(false),
+                                                                                                                                                                                                    m_stop(false),
+                                                                                                                                                                                                    m_observedHeight(0),
+                                                                                                                                                                                                    m_blockchainHeight(0),
+                                                                                                                                                                                                    m_peersCount(0),
+                                                                                                                                                                                                    logger(log, "protocol")
     {
 
         if (!m_p2p)

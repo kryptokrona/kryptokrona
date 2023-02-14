@@ -68,29 +68,29 @@ std::vector<AdvancedCommand> allCommands()
 std::vector<AdvancedCommand> basicCommands()
 {
     return zed_utilities::filter(allCommands(), [](AdvancedCommand c)
-                                { return !c.advanced; });
+                                 { return !c.advanced; });
 }
 
 std::vector<AdvancedCommand> advancedCommands()
 {
     return zed_utilities::filter(allCommands(), [](AdvancedCommand c)
-                                { return c.advanced; });
+                                 { return c.advanced; });
 }
 
 std::vector<AdvancedCommand> basicViewWalletCommands()
 {
     return zed_utilities::filter(basicCommands(), [](AdvancedCommand c)
-                                { return c.viewWalletSupport; });
+                                 { return c.viewWalletSupport; });
 }
 
 std::vector<AdvancedCommand> advancedViewWalletCommands()
 {
     return zed_utilities::filter(advancedCommands(), [](AdvancedCommand c)
-                                { return c.viewWalletSupport; });
+                                 { return c.viewWalletSupport; });
 }
 
 std::vector<AdvancedCommand> allViewWalletCommands()
 {
     return zed_utilities::filter(allCommands(), [](AdvancedCommand c)
-                                { return c.viewWalletSupport; });
+                                 { return c.viewWalletSupport; });
 }

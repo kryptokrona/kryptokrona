@@ -463,8 +463,8 @@ std::vector<std::tuple<crypto::PublicKey, wallet_types::TransactionInput>> Walle
             const uint64_t spendHeight = 0;
 
             const wallet_types::TransactionInput input({keyImage, output.amount, blockHeight, rawTX.transactionPublicKey,
-                                                       outputIndex, output.globalOutputIndex, output.key, spendHeight,
-                                                       rawTX.unlockTime, rawTX.hash});
+                                                        outputIndex, output.globalOutputIndex, output.key, spendHeight,
+                                                        rawTX.unlockTime, rawTX.hash});
 
             inputs.emplace_back(derivedSpendKey, input);
         }

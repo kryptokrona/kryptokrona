@@ -152,7 +152,7 @@ ApiDispatcher::ApiDispatcher(
 
         /* Creates an integrated address from the given address and payment ID */
         .Get("/addresses/" + api_constants::addressRegex + "/" + api_constants::hashRegex, router(
-                                                                                             &ApiDispatcher::createIntegratedAddress, walletMustBeOpen, viewWalletsAllowed))
+                                                                                               &ApiDispatcher::createIntegratedAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get all transactions */
         .Get("/transactions", router(&ApiDispatcher::getTransactions, walletMustBeOpen, viewWalletsAllowed))
@@ -162,7 +162,7 @@ ApiDispatcher::ApiDispatcher(
 
         /* Get all (outgoing) unconfirmed transactions, belonging to the given address */
         .Get("/transactions/unconfirmed/" + api_constants::addressRegex, router(
-                                                                            &ApiDispatcher::getUnconfirmedTransactionsForAddress, walletMustBeOpen, viewWalletsAllowed))
+                                                                             &ApiDispatcher::getUnconfirmedTransactionsForAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the transactions starting at the given block, for 1000 blocks */
         .Get("/transactions/\\d+", router(&ApiDispatcher::getTransactionsFromHeight, walletMustBeOpen, viewWalletsAllowed))
@@ -172,15 +172,15 @@ ApiDispatcher::ApiDispatcher(
 
         /* Get the transactions starting at the given block, for 1000 blocks, belonging to the given address */
         .Get("/transactions/address/" + api_constants::addressRegex + "/\\d+", router(
-                                                                                  &ApiDispatcher::getTransactionsFromHeightWithAddress, walletMustBeOpen, viewWalletsAllowed))
+                                                                                   &ApiDispatcher::getTransactionsFromHeightWithAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the transactions starting at the given block, and ending at the given block, belonging to the given address */
         .Get("/transactions/address/" + api_constants::addressRegex + "/\\d+/\\d+", router(
-                                                                                       &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed))
+                                                                                        &ApiDispatcher::getTransactionsFromHeightToHeightWithAddress, walletMustBeOpen, viewWalletsAllowed))
 
         /* Get the transaction private key for the given hash */
         .Get("/transactions/privatekey/" + api_constants::hashRegex, router(
-                                                                        &ApiDispatcher::getTxPrivateKey, walletMustBeOpen, viewWalletsBanned))
+                                                                         &ApiDispatcher::getTxPrivateKey, walletMustBeOpen, viewWalletsBanned))
 
         /* Get details for the given transaction hash, if known */
         .Get("/transactions/hash/" + api_constants::hashRegex, router(&ApiDispatcher::getTransactionDetails, walletMustBeOpen, viewWalletsAllowed))

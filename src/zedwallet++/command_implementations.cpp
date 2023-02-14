@@ -356,10 +356,10 @@ void saveCSV(const std::shared_ptr<WalletBackend> walletBackend)
         const std::string direction = tx.totalAmount() > 0 ? "IN" : "OUT";
 
         csv << zed_utilities::unixTimeToDate(tx.timestamp) << "," /* Timestamp */
-            << tx.blockHeight << ","                             /* Block Height */
-            << tx.hash << ","                                    /* Hash */
-            << amount << ","                                     /* Amount */
-            << direction                                         /* In/Out */
+            << tx.blockHeight << ","                              /* Block Height */
+            << tx.hash << ","                                     /* Hash */
+            << amount << ","                                      /* Amount */
+            << direction                                          /* In/Out */
             << std::endl;
     }
 

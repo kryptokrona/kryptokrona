@@ -200,21 +200,21 @@ namespace cryptonote
     }
 
     NodeServer::NodeServer(syst::Dispatcher &dispatcher, cryptonote::CryptoNoteProtocolHandler &payload_handler, std::shared_ptr<logging::ILogger> log) : m_dispatcher(dispatcher),
-                                                                                                                                                            m_workingContextGroup(dispatcher),
-                                                                                                                                                            m_payload_handler(payload_handler),
-                                                                                                                                                            m_allow_local_ip(false),
-                                                                                                                                                            m_hide_my_port(false),
-                                                                                                                                                            m_network_id(cryptonote::CRYPTONOTE_NETWORK),
-                                                                                                                                                            logger(log, "node_server"),
-                                                                                                                                                            m_stopEvent(m_dispatcher),
-                                                                                                                                                            m_idleTimer(m_dispatcher),
-                                                                                                                                                            m_timedSyncTimer(m_dispatcher),
-                                                                                                                                                            m_timeoutTimer(m_dispatcher),
-                                                                                                                                                            m_stop(false),
-                                                                                                                                                            // intervals
-                                                                                                                                                            // m_peer_handshake_idle_maker_interval(cryptonote::P2P_DEFAULT_HANDSHAKE_INTERVAL),
-                                                                                                                                                            m_connections_maker_interval(1),
-                                                                                                                                                            m_peerlist_store_interval(60 * 30, false)
+                                                                                                                                                          m_workingContextGroup(dispatcher),
+                                                                                                                                                          m_payload_handler(payload_handler),
+                                                                                                                                                          m_allow_local_ip(false),
+                                                                                                                                                          m_hide_my_port(false),
+                                                                                                                                                          m_network_id(cryptonote::CRYPTONOTE_NETWORK),
+                                                                                                                                                          logger(log, "node_server"),
+                                                                                                                                                          m_stopEvent(m_dispatcher),
+                                                                                                                                                          m_idleTimer(m_dispatcher),
+                                                                                                                                                          m_timedSyncTimer(m_dispatcher),
+                                                                                                                                                          m_timeoutTimer(m_dispatcher),
+                                                                                                                                                          m_stop(false),
+                                                                                                                                                          // intervals
+                                                                                                                                                          // m_peer_handshake_idle_maker_interval(cryptonote::P2P_DEFAULT_HANDSHAKE_INTERVAL),
+                                                                                                                                                          m_connections_maker_interval(1),
+                                                                                                                                                          m_peerlist_store_interval(60 * 30, false)
     {
     }
 
@@ -744,12 +744,12 @@ namespace cryptonote
             try
             {
                 syst::Context<syst::TcpConnection> connectionContext(m_dispatcher, [&]
-                                                                         {
+                                                                     {
           syst::TcpConnector connector(m_dispatcher);
           return connector.connect(syst::Ipv4Address(common::ipAddressToString(na.ip)), static_cast<uint16_t>(na.port)); });
 
                 syst::Context<> timeoutContext(m_dispatcher, [&]
-                                                 {
+                                               {
           syst::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout));
           logger(DEBUGGING) << "Connection to " << na <<" timed out, interrupt it";
           safeInterrupt(connectionContext); });
@@ -773,12 +773,12 @@ namespace cryptonote
             try
             {
                 syst::Context<bool> handshakeContext(m_dispatcher, [&]
-                                                       {
+                                                     {
           cryptonote::LevinProtocol proto(ctx.connection);
           return handshake(proto, ctx, just_take_peerlist); });
 
                 syst::Context<> timeoutContext(m_dispatcher, [&]
-                                                 {
+                                               {
           // Here we use connection_timeout * 3, one for this handshake, and two for back ping from peer.
           syst::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout * 3));
           logger(DEBUGGING) << "Handshake with " << na << " timed out, interrupt it";
@@ -1182,13 +1182,13 @@ namespace cryptonote
             COMMAND_PING::request req;
             COMMAND_PING::response rsp;
             syst::Context<> pingContext(m_dispatcher, [&]
-                                          {
+                                        {
         syst::TcpConnector connector(m_dispatcher);
         auto connection = connector.connect(syst::Ipv4Address(ip), static_cast<uint16_t>(port));
         LevinProtocol(connection).invoke(COMMAND_PING::ID, req, rsp); });
 
             syst::Context<> timeoutContext(m_dispatcher, [&]
-                                             {
+                                           {
         syst::Timer(m_dispatcher).sleep(std::chrono::milliseconds(m_config.m_net_config.connection_timeout * 2));
         logger(DEBUGGING) << context << "Back ping timed out" << ip << ":" << port;
         safeInterrupt(pingContext); });
@@ -1495,7 +1495,7 @@ namespace cryptonote
     {
         // This inner context is necessary in order to stop connection handler at any moment
         syst::Context<> context(m_dispatcher, [this, &connectionId, &ctx]
-                                  {
+                                {
       syst::Context<> writeContext(m_dispatcher, std::bind(&NodeServer::writeHandler, this, std::ref(ctx)));
 
       try {

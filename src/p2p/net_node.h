@@ -79,11 +79,11 @@ namespace cryptonote
         syst::TcpConnection connection;
 
         P2pConnectionContext(syst::Dispatcher &dispatcher, std::shared_ptr<logging::ILogger> log, syst::TcpConnection &&conn) : context(nullptr),
-                                                                                                                                    peerId(0),
-                                                                                                                                    connection(std::move(conn)),
-                                                                                                                                    logger(log, "node_server"),
-                                                                                                                                    queueEvent(dispatcher),
-                                                                                                                                    stopped(false)
+                                                                                                                                peerId(0),
+                                                                                                                                connection(std::move(conn)),
+                                                                                                                                logger(log, "node_server"),
+                                                                                                                                queueEvent(dispatcher),
+                                                                                                                                stopped(false)
         {
         }
 
