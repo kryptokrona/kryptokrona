@@ -91,13 +91,29 @@ jobs:
         run: |
           docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} -f Dockerfile.test . --no-cache
 
-      - name: Tag Latest Image
-        run: docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:latest
+      - name: Tag Image
+        run: |
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:latest
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE-testnet:latest
 
-      - name: Publish Docker
+      - name: Publish Docker to GitHub Repository
         run: |
           docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
           docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:latest
+
+      - uses: actions/checkout@v2
+      - name: Login into Docker Hub
+        env:
+          DOCKER_HUB_USER: ${{secrets.DOCKER_HUB_USER}}
+          DOCKER_HUB_PASSWORD: ${{secrets.DOCKER_HUB_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+
+      - name: Publish Docker to Docker Hub
+        run: |
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE-testnet:latest
 
   docker-mainnet:
     name: Build and Publish Docker Image for main-net
@@ -119,10 +135,26 @@ jobs:
         run: |
           docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} . --no-cache
 
-      - name: Tag Latest Image
-        run: docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:latest
+      - name: Tag Image
+        run: |
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:latest
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE:latest
 
-      - name: Publish Docker
+      - name: Publish Docker to GitHub Repository
         run: |
           docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
           docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:latest
+
+      - uses: actions/checkout@v2
+      - name: Login into Docker Hub
+        env:
+          DOCKER_HUB_USER: ${{secrets.DOCKER_HUB_USER}}
+          DOCKER_HUB_PASSWORD: ${{secrets.DOCKER_HUB_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+
+      - name: Publish Docker to Docker Hub
+        run: |
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE:latest
