@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        logger(INFO) << "P2p server initialized OK";
+        logger(INFO) << "p2p server initialized OK";
 
         if (!config.noConsole)
         {
