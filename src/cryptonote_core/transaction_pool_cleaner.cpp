@@ -85,7 +85,7 @@ namespace cryptonote
         return transactionPool->getTransactionHashesByPaymentId(paymentId);
     }
 
-    std::string TransactionPoolCleanWrapper::hex2ascii(std::string hex)
+    std::string TransactionPoolCleanWrapper::hex2ascii(const std::string &hex)
     {
         std::string ascii;
 
@@ -102,7 +102,7 @@ namespace cryptonote
         return ascii;
     }
 
-    json TransactionPoolCleanWrapper::trimExtra(std::string extra)
+    json TransactionPoolCleanWrapper::trimExtra(const std::string &extra)
     {
         try
         {

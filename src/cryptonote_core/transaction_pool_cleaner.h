@@ -55,8 +55,8 @@ namespace cryptonote
         virtual uint64_t getTransactionReceiveTime(const crypto::Hash &hash) const override;
         virtual std::vector<crypto::Hash> getTransactionHashesByPaymentId(const crypto::Hash &paymentId) const override;
 
-        json trimExtra(std::string extra);
-        std::string hex2ascii(std::string hex);
+        std::string hex2ascii(const std::string &hex);
+        json trimExtra(const std::string &extra);
         virtual std::vector<crypto::Hash> clean(const uint32_t height) override;
 
     private:
