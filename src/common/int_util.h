@@ -21,10 +21,38 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+
+#if !defined(_WIN32)
 #include <sys/param.h>
+#endif
 
 #if defined(_MSC_VER)
 #include <stdlib.h>
+
+#ifdef _MSC_VER
+# define LITTLE_ENDIAN	1234
+# define BIG_ENDIAN	4321
+# define BYTE_ORDER	LITTLE_ENDIAN
+#endif
+
+#if defined(__MINGW32__) || defined(__MINGW64__)
+# define LITTLE_ENDIAN	1234
+# define BIG_ENDIAN	4321
+# define BYTE_ORDER	LITTLE_ENDIAN
+#endif
+
+#ifdef __linux__
+#include <endian.h>
+
+# define LITTLE_ENDIAN	__LITTLE_ENDIAN
+# define BIG_ENDIAN	__BIG_ENDIAN
+# define PDP_ENDIAN	__PDP_ENDIAN
+# define BYTE_ORDER	__BYTE_ORDER
+#endif
+
+#if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN) || !defined(BIG_ENDIAN)
+static_assert(false, "BYTE_ORDER is undefined. Perhaps, GNU extensions are not enabled");
+#endif
 
 #define inline __inline
 
@@ -202,10 +230,6 @@ static inline void memcpy_swap64(void *dst, const void *src, uint64_t n)
         ((uint64_t *)dst)[i] = swap64(((const uint64_t *)src)[i]);
     }
 }
-
-#if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN) || !defined(BIG_ENDIAN)
-static_assert(false, "BYTE_ORDER is undefined. Perhaps, GNU extensions are not enabled");
-#endif
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 #define SWAP32LE IDENT32
