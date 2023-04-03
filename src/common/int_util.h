@@ -41,14 +41,6 @@
 # define BYTE_ORDER	LITTLE_ENDIAN
 #endif
 
-#ifdef __linux__
-#include <endian.h>
-
-# define LITTLE_ENDIAN	__LITTLE_ENDIAN
-# define BIG_ENDIAN	__BIG_ENDIAN
-# define PDP_ENDIAN	__PDP_ENDIAN
-# define BYTE_ORDER	__BYTE_ORDER
-#endif
 
 #if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN) || !defined(BIG_ENDIAN)
 static_assert(false, "BYTE_ORDER is undefined. Perhaps, GNU extensions are not enabled");

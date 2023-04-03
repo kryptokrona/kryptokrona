@@ -33,7 +33,7 @@
 #include <config/cryptonote_checkpoints.h>
 #include <logging/logger_manager.h>
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <crtdbg.h>
 #include <io.h>
 #else
