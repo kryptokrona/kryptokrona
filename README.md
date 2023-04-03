@@ -236,13 +236,14 @@ The binaries will be in the `src` folder when you are complete.
 
 ### Prerequisites
 
-- Install [Visual Studio 2017 Community Edition](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15&page=inlineinstall)
-- When installing Visual Studio, it is **required** that you install **Desktop development with C++**
+- Install [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/older-downloads/)
+- Install [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false)
+- When installing Visual Studio, it is **required** that you install **Desktop development with C++**.  Select MSVC v141 Build Tools.
 - Install the latest version of [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.68.0/boost_1_68_0-msvc-14.1-64.exe/download) - Currently Boost 1.68.
 
 ### Build using Visual C++ 2019
 
-- From the start menu, open 'x64 Native Tools Command Prompt for vs2017'.
+- From the start menu, open 'x64 Native Tools Command Prompt for vs2019'.
 - `cd <your_kryptokrona_directory>`
 - `mkdir build`
 - `cd build`
@@ -255,7 +256,7 @@ If you have errors on this step about not being able to find the following stati
 
 ### Build using Visual C++ 2022
 
-- From the start menu, open 'x64 Native Tools Command Prompt for vs2017'.
+- From the start menu, open 'x64 Native Tools Command Prompt for vs2022'.
 - `cd <your_kryptokrona_directory>`
 - `mkdir build`
 - `cd build`
