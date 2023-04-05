@@ -68,12 +68,12 @@
     sys_alert_hostname: "{{ domain_name }}"
 
     sys_swagger_contact_name: 'Marcus Cvjeticanin'
-    sys_swagger_contact_email: 'mjovanc@protonmail.com'
+    sys_swagger_contact_email: 'mjovanc@icloud.com'
     sys_swagger_contact_url: 'https://github.com/kryptokrona/hugin-api/issues'
 
     sys_api_port: '3000'
     sys_ws_port: '8080'
-    sys_hugin_syncer_sleep: '2000'
+    sys_hugin_syncer_sleep: '10000'
 
     sys_project_name: 'Hugin API'
 
