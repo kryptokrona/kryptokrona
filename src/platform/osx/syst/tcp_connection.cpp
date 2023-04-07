@@ -19,9 +19,9 @@
 #include <cassert>
 
 #include <netinet/in.h>
-#include <syst/event.h>
-#include <syst/errno.h>
-#include <syst/socket.h>
+#include <sys/event.h>
+#include <sys/errno.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 #include "dispatcher.h"

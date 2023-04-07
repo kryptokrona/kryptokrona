@@ -20,10 +20,10 @@
 
 #include <fcntl.h>
 #include <netdb.h>
-#include <syst/errno.h>
-#include <syst/event.h>
-#include <syst/socket.h>
-#include <syst/types.h>
+#include <sys/errno.h>
+#include <sys/event.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <syst/interrupted_exception.h>

@@ -227,6 +227,14 @@ The binaries will be in the `src` folder when you are complete.
 - `cmake ..`
 - `make`
 
+Note that if you are using x64 you need to set the flag by running cmake with:
+
+`cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 ..`
+
+Or with macOS m1:
+
+`cmake -DCMAKE_OSX_ARCHITECTURES=arm64 ..`
+
 The binaries will be in the `src` folder when you are complete.
 
 - `cd src`

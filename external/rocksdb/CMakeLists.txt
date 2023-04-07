@@ -189,9 +189,13 @@ else()
 endif()
 
 if(APPLE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    # Need to build against libc++ instead of libstc++ on apple
+    # Need to build against libc++ instead of libstc++ on apple with GCC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++ -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -nodefaultlibs -lc++ -lc++abi -lm -lc -lgcc -lgcc_eh")
+elseif(APPLE AND CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    # Need to build against libc++ on apple with Clang
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -I/opt/homebrew/opt/llvm/include/c++/v1 -L/opt/homebrew/opt/llvm/lib/c++")
 endif()
+
 
 
 include(CheckCCompilerFlag)

@@ -20,9 +20,9 @@
 #include <stdexcept>
 #include <string>
 
-#include <syst/errno.h>
-#include <syst/event.h>
-#include <syst/time.h>
+#include <sys/errno.h>
+#include <sys/event.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include "dispatcher.h"
