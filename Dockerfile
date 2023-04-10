@@ -43,6 +43,7 @@ WORKDIR /usr/src/kryptokrona/build/src
 # set executable permission on kryptokrona deamon
 RUN chmod +x kryptokronad
 
+EXPOSE 11897
 EXPOSE 11898
 
 # --data-dir is binded to a volume - this volume is binded when starting the container
