@@ -132,7 +132,7 @@ endif()
 if(MSVC)
     target_link_libraries(kryptokronad syst cryptonote_core rocksdb ${Boost_LIBRARIES})
 else()
-    target_link_libraries(kryptokronad syst cryptonote_core rocksdblib ${Boost_LIBRARIES})
+    target_link_libraries(kryptokronad syst cryptonote_core librocksdb ${Boost_LIBRARIES})
 endif()
 
 # Add the dependencies we need
