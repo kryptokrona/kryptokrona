@@ -1,55 +1,41 @@
-# ![image](https://user-images.githubusercontent.com/36674091/169624229-5d071dea-bf48-49d2-86f3-6e7b1126e38d.png)
+<a href="https://github.com/mjovanc/falcon">
+  <img align="right" width="150" height="150" alt="Yggdrasil Kryptokrona Wallet" src="resources/kryptokrona.png">
+</a>
 
-<p>
-<a href="https://github.com/kryptokrona/kryptokrona/actions">
-    <img src="https://github.com/kryptokrona/kryptokrona/actions/workflows/main-ci.yml/badge.svg">
-</a>
-<a href="https://github.com/kryptokrona/kryptokrona/issues">
-    <img src="https://img.shields.io/github/issues/kryptokrona/kryptokrona">
-</a>
-<a href="https://github.com/kryptokrona/kryptokrona/pulls">
-    <img src="https://img.shields.io/github/issues-pr/kryptokrona/kryptokrona">
-</a>
-<a href="https://github.com/kryptokrona/kryptokrona/commits/main">
-    <img src="https://img.shields.io/github/commit-activity/m/kryptokrona/kryptokrona">
-</a>
-<a href="https://github.com/kryptokrona/kryptokrona/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/kryptokrona/kryptokrona">
-</a>
-<a href="https://chat.kryptokrona.se">
-    <img src="https://img.shields.io/discord/562673808582901793?label=Discord&logo=Discord&logoColor=white&style=flat">
-</a> 
-<a href="https://twitter.com/kryptokrona">
-    <img src="https://img.shields.io/twitter/follow/kryptokrona">
-</a>
-</p>
+# Kryptokrona
+[![build](https://img.shields.io/github/actions/workflow/status/kryptokrona/kryptokrona/master-ci.yml?branch=master)](https://github.com/kryptokrona/kryptokrona/actions/workflows/master-ci.yml)
+[![release](https://img.shields.io/github/v/release/kryptokrona/kryptokrona)](https://img.shields.io/github/v/release/kryptokrona/kryptokrona)
+[![license](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://opensource.org/licenses/GPLv3)
+[![discord](https://img.shields.io/discord/562673808582901793?label=discord)](https://discord.gg/VTgsTGS9b7)
 
 Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, which forms the basis for Monero, among others. CryptoNote is a so-called “application layer” protocol further developed by TurtleCoin that enables things like: private transactions, messages and arbitrary data storage, completely decentralized.
 
 # Table of Contents
 
+- [Kryptokrona](#kryptokrona)
+- [Table of Contents](#table-of-contents)
 - [Development Resources](#development-resources)
 - [Versioning](#versioning)
 - [CI/CD](#cicd)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Ubuntu](#ubuntu)
-    - [Build using GCC](#ubuntu-build-using-gcc)
-    - [Build using Clang](#ubuntu-build-using-clang)
+    - [Build using GCC](#build-using-gcc)
+    - [Build using Clang](#build-using-clang)
   - [Generic Linux](#generic-linux)
     - [Build](#build)
   - [OSX/Apple](#osxapple)
     - [Prerequisites](#prerequisites-1)
-      - [Build using GCC](#build-using-gcc)
-      - [Build using Clang](#build-using-clang)
+    - [Build using GCC](#build-using-gcc-1)
+    - [Build using Clang](#build-using-clang-1)
   - [Windows](#windows)
-    - [Prerequisites](#prerequisites)
-    - [Build using Visual C++](#build-using-visual-c)
+    - [Prerequisites](#prerequisites-2)
+    - [Build using Visual C++ 2019](#build-using-visual-c-2019)
+    - [Build using Visual C++ 2022](#build-using-visual-c-2022)
   - [Raspberry Pi 3 B+ (AARCH64/ARM64)](#raspberry-pi-3-b-aarch64arm64)
     - [Known working images](#known-working-images)
-    - [Build](#build)
+    - [Build](#build-1)
 - [Setup testnet](#setup-testnet)
-  - [Change config](#change-config)
   - [Install Docker](#install-docker)
   - [Start the orchestration of Docker containers](#start-the-orchestration-of-docker-containers)
   - [Stop all Docker containers](#stop-all-docker-containers)
@@ -60,8 +46,8 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 - [Help and Support](#help-and-support)
 - [Thanks](#thanks)
 - [Copypasta for license when editing files](#copypasta-for-license-when-editing-files)
-  - [Contributors](#contributors)
-  - [License](#license)
+- [Contributors](#contributors)
+- [License](#license)
 
 # Development Resources
 
@@ -461,4 +447,4 @@ being awesome contributors to this project. **We'd like to take a moment to reco
 
 # License
 
-The license is GPL-3.0 License.
+The license is GPL-3.0.
