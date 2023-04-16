@@ -7,7 +7,7 @@ FROM ubuntu:22.04
 COPY . /usr/src/kryptokrona
 WORKDIR /usr/src/kryptokrona
 
-RUN chmod +x ./wait-for-it.sh ./docker-entrypoint.sh
+RUN chmod +x ./scripts/testnet/wait-for-it.sh ./scripts/testnet/docker-entrypoint.sh
 
 # install build dependencies
 RUN apt-get update && \

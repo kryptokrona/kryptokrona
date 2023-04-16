@@ -43,7 +43,7 @@ services:
     command: >
       /bin/sh -c " chmod 0644 /etc/cron.d/miner-cron && crontab /etc/cron.d/miner-cron && touch /var/log/cron.log && cron -f && tail -f /var/log/cron.log"
     volumes:
-      - ./miner-cron:/etc/cron.d/miner-cron
+      - ./scripts/testnet/miner-cron:/etc/cron.d/miner-cron
     depends_on:
       - node1
       - node2

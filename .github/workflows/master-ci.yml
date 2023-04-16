@@ -1,4 +1,4 @@
-name: Kryptokrona Main Pipeline
+name: Kryptokrona Master Pipeline
 
 env:
   GITHUB_REGISTRY: "ghcr.io"
