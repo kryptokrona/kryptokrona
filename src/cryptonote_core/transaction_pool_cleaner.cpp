@@ -144,7 +144,7 @@ namespace cryptonote
 
             for (const auto &hash : transactionHashes)
             {
-                logger(logging::INFO) << "Checking transaction " << common::podToHex(hash);
+                logger(logging::DEBUGGING) << "Checking transaction " << common::podToHex(hash);
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
                 boxed_transaction_age = 0;
                 transaction_extra_data_size = transactionPool->getTransaction(hash).getTransaction().extra.size();

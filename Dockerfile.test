@@ -39,7 +39,10 @@ RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
 
 # build and install
-RUN cmake -DTEST_NET=ON .. && make -j$(nproc)
+RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DTEST_NET=ON .. && make -j$(nproc)
+
+EXPOSE 11897
+EXPOSE 11898
 
 # create the directory for the daemon files
 RUN mkdir -p src/blockloc
