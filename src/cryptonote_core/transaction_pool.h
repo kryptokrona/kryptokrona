@@ -54,6 +54,8 @@ namespace cryptonote
         virtual uint64_t getTransactionReceiveTime(const crypto::Hash &hash) const override;
         virtual std::vector<crypto::Hash> getTransactionHashesByPaymentId(const crypto::Hash &paymentId) const override;
 
+        virtual void flush() override;
+
     private:
         TransactionValidatorState poolState;
 

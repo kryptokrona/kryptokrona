@@ -242,4 +242,8 @@ namespace cryptonote
         }
     }
 
+    void TransactionPoolCleanWrapper::flush()
+    {
+        return transactionPool->flush();
+    }
 }

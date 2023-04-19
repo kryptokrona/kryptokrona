@@ -183,4 +183,13 @@ namespace cryptonote
         return transactionHashes;
     }
 
+    void TransactionPool::flush()
+    {
+        const auto txns = getTransactionHashes();
+
+        for (const auto tx : txns)
+        {
+            removeTransaction(tx);
+        }
+    }
 }

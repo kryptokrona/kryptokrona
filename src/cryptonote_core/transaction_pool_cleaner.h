@@ -59,6 +59,8 @@ namespace cryptonote
         json trimExtra(const std::string &extra);
         virtual std::vector<crypto::Hash> clean(const uint32_t height) override;
 
+        virtual void flush() override;
+
     private:
         std::unique_ptr<ITransactionPool> transactionPool;
         std::unique_ptr<ITimeProvider> timeProvider;
