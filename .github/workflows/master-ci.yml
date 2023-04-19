@@ -57,7 +57,7 @@ jobs:
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: |
           cmake -DBoost_ARCHITECTURE=-x64 ..
-          make -j$(nproc) --ignore-errors
+          make
         working-directory: build
 
       - name: Upload Ubuntu Artifact
