@@ -1,5 +1,5 @@
-<a href="https://github.com/mjovanc/falcon">
-  <img align="right" width="250" height="120" alt="Yggdrasil Kryptokrona Wallet" src="resources/kryptokrona.svg">
+<a href="https://github.com/kryptokrona/kryptokrona">
+  <img align="right" width="200" height="120" alt="Kryptokrona" src="resources/kryptokrona.svg">
 </a>
 
 # Kryptokrona
