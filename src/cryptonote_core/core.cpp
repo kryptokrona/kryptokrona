@@ -1613,7 +1613,7 @@ namespace cryptonote
            an insane number of times */
         if (transactionPool->checkIfTransactionPresent(transactionHash))
         {
-            return {false, "Transaction already exists in pool"};
+            return false;
         }
 
         if (!isTransactionValidForPool(cachedTransaction, validatorState))
