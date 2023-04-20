@@ -211,7 +211,7 @@ namespace cryptonote
         const char MINER_CONFIG_FILE_NAME[] = "miner_conf.json";
     } // parameters
 
-    const char CRYPTONOTE_NAME[] = "Kryptokrona";
+    const char CRYPTONOTE_NAME[] = "kryptokrona";
 
     const uint8_t TRANSACTION_VERSION_1 = 1;
     const uint8_t TRANSACTION_VERSION_2 = 2;
