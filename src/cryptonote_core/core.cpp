@@ -711,8 +711,16 @@ namespace cryptonote
                to a block */
             uint64_t firstBlockHeight = startHeight == 0 ? timestampBlockHeight : startHeight;
 
+            /* If we don't find the last known block we exit the method */
+            bool foundLastKnownBlock = checkBlockchainSupplement(knownBlockHashes);
+            if (!foundLastKnownBlock)
+            {
+                /* We don't know about any of the blocks, so return nothing */
+                return false;
+            }
+
             /* The height of the last block we know about */
-            uint64_t lastKnownBlockHashHeight = static_cast<uint64_t>(findBlockchainSupplement(knownBlockHashes));
+            uint64_t lastKnownBlockHashHeight = static_cast<uint64_t>(findBlockchainSupplement(knownBlockHashes)); // throws
 
             /* Start returning either from the start height, or the height of the
                last block we know about, whichever is higher */
@@ -2173,7 +2181,7 @@ namespace cryptonote
             return 0;
         }
 
-        // TODO: check for genesis blocks match
+        // check for genesis blocks match
         for (auto &hash : remoteBlockIds)
         {
             IBlockchainCache *blockchainSegment = findMainChainSegmentContainingBlock(hash);
@@ -2184,6 +2192,20 @@ namespace cryptonote
         }
 
         throw std::runtime_error("Genesis block hash was not found.");
+    }
+
+    bool Core::checkBlockchainSupplement(const std::vector<crypto::Hash> &remoteBlockIds) const
+    {
+        for (auto &hash : remoteBlockIds)
+        {
+            IBlockchainCache *blockchainSegment = findMainChainSegmentContainingBlock(hash);
+            if (blockchainSegment != nullptr)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     std::vector<crypto::Hash> cryptonote::Core::getBlockHashes(uint32_t startBlockIndex, uint32_t maxCount) const

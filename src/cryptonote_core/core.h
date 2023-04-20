@@ -162,6 +162,7 @@ namespace cryptonote
         std::error_code validateTransaction(const CachedTransaction &transaction, TransactionValidatorState &state, IBlockchainCache *cache, uint64_t &fee, uint32_t blockIndex);
 
         uint32_t findBlockchainSupplement(const std::vector<crypto::Hash> &remoteBlockIds) const;
+        bool checkBlockchainSupplement(const std::vector<crypto::Hash> &remoteBlockIds) const;
         std::vector<crypto::Hash> getBlockHashes(uint32_t startBlockIndex, uint32_t maxCount) const;
 
         std::error_code validateBlock(const CachedBlock &block, IBlockchainCache *cache, uint64_t &minerReward);
