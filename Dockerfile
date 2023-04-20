@@ -36,7 +36,7 @@ RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
 
 # build and install
-RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make -j$(nproc) --ignore-errors
+RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make
 
 WORKDIR /usr/src/kryptokrona/build/src
 

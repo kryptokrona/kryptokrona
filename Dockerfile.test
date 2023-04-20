@@ -39,7 +39,7 @@ RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
 
 # build and install
-RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DTEST_NET=ON .. && make -j$(nproc)
+RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DTEST_NET=ON .. && make
 
 EXPOSE 11897
 EXPOSE 11898

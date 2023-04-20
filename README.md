@@ -62,13 +62,13 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 
 ## Getting Help
 
-Are you having trouble with Kryptokrona Kotlin SDK? We want to help!
+Are you having trouble with Kryptokrona? We want to help!
 
 - Read through all documentation on our Wiki: https://docs.kryptokrona.org
 
 - If you are upgrading, read the release notes for upgrade instructions and "new and noteworthy" features.
 
-- Ask a question we monitor stackoverflow.com for questions tagged with kryptokrona-kotlin-sdk. You can also chat with the community on Hugin or Discord.
+- Ask a question we monitor stackoverflow.com for questions tagged with kryptokrona. You can also chat with the community on Hugin or Discord.
 
 - Report bugs with Kryptokrona at https://github.com/kryptokrona/kryptokrona/issues.
 
@@ -82,7 +82,7 @@ Kryptokrona uses GitHub’s integrated issue tracking system to record bugs and 
 
 - If the issue doesn’t already exist, create a new issue.
 
-- Please provide as much information as possible with the issue report. We like to know the Kryptokrona Kotlin SDK version, operating system, and JVM version you’re using.
+- Please provide as much information as possible with the issue report. We like to know the Kryptokrona version, operating system, and JVM version you’re using.
 
 - If you need to paste code or include a stack trace, use Markdown. ``` escapes before and after your text.
 
