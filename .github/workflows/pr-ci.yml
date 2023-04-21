@@ -26,9 +26,18 @@ jobs:
               cxx: "g++",
               platform: x64,
             }
+          - {
+              name: "Windows Latest Visual Studio 2019",
+              artifact: "kryptokrona-windows-latest.zip",
+              os: windows-latest,
+              cc: "cl.exe",
+              cxx: "cl.exe",
+              platform: x64,
+            }
     steps:
       - uses: actions/checkout@v2
 
+      # ubuntu
       - name: "Install ${{ matrix.config.name }} Dependencies "
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
@@ -51,3 +60,23 @@ jobs:
           cmake -DBoost_ARCHITECTURE=-x64 ..
           make
         working-directory: build
+
+      - name: Install Boost 1.74.0
+        if: ${{ contains(matrix.config.name, 'windows') }}
+        uses: MarkusJx/install-boost@v2.4.1
+        id: install-boost
+        with:
+            boost_version: 1.74.0
+            platform_version: 2019
+            toolset: msvc
+
+      - name: Configure CMake
+        if: ${{ contains(matrix.config.name, 'windows') }}
+        run: cmake . -DCMAKE_BUILD_TYPE=Release -B build
+        env:
+            BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+
+      - name: Build Windows Target
+        if: ${{ contains(matrix.config.name, 'windows') }}
+        run: cmake --build build --config Release
+
