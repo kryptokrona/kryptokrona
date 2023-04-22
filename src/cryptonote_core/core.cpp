@@ -711,6 +711,12 @@ namespace cryptonote
                to a block */
             uint64_t firstBlockHeight = startHeight == 0 ? timestampBlockHeight : startHeight;
 
+            // if the known block hashes are empty, we can't do anything
+            if (knownBlockHashes.empty())
+            {
+                return 0;
+            }
+
             /* If we don't find the last known block we exit the method */
             bool foundLastKnownBlock = checkBlockchainSupplement(knownBlockHashes);
             if (!foundLastKnownBlock)
@@ -2848,7 +2854,7 @@ namespace cryptonote
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(cachedTransaction.getTransactionHash());
 
                 logger(logging::DEBUGGING) << "Transaction age is "
-                                      << transactionAge;
+                                           << transactionAge;
 
                 if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                 {
