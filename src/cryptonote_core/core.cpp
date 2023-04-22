@@ -712,21 +712,23 @@ namespace cryptonote
             uint64_t firstBlockHeight = startHeight == 0 ? timestampBlockHeight : startHeight;
 
             // if the known block hashes are empty, we can't do anything
+            uint64_t lastKnownBlockHashHeight = 0;
             if (knownBlockHashes.empty())
             {
-                return 0;
+                lastKnownBlockHashHeight = 0;
             }
-
-            /* If we don't find the last known block we exit the method */
-            bool foundLastKnownBlock = checkBlockchainSupplement(knownBlockHashes);
-            if (!foundLastKnownBlock)
+            else
             {
-                /* We don't know about any of the blocks, so return nothing */
-                return false;
+                /* If we don't find the last known block we exit the method */
+                bool foundLastKnownBlock = checkBlockchainSupplement(knownBlockHashes);
+                if (!foundLastKnownBlock)
+                {
+                    /* We don't know about any of the blocks, so return nothing */
+                    return false;
+                }
+                /* The height of the last block we know about */
+                lastKnownBlockHashHeight = static_cast<uint64_t>(findBlockchainSupplement(knownBlockHashes)); // throws
             }
-
-            /* The height of the last block we know about */
-            uint64_t lastKnownBlockHashHeight = static_cast<uint64_t>(findBlockchainSupplement(knownBlockHashes)); // throws
 
             /* Start returning either from the start height, or the height of the
                last block we know about, whichever is higher */
