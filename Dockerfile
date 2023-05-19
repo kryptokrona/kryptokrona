@@ -43,7 +43,9 @@ FROM ubuntu:22.04
 WORKDIR /usr/src/kryptokrona
 
 COPY --from=builder /usr/src/kryptokrona/start.sh .
-COPY --from=builder /usr/src/kryptokrona/build/src .
+COPY --from=builder /usr/src/kryptokrona/build/src/kryptokronad .
+COPY --from=builder /usr/src/kryptokrona/build/src/xkrwallet .
+COPY --from=builder /usr/src/kryptokrona/build/src/miner .
 
 # set executable permissions
 RUN chmod +x start.sh
