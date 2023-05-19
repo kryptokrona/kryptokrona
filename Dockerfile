@@ -1,7 +1,8 @@
 # this docker file is intended for production usage to setup a node for the
 # kryptokrona blockchain. it is build using github actions.
 
-FROM ubuntu:22.04
+# step 1: build the binary
+FROM ubuntu:22.04 as builder
 
 COPY . /usr/src/kryptokrona
 WORKDIR /usr/src/kryptokrona
@@ -29,8 +30,6 @@ RUN apt-get update && \
     libboost-program-options1.74.0 \
     libicu70
 
-RUN chmod +x start.sh
-
 # create the build directory
 RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
@@ -38,9 +37,16 @@ WORKDIR /usr/src/kryptokrona/build
 # build and install
 RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" .. && make
 
-WORKDIR /usr/src/kryptokrona/build/src
+# step 2: create the final image
+FROM ubuntu:22.04
 
-# set executable permission on kryptokrona deamon
+WORKDIR /usr/src/kryptokrona
+
+COPY --from=builder /usr/src/kryptokrona/start.sh .
+COPY --from=builder /usr/src/kryptokrona/build/src .
+
+# set executable permissions
+RUN chmod +x start.sh
 RUN chmod +x kryptokronad
 
 EXPOSE 11897
