@@ -2,7 +2,8 @@
 # we only have to set specific command or entrypoint inside the docker compose
 # file to customize the behavior of the container when started.
 
-FROM ubuntu:22.04
+# step 1: build the binary
+FROM ubuntu:22.04 as builder
 
 COPY . /usr/src/kryptokrona
 WORKDIR /usr/src/kryptokrona
@@ -40,6 +41,16 @@ WORKDIR /usr/src/kryptokrona/build
 
 # build and install
 RUN cmake -DCMAKE_CXX_FLAGS="-g0 -Os -fPIC -std=gnu++17" -DTEST_NET=ON .. && make
+
+# step 2: create the final image
+FROM ubuntu:22.04
+
+WORKDIR /usr/src/kryptokrona
+
+COPY --from=builder /usr/src/kryptokrona/start.sh .
+COPY --from=builder /usr/src/kryptokrona/build/src/kryptokronad .
+COPY --from=builder /usr/src/kryptokrona/build/src/xkrwallet .
+COPY --from=builder /usr/src/kryptokrona/build/src/miner .
 
 EXPOSE 11897
 EXPOSE 11898
