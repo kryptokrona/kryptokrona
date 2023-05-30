@@ -1,0 +1,44 @@
+
+- name: Install Coturn
+  apt:
+    name: "coturn"
+    update_cache: true
+    state: present
+
+- name: Turn off coturn
+  service:
+    name: coturn
+    state: stopped
+
+- name: Remove coturn file
+  file:
+    name: /etc/default/coturn
+    state: absent
+
+- name: Install new coturn file
+  template:
+    src: templates/coturn
+    dest: /etc/default/coturn
+
+- name: Copy over coturn config
+  template:
+    src: templates/turnserver.conf.j2
+    dest: /etc/turnserver.conf
+
+- name: Remove coturn file
+  file:
+    name: /lib/systemd/system/coturn.service
+    state: absent
+
+- name: Copy over coturn config
+  template:
+    src: templates/coturn.service
+    dest: /lib/systemd/system/coturn.service
+
+- name: Reload daemon
+  shell: systemctl daemon-reload
+
+- name: Turn on coturn
+  service:
+    name: coturn
+    state: started

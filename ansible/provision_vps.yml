@@ -43,6 +43,10 @@
     web_server_port: "443"
     hidden_service_port: "443"
 
+    # Variables for coturn
+    docker_coturn_image: "coturn/coturn"
+    docker_coturn_container_name: "coturn"
+
     # DO NOT CONFIGURE THE ABOVE YOURSELF
     removal_interval: '1 years 2 months 3 days 2 hours 1 minutes 1 second'
     
@@ -87,3 +91,4 @@
   - nginx
   - prometheus
   - onion
+  - coturn
