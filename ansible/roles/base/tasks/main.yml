@@ -65,5 +65,16 @@
 - name: Iptables Websocket port
   shell: "iptables -C INPUT -s 0/0 -p tcp --dport {{ sys_ws_port }} -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport {{ sys_ws_port }} -j ACCEPT"
 
+- name: Iptables 3478 (TCP) port
+  shell: "iptables -C INPUT -s 0/0 -p tcp --dport 3478 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 3478 -j ACCEPT"
+- name: Iptables 3478 (UDP) port
+  shell: "iptables -C INPUT -s 0/0 -p udp --dport 3478 -j ACCEPT || iptables -I INPUT -s 0/0 -p udp --dport 3478 -j ACCEPT"
+
+- name: Iptables 5349 (TCP) port
+  shell: "iptables -C INPUT -s 0/0 -p tcp --dport 5349 -j ACCEPT || iptables -I INPUT -s 0/0 -p tcp --dport 5349 -j ACCEPT"
+- name: Iptables 3478 (UDP) port
+  shell: "iptables -C INPUT -s 0/0 -p udp --dport 5349 -j ACCEPT || iptables -I INPUT -s 0/0 -p udp --dport 5349 -j ACCEPT"
+
+
 - name: Save iptables changes
   shell: iptables-save > /etc/network/iptables.rules
