@@ -46,11 +46,19 @@ COPY --from=builder /usr/src/kryptokrona/start.sh .
 COPY --from=builder /usr/src/kryptokrona/build/src/kryptokronad .
 COPY --from=builder /usr/src/kryptokrona/build/src/xkrwallet .
 COPY --from=builder /usr/src/kryptokrona/build/src/miner .
+COPY --from=builder /usr/src/kryptokrona/build/src/kryptokrona-service .
+COPY --from=builder /usr/src/kryptokrona/build/src/wallet-api .
 
 # set executable permissions
 RUN chmod +x start.sh
 RUN chmod +x kryptokronad
+RUN chmod +x xkrwallet
+RUN chmod +x miner
+RUN chmod +x kryptokrona-service
+RUN chmod +x wallet-api
 
+EXPOSE 5000
+EXPOSE 8070
 EXPOSE 11897
 EXPOSE 11898
 
