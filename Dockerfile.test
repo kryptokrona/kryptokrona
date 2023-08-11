@@ -59,6 +59,7 @@ COPY --from=builder /usr/src/kryptokrona/build/src/xkrwallet .
 COPY --from=builder /usr/src/kryptokrona/build/src/miner .
 COPY --from=builder /usr/src/kryptokrona/build/src/kryptokrona-service .
 COPY --from=builder /usr/src/kryptokrona/build/src/wallet-api .
+COPY --from=builder /usr/src/kryptokrona/scripts/walletapi_docker_wrapper.py .
 
 # set executable permissions
 RUN chmod +x start.sh
