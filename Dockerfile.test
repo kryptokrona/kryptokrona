@@ -35,6 +35,12 @@ RUN apt-get update && \
     cron \
     rpcbind
 
+# Install Python and pip
+RUN apt-get install -y python3-pip
+
+# Install pexpect library
+RUN pip3 install pexpec
+
 # create the build directory
 RUN mkdir build
 WORKDIR /usr/src/kryptokrona/build
