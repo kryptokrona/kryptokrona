@@ -39,7 +39,7 @@ RUN apt-get update && \
 RUN apt-get install -y python3-pip
 
 # Install pexpect library
-RUN pip3 install pexpec
+RUN pip3 install pexpect
 
 # create the build directory
 RUN mkdir build
