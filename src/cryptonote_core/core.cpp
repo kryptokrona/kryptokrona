@@ -3358,11 +3358,11 @@ namespace cryptonote
             {
                 timer.sleep(OUTDATED_TRANSACTION_POLLING_INTERVAL);
 
-                logger(logging::INFO) << "Running pool transaction cleaning sequence... ";
+                logger(logging::DEBUGGING) << "Running pool transaction cleaning sequence... ";
 
                 auto deletedTransactions = transactionPool->clean(getTopBlockIndex());
 
-                logger(logging::INFO) << "Pool transaction cleaning sequence, done... ";
+                logger(logging::DEBUGGING) << "Pool transaction cleaning sequence, done... ";
 
                 notifyObservers(makeDelTransactionMessage(std::move(deletedTransactions), Messages::DeleteTransaction::Reason::Outdated));
             }
