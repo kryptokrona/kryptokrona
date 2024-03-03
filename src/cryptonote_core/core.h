@@ -194,7 +194,7 @@ namespace cryptonote
         void fillQueryBlockDetails(uint32_t fullOffset, uint32_t currentIndex, size_t maxItemsCount, std::vector<BlockDetails> &entries) const;
 
         void getTransactionPoolDifference(const std::vector<crypto::Hash> &knownHashes, std::vector<crypto::Hash> &newTransactions, std::vector<crypto::Hash> &deletedTransactions) const;
-
+        void getTransactionPoolTimeDifference(uint64_t timestampBegin, std::vector<crypto::Hash> &newTransactions) const;
         uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
         size_t calculateCumulativeBlocksizeLimit(uint32_t height) const;
 
