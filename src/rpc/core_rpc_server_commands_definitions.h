@@ -123,7 +123,7 @@ namespace cryptonote
 
         struct response
         {
-            std::vector<BinaryArray> addedTxs; // Added transactions blobs
+            std::vector<TransactionPrefixInfo> addedTxs; // Added transactions blobs
             std::string status;
 
             void serialize(ISerializer &s)

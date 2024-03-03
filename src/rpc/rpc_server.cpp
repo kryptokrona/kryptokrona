@@ -496,7 +496,7 @@ namespace cryptonote
     bool RpcServer::onGetPool(const COMMAND_RPC_GET_POOL::request &req, COMMAND_RPC_GET_POOL::response &rsp)
     {
         rsp.status = CORE_RPC_STATUS_OK;
-        rsp.isTailBlockActual = m_core.getPool(req.timestampBegin, rsp.addedTxs);
+        m_core.getPool(req.timestampBegin, rsp.addedTxs);
 
         return true;
     }
