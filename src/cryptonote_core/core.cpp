@@ -2767,7 +2767,7 @@ namespace cryptonote
 
             /* This value might differ from our client timestamp when checking batches.
                We should deduct a couple of seconds to make up for this. This can be done at client request */
-            uint64_t transactionTime = transactionPool->getTransactionReceiveTime(it);
+            uint64_t transactionTime = transactionPool->getTransactionReceiveTime(*it);
 
             logger(logging::DEBUGGING) << "Transaction age is "
                                        << transactionTime;
