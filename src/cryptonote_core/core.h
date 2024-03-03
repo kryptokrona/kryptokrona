@@ -104,6 +104,7 @@ namespace cryptonote
         virtual std::tuple<bool, BinaryArray> getPoolTransaction(const crypto::Hash &transactionHash) const override;
         virtual bool getPoolChanges(const crypto::Hash &lastBlockHash, const std::vector<crypto::Hash> &knownHashes, std::vector<BinaryArray> &addedTransactions,
                                     std::vector<crypto::Hash> &deletedTransactions) const override;
+        virtual bool getPool(uint64_t timestampBegin, std::vector<TransactionPrefixInfo> &addedTransactions) const override;
         virtual bool getPoolChangesLite(const crypto::Hash &lastBlockHash, const std::vector<crypto::Hash> &knownHashes, std::vector<TransactionPrefixInfo> &addedTransactions,
                                         std::vector<crypto::Hash> &deletedTransactions) const override;
 

@@ -108,6 +108,32 @@ namespace cryptonote
         };
     };
     //-----------------------------------------------
+
+    struct COMMAND_RPC_GET_POOL
+    {
+        struct request
+        {
+            uint64_t timestampBegin;
+
+            void serialize(ISerializer &s)
+            {
+                KV_MEMBER(timestampBegin);
+            }
+        };
+
+        struct response
+        {
+            std::vector<BinaryArray> addedTxs; // Added transactions blobs
+            std::string status;
+
+            void serialize(ISerializer &s)
+            {
+                KV_MEMBER(addedTxs)
+                KV_MEMBER(status)
+            }
+        };
+    };
+
     struct COMMAND_RPC_GET_POOL_CHANGES
     {
         struct request

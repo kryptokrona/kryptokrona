@@ -69,6 +69,7 @@ namespace cryptonote
             COMMAND_RPC_GET_GLOBAL_INDEXES_FOR_RANGE::response &res);
 
         bool on_get_random_outs(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::request &req, COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS::response &res);
+        bool onGetPool(const COMMAND_RPC_GET_POOL::request &req, COMMAND_RPC_GET_POOL::response &rsp);
         bool onGetPoolChanges(const COMMAND_RPC_GET_POOL_CHANGES::request &req, COMMAND_RPC_GET_POOL_CHANGES::response &rsp);
         bool onGetPoolChangesLite(const COMMAND_RPC_GET_POOL_CHANGES_LITE::request &req, COMMAND_RPC_GET_POOL_CHANGES_LITE::response &rsp);
         bool onGetBlocksDetailsByHeights(const COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HEIGHTS::request &req, COMMAND_RPC_GET_BLOCKS_DETAILS_BY_HEIGHTS::response &rsp);

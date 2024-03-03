@@ -1756,6 +1756,26 @@ namespace cryptonote
         return getTopBlockHash() == lastBlockHash;
     }
 
+    bool Core::getPool(uint64_t timestampBegin, std::vector<TransactionPrefixInfo> &addedTransactions) const
+    {
+        throwIfNotInitialized();
+
+        std::vector<crypto::Hash> newTransactions;
+        getTransactionPoolTimeDifference(timestampBegin, newTransactions);
+
+        addedTransactions.reserve(newTransactions.size());
+        for (const auto &hash : newTransactions)
+        {
+            TransactionPrefixInfo transactionPrefixInfo;
+            transactionPrefixInfo.txHash = hash;
+            transactionPrefixInfo.txPrefix =
+                static_cast<const TransactionPrefix &>(transactionPool->getTransaction(hash).getTransaction());
+            addedTransactions.emplace_back(std::move(transactionPrefixInfo));
+        }
+
+        return true;
+    }
+
     bool Core::getBlockTemplate(BlockTemplate &b, const AccountPublicAddress &adr, const BinaryArray &extraNonce,
                                 uint64_t &difficulty, uint32_t &height) const
     {
@@ -2733,6 +2753,36 @@ namespace cryptonote
 
         newTransactions.assign(poolTransactions.begin(), poolTransactions.end());
         deletedTransactions.assign(knownTransactions.begin(), knownTransactions.end());
+    }
+
+    /* Check for time difference instead of sending known hashes back and forth. */
+    void Core::getTransactionPoolTimeDifference(uint64_t timestampBegin, std::vector<crypto::Hash> &newTransactions) const
+    {
+        auto t = transactionPool->getTransactionHashes();
+
+        std::unordered_set<crypto::Hash> poolTransactions(t.begin(), t.end());
+
+        for (auto it = poolTransactions.begin(), end = poolTransactions.end(); it != end;)
+        {
+
+            /* This value might differ from our client timestamp when checking batches.
+               We should deduct a couple of seconds to make up for this. This can be done at client request */
+            uint64_t transactionTime = transactionPool->getTransactionReceiveTime(it);
+
+            logger(logging::DEBUGGING) << "Transaction age is "
+                                       << transactionTime;
+
+            if (transactionTime < timestampBegin)
+            {
+                it = poolTransactions.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        newTransactions.assign(poolTransactions.begin(), poolTransactions.end());
     }
 
     uint8_t Core::getBlockMajorVersionForHeight(uint32_t height) const

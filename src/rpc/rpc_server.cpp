@@ -155,6 +155,7 @@ namespace cryptonote
         {"/getwalletsyncdata", {jsonMethod<COMMAND_RPC_GET_WALLET_SYNC_DATA>(&RpcServer::on_get_wallet_sync_data), false}},
         {"/get_o_indexes", {jsonMethod<COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES>(&RpcServer::on_get_indexes), false}},
         {"/getrandom_outs", {jsonMethod<COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS>(&RpcServer::on_get_random_outs), false}},
+        {"/get_pool", {jsonMethod<COMMAND_RPC_GET_POOL>(&RpcServer::onGetPool), false}},
         {"/get_pool_changes", {jsonMethod<COMMAND_RPC_GET_POOL_CHANGES>(&RpcServer::onGetPoolChanges), false}},
         {"/get_pool_changes_lite", {jsonMethod<COMMAND_RPC_GET_POOL_CHANGES_LITE>(&RpcServer::onGetPoolChangesLite), false}},
         {"/get_block_details_by_height", {jsonMethod<COMMAND_RPC_GET_BLOCK_DETAILS_BY_HEIGHT>(&RpcServer::onGetBlockDetailsByHeight), false}},
@@ -489,6 +490,14 @@ namespace cryptonote
         std::string s = ss.str();
         logger(TRACE) << "COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS: " << ENDL << s;
         res.status = CORE_RPC_STATUS_OK;
+        return true;
+    }
+
+    bool RpcServer::onGetPool(const COMMAND_RPC_GET_POOL::request &req, COMMAND_RPC_GET_POOL::response &rsp)
+    {
+        rsp.status = CORE_RPC_STATUS_OK;
+        rsp.isTailBlockActual = m_core.getPool(req.timestampBegin, rsp.addedTxs);
+
         return true;
     }
 
