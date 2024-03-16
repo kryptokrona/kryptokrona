@@ -141,15 +141,11 @@ namespace cryptonote
             uint64_t currentTime = timeProvider->now();
             auto transactionHashes = transactionPool->getTransactionHashes();
             std::vector<crypto::Hash> deletedTransactions;
-            uint64_t boxed_transaction_age;
-            uint64_t transaction_extra_data_size;
 
             for (const auto &hash : transactionHashes)
             {
                 logger(logging::DEBUGGING) << "Checking transaction " << common::podToHex(hash);
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
-                boxed_transaction_age = 0;
-                transaction_extra_data_size = transactionPool->getTransaction(hash).getTransaction().extra.size();
                 logger(logging::DEBUGGING) << "Transaction extra size: " << transactionPool->getTransaction(hash).getTransaction().extra.size();
 
                 CachedTransaction transaction = transactionPool->getTransaction(hash);
@@ -164,35 +160,6 @@ namespace cryptonote
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
-                }
-                else if (transaction_extra_data_size >= 128)
-                {
-                    try
-                    {
-                        // check transaction age
-                        std::string extraData = common::toHex(
-                            transactionPool->getTransaction(hash).getTransaction().extra.data(),
-                            transaction_extra_data_size);
-
-                        // parse the json
-                        json j = trimExtra(extraData);
-                        uint64_t box_time = j.at("t").get<uint64_t>();
-                        boxed_transaction_age = currentTime - (box_time / 1000);
-
-                        if (
-                            (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || boxed_transaction_age >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME) &&
-                            transaction_extra_data_size > cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
-                        {
-                            logger(logging::INFO) << "Deleting hugin transaction...";
-                            recentlyDeletedTransactions.emplace(hash, currentTime);
-                            transactionPool->removeTransaction(hash);
-                            deletedTransactions.emplace_back(std::move(hash));
-                        }
-                    }
-                    catch (std::exception &e)
-                    {
-                        logger(logging::INFO) << "Unable to remove hugin transaction, not a valid hugin transaction.";
-                    }
                 }
                 else if (transactionAge >= timeout)
                 {
