@@ -24,7 +24,6 @@
 
 namespace send_transaction
 {
-
     std::tuple<Error, crypto::Hash> sendFusionTransactionBasic(
         const std::shared_ptr<Nigel> daemon,
         const std::shared_ptr<SubWallets> subWallets)
