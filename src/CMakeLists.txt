@@ -36,7 +36,6 @@ file(GLOB_RECURSE transfers transfers/*)
 file(GLOB_RECURSE kryptokronad daemon/*)
 file(GLOB_RECURSE utilities utilities/*)
 file(GLOB_RECURSE wallet wallet/*)
-file(GLOB_RECURSE wallet_api wallet_api/*)
 file(GLOB_RECURSE wallet_backend wallet_backend/*)
 file(GLOB_RECURSE zedwallet zedwallet/*)
 file(GLOB_RECURSE zedwallet++ zedwallet++/*)
@@ -50,7 +49,7 @@ else()
 endif()
 
 # Group the files together in IDEs
-source_group("" FILES $${common} ${crypto} ${cryptonote_core} ${cryptonote_protocol} ${kryptokronad} ${json_rpc_server} ${http} ${logging} ${miner} ${mnemonics} ${Nigel} ${NodeRpcProxy} ${p2p} ${rpc} ${serialization} ${syst} ${transfers} ${wallet} ${wallet_api} ${wallet_backend} ${zedwallet} ${zedwallet++} ${crypto_test} ${errors} ${utilities} ${sub_wallets})
+source_group("" FILES $${common} ${crypto} ${cryptonote_core} ${cryptonote_protocol} ${kryptokronad} ${json_rpc_server} ${http} ${logging} ${miner} ${mnemonics} ${Nigel} ${NodeRpcProxy} ${p2p} ${rpc} ${serialization} ${syst} ${transfers} ${wallet} ${wallet_backend} ${zedwallet} ${zedwallet++} ${crypto_test} ${errors} ${utilities} ${sub_wallets})
 
 # Define a group of files as a library to link against
 add_library(blockchain_explorer STATIC ${blockchain_explorer})
@@ -100,7 +99,6 @@ add_executable(crypto_test ${crypto_test} ${CT_SOURCES_OS})
 add_executable(miner ${miner} ${MINER_SOURCES_OS})
 add_executable(service ${service} ${PG_SOURCES_OS})
 add_executable(kryptokronad ${kryptokronad} ${DAEMON_SOURCES_OS})
-add_executable(wallet_api ${wallet_api} ${WALLET_API_SOURCES_OS})
 add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
 add_executable(zedwallet++ ${zedwallet++} ${ZED_WALLET_SOURCES_OS})
 
@@ -148,7 +146,6 @@ target_link_libraries(rpc p2p utilities)
 target_link_libraries(service json_rpc_server wallet mnemonics errors)
 target_link_libraries(sub_wallets utilities cryptonote_core)
 target_link_libraries(wallet node_rpc_proxy transfers cryptonote_core common ${Boost_LIBRARIES})
-target_link_libraries(wallet_api wallet_backend)
 target_link_libraries(wallet_backend mnemonics cryptonote_core nigel cryptopp-static __filesystem utilities sub_wallets)
 target_link_libraries(wallet_service mnemonics)
 target_link_libraries(zedwallet mnemonics wallet errors utilities)
@@ -164,7 +161,6 @@ add_dependencies(p2p version)
 add_dependencies(rpc version)
 add_dependencies(service version)
 add_dependencies(kryptokronad version)
-add_dependencies(wallet_api version)
 add_dependencies(wallet_service version)
 add_dependencies(zedwallet version)
 
@@ -175,7 +171,6 @@ set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "xkrwallet-beta")
 set_property(TARGET service PROPERTY OUTPUT_NAME "kryptokrona-service")
 set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
 set_property(TARGET crypto_test PROPERTY OUTPUT_NAME "crypto_test")
-set_property(TARGET wallet_api PROPERTY OUTPUT_NAME "wallet-api")
 
 # Additional make targets, can be used to build a subset of the targets
 # e.g. make pool will build only kryptokronad and service
