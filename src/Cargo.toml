@@ -1,0 +1,9 @@
+# This is only intended to be here so we can run build.rs file
+# since it's not currently possible to have at workspace level (root dir)
+
+[package]
+name = "src"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
