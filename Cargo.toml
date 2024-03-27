@@ -1,6 +1,6 @@
 [workspace]
 
-members = [ "src",
+members = [
     "src/wallet_api",
 ]
 
