@@ -1,22 +1,20 @@
 [package]
-name = "wallet_api"
-version = "0.2.0"
+name = "crypto"
+version = "0.1.0"
 edition = "2021"
 authors = [
     "Marcus Cvjeticanin <mjovanc@icloud.com>",
 ]
 license = "GPL-3.0"
-description = "Wallet API implementation in Rust."
+description = "Crypto library in Rust."
 documentation = "https://github.com/kryptokrona/kryptokrona"
 homepage = "https://github.com/kryptokrona/kryptokrona"
 repository = "https://github.com/kryptokrona/kryptokrona.git"
 include = ["LICENSE-GPL"]
 
-#[build]
-#rustc-link-search = ["../../build/cpp/libcrypto.a"]
-#rustc-link-lib = ["crypto"]
-
 [dependencies]
-tokio = { version = "1", features = ["full"] }
-sled = "0.34.7"
-clap = "4.5.4"
+cc = "1.0.90"
+libc = "0.2.153"
+
+[build-dependencies]
+cc = "1.0"
