@@ -10,9 +10,9 @@
 #include <cstdio>
 #include <cstring>
 
-#include <common/file_system_shim.h>
+#include <file_system_shim.h>
 
-#include <config/cryptonote_config.h>
+// #include <cryptonote_config.h>
 
 #ifdef WIN32
 #ifndef NOMINMAX
@@ -304,7 +304,7 @@ namespace tools
         std::string config_folder;
 #ifdef WIN32
         // Windows
-        config_folder = get_special_folder_path(CSIDL_APPDATA, true) + "/" + cryptonote::CRYPTONOTE_NAME;
+        config_folder = get_special_folder_path(CSIDL_APPDATA, true) + "/" + "cryptonote::CRYPTONOTE_NAME";
 #else
         std::string pathRet;
         char *pszHome = getenv("HOME");
@@ -315,10 +315,10 @@ namespace tools
 #ifdef MAC_OSX
         // Mac
         pathRet /= "Library/Application Support";
-        config_folder = (pathRet + "/" + cryptonote::CRYPTONOTE_NAME);
+        config_folder = (pathRet + "/" + "cryptonote::CRYPTONOTE_NAME");
 #else
         // Unix
-        config_folder = (pathRet + "/." + cryptonote::CRYPTONOTE_NAME);
+        config_folder = (pathRet + "/." + "cryptonote::CRYPTONOTE_NAME");
 #endif
 #endif
 

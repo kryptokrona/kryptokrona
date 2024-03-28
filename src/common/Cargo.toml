@@ -1,0 +1,19 @@
+[package]
+name = "common"
+version = "0.1.0"
+edition = "2021"
+authors = [
+    "Marcus Cvjeticanin <mjovanc@icloud.com>",
+]
+license = "GPL-3.0"
+description = "Common library in Rust."
+documentation = "https://github.com/kryptokrona/kryptokrona"
+homepage = "https://github.com/kryptokrona/kryptokrona"
+repository = "https://github.com/kryptokrona/kryptokrona.git"
+include = ["LICENSE-GPL"]
+
+[dependencies]
+cc = "1.0.90"
+
+[build-dependencies]
+cc = "1.0.90"
