@@ -3,4 +3,10 @@ name = "wallet_api"
 version = "0.2.0"
 edition = "2021"
 
+[build]
+rustc-link-search = ["../../build/cpp/libcrypto.a"]
+rustc-link-lib = ["crypto"]
+
 [dependencies]
+tokio = { version = "1", features = ["full"] }
+sled = "0.34.7"

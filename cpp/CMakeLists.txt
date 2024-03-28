@@ -49,7 +49,7 @@ else()
 endif()
 
 # Group the files together in IDEs
-source_group("" FILES $${common} ${crypto} ${cryptonote_core} ${cryptonote_protocol} ${kryptokronad} ${json_rpc_server} ${http} ${logging} ${miner} ${mnemonics} ${Nigel} ${NodeRpcProxy} ${p2p} ${rpc} ${serialization} ${syst} ${transfers} ${wallet} ${wallet_backend} ${zedwallet} ${zedwallet++} ${crypto_test} ${errors} ${utilities} ${sub_wallets})
+# source_group("" FILES $${common} ${crypto} ${cryptonote_core} ${cryptonote_protocol} ${kryptokronad} ${json_rpc_server} ${http} ${logging} ${miner} ${mnemonics} ${Nigel} ${NodeRpcProxy} ${p2p} ${rpc} ${serialization} ${syst} ${transfers} ${wallet} ${wallet_backend} ${zedwallet} ${zedwallet++} ${crypto_test} ${errors} ${utilities} ${sub_wallets})
 
 # Define a group of files as a library to link against
 add_library(blockchain_explorer STATIC ${blockchain_explorer})
@@ -113,15 +113,14 @@ endif()
 add_library(__filesystem INTERFACE)
 
 # Windows works out of the box
+message(STATUS "CMAKE_OSX_ARCHITECTURES: ${CMAKE_OSX_ARCHITECTURES}")
 if(APPLE)
     if(CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
         # Apply rules specific to x64 architecture on macOS
         target_link_libraries(__filesystem INTERFACE /usr/local/opt/llvm/lib/c++/libc++abi.a)
-    elseif(CMAKE_OSX_ARCHITECTURES STREQUAL "arm64")
-        # Apply rules specific to arm64 architecture on macOS (M1)
-        target_link_libraries(__filesystem INTERFACE /opt/homebrew/opt/llvm/lib/c++/libc++abi.a)
     else()
-        message(FATAL_ERROR "Unsupported macOS architecture")
+        # message(FATAL_ERROR "Unsupported macOS architecture")
+        target_link_libraries(__filesystem INTERFACE /opt/homebrew/opt/llvm/lib/c++/libc++abi.a)
     endif()
 elseif(UNIX)
     target_link_libraries(__filesystem INTERFACE stdc++fs)
