@@ -1,5 +1,5 @@
 [workspace]
-members = [
+members = [ "src/common", "src/crypto",
     "src/wallet_api",
 ]
 
