@@ -12,11 +12,10 @@ homepage = "https://github.com/kryptokrona/kryptokrona"
 repository = "https://github.com/kryptokrona/kryptokrona.git"
 include = ["LICENSE-GPL"]
 
-#[build]
-#rustc-link-search = ["../../build/cpp/libcrypto.a"]
-#rustc-link-lib = ["crypto"]
-
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 sled = "0.34.7"
 clap = "4.5.4"
+anyhow = "1.0"
+futures = "0.3"
+tarpc = { version = "0.34.0", features = ["tokio1"] }
