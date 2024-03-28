@@ -1,8 +1,4 @@
-<a href="https://github.com/kryptokrona/kryptokrona">
-  <img align="right" width="200" height="120" alt="Kryptokrona" src="resources/kryptokrona.svg">
-</a>
-
-# kryptokrona
+# Kryptokrona
 [![build](https://img.shields.io/github/actions/workflow/status/kryptokrona/kryptokrona/master-ci.yml?branch=master)](https://github.com/kryptokrona/kryptokrona/actions/workflows/master-ci.yml)
 [![release](https://img.shields.io/github/v/release/kryptokrona/kryptokrona)](https://img.shields.io/github/v/release/kryptokrona/kryptokrona)
 [![license](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://opensource.org/licenses/GPLv3)
