@@ -16,6 +16,7 @@ struct Config {
     rpc_password: Option<String>,
 }
 
+use crate::tracing::init_tracing;
 use clap::Parser;
 use futures::{future, prelude::*};
 use rand::{
@@ -33,7 +34,6 @@ use tarpc::{
     tokio_serde::formats::Json,
 };
 use tokio::time;
-use crate::tracing::init_tracing;
 
 #[derive(Parser)]
 struct Flags {
