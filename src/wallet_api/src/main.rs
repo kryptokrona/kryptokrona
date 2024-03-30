@@ -1,29 +1,17 @@
-mod tracing;
-
-use sled::Error;
-
-use clap::Arg;
+mod trace;
 
 const PBKDF2_ITERATIONS: i64 = 10000;
 // const ADDRESS_BODY_LENGTH: i16 =
 // const ADDRESS_REGEX: &str =
 const HASH_REGEX: &str = "[a-fA-F0-9]{64}";
 
-struct Config {
-    port: u16,
-    rpc_bind_ip: String,
-    enable_cors: Option<String>,
-    rpc_password: Option<String>,
-}
-
-use crate::tracing::init_tracing;
+use crate::trace::init_tracing;
 use clap::Parser;
 use futures::{future, prelude::*};
 use rand::{
     distributions::{Distribution, Uniform},
     thread_rng,
 };
-use service::{init_tracing, World};
 use std::{
     net::{IpAddr, Ipv6Addr, SocketAddr},
     time::Duration,
@@ -37,9 +25,11 @@ use tokio::time;
 
 #[derive(Parser)]
 struct Flags {
-    /// Sets the port number to listen on.
     #[clap(long)]
     port: u16,
+    rpc_bind_ip: String,
+    enable_cors: Option<String>,
+    rpc_password: Option<String>,
 }
 
 // This is the type that implements the generated World trait. It is the business logic
@@ -49,7 +39,6 @@ struct HelloServer(SocketAddr);
 
 #[tarpc::service]
 pub trait World {
-    /// Returns a greeting for name.
     async fn hello(name: String) -> String;
 }
 
