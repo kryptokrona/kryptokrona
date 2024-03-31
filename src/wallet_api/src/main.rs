@@ -39,14 +39,19 @@ struct WalletRPCServer(SocketAddr);
 
 #[tarpc::service]
 pub trait WalletRPC {
-    async fn hello(name: String) -> String;
+    async fn wallet_open(name: String) -> String;
+    async fn wallet_import_key(name: String) -> String;
 }
 
 impl WalletRPC for WalletRPCServer {
     // GET
 
     // POST
-    async fn hello(self, _: context::Context, name: String) -> String {
+    async fn wallet_open(self, _: context::Context, name: String) -> String {
+        format!("Hello, {name}! You are connected from {}", self.0)
+    }
+
+    async fn wallet_import_key(self, _: context::Context, name: String) -> String {
         format!("Hello, {name}! You are connected from {}", self.0)
     }
 
