@@ -34,6 +34,7 @@ async fn spawn(fut: impl Future<Output = ()> + Send + 'static) {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // TODO: build CLI with Clap here to take in arguments instead
     let flags = Flags::parse();
     init_tracing("Kryptokrona Wallet RPC Server")?;
 
