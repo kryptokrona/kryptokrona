@@ -8,6 +8,7 @@ description = "Wallet API implementation in Rust."
 documentation = "https://github.com/kryptokrona/kryptokrona"
 homepage = "https://github.com/kryptokrona/kryptokrona"
 repository = "https://github.com/kryptokrona/kryptokrona.git"
+rust-version = "1.77.1"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
