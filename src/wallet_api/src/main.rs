@@ -1,3 +1,4 @@
+mod rpc;
 mod trace;
 
 const PBKDF2_ITERATIONS: i64 = 10000;
@@ -5,23 +6,15 @@ const PBKDF2_ITERATIONS: i64 = 10000;
 // const ADDRESS_REGEX: &str =
 const HASH_REGEX: &str = "[a-fA-F0-9]{64}";
 
-use crate::trace::init_tracing;
 use clap::Parser;
 use futures::{future, prelude::*};
-use rand::{
-    distributions::{Distribution, Uniform},
-    thread_rng,
-};
-use std::{
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
-    time::Duration,
-};
+use rpc::WalletRPC;
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use tarpc::{
-    context,
     server::{self, incoming::Incoming, Channel},
     tokio_serde::formats::Json,
 };
-use tokio::time;
+use trace::init_tracing;
 
 #[derive(Parser)]
 struct Flags {
@@ -32,35 +25,8 @@ struct Flags {
     rpc_password: Option<String>,
 }
 
-// This is the type that implements the generated World trait. It is the business logic
-// and is used to start the server.
 #[derive(Clone)]
-struct WalletRPCServer(SocketAddr);
-
-#[tarpc::service]
-pub trait WalletRPC {
-    async fn wallet_open(name: String) -> String;
-    async fn wallet_import_key(name: String) -> String;
-}
-
-impl WalletRPC for WalletRPCServer {
-    // GET
-
-    // POST
-    async fn wallet_open(self, _: context::Context, name: String) -> String {
-        format!("Hello, {name}! You are connected from {}", self.0)
-    }
-
-    async fn wallet_import_key(self, _: context::Context, name: String) -> String {
-        format!("Hello, {name}! You are connected from {}", self.0)
-    }
-
-    // PUT
-
-    // DELETE
-
-    // OPTIONS
-}
+pub struct WalletRPCServer(SocketAddr);
 
 async fn spawn(fut: impl Future<Output = ()> + Send + 'static) {
     tokio::spawn(fut);
@@ -88,7 +54,7 @@ async fn main() -> anyhow::Result<()> {
         // the generated trait.
         .map(|channel| {
             let server = WalletRPCServer(channel.transport().peer_addr().unwrap());
-            channel.execute(server.serve()).for_each(spawn)
+            channel.execute(WalletRPC::serve(server)).for_each(spawn)
         })
         // Max 10 channels.
         .buffer_unordered(10)
