@@ -20,11 +20,10 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
   - [Stop all Docker containers](#stop-all-docker-containers)
   - [Start all Docker containers again](#start-all-docker-containers-again)
   - [Removing all data](#removing-all-data)
-- [Deploy node](#deploy-node)
 - [Checklist before release](#checklist-before-release)
 - [Help and Support](#help-and-support)
 - [Thanks](#thanks)
-- [Copypasta for license when editing files](#copypasta-for-license-when-editing-files)
+- [Copypasta for license when adding new files](#copypasta-for-license-when-adding-new-files)
 - [Contributors](#contributors)
 - [License](#license)
 
@@ -35,7 +34,7 @@ Kryptokrona is a decentralized blockchain from the Nordic based on CryptoNote, w
 - GitHub: https://github.com/kryptokrona
 - Hugin: Kryptokrona group on Hugin Messenger `33909fb89783fb15b5c2df50ff7107c112c3b232681f77814c024c909c07e932`r
 - It is HIGHLY recommended to join our board on Hugin Messenger if you want to contribute to stay up to date on what is happening on the project.
-- Twitter: https://twitter.com/kryptokrona
+- 𝕏: https://x.com/kryptokrona
 
 ## Getting Help
 
@@ -90,8 +89,6 @@ the project tagged by the project name, owner, repository and short form of comm
 The purpose of publishing prepared Docker images is to make it faster and easier to deploy a Kryptokrona node/pool.
 
 ## Installation
-
-
 
 ## Setup testnet
 
@@ -181,13 +178,9 @@ Now we will remove networks, volumes, images and containers existing on our syst
 
 Check also out the article made by Marcus Cvjeticanin here: https://medium.com/coinsbench/setup-a-testnet-with-kryptokrona-blockchain-41b5f9ffd86
 
-## Deploy node
-
-To deploy your own node, please follow the instructions on our Wiki: [https://docs.kryptokrona.org/guides/kryptokrona/deploy-your-own-full-node](https://docs.kryptokrona.org/guides/kryptokrona/deploy-your-own-full-node)
-
 ## Checklist before release
 
-1. Edit the file in `config/version.h.in` and bump up the version.
+1. Edit versions in `Cargo.toml` files.
 2. Create PR and wait for review + merge.
 3. Create a tag on master `git tag v*.*.*`
 4. Push the changes `git push origin <tag_name>` to trigger a new build and to publish to various package managers.
@@ -200,17 +193,38 @@ For questions and support please use the channel #support in [Kryptokrona](https
 
 Cryptonote Developers, Bytecoin Developers, Monero Developers, Forknote Project, TurtleCoin Community, Kryptokrona Developers
 
-## Copypasta for license when editing files
+## Copypasta for license when adding new files
 
 Hi Kryptokrona contributor, thanks for forking and sending back Pull Requests. Extensive docs about contributing are in the works or elsewhere. For now this is the bit we need to get into all the files we touch. Please add it to the top of the files, see [src/cryptonote_config.h](https://github.com/turtlecoin/turtlecoin/commit/28cfef2575f2d767f6e512f2a4017adbf44e610e) for an example.
 
 ```
-// Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
-// Copyright (c) 2014-2018, The Monero Project
-// Copyright (c) 2018-2019, The TurtleCoin Developers
-// Copyright (c) 2019, The Kryptokrona Developers
+// Copyright (c) 2019-2024, The Kryptokrona Project
 //
-// Please see the included LICENSE file for more information.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are
+// permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this list of
+//    conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice, this list
+//    of conditions and the following disclaimer in the documentation and/or other
+//    materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its contributors may be
+//    used to endorse or promote products derived from this software without specific
+//    prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+// THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+// THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 ## Contributors
@@ -227,4 +241,4 @@ being awesome contributors to this project. **We'd like to take a moment to reco
 
 ## License
 
-The GPL-3.0 License.
+The GPL-3.0 and BSD-3 License.
