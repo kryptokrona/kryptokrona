@@ -1,8 +1,0 @@
-vault_vps_user: ansible # write here without quotes
-vault_vps_password: <password> # write here without quotes
-vault_postgres_db_user: <db_user> # write here without quotes
-vault_postgres_db_password: <password> # write here without quotes
-vault_postgres_db_name: <db_name> # write here without quotes
-vault_alert_my_address: <wallet address> # leave this with empty string "" if not used
-vault_alert_private_key: <your private key> # leave this with empty string "" if not used
-vault_alert_group: <hugin group id> # leave this with empty string "" if not used

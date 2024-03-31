@@ -1,9 +1,0 @@
-# hosts.inventory
-# add hostname or IP under vps
-
-[vps]
-n1.vxo.nu letsencrypt_email=mjovanc@protonmail.com domain_name=n1.vxo.nu exporter_version=1.3.1
-n2.vxo.nu letsencrypt_email=mjovanc@protonmail.com domain_name=n2.vxo.nu exporter_version=1.3.1
-
-[server]
-localhost ansible_connection=local
