@@ -26,25 +26,25 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mod transaction {
-    include!(concat!(env!("OUT_DIR"), "/transaction.rs"));
-}
+// mod transaction {
+//     include!(concat!(env!("OUT_DIR"), "/transaction.rs"));
+// }
 
-mod wallet {
-    include!(concat!(env!("OUT_DIR"), "/wallet.rs"));
-}
+// mod wallet {
+//     include!(concat!(env!("OUT_DIR"), "/wallet.rs"));
+// }
 
-mod node {
-    include!(concat!(env!("OUT_DIR"), "/node.rs"));
-}
+// mod node {
+//     include!(concat!(env!("OUT_DIR"), "/node.rs"));
+// }
 
-mod address {
-    include!(concat!(env!("OUT_DIR"), "/address.rs"));
-}
+// mod address {
+//     include!(concat!(env!("OUT_DIR"), "/address.rs"));
+// }
 
-mod misc {
-    include!(concat!(env!("OUT_DIR"), "/misc.rs"));
-}
+// mod misc {
+//     include!(concat!(env!("OUT_DIR"), "/misc.rs"));
+// }
 
 mod rpc;
 

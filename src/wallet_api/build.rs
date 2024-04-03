@@ -1,5 +1,8 @@
 fn main() {
+    // Make sure to have the proto compiler installed on your system
+    // we will add it here to install depending on OS later
     tonic_build::configure()
+        .out_dir("src/api/")
         .compile(
             &[
                 "proto/node.proto",
