@@ -8,7 +8,7 @@ on:
       - rust # change this to master later
   pull_request:
     branches:
-      - master
+      - rust # change this to master later
     paths-ignore:
       - "**/README.md"
       - "**/LICENSE"
@@ -19,7 +19,7 @@ on:
 
 jobs:
   build:
-    name: build ${{ matrix.config.name }} - ${{ matrix.config.arch }}
+    name: build ${{ matrix.config.name }} (${{ matrix.config.arch }})
     runs-on: ${{ matrix.config.os }}
 
     strategy:
