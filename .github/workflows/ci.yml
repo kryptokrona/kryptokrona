@@ -53,7 +53,7 @@ jobs:
         if: matrix.config.name == 'macos'
         run: |
           rustup target add ${{ matrix.config.args }}
-          brew install -y protobuf
+          brew install protobuf
 
       - name: Cache Cargo Dependencies
         uses: actions/cache@v2
