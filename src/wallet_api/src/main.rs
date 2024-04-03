@@ -26,27 +26,10 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// mod transaction {
-//     include!(concat!(env!("OUT_DIR"), "/transaction.rs"));
-// }
-
-// mod wallet {
-//     include!(concat!(env!("OUT_DIR"), "/wallet.rs"));
-// }
-
-// mod node {
-//     include!(concat!(env!("OUT_DIR"), "/node.rs"));
-// }
-
-// mod address {
-//     include!(concat!(env!("OUT_DIR"), "/address.rs"));
-// }
-
-// mod misc {
-//     include!(concat!(env!("OUT_DIR"), "/misc.rs"));
-// }
-
+mod api;
 mod rpc;
+
+use api::address::address_server;
 
 // use transaction::TransactionRPCServer;
 // use wallet::WalletRPCServer;
@@ -62,62 +45,62 @@ const HASH_REGEX: &str = "[a-fA-F0-9]{64}";
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create server instances for each service
-    // let transaction_server = TransactionRPCServer::default();
-    // let wallet_server = WalletRPCServer::default();
-    // let node_server = NodeRPCServer::default();
-    // let address_server = AddressRPCServer::default();
-    // let misc_server = MiscRPCServer::default();
+    let transaction_server = TransactionServer::default();
+    let wallet_server = WalletServer::default();
+    let node_server = NodeServer::default();
+    let address_server = address_server::default();
+    let misc_server = MiscServer::default();
 
-    // // Serve the gRPC servers
-    // let transaction_server_addr = "[::1]:50053".parse().unwrap();
-    // tokio::spawn(async move {
-    //     println!(
-    //         "Transaction server listening on {}",
-    //         transaction_server_addr
-    //     );
-    //     tonic::transport::Server::builder()
-    //         .add_service(transaction_server)
-    //         .serve(transaction_server_addr)
-    //         .await
-    //         .unwrap();
-    // });
+    // Serve the gRPC servers
+    let transaction_server_addr = "[::1]:50053".parse().unwrap();
+    tokio::spawn(async move {
+        println!(
+            "Transaction server listening on {}",
+            transaction_server_addr
+        );
+        tonic::transport::Server::builder()
+            .add_service(transaction_server)
+            .serve(transaction_server_addr)
+            .await
+            .unwrap();
+    });
 
-    // let wallet_server_addr = "[::1]:50051".parse().unwrap();
-    // println!("Wallet server listening on {}", wallet_server_addr);
-    // tokio::spawn(async move {
-    //     tonic::transport::Server::builder()
-    //         .add_service(wallet_server)
-    //         .serve(wallet_server_addr)
-    //         .await
-    //         .unwrap();
-    // });
+    let wallet_server_addr = "[::1]:50051".parse().unwrap();
+    println!("Wallet server listening on {}", wallet_server_addr);
+    tokio::spawn(async move {
+        tonic::transport::Server::builder()
+            .add_service(wallet_server)
+            .serve(wallet_server_addr)
+            .await
+            .unwrap();
+    });
 
-    // let node_server_addr = "[::1]:50052".parse().unwrap();
-    // println!("Node server listening on {}", node_server_addr);
-    // tokio::spawn(async move {
-    //     tonic::transport::Server::builder()
-    //         .add_service(node_server)
-    //         .serve(node_server_addr)
-    //         .await
-    //         .unwrap();
-    // });
+    let node_server_addr = "[::1]:50052".parse().unwrap();
+    println!("Node server listening on {}", node_server_addr);
+    tokio::spawn(async move {
+        tonic::transport::Server::builder()
+            .add_service(node_server)
+            .serve(node_server_addr)
+            .await
+            .unwrap();
+    });
 
-    // let address_server_addr = "[::1]:50054".parse().unwrap();
-    // println!("Address server listening on {}", address_server_addr);
-    // tokio::spawn(async move {
-    //     tonic::transport::Server::builder()
-    //         .add_service(address_server)
-    //         .serve(address_server_addr)
-    //         .await
-    //         .unwrap();
-    // });
+    let address_server_addr = "[::1]:50054".parse().unwrap();
+    println!("Address server listening on {}", address_server_addr);
+    tokio::spawn(async move {
+        tonic::transport::Server::builder()
+            .add_service(address_server)
+            .serve(address_server_addr)
+            .await
+            .unwrap();
+    });
 
-    // let misc_server_addr = "[::1]:50055".parse().unwrap();
-    // println!("Misc server listening on {}", misc_server_addr);
-    // tonic::transport::Server::builder()
-    //     .add_service(misc_server)
-    //     .serve(misc_server_addr)
-    //     .await?;
+    let misc_server_addr = "[::1]:50055".parse().unwrap();
+    println!("Misc server listening on {}", misc_server_addr);
+    tonic::transport::Server::builder()
+        .add_service(misc_server)
+        .serve(misc_server_addr)
+        .await?;
 
     Ok(())
 }
