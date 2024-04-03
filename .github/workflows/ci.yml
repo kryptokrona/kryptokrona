@@ -29,6 +29,10 @@ jobs:
           - x64
           - arm64
           - x86
+        name:
+          - ubuntu
+          - macos
+          - windows
 
     steps:
       - uses: actions/checkout@v3
