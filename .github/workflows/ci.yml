@@ -19,20 +19,26 @@ on:
 
 jobs:
   build:
-    name: build ${{ matrix.os }} - ${{ matrix.arch }}
-    runs-on: ${{ matrix.os }}
+    name: build ${{ matrix.config.name }} - ${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.os }}
 
     strategy:
+      fail-fast: true
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        arch:
-          - x64
-          - arm64
-          - x86
-        name:
-          - ubuntu
-          - macos
-          - windows
+        config:
+          - {
+              name: "macos",
+              os: macos-latest,
+              args: "--target aarch64-apple-darwin",
+              arch: arm64,
+            }
+          - {
+              name: "macos",
+              os: macos-latest,
+              args: "--target x86_64-apple-darwin",
+              arch: x86_64,
+            }
+          # we will add ubuntu and windows here once we get macos working
 
     steps:
       - uses: actions/checkout@v3
