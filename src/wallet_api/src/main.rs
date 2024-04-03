@@ -29,8 +29,6 @@
 mod api;
 mod rpc;
 
-use api::address::address_server::AddressServer;
-
 const PBKDF2_ITERATIONS: i64 = 10000;
 // const ADDRESS_BODY_LENGTH: i16 =
 // const ADDRESS_REGEX: &str =

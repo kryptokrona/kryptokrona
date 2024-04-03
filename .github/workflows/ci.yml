@@ -49,15 +49,15 @@ jobs:
           profile: minimal
           toolchain: stable
 
+      - name: Add Target
+        run: rustup target add ${{ matrix.config.args }}
+
       - name: Cache Cargo Dependencies
         uses: actions/cache@v2
         with:
           path: |
             ~/.cargo
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Add Target
-        run: rustup target add ${{ matrix.config.args }}
 
       - name: Run Clippy
         run: cargo clippy --all-features --target ${{ matrix.config.args }}
