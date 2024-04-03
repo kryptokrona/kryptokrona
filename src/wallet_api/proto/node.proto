@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package node;
+
+// Request message for getting node information.
+message GetNodeInfoRequest {}
+
+// Response message containing node information.
+message GetNodeInfoResponse {
+    string node_info = 1;
+}
+
+// Node service definition.
+service Node {
+    rpc GetNodeInfo(GetNodeInfoRequest) returns (GetNodeInfoResponse) {}
+}

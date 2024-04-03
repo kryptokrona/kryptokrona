@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package wallet;
+
+// Wallet service definition.
+service Wallet {
+  // Example RPC method
+  rpc GetNodeInfo (NodeInfoRequest) returns (NodeInfoResponse) {}
+  // Add other RPC methods here
+}
+
+// Request message containing the node information.
+message NodeInfoRequest {
+  // Add fields as needed
+}
+
+// Response message containing the node information.
+message NodeInfoResponse {
+  // Add fields as needed
+}

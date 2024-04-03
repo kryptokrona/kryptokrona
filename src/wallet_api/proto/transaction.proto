@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package transaction;
+
+// Request message for sending a basic transaction.
+message SendBasicTransactionRequest {
+    // Add fields as needed for transaction details.
+}
+
+// Response message containing transaction status.
+message SendBasicTransactionResponse {
+    string status = 1;
+}
+
+// Transaction service definition.
+service Transaction {
+    rpc SendBasicTransaction(SendBasicTransactionRequest) returns (SendBasicTransactionResponse) {}
+    // Add other transaction-related RPC methods here...
+}

@@ -26,65 +26,98 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+mod transaction {
+    include!(concat!(env!("OUT_DIR"), "/transaction.rs"));
+}
+
+mod wallet {
+    include!(concat!(env!("OUT_DIR"), "/wallet.rs"));
+}
+
+mod node {
+    include!(concat!(env!("OUT_DIR"), "/node.rs"));
+}
+
+mod address {
+    include!(concat!(env!("OUT_DIR"), "/address.rs"));
+}
+
+mod misc {
+    include!(concat!(env!("OUT_DIR"), "/misc.rs"));
+}
+
 mod rpc;
-mod trace;
+
+// use transaction::TransactionRPCServer;
+// use wallet::WalletRPCServer;
+// use node::NodeRPCServer;
+// use address::AddressRPCServer;
+// use misc::MiscRPCServer;
 
 const PBKDF2_ITERATIONS: i64 = 10000;
 // const ADDRESS_BODY_LENGTH: i16 =
 // const ADDRESS_REGEX: &str =
 const HASH_REGEX: &str = "[a-fA-F0-9]{64}";
 
-use clap::Parser;
-use futures::{future, prelude::*};
-use rpc::WalletRPC;
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
-use tarpc::{
-    server::{self, incoming::Incoming, Channel},
-    tokio_serde::formats::Json,
-};
-use trace::init_tracing;
-
-#[derive(Parser)]
-struct Flags {
-    #[clap(long)]
-    port: u16,
-    rpc_bind_ip: String,
-    enable_cors: Option<String>,
-    rpc_password: Option<String>,
-}
-
-#[derive(Clone)]
-pub struct WalletRPCServer(SocketAddr);
-
-async fn spawn(fut: impl Future<Output = ()> + Send + 'static) {
-    tokio::spawn(fut);
-}
-
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    // TODO: build CLI with Clap here to take in arguments instead
-    let flags = Flags::parse();
-    // init_tracing("Kryptokrona Wallet RPC Server")?;
-    println!("Kryptokrona Wallet RPC Server");
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Create server instances for each service
+    let transaction_server = TransactionRPCServer::default();
+    let wallet_server = WalletRPCServer::default();
+    let node_server = NodeRPCServer::default();
+    let address_server = AddressRPCServer::default();
+    let misc_server = MiscRPCServer::default();
 
-    let server_addr = (IpAddr::V4(Ipv4Addr::LOCALHOST), flags.port);
+    // Serve the gRPC servers
+    let transaction_server_addr = "[::1]:50053".parse().unwrap();
+    tokio::spawn(async move {
+        println!(
+            "Transaction server listening on {}",
+            transaction_server_addr
+        );
+        tonic::transport::Server::builder()
+            .add_service(transaction_server)
+            .serve(transaction_server_addr)
+            .await
+            .unwrap();
+    });
 
-    let mut listener = tarpc::serde_transport::tcp::listen(&server_addr, Json::default).await?;
-    // tracing::info!("Listening on port {}", listener.local_addr().port());
-    println!("Listening on {}", listener.local_addr());
+    let wallet_server_addr = "[::1]:50051".parse().unwrap();
+    println!("Wallet server listening on {}", wallet_server_addr);
+    tokio::spawn(async move {
+        tonic::transport::Server::builder()
+            .add_service(wallet_server)
+            .serve(wallet_server_addr)
+            .await
+            .unwrap();
+    });
 
-    listener.config_mut().max_frame_length(usize::MAX);
-    listener
-        .filter_map(|r| future::ready(r.ok()))
-        .map(server::BaseChannel::with_defaults)
-        .max_channels_per_key(1, |t| t.transport().peer_addr().unwrap().ip())
-        .map(|channel| {
-            let server = WalletRPCServer(channel.transport().peer_addr().unwrap());
-            channel.execute(WalletRPC::serve(server)).for_each(spawn)
-        })
-        .buffer_unordered(10)
-        .for_each(|_| async {})
-        .await;
+    let node_server_addr = "[::1]:50052".parse().unwrap();
+    println!("Node server listening on {}", node_server_addr);
+    tokio::spawn(async move {
+        tonic::transport::Server::builder()
+            .add_service(node_server)
+            .serve(node_server_addr)
+            .await
+            .unwrap();
+    });
+
+    let address_server_addr = "[::1]:50054".parse().unwrap();
+    println!("Address server listening on {}", address_server_addr);
+    tokio::spawn(async move {
+        tonic::transport::Server::builder()
+            .add_service(address_server)
+            .serve(address_server_addr)
+            .await
+            .unwrap();
+    });
+
+    let misc_server_addr = "[::1]:50055".parse().unwrap();
+    println!("Misc server listening on {}", misc_server_addr);
+    tonic::transport::Server::builder()
+        .add_service(misc_server)
+        .serve(misc_server_addr)
+        .await?;
 
     Ok(())
 }
