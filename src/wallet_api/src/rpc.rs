@@ -90,166 +90,166 @@ pub struct WalletRPCServer;
 
 pub struct WalletRpC {}
 
-#[tonic::async_trait]
-impl WalletRPC for WalletRPCServer {
-    // GET
-    async fn get_node_info(&self, request: Request<String>) -> String {
-        format!("Get Node Info")
-    }
+// #[tonic::async_trait]
+// impl WalletRPC for WalletRPCServer {
+//     // GET
+//     async fn get_node_info(&self, request: Request<String>) -> String {
+//         format!("Get Node Info")
+//     }
 
-    async fn get_private_view_key(&self, request: Request<String>) -> String {
-        "Get Private View Key".to_string()
-    }
+//     async fn get_private_view_key(&self, request: Request<String>) -> String {
+//         "Get Private View Key".to_string()
+//     }
 
-    async fn get_spend_keys(&self, request: Request<String>) -> String {
-        format!("Get Spend Keys for Address")
-    }
+//     async fn get_spend_keys(&self, request: Request<String>) -> String {
+//         format!("Get Spend Keys for Address")
+//     }
 
-    async fn get_mnemonic_seed(&self, request: Request<String>) -> String {
-        format!("Get Mnemonic Seed for Address")
-    }
+//     async fn get_mnemonic_seed(&self, request: Request<String>) -> String {
+//         format!("Get Mnemonic Seed for Address")
+//     }
 
-    async fn get_status(&self, request: Request<String>) -> String {
-        format!("Get Status")
-    }
+//     async fn get_status(&self, request: Request<String>) -> String {
+//         format!("Get Status")
+//     }
 
-    async fn get_addresses(&self, request: Request<String>) -> String {
-        format!("Get Addresses")
-    }
+//     async fn get_addresses(&self, request: Request<String>) -> String {
+//         format!("Get Addresses")
+//     }
 
-    async fn get_primary_address(&self, request: Request<String>) -> String {
-        "Get Primary Address".to_string()
-    }
+//     async fn get_primary_address(&self, request: Request<String>) -> String {
+//         "Get Primary Address".to_string()
+//     }
 
-    async fn create_integrated_address(&self, request: Request<String>) -> String {
-        format!("Create Integrated Address from and Payment ID ")
-    }
+//     async fn create_integrated_address(&self, request: Request<String>) -> String {
+//         format!("Create Integrated Address from and Payment ID ")
+//     }
 
-    async fn get_transactions(&self, request: Request<String>) -> String {
-        format!("Get Transactions")
-    }
+//     async fn get_transactions(&self, request: Request<String>) -> String {
+//         format!("Get Transactions")
+//     }
 
-    async fn get_unconfirmed_transactions(&self, request: Request<String>) -> String {
-        "Get Unconfirmed Transactions".to_string()
-    }
+//     async fn get_unconfirmed_transactions(&self, request: Request<String>) -> String {
+//         "Get Unconfirmed Transactions".to_string()
+//     }
 
-    async fn get_unconfirmed_transactions_for_address(&self, request: Request<String>) -> String {
-        format!("Get Unconfirmed Transactions for Address")
-    }
+//     async fn get_unconfirmed_transactions_for_address(&self, request: Request<String>) -> String {
+//         format!("Get Unconfirmed Transactions for Address")
+//     }
 
-    async fn get_transactions_from_height(&self, request: Request<String>) -> String {
-        format!("Get Transactions from Height")
-    }
+//     async fn get_transactions_from_height(&self, request: Request<String>) -> String {
+//         format!("Get Transactions from Height")
+//     }
 
-    async fn get_transactions_from_height_to_height(&self, request: Request<String>) -> String {
-        format!("Get Transactions from Height  to ")
-    }
+//     async fn get_transactions_from_height_to_height(&self, request: Request<String>) -> String {
+//         format!("Get Transactions from Height  to ")
+//     }
 
-    async fn get_transactions_from_height_with_address(&self, request: Request<String>) -> String {
-        format!("Get Transactions from Height  with Address ")
-    }
+//     async fn get_transactions_from_height_with_address(&self, request: Request<String>) -> String {
+//         format!("Get Transactions from Height  with Address ")
+//     }
 
-    async fn get_transactions_from_height_to_height_with_address(
-        &self,
-        request: Request<String>,
-    ) -> String {
-        format!("Get Transactions from Height  to  with Address ")
-    }
+//     async fn get_transactions_from_height_to_height_with_address(
+//         &self,
+//         request: Request<String>,
+//     ) -> String {
+//         format!("Get Transactions from Height  to  with Address ")
+//     }
 
-    async fn get_tx_private_key(&self, request: Request<String>) -> String {
-        format!("Get Balance")
-    }
+//     async fn get_tx_private_key(&self, request: Request<String>) -> String {
+//         format!("Get Balance")
+//     }
 
-    async fn get_transaction_details(&self, request: Request<String>) -> String {
-        format!("Get Balance")
-    }
+//     async fn get_transaction_details(&self, request: Request<String>) -> String {
+//         format!("Get Balance")
+//     }
 
-    async fn get_balance(&self, request: Request<String>) -> String {
-        format!("Get Balance")
-    }
+//     async fn get_balance(&self, request: Request<String>) -> String {
+//         format!("Get Balance")
+//     }
 
-    async fn get_balance_for_address(&self, request: Request<String>) -> String {
-        format!("Get Balance")
-    }
+//     async fn get_balance_for_address(&self, request: Request<String>) -> String {
+//         format!("Get Balance")
+//     }
 
-    async fn get_balances(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn get_balances(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    // POST
-    async fn wallet_open(&self, request: Request<String>) -> String {
-        println!("YOOOOOOOO");
-        format!("Get Balances")
-    }
+//     // POST
+//     async fn wallet_open(&self, request: Request<String>) -> String {
+//         println!("YOOOOOOOO");
+//         format!("Get Balances")
+//     }
 
-    async fn wallet_import_key(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn wallet_import_key(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn wallet_import_seed(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn wallet_import_seed(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn wallet_import_view(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn wallet_import_view(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn wallet_create(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn wallet_create(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn addresses_create(&self, request: Request<String>) -> String {
-        format!("Hello, ! You are connected from ")
-    }
+//     async fn addresses_create(&self, request: Request<String>) -> String {
+//         format!("Hello, ! You are connected from ")
+//     }
 
-    async fn addresses_import(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn addresses_import(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn addresses_import_view(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn addresses_import_view(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn transactions_send_basic(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn transactions_send_basic(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn transactions_send_advanced(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn transactions_send_advanced(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn transactions_send_fusion_basic(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn transactions_send_fusion_basic(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn transactions_send_fusion_advanced(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn transactions_send_fusion_advanced(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    // PUT
-    async fn save_wallet(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     // PUT
+//     async fn save_wallet(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn reset_wallet(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn reset_wallet(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn set_node_info(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn set_node_info(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    // DELETE
-    async fn close_wallet(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     // DELETE
+//     async fn close_wallet(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    async fn delete_address(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
+//     async fn delete_address(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
 
-    // OPTIONS
-    async fn handle_options(&self, request: Request<String>) -> String {
-        format!("Get Balances")
-    }
-}
+//     // OPTIONS
+//     async fn handle_options(&self, request: Request<String>) -> String {
+//         format!("Get Balances")
+//     }
+// }
