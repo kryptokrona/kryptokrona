@@ -29,13 +29,13 @@ jobs:
           - {
               name: "macos",
               os: macos-latest,
-              args: "--target aarch64-apple-darwin",
+              args: "aarch64-apple-darwin",
               arch: arm64,
             }
           - {
               name: "macos",
               os: macos-latest,
-              args: "--target x86_64-apple-darwin",
+              args: "x86_64-apple-darwin",
               arch: x86_64,
             }
           # we will add ubuntu and windows here once we get macos working
@@ -56,11 +56,14 @@ jobs:
             ~/.cargo
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Add Target
+        run: rustup target add ${{ matrix.config.args }}
+
       - name: Run Clippy
-        run: cargo clippy --all-targets --all-features ${{ matrix.config.args }}
+        run: cargo clippy --all-features --target ${{ matrix.config.args }}
 
       - name: Build Project
-        run: cargo build --release ${{ matrix.config.args }}
+        run: cargo build --release --target ${{ matrix.config.args }}
 
       - name: Run Tests
-        run: cargo test ${{ matrix.config.args }}
+        run: cargo test --target ${{ matrix.config.args }}
