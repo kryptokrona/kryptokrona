@@ -209,6 +209,7 @@ impl WalletRPC for WalletRPCServer {
 
     // POST
     async fn wallet_open(self, _: context::Context, name: String) -> String {
+        println!("YOOOOOOOO");
         format!("Hello, {name}! You are connected from {}", self.0)
     }
 
