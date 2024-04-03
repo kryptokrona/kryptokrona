@@ -1,0 +1,48 @@
+# This is the new workflow replacing 'master-ci.yml' for the C++ -> Rust transition
+
+name: build
+
+on:
+  push:
+    branches:
+      - rust # change this to master later
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - "**/README.md"
+      - "**/LICENSE"
+      - "**/SECURITY.md"
+      - "**/.gitignore"
+      - "**/resources/**"
+      - "**/.github/ISSUE_TEMPLATE/**"
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features
+
+      - name: Build Project
+        run: cargo build --release
+
+      - name: Run Tests
+        run: cargo test
