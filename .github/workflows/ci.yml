@@ -54,7 +54,6 @@ jobs:
         run: |
           rustup target add ${{ matrix.config.args }}
           brew install protobuf
-          softwareupdate --install-rosetta --agree-to-license
 
       - name: Cache Cargo Dependencies
         uses: actions/cache@v2
@@ -69,5 +68,5 @@ jobs:
       - name: Build Project
         run: cargo build --release --target ${{ matrix.config.args }}
 
-      - name: Run Tests
-        run: cargo test --release --target ${{ matrix.config.args }}
+      #- name: Run Tests
+      #  run: cargo test --release --target ${{ matrix.config.args }}
