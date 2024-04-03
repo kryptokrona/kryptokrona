@@ -49,8 +49,11 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      - name: Add Target
-        run: rustup target add ${{ matrix.config.args }}
+      - name: Install Dependencies
+        if: matrix.config.name == 'macos'
+        run: |
+          rustup target add ${{ matrix.config.args }}
+          brew install -y protobuf
 
       - name: Cache Cargo Dependencies
         uses: actions/cache@v2
