@@ -177,8 +177,6 @@ When we want to do a full cleanup on our system with Docker we can start the scr
 
 Now we will remove networks, volumes, images and containers existing on our system. If you after removing everything want to start again. Just use the file `setup-testnet.sh` again.
 
-Check also out the article made by Marcus Cvjeticanin here: https://medium.com/coinsbench/setup-a-testnet-with-kryptokrona-blockchain-41b5f9ffd86
-
 ## Checklist before release
 
 1. Edit versions in `Cargo.toml` files.
