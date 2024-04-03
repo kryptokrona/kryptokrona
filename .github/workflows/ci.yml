@@ -19,8 +19,16 @@ on:
 
 jobs:
   build:
-    name: build
-    runs-on: ubuntu-latest
+    name: build ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        arch:
+          - x64
+          - arm64
+          - x86
 
     steps:
       - uses: actions/checkout@v3
