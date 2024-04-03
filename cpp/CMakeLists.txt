@@ -1,178 +1,287 @@
-# Build statically
-add_definitions(-DSTATICLIB)
+# We need 3.8 for set(CMAKE_CXX_STANDARD 17)
+cmake_minimum_required(VERSION 3.8)
 
-# Add external libraries as include dirs, so we can do #include "httplib" for example
-include_directories(${CMAKE_SOURCE_DIR}/external/rocksdb/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/cpp-linenoise)
-include_directories(${CMAKE_SOURCE_DIR}/external/cpp-httplib)
-include_directories(${CMAKE_SOURCE_DIR}/external/nlohmann-json)
-include_directories(${CMAKE_SOURCE_DIR}/external/rapidjson)
-include_directories(${CMAKE_SOURCE_DIR}/external/cxxopts)
-include_directories(${CMAKE_SOURCE_DIR}/external/cryptopp)
+find_program(CCACHE_PROGRAM ccache)
 
-# Show cmake where the source files are
-# Note, if you add remove a source file, you will need to re-run cmake so it
-# can find the new file
-file(GLOB_RECURSE blockchain_explorer blockchain_explorer/*)
-file(GLOB_RECURSE common common/*)
-file(GLOB_RECURSE crypto crypto/*)
-file(GLOB_RECURSE cryptonote_core cryptonote_core/* cryptonote_config.h)
-file(GLOB_RECURSE cryptonote_protocol cryptonote_protocol/*)
-file(GLOB_RECURSE crypto_test crypto_test/*)
-file(GLOB_RECURSE errors errors/*)
-file(GLOB_RECURSE http http/*)
-file(GLOB_RECURSE json_rpc_server json_rpc_server/*)
-file(GLOB_RECURSE logging logging/*)
-file(GLOB_RECURSE miner miner/*)
-file(GLOB_RECURSE mnemonics mnemonics/*)
-file(GLOB_RECURSE nigel nigel/*)
-file(GLOB_RECURSE node_rpc_proxy node_rpc_proxy/*)
-file(GLOB_RECURSE p2p p2p/*)
-file(GLOB_RECURSE rpc rpc/*)
-file(GLOB_RECURSE serialization serialization/*)
-file(GLOB_RECURSE service wallet_service/*)
-file(GLOB_RECURSE sub_wallets sub_wallets/*)
-file(GLOB_RECURSE transfers transfers/*)
-file(GLOB_RECURSE kryptokronad daemon/*)
-file(GLOB_RECURSE utilities utilities/*)
-file(GLOB_RECURSE wallet wallet/*)
-file(GLOB_RECURSE wallet_backend wallet_backend/*)
-file(GLOB_RECURSE zedwallet zedwallet/*)
-file(GLOB_RECURSE zedwallet++ zedwallet++/*)
-
-if(MSVC)
-    file(GLOB_RECURSE syst syst/* platform/windows/syst/*)
-elseif(APPLE)
-    file(GLOB_RECURSE syst syst/* platform/osx/syst/* platform/posix/syst/*)
-else()
-    file(GLOB_RECURSE syst syst/* platform/linux/syst/* platform/posix/syst/*)
+if(CCACHE_PROGRAM)
+    message(STATUS "Found ccache package... Activating...")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-# Group the files together in IDEs
-# source_group("" FILES $${common} ${crypto} ${cryptonote_core} ${cryptonote_protocol} ${kryptokronad} ${json_rpc_server} ${http} ${logging} ${miner} ${mnemonics} ${Nigel} ${NodeRpcProxy} ${p2p} ${rpc} ${serialization} ${syst} ${transfers} ${wallet} ${wallet_backend} ${zedwallet} ${zedwallet++} ${crypto_test} ${errors} ${utilities} ${sub_wallets})
+project(Kryptokrona)
 
-# Define a group of files as a library to link against
-add_library(blockchain_explorer STATIC ${blockchain_explorer})
-add_library(common STATIC ${common})
-add_library(crypto STATIC ${crypto})
-add_library(cryptonote_core STATIC ${cryptonote_core})
-add_library(errors STATIC ${errors})
-add_library(http STATIC ${http})
-add_library(json_rpc_server STATIC ${json_rpc_server})
-add_library(logging STATIC ${logging})
-add_library(mnemonics STATIC ${mnemonics})
-add_library(nigel STATIC ${nigel})
-add_library(node_rpc_proxy STATIC ${node_rpc_proxy})
-add_library(p2p STATIC ${cryptonote_protocol} ${p2p})
-add_library(rpc STATIC ${rpc})
-add_library(serialization STATIC ${serialization})
-add_library(sub_wallets STATIC ${sub_wallets})
-add_library(syst STATIC ${syst})
-add_library(transfers STATIC ${transfers})
-add_library(utilities STATIC ${utilities})
-add_library(wallet STATIC ${wallet})
-add_library(wallet_backend STATIC ${wallet_backend})
-add_library(wallet_service STATIC ${service})
+# Required for finding Threads on ARM
+enable_language(C)
+enable_language(CXX)
 
-if(MSVC)
-    set(DAEMON_SOURCES_OS
-        binary_info/daemon.rc
-    )
-    set(ZED_WALLET_SOURCES_OS
-        binary_info/zedwallet.rc
-    )
-    set(MINER_SOURCES_OS
-        binary_info/miner.rc
-    )
-    set(PG_SOURCES_OS
-        binary_info/service.rc
-    )
-    set(CT_SOURCES_OS
-        binary_info/cryptotest.rc
-    )
-    set(WALLET_API_SOURCES_OS
-        binary_info/walletapi.rc
-    )
+option(TEST_NET "Compile a testnet version" OFF)
+
+if(TEST_NET)
+    message(STATUS "TEST_NET: ON")
+    add_definitions(-DUSE_TESTNET)
 endif()
 
-add_executable(crypto_test ${crypto_test} ${CT_SOURCES_OS})
-add_executable(miner ${miner} ${MINER_SOURCES_OS})
-add_executable(service ${service} ${PG_SOURCES_OS})
-add_executable(kryptokronad ${kryptokronad} ${DAEMON_SOURCES_OS})
-add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
-add_executable(zedwallet++ ${zedwallet++} ${ZED_WALLET_SOURCES_OS})
-
-if(MSVC)
-    target_link_libraries(syst ws2_32)
-    target_link_libraries(kryptokronad Rpcrt4)
-    target_link_libraries(service Rpcrt4)
-endif()
-
-# A bit of hackery so we don't have to do the if/else/ for every target that
-# wants to use filesystem
-add_library(__filesystem INTERFACE)
-
-# Windows works out of the box
-message(STATUS "CMAKE_OSX_ARCHITECTURES: ${CMAKE_OSX_ARCHITECTURES}")
-if(APPLE)
-    if(CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
-        # Apply rules specific to x64 architecture on macOS
-        target_link_libraries(__filesystem INTERFACE /usr/local/opt/llvm/lib/c++/libc++abi.a)
-    else()
-        # message(FATAL_ERROR "Unsupported macOS architecture")
-        target_link_libraries(__filesystem INTERFACE /opt/homebrew/opt/llvm/lib/c++/libc++abi.a)
+# Assert our compiler is good
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # GCC 7.0 or higher
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7)
+        message(FATAL_ERROR "GCC/G++ 11.0 or greater is required to compile. Please check the README.md for detailed compilation instructions.")
     endif()
-elseif(UNIX)
-    target_link_libraries(__filesystem INTERFACE stdc++fs)
-endif()
-
-if(MSVC)
-    target_link_libraries(kryptokronad syst cryptonote_core rocksdb ${Boost_LIBRARIES})
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    # Clang 6.0 or higher
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6)
+        message(FATAL_ERROR "Clang 6.0 or greater is required to compile. Please check the README.md for detailed compilation instructions.")
+    endif()
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    # Visual Studio 15 2017 or higher
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.10)
+        message(FATAL_ERROR "MSVC 19.10 or greater is required to compile (Latest Visual Studio 15 2017 should suffice). Please check the README.md for detailed compilation instructions.")
+    endif()
 else()
-    target_link_libraries(kryptokronad syst cryptonote_core rocksdblib ${Boost_LIBRARIES})
+    message(WARNING "You are using an unsupported compiler. The compilation is very likely to fail. God speed.")
 endif()
 
-# Add the dependencies we need
-target_link_libraries(common __filesystem)
-target_link_libraries(cryptonote_core common logging crypto p2p rpc http serialization syst ${Boost_LIBRARIES})
-target_link_libraries(crypto_test crypto common)
-target_link_libraries(errors sub_wallets)
-target_link_libraries(logging common)
-target_link_libraries(miner cryptonote_core rpc syst http crypto errors utilities)
-target_link_libraries(nigel errors)
-target_link_libraries(p2p cryptonote_core upnpc-static)
-target_link_libraries(rpc p2p utilities)
-target_link_libraries(service json_rpc_server wallet mnemonics errors)
-target_link_libraries(sub_wallets utilities cryptonote_core)
-target_link_libraries(wallet node_rpc_proxy transfers cryptonote_core common ${Boost_LIBRARIES})
-target_link_libraries(wallet_backend mnemonics cryptonote_core nigel cryptopp-static __filesystem utilities sub_wallets)
-target_link_libraries(wallet_service mnemonics)
-target_link_libraries(zedwallet mnemonics wallet errors utilities)
-target_link_libraries(zedwallet++ wallet_backend)
+find_package(Threads)
 
-# Add dependencies means we have to build the latter before we build the former
-# In this case it's because we need to have the current version name rather
-# than a cached one
-add_dependencies(crypto_test version)
-add_dependencies(miner version)
-add_dependencies(json_rpc_server version)
-add_dependencies(p2p version)
-add_dependencies(rpc version)
-add_dependencies(service version)
-add_dependencies(kryptokronad version)
-add_dependencies(wallet_service version)
-add_dependencies(zedwallet version)
+set(VERSION "0.1")
 
-# Finally build the binaries
-set_property(TARGET kryptokronad PROPERTY OUTPUT_NAME "kryptokronad")
-set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "xkrwallet")
-set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "xkrwallet-beta")
-set_property(TARGET service PROPERTY OUTPUT_NAME "kryptokrona-service")
-set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
-set_property(TARGET crypto_test PROPERTY OUTPUT_NAME "crypto_test")
+# # This section describes our general CMake setup options
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release CACHE TYPE INTERNAL)
+set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: Debug, Release, RelWithDebInfo")
+set(CMAKE_SKIP_INSTALL_RULES OFF FORCE)
+set(CMAKE_SKIP_PACKAGE_ALL_DEPENDENCY ON FORCE)
+set(CMAKE_SUPPRESS_REGENERATION ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-# Additional make targets, can be used to build a subset of the targets
-# e.g. make pool will build only kryptokronad and service
-add_custom_target(pool DEPENDS kryptokronad service)
-add_custom_target(solominer DEPENDS kryptokronad zedwallet miner)
-add_custom_target(cli DEPENDS kryptokronad zedwallet)
+# Enable c++17
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# # This section is specifically for RocksDB build options that we've disabled for maximum portability
+set(ENABLE_AVX OFF CACHE STRING "Enable RocksDB AVX/AVX2? Defaults to OFF")
+set(ENABLE_LEAF_FRAME OFF CACHE STRING "Enable RocksDB OMIT_LEAF_FRAME_POINTER detection? Defaults to OFF")
+set(ENABLE_SSE42 OFF CACHE STRING "Enable RocksDB SSE4.2 support detection? Defaults to OFF")
+set(ENABLE_THREAD_LOCAL OFF CACHE STRING "Enable RocksDB THREAD_LOCAL support detection? Defaults to OFF")
+set(ENABLE_SYNC_FILE_RANGE_WRITE OFF CACHE STRING "Enable RocksDB SYNC_FILE_RANGE_WRITE support detection? Defaults to OFF")
+set(ENABLE_PTHREAD_MUTEX_ADAPTIVE_NP OFF CACHE STRING "Enable RocksDB PTHREAD_MUTEX_ADAPTIVE_NP support detection? Defaults to OFF")
+set(ENABLE_MALLOC_USABLE_SIZE OFF CACHE STRING "Enable RocksDB MALLOC_USABLE_SIZE support detection? Defaults to OFF")
+set(ENABLE_SCHED_GETCPU OFF CACHE STRING "Enable RocksDB SCHED_GETCPU support detection? Defaults to OFF")
+
+# # This section is for settings found in the slow-hash routine(s) that may benefit some systems (mostly ARM)
+set(FORCE_USE_HEAP ON CACHE BOOL "Force the use of heap memory allocation")
+set(NO_AES OFF CACHE BOOL "Turn off Hardware AES instructions?")
+set(NO_OPTIMIZED_MULTIPLY_ON_ARM OFF CACHE BOOL "Turn off Optimized Multiplication on ARM?")
+
+if(FORCE_USE_HEAP)
+    add_definitions(-DFORCE_USE_HEAP)
+    message(STATUS "FORCE_USE_HEAP: ENABLED")
+else()
+    message(STATUS "FORCE_USE_HEAP: DISABLED")
+endif()
+
+if(NO_AES)
+    add_definitions(-DNO_AES)
+    message(STATUS "HW AES: DISABLED")
+else()
+    message(STATUS "HW AES: ENABLED")
+endif()
+
+if(NO_OPTIMIZED_MULTIPLY_ON_ARM)
+    add_definitions(-DNO_OPTIMIZED_MULTIPLY_ON_ARM)
+    message(STATUS "OPTIMIZED_ARM_MULTIPLICATION: DISABLED")
+else()
+    message(STATUS "OPTIMIZED_ARM_MULTIPLICATION: ENABLED")
+endif()
+
+# We need to set the label and import it into CMake if it exists
+set(LABEL "")
+
+if(DEFINED ENV{LABEL})
+    set(LABEL $ENV{LABEL})
+    message(STATUS "Found LABEL: ${LABEL}")
+endif()
+
+# We do not support 32-bit builds. When and if we do, this can be removed.
+if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(FATAL_ERROR "Targeting a 32-bit architecture is not supported.")
+endif()
+
+# # We only build static binaries -- this is left here for our dependencies
+set(STATIC ON CACHE BOOL FORCE "Link libraries statically? Forced to ON")
+
+# # This section helps us tag our builds with the git commit information
+set(COMMIT_ID_IN_VERSION ON CACHE BOOL "Include commit ID in version")
+
+# So we can use std::string with rapidjson
+add_definitions(-DRAPIDJSON_HAS_STDSTRING)
+
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/version")
+
+if(NOT COMMIT_ID_IN_VERSION)
+    set(VERSION "${VERSION}-unknown")
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cpp/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version/version.h")
+    add_custom_target(version ALL)
+elseif(DEFINED COMMIT)
+    string(REPLACE "." "\\." VERSION_RE "${VERSION}")
+
+    if(NOT REFS MATCHES "(\\(|, )tag: v${VERSION_RE}(\\)|, )")
+        set(VERSION "${VERSION}-g${COMMIT}")
+    endif()
+
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cpp/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version/version.h")
+    add_custom_target(version ALL)
+else()
+    find_package(Git QUIET)
+
+    if(Git_FOUND OR GIT_FOUND)
+        message(STATUS "Found Git: ${GIT_EXECUTABLE}")
+        add_custom_target(version ALL "${CMAKE_COMMAND}" "-D" "VERSION=${VERSION}" "-D" "GIT=${GIT_EXECUTABLE}" "-D" "TO=${CMAKE_CURRENT_BINARY_DIR}/version/version.h" "-P" "${CMAKE_CURRENT_SOURCE_DIR}/cpp/version.cmake" WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+    else()
+        message(STATUS "WARNING: Git was not found!")
+        set(VERSION "${VERSION}-unknown")
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cpp/version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/version/version.h")
+        add_custom_target(version ALL)
+    endif()
+endif()
+
+include_directories(include "${CMAKE_CURRENT_BINARY_DIR}/version" cpp external)
+
+# # Platform specific code base information is applied here
+if(MSVC)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cpp/platform/windows)
+    add_definitions("/bigobj /MP /W3 /GS- /D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4345 /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN /DGTEST_HAS_TR1_TUPLE=0 /D_VARIADIC_MAX=8 /D__SSE4_1__")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10485760")
+
+    foreach(VAR CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE)
+        string(REPLACE "/MD" "/MT" ${VAR} "${${VAR}}")
+    endforeach()
+
+    include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/cpp/platform/msc)
+elseif(APPLE)
+    include_directories(SYSTEM /usr/include/malloc)
+    enable_language(ASM)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cpp/platform/osx)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cpp/platform/posix)
+
+else()
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cpp/platform/linux)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/cpp/platform/posix)
+endif()
+
+if(NOT MSVC)
+    if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+        # This option has no effect in glibc version less than 2.20.
+        # Since glibc 2.20 _BSD_SOURCE is deprecated, this macro is recomended instead
+        add_definitions("-D_DEFAULT_SOURCE -D_GNU_SOURCE")
+    endif()
+
+    # # This is here to support building for multiple architecture types... but we all know how well that usually goes...
+    set(ARCH default CACHE STRING "CPU to build for: -march value or default")
+
+    if("${ARCH}" STREQUAL "default")
+        set(ARCH_FLAG "")
+    else()
+        set(ARCH_FLAG "-march=${ARCH}")
+    endif()
+
+    # # These options generate all those nice warnings we see while building
+    set(WARNINGS "-Wall -Wextra -Wpointer-arith -Wvla -Wwrite-strings  -Wno-error=extra -Wno-error=unused-function -Wno-error=sign-compare -Wno-error=strict-aliasing -Wno-error=type-limits -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=undef -Wno-error=uninitialized -Wno-error=unused-result")
+
+    if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+        set(WARNINGS "${WARNINGS} -Wno-error=mismatched-tags -Wno-error=null-conversion -Wno-overloaded-shift-op-parentheses -Wno-error=shift-count-overflow -Wno-error=tautological-constant-out-of-range-compare -Wno-error=unused-private-field -Wno-error=unneeded-internal-declaration -Wno-error=unused-function -Wno-error=missing-braces -Wno-error=unused-command-line-argument")
+    else()
+        set(WARNINGS "${WARNINGS} -Wlogical-op -Wno-error=maybe-uninitialized -Wno-error=clobbered -Wno-error=unused-but-set-variable")
+    endif()
+
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        set(WARNINGS "${WARNINGS} -Wno-error=odr")
+    endif()
+
+    set(C_WARNINGS "-Waggregate-return -Wnested-externs -Wold-style-definition -Wstrict-prototypes")
+    set(CXX_WARNINGS "-Wno-reorder -Wno-missing-field-initializers")
+
+    if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64" OR "${LABEL}" STREQUAL "aarch64")
+        set(MAES_FLAG "")
+        set(CRYPTOPP_AARCH64 ON CACHE BOOL FORCE "Tell CryptoPP that we are building for aarch64")
+    elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64" AND NOT "${LABEL}" STREQUAL "aarch64")
+        set(MAES_FLAG "-maes")
+    endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${STATICASSERTC_FLAG} ${WARNINGS} ${C_WARNINGS} ${ARCH_FLAG} ${MAES_FLAG}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 ${STATICASSERTCPP_FLAG} ${WARNINGS} ${CXX_WARNINGS} ${ARCH_FLAG} ${MAES_FLAG}")
+
+    if(APPLE)
+        if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+            # Need to build against libc++ instead of libstc++ on apple
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++ -I/opt/homebrew/opt/llvm/include/c++/v1 -nodefaultlibs -lc++abi -lm -lc -lgcc -lgcc_eh")
+
+            # Need these flags so gcc OSX works on the cryptopp ASM - https://groups.google.com/forum/#!topic/cryptopp-users/po8yO-vYaac
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCRYPTOPP_CLANG_INTEGRATED_ASSEMBLER=1")
+
+        elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+            # Need to link against the llvm libc++ library, default is too old for std::filesystem
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -I/opt/homebrew/opt/llvm/include/c++/v1 -L/opt/homebrew/opt/llvm/lib/c++")
+        endif()
+    endif()
+
+    if(NOT APPLE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    endif()
+
+    # # Setting up DEBUG flags
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        set(DEBUG_FLAGS "-g3 -Og -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fno-inline -fno-omit-frame-pointer")
+    else()
+        set(DEBUG_FLAGS "-g3 -O0 -fno-omit-frame-pointer")
+    endif()
+
+    # # Setting up RELEASE flags
+    set(RELEASE_FLAGS "-Ofast -DNDEBUG -Wno-unused-variable")
+
+    if(NOT APPLE)
+        # There is a clang bug that does not allow to compile code that uses AES-NI intrinsics if -flto is enabled
+        if(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_BUILD_TYPE STREQUAL "Release")
+            # On linux, to build in lto mode, check that ld.gold linker is used: 'update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold HIGHEST_PRIORITY'
+            set(CMAKE_AR gcc-ar)
+            set(CMAKE_RANLIB gcc-ranlib)
+        endif()
+    endif()
+
+    # # Set up the normal CMake flags as we've built them
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_FLAGS}")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_FLAGS}")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_FLAGS}")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_FLAGS}")
+
+    # # Statically link our binaries
+    if(NOT APPLE)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+    endif()
+endif()
+
+# Go get us some static BOOST libraries
+set(Boost_NO_BOOST_CMAKE ON)
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_STATIC_RUNTIME ON)
+find_package(Boost REQUIRED COMPONENTS system filesystem thread date_time chrono regex serialization program_options)
+message(STATUS "Boost Found: ${Boost_INCLUDE_DIRS}")
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+
+if(APPLE)
+    set(Boost_LIBRARIES "${Boost_LIBRARIES}")
+elseif(NOT MSVC)
+    set(Boost_LIBRARIES "${Boost_LIBRARIES};rt")
+endif()
+
+add_subdirectory(external)
+add_subdirectory(cpp)
+
+# # We need to setup the RocksDB build environment to match our system
+if(NOT MSVC)
+    execute_process(
+        COMMAND cmake ${CMAKE_CURRENT_SOURCE_DIR}/external/rocksdb -DWITH_GFLAGS=0 -DCMAKE_BUILD_TYPE=MinSizeRel -DWITH_TESTS=OFF -DWITH_TOOLS=OFF -DPORTABLE=ON -B${PROJECT_BINARY_DIR}/rocksdb
+    )
+    set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_BINARY_DIR}/rocksdb/librocksdb.a")
+endif()
