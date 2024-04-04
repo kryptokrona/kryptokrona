@@ -87,6 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //         .unwrap();
     // });
 
+    // TODO: make a combined server, it's not logical to have many different servers with different ports
     let node_server_addr = "[::1]:50052".parse().unwrap();
     println!("Node server listening on {}", node_server_addr);
     tokio::spawn(async move {
