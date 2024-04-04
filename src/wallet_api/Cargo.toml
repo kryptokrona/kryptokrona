@@ -10,6 +10,10 @@ homepage = "https://github.com/kryptokrona/kryptokrona"
 repository = "https://github.com/kryptokrona/kryptokrona.git"
 rust-version = "1.77.1"
 
+[[bin]]
+name = "wallet_api"
+path = "src/main.rs"
+
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 clap = { version = "4.5.4", features = ["derive"] }
