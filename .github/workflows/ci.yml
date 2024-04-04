@@ -27,13 +27,13 @@ jobs:
       matrix:
         config:
           - {
-              name: "macos",
+              name: "macos 14",
               os: macos-latest,
               args: "aarch64-apple-darwin",
               arch: arm64,
             }
           - {
-              name: "macos",
+              name: "macos 14",
               os: macos-latest,
               args: "x86_64-apple-darwin",
               arch: x86_64,
@@ -62,7 +62,7 @@ jobs:
           toolchain: stable
 
       - name: Install macOS Dependencies
-        if: matrix.config.name == 'macos'
+        if: startsWith(matrix.config.name, 'macos')
         run: |
           rustup target add ${{ matrix.config.args }}
           brew install protobuf
