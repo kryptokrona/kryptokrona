@@ -27,6 +27,21 @@
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 mod rpc;
+mod api {
+    pub mod address;
+    pub mod misc;
+    pub mod node;
+    pub mod transaction;
+    pub mod wallet;
+}
+
+// Use the definitions from node.rs
+// use crate::api::address::address_server::AddressServer;
+// use crate::api::misc::miscellaneous_server::MiscellaneousServer;
+use crate::api::node::node_server::NodeServer;
+use crate::api::transaction::transaction_server::TransactionServer;
+// use crate::api::wallet::wallet_server::WalletServer;
+use crate::rpc::{MyNode, MyTransaction};
 
 const PBKDF2_ITERATIONS: i64 = 10000;
 // const ADDRESS_BODY_LENGTH: i16 =
@@ -35,26 +50,32 @@ const HASH_REGEX: &str = "[a-fA-F0-9]{64}";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create server instances for each service
-    // let transaction_server = TransactionServer::default();
-    // let wallet_server = WalletServer::default();
-    // let node_server = NodeServer::default();
-    // let address_server = AddressServer;
-    // let misc_server = MiscServer::default();
+    let transaction = MyTransaction::default();
+    // let wallet = Wallet::default();
+    let node = MyNode::default();
+    // let address = Address::default();
+    // let misc = Misc::default();
 
-    // // Serve the gRPC servers
-    // let transaction_server_addr = "[::1]:50053".parse().unwrap();
-    // tokio::spawn(async move {
-    //     println!(
-    //         "Transaction server listening on {}",
-    //         transaction_server_addr
-    //     );
-    //     tonic::transport::Server::builder()
-    //         .add_service(transaction_server)
-    //         .serve(transaction_server_addr)
-    //         .await
-    //         .unwrap();
-    // });
+    // Create server instances for each service
+    let transaction_server = TransactionServer::new(transaction);
+    // let wallet_server = WalletServer::new(inner);
+    let node_server = NodeServer::new(node);
+    // let address_server = AddressServer::new(inner);
+    // let misc_server = MiscellaneousServer::new(inner);
+
+    // Serve the gRPC servers
+    let transaction_server_addr = "[::1]:50053".parse().unwrap();
+    tokio::spawn(async move {
+        println!(
+            "Transaction server listening on {}",
+            transaction_server_addr
+        );
+        tonic::transport::Server::builder()
+            .add_service(transaction_server)
+            .serve(transaction_server_addr)
+            .await
+            .unwrap();
+    });
 
     // let wallet_server_addr = "[::1]:50051".parse().unwrap();
     // println!("Wallet server listening on {}", wallet_server_addr);
@@ -66,15 +87,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //         .unwrap();
     // });
 
-    // let node_server_addr = "[::1]:50052".parse().unwrap();
-    // println!("Node server listening on {}", node_server_addr);
-    // tokio::spawn(async move {
-    //     tonic::transport::Server::builder()
-    //         .add_service(node_server)
-    //         .serve(node_server_addr)
-    //         .await
-    //         .unwrap();
-    // });
+    let node_server_addr = "[::1]:50052".parse().unwrap();
+    println!("Node server listening on {}", node_server_addr);
+    tokio::spawn(async move {
+        tonic::transport::Server::builder()
+            .add_service(node_server)
+            .serve(node_server_addr)
+            .await
+            .unwrap();
+    });
 
     // let address_server_addr = "[::1]:50054".parse().unwrap();
     // println!("Address server listening on {}", address_server_addr);

@@ -26,69 +26,48 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use tonic::Request;
+use tonic::{Request, Response, Status};
 
-#[derive(Clone)]
-pub struct WalletRPCServer;
+use crate::api::{
+    node::{node_server::Node, GetNodeInfoRequest, GetNodeInfoResponse},
+    transaction::{
+        transaction_server::Transaction, SendBasicTransactionRequest, SendBasicTransactionResponse,
+    },
+};
 
-/* pub trait WalletRPC {
-    // GET
-    async fn get_node_info(&self, request: Request<String>) -> String; // TODO: add a serialized serde type for the request instead later
-    async fn get_private_view_key() -> String;
-    async fn get_spend_keys(address: String) -> String;
-    async fn get_mnemonic_seed(address: String) -> String;
-    async fn get_status() -> String;
-    async fn get_addresses() -> String;
-    async fn get_primary_address() -> String;
-    async fn create_integrated_address(address: String, payment_id: String) -> String;
-    async fn get_transactions() -> String;
-    async fn get_unconfirmed_transactions() -> String;
-    async fn get_unconfirmed_transactions_for_address(address: String) -> String;
-    async fn get_transactions_from_height(block_height: u64) -> String;
-    async fn get_transactions_from_height_to_height(start_height: u64, end_height: u64) -> String;
-    async fn get_transactions_from_height_with_address(
-        address: String,
-        block_height: u64,
-    ) -> String;
-    async fn get_transactions_from_height_to_height_with_address(
-        address: String,
-        start_height: u64,
-        end_height: u64,
-    ) -> String;
-    async fn get_tx_private_key(hash: String) -> String;
-    async fn get_transaction_details(hash: String) -> String;
-    async fn get_balance() -> String;
-    async fn get_balance_for_address(address: String) -> String;
-    async fn get_balances() -> String;
+#[derive(Debug, Default)]
+pub struct MyTransaction;
 
-    // POST
-    async fn wallet_open(name: String) -> String;
-    async fn wallet_import_key(name: String) -> String;
-    async fn wallet_import_seed(name: String) -> String;
-    async fn wallet_import_view(name: String) -> String;
-    async fn wallet_create(name: String) -> String;
-    async fn addresses_create(name: String) -> String;
-    async fn addresses_import(name: String) -> String;
-    async fn addresses_import_view(name: String) -> String;
-    async fn transactions_send_basic(name: String) -> String;
-    async fn transactions_send_advanced(name: String) -> String;
-    async fn transactions_send_fusion_basic(name: String) -> String;
-    async fn transactions_send_fusion_advanced(name: String) -> String;
+#[derive(Debug, Default)]
+pub struct MyNode;
 
-    // PUT
-    async fn save_wallet(name: String) -> String;
-    async fn reset_wallet(name: String) -> String;
-    async fn set_node_info(name: String) -> String;
+#[tonic::async_trait]
+impl Transaction for MyTransaction {
+    async fn send_basic_transaction(
+        &self,
+        request: Request<SendBasicTransactionRequest>,
+    ) -> Result<Response<SendBasicTransactionResponse>, Status> {
+        println!("Received request from: {:?}", request);
 
-    // DELETE
-    async fn close_wallet(name: String) -> String;
-    async fn delete_address(name: String) -> String;
+        let response = SendBasicTransactionResponse { status: todo!() };
 
-    // OPTIONS
-    async fn handle_options(name: String) -> String;
-} */
+        Ok(Response::new(response))
+    }
+}
 
-pub struct WalletRpC {}
+#[tonic::async_trait]
+impl Node for MyNode {
+    async fn get_node_info(
+        &self,
+        request: Request<GetNodeInfoRequest>,
+    ) -> Result<Response<GetNodeInfoResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetNodeInfoResponse { node_info: todo!() };
+
+        Ok(Response::new(response))
+    }
+}
 
 // #[tonic::async_trait]
 // impl WalletRPC for WalletRPCServer {
