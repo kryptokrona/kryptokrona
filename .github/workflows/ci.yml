@@ -38,6 +38,18 @@ jobs:
               args: "x86_64-apple-darwin",
               arch: x86_64,
             }
+          - {
+              name: "ubuntu",
+              os: ubuntu-22.04,
+              args: "x86_64-unknown-linux-gnu",
+              arch: x86_64,
+            }
+          - {
+              name: "ubuntu",
+              os: ubuntu-20.04,
+              args: "x86_64-unknown-linux-gnu",
+              arch: x86_64,
+            }
           # we will add ubuntu and windows here once we get macos working
 
     steps:
@@ -68,5 +80,5 @@ jobs:
       - name: Build Project
         run: cargo build --release --target ${{ matrix.config.args }}
 
-      #- name: Run Tests
-      #  run: cargo test --release --target ${{ matrix.config.args }}
+      - name: Run Tests
+        run: cargo test --release --target ${{ matrix.config.args }}
