@@ -8,8 +8,7 @@ fn main() {
     build.flag("-std=c++17");
     build.include("../crypto/c");
 
-    build.file("cpp/util.cpp")
-        .include("cpp");
+    build.file("cpp/util.cpp").include("cpp");
 
     build.compile("cppcommon");
 }
