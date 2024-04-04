@@ -66,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // let misc_server = MiscellaneousServer::new(inner);
 
     let server_addr = "[::1]:50055".parse().unwrap();
-    println!("RPC server listening on {}", server_addr);
+    println!("RPC Server listening on {}", server_addr);
     tonic::transport::Server::builder()
         .add_service(transaction_server)
         .add_service(node_server)
