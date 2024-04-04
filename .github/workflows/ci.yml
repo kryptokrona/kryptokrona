@@ -61,11 +61,17 @@ jobs:
           profile: minimal
           toolchain: stable
 
-      - name: Install Dependencies
+      - name: Install macOS Dependencies
         if: matrix.config.name == 'macos'
         run: |
           rustup target add ${{ matrix.config.args }}
           brew install protobuf
+
+      - name: Install Ubuntu Dependencies
+        if: matrix.config.name == 'ubuntu'
+        run: |
+          rustup target add ${{ matrix.config.args }}
+          sudo apt install protobuf-compiler
 
       - name: Cache Cargo Dependencies
         uses: actions/cache@v2
