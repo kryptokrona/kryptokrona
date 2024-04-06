@@ -5,10 +5,10 @@ use crate::api::address::{
 };
 
 #[derive(Debug, Default)]
-pub struct MyAddress;
+pub struct AddressHandler;
 
 #[tonic::async_trait]
-impl Address for MyAddress {
+impl Address for AddressHandler {
     async fn get_primary_address(
         &self,
         request: Request<GetPrimaryAddressRequest>,

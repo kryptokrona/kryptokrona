@@ -9,7 +9,6 @@ fn main() {
                 "proto/wallet.proto",
                 "proto/transaction.proto",
                 "proto/address.proto",
-                "proto/misc.proto",
             ],
             &["proto"],
         )

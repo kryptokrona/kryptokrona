@@ -9,10 +9,10 @@ use crate::api::{
 };
 
 #[derive(Debug, Default)]
-pub struct MyNode;
+pub struct NodeHandler;
 
 #[tonic::async_trait]
-impl Node for MyNode {
+impl Node for NodeHandler {
     async fn get_node_details(
         &self,
         request: Request<GetNodeDetailsRequest>,

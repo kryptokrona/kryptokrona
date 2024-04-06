@@ -5,10 +5,10 @@ use crate::transaction::{
 };
 
 #[derive(Debug, Default)]
-pub struct MyTransaction;
+pub struct TransactionHandler;
 
 #[tonic::async_trait]
-impl Transaction for MyTransaction {
+impl Transaction for TransactionHandler {
     async fn send_basic_transaction(
         &self,
         request: Request<SendBasicTransactionRequest>,

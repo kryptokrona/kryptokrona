@@ -3,10 +3,10 @@ use tonic::{Request, Response, Status};
 use crate::api::wallet::{wallet_server::Wallet, OpenWalletRequest, OpenWalletResponse};
 
 #[derive(Debug, Default)]
-pub struct MyWallet;
+pub struct WalletHandler;
 
 #[tonic::async_trait]
-impl Wallet for MyWallet {
+impl Wallet for WalletHandler {
     async fn open_wallet(
         &self,
         request: Request<OpenWalletRequest>,
