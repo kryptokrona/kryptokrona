@@ -125,7 +125,7 @@ impl Transaction for TransactionHandler {
     ) -> Result<Response<GetTransactionsFromHeightToHeightWithAddressResponse>, Status> {
         println!("Received request from: {:?}", request);
 
-        let response = GetTransactionsFromHeightToHeightResponse {};
+        let response = GetTransactionsFromHeightToHeightWithAddressResponse {};
 
         Ok(Response::new(response))
     }
