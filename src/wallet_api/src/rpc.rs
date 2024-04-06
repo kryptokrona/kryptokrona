@@ -29,7 +29,10 @@
 use tonic::{Request, Response, Status};
 
 use crate::api::{
-    node::{node_server::Node, GetNodeInfoRequest, GetNodeInfoResponse},
+    node::{
+        node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse, GetNodeInfoRequest,
+        GetNodeInfoResponse,
+    },
     transaction::{
         transaction_server::Transaction, SendBasicTransactionRequest, SendBasicTransactionResponse,
     },
@@ -57,13 +60,18 @@ impl Transaction for MyTransaction {
 
 #[tonic::async_trait]
 impl Node for MyNode {
-    async fn get_node_info(
+    async fn get_node_details(
         &self,
-        request: Request<GetNodeInfoRequest>,
-    ) -> Result<Response<GetNodeInfoResponse>, Status> {
+        request: Request<GetNodeDetailsRequest>,
+    ) -> Result<Response<GetNodeDetailsResponse>, Status> {
         println!("Received request from: {:?}", request);
 
-        let response = GetNodeInfoResponse { node_info: todo!() };
+        let response = GetNodeDetailsResponse {
+            daemon_host: todo!(),
+            daemon_port: todo!(),
+            node_fee: todo!(),
+            node_address: todo!(),
+        };
 
         Ok(Response::new(response))
     }

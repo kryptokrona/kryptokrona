@@ -3,14 +3,17 @@ syntax = "proto3";
 package node;
 
 // Request message for getting node information.
-message GetNodeInfoRequest {}
+message GetNodeDetailsRequest {}
 
 // Response message containing node information.
-message GetNodeInfoResponse {
-    string node_info = 1;
+message GetNodeDetailsResponse {
+    string daemon_host = 1;
+    int32 daemon_port = 2;
+    int64 node_fee = 3;
+    string node_address = 4;
 }
 
 // Node service definition.
 service Node {
-    rpc GetNodeInfo(GetNodeInfoRequest) returns (GetNodeInfoResponse) {}
+    rpc GetNodeDetails(GetNodeDetailsRequest) returns (GetNodeDetailsResponse) {}
 }
