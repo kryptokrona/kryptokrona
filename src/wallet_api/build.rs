@@ -8,6 +8,7 @@ fn main() {
 
     tonic_build::configure()
         .file_descriptor_set_path(out_dir.join("wallet_api_descriptor.bin"))
+        .build_server(true)
         .out_dir("src/api/")
         .compile(
             &[

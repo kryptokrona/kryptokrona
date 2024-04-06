@@ -41,6 +41,11 @@ mod handler {
     pub mod wallet_handler;
 }
 
+mod wallet_api_proto {
+    pub(crate) const FILE_DESCRIPTOR_SET: &[u8] =
+        tonic::include_file_descriptor_set!("wallet_api_descriptor");
+}
+
 use crate::api::address::address_server::AddressServer;
 use crate::api::node::node_server::NodeServer;
 use crate::api::transaction;
@@ -67,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Setting up reflection service
     // let reflection_service = tonic_reflection::server::Builder::configure()
-    //     .register_encoded_file_descriptor_set(store_proto::FILE_DESCRIPTOR_SET)
+    //     .register_encoded_file_descriptor_set(wallet_api_proto::FILE_DESCRIPTOR_SET)
     //     .build()
     //     .unwrap();
 
@@ -78,6 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(transaction_server)
         .add_service(node_server)
         .add_service(wallet_server)
+        // .add_service(reflection_service)
         .serve(server_addr)
         .await?;
 
