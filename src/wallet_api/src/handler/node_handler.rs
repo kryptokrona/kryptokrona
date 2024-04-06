@@ -28,13 +28,38 @@
 
 use tonic::{Request, Response, Status};
 
-use crate::api::node::{node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse};
+use crate::api::node::{
+    node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse, GetStatusRequest,
+    GetStatusResponse, SetNodeInfoRequest, SetNodeInfoResponse,
+};
 
 #[derive(Debug, Default)]
 pub struct NodeHandler;
 
 #[tonic::async_trait]
 impl Node for NodeHandler {
+    async fn get_status(
+        &self,
+        request: Request<GetStatusRequest>,
+    ) -> Result<Response<GetStatusResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetStatusResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn set_node_info(
+        &self,
+        request: Request<SetNodeInfoRequest>,
+    ) -> Result<Response<SetNodeInfoResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = SetNodeInfoResponse {};
+
+        Ok(Response::new(response))
+    }
+
     async fn get_node_details(
         &self,
         request: Request<GetNodeDetailsRequest>,
