@@ -35,13 +35,26 @@ mod api {
     pub mod wallet;
 }
 
+mod method {
+    pub mod address_method;
+    pub mod misc_method;
+    pub mod node_method;
+    pub mod transaction_method;
+    pub mod wallet_method;
+}
+
+use crate::api::address::address_server::AddressServer;
 // Use the definitions from node.rs
 // use crate::api::address::address_server::AddressServer;
 // use crate::api::misc::miscellaneous_server::MiscellaneousServer;
 use crate::api::node::node_server::NodeServer;
+use crate::api::transaction;
 use crate::api::transaction::transaction_server::TransactionServer;
-use crate::api::wallet::wallet_server::{Wallet, WalletServer};
-use crate::rpc::{MyNode, MyTransaction, MyWallet};
+use crate::api::wallet::wallet_server::WalletServer;
+use crate::method::address_method::MyAddress;
+use crate::method::node_method::MyNode;
+use crate::method::transaction_method::MyTransaction;
+use crate::method::wallet_method::MyWallet;
 
 const PBKDF2_ITERATIONS: i64 = 10000;
 // const ADDRESS_BODY_LENGTH: i16 =
@@ -50,22 +63,23 @@ const HASH_REGEX: &str = "[a-fA-F0-9]{64}";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let address = MyAddress::default();
+    // let misc = Misc::default();
+    let node = MyNode::default();
     let transaction = MyTransaction::default();
     let wallet = MyWallet::default();
-    let node = MyNode::default();
-    // let address = Address::default();
-    // let misc = Misc::default();
 
     // Create server instances for each service
+    let address_server = AddressServer::new(address);
+    // let misc_server = MiscellaneousServer::new(inner);
+    let node_server = NodeServer::new(node);
     let transaction_server = TransactionServer::new(transaction);
     let wallet_server = WalletServer::new(wallet);
-    let node_server = NodeServer::new(node);
-    // let address_server = AddressServer::new(inner);
-    // let misc_server = MiscellaneousServer::new(inner);
 
     let server_addr = "[::1]:50055".parse().unwrap();
     println!("RPC Server listening on {}", server_addr);
     tonic::transport::Server::builder()
+        .add_service(address_server)
         .add_service(transaction_server)
         .add_service(node_server)
         .add_service(wallet_server)

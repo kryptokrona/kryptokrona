@@ -26,85 +26,9 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-use tonic::{Request, Response, Status};
-
-use crate::api::{
-    node::{node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse},
-    transaction::{
-        transaction_server::Transaction, SendBasicTransactionRequest, SendBasicTransactionResponse,
-    },
-    wallet::{wallet_server::Wallet, OpenWalletRequest, OpenWalletResponse},
-};
-
-#[derive(Debug, Default)]
-pub struct MyTransaction;
-
-#[derive(Debug, Default)]
-pub struct MyNode;
-
-#[derive(Debug, Default)]
-pub struct MyWallet;
-
-#[tonic::async_trait]
-impl Transaction for MyTransaction {
-    async fn send_basic_transaction(
-        &self,
-        request: Request<SendBasicTransactionRequest>,
-    ) -> Result<Response<SendBasicTransactionResponse>, Status> {
-        println!("Received request from: {:?}", request);
-
-        let response = SendBasicTransactionResponse {
-            status: todo!(),
-            http_status_code: todo!(),
-        };
-
-        Ok(Response::new(response))
-    }
-}
-
-#[tonic::async_trait]
-impl Node for MyNode {
-    async fn get_node_details(
-        &self,
-        request: Request<GetNodeDetailsRequest>,
-    ) -> Result<Response<GetNodeDetailsResponse>, Status> {
-        println!("Received request from: {:?}", request);
-
-        let response = GetNodeDetailsResponse {
-            daemon_host: todo!(),
-            daemon_port: todo!(),
-            node_fee: todo!(),
-            node_address: todo!(),
-        };
-
-        Ok(Response::new(response))
-    }
-}
-
-#[tonic::async_trait]
-impl Wallet for MyWallet {
-    async fn open_wallet(
-        &self,
-        request: Request<OpenWalletRequest>,
-    ) -> Result<Response<OpenWalletResponse>, Status> {
-        println!("Received request from: {:?}", request);
-
-        let response = OpenWalletResponse {
-            status: todo!(),
-            http_status_code: todo!(),
-        };
-
-        Ok(Response::new(response))
-    }
-}
-
 // #[tonic::async_trait]
 // impl WalletRPC for WalletRPCServer {
 //     // GET
-//     async fn get_node_info(&self, request: Request<String>) -> String {
-//         format!("Get Node Info")
-//     }
-
 //     async fn get_private_view_key(&self, request: Request<String>) -> String {
 //         "Get Private View Key".to_string()
 //     }
@@ -185,10 +109,6 @@ impl Wallet for MyWallet {
 //     }
 
 //     // POST
-//     async fn wallet_open(&self, request: Request<String>) -> String {
-//         println!("YOOOOOOOO");
-//         format!("Get Balances")
-//     }
 
 //     async fn wallet_import_key(&self, request: Request<String>) -> String {
 //         format!("Get Balances")

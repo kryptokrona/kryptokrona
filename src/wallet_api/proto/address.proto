@@ -2,16 +2,14 @@ syntax = "proto3";
 
 package address;
 
-message CreateAddressRequest {
-    // Add fields as needed for address creation.
-}
+message GetPrimaryAddressRequest {}
 
-message CreateAddressResponse {
+message GetPrimaryAddressResponse {
     string address = 1;
 }
 
 // Address service definition.
 service Address {
-    rpc CreateAddress(CreateAddressRequest) returns (CreateAddressResponse) {}
+    rpc GetPrimaryAddress(GetPrimaryAddressRequest) returns (GetPrimaryAddressResponse) {}
     // Add other address-related RPC methods here...
 }
