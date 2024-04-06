@@ -105,79 +105,78 @@
 //     }
 
 //     async fn get_balances(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     // POST
 
 //     async fn wallet_import_key(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn wallet_import_seed(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn wallet_import_view(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn wallet_create(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn addresses_create(&self, request: Request<String>) -> String {
-//         format!("Hello, ! You are connected from ")
 //     }
 
 //     async fn addresses_import(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn addresses_import_view(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn transactions_send_basic(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn transactions_send_advanced(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn transactions_send_fusion_basic(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn transactions_send_fusion_advanced(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     // PUT
 //     async fn save_wallet(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn reset_wallet(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn set_node_info(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     // DELETE
 //     async fn close_wallet(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     async fn delete_address(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 
 //     // OPTIONS
 //     async fn handle_options(&self, request: Request<String>) -> String {
-//         format!("Get Balances")
+
 //     }
 // }
