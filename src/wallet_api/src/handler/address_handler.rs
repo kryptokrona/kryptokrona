@@ -29,7 +29,11 @@
 use tonic::{Request, Response, Status};
 
 use crate::api::address::{
-    address_server::Address, GetPrimaryAddressRequest, GetPrimaryAddressResponse,
+    address_server::Address, AddressesCreateRequest, AddressesCreateResponse,
+    AddressesImportRequest, AddressesImportResponse, AddressesImportViewRequest,
+    AddressesImportViewResponse, CreateIntegratedAddressRequest, CreateIntegratedAddressResponse,
+    DeleteAddressRequest, DeleteAddressResponse, GetAddressesRequest, GetAddressesResponse,
+    GetPrimaryAddressRequest, GetPrimaryAddressResponse,
 };
 
 #[derive(Debug, Default)]
@@ -46,6 +50,72 @@ impl Address for AddressHandler {
         let response = GetPrimaryAddressResponse {
             address: "Hello!".to_string(),
         };
+
+        Ok(Response::new(response))
+    }
+
+    async fn create_integrated_address(
+        &self,
+        request: Request<CreateIntegratedAddressRequest>,
+    ) -> Result<Response<CreateIntegratedAddressResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = CreateIntegratedAddressResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn addresses_create(
+        &self,
+        request: Request<AddressesCreateRequest>,
+    ) -> Result<Response<AddressesCreateResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = AddressesCreateResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn addresses_import(
+        &self,
+        request: Request<AddressesImportRequest>,
+    ) -> Result<Response<AddressesImportResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = AddressesImportResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn addresses_import_view(
+        &self,
+        request: Request<AddressesImportViewRequest>,
+    ) -> Result<Response<AddressesImportViewResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = AddressesImportViewResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_addresses(
+        &self,
+        request: Request<GetAddressesRequest>,
+    ) -> Result<Response<GetAddressesResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetAddressesResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn delete_address(
+        &self,
+        request: Request<DeleteAddressRequest>,
+    ) -> Result<Response<DeleteAddressResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = DeleteAddressResponse {};
 
         Ok(Response::new(response))
     }
