@@ -43,7 +43,9 @@ impl Address for AddressHandler {
     ) -> Result<Response<GetPrimaryAddressResponse>, Status> {
         println!("Received request from: {:?}", request);
 
-        let response = GetPrimaryAddressResponse { address: todo!() };
+        let response = GetPrimaryAddressResponse {
+            address: "Hello!".to_string(),
+        };
 
         Ok(Response::new(response))
     }
