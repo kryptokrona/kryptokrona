@@ -2,12 +2,10 @@ syntax = "proto3";
 
 package address;
 
-// Request message for creating an address.
 message CreateAddressRequest {
     // Add fields as needed for address creation.
 }
 
-// Response message containing the created address.
 message CreateAddressResponse {
     string address = 1;
 }

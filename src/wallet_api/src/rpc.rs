@@ -52,7 +52,10 @@ impl Transaction for MyTransaction {
     ) -> Result<Response<SendBasicTransactionResponse>, Status> {
         println!("Received request from: {:?}", request);
 
-        let response = SendBasicTransactionResponse { status: todo!() };
+        let response = SendBasicTransactionResponse {
+            status: todo!(),
+            http_status_code: todo!(),
+        };
 
         Ok(Response::new(response))
     }

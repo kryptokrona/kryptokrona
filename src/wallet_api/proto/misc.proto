@@ -2,12 +2,10 @@ syntax = "proto3";
 
 package misc;
 
-// Request message for performing miscellaneous operation.
 message MiscOperationRequest {
     // Add fields as needed for the operation.
 }
 
-// Response message containing the result of the miscellaneous operation.
 message MiscOperationResponse {
     string result = 1;
 }

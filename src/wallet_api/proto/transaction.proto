@@ -2,14 +2,20 @@ syntax = "proto3";
 
 package transaction;
 
-// Request message for sending a basic transaction.
 message SendBasicTransactionRequest {
-    // Add fields as needed for transaction details.
+    string destination = 1;
+    uint64 amount = 2;
+    string payment_id = 3;
 }
 
-// Response message containing transaction status.
 message SendBasicTransactionResponse {
-    string status = 1;
+    enum Status {
+        SUCCESS = 0;
+        ERROR = 1;
+    }
+    
+    Status status = 1;
+    uint32 http_status_code = 2;
 }
 
 // Transaction service definition.

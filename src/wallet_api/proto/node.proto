@@ -2,10 +2,8 @@ syntax = "proto3";
 
 package node;
 
-// Request message for getting node information.
 message GetNodeDetailsRequest {}
 
-// Response message containing node information.
 message GetNodeDetailsResponse {
     string daemon_host = 1;
     int32 daemon_port = 2;
