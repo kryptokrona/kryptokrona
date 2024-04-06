@@ -65,7 +65,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let transaction_server = TransactionServer::new(transaction);
     let wallet_server = WalletServer::new(wallet);
 
-    let server_addr = "[::1]:50055".parse().unwrap();
+    // Setting up reflection service
+    // let reflection_service = tonic_reflection::server::Builder::configure()
+    //     .register_encoded_file_descriptor_set(store_proto::FILE_DESCRIPTOR_SET)
+    //     .build()
+    //     .unwrap();
+
+    let server_addr = "[::1]:50051".parse().unwrap();
     println!("RPC Server listening on {}", server_addr);
     tonic::transport::Server::builder()
         .add_service(address_server)

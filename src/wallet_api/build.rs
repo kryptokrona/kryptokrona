@@ -1,7 +1,13 @@
+use std::{env, path::PathBuf};
+
 fn main() {
     // Make sure to have the proto compiler installed on your system
     // we will add it here to install depending on OS later
+
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+
     tonic_build::configure()
+        .file_descriptor_set_path(out_dir.join("wallet_api_descriptor.bin"))
         .out_dir("src/api/")
         .compile(
             &[
