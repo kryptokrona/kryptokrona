@@ -2,8 +2,14 @@ syntax = "proto3";
 
 package node;
 
+// Request messages
+message GetStatusRequest {}
+message SetNodeInfoRequest {}
 message GetNodeDetailsRequest {}
 
+// Response messages
+message GetStatusResponse {}
+message SetNodeInfoResponse {}
 message GetNodeDetailsResponse {
     string daemon_host = 1;
     int32 daemon_port = 2;
@@ -13,5 +19,7 @@ message GetNodeDetailsResponse {
 
 // Node service definition.
 service Node {
+    rpc GetStatus(GetStatusRequest) returns (GetStatusResponse) {}
+    rpc SetNodeInfo(SetNodeInfoRequest) returns (SetNodeInfoResponse) {}
     rpc GetNodeDetails(GetNodeDetailsRequest) returns (GetNodeDetailsResponse) {}
 }

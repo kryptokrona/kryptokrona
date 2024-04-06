@@ -2,13 +2,29 @@ syntax = "proto3";
 
 package wallet;
 
+// Request messages
 message OpenWalletRequest {
   string daemon_host = 1;
   uint32 daemon_port = 2;
   string filename = 3;
   string password = 4;
 }
+message WalletImportKeyRequest {}
+message WalletImportSeedRequest {}
+message WalletImportViewRequest {}
+message WalletCreateRequest {}
+message SaveWalletRequest {}
+message ResetWalletRequest {}
+message CloseWalletRequest {}
+message GetBalanceRequest {}
+message GetBalanceForAddressRequest {}
+message GetBalancesRequest {}
+message GetPrivateViewKeyRequest {}
+message GetSpendKeysRequest {}
+message GetMnemonicSeedRequest {}
+message GetTxPrivateKeyRequest {}
 
+// Response messages
 message OpenWalletResponse {
   enum Status {
     SUCCESS = 0;
@@ -18,11 +34,38 @@ message OpenWalletResponse {
   Status status = 1;
   uint32 http_status_code = 2;
 }
+message WalletImportKeyResponse {}
+message WalletImportSeedResponse {}
+message WalletImportViewResponse {}
+message WalletCreateResponse {}
+message SaveWalletResponse {}
+message ResetWalletResponse {}
+message CloseWalletResponse {}
+message GetBalanceResponse {}
+message GetBalanceForAddressResponse {}
+message GetBalancesResponse {}
+message GetPrivateViewKeyResponse {}
+message GetSpendKeysResponse {}
+message GetMnemonicSeedResponse {}
+message GetTxPrivateKeyResponse {}
 
 // Wallet service definition.
 service Wallet {
   rpc OpenWallet (OpenWalletRequest) returns (OpenWalletResponse) {}
-  // Add other RPC methods here
+  rpc WalletImportKey (WalletImportKeyRequest) returns (WalletImportKeyResponse) {}
+  rpc WalletImportSeed (WalletImportSeedRequest) returns (WalletImportSeedResponse) {}
+  rpc WalletImportView (WalletImportViewRequest) returns (WalletImportViewResponse) {}
+  rpc WalletCreate (WalletCreateRequest) returns (WalletCreateResponse) {}
+  rpc SaveWallet (SaveWalletRequest) returns (SaveWalletResponse) {}
+  rpc ResetWallet (ResetWalletRequest) returns (ResetWalletResponse) {}
+  rpc CloseWallet (CloseWalletRequest) returns (CloseWalletResponse) {}
+  rpc GetBalance (GetBalanceRequest) returns (GetBalanceResponse) {}
+  rpc GetBalanceForAddress (GetBalanceForAddressRequest) returns (GetBalanceForAddressResponse) {}
+  rpc GetBalances (GetBalancesRequest) returns (GetBalancesResponse) {}
+  rpc GetPrivateViewKey (GetPrivateViewKeyRequest) returns (GetPrivateViewKeyResponse) {}
+  rpc GetSpendKeys (GetSpendKeysRequest) returns (GetSpendKeysResponse) {}
+  rpc GetMnemonicSeed (GetMnemonicSeedRequest) returns (GetMnemonicSeedResponse) {}
+  rpc GetTxPrivateKey (GetTxPrivateKeyRequest) returns (GetTxPrivateKeyResponse) {}
 }
 
 

@@ -2,14 +2,33 @@ syntax = "proto3";
 
 package address;
 
+// Request messages
 message GetPrimaryAddressRequest {}
+message CreateIntegratedAddressRequest {}
+message AddressesCreateRequest {}
+message AddressesImportRequest {}
+message AddressesImportViewRequest {}
+message GetAddressesRequest {}
+message DeleteAddressRequest {}
 
+// Response messages
 message GetPrimaryAddressResponse {
     string address = 1;
 }
+message CreateIntegratedAddressResponse {}
+message AddressesCreateResponse {}
+message AddressesImportResponse {}
+message AddressesImportViewResponse {}
+message GetAddressesResponse {}
+message DeleteAddressResponse {}
 
 // Address service definition.
 service Address {
     rpc GetPrimaryAddress(GetPrimaryAddressRequest) returns (GetPrimaryAddressResponse) {}
-    // Add other address-related RPC methods here...
+    rpc CreateIntegratedAddress(CreateIntegratedAddressRequest) returns (CreateIntegratedAddressResponse) {}
+    rpc AddressesCreate(AddressesCreateRequest) returns (AddressesCreateResponse) {}
+    rpc AddressesImport(AddressesImportRequest) returns (AddressesImportResponse) {}
+    rpc AddressesImportView(AddressesImportViewRequest) returns (AddressesImportViewResponse) {}
+    rpc GetAddresses(GetAddressesRequest) returns (GetAddressesResponse) {}
+    rpc DeleteAddress(DeleteAddressRequest) returns (DeleteAddressResponse) {}
 }

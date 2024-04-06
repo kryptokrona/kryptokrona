@@ -2,12 +2,33 @@ syntax = "proto3";
 
 package transaction;
 
+// Request messages
+message GetTransactionsRequest {}
+message GetUnconfirmedTransactionsRequest {}
+message GetUnconfirmedTransactionsForAddressRequest {}
+message GetTransactionsFromHeightRequest {}
+message GetTransactionsFromHeightToHeightRequest {}
+message GetTransactionsFromHeightWithAddressRequest {}
+message GetTransactionsFromHeightToHeightWithAddressRequest {}
+message GetTransactionDetailsRequest {}
 message SendBasicTransactionRequest {
     string destination = 1;
     uint64 amount = 2;
     string payment_id = 3;
 }
+message SendAdvancedTransactionRequest {}
+message SendFusionBasicTransactionRequest {}
+message SendFusionAdvancedTransactionRequest {}
 
+// Response messages
+message GetTransactionsResponse {}
+message GetUnconfirmedTransactionsResponse {}
+message GetUnconfirmedTransactionsForAddressResponse {}
+message GetTransactionsFromHeightResponse {}
+message GetTransactionsFromHeightToHeightResponse {}
+message GetTransactionsFromHeightWithAddressResponse {}
+message GetTransactionsFromHeightToHeightWithAddressResponse {}
+message GetTransactionDetailsResponse {}
 message SendBasicTransactionResponse {
     enum Status {
         SUCCESS = 0;
@@ -17,9 +38,22 @@ message SendBasicTransactionResponse {
     Status status = 1;
     uint32 http_status_code = 2;
 }
+message SendAdvancedTransactionResponse {}
+message SendFusionBasicTransactionResponse {}
+message SendFusionAdvancedTransactionResponse {}
 
 // Transaction service definition.
 service Transaction {
+    rpc GetTransactions(GetTransactionsRequest) returns (GetTransactionsResponse) {}
+    rpc GetUnconfirmedTransactions(GetUnconfirmedTransactionsRequest) returns (GetUnconfirmedTransactionsResponse) {}
+    rpc GetUnconfirmedTransactionsForAddress(GetUnconfirmedTransactionsForAddressRequest) returns (GetUnconfirmedTransactionsForAddressResponse) {}
+    rpc GetTransactionsFromHeight(GetTransactionsFromHeightRequest) returns (GetTransactionsFromHeightResponse) {}
+    rpc GetTransactionsFromHeightToHeight(GetTransactionsFromHeightToHeightRequest) returns (GetTransactionsFromHeightToHeightResponse) {}
+    rpc GetTransactionsFromHeightWithAddress(GetTransactionsFromHeightWithAddressRequest) returns (GetTransactionsFromHeightWithAddressResponse) {}
+    rpc GetTransactionsFromHeightToHeightWithAddress(GetTransactionsFromHeightToHeightWithAddressRequest) returns (GetTransactionsFromHeightToHeightWithAddressResponse) {}
+    rpc GetTransactionDetails(GetTransactionDetailsRequest) returns (GetTransactionDetailsResponse) {}
     rpc SendBasicTransaction(SendBasicTransactionRequest) returns (SendBasicTransactionResponse) {}
-    // Add other transaction-related RPC methods here...
+    rpc SendAdvancedTransaction(SendAdvancedTransactionRequest) returns (SendAdvancedTransactionResponse) {}
+    rpc SendFusionBasicTransaction(SendFusionBasicTransactionRequest) returns (SendFusionBasicTransactionResponse) {}
+    rpc SendFusionAdvancedTransaction(SendFusionAdvancedTransactionRequest) returns (SendFusionAdvancedTransactionResponse) {}
 }
