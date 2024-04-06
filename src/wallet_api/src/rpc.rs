@@ -29,13 +29,11 @@
 use tonic::{Request, Response, Status};
 
 use crate::api::{
-    node::{
-        node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse, GetNodeInfoRequest,
-        GetNodeInfoResponse,
-    },
+    node::{node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse},
     transaction::{
         transaction_server::Transaction, SendBasicTransactionRequest, SendBasicTransactionResponse,
     },
+    wallet::{wallet_server::Wallet, OpenWalletRequest, OpenWalletResponse},
 };
 
 #[derive(Debug, Default)]
@@ -43,6 +41,9 @@ pub struct MyTransaction;
 
 #[derive(Debug, Default)]
 pub struct MyNode;
+
+#[derive(Debug, Default)]
+pub struct MyWallet;
 
 #[tonic::async_trait]
 impl Transaction for MyTransaction {
@@ -74,6 +75,23 @@ impl Node for MyNode {
             daemon_port: todo!(),
             node_fee: todo!(),
             node_address: todo!(),
+        };
+
+        Ok(Response::new(response))
+    }
+}
+
+#[tonic::async_trait]
+impl Wallet for MyWallet {
+    async fn open_wallet(
+        &self,
+        request: Request<OpenWalletRequest>,
+    ) -> Result<Response<OpenWalletResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = OpenWalletResponse {
+            status: todo!(),
+            http_status_code: todo!(),
         };
 
         Ok(Response::new(response))

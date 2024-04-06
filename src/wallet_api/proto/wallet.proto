@@ -2,17 +2,26 @@ syntax = "proto3";
 
 package wallet;
 
-message NodeInfoRequest {
-  // Add fields as needed
+message OpenWalletRequest {
+  string daemon_host = 1;
+  uint32 daemon_port = 2;
+  string filename = 3;
+  string password = 4;
 }
 
-message NodeInfoResponse {
-  // Add fields as needed
+message OpenWalletResponse {
+  enum Status {
+    SUCCESS = 0;
+    ERROR = 1;
+  }
+  
+  Status status = 1;
+  uint32 http_status_code = 2;
 }
 
 // Wallet service definition.
 service Wallet {
-  rpc GetNodeInfo (NodeInfoRequest) returns (NodeInfoResponse) {}
+  rpc OpenWallet (OpenWalletRequest) returns (OpenWalletResponse) {}
   // Add other RPC methods here
 }
 

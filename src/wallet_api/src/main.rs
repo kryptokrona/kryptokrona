@@ -35,15 +35,13 @@ mod api {
     pub mod wallet;
 }
 
-use tonic::server;
-
 // Use the definitions from node.rs
 // use crate::api::address::address_server::AddressServer;
 // use crate::api::misc::miscellaneous_server::MiscellaneousServer;
 use crate::api::node::node_server::NodeServer;
 use crate::api::transaction::transaction_server::TransactionServer;
-// use crate::api::wallet::wallet_server::WalletServer;
-use crate::rpc::{MyNode, MyTransaction};
+use crate::api::wallet::wallet_server::{Wallet, WalletServer};
+use crate::rpc::{MyNode, MyTransaction, MyWallet};
 
 const PBKDF2_ITERATIONS: i64 = 10000;
 // const ADDRESS_BODY_LENGTH: i16 =
@@ -53,14 +51,14 @@ const HASH_REGEX: &str = "[a-fA-F0-9]{64}";
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let transaction = MyTransaction::default();
-    // let wallet = Wallet::default();
+    let wallet = MyWallet::default();
     let node = MyNode::default();
     // let address = Address::default();
     // let misc = Misc::default();
 
     // Create server instances for each service
     let transaction_server = TransactionServer::new(transaction);
-    // let wallet_server = WalletServer::new(inner);
+    let wallet_server = WalletServer::new(wallet);
     let node_server = NodeServer::new(node);
     // let address_server = AddressServer::new(inner);
     // let misc_server = MiscellaneousServer::new(inner);
@@ -70,6 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tonic::transport::Server::builder()
         .add_service(transaction_server)
         .add_service(node_server)
+        .add_service(wallet_server)
         .serve(server_addr)
         .await?;
 
