@@ -28,8 +28,24 @@
 
 use tonic::{Request, Response, Status};
 
-use crate::transaction::{
-    transaction_server::Transaction, SendBasicTransactionRequest, SendBasicTransactionResponse,
+use crate::{
+    api::transaction::{
+        GetTransactionDetailsRequest, GetTransactionDetailsResponse,
+        GetTransactionsFromHeightRequest, GetTransactionsFromHeightResponse,
+        GetTransactionsFromHeightToHeightRequest, GetTransactionsFromHeightToHeightResponse,
+        GetTransactionsFromHeightToHeightWithAddressRequest,
+        GetTransactionsFromHeightToHeightWithAddressResponse,
+        GetTransactionsFromHeightWithAddressRequest, GetTransactionsFromHeightWithAddressResponse,
+        GetTransactionsRequest, GetTransactionsResponse,
+        GetUnconfirmedTransactionsForAddressRequest, GetUnconfirmedTransactionsForAddressResponse,
+        GetUnconfirmedTransactionsRequest, GetUnconfirmedTransactionsResponse,
+        SendAdvancedTransactionRequest, SendAdvancedTransactionResponse,
+        SendFusionAdvancedTransactionRequest, SendFusionAdvancedTransactionResponse,
+        SendFusionBasicTransactionRequest, SendFusionBasicTransactionResponse,
+    },
+    transaction::{
+        transaction_server::Transaction, SendBasicTransactionRequest, SendBasicTransactionResponse,
+    },
 };
 
 #[derive(Debug, Default)]
@@ -37,6 +53,94 @@ pub struct TransactionHandler;
 
 #[tonic::async_trait]
 impl Transaction for TransactionHandler {
+    async fn get_transactions(
+        &self,
+        request: Request<GetTransactionsRequest>,
+    ) -> Result<Response<GetTransactionsResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetTransactionsResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_unconfirmed_transactions(
+        &self,
+        request: Request<GetUnconfirmedTransactionsRequest>,
+    ) -> Result<Response<GetUnconfirmedTransactionsResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetUnconfirmedTransactionsResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_unconfirmed_transactions_for_address(
+        &self,
+        request: Request<GetUnconfirmedTransactionsForAddressRequest>,
+    ) -> Result<Response<GetUnconfirmedTransactionsForAddressResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetUnconfirmedTransactionsForAddressResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_transactions_from_height(
+        &self,
+        request: Request<GetTransactionsFromHeightRequest>,
+    ) -> Result<Response<GetTransactionsFromHeightResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetTransactionsFromHeightResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_transactions_from_height_to_height(
+        &self,
+        request: Request<GetTransactionsFromHeightToHeightRequest>,
+    ) -> Result<Response<GetTransactionsFromHeightToHeightResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetTransactionsFromHeightToHeightResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_transactions_from_height_with_address(
+        &self,
+        request: Request<GetTransactionsFromHeightWithAddressRequest>,
+    ) -> Result<Response<GetTransactionsFromHeightWithAddressResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetTransactionsFromHeightWithAddressResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_transactions_from_height_to_height_with_address(
+        &self,
+        request: Request<GetTransactionsFromHeightToHeightWithAddressRequest>,
+    ) -> Result<Response<GetTransactionsFromHeightToHeightWithAddressResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetTransactionsFromHeightToHeightResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn get_transaction_details(
+        &self,
+        request: Request<GetTransactionDetailsRequest>,
+    ) -> Result<Response<GetTransactionDetailsResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetTransactionDetailsResponse {};
+
+        Ok(Response::new(response))
+    }
+
     async fn send_basic_transaction(
         &self,
         request: Request<SendBasicTransactionRequest>,
@@ -47,6 +151,39 @@ impl Transaction for TransactionHandler {
             status: 200,
             http_status_code: 200,
         };
+
+        Ok(Response::new(response))
+    }
+
+    async fn send_advanced_transaction(
+        &self,
+        request: Request<SendAdvancedTransactionRequest>,
+    ) -> Result<Response<SendAdvancedTransactionResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = SendAdvancedTransactionResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn send_fusion_basic_transaction(
+        &self,
+        request: Request<SendFusionBasicTransactionRequest>,
+    ) -> Result<Response<SendFusionBasicTransactionResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = SendFusionBasicTransactionResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn send_fusion_advanced_transaction(
+        &self,
+        request: Request<SendFusionAdvancedTransactionRequest>,
+    ) -> Result<Response<SendFusionAdvancedTransactionResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = SendFusionAdvancedTransactionResponse {};
 
         Ok(Response::new(response))
     }
