@@ -28,7 +28,16 @@
 
 use tonic::{Request, Response, Status};
 
-use crate::api::wallet::{wallet_server::Wallet, OpenWalletRequest, OpenWalletResponse};
+use crate::api::wallet::{
+    wallet_server::Wallet, CloseWalletRequest, CloseWalletResponse, GetBalanceForAddressRequest,
+    GetBalanceForAddressResponse, GetBalanceRequest, GetBalanceResponse, GetBalancesRequest,
+    GetBalancesResponse, GetMnemonicSeedRequest, GetMnemonicSeedResponse, GetPrivateViewKeyRequest,
+    GetPrivateViewKeyResponse, GetSpendKeysRequest, GetSpendKeysResponse, GetTxPrivateKeyRequest,
+    GetTxPrivateKeyResponse, OpenWalletRequest, OpenWalletResponse, ResetWalletRequest,
+    ResetWalletResponse, SaveWalletRequest, SaveWalletResponse, WalletCreateRequest,
+    WalletCreateResponse, WalletImportKeyRequest, WalletImportKeyResponse, WalletImportSeedRequest,
+    WalletImportSeedResponse, WalletImportViewRequest, WalletImportViewResponse,
+};
 
 #[derive(Debug, Default)]
 pub struct WalletHandler;
@@ -46,6 +55,147 @@ impl Wallet for WalletHandler {
             http_status_code: 200,
         };
 
+        Ok(Response::new(response))
+    }
+
+    async fn wallet_import_key(
+        &self,
+        request: Request<WalletImportKeyRequest>,
+    ) -> Result<Response<WalletImportKeyResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = WalletImportKeyResponse {};
+
+        Ok(Response::new(response))
+    }
+
+    async fn wallet_import_seed(
+        &self,
+        request: Request<WalletImportSeedRequest>,
+    ) -> Result<Response<WalletImportSeedResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = WalletImportSeedResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn wallet_import_view(
+        &self,
+        request: Request<WalletImportViewRequest>,
+    ) -> Result<Response<WalletImportViewResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = WalletImportViewResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn wallet_create(
+        &self,
+        request: Request<WalletCreateRequest>,
+    ) -> Result<Response<WalletCreateResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = WalletCreateResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn save_wallet(
+        &self,
+        request: Request<SaveWalletRequest>,
+    ) -> Result<Response<SaveWalletResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = SaveWalletResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn reset_wallet(
+        &self,
+        request: Request<ResetWalletRequest>,
+    ) -> Result<Response<ResetWalletResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = ResetWalletResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn close_wallet(
+        &self,
+        request: Request<CloseWalletRequest>,
+    ) -> Result<Response<CloseWalletResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = CloseWalletResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn get_balance(
+        &self,
+        request: Request<GetBalanceRequest>,
+    ) -> Result<Response<GetBalanceResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetBalanceResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn get_balance_for_address(
+        &self,
+        request: Request<GetBalanceForAddressRequest>,
+    ) -> Result<Response<GetBalanceForAddressResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetBalanceForAddressResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn get_balances(
+        &self,
+        request: Request<GetBalancesRequest>,
+    ) -> Result<Response<GetBalancesResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetBalancesResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn get_private_view_key(
+        &self,
+        request: Request<GetPrivateViewKeyRequest>,
+    ) -> Result<Response<GetPrivateViewKeyResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetPrivateViewKeyResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn get_spend_keys(
+        &self,
+        request: Request<GetSpendKeysRequest>,
+    ) -> Result<Response<GetSpendKeysResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetSpendKeysResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn get_mnemonic_seed(
+        &self,
+        request: Request<GetMnemonicSeedRequest>,
+    ) -> Result<Response<GetMnemonicSeedResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetMnemonicSeedResponse {};
+        Ok(Response::new(response))
+    }
+
+    async fn get_tx_private_key(
+        &self,
+        request: Request<GetTxPrivateKeyRequest>,
+    ) -> Result<Response<GetTxPrivateKeyResponse>, Status> {
+        println!("Received request from: {:?}", request);
+
+        let response = GetTxPrivateKeyResponse {};
         Ok(Response::new(response))
     }
 }
