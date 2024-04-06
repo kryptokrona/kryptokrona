@@ -71,10 +71,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let wallet_server = WalletServer::new(wallet);
 
     // Setting up reflection service
-    // let reflection_service = tonic_reflection::server::Builder::configure()
-    //     .register_encoded_file_descriptor_set(wallet_api_proto::FILE_DESCRIPTOR_SET)
-    //     .build()
-    //     .unwrap();
+    let reflection_service = tonic_reflection::server::Builder::configure()
+        .register_encoded_file_descriptor_set(wallet_api_proto::FILE_DESCRIPTOR_SET)
+        .build()
+        .unwrap();
 
     let server_addr = "[::1]:50051".parse().unwrap();
     println!("RPC Server listening on {}", server_addr);
@@ -83,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(transaction_server)
         .add_service(node_server)
         .add_service(wallet_server)
-        // .add_service(reflection_service)
+        .add_service(reflection_service)
         .serve(server_addr)
         .await?;
 
