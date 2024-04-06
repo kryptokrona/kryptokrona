@@ -42,8 +42,8 @@ impl Wallet for WalletHandler {
         println!("Received request from: {:?}", request);
 
         let response = OpenWalletResponse {
-            status: todo!(),
-            http_status_code: todo!(),
+            status: 200,
+            http_status_code: 200,
         };
 
         Ok(Response::new(response))

@@ -28,13 +28,7 @@
 
 use tonic::{Request, Response, Status};
 
-use crate::api::{
-    node::{node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse},
-    transaction::{
-        transaction_server::Transaction, SendBasicTransactionRequest, SendBasicTransactionResponse,
-    },
-    wallet::{wallet_server::Wallet, OpenWalletRequest, OpenWalletResponse},
-};
+use crate::api::node::{node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse};
 
 #[derive(Debug, Default)]
 pub struct NodeHandler;
@@ -48,10 +42,10 @@ impl Node for NodeHandler {
         println!("Received request from: {:?}", request);
 
         let response = GetNodeDetailsResponse {
-            daemon_host: todo!(),
-            daemon_port: todo!(),
-            node_fee: todo!(),
-            node_address: todo!(),
+            daemon_host: String::from("1000"),
+            daemon_port: 11898,
+            node_fee: 10,
+            node_address: String::from("2312asdakdopj12p3j1"),
         };
 
         Ok(Response::new(response))
