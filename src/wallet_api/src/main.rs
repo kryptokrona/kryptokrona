@@ -75,6 +75,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()
         .unwrap();
 
+    // Start the RPC
     let server_addr = "[::1]:50051".parse().unwrap();
     println!("RPC Server listening on {}", server_addr);
     tonic::transport::Server::builder()
