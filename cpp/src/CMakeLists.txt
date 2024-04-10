@@ -1,6 +1,18 @@
 # Build statically
 add_definitions(-DSTATICLIB)
 
+# RUST
+
+# Create an imported target for the Rust static library
+add_library(rust_crypto STATIC IMPORTED)
+set_target_properties(rust_crypto PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../../target/debug/libcrypto.rlib)
+
+# Include directories for Rust headers
+
+# Link against the Rust static library
+# target_link_libraries(cryptonote_core rust_crypto)
+
+
 # Add external libraries as include dirs, so we can do #include "httplib" for example
 include_directories(${CMAKE_SOURCE_DIR}/external/rocksdb/include)
 include_directories(${CMAKE_SOURCE_DIR}/external/cpp-linenoise)
@@ -15,7 +27,6 @@ include_directories(${CMAKE_SOURCE_DIR}/external/cryptopp)
 # can find the new file
 file(GLOB_RECURSE blockchain_explorer blockchain_explorer/*)
 file(GLOB_RECURSE common common/*)
-file(GLOB_RECURSE crypto crypto/*)
 file(GLOB_RECURSE cryptonote_core cryptonote_core/* cryptonote_config.h)
 file(GLOB_RECURSE cryptonote_protocol cryptonote_protocol/*)
 file(GLOB_RECURSE crypto_test crypto_test/*)
@@ -37,8 +48,6 @@ file(GLOB_RECURSE kryptokronad daemon/*)
 file(GLOB_RECURSE utilities utilities/*)
 file(GLOB_RECURSE wallet wallet/*)
 file(GLOB_RECURSE wallet_backend wallet_backend/*)
-file(GLOB_RECURSE zedwallet zedwallet/*)
-file(GLOB_RECURSE zedwallet++ zedwallet++/*)
 
 if(MSVC)
     file(GLOB_RECURSE syst syst/* platform/windows/syst/*)
@@ -54,7 +63,6 @@ endif()
 # Define a group of files as a library to link against
 add_library(blockchain_explorer STATIC ${blockchain_explorer})
 add_library(common STATIC ${common})
-add_library(crypto STATIC ${crypto})
 add_library(cryptonote_core STATIC ${cryptonote_core})
 add_library(errors STATIC ${errors})
 add_library(http STATIC ${http})
@@ -78,9 +86,6 @@ if(MSVC)
     set(DAEMON_SOURCES_OS
         binary_info/daemon.rc
     )
-    set(ZED_WALLET_SOURCES_OS
-        binary_info/zedwallet.rc
-    )
     set(MINER_SOURCES_OS
         binary_info/miner.rc
     )
@@ -90,17 +95,12 @@ if(MSVC)
     set(CT_SOURCES_OS
         binary_info/cryptotest.rc
     )
-    set(WALLET_API_SOURCES_OS
-        binary_info/walletapi.rc
-    )
 endif()
 
 add_executable(crypto_test ${crypto_test} ${CT_SOURCES_OS})
 add_executable(miner ${miner} ${MINER_SOURCES_OS})
 add_executable(service ${service} ${PG_SOURCES_OS})
 add_executable(kryptokronad ${kryptokronad} ${DAEMON_SOURCES_OS})
-add_executable(zedwallet ${zedwallet} ${ZED_WALLET_SOURCES_OS})
-add_executable(zedwallet++ ${zedwallet++} ${ZED_WALLET_SOURCES_OS})
 
 if(MSVC)
     target_link_libraries(syst ws2_32)
@@ -134,11 +134,11 @@ endif()
 
 # Add the dependencies we need
 target_link_libraries(common __filesystem)
-target_link_libraries(cryptonote_core common logging crypto p2p rpc http serialization syst ${Boost_LIBRARIES})
-target_link_libraries(crypto_test crypto common)
+target_link_libraries(cryptonote_core common logging rust_crypto p2p rpc http serialization syst ${Boost_LIBRARIES})
+target_link_libraries(crypto_test rust_crypto common)
 target_link_libraries(errors sub_wallets)
 target_link_libraries(logging common)
-target_link_libraries(miner cryptonote_core rpc syst http crypto errors utilities)
+target_link_libraries(miner cryptonote_core rpc syst http rust_crypto errors utilities)
 target_link_libraries(nigel errors)
 target_link_libraries(p2p cryptonote_core upnpc-static)
 target_link_libraries(rpc p2p utilities)
@@ -147,8 +147,11 @@ target_link_libraries(sub_wallets utilities cryptonote_core)
 target_link_libraries(wallet node_rpc_proxy transfers cryptonote_core common ${Boost_LIBRARIES})
 target_link_libraries(wallet_backend mnemonics cryptonote_core nigel cryptopp-static __filesystem utilities sub_wallets)
 target_link_libraries(wallet_service mnemonics)
-target_link_libraries(zedwallet mnemonics wallet errors utilities)
-target_link_libraries(zedwallet++ wallet_backend)
+
+target_include_directories(kryptokronad PRIVATE ${CMAKE_SOURCE_DIR}/../../src/crypto/c)
+target_include_directories(crypto_test PRIVATE ${CMAKE_SOURCE_DIR}/../../src/crypto/c)
+target_include_directories(service PRIVATE ${CMAKE_SOURCE_DIR}/../../src/crypto/c)
+target_include_directories(miner PRIVATE ${CMAKE_SOURCE_DIR}/../../src/crypto/c)
 
 # Add dependencies means we have to build the latter before we build the former
 # In this case it's because we need to have the current version name rather
@@ -161,18 +164,9 @@ add_dependencies(rpc version)
 add_dependencies(service version)
 add_dependencies(kryptokronad version)
 add_dependencies(wallet_service version)
-add_dependencies(zedwallet version)
 
 # Finally build the binaries
 set_property(TARGET kryptokronad PROPERTY OUTPUT_NAME "kryptokronad")
-set_property(TARGET zedwallet PROPERTY OUTPUT_NAME "xkrwallet")
-set_property(TARGET zedwallet++ PROPERTY OUTPUT_NAME "xkrwallet-beta")
 set_property(TARGET service PROPERTY OUTPUT_NAME "kryptokrona-service")
 set_property(TARGET miner PROPERTY OUTPUT_NAME "miner")
 set_property(TARGET crypto_test PROPERTY OUTPUT_NAME "crypto_test")
-
-# Additional make targets, can be used to build a subset of the targets
-# e.g. make pool will build only kryptokronad and service
-add_custom_target(pool DEPENDS kryptokronad service)
-add_custom_target(solominer DEPENDS kryptokronad zedwallet miner)
-add_custom_target(cli DEPENDS kryptokronad zedwallet)

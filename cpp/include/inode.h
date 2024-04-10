@@ -11,7 +11,7 @@
 #include <system_error>
 #include <vector>
 
-#include "crypto/crypto.h"
+#include "../../src/crypto/c/crypto.h"
 #include "cryptonote_core/cryptonote_basic.h"
 #include "cryptonote_protocol/cryptonote_protocol_definitions.h"
 #include "rpc/core_rpc_server_commands_definitions.h"
