@@ -32,5 +32,5 @@ fn main() {
         .file("c/slow-hash.c")
         .include("c");
 
-    build.compile("ccrypto");
+    build.compile("crypto");
 }

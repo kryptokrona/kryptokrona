@@ -5,7 +5,7 @@ add_definitions(-DSTATICLIB)
 
 # Create an imported target for the Rust static library
 add_library(rust_crypto STATIC IMPORTED)
-set_target_properties(rust_crypto PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../../target/debug/libcrypto.rlib)
+set_target_properties(rust_crypto PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../../target/debug/libcrypto.a)
 
 # Include directories for Rust headers
 
