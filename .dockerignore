@@ -1,9 +1,0 @@
-build/
-target/
-.git/
-.gitignore
-README.md
-LICENSE
-docker-compose.yml
-Dockerfile
-Dockerfile.test
