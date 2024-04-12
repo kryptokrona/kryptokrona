@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 
-use libc::{c_void, c_char, size_t};
+use libc::{c_char, c_void, size_t};
 
 pub const HASH_SIZE: usize = 32;
 
