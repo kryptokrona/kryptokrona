@@ -26,6 +26,7 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+use std::sync::{Arc, Mutex};
 use tonic::{Request, Response, Status};
 use base::wb::WalletBackend;
 
@@ -43,11 +44,12 @@ impl Node for NodeHandler {
         &self,
         request: Request<GetStatusRequest>,
     ) -> Result<Response<GetStatusResponse>, Status> {
-        // println!("Received request from: {:?}", request);
+        println!("Received request from: {:?}", request);
 
-        let test = WalletBackend {
+        let wb = WalletBackend {
             filename: "".to_string(),
             password: "".to_string(),
+            // daemon: Arc::new(Mutex::new((Node))),
         };
 
         //     const auto [daemonHost, daemonPort] = m_walletBackend->getNodeAddress();
