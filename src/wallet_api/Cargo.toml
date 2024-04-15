@@ -15,7 +15,7 @@ name = "wallet_api"
 path = "src/main.rs"
 
 [dev-dependencies]
-core = { version = "0.2.0", path = "../core" }
+base = { version = "0.2.0", path = "../base" }
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }

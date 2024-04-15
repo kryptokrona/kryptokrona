@@ -27,6 +27,7 @@
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 use tonic::{Request, Response, Status};
+use base::wb::WalletBackend;
 
 use crate::api::node::{
     node_server::Node, GetNodeDetailsRequest, GetNodeDetailsResponse, GetStatusRequest,
@@ -44,7 +45,10 @@ impl Node for NodeHandler {
     ) -> Result<Response<GetStatusResponse>, Status> {
         // println!("Received request from: {:?}", request);
 
-        // let daemon_host = wallet_backend
+        let test = WalletBackend {
+            filename: "".to_string(),
+            password: "".to_string(),
+        };
 
         //     const auto [daemonHost, daemonPort] = m_walletBackend->getNodeAddress();
 

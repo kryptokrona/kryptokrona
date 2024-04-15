@@ -1,5 +1,5 @@
 [package]
-name = "core"
+name = "base"
 version = "0.2.0"
 edition = "2021"
 authors = ["Marcus Cvjeticanin <mjovanc@icloud.com>"]
@@ -18,5 +18,5 @@ hyper-util = { version = "0.1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 
 [lib]
-name = "core"
+name = "base"
 crate-type = ["staticlib"]

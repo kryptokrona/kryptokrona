@@ -26,6 +26,16 @@
 // STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
 // THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+use crate::api::address::address_server::AddressServer;
+use crate::api::node::node_server::NodeServer;
+use crate::api::transaction;
+use crate::api::transaction::transaction_server::TransactionServer;
+use crate::api::wallet::wallet_server::WalletServer;
+use crate::handler::address_handler::AddressHandler;
+use crate::handler::node_handler::NodeHandler;
+use crate::handler::transaction_handler::TransactionHandler;
+use crate::handler::wallet_handler::WalletHandler;
+
 mod api {
     pub mod address;
     pub mod node;
@@ -44,16 +54,6 @@ mod wallet_api_proto {
     pub(crate) const FILE_DESCRIPTOR_SET: &[u8] =
         tonic::include_file_descriptor_set!("wallet_api_descriptor");
 }
-
-use crate::api::address::address_server::AddressServer;
-use crate::api::node::node_server::NodeServer;
-use crate::api::transaction;
-use crate::api::transaction::transaction_server::TransactionServer;
-use crate::api::wallet::wallet_server::WalletServer;
-use crate::handler::address_handler::AddressHandler;
-use crate::handler::node_handler::NodeHandler;
-use crate::handler::transaction_handler::TransactionHandler;
-use crate::handler::wallet_handler::WalletHandler;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
