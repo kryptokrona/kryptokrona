@@ -1,5 +1,6 @@
-use node::Node;
 use std::sync::{Arc, Mutex};
+
+use node::Node;
 
 pub struct WalletBackend {
     filename: String,

@@ -27,3 +27,5 @@ pub const GLOBAL_INDEXES_OBSCURITY: u64 = 10;
 // the queue. If we exceed this, we will wait till it drops below this
 // amount.
 pub const MAXIMUM_SYNC_QUEUE_SIZE: u32 = 1000;
+
+pub mod wallet_backend;

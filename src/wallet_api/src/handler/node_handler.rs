@@ -44,6 +44,10 @@ impl Node for NodeHandler {
     ) -> Result<Response<GetStatusResponse>, Status> {
         println!("Received request from: {:?}", request);
 
+        // let wallet_backend = node::WalletBackend {};
+
+        // let daemon_host = wallet_backend
+
         //     const auto [daemonHost, daemonPort] = m_walletBackend->getNodeAddress();
 
         // const auto [nodeFee, nodeAddress] = m_walletBackend->getNodeFee();
