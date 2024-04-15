@@ -1,4 +1,4 @@
 [workspace]
-members = ["src/common", "src/crypto", "src/wallet_api", "src/core"]
+members = ["src/core", "src/common", "src/crypto", "src/wallet_api"]
 
 resolver = "2"
