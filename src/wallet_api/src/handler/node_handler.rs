@@ -44,6 +44,20 @@ impl Node for NodeHandler {
     ) -> Result<Response<GetStatusResponse>, Status> {
         println!("Received request from: {:?}", request);
 
+        //     const auto [daemonHost, daemonPort] = m_walletBackend->getNodeAddress();
+
+        // const auto [nodeFee, nodeAddress] = m_walletBackend->getNodeFee();
+
+        // nlohmann::json j{
+        //     {"daemonHost", daemonHost},
+        //     {"daemonPort", daemonPort},
+        //     {"nodeFee", nodeFee},
+        //     {"nodeAddress", nodeAddress}};
+
+        // res.set_content(j.dump(4) + "\n", "application/json");
+
+        // return {SUCCESS, 200};
+
         let response = GetStatusResponse {};
 
         Ok(Response::new(response))

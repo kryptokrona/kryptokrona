@@ -1,18 +1,22 @@
 [package]
-name = "wallet_backend"
+name = "node"
 version = "0.2.0"
 edition = "2021"
 authors = ["Marcus Cvjeticanin <mjovanc@icloud.com>"]
 license = "BSD-3-Clause"
-description = "Wallet Backend implementation in Rust."
+description = "Node implementation in Rust."
 documentation = "https://github.com/kryptokrona/kryptokrona"
 homepage = "https://github.com/kryptokrona/kryptokrona"
 repository = "https://github.com/kryptokrona/kryptokrona.git"
 rust-version = "1.77.1"
 
-[dev-dependencies]
-node = { path = "../node" }
+[dependencies]
+hyper = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
+http-body-util = "0.1"
+hyper-util = { version = "0.1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
 
 [lib]
-name = "walletbackend"
+name = "node"
 crate-type = ["staticlib"]
