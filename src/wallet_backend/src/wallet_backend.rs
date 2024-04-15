@@ -17,9 +17,23 @@ impl WalletBackend {
         }
     }
 
-    fn get_node_address(&self) -> (String, u16) {
+    fn get_node_address(&self) -> (u64, String) {
         match self.daemon.lock() {
-            Ok(guard) => guard.node_address(), // should return a tuple with daemon_host and daemon_port
+            Ok(guard) => guard.node_address(),
+            Err(_) => (0, String::new()),
+        }
+    }
+
+    fn get_node_host(&self) -> (String, u16) {
+        match self.daemon.lock() {
+            Ok(guard) => guard.node_host(),
+            Err(_) => (String::new(), 0),
+        }
+    }
+
+    fn get_node_port(&self) -> (String, u16) {
+        match self.daemon.lock() {
+            Ok(guard) => guard.node_port(),
             Err(_) => (String::new(), 0),
         }
     }
