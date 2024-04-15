@@ -1,15 +1,7 @@
-use hyper_util::client::legacy::Client;
-use serde::Deserialize;
 use std::{
-    sync::{Arc, Mutex},
     thread,
     time::Duration,
 };
-
-#[derive(Deserialize)]
-pub struct WalletBlockInfo {
-    // Define WalletBlockInfo structure fields
-}
 
 pub struct Node {
     m_timeout: Duration,

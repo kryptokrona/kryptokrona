@@ -1,11 +1,7 @@
-use std::sync::{Arc, Mutex};
-
-use crate::node::Node;
-
 pub struct WalletBackend {
     pub filename: String,
     pub password: String,
-    pub daemon: Arc<Mutex<Node>>,
+    // pub daemon: Arc<Mutex<Node>>,
     // m_event_handler: Arc<EventHandler>,
     // m_sub_wallets: Arc<SubWallets>,
 }
