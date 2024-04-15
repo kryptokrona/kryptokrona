@@ -1,10 +1,10 @@
 [package]
-name = "node"
+name = "core"
 version = "0.2.0"
 edition = "2021"
 authors = ["Marcus Cvjeticanin <mjovanc@icloud.com>"]
 license = "BSD-3-Clause"
-description = "Node implementation in Rust."
+description = "Core implementation in Rust."
 documentation = "https://github.com/kryptokrona/kryptokrona"
 homepage = "https://github.com/kryptokrona/kryptokrona"
 repository = "https://github.com/kryptokrona/kryptokrona.git"
@@ -18,5 +18,5 @@ hyper-util = { version = "0.1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 
 [lib]
-name = "node"
+name = "core"
 crate-type = ["staticlib"]

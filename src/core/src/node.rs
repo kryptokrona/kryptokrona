@@ -102,11 +102,11 @@ impl Node {
         //     .unwrap();
     }
 
-    fn get_daemon_info(&mut self) {
+    pub fn get_daemon_info(&mut self) {
         // Implementation for getting daemon info
     }
 
-    fn get_fee_info(&mut self) {
+    pub fn get_fee_info(&mut self) {
         // Implementation for getting fee info
     }
 

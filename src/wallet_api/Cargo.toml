@@ -14,6 +14,9 @@ rust-version = "1.77.1"
 name = "wallet_api"
 path = "src/main.rs"
 
+[dev-dependencies]
+core = { path = "../core" }
+
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 clap = { version = "4.5.4", features = ["derive"] }
