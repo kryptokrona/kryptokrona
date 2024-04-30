@@ -146,7 +146,8 @@ namespace cryptonote
         const uint64_t MAX_EXTRA_SIZE_V2_HEIGHT = 1300000;
         const uint64_t MAX_EXTRA_SIZE_POOL = 10000; // Includes Hugin Messages in pool
         const uint64_t MAX_EXTRA_SIZE_BLOCK = 128;  // Excludes Hugin Messages from blocks
-
+        const uint64_t BLOCK_BLOB_SHUFFLE_CHECK_HEIGHT = 1800000;
+        const uint64_t TRANSACTION_SIGNATURE_COUNT_VALIDATION_HEIGHT = 1800000;
         const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
         const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS = DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
@@ -287,12 +288,12 @@ namespace cryptonote
             {0xf1, 0x4b, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc}};
 
     const char *const SEED_NODES[] = {
-        "38.242.216.74:11897", // blocksum
+        "38.242.216.74:11897",   // blocksum
         "185.238.128.190:11897", // dutchpool
-        "207.180.226.231:11897",  // wasa
-        "185.247.226.38:11897", // privacymine
+        "207.180.226.231:11897", // wasa
+        "185.247.226.38:11897",  // privacymine
         "172.111.242.222:11897", // xkr.network
-        "217.31.103.27:11897", // kryptokrona.no
+        "217.31.103.27:11897",   // kryptokrona.no
     };
 #endif
 

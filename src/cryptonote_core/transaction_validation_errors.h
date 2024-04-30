@@ -42,6 +42,8 @@ namespace cryptonote
             WRONG_TRANSACTION_UNLOCK_TIME,
             INVALID_MIXIN,
             EXTRA_TOO_LARGE,
+            BASE_INVALID_SIGNATURES_COUNT,
+            INPUT_INVALID_SIGNATURES_COUNT,
         };
 
         // custom category:
@@ -116,6 +118,10 @@ namespace cryptonote
                     return "Mixin too large or too small";
                 case TransactionValidationError::EXTRA_TOO_LARGE:
                     return "Transaction extra too large";
+                case TransactionValidationError::BASE_INVALID_SIGNATURES_COUNT:
+                    return "Coinbase transactions must not have input signatures";
+                case TransactionValidationError::INPUT_INVALID_SIGNATURES_COUNT:
+                    return "The number of input signatures is not correct";
                 default:
                     return "Unknown error";
                 }
