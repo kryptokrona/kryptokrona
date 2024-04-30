@@ -13,6 +13,7 @@
 #include <common/shuffle_generator.h>
 #include <common/math.h>
 #include <common/memory_input_stream.h>
+#include <iterator>
 
 #include <cryptonote_core/blockchain_cache.h>
 #include <cryptonote_core/blockchain_storage.h>
@@ -1149,6 +1150,51 @@ namespace cryptonote
             return error::BlockValidationError::DIFFICULTY_OVERHEAD;
         }
 
+        // Copyright (c) 2018-2019, The Galaxia Project Developers
+        if (blockIndex >= cryptonote::parameters::BLOCK_BLOB_SHUFFLE_CHECK_HEIGHT)
+        {
+            /* Check to verify that the blocktemplate suppied contains no duplicate transaction hashes */
+            if (!is_unique(blockTemplate.transactionHashes.begin(), blockTemplate.transactionHashes.end()))
+            {
+                return error::BlockValidationError::TRANSACTION_DUPLICATES;
+            }
+
+            /* Build a vector of the rawBlock transaction Hashes */
+            std::vector<Crypto::Hash> transactionHashes{transactions.size()};
+
+            std::transform(transactions.begin(),
+                           transactions.end(),
+                           transactionHashes.begin(),
+                           [](const auto &transaction)
+                           {
+                               return transaction.getTransactionHash();
+                           });
+
+            /* Make sure that the rawBlock transaction hashes contain no duplicates */
+            if (!is_unique(transactionHashes.begin(), transactionHashes.end()))
+            {
+                return error::BlockValidationError::TRANSACTION_DUPLICATES;
+            }
+
+            /* Loop through the rawBlock transaction hashes and verify that they are
+            all in the blocktemplate transaction hashes */
+            for (const auto &transaction : transactionHashes)
+            {
+                const auto search = std::find(blockTemplate.transactionHashes.begin(), blockTemplate.transactionHashes.end(), transaction);
+
+                if (search == blockTemplate.transactionHashes.end())
+                {
+                    return error::BlockValidationError::TRANSACTION_INCONSISTENCY;
+                }
+            }
+
+            /* Ensure that the blocktemplate hashes vector matches the rawBlock transactionHashes vector */
+            if (blockTemplate.transactionHashes != transactionHashes)
+            {
+                return error::BlockValidationError::TRANSACTION_INCONSISTENCY;
+            }
+        }
+
         // This allows us to accept blocks with transaction mixins for the mined money unlock window
         // that may be using older mixin rules on the network. This helps to clear out the transaction
         // pool during a network soft fork that requires a mixin lower or upper bound change
@@ -2084,6 +2130,11 @@ namespace cryptonote
                         return error::TransactionValidationError::INPUT_SPEND_LOCKED_OUT;
                     }
 
+                    if (blockIndex >= cryptonote::parameters::TRANSACTION_SIGNATURE_COUNT_VALIDATION_HEIGHT && outputKeys.size() != cachedTransaction.getTransaction().signatures[inputIndex].size())
+                    {
+                        return error::TransactionValidationError::INPUT_INVALID_SIGNATURES_COUNT;
+                    }
+
                     if (!crypto::crypto_ops::checkRingSignature(cachedTransaction.getTransactionPrefixHash(), in.keyImage, outputKeys, transaction.signatures[inputIndex]))
                     {
                         return error::TransactionValidationError::INPUT_INVALID_SIGNATURES;
@@ -2303,6 +2354,11 @@ namespace cryptonote
         if (!(block.baseTransaction.unlockTime == previousBlockIndex + 1 + currency.minedMoneyUnlockWindow()))
         {
             return error::TransactionValidationError::WRONG_TRANSACTION_UNLOCK_TIME;
+        }
+
+        if (cachedBlock.getBlockIndex() >= cryptonote::parameters::TRANSACTION_SIGNATURE_COUNT_VALIDATION_HEIGHT && !block.baseTransaction.signatures.empty())
+        {
+            return error::TransactionValidationError::BASE_INVALID_SIGNATURES_COUNT;
         }
 
         for (const auto &output : block.baseTransaction.outputs)
@@ -3449,4 +3505,20 @@ namespace cryptonote
         return start_time;
     }
 
+}
+
+template <typename T>
+bool is_unique(T begin, T end)
+{
+    std::unordered_set<typename T::value_type> set{};
+
+    for (; begin != end; ++begin)
+    {
+        if (!set.insert(*begin).second)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
