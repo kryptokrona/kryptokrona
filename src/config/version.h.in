@@ -6,7 +6,7 @@
 #define PROJECT_COPYRIGHT "Copyright 2019, The Kryptokrona Developers"
 #define APP_VER_MAJOR 1
 #define APP_VER_MINOR 1
-#define APP_VER_REV 3
+#define APP_VER_REV 4
 #define APP_VER_BUILD 1
 
 #define BUILD_COMMIT_ID "@VERSION@"
