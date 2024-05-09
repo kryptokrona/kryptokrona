@@ -1154,13 +1154,13 @@ namespace cryptonote
         if (blockIndex >= cryptonote::parameters::BLOCK_BLOB_SHUFFLE_CHECK_HEIGHT)
         {
             /* Check to verify that the blocktemplate suppied contains no duplicate transaction hashes */
-            if (!is_unique(blockTemplate.transactionHashes.begin(), blockTemplate.transactionHashes.end()))
+            if (!Utils::is_unique(blockTemplate.transactionHashes.begin(), blockTemplate.transactionHashes.end()))
             {
                 return error::BlockValidationError::TRANSACTION_DUPLICATES;
             }
 
             /* Build a vector of the rawBlock transaction Hashes */
-            std::vector<Crypto::Hash> transactionHashes{transactions.size()};
+            std::vector<crypto::Hash> transactionHashes{transactions.size()};
 
             std::transform(transactions.begin(),
                            transactions.end(),
@@ -1171,7 +1171,7 @@ namespace cryptonote
                            });
 
             /* Make sure that the rawBlock transaction hashes contain no duplicates */
-            if (!is_unique(transactionHashes.begin(), transactionHashes.end()))
+            if (!Utils::is_unique(transactionHashes.begin(), transactionHashes.end()))
             {
                 return error::BlockValidationError::TRANSACTION_DUPLICATES;
             }
@@ -3505,20 +3505,4 @@ namespace cryptonote
         return start_time;
     }
 
-}
-
-template <typename T>
-bool is_unique(T begin, T end)
-{
-    std::unordered_set<typename T::value_type> set{};
-
-    for (; begin != end; ++begin)
-    {
-        if (!set.insert(*begin).second)
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
