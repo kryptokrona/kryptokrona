@@ -104,36 +104,6 @@ namespace cryptonote
         return ascii;
     }
 
-    json TransactionPoolCleanWrapper::trimExtra(const std::string &extra)
-    {
-        try
-        {
-            std::string payload = hex2ascii(extra.substr(66));
-            json payload_json = json::parse(payload);
-            return payload_json;
-        }
-        catch (std::exception &e)
-        {
-            logger(logging::DEBUGGING) << "Unable to trim extra data with 66";
-        }
-
-        try
-        {
-            std::string payload = hex2ascii(extra.substr(78));
-            json payload_json = json::parse(payload);
-            return payload_json;
-        }
-        catch (std::exception &e)
-        {
-            logger(logging::DEBUGGING) << "Unable to trim extra data with 78";
-        }
-
-        // returning empty json object if try/catch does not return anything
-        std::string payload = "{ 't': 0 }";
-        json payload_json = json::parse(payload);
-        return payload_json;
-    }
-
     std::vector<crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t height)
     {
         try
@@ -141,13 +111,13 @@ namespace cryptonote
             uint64_t currentTime = timeProvider->now();
             auto transactionHashes = transactionPool->getTransactionHashes();
             std::vector<crypto::Hash> deletedTransactions;
-
+            uint64_t tx_extra_data_size;
             for (const auto &hash : transactionHashes)
             {
                 logger(logging::DEBUGGING) << "Checking transaction " << common::podToHex(hash);
                 uint64_t transactionAge = currentTime - transactionPool->getTransactionReceiveTime(hash);
                 logger(logging::DEBUGGING) << "Transaction extra size: " << transactionPool->getTransaction(hash).getTransaction().extra.size();
-
+                tx_extra_data_size = transactionPool->getTransaction(hash).getTransaction().extra.size();
                 CachedTransaction transaction = transactionPool->getTransaction(hash);
                 std::vector<CachedTransaction> transactions;
                 transactions.emplace_back(transaction);
@@ -161,9 +131,19 @@ namespace cryptonote
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
                 }
+                if (tx_extra_data_size > 128)
+                {
+                    if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+                    {
+                        logger(logging::DEBUGGING) << "Deleting hugin transaction...";
+                        recentlyDeletedTransactions.emplace(hash, currentTime);
+                        transactionPool->removeTransaction(hash);
+                        deletedTransactions.emplace_back(std::move(hash));
+                    }
+                }
                 else if (transactionAge >= timeout)
                 {
-                    logger(logging::INFO) << "Deleting transaction " << common::podToHex(hash) << " from pool.";
+                    logger(logging::DEBUGGING) << "Deleting transaction " << common::podToHex(hash) << " from pool.";
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
