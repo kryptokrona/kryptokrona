@@ -146,8 +146,8 @@ namespace cryptonote
         const uint64_t MAX_EXTRA_SIZE_V2_HEIGHT = 1300000;
         const uint64_t MAX_EXTRA_SIZE_POOL = 10000; // Includes Hugin Messages in pool
         const uint64_t MAX_EXTRA_SIZE_BLOCK = 128;  // Excludes Hugin Messages from blocks
-        const uint64_t BLOCK_BLOB_SHUFFLE_CHECK_HEIGHT = 1800000;
-        const uint64_t TRANSACTION_SIGNATURE_COUNT_VALIDATION_HEIGHT = 1800000;
+        const uint64_t BLOCK_BLOB_SHUFFLE_CHECK_HEIGHT = 1750000;
+        const uint64_t TRANSACTION_SIGNATURE_COUNT_VALIDATION_HEIGHT = 1750000;
         const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
         const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS = DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
@@ -190,7 +190,7 @@ namespace cryptonote
         };
 
         /* MAKE SURE TO UPDATE THIS VALUE WITH EVERY MAJOR RELEASE BEFORE A FORK */
-        const uint64_t SOFTWARE_SUPPORTED_FORK_INDEX = 11;
+        const uint64_t SOFTWARE_SUPPORTED_FORK_INDEX = 12;
 
         const uint64_t FORK_HEIGHTS_SIZE = sizeof(FORK_HEIGHTS) / sizeof(*FORK_HEIGHTS);
 
