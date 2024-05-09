@@ -8,7 +8,7 @@
 #pragma once
 
 #include <vector>
-
+#include <unordered_set>
 #include "cached_transaction.h"
 #include "cryptonote.h"
 #include "cryptonote_tools.h"
@@ -19,6 +19,21 @@ namespace cryptonote
     {
 
         bool restoreCachedTransactions(const std::vector<BinaryArray> &binaryTransactions, std::vector<CachedTransaction> &transactions);
+        /* Verify that the items in a collection are all unique */
+        template <typename T>
+        bool is_unique(T begin, T end)
+        {
+            std::unordered_set<typename T::value_type> set{};
 
+            for (; begin != end; ++begin)
+            {
+                if (!set.insert(*begin).second)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     } // namespace Utils
 } // namespace cryptonote
