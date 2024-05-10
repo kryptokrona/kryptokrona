@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vector>
+#include <iterator>
 #include <unordered_set>
 #include "cached_transaction.h"
 #include "cryptonote.h"
