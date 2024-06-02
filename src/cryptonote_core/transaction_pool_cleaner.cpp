@@ -133,7 +133,7 @@ namespace cryptonote
                 }
                 if (tx_extra_data_size > 128)
                 {
-                    if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+                    if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || tx_extra_data_size >= cryptonote::parameters::MAX_EXTRA_SIZE_POOL)
                     {
                         logger(logging::DEBUGGING) << "Deleting hugin transaction...";
                         recentlyDeletedTransactions.emplace(hash, currentTime);
