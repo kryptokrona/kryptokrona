@@ -43,7 +43,7 @@ namespace cryptonote
         const uint64_t LWMA_2_DIFFICULTY_BLOCK_INDEX_V2 = 700000;
         const uint64_t LWMA_2_DIFFICULTY_BLOCK_INDEX_V3 = 800000;
 
-        const uint64_t LWMA_3_DIFFICULTY_BLOCK_INDEX = 2000000;
+        const uint64_t LWMA_3_DIFFICULTY_BLOCK_INDEX = 2200000;
 
         const unsigned EMISSION_SPEED_FACTOR = 21;
         static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
@@ -141,11 +141,11 @@ namespace cryptonote
         const size_t MAX_BLOCK_SIZE_INITIAL = 100000;
         const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR = 100 * 1024;
         const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR = 365 * 24 * 60 * 60 / DIFFICULTY_TARGET;
-        const uint64_t MAX_EXTRA_SIZE = 10000;
+        const uint64_t MAX_EXTRA_SIZE = 2200§;
         const uint64_t MAX_EXTRA_SIZE_V2 = 1024;
         const uint64_t MAX_EXTRA_SIZE_V2_HEIGHT = 1300000;
-        const uint64_t MAX_EXTRA_SIZE_POOL = 10000; // Includes Hugin Messages in pool
-        const uint64_t MAX_EXTRA_SIZE_BLOCK = 128;  // Excludes Hugin Messages from blocks
+        const uint64_t MAX_EXTRA_SIZE_POOL = 2200; // Includes Hugin Messages in pool
+        const uint64_t MAX_EXTRA_SIZE_BLOCK = 128; // Excludes Hugin Messages from blocks
 
         const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
         const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS = DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
@@ -185,11 +185,11 @@ namespace cryptonote
                 1400000, // 9
                 1600000, // 10
                 1800000, // 11
-                2000000, // 12
+                2200000, // 12
         };
 
         /* MAKE SURE TO UPDATE THIS VALUE WITH EVERY MAJOR RELEASE BEFORE A FORK */
-        const uint64_t SOFTWARE_SUPPORTED_FORK_INDEX = 11;
+        const uint64_t SOFTWARE_SUPPORTED_FORK_INDEX = 12;
 
         const uint64_t FORK_HEIGHTS_SIZE = sizeof(FORK_HEIGHTS) / sizeof(*FORK_HEIGHTS);
 
@@ -287,12 +287,12 @@ namespace cryptonote
             {0xf1, 0x4b, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc}};
 
     const char *const SEED_NODES[] = {
-        "38.242.216.74:11897", // blocksum
+        "38.242.216.74:11897",   // blocksum
         "185.238.128.190:11897", // dutchpool
-        "207.180.226.231:11897",  // wasa
-        "185.247.226.38:11897", // privacymine
+        "207.180.226.231:11897", // wasa
+        "185.247.226.38:11897",  // privacymine
         "172.111.242.222:11897", // xkr.network
-        "217.31.103.27:11897", // kryptokrona.no
+        "217.31.103.27:11897",   // kryptokrona.no
     };
 #endif
 
