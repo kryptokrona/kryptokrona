@@ -1,6 +1,7 @@
 // Copyright (c) 2012-2017, The CryptoNote developers, The Bytecoin developers
 // Copyright (c) 2014-2018, The Monero Project
 // Copyright (c) 2018-2019, The TurtleCoin Developers
+// Copyright (c) 2018-2019 Galaxia Project Developers
 // Copyright (c) 2019, The Kryptokrona Developers
 //
 // Please see the included LICENSE file for more information.
@@ -28,7 +29,9 @@ namespace cryptonote
             BLOCK_REWARD_MISMATCH,
             CHECKPOINT_BLOCK_HASH_MISMATCH,
             PROOF_OF_WORK_TOO_WEAK,
-            TRANSACTION_ABSENT_IN_POOL
+            TRANSACTION_ABSENT_IN_POOL,
+            TRANSACTION_DUPLICATES,
+            TRANSACTION_INCONSISTENCY
         };
 
         // custom category:
@@ -77,6 +80,10 @@ namespace cryptonote
                     return "Proof of work is too weak";
                 case BlockValidationError::TRANSACTION_ABSENT_IN_POOL:
                     return "Block's transaction is absent in transaction pool";
+                case BlockValidationError::TRANSACTION_DUPLICATES:
+                    return "Block contains duplicate transaction hashes";
+                case BlockValidationError::TRANSACTION_INCONSISTENCY:
+                    return "Block contains inconsisten transaction hashes";
                 default:
                     return "Unknown error";
                 }

@@ -3,6 +3,7 @@
 </a>
 
 # kryptokrona
+
 [![build](https://img.shields.io/github/actions/workflow/status/kryptokrona/kryptokrona/master-ci.yml?branch=master)](https://github.com/kryptokrona/kryptokrona/actions/workflows/master-ci.yml)
 [![release](https://img.shields.io/github/v/release/kryptokrona/kryptokrona)](https://img.shields.io/github/v/release/kryptokrona/kryptokrona)
 [![license](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://opensource.org/licenses/GPLv3)
@@ -261,8 +262,8 @@ The binaries will be in the `src` folder when you are complete.
 #### Prerequisites
 
 - Install [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/vs/older-downloads/)
-- Install [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false)
-- When installing Visual Studio, it is **required** that you install **Desktop development with C++**.  Select MSVC v141 Build Tools.
+
+- When installing Visual Studio, it is **required** that you install **Desktop development with C++**. Select MSVC v141 Build Tools.
 - Install the latest version of [Boost](https://sourceforge.net/projects/boost/files/boost-binaries/1.68.0/boost_1_68_0-msvc-14.1-64.exe/download) - Currently Boost 1.68.
 
 #### Build using Visual C++ 2019
@@ -271,26 +272,12 @@ The binaries will be in the `src` folder when you are complete.
 - `cd <your_kryptokrona_directory>`
 - `mkdir build`
 - `cd build`
-- `set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";%PATH%`
+- `set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";%PATH%`
 - `cmake -G "Visual Studio 16 2019" -A x64 .. -DBOOST_ROOT=C:/local/boost_1_68_0`
 
 If you have errors on this step about not being able to find the following static libraries, you may need to update your cmake. Open 'Visual Studio Installer' and click 'Update'.
 
 - `MSBuild kryptokrona.sln /p:Configuration=Release /p:PlatformToolset=v141`
-
-#### Build using Visual C++ 2022
-
-- From the start menu, open 'x64 Native Tools Command Prompt for vs2022'.
-- `cd <your_kryptokrona_directory>`
-- `mkdir build`
-- `cd build`
-- `set PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin";%PATH%`
-- `cmake -G "Visual Studio 17 2022" .. -DBOOST_ROOT=C:/local/boost_1_68_0 `
-
-If you have errors on this step about not being able to find the following static libraries, you may need to update your cmake. Open 'Visual Studio Installer' and click 'Update'.
-
-- `MSBuild kryptokrona.sln /p:Configuration=Release /p:PlatformToolset=v141 /p:Platform="x64" /m`
-
 
 The binaries will be in the `src/Release` folder when you are complete.
 
@@ -454,7 +441,6 @@ being awesome contributors to this project. **We'd like to take a moment to reco
 [<img src="https://github.com/f-r00t.png?size=72" alt="f-r00t" width="72">](https://github.com/f-r00t)
 [<img src="https://github.com/n9lsjr.png?size=72" alt="n9lsjr" width="72">](https://github.com/n9lsjr)
 [<img src="https://github.com/TechyGuy17.png?size=72" alt="TechyGuy17" width="72">](https://github.com/TechyGuy17)
-
 
 ## License
 

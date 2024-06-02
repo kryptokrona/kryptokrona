@@ -13,6 +13,7 @@
 #include <common/shuffle_generator.h>
 #include <common/math.h>
 #include <common/memory_input_stream.h>
+#include <iterator>
 
 #include <cryptonote_core/blockchain_cache.h>
 #include <cryptonote_core/blockchain_storage.h>
@@ -1149,6 +1150,51 @@ namespace cryptonote
             return error::BlockValidationError::DIFFICULTY_OVERHEAD;
         }
 
+        // Copyright (c) 2018-2019, The Galaxia Project Developers
+        if (blockIndex >= cryptonote::parameters::BLOCK_BLOB_SHUFFLE_CHECK_HEIGHT)
+        {
+            /* Check to verify that the blocktemplate suppied contains no duplicate transaction hashes */
+            if (!Utils::is_unique(blockTemplate.transactionHashes.begin(), blockTemplate.transactionHashes.end()))
+            {
+                return error::BlockValidationError::TRANSACTION_DUPLICATES;
+            }
+
+            /* Build a vector of the rawBlock transaction Hashes */
+            std::vector<crypto::Hash> transactionHashes{transactions.size()};
+
+            std::transform(transactions.begin(),
+                           transactions.end(),
+                           transactionHashes.begin(),
+                           [](const auto &transaction)
+                           {
+                               return transaction.getTransactionHash();
+                           });
+
+            /* Make sure that the rawBlock transaction hashes contain no duplicates */
+            if (!Utils::is_unique(transactionHashes.begin(), transactionHashes.end()))
+            {
+                return error::BlockValidationError::TRANSACTION_DUPLICATES;
+            }
+
+            /* Loop through the rawBlock transaction hashes and verify that they are
+            all in the blocktemplate transaction hashes */
+            for (const auto &transaction : transactionHashes)
+            {
+                const auto search = std::find(blockTemplate.transactionHashes.begin(), blockTemplate.transactionHashes.end(), transaction);
+
+                if (search == blockTemplate.transactionHashes.end())
+                {
+                    return error::BlockValidationError::TRANSACTION_INCONSISTENCY;
+                }
+            }
+
+            /* Ensure that the blocktemplate hashes vector matches the rawBlock transactionHashes vector */
+            if (blockTemplate.transactionHashes != transactionHashes)
+            {
+                return error::BlockValidationError::TRANSACTION_INCONSISTENCY;
+            }
+        }
+
         // This allows us to accept blocks with transaction mixins for the mined money unlock window
         // that may be using older mixin rules on the network. This helps to clear out the transaction
         // pool during a network soft fork that requires a mixin lower or upper bound change
@@ -1756,6 +1802,26 @@ namespace cryptonote
         return getTopBlockHash() == lastBlockHash;
     }
 
+    bool Core::getPool(uint64_t timestampBegin, std::vector<TransactionPrefixInfo> &addedTransactions) const
+    {
+        throwIfNotInitialized();
+
+        std::vector<crypto::Hash> newTransactions;
+        getTransactionPoolTimeDifference(timestampBegin, newTransactions);
+
+        addedTransactions.reserve(newTransactions.size());
+        for (const auto &hash : newTransactions)
+        {
+            TransactionPrefixInfo transactionPrefixInfo;
+            transactionPrefixInfo.txHash = hash;
+            transactionPrefixInfo.txPrefix =
+                static_cast<const TransactionPrefix &>(transactionPool->getTransaction(hash).getTransaction());
+            addedTransactions.emplace_back(std::move(transactionPrefixInfo));
+        }
+
+        return true;
+    }
+
     bool Core::getBlockTemplate(BlockTemplate &b, const AccountPublicAddress &adr, const BinaryArray &extraNonce,
                                 uint64_t &difficulty, uint32_t &height) const
     {
@@ -2064,6 +2130,11 @@ namespace cryptonote
                         return error::TransactionValidationError::INPUT_SPEND_LOCKED_OUT;
                     }
 
+                    if (blockIndex >= cryptonote::parameters::TRANSACTION_SIGNATURE_COUNT_VALIDATION_HEIGHT && outputKeys.size() != cachedTransaction.getTransaction().signatures[inputIndex].size())
+                    {
+                        return error::TransactionValidationError::INPUT_INVALID_SIGNATURES_COUNT;
+                    }
+
                     if (!crypto::crypto_ops::checkRingSignature(cachedTransaction.getTransactionPrefixHash(), in.keyImage, outputKeys, transaction.signatures[inputIndex]))
                     {
                         return error::TransactionValidationError::INPUT_INVALID_SIGNATURES;
@@ -2283,6 +2354,11 @@ namespace cryptonote
         if (!(block.baseTransaction.unlockTime == previousBlockIndex + 1 + currency.minedMoneyUnlockWindow()))
         {
             return error::TransactionValidationError::WRONG_TRANSACTION_UNLOCK_TIME;
+        }
+
+        if (cachedBlock.getBlockIndex() >= cryptonote::parameters::TRANSACTION_SIGNATURE_COUNT_VALIDATION_HEIGHT && !block.baseTransaction.signatures.empty())
+        {
+            return error::TransactionValidationError::BASE_INVALID_SIGNATURES_COUNT;
         }
 
         for (const auto &output : block.baseTransaction.outputs)
@@ -2733,6 +2809,36 @@ namespace cryptonote
 
         newTransactions.assign(poolTransactions.begin(), poolTransactions.end());
         deletedTransactions.assign(knownTransactions.begin(), knownTransactions.end());
+    }
+
+    /* Check for time difference instead of sending known hashes back and forth. */
+    void Core::getTransactionPoolTimeDifference(uint64_t timestampBegin, std::vector<crypto::Hash> &newTransactions) const
+    {
+        auto t = transactionPool->getTransactionHashes();
+
+        std::unordered_set<crypto::Hash> poolTransactions(t.begin(), t.end());
+
+        for (auto it = poolTransactions.begin(), end = poolTransactions.end(); it != end;)
+        {
+
+            /* This value might differ from our client timestamp when checking batches.
+               We should deduct a couple of seconds to make up for this. This can be done at client request */
+            uint64_t transactionTime = transactionPool->getTransactionReceiveTime(*it);
+
+            logger(logging::DEBUGGING) << "Transaction age is "
+                                       << transactionTime;
+
+            if (transactionTime < timestampBegin)
+            {
+                it = poolTransactions.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        newTransactions.assign(poolTransactions.begin(), poolTransactions.end());
     }
 
     uint8_t Core::getBlockMajorVersionForHeight(uint32_t height) const

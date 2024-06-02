@@ -120,6 +120,7 @@ namespace cryptonote
         virtual bool getPoolChangesLite(const crypto::Hash &lastBlockHash, const std::vector<crypto::Hash> &knownHashes,
                                         std::vector<TransactionPrefixInfo> &addedTransactions,
                                         std::vector<crypto::Hash> &deletedTransactions) const = 0;
+        virtual bool getPool(uint64_t timestampBegin, std::vector<TransactionPrefixInfo> &addedTransactions) const = 0;
 
         virtual bool getBlockTemplate(BlockTemplate &b, const AccountPublicAddress &adr, const BinaryArray &extraNonce,
                                       uint64_t &difficulty, uint32_t &height) const = 0;
