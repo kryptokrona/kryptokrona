@@ -104,6 +104,36 @@ namespace cryptonote
         return ascii;
     }
 
+    json TransactionPoolCleanWrapper::trimExtra(const std::string &extra)
+    {
+        try
+        {
+            std::string payload = hex2ascii(extra.substr(66));
+            json payload_json = json::parse(payload);
+            return payload_json;
+        }
+        catch (std::exception &e)
+        {
+            logger(logging::DEBUGGING) << "Unable to trim extra data with 66";
+        }
+
+        try
+        {
+            std::string payload = hex2ascii(extra.substr(78));
+            json payload_json = json::parse(payload);
+            return payload_json;
+        }
+        catch (std::exception &e)
+        {
+            logger(logging::DEBUGGING) << "Unable to trim extra data with 78";
+        }
+
+        // returning empty json object if try/catch does not return anything
+        std::string payload = "{ 't': 0 }";
+        json payload_json = json::parse(payload);
+        return payload_json;
+    }
+
     std::vector<crypto::Hash> TransactionPoolCleanWrapper::clean(const uint32_t height)
     {
         try
@@ -112,6 +142,7 @@ namespace cryptonote
             auto transactionHashes = transactionPool->getTransactionHashes();
             std::vector<crypto::Hash> deletedTransactions;
             uint64_t tx_extra_data_size;
+            uint64_t boxed_transaction_age;
             for (const auto &hash : transactionHashes)
             {
                 logger(logging::DEBUGGING) << "Checking transaction " << common::podToHex(hash);
@@ -121,7 +152,7 @@ namespace cryptonote
                 CachedTransaction transaction = transactionPool->getTransaction(hash);
                 std::vector<CachedTransaction> transactions;
                 transactions.emplace_back(transaction);
-
+                boxed_transaction_age = 0;
                 auto [success, error] = Mixins::validate(transactions, height);
 
                 if (!success)
@@ -130,23 +161,55 @@ namespace cryptonote
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
+                    continue;
                 }
-                if (tx_extra_data_size > 128)
-                {
-                    if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || tx_extra_data_size >= cryptonote::parameters::MAX_EXTRA_SIZE_POOL)
-                    {
-                        logger(logging::DEBUGGING) << "Deleting hugin transaction...";
-                        recentlyDeletedTransactions.emplace(hash, currentTime);
-                        transactionPool->removeTransaction(hash);
-                        deletedTransactions.emplace_back(std::move(hash));
-                    }
-                }
-                else if (transactionAge >= timeout)
+                if (transactionAge >= timeout)
                 {
                     logger(logging::DEBUGGING) << "Deleting transaction " << common::podToHex(hash) << " from pool.";
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
+                    continue
+                }
+
+                if (tx_extra_data_size > cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
+                {
+                    if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || tx_extra_data_size >= cryptonote::parameters::MAX_EXTRA_SIZE_POOL)
+                    {
+                        recentlyDeletedTransactions.emplace(hash, currentTime);
+                        transactionPool->removeTransaction(hash);
+                        deletedTransactions.emplace_back(std::move(hash));
+                        continue
+                    }
+                    try
+                    {
+                        // check transaction age
+                        std::string extraData = common::toHex(
+                            transactionPool->getTransaction(hash).getTransaction().extra.data(),
+                            transaction_extra_data_size);
+
+                        // parse the json
+                        json j = trimExtra(extraData);
+                        uint64_t box_time = j.at("t").get<uint64_t>();
+                        boxed_transaction_age = currentTime - (box_time / 1000);
+
+                        if (boxed_transaction_age >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
+                        {
+                            logger(logging::INFO) << "Deleting hugin transaction...";
+                            recentlyDeletedTransactions.emplace(hash, currentTime);
+                            transactionPool->removeTransaction(hash);
+                            deletedTransactions.emplace_back(std::move(hash));
+                            continue
+                        }
+                    }
+                    catch (std::exception &e)
+                    {
+                        logger(logging::DEBUGGING) << "Unable to parse hugin transaction, not a valid hugin transaction.";
+                        recentlyDeletedTransactions.emplace(hash, currentTime);
+                        transactionPool->removeTransaction(hash);
+                        deletedTransactions.emplace_back(std::move(hash));
+                        continue
+                    }
                 }
                 else
                 {
