@@ -169,7 +169,7 @@ namespace cryptonote
                     recentlyDeletedTransactions.emplace(hash, currentTime);
                     transactionPool->removeTransaction(hash);
                     deletedTransactions.emplace_back(std::move(hash));
-                    continue
+                    continue;
                 }
 
                 if (tx_extra_data_size > cryptonote::parameters::MAX_EXTRA_SIZE_BLOCK)
@@ -180,7 +180,7 @@ namespace cryptonote
                         recentlyDeletedTransactions.emplace(hash, currentTime);
                         transactionPool->removeTransaction(hash);
                         deletedTransactions.emplace_back(std::move(hash));
-                        continue
+                        continue;
                     }
                     try
                     {
@@ -200,7 +200,7 @@ namespace cryptonote
                             recentlyDeletedTransactions.emplace(hash, currentTime);
                             transactionPool->removeTransaction(hash);
                             deletedTransactions.emplace_back(std::move(hash));
-                            continue
+                            continue;
                         }
                     }
                     catch (std::exception &e)
@@ -209,7 +209,7 @@ namespace cryptonote
                         recentlyDeletedTransactions.emplace(hash, currentTime);
                         transactionPool->removeTransaction(hash);
                         deletedTransactions.emplace_back(std::move(hash));
-                        continue
+                        continue;
                     }
                 }
                 else
