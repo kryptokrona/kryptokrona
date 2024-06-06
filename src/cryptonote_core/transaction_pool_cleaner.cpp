@@ -176,6 +176,7 @@ namespace cryptonote
                 {
                     if (transactionAge >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME || tx_extra_data_size >= cryptonote::parameters::MAX_EXTRA_SIZE_POOL)
                     {
+                        logger(logging::DEBUGGING) << "Deleting hugin transaction...";
                         recentlyDeletedTransactions.emplace(hash, currentTime);
                         transactionPool->removeTransaction(hash);
                         deletedTransactions.emplace_back(std::move(hash));
@@ -195,7 +196,7 @@ namespace cryptonote
 
                         if (boxed_transaction_age >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_TX_LIVETIME)
                         {
-                            logger(logging::INFO) << "Deleting hugin transaction...";
+                            logger(logging::DEBUGGING) << "Deleting hugin transaction...";
                             recentlyDeletedTransactions.emplace(hash, currentTime);
                             transactionPool->removeTransaction(hash);
                             deletedTransactions.emplace_back(std::move(hash));
