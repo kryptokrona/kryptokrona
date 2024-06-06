@@ -41,13 +41,13 @@ jobs:
         if: matrix.config.os == 'ubuntu-20.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 libboost-date-time1.71.0 libboost-chrono1.71.0 libboost-regex1.71.0 libboost-serialization1.71.0 libboost-program-options1.71.0 libicu66
+          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libboost-system1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 libboost-date-time1.71.0 libboost-chrono1.71.0 libboost-regex1.71.0 libboost-serialization1.71.0 libboost-program-options1.71.0 libicu66
 
       - name: "Install ${{ matrix.config.name }} Dependencies "
         if: matrix.config.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc-11 g++-11 git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
+          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
       - name: mkdir build
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
