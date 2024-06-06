@@ -187,7 +187,7 @@ namespace cryptonote
                         // check transaction age
                         std::string extraData = common::toHex(
                             transactionPool->getTransaction(hash).getTransaction().extra.data(),
-                            transaction_extra_data_size);
+                            tx_extra_data_size);
 
                         // parse the json
                         json j = trimExtra(extraData);
