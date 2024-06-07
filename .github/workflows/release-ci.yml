@@ -97,8 +97,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/src/${{ needs.build.outputs.artifact }}
-          asset_name: ${{ needs.build.outputs.artifact }}
+          asset_path: build/src/${{ matrix.config.artifact }}
+          asset_name: ${{ matrix.config.artifact }}
           asset_content_type: application/zip
 
   docker-testnet:
