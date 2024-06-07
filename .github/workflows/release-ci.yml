@@ -56,7 +56,6 @@ jobs:
       - name: Build Ubuntu Target
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: |
-          cd build
           cmake -DBoost_ARCHITECTURE=-x64 ..
           make
         working-directory: build
