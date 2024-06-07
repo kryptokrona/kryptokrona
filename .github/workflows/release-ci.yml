@@ -39,17 +39,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Install ${{ matrix.config.name }} Dependencies "
-        if: matrix.config.os == 'ubuntu-20.04'
+      - name: "Install ${{ matrix.config.name }} Dependencies"
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libboost-system1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 libboost-date-time1.71.0 libboost-chrono1.71.0 libboost-regex1.71.0 libboost-serialization1.71.0 libboost-program-options1.71.0 libicu66
-
-      - name: "Install ${{ matrix.config.name }} Dependencies "
-        if: matrix.config.os == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
+          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libicu-dev
+          if [ ${{ matrix.config.os }} == "ubuntu-20.04" ]; then
+            sudo apt-get install -y libboost-system1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 libboost-date-time1.71.0 libboost-chrono1.71.0 libboost-regex1.71.0 libboost-serialization1.71.0 libboost-program-options1.71.0;
+          elif [ ${{ matrix.config.os }} == "ubuntu-22.04" ]; then
+            sudo apt-get install -y libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0;
+          fi
 
       - name: mkdir build
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
@@ -58,8 +56,16 @@ jobs:
       - name: Build Ubuntu Target
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: |
+          cd build
           cmake -DBoost_ARCHITECTURE=-x64 ..
           make
+        working-directory: build
+
+      - name: Package Artifacts
+        if: ${{ contains(matrix.config.name, 'ubuntu') }}
+        run: |
+          cd build/src
+          zip -r ${{ matrix.config.artifact }}.zip kryptokronad xkrwallet kryptokrona-service miner wallet-api
         working-directory: build
 
       - name: Upload Ubuntu Artifact
@@ -67,12 +73,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.config.artifact }}
-          path: |
-            build/src/kryptokronad
-            build/src/xkrwallet
-            build/src/kryptokrona-service
-            build/src/miner
-            build/src/wallet-api
+          path: build/src/${{ matrix.config.artifact }}.zip
 
   create-release:
     name: Create GitHub Release
@@ -97,49 +98,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/src/kryptokronad
-          asset_name: kryptokronad
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/src/xkrwallet
-          asset_name: xkrwallet
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/src/kryptokrona-service
-          asset_name: kryptokrona-service
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/src/miner
-          asset_name: miner
-          asset_content_type: application/octet-stream
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/src/wallet-api
-          asset_name: wallet-api
-          asset_content_type: application/octet-stream
+          asset_path: build/src/${{ needs.build.outputs.artifact }}
+          asset_name: ${{ needs.build.outputs.artifact }}
+          asset_content_type: application/zip
 
   docker-testnet:
     name: Build and Publish Docker Image for testnet
