@@ -1,0 +1,229 @@
+name: Kryptokrona Master Pipeline
+
+env:
+  GITHUB_REGISTRY: "ghcr.io"
+  GITHUB_OWNER: "kryptokrona"
+  GITHUB_DOCKER_IMAGE: "kryptokrona"
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: "Build: ${{ matrix.config.name }} / ${{ matrix.config.platform }}"
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        config:
+          - {
+              name: "Ubuntu 20.04 GCC",
+              artifact: "kryptokrona-ubuntu-20",
+              os: ubuntu-20.04,
+              cc: "gcc",
+              cxx: "g++",
+              platform: x64,
+            }
+          - {
+              name: "Ubuntu 22.04 GCC",
+              artifact: "kryptokrona-ubuntu-22",
+              os: ubuntu-22.04,
+              cc: "gcc",
+              cxx: "g++",
+              platform: x64,
+            }
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Install ${{ matrix.config.name }} Dependencies "
+        if: matrix.config.os == 'ubuntu-20.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libboost-system1.71.0 libboost-filesystem1.71.0 libboost-thread1.71.0 libboost-date-time1.71.0 libboost-chrono1.71.0 libboost-regex1.71.0 libboost-serialization1.71.0 libboost-program-options1.71.0 libicu66
+
+      - name: "Install ${{ matrix.config.name }} Dependencies "
+        if: matrix.config.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
+
+      - name: mkdir build
+        if: ${{ contains(matrix.config.name, 'ubuntu') }}
+        run: mkdir build
+
+      - name: Build Ubuntu Target
+        if: ${{ contains(matrix.config.name, 'ubuntu') }}
+        run: |
+          cmake -DBoost_ARCHITECTURE=-x64 ..
+          make
+        working-directory: build
+
+      - name: Upload Ubuntu Artifact
+        if: ${{ contains(matrix.config.name, 'ubuntu') }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.config.artifact }}
+          path: |
+            build/src/kryptokronad
+            build/src/xkrwallet
+            build/src/kryptokrona-service
+            build/src/miner
+            build/src/wallet-api
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/src/kryptokronad
+          asset_name: kryptokronad
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/src/xkrwallet
+          asset_name: xkrwallet
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/src/kryptokrona-service
+          asset_name: kryptokrona-service
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/src/miner
+          asset_name: miner
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/src/wallet-api
+          asset_name: wallet-api
+          asset_content_type: application/octet-stream
+
+  docker-testnet:
+    name: Build and Publish Docker Image for testnet
+    runs-on: ubuntu-22.04
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: benjlevesque/short-sha@v1.2
+
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build Docker
+        run: |
+          docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} -f Dockerfile.test . --no-cache
+
+      - name: Tag Image
+        run: |
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:latest
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE-testnet:latest
+
+      - name: Publish Docker to GitHub Repository
+        run: |
+          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
+          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:latest
+
+      - uses: actions/checkout@v2
+      - name: Login into Docker Hub
+        env:
+          DOCKER_HUB_USER: ${{secrets.DOCKER_HUB_USER}}
+          DOCKER_HUB_PASSWORD: ${{secrets.DOCKER_HUB_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+
+      - name: Publish Docker to Docker Hub
+        run: |
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE-testnet:latest
+
+  docker-mainnet:
+    name: Build and Publish Docker Image for main-net
+    runs-on: ubuntu-22.04
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v2
+      - uses: benjlevesque/short-sha@v1.2
+
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build Docker
+        run: |
+          docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} . --no-cache
+
+      - name: Tag Image
+        run: |
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:latest
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
+          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE:latest
+
+      - name: Publish Docker to GitHub Repository
+        run: |
+          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
+          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:latest
+
+      - uses: actions/checkout@v2
+      - name: Login into Docker Hub
+        env:
+          DOCKER_HUB_USER: ${{secrets.DOCKER_HUB_USER}}
+          DOCKER_HUB_PASSWORD: ${{secrets.DOCKER_HUB_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+
+      - name: Publish Docker to Docker Hub
+        run: |
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
+          docker push mjovanc/$GITHUB_DOCKER_IMAGE:latest
