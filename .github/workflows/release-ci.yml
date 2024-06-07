@@ -63,7 +63,7 @@ jobs:
       - name: Package Artifacts
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: |
-          cd build/src
+          cd src
           zip -r ${{ matrix.config.artifact }}.zip kryptokronad xkrwallet kryptokrona-service miner wallet-api
         working-directory: build
 
