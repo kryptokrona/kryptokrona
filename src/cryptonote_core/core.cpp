@@ -2484,7 +2484,7 @@ namespace cryptonote
 
             if (blockTemplate.previousBlockHash != previousBlockHash)
             {
-                logger(Logging::ERROR) << "Local blockchain corruption detected. " << std::endl
+                logger(logging::ERROR) << "Local blockchain corruption detected. " << std::endl
                                        << "Block with index " << i << " and hash " << cachedBlock.getBlockHash()
                                        << " has previous block hash " << blockTemplate.previousBlockHash << ", but parent has hash " << previousBlockHash << "." << std::endl
                                        << "Please try to repair this issue by starting the node with the option: --rewind " << i << std::endl
