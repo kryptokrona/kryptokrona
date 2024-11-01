@@ -554,7 +554,7 @@ namespace payment_service
 
         struct Response
         {
-            std::bool isValid;
+            bool isValid;
 
             void serialize(cryptonote::ISerializer &serializer);
         };
