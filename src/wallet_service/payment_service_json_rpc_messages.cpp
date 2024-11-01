@@ -473,4 +473,18 @@ namespace payment_service
         serializer(amount, "amount");
     }
 
+    void ValidateAddress::Request::serialize(cryptonote::ISerializer &serializer)
+    {
+        if (!serializer(address, "address"))
+        {
+            throw RequestSerializationError();
+        }
+
+    }
+
+    void ValidateAddress::Response::serialize(cryptonote::ISerializer &serializer)
+    {
+        serializer(isValid, "isValid");
+    }
+
 }
