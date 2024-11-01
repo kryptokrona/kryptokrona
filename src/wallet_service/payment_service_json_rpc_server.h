@@ -117,6 +117,7 @@ namespace payment_service
         std::error_code handleEstimateFusion(const EstimateFusion::Request &request, EstimateFusion::Response &response);
         std::error_code handleCreateIntegratedAddress(const CreateIntegratedAddress::Request &request, CreateIntegratedAddress::Response &response);
         std::error_code handleNodeFeeInfo(const NodeFeeInfo::Request &request, NodeFeeInfo::Response &response);
+        std::error_code handleValidateAddress(const ValidateAddress::Request &request, ValidateAddress::Response &response);
     };
 
 } // namespace payment_service
