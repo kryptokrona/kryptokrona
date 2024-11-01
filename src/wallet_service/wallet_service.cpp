@@ -1692,4 +1692,14 @@ namespace payment_service
         return convertTransactionsInBlockInfoToTransactionsInBlockRpcInfo(filteredTransactions);
     }
 
+    bool validateAddress(const std::string &address)
+    {
+        if (!cryptonote::validateAddress(address, currency))
+        {
+            logger(logging::WARNING, logging::BRIGHT_YELLOW) << "Can't validate address " << address;
+            return false;
+        }
+        return true;
+    }
+
 } // namespace payment_service
