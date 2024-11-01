@@ -52,6 +52,7 @@ namespace payment_service
         handlers.emplace("createIntegratedAddress", jsonHandler<CreateIntegratedAddress::Request, CreateIntegratedAddress::Response>(std::bind(&PaymentServiceJsonRpcServer::handleCreateIntegratedAddress, this, std::placeholders::_1, std::placeholders::_2)));
         handlers.emplace("getFeeInfo", jsonHandler<NodeFeeInfo::Request, NodeFeeInfo::Response>(std::bind(&PaymentServiceJsonRpcServer::handleNodeFeeInfo, this, std::placeholders::_1, std::placeholders::_2)));
         handlers.emplace("getNodeFeeInfo", jsonHandler<NodeFeeInfo::Request, NodeFeeInfo::Response>(std::bind(&PaymentServiceJsonRpcServer::handleNodeFeeInfo, this, std::placeholders::_1, std::placeholders::_2)));
+        handlers.emplace("validateAddress", jsonHandler<ValidateAddress::Request, ValidateAddress::Response>(std::bind(&PaymentServiceJsonRpcServer::handleValidateAddress, this, std::placeholders::_1, std::placeholders::_2)));
     }
 
     void PaymentServiceJsonRpcServer::processJsonRpcRequest(const common::JsonValue &req, common::JsonValue &resp)
@@ -286,6 +287,11 @@ namespace payment_service
     std::error_code PaymentServiceJsonRpcServer::handleNodeFeeInfo(const NodeFeeInfo::Request &request, NodeFeeInfo::Response &response)
     {
         return service.getFeeInfo(response.address, response.amount);
+    }
+
+    std::error_code PaymentServiceJsonRpcServer::handleValidateAddress(const ValidateAddress::Request &request, ValidateAddress::Response &response)
+    {
+        return service.validateAddress(request.address);
     }
 
 }
