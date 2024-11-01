@@ -291,7 +291,7 @@ namespace payment_service
 
     std::error_code PaymentServiceJsonRpcServer::handleValidateAddress(const ValidateAddress::Request &request, ValidateAddress::Response &response)
     {
-        return service.validateAddress(request.address);
+        return service.validateAddress(request.address, response.isValid);
     }
 
 }
