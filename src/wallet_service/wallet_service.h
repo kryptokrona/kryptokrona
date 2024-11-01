@@ -93,7 +93,7 @@ namespace payment_service
         std::error_code createIntegratedAddress(const std::string &address, const std::string &paymentId, std::string &integratedAddress);
         std::error_code getFeeInfo(std::string &address, uint32_t &amount);
         uint64_t getDefaultMixin() const;
-        bool validateAddress(const std::string &address);
+        std::error_code validateAddress(const std::string &address, bool &isValid);
 
     private:
         void refresh();
