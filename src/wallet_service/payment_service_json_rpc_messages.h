@@ -543,4 +543,21 @@ namespace payment_service
         };
     };
 
+    struct ValidateAddress
+    {
+        struct Request
+        {
+            std::string address;
+
+            void serialize(cryptonote::ISerializer &serializer);
+        };
+
+        struct Response
+        {
+            std::bool isValid;
+
+            void serialize(cryptonote::ISerializer &serializer);
+        };
+    };
+
 } // namespace payment_service
