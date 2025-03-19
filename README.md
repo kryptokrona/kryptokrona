@@ -437,6 +437,7 @@ The following contributors have either helped to start this project, have contri
 code, are actively maintaining it (including documentation), or in other ways
 being awesome contributors to this project. **We'd like to take a moment to recognize them.**
 
+[<img src="https://github.com/kurosci.png?size=72" alt="kurosci" width="72">](https://github.com/kurosci)
 [<img src="https://github.com/mjovanc.png?size=72" alt="mjovanc" width="72">](https://github.com/mjovanc)
 [<img src="https://github.com/f-r00t.png?size=72" alt="f-r00t" width="72">](https://github.com/f-r00t)
 [<img src="https://github.com/n9lsjr.png?size=72" alt="n9lsjr" width="72">](https://github.com/n9lsjr)
