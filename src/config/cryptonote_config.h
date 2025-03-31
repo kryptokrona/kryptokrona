@@ -295,6 +295,7 @@ namespace cryptonote
         "185.247.226.38:11897",  // privacymine
         "172.94.14.157:11897",   // xkr.network
         "217.31.103.27:11897",   // kryptokrona.no
+        "95.216.136.222:111897", // TechyPool
     };
 #endif
 
