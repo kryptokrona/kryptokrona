@@ -295,6 +295,7 @@ namespace cryptonote
         "95.216.136.222:11897", // TechyPool
         "130.237.83.246:20191", // KTH Node
         "149.28.87.122:11897", // node.xkr.la
+        "209.38.232.36:11897" // Northern Lights
     };
 #endif
 
