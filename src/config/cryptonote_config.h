@@ -293,7 +293,7 @@ namespace cryptonote
         "185.238.128.190:11897", // dutchpool
         "207.180.226.231:11897", // wasa
         "185.247.226.38:11897",  // privacymine
-        "172.111.242.222:11897", // xkr.network
+        "172.94.14.157:11897",   // xkr.network
         "217.31.103.27:11897",   // kryptokrona.no
     };
 #endif
