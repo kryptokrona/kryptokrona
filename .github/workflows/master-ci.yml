@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload Ubuntu Artifact
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.config.artifact }}
           path: |
