@@ -289,13 +289,12 @@ namespace cryptonote
             {0xf1, 0x4b, 0xb8, 0xc8, 0xb2, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc}};
 
     const char *const SEED_NODES[] = {
-        "38.242.216.74:11897",   // blocksum
         "185.238.128.190:11897", // dutchpool
         "207.180.226.231:11897", // wasa
-        "185.247.226.38:11897",  // privacymine
         "172.94.14.157:11897",   // xkr.network
-        "217.31.103.27:11897",   // kryptokrona.no
         "95.216.136.222:11897", // TechyPool
+        "130.237.83.246:20191", // KTH Node
+        "149.28.87.122:11897", // node.xkr.la
     };
 #endif
 
