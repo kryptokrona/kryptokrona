@@ -282,10 +282,27 @@ if(NOT MSVC)
 endif()
 
 # Go get us some static BOOST libraries
-set(Boost_NO_BOOST_CMAKE ON)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_STATIC_RUNTIME ON)
-find_package(Boost REQUIRED COMPONENTS system filesystem thread date_time chrono regex serialization program_options)
+
+# CMake >= 3.30 removes the bundled FindBoost module (policy CMP0167) in favour
+# of the BoostConfig.cmake that modern Boost ships. The old module also fails on
+# newer Boost (>= 1.69) where Boost.System is header-only -- it reports "system"
+# as a missing compiled library (this broke the macOS CI runner on Boost 1.90).
+# Prefer Boost's own config package, and only fall back to the legacy module
+# finder for very old Boost installs that predate BoostConfig.cmake.
+set(KK_BOOST_COMPONENTS system filesystem thread date_time chrono regex serialization program_options)
+
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
+
+find_package(Boost QUIET CONFIG COMPONENTS ${KK_BOOST_COMPONENTS})
+if(NOT Boost_FOUND)
+    message(STATUS "BoostConfig.cmake not found, falling back to legacy FindBoost module")
+    set(Boost_NO_BOOST_CMAKE ON)
+    find_package(Boost REQUIRED COMPONENTS ${KK_BOOST_COMPONENTS})
+endif()
 message(STATUS "Boost Found: ${Boost_INCLUDE_DIRS}")
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
