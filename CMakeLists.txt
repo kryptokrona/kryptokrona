@@ -155,10 +155,10 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10485760")
 
     # MSVC's standard headers are leaner than libc++/libstdc++ and do NOT pull in
-    # <stdexcept>/<chrono> transitively, so TUs that use std::runtime_error or
-    # std::chrono::system_clock without including them fail (error C2039
-    # 'runtime_error' / C2653 'system_clock'). Force-include a small prelude
-    # header into every translation unit to fix that in one place.
+    # <stdexcept> transitively, so TUs that use std::runtime_error without
+    # including it fail (error C2039 'runtime_error' is not a member of 'std').
+    # Force-include a small prelude header into every translation unit to fix
+    # that in one place. (Keep the prelude minimal -- see kk_msvc_prelude.h.)
     #
     # We force-include a __cplusplus-guarded header (kk_msvc_prelude.h, found via
     # the src/platform/msc include dir added below) rather than the bare C++
