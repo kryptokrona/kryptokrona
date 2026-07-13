@@ -8,6 +8,7 @@
 #include "ipv4_resolver.h"
 #include <cassert>
 #include <random>
+#include <stdexcept>
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif

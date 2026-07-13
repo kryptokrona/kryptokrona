@@ -154,6 +154,13 @@ if(MSVC)
     add_definitions("/bigobj /MP /W3 /GS- /D_CRT_SECURE_NO_WARNINGS /wd4996 /wd4345 /D_WIN32_WINNT=0x0600 /DWIN32_LEAN_AND_MEAN /DGTEST_HAS_TR1_TUPLE=0 /D_VARIADIC_MAX=8 /D__SSE4_1__")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10485760")
 
+    # MSVC's standard headers are leaner than libc++/libstdc++ and do NOT pull in
+    # <stdexcept> transitively, so the many TUs that use std::runtime_error etc.
+    # without including it directly fail to compile (error C2039 'runtime_error'
+    # is not a member of 'std'). Force-include it into every C++ TU. Scoped to
+    # CXX so the C sources (cryptopp/rocksdb/slow-hash) don't get a C++ header.
+    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:/FIstdexcept>")
+
     foreach(VAR CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE)
         string(REPLACE "/MD" "/MT" ${VAR} "${${VAR}}")
     endforeach()

@@ -125,7 +125,8 @@ jobs:
           security import "$RUNNER_TEMP/cert.p12" -P "$APPLE_CERTIFICATE_PASSWORD" \
             -A -t cert -f pkcs12 -k "$KEYCHAIN"
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PWD" "$KEYCHAIN" >/dev/null
-          security list-keychains -d user -s "$KEYCHAIN" login.keychain
+          # Add our keychain to the search list without dropping the existing ones
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | sed 's/["]//g')
 
           # --- Sign each binary (hardened runtime + secure timestamp) ---
           cd build/src
