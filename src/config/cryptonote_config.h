@@ -290,12 +290,10 @@ namespace cryptonote
 
     const char *const SEED_NODES[] = {
         "185.238.128.190:11897", // dutchpool
-        "207.180.226.231:11897", // wasa
         "172.94.14.157:11897",   // xkr.network
         "95.216.136.222:11897", // TechyPool
         "130.237.83.246:20191", // KTH Node
-        "149.28.87.122:11897", // node.xkr.la
-        "209.38.232.36:11897" // Northern Lights
+        "149.28.87.122:11897" // node.xkr.la
     };
 #endif
 
