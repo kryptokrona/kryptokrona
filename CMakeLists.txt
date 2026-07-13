@@ -292,22 +292,26 @@ if(MSVC)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 
-if(APPLE)
-    # macOS binaries are never fully static (Apple ships no static system
-    # libraries), and Homebrew's newer Boost bottles (e.g. 1.90) provide only
-    # shared libs -- requesting static there leaves Boost with no library to
-    # link. Use the shared Boost that Homebrew always ships.
-    set(Boost_USE_STATIC_LIBS OFF)
-else()
-    set(Boost_USE_STATIC_LIBS ON)
-endif()
+# Link Boost statically on every platform so the resulting binaries are
+# self-contained (no external libboost_*.dylib/.so needed at runtime -- the
+# GitHub artifact has to run on machines that don't have Boost installed).
+# Homebrew/apt Boost both ship static .a libraries, and config mode resolves
+# the Boost:: imported targets to them. (The earlier CI link failure was caused
+# solely by Boost_USE_STATIC_RUNTIME above, not by static libs being missing.)
+set(Boost_USE_STATIC_LIBS ON)
 
 # CMake >= 3.30 deprecates/removes the bundled FindBoost module (policy CMP0167)
 # in favour of the BoostConfig.cmake that modern Boost ships. That module also
 # fails on newer Boost (>= 1.69) where Boost.System is header-only -- it reports
 # "system" as a missing compiled library (this broke the macOS CI runner on
 # Boost 1.90).
-set(KK_BOOST_COMPONENTS system filesystem thread date_time chrono regex serialization program_options)
+# NOTE: Boost.Regex is intentionally omitted -- it is not used anywhere in the
+# codebase, and its config-mode imported target (Boost::regex) drags in a hard
+# link dependency on ICU. ICU is keg-only on Homebrew (not on the linker search
+# path), so static linking failed with "ld: library 'icudata' not found". The
+# legacy FindBoost never added that transitive dependency, which is why older
+# builds linked fine despite listing regex.
+set(KK_BOOST_COMPONENTS system filesystem thread date_time chrono serialization program_options)
 
 # 1) Prefer Boost's own config package (present on Homebrew / apt Boost). The
 #    explicit CONFIG keyword forces config mode regardless of CMP0167.
