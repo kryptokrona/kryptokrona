@@ -25,7 +25,7 @@ if(cryptocpp_DISPLAY_CMAKE_SUPPORT_WARNING)
 )
 endif()
 
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.5)
 if (${CMAKE_VERSION} VERSION_LESS "3.0.0")
   project(cryptopp)
   set(cryptopp_VERSION_MAJOR 7)

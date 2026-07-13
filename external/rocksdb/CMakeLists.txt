@@ -32,7 +32,7 @@
 # 3. cmake ..
 # 4. make -j
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5)
 
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
@@ -193,10 +193,9 @@ if(APPLE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++ -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -nodefaultlibs -lc++ -lc++abi -lm -lc -lgcc -lgcc_eh")
 endif()
 # NOTE: With Clang on Apple (both Xcode's AppleClang and Homebrew LLVM) the
-# default libc++ already provides everything RocksDB needs. This project's old
-# cmake_minimum_required makes CMake policy CMP0025 report AppleClang as plain
-# "Clang", so we must NOT inject a hardcoded Homebrew LLVM include path here --
-# doing so mixes incompatible standard-library headers and breaks the build.
+# default libc++ already provides everything RocksDB needs, so -- unlike the GCC
+# branch above -- we must NOT inject a hardcoded Homebrew LLVM include path here.
+# Doing so mixes incompatible standard-library headers and breaks the build.
 
 
 
