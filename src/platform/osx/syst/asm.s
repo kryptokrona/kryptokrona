@@ -80,8 +80,10 @@ _setmcontext:
     ldr x27, [x0, #224]
     ldr x28, [x0, #232]
     ldr x29, [x0, #240] ; frame pointer (x29)
-    ldr x30, [x0, #248] ; link register (x30)
-    ldr x0, [x0, #8]
+    ldr x30, [x0, #248] ; link register (x30) / entry point ret's to
+    ldr x1, [x0, #256]  ; saved stack pointer
+    mov sp, x1          ; restore SP (was previously never restored)
+    ldr x0, [x0, #8]    ; x0 = argument / return value (load last: x0 is base)
     ret
 
 .globl _getmcontext
@@ -119,10 +121,10 @@ _getmcontext:
     str x29, [x0, #240] ; frame pointer (x29)
     str x30, [x0, #248] ; link register (x30)
 
-    mov x1, x30         ; store x30 (link register) temporarily in x1
-    str x1, [x0, #256]  ; store x30 in the context
+    mov x1, sp          ; capture the current stack pointer
+    str x1, [x0, #256]  ; save SP so setmcontext can restore it
 
-    mov x0, #0          ; clear x0
+    mov x0, #0          ; getmcontext returns 0 on the direct call
     ret
 
 #endif
