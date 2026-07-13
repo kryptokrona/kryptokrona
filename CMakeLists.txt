@@ -281,25 +281,47 @@ if(NOT MSVC)
     endif()
 endif()
 
-# Go get us some static BOOST libraries
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_STATIC_RUNTIME ON)
-
-# CMake >= 3.30 removes the bundled FindBoost module (policy CMP0167) in favour
-# of the BoostConfig.cmake that modern Boost ships. The old module also fails on
-# newer Boost (>= 1.69) where Boost.System is header-only -- it reports "system"
-# as a missing compiled library (this broke the macOS CI runner on Boost 1.90).
-# Prefer Boost's own config package, and only fall back to the legacy module
-# finder for very old Boost installs that predate BoostConfig.cmake.
-set(KK_BOOST_COMPONENTS system filesystem thread date_time chrono regex serialization program_options)
-
-if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)
+# Go get us some static BOOST libraries.
+#
+# Boost_USE_STATIC_RUNTIME selects Boost built against a static C runtime
+# (Windows /MT vs /MD). It is meaningless on macOS/Linux, and worse: in Boost's
+# config mode (BoostConfig.cmake) it makes Boost match NO library variant, so
+# Boost_LIBRARIES comes back empty and the wallet/service executables fail to
+# link with "undefined boost::filesystem::detail::*". Only request it on MSVC.
+if(MSVC)
+    set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 
+if(APPLE)
+    # macOS binaries are never fully static (Apple ships no static system
+    # libraries), and Homebrew's newer Boost bottles (e.g. 1.90) provide only
+    # shared libs -- requesting static there leaves Boost with no library to
+    # link. Use the shared Boost that Homebrew always ships.
+    set(Boost_USE_STATIC_LIBS OFF)
+else()
+    set(Boost_USE_STATIC_LIBS ON)
+endif()
+
+# CMake >= 3.30 deprecates/removes the bundled FindBoost module (policy CMP0167)
+# in favour of the BoostConfig.cmake that modern Boost ships. That module also
+# fails on newer Boost (>= 1.69) where Boost.System is header-only -- it reports
+# "system" as a missing compiled library (this broke the macOS CI runner on
+# Boost 1.90).
+set(KK_BOOST_COMPONENTS system filesystem thread date_time chrono regex serialization program_options)
+
+# 1) Prefer Boost's own config package (present on Homebrew / apt Boost). The
+#    explicit CONFIG keyword forces config mode regardless of CMP0167.
 find_package(Boost QUIET CONFIG COMPONENTS ${KK_BOOST_COMPONENTS})
+
+# 2) Fall back to the legacy FindBoost module. This is required for prebuilt
+#    Boost that ships no BoostConfig.cmake -- e.g. the Boost that GitHub's
+#    Windows runners expose via BOOST_ROOT. Force CMP0167 OLD so the module
+#    stays available on newer CMake.
 if(NOT Boost_FOUND)
     message(STATUS "BoostConfig.cmake not found, falling back to legacy FindBoost module")
+    if(POLICY CMP0167)
+        cmake_policy(SET CMP0167 OLD)
+    endif()
     set(Boost_NO_BOOST_CMAKE ON)
     find_package(Boost REQUIRED COMPONENTS ${KK_BOOST_COMPONENTS})
 endif()
