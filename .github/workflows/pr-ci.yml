@@ -79,13 +79,26 @@ jobs:
           cmake ..
           make -j$(sysctl -n hw.ncpu)
 
+      - name: Install Boost (vcpkg, static)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # GitHub's Windows runners no longer ship a prebuilt Boost, so install
+          # it via the preinstalled vcpkg. The x64-windows-static triplet builds
+          # Boost with the static /MT runtime that matches the /MT this project
+          # forces, and ships BoostConfig.cmake so CMake's config mode finds it.
+          vcpkg install `
+            boost-system boost-filesystem boost-thread boost-date-time `
+            boost-chrono boost-serialization boost-program-options `
+            --triplet x64-windows-static
+
       - name: Build Windows Target
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $boostRoot = (Get-ChildItem Env: | Where-Object { $_.Name -match '^BOOST_ROOT_1_\d+_0$' } | Select-Object -First 1).Value
-          Write-Host "Using BOOST_ROOT=$boostRoot"
           mkdir build
           cd build
-          cmake -G "Visual Studio 17 2022" -A x64 -DBOOST_ROOT="$boostRoot" ..
+          cmake -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static ..
           cmake --build . --config Release -- /m

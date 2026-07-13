@@ -283,14 +283,13 @@ endif()
 
 # Go get us some static BOOST libraries.
 #
-# Boost_USE_STATIC_RUNTIME selects Boost built against a static C runtime
-# (Windows /MT vs /MD). It is meaningless on macOS/Linux, and worse: in Boost's
-# config mode (BoostConfig.cmake) it makes Boost match NO library variant, so
-# Boost_LIBRARIES comes back empty and the wallet/service executables fail to
-# link with "undefined boost::filesystem::detail::*". Only request it on MSVC.
-if(MSVC)
-    set(Boost_USE_STATIC_RUNTIME ON)
-endif()
+# NOTE: do NOT set Boost_USE_STATIC_RUNTIME here. It selects Boost built against
+# a static C runtime (Windows /MT vs /MD); it is meaningless on macOS/Linux and,
+# worse, in Boost's config mode (BoostConfig.cmake) it makes Boost match NO
+# library variant, so Boost_LIBRARIES comes back empty and the wallet/service
+# executables fail to link with "undefined boost::filesystem::detail::*". On
+# Windows the C-runtime kind is chosen by the vcpkg triplet (x64-windows-static
+# gives /MT) which matches the /MT this file forces for MSVC below.
 
 # Link Boost statically on every platform so the resulting binaries are
 # self-contained (no external libboost_*.dylib/.so needed at runtime -- the
