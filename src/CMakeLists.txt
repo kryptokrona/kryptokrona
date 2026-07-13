@@ -116,14 +116,13 @@ add_library(__filesystem INTERFACE)
 
 # Windows works out of the box
 if(APPLE)
-    if(CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
-        # Apply rules specific to x64 architecture on macOS
-        target_link_libraries(__filesystem INTERFACE /usr/local/opt/llvm/lib/c++/libc++abi.a)
-    elseif(CMAKE_OSX_ARCHITECTURES STREQUAL "arm64")
-        # Apply rules specific to arm64 architecture on macOS (M1)
-        target_link_libraries(__filesystem INTERFACE /opt/homebrew/opt/llvm/lib/c++/libc++abi.a)
-    else()
-        message(FATAL_ERROR "Unsupported macOS architecture")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        # Xcode's AppleClang ships a modern libc++ where std::filesystem lives in
+        # the standard library, so nothing extra needs to be linked. This is the
+        # default toolchain on both Apple Silicon (arm64) and Intel (x86_64).
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        # Homebrew GCC/LLVM: link against Homebrew LLVM's libc++abi
+        target_link_libraries(__filesystem INTERFACE ${HOMEBREW_PREFIX}/opt/llvm/lib/c++/libc++abi.a)
     endif()
 elseif(UNIX)
     target_link_libraries(__filesystem INTERFACE stdc++fs)

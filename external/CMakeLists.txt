@@ -7,7 +7,7 @@ add_subdirectory(miniupnpc)
 add_subdirectory(cryptopp)
 
 if(MSVC)
-    add_subdirectory(rocksDB EXCLUDE_FROM_ALL)
+    add_subdirectory(rocksdb EXCLUDE_FROM_ALL)
     set_property(TARGET upnpc-static cryptopp-static rocksdb PROPERTY FOLDER "external")
 elseif(NOT MSVC)
     set_property(TARGET upnpc-static cryptopp-static PROPERTY FOLDER "external")

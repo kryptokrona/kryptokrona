@@ -125,7 +125,14 @@ class autovector {
       return (*vect_)[index_];
     }
 
-    const_reference operator*() const {
+    // NOTE: an iterator is shallow-const like a pointer, so its const-qualified
+    // operator*/operator-> must still return the iterator's own (non-const)
+    // reference/pointer type. Returning the container's const_reference here
+    // makes the element non-assignable through a mutable iterator, which newer
+    // libc++ std::sort (Xcode) rejects with "cannot assign to return value
+    // because function 'operator*' returns a const value". Const-ness is already
+    // carried correctly by const_iterator's TValueType.
+    reference operator*() const {
       assert(vect_->size() >= index_);
       return (*vect_)[index_];
     }
@@ -135,7 +142,7 @@ class autovector {
       return &(*vect_)[index_];
     }
 
-    const_pointer operator->() const {
+    pointer operator->() const {
       assert(vect_->size() >= index_);
       return &(*vect_)[index_];
     }

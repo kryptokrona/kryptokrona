@@ -6,8 +6,9 @@ jobs:
   build:
     name: "Build: ${{ matrix.config.name }} / ${{ matrix.config.platform }}"
     runs-on: ${{ matrix.config.os }}
+    continue-on-error: ${{ matrix.config.experimental || false }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         config:
           - {
@@ -26,8 +27,25 @@ jobs:
               cxx: "g++",
               platform: x64,
             }
+          - {
+              name: "macOS arm64 Clang",
+              artifact: "kryptokrona-macos-arm64.zip",
+              os: macos-14,
+              cc: "clang",
+              cxx: "clang++",
+              platform: arm64,
+            }
+          - {
+              name: "Windows x64 MSVC",
+              artifact: "kryptokrona-windows-x64.zip",
+              os: windows-2022,
+              cc: "cl",
+              cxx: "cl",
+              platform: x64,
+              experimental: true,
+            }
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: "Install ${{ matrix.config.name }} Dependencies "
         if: matrix.config.os == 'ubuntu-20.04'
@@ -41,13 +59,33 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev cron rpcbind libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
-      - name: mkdir build
-        if: ${{ contains(matrix.config.name, 'ubuntu') }}
-        run: mkdir build
+      - name: "Install macOS Dependencies"
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install boost cmake ccache
 
       - name: Build Ubuntu Target
         if: ${{ contains(matrix.config.name, 'ubuntu') }}
         run: |
+          mkdir -p build && cd build
           cmake -DBoost_ARCHITECTURE=-x64 ..
-          make
-        working-directory: build
+          make -j$(nproc)
+
+      - name: Build macOS Target
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p build && cd build
+          cmake ..
+          make -j$(sysctl -n hw.ncpu)
+
+      - name: Build Windows Target
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $boostRoot = (Get-ChildItem Env: | Where-Object { $_.Name -match '^BOOST_ROOT_1_\d+_0$' } | Select-Object -First 1).Value
+          Write-Host "Using BOOST_ROOT=$boostRoot"
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -A x64 -DBOOST_ROOT="$boostRoot" ..
+          cmake --build . --config Release -- /m

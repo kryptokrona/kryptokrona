@@ -189,12 +189,14 @@ else()
 endif()
 
 if(APPLE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    # Need to build against libc++ instead of libstc++ on apple with GCC
+    # Need to build against libc++ instead of libstdc++ on apple with GCC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostdinc++ -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -nodefaultlibs -lc++ -lc++abi -lm -lc -lgcc -lgcc_eh")
-elseif(APPLE AND CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    # Need to build against libc++ on apple with Clang
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -I/opt/homebrew/opt/llvm/include/c++/v1 -L/opt/homebrew/opt/llvm/lib/c++")
 endif()
+# NOTE: With Clang on Apple (both Xcode's AppleClang and Homebrew LLVM) the
+# default libc++ already provides everything RocksDB needs. This project's old
+# cmake_minimum_required makes CMake policy CMP0025 report AppleClang as plain
+# "Clang", so we must NOT inject a hardcoded Homebrew LLVM include path here --
+# doing so mixes incompatible standard-library headers and breaks the build.
 
 
 
@@ -386,7 +388,12 @@ if(CMAKE_SYSTEM_NAME MATCHES "Cygwin")
   add_definitions(-fno-builtin-memcmp -DCYGWIN)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   add_definitions(-DOS_MACOSX)
-  if(CMAKE_SYSTEM_PROCESSOR MATCHES arm)
+  # NOTE: Upstream RocksDB assumes any arm CPU on Darwin is an iOS cross-compile
+  # and forces the cut-down ROCKSDB_LITE build. On native Apple Silicon (arm64)
+  # macOS that strips symbols the rest of the project relies on (e.g.
+  # DBOptions::IncreaseParallelism), breaking the link. Only take the iOS/LITE
+  # path when we are actually targeting an iOS SDK.
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES arm AND CMAKE_OSX_SYSROOT MATCHES "iPhone")
     add_definitions(-DIOS_CROSS_COMPILE -DROCKSDB_LITE)
     # no debug info for IOS, that will make our library big
     add_definitions(-DNDEBUG)
