@@ -156,16 +156,17 @@ if(MSVC)
 
     # MSVC's standard headers are leaner than libc++/libstdc++ and do NOT pull in
     # <stdexcept>/<chrono> transitively, so TUs that use std::runtime_error or
-    # std::chrono::system_clock without including them fail to compile
-    # (error C2039 'runtime_error' / C2653 'system_clock'). Force-include those
-    # headers into every C++ translation unit.
+    # std::chrono::system_clock without including them fail (error C2039
+    # 'runtime_error' / C2653 'system_clock'). Force-include a small prelude
+    # header into every translation unit to fix that in one place.
     #
-    # This MUST go through CMAKE_CXX_FLAGS (C++ only) rather than
-    # add_compile_options, because forcing a C++ header into the project's C
-    # sources (crypto/*.c, cryptopp, rocksdb) trips "error STL1003: Unexpected
-    # compiler, expected C++ compiler". A $<COMPILE_LANGUAGE:CXX> generator
-    # expression does not scope reliably under the Visual Studio generator.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIstdexcept /FIchrono")
+    # We force-include a __cplusplus-guarded header (kk_msvc_prelude.h, found via
+    # the src/platform/msc include dir added below) rather than the bare C++
+    # headers, because the Visual Studio generator applies C++ flags at the
+    # project level and leaks them onto the project's C sources (crypto/*.c).
+    # Forcing a bare C++ header into a .c file trips "error STL1003: Unexpected
+    # compiler, expected C++ compiler"; the guard makes it a no-op for C.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIkk_msvc_prelude.h")
 
     foreach(VAR CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE)
         string(REPLACE "/MD" "/MT" ${VAR} "${${VAR}}")
