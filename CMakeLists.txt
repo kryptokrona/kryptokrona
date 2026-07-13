@@ -155,11 +155,17 @@ if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /STACK:10485760")
 
     # MSVC's standard headers are leaner than libc++/libstdc++ and do NOT pull in
-    # <stdexcept> transitively, so the many TUs that use std::runtime_error etc.
-    # without including it directly fail to compile (error C2039 'runtime_error'
-    # is not a member of 'std'). Force-include it into every C++ TU. Scoped to
-    # CXX so the C sources (cryptopp/rocksdb/slow-hash) don't get a C++ header.
-    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:/FIstdexcept>")
+    # <stdexcept>/<chrono> transitively, so TUs that use std::runtime_error or
+    # std::chrono::system_clock without including them fail to compile
+    # (error C2039 'runtime_error' / C2653 'system_clock'). Force-include those
+    # headers into every C++ translation unit.
+    #
+    # This MUST go through CMAKE_CXX_FLAGS (C++ only) rather than
+    # add_compile_options, because forcing a C++ header into the project's C
+    # sources (crypto/*.c, cryptopp, rocksdb) trips "error STL1003: Unexpected
+    # compiler, expected C++ compiler". A $<COMPILE_LANGUAGE:CXX> generator
+    # expression does not scope reliably under the Visual Studio generator.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIstdexcept /FIchrono")
 
     foreach(VAR CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG CMAKE_C_FLAGS_RELWITHDEBINFO CMAKE_CXX_FLAGS_RELWITHDEBINFO CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE)
         string(REPLACE "/MD" "/MT" ${VAR} "${${VAR}}")
