@@ -87,10 +87,19 @@ jobs:
           # it via the preinstalled vcpkg. The x64-windows-static triplet builds
           # Boost with the static /MT runtime that matches the /MT this project
           # forces, and ships BoostConfig.cmake so CMake's config mode finds it.
-          vcpkg install `
+          #
+          # Unlike Homebrew/apt (which install ALL of Boost), vcpkg installs one
+          # port per Boost module, so we must list every module the code uses --
+          # both the compiled libs (find_package COMPONENTS) and the header-only
+          # ones it #includes (uuid, multi_index, variant, ...). vcpkg pulls each
+          # module's transitive dependencies automatically.
+          vcpkg install --triplet x64-windows-static `
             boost-system boost-filesystem boost-thread boost-date-time `
             boost-chrono boost-serialization boost-program-options `
-            --triplet x64-windows-static
+            boost-multi-index boost-uuid boost-variant boost-optional `
+            boost-utility boost-functional boost-scope-exit boost-foreach `
+            boost-algorithm boost-range boost-lexical-cast boost-iterator `
+            boost-format
 
       - name: Build Windows Target
         if: runner.os == 'Windows'

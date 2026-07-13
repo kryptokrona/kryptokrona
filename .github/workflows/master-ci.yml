@@ -91,6 +91,64 @@ jobs:
           cmake ..
           make -j$(sysctl -n hw.ncpu)
 
+      # ---------------- macOS code signing + notarization ----------------
+      # Signs each binary with a Developer ID certificate (hardened runtime +
+      # secure timestamp) and notarizes them with Apple so Gatekeeper stops
+      # blocking the downloaded binaries. Skips cleanly if the signing secrets
+      # are not configured (e.g. on forks), leaving unsigned binaries.
+      - name: Sign and notarize macOS binaries
+        if: runner.os == 'macOS'
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${APPLE_SIGNING_IDENTITY:-}" ] || [ -z "${APPLE_CERTIFICATE_BASE64:-}" ]; then
+            echo "::warning::Apple signing secrets not set — skipping code signing/notarization."
+            exit 0
+          fi
+
+          BINS="kryptokronad xkrwallet kryptokrona-service miner wallet-api"
+
+          # --- Import the Developer ID cert into a throwaway keychain ---
+          KEYCHAIN="$RUNNER_TEMP/app-signing.keychain-db"
+          KEYCHAIN_PWD="$(openssl rand -base64 24)"
+          security create-keychain -p "$KEYCHAIN_PWD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PWD" "$KEYCHAIN"
+          echo "$APPLE_CERTIFICATE_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PWD" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain
+
+          # --- Sign each binary (hardened runtime + secure timestamp) ---
+          cd build/src
+          for b in $BINS; do
+            codesign --force --options runtime --timestamp \
+              --keychain "$KEYCHAIN" --sign "$APPLE_SIGNING_IDENTITY" "$b"
+            codesign --verify --strict --verbose=2 "$b"
+          done
+
+          # --- Notarize (notarytool needs an archive; bare executables can't be
+          #     stapled, but notarization is recorded against their hashes) ---
+          NZIP="$RUNNER_TEMP/notarize.zip"
+          /usr/bin/zip -j "$NZIP" $BINS
+          xcrun notarytool submit "$NZIP" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+          # --- Clean up the keychain ---
+          security delete-keychain "$KEYCHAIN"
+          echo "macOS binaries signed and notarized."
+
       # ---------------- Windows build (MSVC) ----------------
       - name: Install Boost (vcpkg, static)
         if: runner.os == 'Windows'
@@ -100,10 +158,19 @@ jobs:
           # it via the preinstalled vcpkg. The x64-windows-static triplet builds
           # Boost with the static /MT runtime that matches the /MT this project
           # forces, and ships BoostConfig.cmake so CMake's config mode finds it.
-          vcpkg install `
+          #
+          # Unlike Homebrew/apt (which install ALL of Boost), vcpkg installs one
+          # port per Boost module, so we must list every module the code uses --
+          # both the compiled libs (find_package COMPONENTS) and the header-only
+          # ones it #includes (uuid, multi_index, variant, ...). vcpkg pulls each
+          # module's transitive dependencies automatically.
+          vcpkg install --triplet x64-windows-static `
             boost-system boost-filesystem boost-thread boost-date-time `
             boost-chrono boost-serialization boost-program-options `
-            --triplet x64-windows-static
+            boost-multi-index boost-uuid boost-variant boost-optional `
+            boost-utility boost-functional boost-scope-exit boost-foreach `
+            boost-algorithm boost-range boost-lexical-cast boost-iterator `
+            boost-format
 
       - name: Build Windows Target
         if: runner.os == 'Windows'
