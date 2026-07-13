@@ -27,5 +27,13 @@
 #pragma once
 
 #ifdef __cplusplus
+// <ostream> MUST come first. Being force-included at the very top of every TU,
+// <stdexcept> pulls in <string> -> __msvc_string_view.hpp, whose operator<< for
+// string_view is compiled against std::basic_ostream. If <ostream> hasn't been
+// seen yet, basic_ostream is only forward-declared and MSVC errors with
+// "C2027: use of undefined type 'std::basic_ostream'" (plus iostate/goodbit/
+// badbit undeclared) in EVERY translation unit. Including <ostream> first makes
+// basic_ostream complete before that operator is parsed.
+#include <ostream>
 #include <stdexcept>
 #endif
