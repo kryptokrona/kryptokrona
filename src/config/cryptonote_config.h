@@ -282,7 +282,12 @@ namespace cryptonote
         {
             {0xf1, 0x4c, 0xb8, 0xc8, 0xb3, 0x56, 0x45, 0x2e, 0xee, 0xf0, 0xb4, 0x99, 0xab, 0x71, 0x6c, 0xcc}};
 
-    const char *const SEED_NODES[] = {};
+    // At least one entry is required: MSVC rejects a zero-size array (`[] = {}`).
+    // The testnet has no permanent public seed infrastructure, so this is a
+    // loopback placeholder -- replace with real testnet seed IPs if any exist.
+    // (Nodes started with --add-exclusive-node ignore this list entirely.)
+    const char *const SEED_NODES[] = {
+        "127.0.0.1:11898"};
 #else
     const static boost::uuids::uuid CRYPTONOTE_NETWORK =
         {
