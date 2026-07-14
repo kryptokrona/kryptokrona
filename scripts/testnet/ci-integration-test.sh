@@ -18,9 +18,12 @@ set -euo pipefail
 # Config
 # ----------------------------------------------------------------------------
 BIN_DIR="${BIN_DIR:-build/src}"
-KRYPTOKRONAD="$BIN_DIR/kryptokronad"
-MINER="$BIN_DIR/miner"
-SERVICE="$BIN_DIR/kryptokrona-service"
+# On Windows (MSVC) the binaries are kryptokronad.exe etc.
+EXE=""
+[ -f "$BIN_DIR/kryptokronad.exe" ] && EXE=".exe"
+KRYPTOKRONAD="$BIN_DIR/kryptokronad$EXE"
+MINER="$BIN_DIR/miner$EXE"
+SERVICE="$BIN_DIR/kryptokrona-service$EXE"
 
 RPC_PASSWORD="ci-test-password"
 WALLET_PASSWORD="ci-test-wallet-pass"

@@ -6,8 +6,10 @@ name: Kryptokrona Testnet Integration Test
 # difficulty is low and the block mines quickly.
 #
 # Runs on every CI event -- pull requests, master pushes and tags -- so the
-# testnet flow is exercised on each CI run. It builds its own testnet binaries
-# (a separate build from the mainnet build jobs), so it is a self-contained job.
+# testnet flow is exercised on each CI run, across Linux, macOS and Windows.
+# Each job builds its own testnet binaries (separate from the mainnet build
+# jobs), so it is self-contained. Windows is experimental (its build is still
+# being stabilised and the shell test is not yet validated there).
 on:
   push:
     branches:
@@ -17,33 +19,89 @@ on:
   pull_request:
   workflow_dispatch:
 
-# A new push to the same PR/branch cancels an in-progress integration run, so
-# slow testnet builds don't pile up.
+# A new push to the same PR/branch cancels in-progress runs so slow testnet
+# builds don't pile up.
 concurrency:
   group: integration-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   testnet-integration:
-    name: "Testnet: 3 nodes, mine a block, wallet receives coinbase"
-    runs-on: ubuntu-22.04
-    timeout-minutes: 60
+    name: "Testnet integration / ${{ matrix.config.name }}"
+    runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 90
+    continue-on-error: ${{ matrix.config.experimental || false }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "Ubuntu 22.04", os: ubuntu-22.04 }
+          - { name: "macOS arm64", os: macos-14 }
+          - { name: "Windows x64", os: windows-2022, experimental: true }
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
+      # ---------------- Dependencies ----------------
+      - name: Install dependencies (Ubuntu)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev curl \
             libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
 
-      - name: Build testnet binaries (TEST_NET=ON)
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install boost cmake ccache
+
+      - name: Install Boost (Windows, vcpkg static)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          vcpkg install --triplet x64-windows-static `
+            boost-system boost-filesystem boost-thread boost-date-time `
+            boost-chrono boost-serialization boost-program-options `
+            boost-multi-index boost-uuid boost-variant boost-optional `
+            boost-utility boost-functional boost-scope-exit boost-foreach `
+            boost-algorithm boost-range boost-lexical-cast boost-iterator `
+            boost-format
+
+      # ---------------- Build (TEST_NET=ON) ----------------
+      - name: Build testnet binaries (Ubuntu)
+        if: runner.os == 'Linux'
         run: |
           mkdir -p build && cd build
           cmake -DTEST_NET=ON -DBoost_ARCHITECTURE=-x64 ..
           make -j$(nproc)
 
-      - name: Run testnet integration test
+      - name: Build testnet binaries (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p build && cd build
+          cmake -DTEST_NET=ON ..
+          make -j$(sysctl -n hw.ncpu)
+
+      - name: Build testnet binaries (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -A x64 -DTEST_NET=ON `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static ..
+          cmake --build . --config Release -- /m
+
+      # ---------------- Run the integration test ----------------
+      - name: Run testnet integration test (Unix)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           chmod +x scripts/testnet/ci-integration-test.sh
           BIN_DIR=build/src ./scripts/testnet/ci-integration-test.sh
+
+      - name: Run testnet integration test (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          BIN_DIR=build/src/Release ./scripts/testnet/ci-integration-test.sh
