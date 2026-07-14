@@ -1,0 +1,49 @@
+name: Kryptokrona Testnet Integration Test
+
+# Spins up a 3-node testnet, mines a block and checks the wallet
+# (kryptokrona-service) receives the coinbase -- see
+# scripts/testnet/ci-integration-test.sh. It builds a TEST_NET=ON binary so
+# difficulty is low and the block mines quickly.
+#
+# Runs on every CI event -- pull requests, master pushes and tags -- so the
+# testnet flow is exercised on each CI run. It builds its own testnet binaries
+# (a separate build from the mainnet build jobs), so it is a self-contained job.
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+
+# A new push to the same PR/branch cancels an in-progress integration run, so
+# slow testnet builds don't pile up.
+concurrency:
+  group: integration-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  testnet-integration:
+    name: "Testnet: 3 nodes, mine a block, wallet receives coinbase"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev curl \
+            libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
+
+      - name: Build testnet binaries (TEST_NET=ON)
+        run: |
+          mkdir -p build && cd build
+          cmake -DTEST_NET=ON -DBoost_ARCHITECTURE=-x64 ..
+          make -j$(nproc)
+
+      - name: Run testnet integration test
+        run: |
+          chmod +x scripts/testnet/ci-integration-test.sh
+          BIN_DIR=build/src ./scripts/testnet/ci-integration-test.sh
