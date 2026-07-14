@@ -94,7 +94,13 @@ namespace miner
         isRunning = true;
 
         startBlockchainMonitoring();
+        // Detach the hash-rate reporter: it loops on isRunning with a 60s sleep,
+        // so it can't be joined promptly. Without detaching, finishing a bounded
+        // run (e.g. --limit N) returns from start() while this thread is still
+        // joinable, which aborts the process with "terminate called without an
+        // active exception".
         std::thread reporter(std::bind(&MinerManager::printHashRate, this));
+        reporter.detach();
         startMining(params);
 
         eventLoop();

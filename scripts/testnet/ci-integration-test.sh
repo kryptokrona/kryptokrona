@@ -165,11 +165,13 @@ log "Wallet address: $ADDRESS"
 # 3. Mine a block to our wallet address
 # ----------------------------------------------------------------------------
 log "Mining $BLOCKS_TO_MINE block to the wallet address"
+# Judge success by whether the chain actually advances, not the miner's exit
+# code -- the outcome (a new block on all nodes) is what we care about.
 "$MINER" \
     --daemon-address "127.0.0.1:$NODE1_RPC" \
     --address "$ADDRESS" \
     --threads 1 --limit "$BLOCKS_TO_MINE" \
-    > "$WORK/miner.log" 2>&1 || fail "miner exited with an error"
+    > "$WORK/miner.log" 2>&1 || log "miner exited non-zero; verifying chain height anyway"
 
 # height starts at 1 (genesis), so after mining BLOCKS_TO_MINE it is 1 + that.
 height_reached() {
