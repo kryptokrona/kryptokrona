@@ -290,7 +290,18 @@ namespace cryptonote
 
     bool RpcServer::isCoreReady()
     {
+        // A testnet must be able to serve block templates from genesis: a fresh
+        // isolated node never reaches the "synchronized" P2P state (there is
+        // nothing to sync from), so without this getblocktemplate would return
+        // "Core is busy" forever and mining could never bootstrap. The
+        // isTestnet() short-circuit below is meant for exactly this, but the
+        // compile-time USE_TESTNET build does not set the runtime isTestnet()
+        // flag (there is no --testnet option), so honour the macro directly too.
+#if defined(USE_TESTNET)
+        return true;
+#else
         return m_core.getCurrency().isTestnet() || m_p2p.get_payload_object().isSynchronized();
+#endif
     }
 
     bool RpcServer::on_get_blocks(const COMMAND_RPC_GET_BLOCKS_FAST::request &req, COMMAND_RPC_GET_BLOCKS_FAST::response &res)

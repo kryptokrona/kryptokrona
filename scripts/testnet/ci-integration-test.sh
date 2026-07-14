@@ -166,12 +166,22 @@ log "Wallet address: $ADDRESS"
 # ----------------------------------------------------------------------------
 log "Mining $BLOCKS_TO_MINE block to the wallet address"
 # Judge success by whether the chain actually advances, not the miner's exit
-# code -- the outcome (a new block on all nodes) is what we care about.
+# code -- the outcome (a new block on all nodes) is what we care about. Run the
+# miner under a watchdog so it can never hang the job: at testnet difficulty 1
+# blocks are near-instant, and it exits on --limit; if it ever loops (e.g. the
+# daemon returns errors) we kill it and let the height check decide.
 "$MINER" \
     --daemon-address "127.0.0.1:$NODE1_RPC" \
     --address "$ADDRESS" \
     --threads 1 --limit "$BLOCKS_TO_MINE" \
-    > "$WORK/miner.log" 2>&1 || log "miner exited non-zero; verifying chain height anyway"
+    > "$WORK/miner.log" 2>&1 &
+miner_pid=$!
+for _ in $(seq 1 90); do
+    kill -0 "$miner_pid" 2>/dev/null || break
+    sleep 1
+done
+kill "$miner_pid" 2>/dev/null || true
+wait "$miner_pid" 2>/dev/null || true
 
 # height starts at 1 (genesis), so after mining BLOCKS_TO_MINE it is 1 + that.
 height_reached() {
