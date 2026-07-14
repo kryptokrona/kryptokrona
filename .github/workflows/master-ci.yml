@@ -15,7 +15,7 @@ jobs:
     name: "Build: ${{ matrix.config.name }} / ${{ matrix.config.platform }}"
     runs-on: ${{ matrix.config.os }}
     # The Windows build is still being stabilised, so don't let it fail the
-    # whole matrix (which would block the Docker publish jobs below).
+    # whole matrix (it is marked experimental in the config below).
     continue-on-error: ${{ matrix.config.experimental || false }}
     strategy:
       fail-fast: false
@@ -195,89 +195,3 @@ jobs:
             build/src/Release/miner.exe
             build/src/Release/wallet-api.exe
 
-  docker-testnet:
-    name: Build and Publish Docker Image for testnet
-    runs-on: ubuntu-22.04
-    needs: [build]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: benjlevesque/short-sha@v1.2
-
-      - name: Log into registry ghcr.io
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - name: Build Docker
-        run: |
-          docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} -f Dockerfile.test . --no-cache
-
-      - name: Tag Image
-        run: |
-          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:latest
-          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
-          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE-testnet:latest
-
-      - name: Publish Docker to GitHub Repository
-        run: |
-          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
-          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE-testnet:latest
-
-      - uses: actions/checkout@v2
-      - name: Login into Docker Hub
-        env:
-          DOCKER_HUB_USER: ${{secrets.DOCKER_HUB_USER}}
-          DOCKER_HUB_PASSWORD: ${{secrets.DOCKER_HUB_PASSWORD}}
-        run: |
-          docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-
-      - name: Publish Docker to Docker Hub
-        run: |
-          docker push mjovanc/$GITHUB_DOCKER_IMAGE-testnet:${{ env.SHA }}
-          docker push mjovanc/$GITHUB_DOCKER_IMAGE-testnet:latest
-
-  docker-mainnet:
-    name: Build and Publish Docker Image for main-net
-    runs-on: ubuntu-22.04
-    needs: [build]
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - uses: actions/checkout@v2
-      - uses: benjlevesque/short-sha@v1.2
-
-      - name: Log into registry ghcr.io
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
-
-      - name: Build Docker
-        run: |
-          docker build -t $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} . --no-cache
-
-      - name: Tag Image
-        run: |
-          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:latest
-          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
-          docker tag $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }} mjovanc/$GITHUB_DOCKER_IMAGE:latest
-
-      - name: Publish Docker to GitHub Repository
-        run: |
-          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
-          docker push $GITHUB_REGISTRY/$GITHUB_OWNER/$GITHUB_DOCKER_IMAGE:latest
-
-      - uses: actions/checkout@v2
-      - name: Login into Docker Hub
-        env:
-          DOCKER_HUB_USER: ${{secrets.DOCKER_HUB_USER}}
-          DOCKER_HUB_PASSWORD: ${{secrets.DOCKER_HUB_PASSWORD}}
-        run: |
-          docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-
-      - name: Publish Docker to Docker Hub
-        run: |
-          docker push mjovanc/$GITHUB_DOCKER_IMAGE:${{ env.SHA }}
-          docker push mjovanc/$GITHUB_DOCKER_IMAGE:latest
