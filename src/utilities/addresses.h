@@ -17,6 +17,10 @@ namespace utilities
 
     std::tuple<crypto::PublicKey, crypto::PublicKey> addressToKeys(const std::string address);
 
+    /* Re-encodes a standard address under the other supported prefix (default
+       <-> alternate). Same keys, same wallet; empty string if not parseable. */
+    std::string alternateAddressForm(const std::string address);
+
     std::tuple<std::string, std::string> extractIntegratedAddressData(const std::string address);
 
     std::string publicKeysToAddress(

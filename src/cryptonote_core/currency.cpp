@@ -446,9 +446,13 @@ namespace cryptonote
             return false;
         }
 
-        if (prefix != m_publicAddressBase58Prefix)
+        /* Accept both the configured prefix and the alternate prefix -- they
+           encode the same keys, so an address in either form is valid. */
+        if (prefix != m_publicAddressBase58Prefix &&
+            prefix != parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT)
         {
-            logger(DEBUGGING) << "Wrong address prefix: " << prefix << ", expected " << m_publicAddressBase58Prefix;
+            logger(DEBUGGING) << "Wrong address prefix: " << prefix << ", expected " << m_publicAddressBase58Prefix
+                              << " or " << parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT;
             return false;
         }
 

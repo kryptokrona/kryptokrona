@@ -24,7 +24,13 @@ namespace cryptonote
         const uint32_t CRYPTONOTE_MAX_BLOCK_NUMBER = 500000000;
         const size_t CRYPTONOTE_MAX_BLOCK_BLOB_SIZE = 500000000;
         const size_t CRYPTONOTE_MAX_TX_SIZE = 1000000000;
+        // The default address prefix used when generating/displaying addresses (SEKR...).
         const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX = 2239254;
+        // Alternate/secondary prefix (Xkr...). Both prefixes encode the SAME keys and
+        // are accepted on decode; wallets can show/export both forms so an address still
+        // works with third-party services that only support one prefix during a
+        // transition. Making this the default is a one-line swap with the line above.
+        const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT = 45239;
         const uint32_t CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW = 20;
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT = 60 * 60 * 2;
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3 = 3 * DIFFICULTY_TARGET;

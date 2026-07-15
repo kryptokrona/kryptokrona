@@ -334,9 +334,10 @@ namespace payment_service
                 throw std::system_error(make_error_code(cryptonote::error::BAD_ADDRESS));
             }
 
-            /* The prefix needs to be the same as the base58 prefix */
-            if (prefix !=
-                cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
+            /* Accept either the default or the alternate prefix (both encode the
+               same keys, so an integrated address in either form is valid). */
+            if (prefix != cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX &&
+                prefix != cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT)
             {
                 throw std::system_error(make_error_code(cryptonote::error::BAD_ADDRESS));
             }
