@@ -13,11 +13,14 @@ namespace api_constants
        password. */
     const uint64_t PBKDF2_ITERATIONS = 10000;
 
-    /* The length of the address after removing the prefix */
+    /* The length of the address after removing the prefix. The SEKR and Xkr
+       prefixes differ in length by one char, so the body (95 chars) is the same
+       for both -- only the prefix differs. */
     const uint16_t addressBodyLength = wallet_config::standardAddressLength - wallet_config::addressPrefix.length();
 
-    /* This is the equivalent of TRTL[a-zA-Z0-9]{95} but working for all coins */
-    const std::string addressRegex = std::string(wallet_config::addressPrefix) + "[a-zA-Z0-9]{" + std::to_string(addressBodyLength) + "}";
+    /* Matches an address under either prefix, e.g. (?:SEKR|Xkr)[a-zA-Z0-9]{95},
+       so wallet-api routes with an {address} path segment accept both forms. */
+    const std::string addressRegex = "(?:" + std::string(wallet_config::addressPrefix) + "|" + std::string(wallet_config::addressPrefixAlt) + ")[a-zA-Z0-9]{" + std::to_string(addressBodyLength) + "}";
 
     /* 64 char, hex */
     const std::string hashRegex = "[a-fA-F0-9]{64}";

@@ -13,6 +13,11 @@ namespace wallet_config
     /* The prefix your coins address starts with */
     const std::string_view addressPrefix = "SEKR";
 
+    /* The alternate prefix accepted during the SEKR->Xkr migration. Both encode
+       the same keys; addresses under this prefix are a character shorter (the
+       varint is smaller), so they have their own lengths below. */
+    const std::string_view addressPrefixAlt = "Xkr";
+
     /* Your coins 'Ticker', e.g. Monero = XMR, Bitcoin = BTC */
     const std::string ticker = "XKR";
 
@@ -51,6 +56,11 @@ namespace wallet_config
        chunks of 8 chars at once into blocks of 11 chars, we can calculate
        this automatically */
     const uint16_t integratedAddressLength = standardAddressLength + ((64 * 11) / 8);
+
+    /* Lengths of the same addresses under the alternate (Xkr) prefix, which is a
+       character shorter than the SEKR prefix. Accepted alongside the above. */
+    const uint16_t standardAddressLengthAlt = 98;
+    const uint16_t integratedAddressLengthAlt = standardAddressLengthAlt + ((64 * 11) / 8);
 
     /* The default fee value to use with transactions (in ATOMIC units!) */
     const uint64_t defaultFee = cryptonote::parameters::MINIMUM_FEE;

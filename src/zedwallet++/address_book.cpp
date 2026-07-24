@@ -84,7 +84,8 @@ void addToAddressBook()
     std::string paymentID;
 
     /* Don't prompt for a payment ID if we have an integrated address */
-    if (address.length() == wallet_config::standardAddressLength)
+    if (address.length() == wallet_config::standardAddressLength ||
+        address.length() == wallet_config::standardAddressLengthAlt)
     {
         const bool cancelAllowed = true;
 
