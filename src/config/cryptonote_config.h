@@ -31,7 +31,15 @@ namespace cryptonote
         // works with third-party services that only support one prefix during a
         // transition. Making this the default is a one-line swap with the line above.
         const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT = 45239;
+        // Coinbase maturity. On testnet we lower it to 1 so mined coins are
+        // spendable almost immediately, which lets a local testnet exercise the
+        // spend/fusion endpoints without mining past a 20-block window. Testnet
+        // is isolated, so this does not affect mainnet consensus.
+#ifdef USE_TESTNET
+        const uint32_t CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW = 1;
+#else
         const uint32_t CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW = 20;
+#endif
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT = 60 * 60 * 2;
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3 = 3 * DIFFICULTY_TARGET;
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4 = 6 * DIFFICULTY_TARGET;
@@ -166,10 +174,22 @@ namespace cryptonote
         const size_t FUSION_TX_MIN_INPUT_COUNT = 12;
         const size_t FUSION_TX_MIN_IN_OUT_COUNT_RATIO = 4;
 
+#ifdef USE_TESTNET
+        // A fresh testnet would otherwise walk the PoW-variant hard-forks at
+        // heights 1-4 (V4 = CN-Lite Variant 1, V5 = CN-Turtle Variant 2), where
+        // early blocks each use a different hashing variant and mining stalls.
+        // Mainnet is long past these and runs only the final variant (V5), so we
+        // start testnet directly on it: every block from height 1 is V5.
+        const uint32_t UPGRADE_HEIGHT_V2 = 0;
+        const uint32_t UPGRADE_HEIGHT_V3 = 0;
+        const uint32_t UPGRADE_HEIGHT_V4 = 0;
+        const uint32_t UPGRADE_HEIGHT_V5 = 0;
+#else
         const uint32_t UPGRADE_HEIGHT_V2 = 1;
         const uint32_t UPGRADE_HEIGHT_V3 = 2;
         const uint32_t UPGRADE_HEIGHT_V4 = 3; // Upgrade height for CN-Lite Variant 1 switch.
         const uint32_t UPGRADE_HEIGHT_V5 = 4; // Upgrade height for CN-Turtle Variant 2 switch.
+#endif
         const uint32_t UPGRADE_HEIGHT_CURRENT = UPGRADE_HEIGHT_V5;
 
         const unsigned UPGRADE_VOTING_THRESHOLD = 90;                             // percent
