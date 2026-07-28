@@ -518,10 +518,9 @@ namespace cryptonote
        Kryptokrona's PoW (CryptoNight-Turtle) is not seed-based like RandomX. */
     struct COMMAND_RPC_GET_MINER_DATA
     {
-        struct request
-        {
-            void serialize(ISerializer &s) {}
-        };
+        // EMPTY_STRUCT (like get_info) so a request without a "params" field is
+        // accepted - P2Pool sends get_miner_data with no params.
+        typedef EMPTY_STRUCT request;
 
         struct tx_backlog_entry
         {
@@ -548,6 +547,7 @@ namespace cryptonote
             uint64_t median_weight;
             uint64_t already_generated_coins;
             uint64_t median_timestamp;
+            uint64_t unlock_window;
             std::vector<tx_backlog_entry> tx_backlog;
 
             void serialize(ISerializer &s)
@@ -561,6 +561,7 @@ namespace cryptonote
                 KV_MEMBER(median_weight)
                 KV_MEMBER(already_generated_coins)
                 KV_MEMBER(median_timestamp)
+                KV_MEMBER(unlock_window)
                 KV_MEMBER(tx_backlog)
             }
         };

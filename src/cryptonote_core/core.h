@@ -151,6 +151,7 @@ namespace cryptonote
             uint64_t medianWeight;
             uint64_t alreadyGeneratedCoins;
             uint64_t medianTimestamp;
+            uint64_t unlockWindow;
             std::vector<MinerDataTx> txBacklog;
         };
         bool getMinerData(MinerData &data) const;

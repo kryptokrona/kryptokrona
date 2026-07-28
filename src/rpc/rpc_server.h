@@ -35,6 +35,9 @@ namespace cryptonote
         std::vector<std::string> getCorsDomains();
 
         bool on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res, json_rpc::JsonRpcError &error_resp);
+        // 2-arg adapter so the handler can be registered with makeMemberMethod
+        // (which does not support the error_resp form). Throws on error.
+        bool on_get_block_headers_range_json(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res);
         bool on_get_info(const COMMAND_RPC_GET_INFO::request &req, COMMAND_RPC_GET_INFO::response &res);
 
     private:

@@ -2034,6 +2034,10 @@ namespace cryptonote
         assert(!chainsLeaves.empty());
         data.alreadyGeneratedCoins = chainsLeaves[0]->getAlreadyGeneratedCoins();
 
+        // Coinbase unlock window (20 mainnet, 1 testnet) - a pool building its own
+        // coinbase must set unlock_time = height + this or the block is rejected.
+        data.unlockWindow = currency.minedMoneyUnlockWindow();
+
         // Median timestamp over the same window getBlockTemplate uses. A miner
         // must not set a block timestamp below this value.
         const uint64_t timestampWindow = (height >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)

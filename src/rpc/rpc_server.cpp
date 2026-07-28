@@ -233,11 +233,13 @@ namespace cryptonote
                 {"on_getblockhash", {makeMemberMethod(&RpcServer::on_getblockhash), false}},
                 {"getblocktemplate", {makeMemberMethod(&RpcServer::on_getblocktemplate), false}},
                 {"get_miner_data", {makeMemberMethod(&RpcServer::on_get_miner_data), false}},
+                {"get_info", {makeMemberMethod(&RpcServer::on_get_info), true}},
                 {"getcurrencyid", {makeMemberMethod(&RpcServer::on_get_currency_id), true}},
                 {"submitblock", {makeMemberMethod(&RpcServer::on_submitblock), false}},
                 {"getlastblockheader", {makeMemberMethod(&RpcServer::on_get_last_block_header), false}},
                 {"getblockheaderbyhash", {makeMemberMethod(&RpcServer::on_get_block_header_by_hash), false}},
-                {"getblockheaderbyheight", {makeMemberMethod(&RpcServer::on_get_block_header_by_height), false}}};
+                {"getblockheaderbyheight", {makeMemberMethod(&RpcServer::on_get_block_header_by_height), false}},
+                {"get_block_headers_range", {makeMemberMethod(&RpcServer::on_get_block_headers_range_json), false}}};
 
             auto it = jsonRpcHandlers.find(jsonRequest.getMethod());
             if (it == jsonRpcHandlers.end())
@@ -1262,6 +1264,7 @@ namespace cryptonote
         res.median_weight = data.medianWeight;
         res.already_generated_coins = data.alreadyGeneratedCoins;
         res.median_timestamp = data.medianTimestamp;
+        res.unlock_window = data.unlockWindow;
 
         res.tx_backlog.reserve(data.txBacklog.size());
         for (const auto &tx : data.txBacklog)
@@ -1425,6 +1428,16 @@ namespace cryptonote
         assert(cachedBlock.getBlockIndex() == req.height);
         fill_block_header_response(block, false, index, cachedBlock.getBlockHash(), res.block_header);
         res.status = CORE_RPC_STATUS_OK;
+        return true;
+    }
+
+    bool RpcServer::on_get_block_headers_range_json(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res)
+    {
+        json_rpc::JsonRpcError error_resp;
+        if (!on_get_block_headers_range(req, res, error_resp))
+        {
+            throw error_resp;
+        }
         return true;
     }
 
