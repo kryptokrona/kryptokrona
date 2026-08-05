@@ -8,7 +8,7 @@
 # through the service's JSON-RPC. Exits non-zero if any stage fails.
 #
 # Requires TESTNET binaries (built with -DTEST_NET=ON): low difficulty so the
-# first blocks mine near-instantly, and a coinbase unlock window of 20 blocks.
+# first blocks mine near-instantly, and a coinbase unlock window of 1 block.
 #
 # Usage: BIN_DIR=build_testnet/src scripts/testnet/ci-integration-test.sh
 
@@ -33,8 +33,9 @@ NODE1_RPC=31001
 SERVICE_PORT=32000
 
 # Mine a single block: enough to prove the daemon accepts mined blocks and the
-# wallet picks up the coinbase. (The reward stays locked for the coinbase unlock
-# window of 20 blocks, so we assert on the wallet's total balance, not spendable.)
+# wallet picks up the coinbase. (We assert on the wallet's total balance
+# (available + locked), so the check holds regardless of the coinbase unlock
+# window.)
 BLOCKS_TO_MINE=1
 
 WORK="$(mktemp -d 2>/dev/null || mktemp -d -t kk-testnet)"
@@ -218,8 +219,8 @@ log "Chain height is now $(daemon_get "$NODE1_RPC" /getinfo | json_field height)
 # ----------------------------------------------------------------------------
 # 4. Confirm the wallet received the coinbase
 # ----------------------------------------------------------------------------
-# The coinbase reward stays locked until the unlock window (20 blocks) passes,
-# so after a single block it shows up as lockedAmount, not availableBalance.
+# The coinbase reward may still be locked right after mining (depending on the
+# unlock window), so we assert on the total (availableBalance + lockedAmount).
 # We assert on the total (available + locked) to prove the wallet received it.
 log "Waiting for the wallet to sync and register the mined coinbase"
 received_coinbase() {

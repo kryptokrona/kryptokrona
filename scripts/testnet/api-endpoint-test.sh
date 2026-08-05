@@ -52,8 +52,9 @@ WAPI_PORT=33100
 
 # Number of extra addresses ("wallets") to create in the service and wallet-api.
 WALLET_COUNT="${WALLET_COUNT:-110}"
-# Blocks to mine. Coinbase unlocks after 20 blocks on testnet, so >20 gives us a
-# spendable balance for the sendTransaction endpoints.
+# Blocks to mine. The testnet coinbase unlock window is 1 block
+# (CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW under USE_TESTNET), so even a couple of
+# blocks yields a spendable balance for the sendTransaction endpoints.
 MINE_BLOCKS="${MINE_BLOCKS:-40}"
 
 WORK="$(mktemp -d 2>/dev/null || mktemp -d -t kk-api)"
