@@ -294,8 +294,10 @@ Error validateAddresses(
             std::stringstream stream;
 
             stream << "The address given is the wrong length. It should be "
-                   << wallet_config::standardAddressLength << " chars or "
-                   << wallet_config::integratedAddressLength << " chars, but "
+                   << wallet_config::standardAddressLength << " or "
+                   << wallet_config::standardAddressLengthAlt << " chars (standard), or "
+                   << wallet_config::integratedAddressLength << " or "
+                   << wallet_config::integratedAddressLengthAlt << " chars (integrated), but "
                    << "it is " << address.length() << " chars.";
 
             return Error(ADDRESS_WRONG_LENGTH, stream.str());

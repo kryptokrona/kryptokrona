@@ -1016,8 +1016,10 @@ AddressType parseAddress(std::string address)
     {
         std::cout << WarningMsg("Address is wrong length!") << std::endl
                   << "It should be " << wallet_config::standardAddressLength
-                  << " or " << wallet_config::integratedAddressLength
-                  << " characters long, but it is " << address.length()
+                  << " or " << wallet_config::standardAddressLengthAlt
+                  << " (standard) or " << wallet_config::integratedAddressLength
+                  << " or " << wallet_config::integratedAddressLengthAlt
+                  << " (integrated) characters long, but it is " << address.length()
                   << " characters long!" << std::endl
                   << std::endl;
 

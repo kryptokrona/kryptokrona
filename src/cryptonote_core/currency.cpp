@@ -530,14 +530,16 @@ namespace cryptonote
 
     uint64_t Currency::getNextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<uint64_t> cumulativeDifficulties) const
     {
-#ifdef USE_TESTNET
-        // Fixed minimal difficulty on testnet. The bundled CPU miner varies the
-        // main-block nonce, which does not affect the (parent-block) PoW hash of
-        // V2+ blocks, so it can only ever submit one hash per template -- it
-        // cannot search for a higher target. A fixed difficulty of 1 lets it mine
-        // every block instantly, giving a freely-mineable local testnet.
-        return 1;
-#endif
+        // Testnet-only difficulty override (0 = disabled on mainnet). See the
+        // TESTNET_FIXED_DIFFICULTY comment in cryptonote_config.h for why a fresh
+        // testnet needs this crutch. Kept as a runtime check on a config constant
+        // rather than a compile-time early return so mainnet keeps the real
+        // algorithm reachable (no dead-code warning) and the knob lives with the
+        // other testnet parameters.
+        if (parameters::TESTNET_FIXED_DIFFICULTY != 0)
+        {
+            return parameters::TESTNET_FIXED_DIFFICULTY;
+        }
         /* nextDifficultyV3 and above are defined in src/CryptoNoteCore/Difficulty.cpp */
         if (blockIndex >= cryptonote::parameters::LWMA_3_DIFFICULTY_BLOCK_INDEX)
         {

@@ -40,6 +40,21 @@ namespace cryptonote
 #else
         const uint32_t CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW = 20;
 #endif
+        // Fixed proof-of-work difficulty for testnet (0 = disabled -> use the real
+        // retargeting algorithm). A fresh local testnet otherwise stalls a few
+        // blocks in: the block major version climbs V1->V5 one step per block and
+        // the PoW variant switches at the V4/V5 upgrade heights, where the bundled
+        // miner and the daemon disagree on the block hash and the daemon rejects
+        // the miner's shares as "too weak". Pinning the difficulty low makes any
+        // hash acceptable so the chain mines freely. This is a testnet-only crutch
+        // to keep the local test harness working -- NOT a fix for the underlying
+        // miner/daemon disagreement, which still needs to be root-caused before a
+        // testnet can mine on the real difficulty algorithm.
+#ifdef USE_TESTNET
+        const uint64_t TESTNET_FIXED_DIFFICULTY = 1;
+#else
+        const uint64_t TESTNET_FIXED_DIFFICULTY = 0;
+#endif
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT = 60 * 60 * 2;
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V3 = 3 * DIFFICULTY_TARGET;
         const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT_V4 = 6 * DIFFICULTY_TARGET;
