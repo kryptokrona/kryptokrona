@@ -115,7 +115,8 @@ Error validateIntegratedAddresses(
 {
     for (const auto [address, amount] : destinations)
     {
-        if (address.length() != wallet_config::integratedAddressLength)
+        if (address.length() != wallet_config::integratedAddressLength &&
+            address.length() != wallet_config::integratedAddressLengthAlt)
         {
             continue;
         }
@@ -283,9 +284,12 @@ Error validateAddresses(
 {
     for (auto &address : addresses)
     {
-        /* Address is the wrong length */
+        /* Address is the wrong length. Accept both the SEKR lengths and the
+           (one-char-shorter) Xkr lengths -- both prefixes are valid. */
         if (address.length() != wallet_config::standardAddressLength &&
-            address.length() != wallet_config::integratedAddressLength)
+            address.length() != wallet_config::integratedAddressLength &&
+            address.length() != wallet_config::standardAddressLengthAlt &&
+            address.length() != wallet_config::integratedAddressLengthAlt)
         {
             std::stringstream stream;
 
@@ -297,14 +301,17 @@ Error validateAddresses(
             return Error(ADDRESS_WRONG_LENGTH, stream.str());
         }
 
-        /* Address has the wrong prefix */
+        /* Address has the wrong prefix (accept SEKR or Xkr) */
         if (address.substr(0, wallet_config::addressPrefix.length()) !=
-            wallet_config::addressPrefix)
+                wallet_config::addressPrefix &&
+            address.substr(0, wallet_config::addressPrefixAlt.length()) !=
+                wallet_config::addressPrefixAlt)
         {
             return ADDRESS_WRONG_PREFIX;
         }
 
-        if (address.length() == wallet_config::integratedAddressLength)
+        if (address.length() == wallet_config::integratedAddressLength ||
+            address.length() == wallet_config::integratedAddressLengthAlt)
         {
             if (!integratedAddressesAllowed)
             {

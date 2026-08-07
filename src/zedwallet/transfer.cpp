@@ -909,7 +909,8 @@ bool parseFee(std::string feeString)
 Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
     std::string integratedAddress)
 {
-    if (integratedAddress.length() != wallet_config::integratedAddressLength)
+    if (integratedAddress.length() != wallet_config::integratedAddressLength &&
+        integratedAddress.length() != wallet_config::integratedAddressLengthAlt)
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
@@ -923,9 +924,11 @@ Maybe<std::pair<std::string, std::string>> extractIntegratedAddress(
         return Nothing<std::pair<std::string, std::string>>();
     }
 
-    /* The prefix needs to be the same as the base58 prefix */
+    /* The prefix needs to be the base58 prefix (SEKR) or its alternate (Xkr) */
     if (prefix !=
-        cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
+            cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX &&
+        prefix !=
+            cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT)
     {
         return Nothing<std::pair<std::string, std::string>>();
     }
@@ -1007,7 +1010,9 @@ AddressType parseAddress(std::string address)
     /* Failed to parse, lets try and diagnose a more accurate failure message */
 
     if (address.length() != wallet_config::standardAddressLength &&
-        address.length() != wallet_config::integratedAddressLength)
+        address.length() != wallet_config::integratedAddressLength &&
+        address.length() != wallet_config::standardAddressLengthAlt &&
+        address.length() != wallet_config::integratedAddressLengthAlt)
     {
         std::cout << WarningMsg("Address is wrong length!") << std::endl
                   << "It should be " << wallet_config::standardAddressLength
@@ -1020,10 +1025,14 @@ AddressType parseAddress(std::string address)
     }
 
     if (address.substr(0, wallet_config::addressPrefix.length()) !=
-        wallet_config::addressPrefix)
+            wallet_config::addressPrefix &&
+        address.substr(0, wallet_config::addressPrefixAlt.length()) !=
+            wallet_config::addressPrefixAlt)
     {
         std::cout << WarningMsg("Invalid address! It should start with ")
                   << WarningMsg(std::string(wallet_config::addressPrefix))
+                  << WarningMsg(" or ")
+                  << WarningMsg(std::string(wallet_config::addressPrefixAlt))
                   << WarningMsg("!")
                   << std::endl
                   << std::endl;
@@ -1054,12 +1063,14 @@ bool parseStandardAddress(std::string address, bool printErrors)
     const bool valid = cryptonote::parseAccountAddressString(prefix, addr,
                                                              address);
 
-    if (address.length() != wallet_config::standardAddressLength)
+    if (address.length() != wallet_config::standardAddressLength &&
+        address.length() != wallet_config::standardAddressLengthAlt)
     {
         if (printErrors)
         {
             std::cout << WarningMsg("Address is wrong length!") << std::endl
                       << "It should be " << wallet_config::standardAddressLength
+                      << " or " << wallet_config::standardAddressLengthAlt
                       << " characters long, but it is " << address.length()
                       << " characters long!" << std::endl
                       << std::endl;
@@ -1071,12 +1082,15 @@ bool parseStandardAddress(std::string address, bool printErrors)
        reasons. To work around this, we can just check that the address starts
        with TRTL, as long as the prefix is the TRTL prefix. This keeps it
        working on testnets with different prefixes. */
-    else if (address.substr(0, wallet_config::addressPrefix.length()) != wallet_config::addressPrefix)
+    else if (address.substr(0, wallet_config::addressPrefix.length()) != wallet_config::addressPrefix &&
+             address.substr(0, wallet_config::addressPrefixAlt.length()) != wallet_config::addressPrefixAlt)
     {
         if (printErrors)
         {
             std::cout << WarningMsg("Invalid address! It should start with ")
                       << WarningMsg(std::string(wallet_config::addressPrefix))
+                      << WarningMsg(" or ")
+                      << WarningMsg(std::string(wallet_config::addressPrefixAlt))
                       << WarningMsg("!")
                       << std::endl
                       << std::endl;

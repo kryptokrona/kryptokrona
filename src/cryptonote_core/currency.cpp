@@ -72,8 +72,10 @@ namespace cryptonote
 
         if (isTestnet())
         {
-            m_upgradeHeightV2 = 0;
-            m_upgradeHeightV3 = static_cast<uint32_t>(-1);
+            // Upgrade heights come from the config (all 0 under USE_TESTNET, so
+            // the chain runs the current mainnet PoW variant V5 from height 1 --
+            // see UPGRADE_HEIGHT_V* in cryptonote_config.h). Only the on-disk
+            // file names are testnet-specific here.
             m_blocksFileName = "testnet_" + m_blocksFileName;
             m_blockIndexesFileName = "testnet_" + m_blockIndexesFileName;
             m_txPoolFileName = "testnet_" + m_txPoolFileName;
@@ -446,9 +448,13 @@ namespace cryptonote
             return false;
         }
 
-        if (prefix != m_publicAddressBase58Prefix)
+        /* Accept both the configured prefix and the alternate prefix -- they
+           encode the same keys, so an address in either form is valid. */
+        if (prefix != m_publicAddressBase58Prefix &&
+            prefix != parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT)
         {
-            logger(DEBUGGING) << "Wrong address prefix: " << prefix << ", expected " << m_publicAddressBase58Prefix;
+            logger(DEBUGGING) << "Wrong address prefix: " << prefix << ", expected " << m_publicAddressBase58Prefix
+                              << " or " << parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT;
             return false;
         }
 
@@ -524,6 +530,14 @@ namespace cryptonote
 
     uint64_t Currency::getNextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<uint64_t> cumulativeDifficulties) const
     {
+#ifdef USE_TESTNET
+        // Fixed minimal difficulty on testnet. The bundled CPU miner varies the
+        // main-block nonce, which does not affect the (parent-block) PoW hash of
+        // V2+ blocks, so it can only ever submit one hash per template -- it
+        // cannot search for a higher target. A fixed difficulty of 1 lets it mine
+        // every block instantly, giving a freely-mineable local testnet.
+        return 1;
+#endif
         /* nextDifficultyV3 and above are defined in src/CryptoNoteCore/Difficulty.cpp */
         if (blockIndex >= cryptonote::parameters::LWMA_3_DIFFICULTY_BLOCK_INDEX)
         {
