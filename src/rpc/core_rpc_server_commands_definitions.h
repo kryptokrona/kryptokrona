@@ -510,6 +510,63 @@ namespace cryptonote
         };
     };
 
+    /* get_miner_data returns everything a decentralized pool (e.g. P2Pool)
+       needs to build a block template locally, without asking the daemon to
+       construct the coinbase. It mirrors Monero's get_miner_data so ports can
+       reuse the same client parsing. difficulty and the hashes are hex strings;
+       seed_hash is present for schema compatibility and is all-zero because
+       Kryptokrona's PoW (CryptoNight-Turtle) is not seed-based like RandomX. */
+    struct COMMAND_RPC_GET_MINER_DATA
+    {
+        // EMPTY_STRUCT (like get_info) so a request without a "params" field is
+        // accepted - P2Pool sends get_miner_data with no params.
+        typedef EMPTY_STRUCT request;
+
+        struct tx_backlog_entry
+        {
+            std::string id; // tx hash, hex
+            uint64_t weight;
+            uint64_t fee;
+
+            void serialize(ISerializer &s)
+            {
+                KV_MEMBER(id)
+                KV_MEMBER(weight)
+                KV_MEMBER(fee)
+            }
+        };
+
+        struct response
+        {
+            std::string status;
+            uint8_t major_version;
+            uint64_t height;
+            std::string prev_id;   // top block hash, hex
+            std::string seed_hash; // all-zero (see note above)
+            std::string difficulty; // next-block difficulty, hex string
+            uint64_t median_weight;
+            uint64_t already_generated_coins;
+            uint64_t median_timestamp;
+            uint64_t unlock_window;
+            std::vector<tx_backlog_entry> tx_backlog;
+
+            void serialize(ISerializer &s)
+            {
+                KV_MEMBER(status)
+                KV_MEMBER(major_version)
+                KV_MEMBER(height)
+                KV_MEMBER(prev_id)
+                KV_MEMBER(seed_hash)
+                KV_MEMBER(difficulty)
+                KV_MEMBER(median_weight)
+                KV_MEMBER(already_generated_coins)
+                KV_MEMBER(median_timestamp)
+                KV_MEMBER(unlock_window)
+                KV_MEMBER(tx_backlog)
+            }
+        };
+    };
+
     struct COMMAND_RPC_GET_CURRENCY_ID
     {
         typedef EMPTY_STRUCT request;

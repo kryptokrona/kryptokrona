@@ -2011,6 +2011,68 @@ namespace cryptonote
         return false;
     }
 
+    bool Core::getMinerData(MinerData &data) const
+    {
+        throwIfNotInitialized();
+
+        const uint32_t height = getTopBlockIndex() + 1;
+
+        data.height = height;
+        data.prevId = getTopBlockHash();
+        data.difficulty = getDifficultyForNextBlock();
+        if (data.difficulty == 0)
+        {
+            logger(logging::ERROR, logging::BRIGHT_RED) << "getMinerData: difficulty overhead.";
+            return false;
+        }
+
+        data.majorVersion = getBlockMajorVersionForHeight(height);
+
+        // Same median size the daemon would use to build the block template.
+        data.medianWeight = calculateCumulativeBlocksizeLimit(height) / 2;
+
+        assert(!chainsLeaves.empty());
+        data.alreadyGeneratedCoins = chainsLeaves[0]->getAlreadyGeneratedCoins();
+
+        // Coinbase unlock window (20 mainnet, 1 testnet) - a pool building its own
+        // coinbase must set unlock_time = height + this or the block is rejected.
+        data.unlockWindow = currency.minedMoneyUnlockWindow();
+
+        // Median timestamp over the same window getBlockTemplate uses. A miner
+        // must not set a block timestamp below this value.
+        const uint64_t timestampWindow = (height >= cryptonote::parameters::LWMA_2_DIFFICULTY_BLOCK_INDEX)
+                                             ? cryptonote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V3
+                                             : cryptonote::parameters::BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW;
+        data.medianTimestamp = 0;
+        if (height >= timestampWindow)
+        {
+            std::vector<uint64_t> timestamps;
+            timestamps.reserve(timestampWindow);
+            for (uint32_t offset = height - static_cast<uint32_t>(timestampWindow); offset < height; ++offset)
+            {
+                timestamps.push_back(getBlockTimestampByIndex(offset));
+            }
+            data.medianTimestamp = common::medianValue(timestamps);
+        }
+
+        // Mempool backlog so the pool can include fee-paying transactions.
+        data.txBacklog.clear();
+        for (const crypto::Hash &txHash : getPoolTransactionHashes())
+        {
+            try
+            {
+                const TransactionDetails details = getTransactionDetails(txHash);
+                data.txBacklog.push_back(MinerDataTx{txHash, details.size, details.fee});
+            }
+            catch (const std::exception &)
+            {
+                // Transaction may have left the pool concurrently; just skip it.
+            }
+        }
+
+        return true;
+    }
+
     CoreStatistics Core::getCoreStatistics() const
     {
         // TODO: implement it

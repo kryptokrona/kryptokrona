@@ -47,13 +47,38 @@ namespace utilities
             throw std::invalid_argument("Address is not valid!");
         }
 
-        /* Incorrect prefix */
-        if (prefix != cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
+        /* Incorrect prefix. Accept both the default and the alternate prefix --
+           they encode the same keys, so an address in either form is valid. */
+        if (prefix != cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX &&
+            prefix != cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT)
         {
             throw std::invalid_argument("Address is not valid!");
         }
 
         return {parsedAddress.spendPublicKey, parsedAddress.viewPublicKey};
+    }
+
+    /* Given a standard address, returns the SAME keys encoded under the OTHER
+       supported prefix (default <-> alternate). Both forms are valid and decode
+       to the same wallet; this lets a wallet present the form a given third-party
+       service expects. Returns an empty string if the input can't be parsed as a
+       standard address (e.g. an integrated address). */
+    std::string alternateAddressForm(const std::string address)
+    {
+        cryptonote::AccountPublicAddress parsedAddress;
+        uint64_t prefix;
+
+        if (!parseAccountAddressString(prefix, parsedAddress, address))
+        {
+            return "";
+        }
+
+        const uint64_t otherPrefix =
+            (prefix == cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX)
+                ? cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT
+                : cryptonote::parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX;
+
+        return cryptonote::getAccountAddressAsStr(otherPrefix, parsedAddress);
     }
 
     /* Assumes address is valid */

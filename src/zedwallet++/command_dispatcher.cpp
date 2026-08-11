@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include <zedwallet++/address_book.h>
+#include <utilities/addresses.h>
 #include <utilities/coloured_msg.h>
 #include <zedwallet++/command_implementations.h>
 #include <zedwallet++/open.h>
@@ -33,7 +34,21 @@ bool handleCommand(
     }
     else if (command == "address")
     {
-        std::cout << SuccessMsg(walletBackend->getPrimaryAddress()) << std::endl;
+        const std::string address = walletBackend->getPrimaryAddress();
+
+        std::cout << SuccessMsg(address) << std::endl;
+
+        /* Show the same wallet encoded under the other supported prefix, so it
+           can be handed to third-party services that only accept one form. */
+        const std::string altAddress = utilities::alternateAddressForm(address);
+
+        if (!altAddress.empty())
+        {
+            std::cout << std::endl
+                      << InformationMsg("Alternate address (same wallet, for services that only support the other prefix):")
+                      << std::endl
+                      << SuccessMsg(altAddress) << std::endl;
+        }
     }
     else if (command == "balance")
     {

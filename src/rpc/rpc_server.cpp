@@ -232,11 +232,14 @@ namespace cryptonote
                 {"getblockcount", {makeMemberMethod(&RpcServer::on_getblockcount), true}},
                 {"on_getblockhash", {makeMemberMethod(&RpcServer::on_getblockhash), false}},
                 {"getblocktemplate", {makeMemberMethod(&RpcServer::on_getblocktemplate), false}},
+                {"get_miner_data", {makeMemberMethod(&RpcServer::on_get_miner_data), false}},
+                {"get_info", {makeMemberMethod(&RpcServer::on_get_info), true}},
                 {"getcurrencyid", {makeMemberMethod(&RpcServer::on_get_currency_id), true}},
                 {"submitblock", {makeMemberMethod(&RpcServer::on_submitblock), false}},
                 {"getlastblockheader", {makeMemberMethod(&RpcServer::on_get_last_block_header), false}},
                 {"getblockheaderbyhash", {makeMemberMethod(&RpcServer::on_get_block_header_by_hash), false}},
-                {"getblockheaderbyheight", {makeMemberMethod(&RpcServer::on_get_block_header_by_height), false}}};
+                {"getblockheaderbyheight", {makeMemberMethod(&RpcServer::on_get_block_header_by_height), false}},
+                {"get_block_headers_range", {makeMemberMethod(&RpcServer::on_get_block_headers_range_json), false}}};
 
             auto it = jsonRpcHandlers.find(jsonRequest.getMethod());
             if (it == jsonRpcHandlers.end())
@@ -1235,6 +1238,48 @@ namespace cryptonote
         return true;
     }
 
+    bool RpcServer::on_get_miner_data(const COMMAND_RPC_GET_MINER_DATA::request & /*req*/, COMMAND_RPC_GET_MINER_DATA::response &res)
+    {
+        Core::MinerData data;
+        if (!m_core.getMinerData(data))
+        {
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to gather miner data"};
+        }
+
+        res.major_version = data.majorVersion;
+        res.height = data.height;
+        res.prev_id = common::podToHex(data.prevId);
+
+        // Kryptokrona's PoW (CryptoNight-Turtle) is not seed-based; the field is
+        // kept only so clients that also parse Monero's get_miner_data don't choke.
+        res.seed_hash = std::string(64, '0');
+
+        // difficulty is a hex string (matches Monero's get_miner_data / P2Pool's parser).
+        {
+            char buf[32];
+            snprintf(buf, sizeof(buf), "%llx", static_cast<unsigned long long>(data.difficulty));
+            res.difficulty = buf;
+        }
+
+        res.median_weight = data.medianWeight;
+        res.already_generated_coins = data.alreadyGeneratedCoins;
+        res.median_timestamp = data.medianTimestamp;
+        res.unlock_window = data.unlockWindow;
+
+        res.tx_backlog.reserve(data.txBacklog.size());
+        for (const auto &tx : data.txBacklog)
+        {
+            COMMAND_RPC_GET_MINER_DATA::tx_backlog_entry entry;
+            entry.id = common::podToHex(tx.id);
+            entry.weight = tx.weight;
+            entry.fee = tx.fee;
+            res.tx_backlog.push_back(std::move(entry));
+        }
+
+        res.status = CORE_RPC_STATUS_OK;
+        return true;
+    }
+
     bool RpcServer::on_get_currency_id(const COMMAND_RPC_GET_CURRENCY_ID::request & /*req*/, COMMAND_RPC_GET_CURRENCY_ID::response &res)
     {
         Hash genesisBlockHash = m_core.getCurrency().genesisBlockHash();
@@ -1383,6 +1428,16 @@ namespace cryptonote
         assert(cachedBlock.getBlockIndex() == req.height);
         fill_block_header_response(block, false, index, cachedBlock.getBlockHash(), res.block_header);
         res.status = CORE_RPC_STATUS_OK;
+        return true;
+    }
+
+    bool RpcServer::on_get_block_headers_range_json(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res)
+    {
+        json_rpc::JsonRpcError error_resp;
+        if (!on_get_block_headers_range(req, res, error_resp))
+        {
+            throw error_resp;
+        }
         return true;
     }
 

@@ -72,8 +72,10 @@ namespace cryptonote
 
         if (isTestnet())
         {
-            m_upgradeHeightV2 = 0;
-            m_upgradeHeightV3 = static_cast<uint32_t>(-1);
+            // Upgrade heights come from the config (all 0 under USE_TESTNET, so
+            // the chain runs the current mainnet PoW variant V5 from height 1 --
+            // see UPGRADE_HEIGHT_V* in cryptonote_config.h). Only the on-disk
+            // file names are testnet-specific here.
             m_blocksFileName = "testnet_" + m_blocksFileName;
             m_blockIndexesFileName = "testnet_" + m_blockIndexesFileName;
             m_txPoolFileName = "testnet_" + m_txPoolFileName;
@@ -446,9 +448,13 @@ namespace cryptonote
             return false;
         }
 
-        if (prefix != m_publicAddressBase58Prefix)
+        /* Accept both the configured prefix and the alternate prefix -- they
+           encode the same keys, so an address in either form is valid. */
+        if (prefix != m_publicAddressBase58Prefix &&
+            prefix != parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT)
         {
-            logger(DEBUGGING) << "Wrong address prefix: " << prefix << ", expected " << m_publicAddressBase58Prefix;
+            logger(DEBUGGING) << "Wrong address prefix: " << prefix << ", expected " << m_publicAddressBase58Prefix
+                              << " or " << parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX_ALT;
             return false;
         }
 
@@ -524,6 +530,16 @@ namespace cryptonote
 
     uint64_t Currency::getNextDifficulty(uint8_t version, uint32_t blockIndex, std::vector<uint64_t> timestamps, std::vector<uint64_t> cumulativeDifficulties) const
     {
+        // Testnet-only difficulty override (0 = disabled on mainnet). See the
+        // TESTNET_FIXED_DIFFICULTY comment in cryptonote_config.h for why a fresh
+        // testnet needs this crutch. Kept as a runtime check on a config constant
+        // rather than a compile-time early return so mainnet keeps the real
+        // algorithm reachable (no dead-code warning) and the knob lives with the
+        // other testnet parameters.
+        if (parameters::TESTNET_FIXED_DIFFICULTY != 0)
+        {
+            return parameters::TESTNET_FIXED_DIFFICULTY;
+        }
         /* nextDifficultyV3 and above are defined in src/CryptoNoteCore/Difficulty.cpp */
         if (blockIndex >= cryptonote::parameters::LWMA_3_DIFFICULTY_BLOCK_INDEX)
         {

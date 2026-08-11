@@ -8,7 +8,7 @@
 # through the service's JSON-RPC. Exits non-zero if any stage fails.
 #
 # Requires TESTNET binaries (built with -DTEST_NET=ON): low difficulty so the
-# first blocks mine near-instantly, and a coinbase unlock window of 20 blocks.
+# first blocks mine near-instantly, and a coinbase unlock window of 1 block.
 #
 # Usage: BIN_DIR=build_testnet/src scripts/testnet/ci-integration-test.sh
 
@@ -33,8 +33,9 @@ NODE1_RPC=31001
 SERVICE_PORT=32000
 
 # Mine a single block: enough to prove the daemon accepts mined blocks and the
-# wallet picks up the coinbase. (The reward stays locked for the coinbase unlock
-# window of 20 blocks, so we assert on the wallet's total balance, not spendable.)
+# wallet picks up the coinbase. (We assert on the wallet's total balance
+# (available + locked), so the check holds regardless of the coinbase unlock
+# window.)
 BLOCKS_TO_MINE=1
 
 WORK="$(mktemp -d 2>/dev/null || mktemp -d -t kk-testnet)"
@@ -165,6 +166,27 @@ ADDRESS="$(service_rpc getAddresses '{}' | sed -E 's/.*"addresses":\["([^"]+)".*
 log "Wallet address: $ADDRESS"
 
 # ----------------------------------------------------------------------------
+# 2b. Address-prefix backwards compatibility (SEKR + Xkr both decode)
+# ----------------------------------------------------------------------------
+# The address prefix is display-only, not consensus: the same keys can be
+# encoded under the legacy prefix (SEKR / 2239254) or the new one (Xkr / 45239),
+# and every address-accepting entry point dual-decodes both. These two strings
+# encode the SAME keys under each prefix; the daemon/service must consider both
+# valid, and an obviously malformed address invalid. This exercises the C++
+# dual-decode (Currency::parseAccountAddressString via validateAddress) on every
+# OS the integration test runs on.
+log "Checking address-prefix backwards compatibility (SEKR + Xkr both accepted)"
+SEKR_ADDR="SEKReXzbFzP13xQEcTeZ7v2xb7n2wkpzXQTGpoVU5DevgHbjPyS8Zz9SzfErVB8KFGAyVNkcbUbKjGJhYovhCxG83DLwaYj6eYX"
+XKR_ADDR="Xkrf4ot1pfRE3XZ5WckmX8XLriaSoUXXHAFx5Ppwowq3eYTUgHbDJcAJW5FAomRg26TzXFHqGrLmYNZbFtxZBXAU3ECQ2HEy51"
+address_valid() { # address -> succeeds iff the service reports it valid
+    service_rpc validateAddress "{\"address\":\"$1\"}" | grep -q '"isValid":true'
+}
+address_valid "$SEKR_ADDR" || fail "service rejected the legacy SEKR-prefixed address"
+address_valid "$XKR_ADDR"  || fail "service rejected the new Xkr-prefixed address (dual-decode broken)"
+address_valid "SEKRnotarealaddress123" && fail "service accepted an obviously invalid address"
+log "Both SEKR and Xkr address prefixes are accepted; malformed address rejected"
+
+# ----------------------------------------------------------------------------
 # 3. Mine a block to our wallet address
 # ----------------------------------------------------------------------------
 log "Mining $BLOCKS_TO_MINE block to the wallet address"
@@ -197,8 +219,8 @@ log "Chain height is now $(daemon_get "$NODE1_RPC" /getinfo | json_field height)
 # ----------------------------------------------------------------------------
 # 4. Confirm the wallet received the coinbase
 # ----------------------------------------------------------------------------
-# The coinbase reward stays locked until the unlock window (20 blocks) passes,
-# so after a single block it shows up as lockedAmount, not availableBalance.
+# The coinbase reward may still be locked right after mining (depending on the
+# unlock window), so we assert on the total (availableBalance + lockedAmount).
 # We assert on the total (available + locked) to prove the wallet received it.
 log "Waiting for the wallet to sync and register the mined coinbase"
 received_coinbase() {

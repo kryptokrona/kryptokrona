@@ -64,7 +64,8 @@ void transfer(
 
     std::string paymentID;
 
-    if (address.length() == wallet_config::standardAddressLength)
+    if (address.length() == wallet_config::standardAddressLength ||
+        address.length() == wallet_config::standardAddressLengthAlt)
     {
         paymentID = getPaymentID(
             "What payment ID do you want to use?\n"

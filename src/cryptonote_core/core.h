@@ -133,6 +133,29 @@ namespace cryptonote
 
         virtual uint64_t get_current_blockchain_height() const;
 
+        // Everything a decentralized pool needs to build the next block template
+        // locally (see COMMAND_RPC_GET_MINER_DATA). Uses the same computations as
+        // getBlockTemplate for major version, median size and median timestamp.
+        struct MinerDataTx
+        {
+            crypto::Hash id;
+            uint64_t weight;
+            uint64_t fee;
+        };
+        struct MinerData
+        {
+            uint8_t majorVersion;
+            uint64_t height;
+            crypto::Hash prevId;
+            uint64_t difficulty;
+            uint64_t medianWeight;
+            uint64_t alreadyGeneratedCoins;
+            uint64_t medianTimestamp;
+            uint64_t unlockWindow;
+            std::vector<MinerDataTx> txBacklog;
+        };
+        bool getMinerData(MinerData &data) const;
+
     private:
         const Currency &currency;
         syst::Dispatcher &dispatcher;

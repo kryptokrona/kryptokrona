@@ -100,6 +100,15 @@ jobs:
           chmod +x scripts/testnet/ci-integration-test.sh
           BIN_DIR=build/src ./scripts/testnet/ci-integration-test.sh
 
+      # Full API-surface test: exercises every daemon / kryptokrona-service /
+      # wallet-api endpoint plus 100+ wallets. Requires jq + curl (preinstalled
+      # on the GitHub Ubuntu/macOS runners).
+      - name: Run API endpoint test (Unix)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          chmod +x scripts/testnet/api-endpoint-test.sh
+          BIN_DIR=build/src ./scripts/testnet/api-endpoint-test.sh
+
       - name: Run testnet integration test (Windows)
         if: runner.os == 'Windows'
         shell: bash

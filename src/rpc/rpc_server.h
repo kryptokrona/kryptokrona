@@ -35,6 +35,9 @@ namespace cryptonote
         std::vector<std::string> getCorsDomains();
 
         bool on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res, json_rpc::JsonRpcError &error_resp);
+        // 2-arg adapter so the handler can be registered with makeMemberMethod
+        // (which does not support the error_resp form). Throws on error.
+        bool on_get_block_headers_range_json(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res);
         bool on_get_info(const COMMAND_RPC_GET_INFO::request &req, COMMAND_RPC_GET_INFO::response &res);
 
     private:
@@ -88,6 +91,7 @@ namespace cryptonote
         bool on_getblockcount(const COMMAND_RPC_GETBLOCKCOUNT::request &req, COMMAND_RPC_GETBLOCKCOUNT::response &res);
         bool on_getblockhash(const COMMAND_RPC_GETBLOCKHASH::request &req, COMMAND_RPC_GETBLOCKHASH::response &res);
         bool on_getblocktemplate(const COMMAND_RPC_GETBLOCKTEMPLATE::request &req, COMMAND_RPC_GETBLOCKTEMPLATE::response &res);
+        bool on_get_miner_data(const COMMAND_RPC_GET_MINER_DATA::request &req, COMMAND_RPC_GET_MINER_DATA::response &res);
         bool on_get_currency_id(const COMMAND_RPC_GET_CURRENCY_ID::request &req, COMMAND_RPC_GET_CURRENCY_ID::response &res);
         bool on_submitblock(const COMMAND_RPC_SUBMITBLOCK::request &req, COMMAND_RPC_SUBMITBLOCK::response &res);
         bool on_get_last_block_header(const COMMAND_RPC_GET_LAST_BLOCK_HEADER::request &req, COMMAND_RPC_GET_LAST_BLOCK_HEADER::response &res);
