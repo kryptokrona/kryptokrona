@@ -9,6 +9,7 @@
 
 #include "rocksdb/cache.h"
 #include "rocksdb/table.h"
+#include "rocksdb/filter_policy.h"
 #include "rocksdb/db.h"
 #include "rocksdb/utilities/backupable_db.h"
 
@@ -223,6 +224,12 @@ rocksdb::Options RocksDBWrapper::getDBOptions(const DataBaseConfig &config)
     // level style compaction
     fOptions.compaction_style = rocksdb::kCompactionStyleLevel;
 
+    // Compression stays disabled because the vendored RocksDB is built WITHOUT compression
+    // libraries (external/rocksdb/CMakeLists.txt: WITH_LZ4 / WITH_ZSTD / WITH_SNAPPY = OFF),
+    // so selecting kLZ4/kZSTD/kSnappy here would fail at runtime. Enabling LZ4 on the upper
+    // levels + ZSTD on the bottommost would shrink the DB ~2-4x and cut disk I/O (a worthwhile
+    // follow-up), but requires turning those build options ON and adding the lz4/zstd deps to
+    // the CI matrix first.
     fOptions.compression_per_level.resize(fOptions.num_levels);
     for (int i = 0; i < fOptions.num_levels; ++i)
     {
@@ -231,6 +238,12 @@ rocksdb::Options RocksDBWrapper::getDBOptions(const DataBaseConfig &config)
 
     rocksdb::BlockBasedTableOptions tableOptions;
     tableOptions.block_cache = rocksdb::NewLRUCache(config.getReadCacheSize());
+    // A bloom filter (~10 bits/key) avoids a disk seek for point lookups that miss.
+    tableOptions.filter_policy.reset(rocksdb::NewBloomFilterPolicy(10, false));
+    // Keep index and filter blocks in the block cache, and pin the L0 ones, so hot
+    // metadata stays in RAM instead of being re-read from disk on every lookup.
+    tableOptions.cache_index_and_filter_blocks = true;
+    tableOptions.pin_l0_filter_and_index_blocks_in_cache = true;
     std::shared_ptr<rocksdb::TableFactory> tfp(NewBlockBasedTableFactory(tableOptions));
     fOptions.table_factory = tfp;
 

@@ -7,6 +7,7 @@
 #pragma once
 #include <ctime>
 #include <vector>
+#include <shared_mutex>
 #include <unordered_map>
 #include "blockchain_cache.h"
 #include "blockchain_messages.h"
@@ -155,6 +156,21 @@ namespace cryptonote
             std::vector<MinerDataTx> txBacklog;
         };
         bool getMinerData(MinerData &data) const;
+        // Block-derived portion of the miner data (everything except the mempool tx
+        // backlog). It is a pure function of the top block, so callers may memoize it
+        // keyed by the top-block hash (invalidate on a new block or reorg).
+        bool getMinerDataBlockPart(MinerData &data) const;
+        // Live mempool tx backlog. Changes whenever the pool changes (independently of
+        // blocks), so it must NOT be cached -- always rebuild it.
+        bool getMinerTxBacklog(std::vector<MinerDataTx> &backlog) const;
+
+        // Concurrency guard. Core was written for single-threaded (dispatcher) access;
+        // the RPC server now runs each request on a worker thread. Read handlers take a
+        // SHARED lock on this around their core access, and the block-add write path takes
+        // an EXCLUSIVE lock -- so reads run concurrently with each other but never while a
+        // block is being added. Held at request/write boundaries only (never nested in
+        // inner core methods) to avoid recursive-lock deadlocks.
+        std::shared_mutex &getAccessLock() const { return m_accessLock; }
 
     private:
         const Currency &currency;
@@ -173,6 +189,7 @@ namespace cryptonote
         IntrusiveLinkedList<MessageQueue<BlockchainMessage>> queueList;
         std::unique_ptr<IBlockchainCacheFactory> blockchainCacheFactory;
         std::unique_ptr<IMainChainStorage> mainChainStorage;
+        mutable std::shared_mutex m_accessLock;
         bool initialized;
 
         time_t start_time;

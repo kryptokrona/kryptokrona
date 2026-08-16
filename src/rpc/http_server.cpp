@@ -10,6 +10,7 @@
 
 #include <http/http_parser.h>
 #include <syst/interrupted_exception.h>
+#include <syst/remote_context.h>
 #include <syst/tcp_stream.h>
 #include <syst/ipv4_address.h>
 
@@ -81,7 +82,17 @@ namespace cryptonote
                 HttpResponse resp;
 
                 parser.receiveRequest(stream, req);
-                processRequest(req, resp);
+
+                // Run the (potentially blocking, DB-heavy) request handler on a worker
+                // thread instead of directly on the cooperative dispatcher. A RocksDB read
+                // is a blocking syscall that does not yield the dispatcher, so handling a
+                // request inline stalls every other connection until it finishes. Offloading
+                // lets the dispatcher keep serving other connections (and processing blocks)
+                // while this one's handler runs; the context yields until it completes.
+                // get() rethrows any handler exception here, preserving the catch below.
+                syst::RemoteContext<void> processingContext(m_dispatcher, [this, &req, &resp]
+                                                            { processRequest(req, resp); });
+                processingContext.get();
 
                 stream << resp;
                 stream.flush();

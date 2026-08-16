@@ -201,7 +201,20 @@ namespace cryptonote
             return;
         }
 
-        it->second.handler(this, request, response);
+        // Requests run on worker threads (see HttpServer::acceptLoop offload), so read
+        // handlers take a SHARED lock to run concurrently while staying safe against the
+        // exclusive block/pool write locks. Skip it for "/json_rpc" (locks per-method
+        // internally below) and "/sendrawtransaction" (write path locks internally) --
+        // shared-locking those would deadlock against the exclusive lock they take.
+        if (url == "/json_rpc" || url == "/sendrawtransaction")
+        {
+            it->second.handler(this, request, response);
+        }
+        else
+        {
+            std::shared_lock<std::shared_mutex> readLock(m_core.getAccessLock());
+            it->second.handler(this, request, response);
+        }
     }
 
     bool RpcServer::processJsonRpcRequest(const HttpRequest &request, HttpResponse &response)
@@ -252,7 +265,18 @@ namespace cryptonote
                 throw JsonRpcError(CORE_RPC_ERROR_CODE_CORE_BUSY, "Core is busy");
             }
 
-            it->second.handler(this, jsonRequest, jsonResponse);
+            // Read methods take a SHARED lock (concurrent). "submitblock" is a write and
+            // locks exclusively inside submitBlock/addBlock, so shared-locking it here would
+            // deadlock -- run it without the shared lock.
+            if (jsonRequest.getMethod() == "submitblock")
+            {
+                it->second.handler(this, jsonRequest, jsonResponse);
+            }
+            else
+            {
+                std::shared_lock<std::shared_mutex> readLock(m_core.getAccessLock());
+                it->second.handler(this, jsonRequest, jsonResponse);
+            }
         }
         catch (const JsonRpcError &err)
         {
@@ -1240,10 +1264,42 @@ namespace cryptonote
 
     bool RpcServer::on_get_miner_data(const COMMAND_RPC_GET_MINER_DATA::request & /*req*/, COMMAND_RPC_GET_MINER_DATA::response &res)
     {
+        // p2pool polls this every ~1-2s per connection, and the block-derived fields
+        // (difficulty/median windows etc.) cost ~3 x ~100-block DB reads to compute but
+        // only change when the top block changes. Memoize them keyed by the top-block
+        // hash so repeated polls between blocks are almost free. The mempool tx backlog
+        // is always rebuilt below so pool freshness is never sacrificed.
+        const crypto::Hash topHash = m_core.getTopBlockHash();
+
         Core::MinerData data;
-        if (!m_core.getMinerData(data))
+        bool cacheHit = false;
         {
-            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to gather miner data"};
+            std::lock_guard<std::mutex> lock(m_minerDataCacheMutex);
+            if (m_minerDataCacheValid && m_minerDataCacheTopHash == topHash)
+            {
+                data = m_minerDataCacheBlockPart;
+                cacheHit = true;
+            }
+        }
+
+        if (!cacheHit)
+        {
+            if (!m_core.getMinerDataBlockPart(data))
+            {
+                throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to gather miner data"};
+            }
+            std::lock_guard<std::mutex> lock(m_minerDataCacheMutex);
+            // Key on the hash the block part was actually computed against (data.prevId),
+            // so a tip that moved mid-computation invalidates cleanly on the next call.
+            m_minerDataCacheBlockPart = data;
+            m_minerDataCacheTopHash = data.prevId;
+            m_minerDataCacheValid = true;
+        }
+
+        // Always rebuild the mempool backlog live -- never cached.
+        if (!m_core.getMinerTxBacklog(data.txBacklog))
+        {
+            throw json_rpc::JsonRpcError{CORE_RPC_ERROR_CODE_INTERNAL_ERROR, "Internal error: failed to gather miner tx backlog"};
         }
 
         res.major_version = data.majorVersion;
@@ -1362,7 +1418,7 @@ namespace cryptonote
 
     }
 
-    void RpcServer::fill_block_header_response(const BlockTemplate &blk, bool orphan_status, uint32_t index, const Hash &hash, block_header_response &response)
+    void RpcServer::fill_block_header_response(const BlockTemplate &blk, bool orphan_status, uint32_t index, const Hash &hash, block_header_response &response, bool lightweight)
     {
         response.major_version = blk.majorVersion;
         response.minor_version = blk.minorVersion;
@@ -1375,9 +1431,23 @@ namespace cryptonote
         response.hash = common::podToHex(hash);
         response.difficulty = m_core.getBlockDifficulty(index);
         response.reward = get_block_reward(blk);
-        BlockDetails blkDetails = m_core.getBlockDetails(hash);
-        response.num_txes = static_cast<uint32_t>(blkDetails.transactions.size());
-        response.block_size = blkDetails.blockSize;
+        if (lightweight)
+        {
+            // Bulk header queries (get_block_headers_range) must not call getBlockDetails:
+            // it restores the block template a SECOND time (we already have `blk`) and loads
+            // every transaction's details -- the dominant cost when serving 100s of headers.
+            // num_txes = non-coinbase tx hashes + the coinbase; block_size is approximated by
+            // the block template's serialized size (header + coinbase + tx hashes). These two
+            // fields are informational for header sync; the PoW/linkage fields above are exact.
+            response.num_txes = static_cast<uint32_t>(blk.transactionHashes.size() + 1);
+            response.block_size = getObjectBinarySize(blk);
+        }
+        else
+        {
+            BlockDetails blkDetails = m_core.getBlockDetails(hash);
+            response.num_txes = static_cast<uint32_t>(blkDetails.transactions.size());
+            response.block_size = blkDetails.blockSize;
+        }
     }
 
     bool RpcServer::on_get_last_block_header(const COMMAND_RPC_GET_LAST_BLOCK_HEADER::request &req, COMMAND_RPC_GET_LAST_BLOCK_HEADER::response &res)
@@ -1452,13 +1522,25 @@ namespace cryptonote
             return false;
         }
 
+        // Cap the range. Without this an unbounded request forces (end-start) full-block
+        // reads to be materialised in memory at once; many concurrent p2pool connections
+        // requesting large ranges is a memory/DB-load blowup that can OOM the daemon.
+        // Monero caps this endpoint the same way.
+        static const uint64_t MAX_BLOCK_HEADERS_RANGE = 1000;
+        if (req.end_height - req.start_height + 1 > MAX_BLOCK_HEADERS_RANGE)
+        {
+            error_resp.code = CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT;
+            error_resp.message = "Requested block header range is too large (max " + std::to_string(MAX_BLOCK_HEADERS_RANGE) + " blocks).";
+            return false;
+        }
+
         for (uint32_t h = static_cast<uint32_t>(req.start_height); h <= static_cast<uint32_t>(req.end_height); ++h)
         {
             crypto::Hash block_hash = m_core.getBlockHashByIndex(h);
             cryptonote::BlockTemplate blk = m_core.getBlockByHash(block_hash);
 
             res.headers.push_back(block_header_response());
-            fill_block_header_response(blk, false, h, block_hash, res.headers.back());
+            fill_block_header_response(blk, false, h, block_hash, res.headers.back(), /*lightweight=*/true);
 
             // TODO: Error handling like in monero?
             /*block blk;
