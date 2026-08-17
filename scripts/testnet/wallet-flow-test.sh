@@ -16,9 +16,9 @@
 #   6. restart a wallet and assert its balance/history persist
 #
 # Topology (one wallet per node; both backends covered):
-#   node1 (rpc 31001)  <-  W1 = kryptokrona-service (32001)  [miner]
-#   node2 (rpc 31002)  <-  W2 = wallet-api           (33002)
-#   node3 (rpc 31003)  <-  W3 = kryptokrona-service  (32003)
+#   node1 (rpc 31201)  <-  W1 = kryptokrona-service (32201)  [miner]
+#   node2 (rpc 31202)  <-  W2 = wallet-api           (33201)
+#   node3 (rpc 31203)  <-  W3 = kryptokrona-service  (32203)
 #
 # Requires TESTNET binaries (-DTEST_NET=ON): difficulty is pinned to 1 so mining
 # is instant, and the coinbase unlock window is 1 block so mined coins spend
@@ -42,8 +42,15 @@ WALLET_API="$BIN_DIR/wallet-api$EXE"
 RPC_PASSWORD="ci-test-password"
 WALLET_PASSWORD="ci-test-wallet-pass"
 
-# node i: p2p 30000+i, rpc 31000+i. W1 svc 32001, W3 svc 32003, W2 wallet-api 33002.
-W1_PORT=32001; W3_PORT=32003; W2_PORT=33002
+# Ports. Deliberately in a range that does NOT overlap ci-integration-test.sh
+# (3000x/3100x/32000) or api-endpoint-test.sh (30100/31100/32100/33100): all
+# three run sequentially in the same CI job, and those suites' daemons can
+# core-dump on shutdown and briefly fail to release their ports, so a shared
+# port would make this test flakily fail to bind.
+# node i: p2p P2P_BASE+i, rpc RPC_BASE+i.
+P2P_BASE=30200; RPC_BASE=31200
+N1_RPC=$((RPC_BASE+1)); N2_RPC=$((RPC_BASE+2)); N3_RPC=$((RPC_BASE+3))
+W1_PORT=32201; W3_PORT=32203; W2_PORT=33201
 
 MINE_INITIAL=25     # blocks mined to W1 up front (instant at difficulty 1)
 MINE_CONFIRM=3      # blocks mined to confirm each round of sends
@@ -131,26 +138,26 @@ log "Starting 3 testnet nodes (--add-exclusive-node mesh)"
 for i in 1 2 3; do
     mkdir -p "$WORK/node$i"
     exclusive=()
-    for j in 1 2 3; do [ "$j" -ne "$i" ] && exclusive+=(--add-exclusive-node "127.0.0.1:$((30000+j))"); done
+    for j in 1 2 3; do [ "$j" -ne "$i" ] && exclusive+=(--add-exclusive-node "127.0.0.1:$((P2P_BASE+j))"); done
     "$KRYPTOKRONAD" \
         --data-dir "$WORK/node$i" \
-        --p2p-bind-ip 127.0.0.1 --p2p-bind-port "$((30000+i))" \
-        --rpc-bind-ip 127.0.0.1 --rpc-bind-port "$((31000+i))" \
+        --p2p-bind-ip 127.0.0.1 --p2p-bind-port "$((P2P_BASE+i))" \
+        --rpc-bind-ip 127.0.0.1 --rpc-bind-port "$((RPC_BASE+i))" \
         "${exclusive[@]}" --log-level 1 > "$WORK/node$i.log" 2>&1 &
     PIDS+=($!)
 done
 for i in 1 2 3; do
-    node_up() { dget "$((31000+i))" | jq -e '.status' >/dev/null 2>&1; }
+    node_up() { dget "$((RPC_BASE+i))" | jq -e '.status' >/dev/null 2>&1; }
     wait_for "node$i rpc" 60 node_up || fail "node$i RPC did not come up"
 done
 peered() {
     for i in 1 2 3; do
-        c=$(dget "$((31000+i))" | jq -r '(.outgoing_connections_count // 0) + (.incoming_connections_count // 0)' 2>/dev/null)
+        c=$(dget "$((RPC_BASE+i))" | jq -r '(.outgoing_connections_count // 0) + (.incoming_connections_count // 0)' 2>/dev/null)
         [[ "$c" =~ ^[0-9]+$ ]] && [ "$c" -ge 2 ] || return 1
     done
 }
 wait_for "peering" 120 peered || fail "nodes did not fully peer"
-ok "all 3 nodes peered ($(for i in 1 2 3; do printf 'node%s=%s ' "$i" "$(dget $((31000+i)) | jq -r '(.outgoing_connections_count//0)+(.incoming_connections_count//0)')"; done))"
+ok "all 3 nodes peered ($(for i in 1 2 3; do printf 'node%s=%s ' "$i" "$(dget $((RPC_BASE+i)) | jq -r '(.outgoing_connections_count//0)+(.incoming_connections_count//0)')"; done))"
 
 # ----------------------------------------------------------------------------
 # 2. Start one wallet per node -- both backends
@@ -171,13 +178,13 @@ start_service_wallet() { # name port daemon_rpc container
 }
 
 log "Starting W1 = kryptokrona-service @ node1 (the miner's wallet)"
-start_service_wallet w1 "$W1_PORT" 31001 "$WORK/w1.container"
+start_service_wallet w1 "$W1_PORT" "$N1_RPC" "$WORK/w1.container"
 W1_ADDR=$(svc "$W1_PORT" getAddresses | jq -r '.result.addresses[0]')
 [ -n "$W1_ADDR" ] && [ "$W1_ADDR" != null ] || fail "could not read W1 address"
 ok "W1 (service)    $W1_ADDR"
 
 log "Starting W3 = kryptokrona-service @ node3"
-start_service_wallet w3 "$W3_PORT" 31003 "$WORK/w3.container"
+start_service_wallet w3 "$W3_PORT" "$N3_RPC" "$WORK/w3.container"
 W3_ADDR=$(svc "$W3_PORT" getAddresses | jq -r '.result.addresses[0]')
 [ -n "$W3_ADDR" ] && [ "$W3_ADDR" != null ] || fail "could not read W3 address"
 ok "W3 (service)    $W3_ADDR"
@@ -193,7 +200,7 @@ exec 8<>"$WAPI_FIFO"; WAPI_FD_OPEN=1
 # numeric HTTP code just means the REST server itself is accepting connections.
 wapi_up() { wapi GET /status; [[ "$WAPI_CODE" =~ ^[0-9]+$ ]]; }
 wait_for "w2" 60 wapi_up || fail "W2 (wallet-api) did not come up"
-wapi POST /wallet/create "{\"daemonHost\":\"127.0.0.1\",\"daemonPort\":31002,\"filename\":\"$WORK/w2.container\",\"password\":\"$WALLET_PASSWORD\"}"
+wapi POST /wallet/create "{\"daemonHost\":\"127.0.0.1\",\"daemonPort\":$N2_RPC,\"filename\":\"$WORK/w2.container\",\"password\":\"$WALLET_PASSWORD\"}"
 [ "$WAPI_CODE" = 200 ] || fail "wallet-api /wallet/create failed (HTTP $WAPI_CODE): $WAPI_BODY"
 wapi GET /addresses/primary; W2_ADDR=$(printf '%s' "$WAPI_BODY" | jq -r '.address')
 [ -n "$W2_ADDR" ] && [ "$W2_ADDR" != null ] || fail "could not read W2 address"
@@ -221,12 +228,12 @@ daemon_height() { dget "$1" | jq -r '.height'; }
 
 # Mine COUNT blocks to ADDR via node1, then wait every node to reach that height.
 mine_and_propagate() { # count addr
-    "$MINER" --daemon-address "127.0.0.1:31001" --address "$2" --threads 1 --limit "$1" > "$WORK/miner.log" 2>&1 &
+    "$MINER" --daemon-address "127.0.0.1:$N1_RPC" --address "$2" --threads 1 --limit "$1" > "$WORK/miner.log" 2>&1 &
     local mp=$!
-    for _ in $(seq 1 200); do kill -0 "$mp" 2>/dev/null || break; local h; h=$(daemon_height 31001); [[ "$h" =~ ^[0-9]+$ ]] && [ "$h" -ge "$TARGET" ] && break; sleep 0.2; done
+    for _ in $(seq 1 200); do kill -0 "$mp" 2>/dev/null || break; local h; h=$(daemon_height "$N1_RPC"); [[ "$h" =~ ^[0-9]+$ ]] && [ "$h" -ge "$TARGET" ] && break; sleep 0.2; done
     kill "$mp" 2>/dev/null || true; wait "$mp" 2>/dev/null || true
-    local H; H=$(daemon_height 31001)
-    all_at_height() { for i in 1 2 3; do [ "$(daemon_height $((31000+i)))" = "$H" ] || return 1; done; }
+    local H; H=$(daemon_height "$N1_RPC")
+    all_at_height() { for i in 1 2 3; do [ "$(daemon_height $((RPC_BASE+i)))" = "$H" ] || return 1; done; }
     wait_for "propagate to $H" 60 all_at_height || fail "block $H did not propagate to all nodes"
     echo "$H"
 }
@@ -259,9 +266,9 @@ ok "W1->W3 tx $TX_1_3"
 log "Checking mempool relay (both txs reach all 3 nodes' pools)"
 pool_count() { dget "$1" | jq -r '.tx_pool_size // 0'; }   # $1=rpcport
 for i in 1 2 3; do
-    relayed() { local c; c=$(pool_count "$((31000+i))"); [[ "$c" =~ ^[0-9]+$ ]] && [ "$c" -ge 2 ]; }
-    wait_for "relay to node$i" 30 relayed || fail "txs did not relay to node$i's mempool (pool size $(pool_count "$((31000+i))"))"
-    ok "node$i mempool holds $(pool_count "$((31000+i))") txs"
+    relayed() { local c; c=$(pool_count "$((RPC_BASE+i))"); [[ "$c" =~ ^[0-9]+$ ]] && [ "$c" -ge 2 ]; }
+    wait_for "relay to node$i" 30 relayed || fail "txs did not relay to node$i's mempool (pool size $(pool_count "$((RPC_BASE+i))"))"
+    ok "node$i mempool holds $(pool_count "$((RPC_BASE+i))") txs"
 done
 
 # ----------------------------------------------------------------------------
@@ -307,7 +314,7 @@ W3_PID=$(pgrep -f "kryptokrona-service.*--bind-port $W3_PORT" | head -1 || true)
 [ -n "$W3_PID" ] && { kill -9 "$W3_PID" 2>/dev/null || true; }
 sleep 2
 "$SERVICE" --container-file "$WORK/w3.container" --container-password "$WALLET_PASSWORD" \
-    --daemon-address 127.0.0.1 --daemon-port 31003 \
+    --daemon-address 127.0.0.1 --daemon-port "$N3_RPC" \
     --bind-address 127.0.0.1 --bind-port "$W3_PORT" --rpc-password "$RPC_PASSWORD" \
     --log-level 1 > "$WORK/w3-restart.log" 2>&1 &
 PIDS+=($!)
