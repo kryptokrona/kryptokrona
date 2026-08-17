@@ -37,6 +37,18 @@ namespace cryptonote
     protected:
         syst::Dispatcher &m_dispatcher;
 
+        // Whether acceptLoop should run processRequest on a worker thread
+        // (syst::RemoteContext) instead of inline on the cooperative dispatcher.
+        // Off by default: the base behaviour is to process inline. Only servers
+        // whose handlers are self-contained (e.g. the daemon's Core/DB reads,
+        // whose cross-thread work is posted back via Dispatcher::remoteSpawn)
+        // may opt in. It MUST stay off for servers whose handlers drive
+        // dispatcher-bound state on this thread -- notably the wallet service's
+        // JsonRpcServer, which operates a WalletService/WalletGreen bound to
+        // this same dispatcher; running those off-dispatcher is undefined
+        // behaviour and crashes the process.
+        virtual bool offloadRequestProcessing() const { return false; }
+
     private:
         void acceptLoop();
         void connectionHandler(syst::TcpConnection &&conn);

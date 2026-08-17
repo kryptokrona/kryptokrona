@@ -56,6 +56,10 @@ namespace cryptonote
         static std::unordered_map<std::string, RpcHandler<HandlerFunction>> s_handlers;
 
         virtual void processRequest(const HttpRequest &request, HttpResponse &response) override;
+        // The daemon's handlers are self-contained Core/DB reads (any cross-thread
+        // work is posted back via Dispatcher::remoteSpawn), so they are safe to run
+        // off the dispatcher and benefit from the concurrency. Opt in.
+        bool offloadRequestProcessing() const override { return true; }
         bool processJsonRpcRequest(const HttpRequest &request, HttpResponse &response);
         bool isCoreReady();
 

@@ -83,16 +83,27 @@ namespace cryptonote
 
                 parser.receiveRequest(stream, req);
 
-                // Run the (potentially blocking, DB-heavy) request handler on a worker
-                // thread instead of directly on the cooperative dispatcher. A RocksDB read
-                // is a blocking syscall that does not yield the dispatcher, so handling a
-                // request inline stalls every other connection until it finishes. Offloading
-                // lets the dispatcher keep serving other connections (and processing blocks)
-                // while this one's handler runs; the context yields until it completes.
-                // get() rethrows any handler exception here, preserving the catch below.
-                syst::RemoteContext<void> processingContext(m_dispatcher, [this, &req, &resp]
-                                                            { processRequest(req, resp); });
-                processingContext.get();
+                if (offloadRequestProcessing())
+                {
+                    // Run the (potentially blocking, DB-heavy) request handler on a worker
+                    // thread instead of directly on the cooperative dispatcher. A RocksDB read
+                    // is a blocking syscall that does not yield the dispatcher, so handling a
+                    // request inline stalls every other connection until it finishes. Offloading
+                    // lets the dispatcher keep serving other connections (and processing blocks)
+                    // while this one's handler runs; the context yields until it completes.
+                    // get() rethrows any handler exception here, preserving the catch below.
+                    //
+                    // Only servers that opt in (see offloadRequestProcessing) take this path.
+                    // The wallet service's JsonRpcServer must NOT -- its handlers drive a
+                    // WalletService bound to this dispatcher and would crash off-thread.
+                    syst::RemoteContext<void> processingContext(m_dispatcher, [this, &req, &resp]
+                                                                { processRequest(req, resp); });
+                    processingContext.get();
+                }
+                else
+                {
+                    processRequest(req, resp);
+                }
 
                 stream << resp;
                 stream.flush();
