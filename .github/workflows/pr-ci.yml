@@ -13,7 +13,7 @@ jobs:
         config:
           - {
               name: "Ubuntu 22.04 GCC",
-              artifact: "kryptokrona-ubuntu-22.zip",
+              artifact: "kryptokrona-ubuntu-22",
               os: ubuntu-22.04,
               cc: "gcc",
               cxx: "g++",
@@ -21,7 +21,7 @@ jobs:
             }
           - {
               name: "macOS arm64 Clang",
-              artifact: "kryptokrona-macos-arm64.zip",
+              artifact: "kryptokrona-macos-arm64",
               os: macos-14,
               cc: "clang",
               cxx: "clang++",
@@ -29,7 +29,7 @@ jobs:
             }
           - {
               name: "Windows x64 MSVC",
-              artifact: "kryptokrona-windows-x64.zip",
+              artifact: "kryptokrona-windows-x64",
               os: windows-2022,
               cc: "cl",
               cxx: "cl",
@@ -97,3 +97,32 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows-static ..
           cmake --build . --config Release -- /m
+
+      # ---------------- Artifact upload ----------------
+      # Publish the built binaries on every PR so reviewers can download and test
+      # them without building locally. (macOS PR binaries are unsigned -- unlike
+      # the master pipeline they are not notarized, so Gatekeeper will quarantine
+      # them: clear it with `xattr -d com.apple.quarantine <bin>` before running.)
+      - name: Upload Unix Artifact
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.config.artifact }}
+          path: |
+            build/src/kryptokronad
+            build/src/xkrwallet
+            build/src/kryptokrona-service
+            build/src/miner
+            build/src/wallet-api
+
+      - name: Upload Windows Artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.config.artifact }}
+          path: |
+            build/src/Release/kryptokronad.exe
+            build/src/Release/xkrwallet.exe
+            build/src/Release/kryptokrona-service.exe
+            build/src/Release/miner.exe
+            build/src/Release/wallet-api.exe
