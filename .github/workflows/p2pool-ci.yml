@@ -137,6 +137,20 @@ jobs:
           echo "macOS binaries signed and notarized."
 
       # ---------------- Windows build (MSVC) ----------------
+      # Restore the vcpkg binary cache so Boost is built from source only once;
+      # later runs restore the prebuilt packages and skip the ~30 github.com
+      # downloads entirely (which is what trips the HTTP 429s). run_id in the key
+      # + prefix restore-keys makes it a rolling cache that always saves the
+      # latest snapshot and restores the most recent prior one.
+      - name: Cache vcpkg Boost binaries (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}\vcpkg_bincache
+          key: vcpkg-x64-windows-static-${{ github.run_id }}
+          restore-keys: |
+            vcpkg-x64-windows-static-
+
       - name: Install Boost (vcpkg, static)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -151,13 +165,33 @@ jobs:
           # both the compiled libs (find_package COMPONENTS) and the header-only
           # ones it #includes (uuid, multi_index, variant, ...). vcpkg pulls each
           # module's transitive dependencies automatically.
-          vcpkg install --triplet x64-windows-static `
-            boost-system boost-filesystem boost-thread boost-date-time `
-            boost-chrono boost-serialization boost-program-options `
-            boost-multi-index boost-uuid boost-variant boost-optional `
-            boost-utility boost-functional boost-scope-exit boost-foreach `
-            boost-algorithm boost-range boost-lexical-cast boost-iterator `
-            boost-format
+          # Boost source tarballs are fetched from github.com, which
+          # intermittently rate-limits (HTTP 429) or 502s and fails the whole
+          # install. Retry with backoff -- vcpkg is idempotent and resumes from
+          # what it already downloaded/built.
+          #
+          # Point vcpkg at the binary cache restored by the actions/cache step
+          # above: on a warm cache it restores the prebuilt Boost and skips the
+          # github.com downloads AND the compile, so only the first cold run pays
+          # the download cost -- which the retry loop makes reliable.
+          $env:VCPKG_DEFAULT_BINARY_CACHE = "${{ github.workspace }}\vcpkg_bincache"
+          New-Item -ItemType Directory -Force -Path $env:VCPKG_DEFAULT_BINARY_CACHE | Out-Null
+          $modules = @(
+            'boost-system','boost-filesystem','boost-thread','boost-date-time',
+            'boost-chrono','boost-serialization','boost-program-options',
+            'boost-multi-index','boost-uuid','boost-variant','boost-optional',
+            'boost-utility','boost-functional','boost-scope-exit','boost-foreach',
+            'boost-algorithm','boost-range','boost-lexical-cast','boost-iterator',
+            'boost-format'
+          )
+          for ($attempt = 1; $attempt -le 5; $attempt++) {
+            vcpkg install --triplet x64-windows-static @modules
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 5) { throw "vcpkg install failed after 5 attempts (exit $LASTEXITCODE)" }
+            $wait = 30 * $attempt
+            Write-Host "::warning::vcpkg boost install failed (attempt $attempt/5); retrying in $wait s"
+            Start-Sleep -Seconds $wait
+          }
 
       - name: Build Windows Target
         if: runner.os == 'Windows'
