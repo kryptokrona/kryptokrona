@@ -109,6 +109,19 @@ jobs:
           chmod +x scripts/testnet/api-endpoint-test.sh
           BIN_DIR=build/src ./scripts/testnet/api-endpoint-test.sh
 
+      # The money-flow smoke test: 3 peered nodes, a wallet on each (both the
+      # kryptokrona-service and wallet-api backends), mine to one and send real
+      # funds between them across the p2p network, asserting exact receipt +
+      # persistence. Linux-only for now: it runs ~7 processes (3 nodes + 3
+      # wallets + miner) and the resource-constrained macOS runner is prone to
+      # timing flakiness under that load. To also cover macOS, add
+      # "|| runner.os == 'macOS'" once its reliability is confirmed.
+      - name: Run wallet flow test (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x scripts/testnet/wallet-flow-test.sh
+          BIN_DIR=build/src ./scripts/testnet/wallet-flow-test.sh
+
       - name: Run testnet integration test (Windows)
         if: runner.os == 'Windows'
         shell: bash
