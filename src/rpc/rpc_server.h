@@ -9,12 +9,16 @@
 #include "http_server.h"
 
 #include <functional>
+#include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 
 #include <logging/logger_ref.h>
 #include "common/math.h"
 #include "core_rpc_server_commands_definitions.h"
 #include "json_rpc.h"
+// Full definition needed: the get_miner_data cache holds a Core::MinerData by value.
+#include <cryptonote_core/core.h>
 
 namespace cryptonote
 {
@@ -52,6 +56,10 @@ namespace cryptonote
         static std::unordered_map<std::string, RpcHandler<HandlerFunction>> s_handlers;
 
         virtual void processRequest(const HttpRequest &request, HttpResponse &response) override;
+        // The daemon's handlers are self-contained Core/DB reads (any cross-thread
+        // work is posted back via Dispatcher::remoteSpawn), so they are safe to run
+        // off the dispatcher and benefit from the concurrency. Opt in.
+        bool offloadRequestProcessing() const override { return true; }
         bool processJsonRpcRequest(const HttpRequest &request, HttpResponse &response);
         bool isCoreReady();
 
@@ -98,7 +106,7 @@ namespace cryptonote
         bool on_get_block_header_by_hash(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HASH::request &req, COMMAND_RPC_GET_BLOCK_HEADER_BY_HASH::response &res);
         bool on_get_block_header_by_height(const COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::request &req, COMMAND_RPC_GET_BLOCK_HEADER_BY_HEIGHT::response &res);
 
-        void fill_block_header_response(const BlockTemplate &blk, bool orphan_status, uint32_t index, const crypto::Hash &hash, block_header_response &responce);
+        void fill_block_header_response(const BlockTemplate &blk, bool orphan_status, uint32_t index, const crypto::Hash &hash, block_header_response &responce, bool lightweight = false);
         RawBlockLegacy prepareRawBlockLegacy(BinaryArray &&blockBlob);
 
         bool f_on_blocks_list_json(const F_COMMAND_RPC_GET_BLOCKS_LIST::request &req, F_COMMAND_RPC_GET_BLOCKS_LIST::response &res);
@@ -114,6 +122,15 @@ namespace cryptonote
         std::vector<std::string> m_cors_domains;
         std::string m_fee_address;
         uint32_t m_fee_amount;
+
+        // get_miner_data cache. The block-derived fields are a pure function of the top
+        // block, so they are memoized here keyed by the top-block hash and invalidated on
+        // a new block or reorg. The mempool tx backlog is deliberately NOT cached -- it is
+        // rebuilt live on every request so newly arrived pool transactions are never stale.
+        std::mutex m_minerDataCacheMutex;
+        bool m_minerDataCacheValid = false;
+        crypto::Hash m_minerDataCacheTopHash{};
+        Core::MinerData m_minerDataCacheBlockPart;
     };
 
 }

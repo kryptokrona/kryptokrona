@@ -55,17 +55,51 @@ jobs:
           brew update
           brew install boost cmake ccache
 
+      # Restore the vcpkg binary cache so Boost is built from source only once;
+      # later runs restore the prebuilt packages and skip the ~30 github.com
+      # downloads entirely (which is what trips the HTTP 429s). run_id in the key
+      # + prefix restore-keys makes it a rolling cache that always saves the
+      # latest snapshot and restores the most recent prior one.
+      - name: Cache vcpkg Boost binaries (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}\vcpkg_bincache
+          key: vcpkg-x64-windows-static-${{ github.run_id }}
+          restore-keys: |
+            vcpkg-x64-windows-static-
+
       - name: Install Boost (Windows, vcpkg static)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          vcpkg install --triplet x64-windows-static `
-            boost-system boost-filesystem boost-thread boost-date-time `
-            boost-chrono boost-serialization boost-program-options `
-            boost-multi-index boost-uuid boost-variant boost-optional `
-            boost-utility boost-functional boost-scope-exit boost-foreach `
-            boost-algorithm boost-range boost-lexical-cast boost-iterator `
-            boost-format
+          # Boost source tarballs are fetched from github.com, which
+          # intermittently rate-limits (HTTP 429) or 502s and fails the whole
+          # install. Retry with backoff -- vcpkg is idempotent and resumes from
+          # what it already downloaded/built.
+          #
+          # Point vcpkg at the binary cache restored by the actions/cache step
+          # above: on a warm cache it restores the prebuilt Boost and skips the
+          # github.com downloads AND the compile, so only the first cold run pays
+          # the download cost -- which the retry loop makes reliable.
+          $env:VCPKG_DEFAULT_BINARY_CACHE = "${{ github.workspace }}\vcpkg_bincache"
+          New-Item -ItemType Directory -Force -Path $env:VCPKG_DEFAULT_BINARY_CACHE | Out-Null
+          $modules = @(
+            'boost-system','boost-filesystem','boost-thread','boost-date-time',
+            'boost-chrono','boost-serialization','boost-program-options',
+            'boost-multi-index','boost-uuid','boost-variant','boost-optional',
+            'boost-utility','boost-functional','boost-scope-exit','boost-foreach',
+            'boost-algorithm','boost-range','boost-lexical-cast','boost-iterator',
+            'boost-format'
+          )
+          for ($attempt = 1; $attempt -le 5; $attempt++) {
+            vcpkg install --triplet x64-windows-static @modules
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 5) { throw "vcpkg install failed after 5 attempts (exit $LASTEXITCODE)" }
+            $wait = 30 * $attempt
+            Write-Host "::warning::vcpkg boost install failed (attempt $attempt/5); retrying in $wait s"
+            Start-Sleep -Seconds $wait
+          }
 
       # ---------------- Build (TEST_NET=ON) ----------------
       - name: Build testnet binaries (Ubuntu)
@@ -108,6 +142,19 @@ jobs:
         run: |
           chmod +x scripts/testnet/api-endpoint-test.sh
           BIN_DIR=build/src ./scripts/testnet/api-endpoint-test.sh
+
+      # The money-flow smoke test: 3 peered nodes, a wallet on each (both the
+      # kryptokrona-service and wallet-api backends), mine to one and send real
+      # funds between them across the p2p network, asserting exact receipt +
+      # persistence. Linux-only for now: it runs ~7 processes (3 nodes + 3
+      # wallets + miner) and the resource-constrained macOS runner is prone to
+      # timing flakiness under that load. To also cover macOS, add
+      # "|| runner.os == 'macOS'" once its reliability is confirmed.
+      - name: Run wallet flow test (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x scripts/testnet/wallet-flow-test.sh
+          BIN_DIR=build/src ./scripts/testnet/wallet-flow-test.sh
 
       - name: Run testnet integration test (Windows)
         if: runner.os == 'Windows'

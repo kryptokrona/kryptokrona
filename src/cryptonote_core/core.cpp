@@ -1087,6 +1087,11 @@ namespace cryptonote
     std::error_code Core::addBlock(const CachedBlock &cachedBlock, RawBlock &&rawBlock)
     {
         throwIfNotInitialized();
+        // Exclusive write lock. Adding a block mutates in-memory chain state (segments,
+        // indexes, caches) that concurrent RPC read handlers traverse under a shared lock,
+        // so block writes must be exclusive against them. This is the single funnel for all
+        // block additions (network blocks and submitBlock), so locking here covers writes.
+        std::unique_lock<std::shared_mutex> writeLock(m_accessLock);
         uint32_t blockIndex = cachedBlock.getBlockIndex();
         crypto::Hash blockHash = cachedBlock.getBlockHash();
         std::ostringstream os;
@@ -1664,6 +1669,10 @@ namespace cryptonote
 
     bool Core::addTransactionToPool(CachedTransaction &&cachedTransaction)
     {
+        // Exclusive write lock: mutating the pool (and validating against the chain) races
+        // with RPC read handlers that read the pool/chain under a shared lock. This is the
+        // funnel for both the BinaryArray overload and network transactions.
+        std::unique_lock<std::shared_mutex> writeLock(m_accessLock);
         TransactionValidatorState validatorState;
 
         auto transactionHash = cachedTransaction.getTransactionHash();
@@ -2013,6 +2022,16 @@ namespace cryptonote
 
     bool Core::getMinerData(MinerData &data) const
     {
+        // Full miner data = the cacheable block-derived part + the live mempool backlog.
+        if (!getMinerDataBlockPart(data))
+        {
+            return false;
+        }
+        return getMinerTxBacklog(data.txBacklog);
+    }
+
+    bool Core::getMinerDataBlockPart(MinerData &data) const
+    {
         throwIfNotInitialized();
 
         const uint32_t height = getTopBlockIndex() + 1;
@@ -2055,14 +2074,23 @@ namespace cryptonote
             data.medianTimestamp = common::medianValue(timestamps);
         }
 
-        // Mempool backlog so the pool can include fee-paying transactions.
-        data.txBacklog.clear();
+        return true;
+    }
+
+    bool Core::getMinerTxBacklog(std::vector<MinerDataTx> &backlog) const
+    {
+        throwIfNotInitialized();
+
+        // Mempool backlog so the pool can include fee-paying transactions. Rebuilt on
+        // every call: transactions can enter/leave the pool at any time, so this must
+        // never be served from a cache.
+        backlog.clear();
         for (const crypto::Hash &txHash : getPoolTransactionHashes())
         {
             try
             {
                 const TransactionDetails details = getTransactionDetails(txHash);
-                data.txBacklog.push_back(MinerDataTx{txHash, details.size, details.fee});
+                backlog.push_back(MinerDataTx{txHash, details.size, details.fee});
             }
             catch (const std::exception &)
             {

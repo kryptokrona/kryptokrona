@@ -311,9 +311,17 @@ namespace cryptonote
     const char P2P_STAT_TRUSTED_PUB_KEY[] = "";
 
     const uint64_t DATABASE_WRITE_BUFFER_MB_DEFAULT_SIZE = 256;
-    const uint64_t DATABASE_READ_BUFFER_MB_DEFAULT_SIZE = 10;
-    const uint32_t DATABASE_DEFAULT_MAX_OPEN_FILES = 100;
-    const uint16_t DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT = 2;
+    // Block cache. 10 MB is far too small for a multi-GB blockchain DB: it gives a
+    // near-zero cache-hit rate, so effectively every read hits disk. That makes RPC
+    // calls that touch the DB (e.g. getinfo's difficulty window) take seconds and lets
+    // any bulk-read client (p2pool header sync) starve the daemon. Busy nodes with more
+    // RAM should raise this further via --db-read-buffer-size (e.g. 2048).
+    const uint64_t DATABASE_READ_BUFFER_MB_DEFAULT_SIZE = 256;
+    // Max open SST files. 100 causes constant open/close thrashing on a DB with thousands
+    // of SST files. Keep below the process open-file (nofile) limit; raise via
+    // --db-max-open-files where the limit allows.
+    const uint32_t DATABASE_DEFAULT_MAX_OPEN_FILES = 512;
+    const uint16_t DATABASE_DEFAULT_BACKGROUND_THREADS_COUNT = 4;
 
     const char LATEST_VERSION_URL[] = "https://github.com/kryptokrona/kryptokrona";
     const std::string LICENSE_URL = "https://github.com/kryptokrona/kryptokrona/blob/master/LICENSE";
