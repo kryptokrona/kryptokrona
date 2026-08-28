@@ -76,12 +76,16 @@ BTC_WALLET="l3"
 BTC_CONTAINER="xkr-l3-bitcoind"
 ELECTRS_CONTAINER="xkr-l3-electrs"
 
-# Swap sizing. required XKR = BTC_AMOUNT_SAT * 1e6 (FixedRate 0.01 * pico scale).
-BTC_AMOUNT_SAT="${BTC_AMOUNT_SAT:-2500}"
+# Swap sizing. The engine agrees an amount at FixedRate 0.01 (BTC per coin) and
+# the adapter scales it to XKR's 5 decimals, so the on-chain XKR lock works out to
+# BTC_AMOUNT_SAT / 10 atomic units (see swap::xkr::to_xkr_atomic). 100_000 sat ->
+# 10_000 XKR atomic (0.1 XKR): comfortably above the XKR dust threshold + fee,
+# while the BTC lock stays well above its own fee.
+BTC_AMOUNT_SAT="${BTC_AMOUNT_SAT:-100000}"
 XKR_FEE=10
-XKR_LOCK_AMOUNT=$((BTC_AMOUNT_SAT * 1000000))
+XKR_LOCK_AMOUNT=$((BTC_AMOUNT_SAT / 10))
 # Fund the ASB with a comfortable margin over the exact lock amount.
-XKR_DEPOSIT_AMOUNT=$((XKR_LOCK_AMOUNT + XKR_LOCK_AMOUNT / 5 + 100000))
+XKR_DEPOSIT_AMOUNT=$((XKR_LOCK_AMOUNT * 2 + 100000))
 SWAP_TIMEOUT_SECS="${SWAP_TIMEOUT_SECS:-900}"
 # happy = full redeem-both-sides swap; refund = Alice never locks XKR, so Bob must
 # reclaim his BTC via the cancel timelock (the safety path). Passed to the example.
