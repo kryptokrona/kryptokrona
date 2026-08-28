@@ -178,16 +178,18 @@ jobs:
       - name: Checkout kryptokrona
         uses: actions/checkout@v4
 
-      - name: Checkout yggdrasil-wallet (XKR wallet RPC service)
+      - name: Checkout aesir-wallet (XKR wallet RPC service)
         uses: actions/checkout@v4
         with:
-          repository: kryptokrona/yggdrasil-wallet
+          repository: kryptokrona/aesir-wallet
+          ref: swap
           path: yggdrasil-wallet
 
       - name: Checkout xkr-swap-core (swap engine)
         uses: actions/checkout@v4
         with:
           repository: kryptokrona/xkr-swap-core
+          ref: kryptokrona-port
           path: xkr-swap-core
 
       - name: Install build dependencies
