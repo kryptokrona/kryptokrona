@@ -259,10 +259,14 @@ miner_up() { service_rpc "$MINER_PORT" getStatus '{}' | grep -q '"result"'; }
 wait_for "miner service" 60 miner_up || fail "miner service down"
 MINER_ADDR="$(service_rpc "$MINER_PORT" getAddresses '{}' | sed -E 's/.*"addresses":\["([^"]+)".*/\1/')"
 
-# Mine until the miner can afford the deposit. Reward ~4.77e7 atomic/block, so
-# this is roughly XKR_DEPOSIT_AMOUNT / 4.77e7 blocks, in batches.
+# Mine an unconditional baseline before checking balance (mirrors the proven
+# engine-e2e funding). The deposit target is small now (XKR = BTC_sat/10), so a
+# balance-gated loop can skip mining entirely if the just-started miner service
+# returns a transient reading -- leaving the wallet with no real funds. On testnet
+# the coinbase unlock window is 1 and difficulty is fixed at 1, so this is fast.
 miner_ok() { a="$(service_rpc "$MINER_PORT" getBalance '{}' | json_field availableBalance)"; [[ "$a" =~ ^[0-9]+$ ]] || a=0; [ "$a" -gt $((XKR_DEPOSIT_AMOUNT + XKR_FEE)) ]; }
-for _ in $(seq 1 40); do
+mine_blocks "$MINER_ADDR" 20
+for _ in $(seq 1 20); do
     miner_ok && break
     mine_blocks "$MINER_ADDR" 10
 done
@@ -280,7 +284,9 @@ ok "ASB (party A) XKR address: $FUNDER_ADDR"
 
 dep="{\"anonymity\":0,\"fee\":$XKR_FEE,\"unlockTime\":0,\"changeAddress\":\"$MINER_ADDR\",\"transfers\":[{\"address\":\"$FUNDER_ADDR\",\"amount\":$XKR_DEPOSIT_AMOUNT}]}"
 DEP_RESP="$(service_rpc "$MINER_PORT" sendTransaction "$dep")"
-[ -n "$(echo "$DEP_RESP" | json_field transactionHash)" ] || fail "ASB deposit failed: $DEP_RESP"
+# Guard on the actual field name -- json_field echoes the whole response when the
+# field is absent, so an error body would otherwise slip through as "non-empty".
+echo "$DEP_RESP" | grep -q '"transactionHash"' || fail "ASB deposit failed: $DEP_RESP"
 mine_blocks "$MINER_ADDR" 6
 funder_ok() { a="$(service_rpc "$FUNDER_PORT" getBalance '{}' | json_field availableBalance)"; [[ "$a" =~ ^[0-9]+$ ]] || a=0; [ "$a" -ge $((XKR_LOCK_AMOUNT + XKR_FEE)) ]; }
 wait_for "ASB wallet spendable" 240 funder_ok || fail "ASB wallet never received deposit"
