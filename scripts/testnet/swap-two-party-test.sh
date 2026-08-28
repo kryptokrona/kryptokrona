@@ -319,7 +319,7 @@ SWAP_MODE="$SWAP_MODE" \
 XKR_WALLET_RPC_URL="http://127.0.0.1:$XKR_RPC_PORT" \
 XKR_ASB_SPEND_SECRET="$A_SPEND" XKR_ASB_VIEW_SECRET="$A_VIEW" \
 XKR_RECEIVE_ADDRESS="$MINER_ADDR" \
-RUST_LOG="${RUST_LOG:-info,swap=debug,swap_p2p=info}" \
+RUST_LOG="${RUST_LOG:-info,swap=debug,swap_p2p=debug,bitcoin_wallet=debug,electrum_pool=debug}" \
     "$EXAMPLE_BIN"
 RC=$?
 set -e
