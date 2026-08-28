@@ -161,3 +161,80 @@ jobs:
         shell: bash
         run: |
           BIN_DIR=build/src/Release ./scripts/testnet/ci-integration-test.sh
+
+  # XKR atomic-swap integration: proves the BTC<->XKR swap engine's XKR side
+  # against a live testnet. Two tiers:
+  #   * swap-rpc-service-test.sh  -- the JS wallet RPC service (xkr-wallet-rpc.cjs
+  #     from kryptokrona/yggdrasil-wallet) driven directly.
+  #   * swap-engine-e2e-test.sh   -- the Rust engine's own XkrWallet adapter
+  #     (kryptokrona/xkr-swap-core) driven against that service.
+  # Linux-only: both spin up a peered 3-node mesh plus Node + a Rust build.
+  xkr-swap-integration:
+    name: "XKR swap integration (Linux)"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout kryptokrona
+        uses: actions/checkout@v4
+
+      - name: Checkout yggdrasil-wallet (XKR wallet RPC service)
+        uses: actions/checkout@v4
+        with:
+          repository: kryptokrona/yggdrasil-wallet
+          path: yggdrasil-wallet
+
+      - name: Checkout xkr-swap-core (swap engine)
+        uses: actions/checkout@v4
+        with:
+          repository: kryptokrona/xkr-swap-core
+          path: xkr-swap-core
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libboost-dev libboost-all-dev libssl-dev libffi-dev python3-dev gcc g++ git cmake librocksdb-dev curl jq \
+            libboost-system1.74.0 libboost-filesystem1.74.0 libboost-thread1.74.0 libboost-date-time1.74.0 libboost-chrono1.74.0 libboost-regex1.74.0 libboost-serialization1.74.0 libboost-program-options1.74.0 libicu70
+
+      - name: Build kryptokrona testnet binaries
+        run: |
+          mkdir -p build && cd build
+          cmake -DTEST_NET=ON -DBoost_ARCHITECTURE=-x64 ..
+          make -j$(nproc)
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Only the pure-JS kryptokrona-wallet-backend-js + kryptokrona-utils are
+      # needed by the service; --ignore-scripts skips the wallet app's native
+      # build steps so CI doesn't depend on them.
+      - name: Install XKR wallet RPC service deps
+        working-directory: yggdrasil-wallet
+        run: npm ci --ignore-scripts || npm install --ignore-scripts
+
+      # The engine is XKR-only now: no monero-sys / C++ Monero build, so this is a
+      # plain (cached) Rust build. rust-toolchain.toml pins the compiler.
+      - name: Cache Rust build (xkr-swap-core)
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: xkr-swap-core
+
+      - name: Build XKR engine adapter example
+        working-directory: xkr-swap-core
+        run: cargo build -p swap --example xkr_adapter_e2e
+
+      - name: Run XKR wallet RPC service test
+        run: |
+          chmod +x scripts/testnet/swap-rpc-service-test.sh
+          BIN_DIR=build/src \
+          XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
+          ./scripts/testnet/swap-rpc-service-test.sh
+
+      - name: Run XKR engine <-> service e2e test
+        run: |
+          chmod +x scripts/testnet/swap-engine-e2e-test.sh
+          BIN_DIR=build/src \
+          XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
+          EXAMPLE_BIN="$GITHUB_WORKSPACE/xkr-swap-core/target/debug/examples/xkr_adapter_e2e" \
+          ./scripts/testnet/swap-engine-e2e-test.sh
