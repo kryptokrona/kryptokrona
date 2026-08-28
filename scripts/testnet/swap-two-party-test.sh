@@ -298,7 +298,7 @@ BG_MINER_PID=$!
 # ---------------------------------------------------------------------------
 log "Running the two-party BTC<->XKR swap (Alice + Bob in-process)"
 set +e
-ELECTRUM_RPC_URL="tcp://@127.0.0.1:$ELECTRUM_PORT" \
+ELECTRUM_RPC_URL="tcp://127.0.0.1:$ELECTRUM_PORT" \
 BITCOIND_RPC_URL="http://$BTC_RPC_USER:$BTC_RPC_PASS@127.0.0.1:$BTC_RPC_PORT/wallet/$BTC_WALLET" \
 BTC_AMOUNT_SAT="$BTC_AMOUNT_SAT" \
 SWAP_TIMEOUT_SECS="$SWAP_TIMEOUT_SECS" \
