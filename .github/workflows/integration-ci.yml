@@ -220,9 +220,11 @@ jobs:
         with:
           workspaces: xkr-swap-core
 
-      - name: Build XKR engine adapter example
+      - name: Build XKR engine examples
         working-directory: xkr-swap-core
-        run: cargo build -p swap --example xkr_adapter_e2e
+        run: |
+          cargo build -p swap --example xkr_adapter_e2e
+          cargo build -p swap --example xkr_two_party_swap
 
       - name: Run XKR wallet RPC service test
         run: |
@@ -238,3 +240,15 @@ jobs:
           XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
           EXAMPLE_BIN="$GITHUB_WORKSPACE/xkr-swap-core/target/debug/examples/xkr_adapter_e2e" \
           ./scripts/testnet/swap-engine-e2e-test.sh
+
+      # Level 3: a full two-party BTC<->XKR swap. Alice + Bob run in-process
+      # (xkr_two_party_swap) against the XKR mesh above plus a regtest bitcoind +
+      # esplora electrs (Docker, preinstalled on the Ubuntu runner). This is the
+      # only test that exercises the whole cross-chain choreography end to end.
+      - name: Run two-party BTC<->XKR swap test
+        run: |
+          chmod +x scripts/testnet/swap-two-party-test.sh
+          BIN_DIR=build/src \
+          XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
+          EXAMPLE_BIN="$GITHUB_WORKSPACE/xkr-swap-core/target/debug/examples/xkr_two_party_swap" \
+          ./scripts/testnet/swap-two-party-test.sh
