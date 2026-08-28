@@ -209,12 +209,20 @@ jobs:
         with:
           node-version: '18'
 
-      # Only the pure-JS kryptokrona-wallet-backend-js + kryptokrona-utils are
-      # needed by the service; --ignore-scripts skips the wallet app's native
-      # build steps so CI doesn't depend on them.
-      - name: Install XKR wallet RPC service deps
-        working-directory: yggdrasil-wallet
-        run: npm ci --ignore-scripts || npm install --ignore-scripts
+      # The xkr-wallet-rpc.cjs service needs only two published packages
+      # (kryptokrona-wallet-backend-js + kryptokrona-utils). We install them into
+      # an isolated dir rather than running the wallet app's own `npm ci`, which
+      # would drag in the whole Svelte/Electron tree (peer + engine conflicts) and
+      # whose committed lockfile links backend-js from a local sibling path that
+      # doesn't exist in CI. NODE_PATH (exported for all later steps) lets the
+      # service resolve them.
+      - name: Install XKR wallet RPC service deps (isolated)
+        run: |
+          mkdir -p "$RUNNER_TEMP/xkrsvc" && cd "$RUNNER_TEMP/xkrsvc"
+          npm init -y >/dev/null
+          npm install --ignore-scripts --no-audit --no-fund \
+            kryptokrona-wallet-backend-js@^2.6.0 kryptokrona-utils@^1.4.0
+          echo "NODE_PATH=$RUNNER_TEMP/xkrsvc/node_modules" >> "$GITHUB_ENV"
 
       # The engine is XKR-only now: no monero-sys / C++ Monero build, so this is a
       # plain (cached) Rust build. rust-toolchain.toml pins the compiler.
