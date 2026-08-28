@@ -83,6 +83,9 @@ XKR_LOCK_AMOUNT=$((BTC_AMOUNT_SAT * 1000000))
 # Fund the ASB with a comfortable margin over the exact lock amount.
 XKR_DEPOSIT_AMOUNT=$((XKR_LOCK_AMOUNT + XKR_LOCK_AMOUNT / 5 + 100000))
 SWAP_TIMEOUT_SECS="${SWAP_TIMEOUT_SECS:-900}"
+# happy = full redeem-both-sides swap; refund = Alice never locks XKR, so Bob must
+# reclaim his BTC via the cancel timelock (the safety path). Passed to the example.
+SWAP_MODE="${SWAP_MODE:-happy}"
 
 WORK="$(mktemp -d 2>/dev/null || mktemp -d -t kk-l3)"
 BTC_DATADIR="$WORK/btcdata"; mkdir -p "$BTC_DATADIR"
@@ -296,12 +299,13 @@ BG_MINER_PID=$!
 # ---------------------------------------------------------------------------
 # 6. Run the full two-party swap
 # ---------------------------------------------------------------------------
-log "Running the two-party BTC<->XKR swap (Alice + Bob in-process)"
+log "Running the two-party BTC<->XKR swap (Alice + Bob in-process, mode=$SWAP_MODE)"
 set +e
 ELECTRUM_RPC_URL="tcp://127.0.0.1:$ELECTRUM_PORT" \
 BITCOIND_RPC_URL="http://$BTC_RPC_USER:$BTC_RPC_PASS@127.0.0.1:$BTC_RPC_PORT/wallet/$BTC_WALLET" \
 BTC_AMOUNT_SAT="$BTC_AMOUNT_SAT" \
 SWAP_TIMEOUT_SECS="$SWAP_TIMEOUT_SECS" \
+SWAP_MODE="$SWAP_MODE" \
 XKR_WALLET_RPC_URL="http://127.0.0.1:$XKR_RPC_PORT" \
 XKR_ASB_SPEND_SECRET="$A_SPEND" XKR_ASB_VIEW_SECRET="$A_VIEW" \
 XKR_RECEIVE_ADDRESS="$MINER_ADDR" \
@@ -313,8 +317,15 @@ set -e
 
 echo
 echo "=============================================================="
-echo "TWO-PARTY BTC<->XKR SWAP TEST PASSED"
-echo "  Bob locked BTC, Alice locked XKR, Bob revealed his signature,"
-echo "  Alice redeemed the BTC and Bob swept the XKR -- end to end,"
-echo "  on two live chains."
+if [ "$SWAP_MODE" = refund ]; then
+    echo "REFUND SAFETY TEST PASSED"
+    echo "  Bob locked BTC, Alice never locked XKR, and once the cancel"
+    echo "  timelock expired Bob unilaterally reclaimed his BTC -- funds"
+    echo "  are safe when a swap is abandoned."
+else
+    echo "TWO-PARTY BTC<->XKR SWAP TEST PASSED"
+    echo "  Bob locked BTC, Alice locked XKR, Bob revealed his signature,"
+    echo "  Alice redeemed the BTC and Bob swept the XKR -- end to end,"
+    echo "  on two live chains."
+fi
 echo "=============================================================="

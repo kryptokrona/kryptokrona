@@ -266,3 +266,15 @@ jobs:
           XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
           EXAMPLE_BIN="$GITHUB_WORKSPACE/xkr-swap-core/target/debug/examples/xkr_two_party_swap" \
           ./scripts/testnet/swap-two-party-test.sh
+
+      # Safety path: the same two-party harness in refund mode -- Alice never locks
+      # XKR, so Bob must reclaim his BTC via the cancel timelock (ends BtcRefunded).
+      # Proves funds aren't stranded when a swap is abandoned.
+      - name: Run BTC<->XKR refund safety test
+        run: |
+          chmod +x scripts/testnet/swap-two-party-test.sh
+          BIN_DIR=build/src \
+          SWAP_MODE=refund \
+          XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
+          EXAMPLE_BIN="$GITHUB_WORKSPACE/xkr-swap-core/target/debug/examples/xkr_two_party_swap" \
+          ./scripts/testnet/swap-two-party-test.sh
