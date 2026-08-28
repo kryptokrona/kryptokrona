@@ -278,3 +278,15 @@ jobs:
           XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
           EXAMPLE_BIN="$GITHUB_WORKSPACE/xkr-swap-core/target/debug/examples/xkr_two_party_swap" \
           ./scripts/testnet/swap-two-party-test.sh
+
+      # Safety path: Bob locks BTC, sees the XKR lock, then goes offline without
+      # signing or refunding. After the cancel + punish timelocks Alice claims his
+      # BTC (ends BtcPunished). Proves a misbehaving taker can't strand the maker.
+      - name: Run BTC<->XKR punish safety test
+        run: |
+          chmod +x scripts/testnet/swap-two-party-test.sh
+          BIN_DIR=build/src \
+          SWAP_MODE=punish \
+          XKR_RPC_SERVICE="$GITHUB_WORKSPACE/yggdrasil-wallet/src/backend/swap/xkr-wallet-rpc.cjs" \
+          EXAMPLE_BIN="$GITHUB_WORKSPACE/xkr-swap-core/target/debug/examples/xkr_two_party_swap" \
+          ./scripts/testnet/swap-two-party-test.sh

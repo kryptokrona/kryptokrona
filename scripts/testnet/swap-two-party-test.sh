@@ -326,6 +326,11 @@ if [ "$SWAP_MODE" = refund ]; then
     echo "  Bob locked BTC, Alice never locked XKR, and once the cancel"
     echo "  timelock expired Bob unilaterally reclaimed his BTC -- funds"
     echo "  are safe when a swap is abandoned."
+elif [ "$SWAP_MODE" = punish ]; then
+    echo "PUNISH SAFETY TEST PASSED"
+    echo "  Bob locked BTC and saw the XKR lock, then went offline without"
+    echo "  signing or refunding; after the cancel + punish timelocks Alice"
+    echo "  claimed his BTC -- a misbehaving taker cannot strand the maker."
 else
     echo "TWO-PARTY BTC<->XKR SWAP TEST PASSED"
     echo "  Bob locked BTC, Alice locked XKR, Bob revealed his signature,"
