@@ -58,13 +58,22 @@ RPC_PASSWORD="ci-test-password"
 WALLET_PASSWORD="ci-test-wallet-pass"
 
 # Ports (distinct from the other two swap scripts so they can share a CI job).
-P2P_BASE=30500
-RPC_BASE=31500
+# Each mode gets its own offset so the happy/refund/punish CI steps -- which run
+# back to back -- never collide on ports even if a previous step's node is slow
+# to die (kryptokronad can outlive a SIGTERM). Bitcoin/electrs use fixed Docker
+# ports, freed by the name-based `docker rm -f` at startup.
+case "${SWAP_MODE:-happy}" in
+    refund) MODE_PORT_OFFSET=100 ;;
+    punish) MODE_PORT_OFFSET=200 ;;
+    *)      MODE_PORT_OFFSET=0 ;;
+esac
+P2P_BASE=$((30500 + MODE_PORT_OFFSET))
+RPC_BASE=$((31500 + MODE_PORT_OFFSET))
 N1_RPC=$((RPC_BASE+1)); N2_RPC=$((RPC_BASE+2)); N3_RPC=$((RPC_BASE+3))
 NODE_RPC=$N1_RPC
-MINER_PORT=32500
-FUNDER_PORT=32501
-XKR_RPC_PORT=40002
+MINER_PORT=$((32500 + MODE_PORT_OFFSET))
+FUNDER_PORT=$((32501 + MODE_PORT_OFFSET))
+XKR_RPC_PORT=$((40002 + MODE_PORT_OFFSET))
 
 # Bitcoin (regtest) infra -- see the coblox/vulpemventures images below.
 BTC_RPC_USER="admin"
@@ -113,12 +122,19 @@ dump_logs() {
 
 cleanup() {
     log "Cleaning up"
-    [ -n "$BG_MINER_PID" ] && kill "$BG_MINER_PID" 2>/dev/null || true
-    [ -n "$BTC_BG_MINER_PID" ] && kill "$BTC_BG_MINER_PID" 2>/dev/null || true
+    local all=("${PIDS[@]:-}")
+    [ -n "$BG_MINER_PID" ] && all+=("$BG_MINER_PID")
+    [ -n "$BTC_BG_MINER_PID" ] && all+=("$BTC_BG_MINER_PID")
+    # SIGTERM first for a graceful shutdown...
+    for pid in "${all[@]}"; do [ -n "$pid" ] && kill "$pid" 2>/dev/null || true; done
     pkill -P $$ 2>/dev/null || true
-    for pid in "${PIDS[@]:-}"; do kill "$pid" 2>/dev/null || true; done
-    docker rm -f "$ELECTRS_CONTAINER" "$BTC_CONTAINER" >/dev/null 2>&1 || true
     sleep 2
+    # ...then SIGKILL any survivor so its port is freed before the next CI step
+    # starts (kryptokronad can ignore/outlive SIGTERM; these are throwaway nodes).
+    for pid in "${all[@]}"; do [ -n "$pid" ] && kill -9 "$pid" 2>/dev/null || true; done
+    pkill -9 -P $$ 2>/dev/null || true
+    docker rm -f "$ELECTRS_CONTAINER" "$BTC_CONTAINER" >/dev/null 2>&1 || true
+    sleep 1
     rm -rf "$WORK" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
@@ -319,7 +335,7 @@ SWAP_MODE="$SWAP_MODE" \
 XKR_WALLET_RPC_URL="http://127.0.0.1:$XKR_RPC_PORT" \
 XKR_ASB_SPEND_SECRET="$A_SPEND" XKR_ASB_VIEW_SECRET="$A_VIEW" \
 XKR_RECEIVE_ADDRESS="$MINER_ADDR" \
-RUST_LOG="${RUST_LOG:-info,swap=trace,swap_p2p=trace,bitcoin_wallet=debug,electrum_pool=debug}" \
+RUST_LOG="${RUST_LOG:-info,swap=debug,swap_p2p=info,bitcoin_wallet=info}" \
     "$EXAMPLE_BIN"
 RC=$?
 set -e
