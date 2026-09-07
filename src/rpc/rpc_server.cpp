@@ -1514,8 +1514,15 @@ namespace cryptonote
     bool RpcServer::on_get_block_headers_range(const COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::request &req, COMMAND_RPC_GET_BLOCK_HEADERS_RANGE::response &res, json_rpc::JsonRpcError &error_resp)
     {
         // TODO: change usage to jsonRpcHandlers?
-        const uint64_t bc_height = m_core.get_current_blockchain_height();
-        if (req.start_height > bc_height || req.end_height >= bc_height || req.start_height > req.end_height)
+        // Use the in-memory top block index (the same source /getheight reports via
+        // getTopBlockIndex()+1). get_current_blockchain_height() returns
+        // mainChainStorage->getBlockCount(), which on this build lags the core top
+        // index by one; using it here made the check reject any range ending at the
+        // current tip (end_height == topIndex), which broke p2pool header sync on
+        // restart (p2pool always backfills up to the tip). Allow start/end up to and
+        // including the tip.
+        const uint64_t top_index = m_core.getTopBlockIndex();
+        if (req.start_height > top_index || req.end_height > top_index || req.start_height > req.end_height)
         {
             error_resp.code = CORE_RPC_ERROR_CODE_TOO_BIG_HEIGHT;
             error_resp.message = "Invalid start/end heights.";
