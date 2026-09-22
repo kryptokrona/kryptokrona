@@ -2084,18 +2084,27 @@ namespace cryptonote
         // Mempool backlog so the pool can include fee-paying transactions. Rebuilt on
         // every call: transactions can enter/leave the pool at any time, so this must
         // never be served from a cache.
+        //
+        // Read size + fee straight from the pool's in-memory CachedTransactions. This
+        // MUST NOT go through getTransactionDetails(): that resolves every input's
+        // ring-member outputs from RocksDB (thousands of random DB reads for a large
+        // pool). p2pool polls get_miner_data every ~1-2s per connection, so on a big
+        // mempool -- especially on a spinning disk -- that saturated the DB and the
+        // core lock and made the whole node's RPC unresponsive. size and fee need zero
+        // DB access; the pool already holds both. getPoolTransactions() returns a
+        // consistent snapshot under a single lock, so there is no per-tx lookup and no
+        // concurrent-removal race to guard against.
         backlog.clear();
-        for (const crypto::Hash &txHash : getPoolTransactionHashes())
+
+        const std::vector<CachedTransaction> poolTransactions = transactionPool->getPoolTransactions();
+        backlog.reserve(poolTransactions.size());
+
+        for (const CachedTransaction &transaction : poolTransactions)
         {
-            try
-            {
-                const TransactionDetails details = getTransactionDetails(txHash);
-                backlog.push_back(MinerDataTx{txHash, details.size, details.fee});
-            }
-            catch (const std::exception &)
-            {
-                // Transaction may have left the pool concurrently; just skip it.
-            }
+            backlog.push_back(MinerDataTx{
+                transaction.getTransactionHash(),
+                transaction.getTransactionBinaryArray().size(),
+                transaction.getTransactionFee()});
         }
 
         return true;
