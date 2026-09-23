@@ -1749,6 +1749,23 @@ namespace cryptonote
             return false;
         }
 
+        // Bound how many zero-fee fusion transactions the mempool will accept. Fusion
+        // txs are free, and a block template only fits ~1 of them (FUSION_TX_MAX_SIZE),
+        // so a flood of them can never be out-mined -- it just balloons the pool, which
+        // starves the RPC and drains only via the 24h TTL. Once the pool is at the
+        // limit, refuse further fusion txs; the sender simply resubmits later. Fee-paying
+        // transactions are never subject to this (they never reach here as isFusion), so
+        // real economic traffic is unaffected. getTransactionCount() is O(1). This runs
+        // under the addTransactionToPool write lock, so the count is stable.
+        if (isFusion && transactionPool->getTransactionCount() >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_MAX_FUSION_TRANSACTIONS)
+        {
+            logger(logging::DEBUGGING) << "Fusion transaction " << transactionHash
+                                       << " not added: mempool is at the fusion limit ("
+                                       << cryptonote::parameters::CRYPTONOTE_MEMPOOL_MAX_FUSION_TRANSACTIONS
+                                       << " txs). It can be resubmitted once the pool drains.";
+            return false;
+        }
+
         return true;
     }
 
