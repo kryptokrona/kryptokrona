@@ -7,6 +7,7 @@
 #pragma once
 #include <ctime>
 #include <vector>
+#include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
 #include "blockchain_cache.h"
@@ -190,6 +191,19 @@ namespace cryptonote
         std::unique_ptr<IBlockchainCacheFactory> blockchainCacheFactory;
         std::unique_ptr<IMainChainStorage> mainChainStorage;
         mutable std::shared_mutex m_accessLock;
+
+        // Recently-seen transaction dedup. Peers rebroadcast the mempool constantly, and
+        // re-running validateTransaction (ring-signature checks + RocksDB ring-member
+        // lookups) for every rebroadcast is what pegs the main thread and starves RPC
+        // under a tx flood -- especially once txs are rejected/capped and therefore never
+        // land in the pool (so checkIfTransactionPresent can't catch the re-sends). We
+        // remember the hashes we've already processed (accepted OR rejected) for a short
+        // window and drop rebroadcasts in O(1) before any validation. Guarded by its own
+        // mutex so the common "already seen" path never touches the Core write lock.
+        mutable std::mutex m_recentlySeenMutex;
+        std::unordered_map<crypto::Hash, uint64_t> m_recentlySeen;
+        uint64_t m_recentlySeenSweepCounter = 0;
+
         bool initialized;
 
         time_t start_time;
@@ -198,6 +212,12 @@ namespace cryptonote
 
         void throwIfNotInitialized() const;
         bool extractTransactions(const std::vector<BinaryArray> &rawTransactions, std::vector<CachedTransaction> &transactions, uint64_t &cumulativeSize);
+
+        // Returns true if this transaction was already processed within the
+        // CRYPTONOTE_MEMPOOL_RECENTLY_SEEN_TX_LIVETIME window (and should be dropped
+        // without re-validation). Otherwise records it as seen now and returns false.
+        // Thread-safe on its own mutex; does not require the Core access lock.
+        bool transactionRecentlySeen(const crypto::Hash &transactionHash);
 
         std::error_code validateSemantic(const Transaction &transaction, uint64_t &fee, uint32_t blockIndex);
         std::error_code validateTransaction(const CachedTransaction &transaction, TransactionValidatorState &state, IBlockchainCache *cache, uint64_t &fee, uint32_t blockIndex);

@@ -1667,15 +1667,62 @@ namespace cryptonote
         return true;
     }
 
+    bool Core::transactionRecentlySeen(const crypto::Hash &transactionHash)
+    {
+        const uint64_t now = static_cast<uint64_t>(std::time(nullptr));
+
+        std::lock_guard<std::mutex> lock(m_recentlySeenMutex);
+
+        // Opportunistically drop expired entries so the map stays bounded to the
+        // recently-seen window (amortised O(1): a full sweep only every 1024 calls).
+        if ((++m_recentlySeenSweepCounter & 1023) == 0)
+        {
+            for (auto it = m_recentlySeen.begin(); it != m_recentlySeen.end();)
+            {
+                if (now - it->second >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_RECENTLY_SEEN_TX_LIVETIME)
+                {
+                    it = m_recentlySeen.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+
+        const auto it = m_recentlySeen.find(transactionHash);
+        if (it != m_recentlySeen.end() && (now - it->second) < cryptonote::parameters::CRYPTONOTE_MEMPOOL_RECENTLY_SEEN_TX_LIVETIME)
+        {
+            return true;
+        }
+
+        // First sighting (or the previous one has expired): record it now and let the
+        // caller do the (expensive) validation exactly once for this window.
+        m_recentlySeen[transactionHash] = now;
+        return false;
+    }
+
     bool Core::addTransactionToPool(CachedTransaction &&cachedTransaction)
     {
+        const auto transactionHash = cachedTransaction.getTransactionHash();
+
+        // Fast pre-filter BEFORE taking the Core write lock: if we've already processed
+        // this exact transaction recently (accepted OR rejected), drop it. Peers
+        // rebroadcast the mempool constantly, and re-validating every rebroadcast (ring
+        // signatures + RocksDB ring-member lookups) is what pegs the main thread and
+        // starves RPC under a flood -- rejected/capped txs never enter the pool, so
+        // checkIfTransactionPresent below cannot catch their re-sends. A hit here is an
+        // O(1) hash lookup and never blocks RPC readers on the Core write lock.
+        if (transactionRecentlySeen(transactionHash))
+        {
+            return false;
+        }
+
         // Exclusive write lock: mutating the pool (and validating against the chain) races
         // with RPC read handlers that read the pool/chain under a shared lock. This is the
         // funnel for both the BinaryArray overload and network transactions.
         std::unique_lock<std::shared_mutex> writeLock(m_accessLock);
         TransactionValidatorState validatorState;
-
-        auto transactionHash = cachedTransaction.getTransactionHash();
 
         /* If the transaction is already in the pool, then checking it again
            and/or trying to add it to the pool again wastes time and resources.
@@ -1746,6 +1793,23 @@ namespace cryptonote
         {
             logger(logging::WARNING) << "Transaction " << transactionHash
                                      << " is not valid. Reason: fee is too small and it's not a fusion transaction";
+            return false;
+        }
+
+        // Bound how many zero-fee fusion transactions the mempool will accept. Fusion
+        // txs are free, and a block template only fits ~1 of them (FUSION_TX_MAX_SIZE),
+        // so a flood of them can never be out-mined -- it just balloons the pool, which
+        // starves the RPC and drains only via the 24h TTL. Once the pool is at the
+        // limit, refuse further fusion txs; the sender simply resubmits later. Fee-paying
+        // transactions are never subject to this (they never reach here as isFusion), so
+        // real economic traffic is unaffected. getTransactionCount() is O(1). This runs
+        // under the addTransactionToPool write lock, so the count is stable.
+        if (isFusion && transactionPool->getTransactionCount() >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_MAX_FUSION_TRANSACTIONS)
+        {
+            logger(logging::DEBUGGING) << "Fusion transaction " << transactionHash
+                                       << " not added: mempool is at the fusion limit ("
+                                       << cryptonote::parameters::CRYPTONOTE_MEMPOOL_MAX_FUSION_TRANSACTIONS
+                                       << " txs). It can be resubmitted once the pool drains.";
             return false;
         }
 
@@ -2084,18 +2148,27 @@ namespace cryptonote
         // Mempool backlog so the pool can include fee-paying transactions. Rebuilt on
         // every call: transactions can enter/leave the pool at any time, so this must
         // never be served from a cache.
+        //
+        // Read size + fee straight from the pool's in-memory CachedTransactions. This
+        // MUST NOT go through getTransactionDetails(): that resolves every input's
+        // ring-member outputs from RocksDB (thousands of random DB reads for a large
+        // pool). p2pool polls get_miner_data every ~1-2s per connection, so on a big
+        // mempool -- especially on a spinning disk -- that saturated the DB and the
+        // core lock and made the whole node's RPC unresponsive. size and fee need zero
+        // DB access; the pool already holds both. getPoolTransactions() returns a
+        // consistent snapshot under a single lock, so there is no per-tx lookup and no
+        // concurrent-removal race to guard against.
         backlog.clear();
-        for (const crypto::Hash &txHash : getPoolTransactionHashes())
+
+        const std::vector<CachedTransaction> poolTransactions = transactionPool->getPoolTransactions();
+        backlog.reserve(poolTransactions.size());
+
+        for (const CachedTransaction &transaction : poolTransactions)
         {
-            try
-            {
-                const TransactionDetails details = getTransactionDetails(txHash);
-                backlog.push_back(MinerDataTx{txHash, details.size, details.fee});
-            }
-            catch (const std::exception &)
-            {
-                // Transaction may have left the pool concurrently; just skip it.
-            }
+            backlog.push_back(MinerDataTx{
+                transaction.getTransactionHash(),
+                transaction.getTransactionBinaryArray().size(),
+                transaction.getTransactionFee()});
         }
 
         return true;

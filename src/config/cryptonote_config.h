@@ -189,6 +189,25 @@ namespace cryptonote
         const size_t FUSION_TX_MIN_INPUT_COUNT = 12;
         const size_t FUSION_TX_MIN_IN_OUT_COUNT_RATIO = 4;
 
+        // Once the mempool holds this many transactions, new ZERO-FEE fusion
+        // transactions are refused (fee-paying transactions are never subject to this).
+        // Fusion txs are free, and a block template only fits ~1 of them
+        // (FUSION_TX_MAX_SIZE = 30 KB vs ~29 KB per tx), so an unbounded fusion flood
+        // can NEVER be mined out -- it just balloons the pool, which starves the RPC and
+        // otherwise drains only via the 24h TTL. A refused fusion tx is simply retried
+        // later by the sender. This is node/relay policy, not a consensus rule.
+        const size_t CRYPTONOTE_MEMPOOL_MAX_FUSION_TRANSACTIONS = 256;
+
+        // How long (seconds) to remember a transaction we've already processed (accepted
+        // OR rejected) so that constant peer rebroadcasts are dropped in O(1) without
+        // redoing the expensive validation (ring-signature checks + RocksDB ring-member
+        // lookups). This is the primary defence against a transaction flood: without it,
+        // rejected/capped txs are never in the pool, so peers keep re-offering them and
+        // the node re-verifies each one endlessly, pegging the main thread and starving
+        // RPC. A legitimate tx that was transiently rejected (e.g. pool full) is simply
+        // retried by the sender after this window. Node/relay policy, not consensus.
+        const uint64_t CRYPTONOTE_MEMPOOL_RECENTLY_SEEN_TX_LIVETIME = 60 * 10; // 10 minutes
+
 #ifdef USE_TESTNET
         // A fresh testnet would otherwise walk the PoW-variant hard-forks at
         // heights 1-4 (V4 = CN-Lite Variant 1, V5 = CN-Turtle Variant 2), where
