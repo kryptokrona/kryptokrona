@@ -1667,15 +1667,62 @@ namespace cryptonote
         return true;
     }
 
+    bool Core::transactionRecentlySeen(const crypto::Hash &transactionHash)
+    {
+        const uint64_t now = static_cast<uint64_t>(std::time(nullptr));
+
+        std::lock_guard<std::mutex> lock(m_recentlySeenMutex);
+
+        // Opportunistically drop expired entries so the map stays bounded to the
+        // recently-seen window (amortised O(1): a full sweep only every 1024 calls).
+        if ((++m_recentlySeenSweepCounter & 1023) == 0)
+        {
+            for (auto it = m_recentlySeen.begin(); it != m_recentlySeen.end();)
+            {
+                if (now - it->second >= cryptonote::parameters::CRYPTONOTE_MEMPOOL_RECENTLY_SEEN_TX_LIVETIME)
+                {
+                    it = m_recentlySeen.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+
+        const auto it = m_recentlySeen.find(transactionHash);
+        if (it != m_recentlySeen.end() && (now - it->second) < cryptonote::parameters::CRYPTONOTE_MEMPOOL_RECENTLY_SEEN_TX_LIVETIME)
+        {
+            return true;
+        }
+
+        // First sighting (or the previous one has expired): record it now and let the
+        // caller do the (expensive) validation exactly once for this window.
+        m_recentlySeen[transactionHash] = now;
+        return false;
+    }
+
     bool Core::addTransactionToPool(CachedTransaction &&cachedTransaction)
     {
+        const auto transactionHash = cachedTransaction.getTransactionHash();
+
+        // Fast pre-filter BEFORE taking the Core write lock: if we've already processed
+        // this exact transaction recently (accepted OR rejected), drop it. Peers
+        // rebroadcast the mempool constantly, and re-validating every rebroadcast (ring
+        // signatures + RocksDB ring-member lookups) is what pegs the main thread and
+        // starves RPC under a flood -- rejected/capped txs never enter the pool, so
+        // checkIfTransactionPresent below cannot catch their re-sends. A hit here is an
+        // O(1) hash lookup and never blocks RPC readers on the Core write lock.
+        if (transactionRecentlySeen(transactionHash))
+        {
+            return false;
+        }
+
         // Exclusive write lock: mutating the pool (and validating against the chain) races
         // with RPC read handlers that read the pool/chain under a shared lock. This is the
         // funnel for both the BinaryArray overload and network transactions.
         std::unique_lock<std::shared_mutex> writeLock(m_accessLock);
         TransactionValidatorState validatorState;
-
-        auto transactionHash = cachedTransaction.getTransactionHash();
 
         /* If the transaction is already in the pool, then checking it again
            and/or trying to add it to the pool again wastes time and resources.
