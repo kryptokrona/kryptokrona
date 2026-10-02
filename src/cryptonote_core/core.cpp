@@ -307,6 +307,17 @@ namespace cryptonote
 
         throwIfNotInitialized();
 
+        // Runtime bounds check: the asserts above are compiled out in release,
+        // so an out-of-range index (e.g. a block-explorer RPC asking for a
+        // height at/above the tip on a lagging node) would otherwise read past
+        // the block vector and segfault. Throw instead so callers can report it.
+        if (chainsLeaves.empty() || blockIndex > getTopBlockIndex())
+        {
+            throw std::runtime_error(
+                "getBlockHashByIndex: block index " + std::to_string(blockIndex)
+                + " is out of range (top block index is " + std::to_string(getTopBlockIndex()) + ")");
+        }
+
         return chainsLeaves[0]->getBlockHash(blockIndex);
     }
 

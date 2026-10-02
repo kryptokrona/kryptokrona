@@ -913,6 +913,13 @@ namespace cryptonote
         try
         {
             uint32_t height = boost::lexical_cast<uint32_t>(req.hash);
+            if (height > m_core.getTopBlockIndex())
+            {
+                throw json_rpc::JsonRpcError{
+                    CORE_RPC_ERROR_CODE_WRONG_PARAM,
+                    "Block height " + std::to_string(height) + " is out of range. Top block index is "
+                        + std::to_string(m_core.getTopBlockIndex()) + '.'};
+            }
             hash = m_core.getBlockHashByIndex(height);
         }
         catch (boost::bad_lexical_cast &)
