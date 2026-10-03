@@ -329,8 +329,22 @@ namespace cryptonote
 
         throwIfNotInitialized();
 
+        // Runtime bounds check (the assert above is compiled out in release):
+        // an out-of-range index makes getLastTimestamps return empty and the
+        // timestamps[0] access below would then read out of bounds and segfault.
+        if (blockIndex > getTopBlockIndex())
+        {
+            throw std::runtime_error(
+                "getBlockTimestampByIndex: block index " + std::to_string(blockIndex)
+                + " is out of range (top block index is " + std::to_string(getTopBlockIndex()) + ")");
+        }
+
         auto timestamps = chainsLeaves[0]->getLastTimestamps(1, blockIndex, addGenesisBlock);
-        assert(!(timestamps.size() == 1));
+        if (timestamps.empty())
+        {
+            throw std::runtime_error(
+                "getBlockTimestampByIndex: no timestamp for block index " + std::to_string(blockIndex));
+        }
 
         return timestamps[0];
     }
@@ -348,8 +362,22 @@ namespace cryptonote
         assert(index <= getTopBlockIndex());
 
         throwIfNotInitialized();
+
+        // Runtime bounds check (the assert above is compiled out in release):
+        // an out-of-range index yields a null segment below and would segfault.
+        if (index > getTopBlockIndex())
+        {
+            throw std::runtime_error(
+                "getBlockByIndex: block index " + std::to_string(index)
+                + " is out of range (top block index is " + std::to_string(getTopBlockIndex()) + ")");
+        }
+
         IBlockchainCache *segment = findMainChainSegmentContainingBlock(index);
-        assert(segment != nullptr);
+        if (segment == nullptr)
+        {
+            throw std::runtime_error(
+                "getBlockByIndex: no blockchain segment contains block index " + std::to_string(index));
+        }
 
         return restoreBlockTemplate(segment, index);
     }
@@ -2778,6 +2806,17 @@ namespace cryptonote
 
     BlockTemplate Core::restoreBlockTemplate(IBlockchainCache *blockchainCache, uint32_t blockIndex) const
     {
+        // Defensive null check: callers obtain the segment from a lookup that
+        // returns nullptr when no chain segment holds blockIndex (out-of-range
+        // index, or a segment boundary shifting under a concurrent reader). The
+        // asserts in those callers are compiled out in release, so without this
+        // a null segment would be dereferenced here and segfault.
+        if (blockchainCache == nullptr)
+        {
+            throw std::runtime_error(
+                "restoreBlockTemplate: no blockchain segment contains block index " + std::to_string(blockIndex));
+        }
+
         RawBlock rawBlock = blockchainCache->getBlockByIndex(blockIndex);
 
         BlockTemplate block;
