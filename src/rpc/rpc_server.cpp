@@ -212,7 +212,7 @@ namespace cryptonote
         }
         else
         {
-            std::shared_lock<std::shared_mutex> readLock(m_core.getAccessLock());
+            std::shared_lock<WriterPreferringSharedMutex> readLock(m_core.getAccessLock());
             it->second.handler(this, request, response);
         }
     }
@@ -274,7 +274,7 @@ namespace cryptonote
             }
             else
             {
-                std::shared_lock<std::shared_mutex> readLock(m_core.getAccessLock());
+                std::shared_lock<WriterPreferringSharedMutex> readLock(m_core.getAccessLock());
                 it->second.handler(this, jsonRequest, jsonResponse);
             }
         }
