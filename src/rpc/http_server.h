@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_set>
 
 #include <http/http_request.h>
@@ -19,6 +20,8 @@
 #include <syst/event.h>
 
 #include <logging/logger_ref.h>
+
+#include "request_concurrency_limiter.h"
 
 namespace cryptonote
 {
@@ -49,6 +52,14 @@ namespace cryptonote
         // behaviour and crashes the process.
         virtual bool offloadRequestProcessing() const { return false; }
 
+        // Maximum number of offloaded request handlers allowed to run at once.
+        // 0 means unlimited (the historical behaviour). A server that offloads
+        // under hostile load (the daemon RpcServer) overrides this to bound the
+        // worker-thread spawn rate and the number of concurrent Core readers, so
+        // an RPC flood cannot starve the shared dispatcher's p2p/sync work.
+        // Only consulted when offloadRequestProcessing() is true.
+        virtual size_t concurrentRequestLimit() const { return 0; }
+
     private:
         void acceptLoop();
         void connectionHandler(syst::TcpConnection &&conn);
@@ -57,6 +68,10 @@ namespace cryptonote
         logging::LoggerRef logger;
         syst::TcpListener m_listener;
         std::unordered_set<syst::TcpConnection *> m_connections;
+
+        // Bounds concurrent offloaded handlers; created in start() only when
+        // offloadRequestProcessing() && concurrentRequestLimit() > 0.
+        std::unique_ptr<RequestConcurrencyLimiter> m_requestLimiter;
     };
 
 }
