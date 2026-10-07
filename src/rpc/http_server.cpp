@@ -26,6 +26,11 @@ namespace cryptonote
 
     void HttpServer::start(const std::string &address, uint16_t port)
     {
+        if (offloadRequestProcessing() && concurrentRequestLimit() > 0)
+        {
+            m_requestLimiter = std::make_unique<RequestConcurrencyLimiter>(m_dispatcher, concurrentRequestLimit());
+        }
+
         m_listener = syst::TcpListener(m_dispatcher, syst::Ipv4Address(address), port);
         workingContextGroup.spawn(std::bind(&HttpServer::acceptLoop, this));
     }
@@ -96,9 +101,24 @@ namespace cryptonote
                     // Only servers that opt in (see offloadRequestProcessing) take this path.
                     // The wallet service's JsonRpcServer must NOT -- its handlers drive a
                     // WalletService bound to this dispatcher and would crash off-thread.
-                    syst::RemoteContext<void> processingContext(m_dispatcher, [this, &req, &resp]
-                                                                { processRequest(req, resp); });
-                    processingContext.get();
+                    //
+                    // The optional slot bounds how many handlers (hence worker threads and
+                    // concurrent Core readers) run at once: under an RPC flood, extra
+                    // requests wait here for a slot rather than spawning unbounded threads
+                    // and starving the dispatcher's p2p/block-sync work.
+                    if (m_requestLimiter)
+                    {
+                        ConcurrencySlot slot(*m_requestLimiter);
+                        syst::RemoteContext<void> processingContext(m_dispatcher, [this, &req, &resp]
+                                                                    { processRequest(req, resp); });
+                        processingContext.get();
+                    }
+                    else
+                    {
+                        syst::RemoteContext<void> processingContext(m_dispatcher, [this, &req, &resp]
+                                                                    { processRequest(req, resp); });
+                        processingContext.get();
+                    }
                 }
                 else
                 {
