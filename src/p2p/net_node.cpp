@@ -985,12 +985,60 @@ namespace cryptonote
         {
             m_connections_maker_interval.call(std::bind(&NodeServer::connections_maker, this));
             m_peerlist_store_interval.call(std::bind(&NodeServer::store_config, this));
+            logSyncDiagnostics(); // [SYNC-DIAG] (self-throttled, only logs when behind)
         }
         catch (std::exception &e)
         {
             logger(DEBUGGING) << "exception in idle_worker: " << e.what();
         }
         return true;
+    }
+
+    //-----------------------------------------------------------------------------------
+    void NodeServer::logSyncDiagnostics()
+    {
+        // [SYNC-DIAG] Capture the full sync picture during a freeze. Gated on being
+        // behind the observed network height (silent when caught up) and throttled to
+        // once per 20s. Logged at WARNING so it shows at --log-level 2 without the
+        // TRACE/DEBUGGING p2p firehose. Remove once the sync-stall is fixed.
+        const uint32_t our = m_payload_handler.get_current_blockchain_height();
+        const uint32_t observed = m_payload_handler.getObservedHeight();
+        if (observed <= our + 2)
+        {
+            return; // caught up (within noise) -> nothing to diagnose
+        }
+
+        const time_t now = time(nullptr);
+        if (now - m_lastSyncDiagLog < 20)
+        {
+            return; // throttle
+        }
+        m_lastSyncDiagLog = now;
+
+        size_t outc = 0, inc = 0;
+        for (const auto &c : m_connections)
+        {
+            if (c.second.m_is_income)
+                ++inc;
+            else
+                ++outc;
+        }
+
+        std::stringstream ss;
+        ss << "[SYNC-DIAG] BEHIND our=" << our << " observed=" << observed
+           << " synced=" << (m_payload_handler.isSynchronized() ? "true" : "false")
+           << " outgoing=" << outc << " incoming=" << inc << ENDL;
+        for (const auto &c : m_connections)
+        {
+            const auto &ctx = c.second;
+            ss << "  " << (ctx.m_is_income ? "[IN ] " : "[OUT] ")
+               << common::ipAddressToString(ctx.m_remote_ip) << ":" << ctx.m_remote_port
+               << " state=" << get_protocol_state_string(ctx.m_state)
+               << " peerHeight=" << ctx.m_remote_blockchain_height
+               << " lastRespHeight=" << ctx.m_last_response_height
+               << " age=" << (now - ctx.m_started) << "s" << ENDL;
+        }
+        logger(WARNING) << ss.str();
     }
 
     //-----------------------------------------------------------------------------------

@@ -24,6 +24,7 @@
 #include "itransaction_pool.h"
 #include "itransaction_pool_cleaner.h"
 #include "iupgrade_manager.h"
+#include "writer_preferring_shared_mutex.h"
 #include <logging/logger_message.h>
 #include "message_queue.h"
 #include "transaction_validatior_state.h"
@@ -171,7 +172,7 @@ namespace cryptonote
         // an EXCLUSIVE lock -- so reads run concurrently with each other but never while a
         // block is being added. Held at request/write boundaries only (never nested in
         // inner core methods) to avoid recursive-lock deadlocks.
-        std::shared_mutex &getAccessLock() const { return m_accessLock; }
+        WriterPreferringSharedMutex &getAccessLock() const { return m_accessLock; }
 
     private:
         const Currency &currency;
@@ -190,7 +191,7 @@ namespace cryptonote
         IntrusiveLinkedList<MessageQueue<BlockchainMessage>> queueList;
         std::unique_ptr<IBlockchainCacheFactory> blockchainCacheFactory;
         std::unique_ptr<IMainChainStorage> mainChainStorage;
-        mutable std::shared_mutex m_accessLock;
+        mutable WriterPreferringSharedMutex m_accessLock;
 
         // Recently-seen transaction dedup. Peers rebroadcast the mempool constantly, and
         // re-running validateTransaction (ring-signature checks + RocksDB ring-member

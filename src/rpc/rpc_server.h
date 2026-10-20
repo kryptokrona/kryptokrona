@@ -60,6 +60,12 @@ namespace cryptonote
         // work is posted back via Dispatcher::remoteSpawn), so they are safe to run
         // off the dispatcher and benefit from the concurrency. Opt in.
         bool offloadRequestProcessing() const override { return true; }
+        // Bound concurrent offloaded handlers so an RPC flood (p2pool + public
+        // callers hammering a public node) cannot spawn unbounded worker threads
+        // or fill the Core read-lock with enough concurrent readers to starve
+        // block application and the shared dispatcher's p2p/sync work. Excess
+        // requests apply backpressure (wait for a slot) instead.
+        size_t concurrentRequestLimit() const override { return 16; }
         bool processJsonRpcRequest(const HttpRequest &request, HttpResponse &response);
         bool isCoreReady();
 
