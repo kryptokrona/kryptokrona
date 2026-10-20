@@ -59,9 +59,6 @@ namespace cryptonote
         virtual uint32_t getObservedHeight() const override;
         virtual uint32_t getBlockchainHeight() const override;
         void requestMissingPoolTransactions(const CryptoNoteConnectionContext &context);
-        // [SYNC-DIAG] Whether initial sync has completed (set once, never reset).
-        // Exposed for the NodeServer sync-stall diagnostics.
-        bool isSynchronized() const { return m_synchronized; }
         // Our local chain height. Public for the NodeServer sync-stall diagnostics.
         uint32_t get_current_blockchain_height();
 
