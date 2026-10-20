@@ -426,6 +426,18 @@ namespace cryptonote
         context.m_remote_blockchain_height = arg.current_blockchain_height;
         if (context.m_state != CryptoNoteConnectionContext::state_normal)
         {
+            // [SYNC-DIAG] A peer announced a new block but this connection isn't in
+            // state_normal, so the block is ignored here (no add, no chain request) --
+            // catch-up then depends entirely on timed sync. If this keeps firing while
+            // we are behind, the connection is wedged in a non-normal state: that is
+            // the freeze we're chasing. Gated on "behind" to avoid normal-sync noise.
+            if (getObservedHeight() > get_current_blockchain_height())
+            {
+                logger(logging::WARNING) << context << "[SYNC-DIAG] ignoring NEW_BLOCK (net height "
+                                         << arg.current_blockchain_height << ") while behind (our height "
+                                         << get_current_blockchain_height() << "); connection state="
+                                         << get_protocol_state_string(context.m_state);
+            }
             return 1;
         }
 
