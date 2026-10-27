@@ -2832,7 +2832,40 @@ namespace cryptonote
     {
         IBlockchainCache *chain = findSegmentContainingBlock(blockHash);
 
-        uint32_t blockIndex = chain->getBlockIndex(blockHash);
+        // doBuildSparseChain is only ever reached through buildSparseChain(),
+        // which passes the current top block hash. Resolving that hash back to an
+        // index goes through a reverse lookup (DatabaseBlockchainCache::getBlockIndex
+        // -> getBlockIndexesByBlockHashes().at()). If the tip's reverse-index entry
+        // is missing or corrupt -- e.g. a block whose forward record (index->block)
+        // was persisted but whose hash->index record was not, after an unclean
+        // shutdown or disk-full event -- that .at() throws std::out_of_range straight
+        // out of start_sync. That exception tears down every outbound peer the
+        // instant synchronization begins, so the node stays connected but can never
+        // advance: a permanent sync wedge. The forward direction (getTopBlockIndex /
+        // getBlockHash) stays intact in that case, so recover by falling back to the
+        // main-chain leaf's authoritative top index instead of letting the exception
+        // escape and stall the node.
+        uint32_t blockIndex;
+        if (chain == nullptr)
+        {
+            chain = chainsLeaves[0];
+            blockIndex = chain->getTopBlockIndex();
+        }
+        else
+        {
+            try
+            {
+                blockIndex = chain->getBlockIndex(blockHash);
+            }
+            catch (const std::out_of_range &)
+            {
+                logger(logging::WARNING)
+                    << "doBuildSparseChain: reverse hash->index lookup failed for tip "
+                    << blockHash << "; falling back to leaf top index so sync can proceed";
+                chain = chainsLeaves[0];
+                blockIndex = chain->getTopBlockIndex();
+            }
+        }
 
         // TODO reserve ceil(log(blockIndex))
         std::vector<crypto::Hash> sparseChain;
