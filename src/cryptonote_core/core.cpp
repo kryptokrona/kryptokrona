@@ -487,8 +487,6 @@ namespace cryptonote
                     continue;
                 }
 
-                // Called from addBlock under m_accessLock: use the lock-free variant so we
-                // don't re-acquire the (non-recursive) write lock on this thread and deadlock.
                 if (addTransactionToPoolImpl(CachedTransaction(std::move(transaction))))
                 {
                     // TODO: send notification
@@ -1461,7 +1459,6 @@ namespace cryptonote
             auto tx = pool.getTransaction(hash);
             pool.removeTransaction(hash);
 
-            // Called from addBlock under m_accessLock: use the lock-free variant.
             if (!addTransactionToPoolImpl(std::move(tx)))
             {
                 notifyObservers(makeDelTransactionMessage({hash}, Messages::DeleteTransaction::Reason::NotActual));
@@ -1774,17 +1771,9 @@ namespace cryptonote
         return addTransactionToPoolImpl(std::move(cachedTransaction));
     }
 
-    // Lock-free body of addTransactionToPool. The caller MUST already hold m_accessLock
-    // exclusively.
-    //
-    // Reorg handling (actualizePoolTransactions / copyTransactionsToPool) re-adds
-    // transactions to the pool from inside addBlock, which already holds the write lock.
-    // Calling the public addTransactionToPool there would re-acquire the (non-recursive,
-    // writer-preferring) m_accessLock on the same thread and deadlock: lock() waits for
-    // m_activeWriter to clear, but this very thread is the active writer, so it hangs
-    // forever. Symptom: the daemon freezes at startup while resolving a fork, right after
-    // logging "removeTransaction: transaction not found", with no further output. Those
-    // callers use this lock-free variant instead.
+    // Lock-free body of addTransactionToPool; caller MUST already hold m_accessLock.
+    // Reorg handling calls this from inside addBlock (which holds the lock) -- re-locking
+    // the non-recursive m_accessLock on the same thread would deadlock.
     bool Core::addTransactionToPoolImpl(CachedTransaction &&cachedTransaction)
     {
         const auto transactionHash = cachedTransaction.getTransactionHash();
@@ -2859,19 +2848,9 @@ namespace cryptonote
     {
         IBlockchainCache *chain = findSegmentContainingBlock(blockHash);
 
-        // doBuildSparseChain is only ever reached through buildSparseChain(),
-        // which passes the current top block hash. Resolving that hash back to an
-        // index goes through a reverse lookup (DatabaseBlockchainCache::getBlockIndex
-        // -> getBlockIndexesByBlockHashes().at()). If the tip's reverse-index entry
-        // is missing or corrupt -- e.g. a block whose forward record (index->block)
-        // was persisted but whose hash->index record was not, after an unclean
-        // shutdown or disk-full event -- that .at() throws std::out_of_range straight
-        // out of start_sync. That exception tears down every outbound peer the
-        // instant synchronization begins, so the node stays connected but can never
-        // advance: a permanent sync wedge. The forward direction (getTopBlockIndex /
-        // getBlockHash) stays intact in that case, so recover by falling back to the
-        // main-chain leaf's authoritative top index instead of letting the exception
-        // escape and stall the node.
+        // The tip's reverse hash->index entry can be missing/corrupt after an unclean
+        // shutdown; fall back to the leaf's top index so a getBlockIndex throw here can't
+        // escape start_sync and wedge sync against every peer.
         uint32_t blockIndex;
         if (chain == nullptr)
         {

@@ -288,9 +288,7 @@ namespace cryptonote
         void huginCleaningProcedure();
         void updateBlockMedianSize();
         bool addTransactionToPool(CachedTransaction &&cachedTransaction);
-        // Lock-free body of addTransactionToPool: the caller MUST already hold m_accessLock
-        // exclusively. Used by reorg handling that runs inside addBlock (under the write
-        // lock) so it does not re-acquire the non-recursive lock and self-deadlock.
+        // Lock-free addTransactionToPool; caller must hold m_accessLock (see core.cpp).
         bool addTransactionToPoolImpl(CachedTransaction &&cachedTransaction);
         bool isTransactionValidForPool(const CachedTransaction &cachedTransaction, TransactionValidatorState &validatorState);
 
