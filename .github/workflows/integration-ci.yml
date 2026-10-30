@@ -53,8 +53,8 @@ jobs:
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew update
-          brew install boost cmake ccache
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install boost
 
       # Restore the vcpkg binary cache so Boost is built from source only once;
       # later runs restore the prebuilt packages and skip the ~30 github.com
