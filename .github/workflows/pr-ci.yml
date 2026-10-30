@@ -57,6 +57,7 @@ jobs:
           mkdir -p build && cd build
           cmake -DBoost_ARCHITECTURE=-x64 ..
           make -j$(nproc)
+          strip --strip-debug src/kryptokronad src/xkrwallet src/kryptokrona-service src/miner src/wallet-api
 
       - name: Build macOS Target
         if: runner.os == 'macOS'
@@ -64,6 +65,7 @@ jobs:
           mkdir -p build && cd build
           cmake ..
           make -j$(sysctl -n hw.ncpu)
+          strip -S src/kryptokronad src/xkrwallet src/kryptokrona-service src/miner src/wallet-api
 
       # Restore the vcpkg binary cache so Boost is built from source only once;
       # later runs restore the prebuilt packages and skip the ~30 github.com
