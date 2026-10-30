@@ -189,7 +189,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: kryptokrona/xkr-swap-core
-          ref: kryptokrona-port
+          ref: master
           path: xkr-swap-core
 
       - name: Install build dependencies
