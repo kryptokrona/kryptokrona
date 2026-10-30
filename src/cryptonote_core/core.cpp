@@ -478,9 +478,18 @@ namespace cryptonote
             if (mainChainSet.count(alt) != 0)
                 break;
             auto transactions = alt->getRawTransactions(alt->getTransactionHashes());
-            for (auto &transaction : transactions)
+            for (auto &transactionBinaryArray : transactions)
             {
-                if (addTransactionToPool(std::move(transaction)))
+                Transaction transaction;
+                if (!fromBinaryArray<Transaction>(transaction, transactionBinaryArray))
+                {
+                    logger(logging::WARNING) << "copyTransactionsToPool: couldn't deserialize transaction, skipping";
+                    continue;
+                }
+
+                // Called from addBlock under m_accessLock: use the lock-free variant so we
+                // don't re-acquire the (non-recursive) write lock on this thread and deadlock.
+                if (addTransactionToPoolImpl(CachedTransaction(std::move(transaction))))
                 {
                     // TODO: send notification
                 }
@@ -1452,7 +1461,8 @@ namespace cryptonote
             auto tx = pool.getTransaction(hash);
             pool.removeTransaction(hash);
 
-            if (!addTransactionToPool(std::move(tx)))
+            // Called from addBlock under m_accessLock: use the lock-free variant.
+            if (!addTransactionToPoolImpl(std::move(tx)))
             {
                 notifyObservers(makeDelTransactionMessage({hash}, Messages::DeleteTransaction::Reason::NotActual));
             }
@@ -1761,6 +1771,23 @@ namespace cryptonote
         // with RPC read handlers that read the pool/chain under a shared lock. This is the
         // funnel for both the BinaryArray overload and network transactions.
         std::unique_lock<WriterPreferringSharedMutex> writeLock(m_accessLock);
+        return addTransactionToPoolImpl(std::move(cachedTransaction));
+    }
+
+    // Lock-free body of addTransactionToPool. The caller MUST already hold m_accessLock
+    // exclusively.
+    //
+    // Reorg handling (actualizePoolTransactions / copyTransactionsToPool) re-adds
+    // transactions to the pool from inside addBlock, which already holds the write lock.
+    // Calling the public addTransactionToPool there would re-acquire the (non-recursive,
+    // writer-preferring) m_accessLock on the same thread and deadlock: lock() waits for
+    // m_activeWriter to clear, but this very thread is the active writer, so it hangs
+    // forever. Symptom: the daemon freezes at startup while resolving a fork, right after
+    // logging "removeTransaction: transaction not found", with no further output. Those
+    // callers use this lock-free variant instead.
+    bool Core::addTransactionToPoolImpl(CachedTransaction &&cachedTransaction)
+    {
+        const auto transactionHash = cachedTransaction.getTransactionHash();
         TransactionValidatorState validatorState;
 
         /* If the transaction is already in the pool, then checking it again
