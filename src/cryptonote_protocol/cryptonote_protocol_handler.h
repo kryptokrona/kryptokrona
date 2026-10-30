@@ -59,6 +59,8 @@ namespace cryptonote
         virtual uint32_t getObservedHeight() const override;
         virtual uint32_t getBlockchainHeight() const override;
         void requestMissingPoolTransactions(const CryptoNoteConnectionContext &context);
+        // Our local chain height. Public for the NodeServer sync-stall diagnostics.
+        uint32_t get_current_blockchain_height();
 
     private:
         //----------------- commands handlers ----------------------------------------------
@@ -77,7 +79,6 @@ namespace cryptonote
         virtual void relayTransactions(const std::vector<BinaryArray> &transactions) override;
 
         //----------------------------------------------------------------------------------
-        uint32_t get_current_blockchain_height();
         bool request_missing_objects(CryptoNoteConnectionContext &context, bool check_having_blocks);
         bool on_connection_synchronized();
         void updateObservedHeight(uint32_t peerHeight, const CryptoNoteConnectionContext &context);

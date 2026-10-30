@@ -58,8 +58,8 @@ jobs:
       - name: "Install macOS Dependencies"
         if: runner.os == 'macOS'
         run: |
-          brew update
-          brew install boost cmake ccache
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          brew install boost
 
       # ---------------- Ubuntu build ----------------
       - name: Build Ubuntu Target
@@ -68,6 +68,7 @@ jobs:
           mkdir -p build && cd build
           cmake -DBoost_ARCHITECTURE=-x64 ..
           make -j$(nproc)
+          strip --strip-debug src/kryptokronad src/xkrwallet src/kryptokrona-service src/miner src/wallet-api
 
       # ---------------- macOS build (Apple Silicon) ----------------
       - name: Build macOS Target
@@ -76,6 +77,7 @@ jobs:
           mkdir -p build && cd build
           cmake ..
           make -j$(sysctl -n hw.ncpu)
+          strip -S src/kryptokronad src/xkrwallet src/kryptokrona-service src/miner src/wallet-api
 
       # ---------------- macOS code signing + notarization ----------------
       # Signs each binary with a Developer ID certificate (hardened runtime +

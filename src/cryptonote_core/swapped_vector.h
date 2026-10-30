@@ -22,6 +22,66 @@
 #include "serialization/binary_input_stream_serializer.h"
 #include "serialization/binary_output_stream_serializer.h"
 
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+#else
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+
+// Crash-safety helpers for the on-disk main-chain storage (blocks.bin /
+// blockindexes.bin). The vector is durable across an *unclean* process exit
+// (segfault / SIGKILL) as long as each block's data + index entry reach the OS
+// page cache before its count header does, and the files are fsync'd on a
+// cadence so a power loss can only ever lose a re-syncable tail. See push_back.
+namespace swapped_vector_detail
+{
+    // Open a second descriptor to an existing file purely so we can fdatasync
+    // the underlying inode without disturbing the std::fstream read/write state.
+    inline int platformOpenRW(const std::string &name)
+    {
+#ifdef _WIN32
+        return _open(name.c_str(), _O_RDWR | _O_BINARY);
+#else
+        return ::open(name.c_str(), O_RDWR);
+#endif
+    }
+
+    inline void platformSync(int fd)
+    {
+        if (fd < 0)
+        {
+            return;
+        }
+#ifdef _WIN32
+        _commit(fd);
+#else
+        // fsync (not fdatasync) for portability: macOS has no fdatasync. The
+        // extra metadata sync is negligible at DISK_SYNC_INTERVAL cadence.
+        fsync(fd);
+#endif
+    }
+
+    inline void platformClose(int fd)
+    {
+        if (fd < 0)
+        {
+            return;
+        }
+#ifdef _WIN32
+        _close(fd);
+#else
+        ::close(fd);
+#endif
+    }
+
+    // Force pending blocks to disk at least this often (in push/pop operations).
+    // Consistency (openability) is preserved every block by ordered flushes;
+    // this bound only limits how many blocks a power loss can discard.
+    const uint64_t DISK_SYNC_INTERVAL = 100;
+}
+
 template <class T>
 class SwappedVector
 {
@@ -204,11 +264,19 @@ private:
     uint64_t m_cacheHits;
     uint64_t m_cacheMisses;
 
+    // Crash-safety: companion descriptors used only for fdatasync, plus a
+    // counter that triggers a durable sync every DISK_SYNC_INTERVAL writes.
+    int m_itemsSyncFd;
+    int m_indexesSyncFd;
+    uint64_t m_pendingSync;
+
     T *prepare(uint64_t index);
+    // Flush the fstream buffers to the OS and fdatasync both files to disk.
+    void syncToDisk();
 };
 
 template <class T>
-SwappedVector<T>::SwappedVector()
+SwappedVector<T>::SwappedVector() : m_itemsSyncFd(-1), m_indexesSyncFd(-1), m_pendingSync(0)
 {
 }
 
@@ -225,6 +293,13 @@ bool SwappedVector<T>::open(const std::string &itemFileName, const std::string &
     {
         return false;
     }
+
+    // Drop any descriptors left over from a previous open() on this instance.
+    swapped_vector_detail::platformClose(m_itemsSyncFd);
+    swapped_vector_detail::platformClose(m_indexesSyncFd);
+    m_itemsSyncFd = -1;
+    m_indexesSyncFd = -1;
+    m_pendingSync = 0;
 
     m_itemsFile.open(itemFileName, std::ios::in | std::ios::out | std::ios::binary);
     m_indexesFile.open(indexFileName, std::ios::in | std::ios::out | std::ios::binary);
@@ -245,7 +320,15 @@ bool SwappedVector<T>::open(const std::string &itemFileName, const std::string &
             m_indexesFile.read(reinterpret_cast<char *>(&itemSize), sizeof itemSize);
             if (!m_indexesFile)
             {
-                return false;
+                // Self-healing: an unclean exit can leave the count header ahead
+                // of the index entries that were actually persisted. Rather than
+                // refusing to boot ("Failed to load main chain storage"), keep the
+                // blocks we can read and let the daemon re-sync the torn tail from
+                // peers. The stale on-disk count is overwritten by the next push.
+                std::cerr << "SwappedVector: index truncated at entry " << i << " of " << count
+                          << "; recovering with " << i << " blocks and re-syncing the rest." << std::endl;
+                m_indexesFile.clear();
+                break;
             }
 
             offsets.emplace_back(itemsFileSize);
@@ -274,6 +357,10 @@ bool SwappedVector<T>::open(const std::string &itemFileName, const std::string &
         m_itemsFileSize = 0;
     }
 
+    // Companion descriptors for durable fdatasync (both files now exist).
+    m_itemsSyncFd = swapped_vector_detail::platformOpenRW(itemFileName);
+    m_indexesSyncFd = swapped_vector_detail::platformOpenRW(indexFileName);
+
     m_poolSize = poolSize;
     m_items.clear();
     m_cache.clear();
@@ -285,6 +372,45 @@ bool SwappedVector<T>::open(const std::string &itemFileName, const std::string &
 template <class T>
 void SwappedVector<T>::close()
 {
+    // A no-op previously: on an unclean exit nothing was ever flushed. Make a
+    // clean close fully durable and release the companion descriptors.
+    syncToDisk();
+
+    if (m_itemsFile.is_open())
+    {
+        m_itemsFile.close();
+    }
+
+    if (m_indexesFile.is_open())
+    {
+        m_indexesFile.close();
+    }
+
+    swapped_vector_detail::platformClose(m_itemsSyncFd);
+    swapped_vector_detail::platformClose(m_indexesSyncFd);
+    m_itemsSyncFd = -1;
+    m_indexesSyncFd = -1;
+}
+
+template <class T>
+void SwappedVector<T>::syncToDisk()
+{
+    // Push fstream buffers into the OS page cache, then force both files to
+    // stable storage. Items are synced before indexes so the on-disk state can
+    // never reference block data that has not yet been persisted.
+    if (m_itemsFile.is_open())
+    {
+        m_itemsFile.flush();
+    }
+
+    if (m_indexesFile.is_open())
+    {
+        m_indexesFile.flush();
+    }
+
+    swapped_vector_detail::platformSync(m_itemsSyncFd);
+    swapped_vector_detail::platformSync(m_indexesSyncFd);
+    m_pendingSync = 0;
 }
 
 template <class T>
@@ -377,6 +503,8 @@ void SwappedVector<T>::clear()
         throw std::runtime_error("SwappedVector::clear");
     }
 
+    syncToDisk();
+
     m_offsets.clear();
     m_itemsFileSize = 0;
     m_items.clear();
@@ -397,6 +525,14 @@ void SwappedVector<T>::pop_back()
     if (!m_indexesFile)
     {
         throw std::runtime_error("SwappedVector::pop_back");
+    }
+
+    // Lowering the count is always consistent on its own; flush it out and sync
+    // on the usual cadence.
+    m_indexesFile.flush();
+    if (++m_pendingSync >= swapped_vector_detail::DISK_SYNC_INTERVAL)
+    {
+        syncToDisk();
     }
 
     m_itemsFileSize = m_offsets.back();
@@ -427,6 +563,10 @@ void SwappedVector<T>::push_back(const T &item)
         serialize(const_cast<T &>(item), archive);
 
         itemsFileSize = m_itemsFile.tellp();
+
+        // Barrier 1: the block data must reach the OS before anything in the
+        // index references it, so a crash can never leave a dangling entry.
+        m_itemsFile.flush();
     }
 
     {
@@ -443,6 +583,11 @@ void SwappedVector<T>::push_back(const T &item)
             throw std::runtime_error("SwappedVector::push_back");
         }
 
+        // Barrier 2: the size entry must reach the OS before the count header
+        // that will make it live. This is what guarantees count <= entries on
+        // disk after any unclean exit, so open() always succeeds.
+        m_indexesFile.flush();
+
         m_indexesFile.seekp(0);
         uint64_t count = m_offsets.size() + 1;
         m_indexesFile.write(reinterpret_cast<char *>(&count), sizeof count);
@@ -450,10 +595,18 @@ void SwappedVector<T>::push_back(const T &item)
         {
             throw std::runtime_error("SwappedVector::push_back");
         }
+
+        // Commit the new count.
+        m_indexesFile.flush();
     }
 
     m_offsets.push_back(m_itemsFileSize);
     m_itemsFileSize = itemsFileSize;
+
+    if (++m_pendingSync >= swapped_vector_detail::DISK_SYNC_INTERVAL)
+    {
+        syncToDisk();
+    }
 
     T *newItem = prepare(m_offsets.size() - 1);
     *newItem = item;

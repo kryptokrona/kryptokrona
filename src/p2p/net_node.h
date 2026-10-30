@@ -173,6 +173,11 @@ namespace cryptonote
         bool handleConfig(const NetNodeConfig &config);
         bool append_net_address(std::vector<NetworkAddress> &nodes, const std::string &addr);
         bool idle_worker();
+        // [SYNC-DIAG] Periodic, gated, throttled dump of the sync picture (our
+        // height vs observed, and every connection's state/peer-height) when the
+        // node is behind -- for diagnosing the sync-stall freeze.
+        void logSyncDiagnostics();
+        time_t m_lastSyncDiagLog = 0;
         bool handle_remote_peerlist(const std::list<PeerlistEntry> &peerlist, time_t local_time, const CryptoNoteConnectionContext &context);
         bool get_local_node_data(basic_node_data &node_data);
 

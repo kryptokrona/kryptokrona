@@ -307,6 +307,17 @@ namespace cryptonote
 
         throwIfNotInitialized();
 
+        // Runtime bounds check: the asserts above are compiled out in release,
+        // so an out-of-range index (e.g. a block-explorer RPC asking for a
+        // height at/above the tip on a lagging node) would otherwise read past
+        // the block vector and segfault. Throw instead so callers can report it.
+        if (chainsLeaves.empty() || blockIndex > getTopBlockIndex())
+        {
+            throw std::runtime_error(
+                "getBlockHashByIndex: block index " + std::to_string(blockIndex)
+                + " is out of range (top block index is " + std::to_string(getTopBlockIndex()) + ")");
+        }
+
         return chainsLeaves[0]->getBlockHash(blockIndex);
     }
 
@@ -318,8 +329,22 @@ namespace cryptonote
 
         throwIfNotInitialized();
 
+        // Runtime bounds check (the assert above is compiled out in release):
+        // an out-of-range index makes getLastTimestamps return empty and the
+        // timestamps[0] access below would then read out of bounds and segfault.
+        if (blockIndex > getTopBlockIndex())
+        {
+            throw std::runtime_error(
+                "getBlockTimestampByIndex: block index " + std::to_string(blockIndex)
+                + " is out of range (top block index is " + std::to_string(getTopBlockIndex()) + ")");
+        }
+
         auto timestamps = chainsLeaves[0]->getLastTimestamps(1, blockIndex, addGenesisBlock);
-        assert(!(timestamps.size() == 1));
+        if (timestamps.empty())
+        {
+            throw std::runtime_error(
+                "getBlockTimestampByIndex: no timestamp for block index " + std::to_string(blockIndex));
+        }
 
         return timestamps[0];
     }
@@ -337,8 +362,22 @@ namespace cryptonote
         assert(index <= getTopBlockIndex());
 
         throwIfNotInitialized();
+
+        // Runtime bounds check (the assert above is compiled out in release):
+        // an out-of-range index yields a null segment below and would segfault.
+        if (index > getTopBlockIndex())
+        {
+            throw std::runtime_error(
+                "getBlockByIndex: block index " + std::to_string(index)
+                + " is out of range (top block index is " + std::to_string(getTopBlockIndex()) + ")");
+        }
+
         IBlockchainCache *segment = findMainChainSegmentContainingBlock(index);
-        assert(segment != nullptr);
+        if (segment == nullptr)
+        {
+            throw std::runtime_error(
+                "getBlockByIndex: no blockchain segment contains block index " + std::to_string(index));
+        }
 
         return restoreBlockTemplate(segment, index);
     }
@@ -439,9 +478,16 @@ namespace cryptonote
             if (mainChainSet.count(alt) != 0)
                 break;
             auto transactions = alt->getRawTransactions(alt->getTransactionHashes());
-            for (auto &transaction : transactions)
+            for (auto &transactionBinaryArray : transactions)
             {
-                if (addTransactionToPool(std::move(transaction)))
+                Transaction transaction;
+                if (!fromBinaryArray<Transaction>(transaction, transactionBinaryArray))
+                {
+                    logger(logging::WARNING) << "copyTransactionsToPool: couldn't deserialize transaction, skipping";
+                    continue;
+                }
+
+                if (addTransactionToPoolImpl(CachedTransaction(std::move(transaction))))
                 {
                     // TODO: send notification
                 }
@@ -1091,7 +1137,7 @@ namespace cryptonote
         // indexes, caches) that concurrent RPC read handlers traverse under a shared lock,
         // so block writes must be exclusive against them. This is the single funnel for all
         // block additions (network blocks and submitBlock), so locking here covers writes.
-        std::unique_lock<std::shared_mutex> writeLock(m_accessLock);
+        std::unique_lock<WriterPreferringSharedMutex> writeLock(m_accessLock);
         uint32_t blockIndex = cachedBlock.getBlockIndex();
         crypto::Hash blockHash = cachedBlock.getBlockHash();
         std::ostringstream os;
@@ -1413,7 +1459,7 @@ namespace cryptonote
             auto tx = pool.getTransaction(hash);
             pool.removeTransaction(hash);
 
-            if (!addTransactionToPool(std::move(tx)))
+            if (!addTransactionToPoolImpl(std::move(tx)))
             {
                 notifyObservers(makeDelTransactionMessage({hash}, Messages::DeleteTransaction::Reason::NotActual));
             }
@@ -1721,7 +1767,16 @@ namespace cryptonote
         // Exclusive write lock: mutating the pool (and validating against the chain) races
         // with RPC read handlers that read the pool/chain under a shared lock. This is the
         // funnel for both the BinaryArray overload and network transactions.
-        std::unique_lock<std::shared_mutex> writeLock(m_accessLock);
+        std::unique_lock<WriterPreferringSharedMutex> writeLock(m_accessLock);
+        return addTransactionToPoolImpl(std::move(cachedTransaction));
+    }
+
+    // Lock-free body of addTransactionToPool; caller MUST already hold m_accessLock.
+    // Reorg handling calls this from inside addBlock (which holds the lock) -- re-locking
+    // the non-recursive m_accessLock on the same thread would deadlock.
+    bool Core::addTransactionToPoolImpl(CachedTransaction &&cachedTransaction)
+    {
+        const auto transactionHash = cachedTransaction.getTransactionHash();
         TransactionValidatorState validatorState;
 
         /* If the transaction is already in the pool, then checking it again
@@ -2767,6 +2822,17 @@ namespace cryptonote
 
     BlockTemplate Core::restoreBlockTemplate(IBlockchainCache *blockchainCache, uint32_t blockIndex) const
     {
+        // Defensive null check: callers obtain the segment from a lookup that
+        // returns nullptr when no chain segment holds blockIndex (out-of-range
+        // index, or a segment boundary shifting under a concurrent reader). The
+        // asserts in those callers are compiled out in release, so without this
+        // a null segment would be dereferenced here and segfault.
+        if (blockchainCache == nullptr)
+        {
+            throw std::runtime_error(
+                "restoreBlockTemplate: no blockchain segment contains block index " + std::to_string(blockIndex));
+        }
+
         RawBlock rawBlock = blockchainCache->getBlockByIndex(blockIndex);
 
         BlockTemplate block;
@@ -2782,7 +2848,30 @@ namespace cryptonote
     {
         IBlockchainCache *chain = findSegmentContainingBlock(blockHash);
 
-        uint32_t blockIndex = chain->getBlockIndex(blockHash);
+        // The tip's reverse hash->index entry can be missing/corrupt after an unclean
+        // shutdown; fall back to the leaf's top index so a getBlockIndex throw here can't
+        // escape start_sync and wedge sync against every peer.
+        uint32_t blockIndex;
+        if (chain == nullptr)
+        {
+            chain = chainsLeaves[0];
+            blockIndex = chain->getTopBlockIndex();
+        }
+        else
+        {
+            try
+            {
+                blockIndex = chain->getBlockIndex(blockHash);
+            }
+            catch (const std::out_of_range &)
+            {
+                logger(logging::WARNING)
+                    << "doBuildSparseChain: reverse hash->index lookup failed for tip "
+                    << blockHash << "; falling back to leaf top index so sync can proceed";
+                chain = chainsLeaves[0];
+                blockIndex = chain->getTopBlockIndex();
+            }
+        }
 
         // TODO reserve ceil(log(blockIndex))
         std::vector<crypto::Hash> sparseChain;
