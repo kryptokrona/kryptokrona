@@ -285,7 +285,8 @@ ok "funder available balance: $(service_rpc "$FUNDER_PORT" getBalance '{}' | jso
 # 4. Start the XKR wallet JS RPC service against the node
 # ----------------------------------------------------------------------------
 log "Starting xkr-wallet-rpc.cjs service"
-"$NODE_BIN" "$XKR_RPC_SERVICE" --port "$XKR_RPC_PORT" --daemon "127.0.0.1:$NODE_RPC" \
+# mixin 0: this throwaway testnet has no ring decoys for the lock denomination
+XKR_SWAP_MIXIN=0 "$NODE_BIN" "$XKR_RPC_SERVICE" --port "$XKR_RPC_PORT" --daemon "127.0.0.1:$NODE_RPC" \
     > "$WORK/xkr-rpc.log" 2>&1 &
 PIDS+=($!)
 xkr_up() { xkr_rpc ping '{}' | grep -q 'pong'; }
